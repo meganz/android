@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.mega"
+    android:installLocation="auto"
+    android:versionCode="1593"
+    android:versionName="1.5.10.2" >
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="19" />
+
+    <supports-screens android:resizeable="true"
+              android:smallScreens="true"
+              android:normalScreens="true"
+              android:largeScreens="true"
+              android:xlargeScreens="true"
+              android:anyDensity="true"/>
+    
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="MEGA_COM"
+        android:theme="@style/Theme.mega" >
+        
+        <activity
+            android:name="TourActivity"
+            android:label="@string/login_activity"
+            android:launchMode="singleTop" 
+            android:theme="@style/login_activity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="LoginActivity"
+            android:theme="@style/login_activity"
+            android:label="@string/login_activity" 
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden" >            
+        </activity>    
+
+        <activity
+            android:name="ManagerActivity"
+            android:label="@string/manager_activity"
+            android:launchMode="singleTop"
+            android:uiOptions="splitActionBarWhenNarrow" >            
+        </activity>     
+        
+        <activity
+            android:name="CreateAccountActivity"
+            android:label="@string/create_account_activity"
+            android:theme="@style/login_activity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden" >
+        </activity>
+    </application>
+
+</manifest>

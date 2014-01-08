@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="standard_margin">10dp</dimen>
+    <dimen name="standard_margin_double">20dp</dimen>
+    <dimen name="standard_margin_half">5dp</dimen>
+    <dimen name="thumb_size">60dp</dimen>
+</resources>
