@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item android:bottom="0px" android:right="0px" android:top="0px" android:left="0px">
+     <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+        <!--   <gradient
+                android:startColor="#84b8b8b8"
+                android:centerColor="#84b8b8b8"
+                android:centerX="0.90"
+                android:endColor="#54ffffff"
+                android:angle="270"
+                android:dither="true" />     -->
+          <solid android:color="#b8b8b8" />
+          <corners android:radius="50dp" />
+        <!--   <padding android:padding="5dp"/> -->
+    </shape>
+</item>
+<!-- 
+<item android:bottom="0px" android:right="0px" android:top="0px" android:left="0px">
+     <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+          <gradient
+                android:startColor="#84b8b8b8"
+                android:centerColor="#84b8b8b8"
+                android:centerY="0.95"
+                android:endColor="#22ffffff"
+                android:angle="0"
+                android:dither="true" />    
+          <corners android:radius="14dp" />
+          <padding android:padding="5dp"/>
+    </shape>
+</item>
+ 
+<item android:bottom="1dp" android:right="1dp" android:top="0px" android:left="0px">
+     <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+          <gradient
+                android:startColor="#84b8b8b8"
+                android:centerColor="#84b8b8b8"
+                android:centerX="0.90"
+                android:endColor="#55000000"
+                android:angle="90"
+                android:dither="true" />    
+          <corners android:radius="14dp" />
+          <padding android:padding="5dp"/>
+
+    </shape>
+</item>
+
+<item android:bottom="1dp" android:right="1dp" android:top="0px" android:left="0px">
+     <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+          <gradient
+                android:startColor="#84b8b8b8"
+                android:centerColor="#84b8b8b8"
+                android:centerY="0.93"
+                android:endColor="#88000000"
+                android:angle="180"
+                android:dither="true" />    
+          <corners android:radius="14dp" />
+    </shape>
+</item>
+ -->
+</layer-list>
+
+

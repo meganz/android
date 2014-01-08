@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="pressed_mega">#CCcc0000</color>
+    <color name="button_text">#ffffff</color>
+    <color name="text_secondary">#7a7a7a</color>
+    <color name="background">#ffffff</color>
+    <color name="background_secondary">#eeeeee</color>
+    <color name="mega">#db0605</color>
+    <color name="text_login">#333333</color>
+</resources>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="MySwitch">
+        <!-- Drawable to use as the "thumb" that switches back and forth. -->
+        <attr name="thumb"  format="reference"/>
+        <!-- Drawable to use as the "track" that the switch thumb slides within. -->
+        <attr name="track" format="reference" />
+        <!-- Text to use when the switch is in the checked/"on" state. -->
+        <attr name="textOn" format="reference|string" />
+        <!-- Text to use when the switch is in the unchecked/"off" state. -->
+        <attr name="textOff" format="reference|string" />
+        
+        <!-- drawablw to use when the switch is in the checked/"on" state. -->
+        <attr name="drawableOn" format="reference" />
+        <!-- drawablw to use when the switch is in the unchecked/"off" state. -->
+        <attr name="drawableOff" format="reference" />
+        
+        <!-- if the switch should operate like iOS UISwitch -->
+        <attr name="pushStyle" format="boolean" />
+        <!-- if text should be drawn on the Thumb or On the track. -->
+        <attr name="textOnThumb" format="boolean" />
+        <!-- if the thumb should be allowed to move more beyond the switch boundaries -->
+        <attr name="thumbExtraMovement" format="dimension" />
+        <!-- Amount of padding on either side of text within the switch thumb. -->
+        <attr name="thumbTextPadding" format="dimension" />
+        <!-- Amount of padding on either side of text within the switch track. -->
+        <attr name="trackTextPadding" format="dimension" />
+        <!-- TextAppearance style for text displayed on the switch thumb. -->
+        <attr name="switchTextAppearanceAttrib" format="reference" />
+        <!-- Minimum width for the switch component -->
+        <attr name="switchMinWidth" format="dimension" />
+        <!-- Minimum height for the switch component -->
+        <attr name="switchMinHeight" format="dimension" />
+        <!-- Minimum space between the switch and caption text -->
+        <attr name="switchPadding" format="dimension" />
+        
+        <attr name="orientation" >
+            <!-- the switch moves only on the x-axis(horizontally) -->
+            <enum name="horizontal" value="1" />
+            <!-- the switch moves only on the y-axis(vertically) -->
+            <enum name="vertical" value="0" />
+        </attr>
+        
+        <!-- the track drawable will be drawn on top of these background. So if
+             these back grounds were to be visible, the track has to have transparency -->
+        <!-- The background when left side of the switch is visible -->
+        <attr name="leftBackground" format="reference"/>
+        
+        <!-- The background when right side of the switch is visible -->
+        <attr name="rightBackground" format="reference"/>
+        
+        <!-- We need a mask drawable to mask the background, then draw the track -->
+        <attr name="backgroundMask" format="reference"/>
+    </declare-styleable>
+    
+    <declare-styleable name="mySwitchTextAppearanceAttrib">
+        <!-- Text color. -->
+        <attr name="textColor" format="color" />
+        <!-- Size of the text. Recommended dimension type for text is "sp" for scaled-pixels (example: 15sp). -->
+        <attr name="textSize"  format="dimension" />
+        <!-- Style (bold, italic, bolditalic) for the text. -->
+        <attr name="textStyle" >
+            <flag name="normal" value="0" />
+            <flag name="bold" value="1" />
+            <flag name="italic" value="2" />
+        </attr>
+        
+        <!-- Typeface (normal, sans, serif, monospace) for the text. -->
+        <attr name="typeface" format="reference">
+            <enum name="normal" value="0" />
+            <enum name="sans" value="1" />
+            <enum name="serif" value="2" />
+            <enum name="monospace" value="3" />
+        </attr>
+        <!-- Color of the text selection highlight. -->
+        <attr name="textColorHighlight" format="color" />
+        <!-- Color of the hint text. -->
+        <attr name="textColorHint" format="color" />
+        <!-- Color of the links. -->
+        <attr name="textColorLink" format="color" />
+    </declare-styleable>
+    <!-- Default style for the Switch widget. -->
+    <attr name="mySwitchStyleAttr" format="reference" />
+</resources>
