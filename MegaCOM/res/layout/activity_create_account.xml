@@ -74,14 +74,16 @@
 				        android:gravity="left|center_vertical" />
 		            
 		            <TextView
+		                android:id="@+id/tos"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
-	                    android:text="@string/tos1" 
+	                    android:text="@string/tos" 
 	                    android:gravity="left|center_vertical"
 	                    android:layout_marginTop="5dp"
-	                    android:layout_marginBottom="5dp" />
+	                    android:layout_marginBottom="5dp"
+	                    android:linksClickable="true" />
 		    
-		    		<TextView
+		    		<!-- <TextView
 	                    android:id="@+id/terms"
 	                    android:layout_width="wrap_content"
 	                    android:layout_height="wrap_content"
@@ -89,7 +91,7 @@
 	                    android:textColor="@color/mega" 
 	                    android:gravity="left|center_vertical"
 	                    android:layout_marginTop="5dp"
-	                    android:layout_marginBottom="5dp" />
+	                    android:layout_marginBottom="5dp" /> -->
 		        </TableRow>		        
 		    </TableLayout>
 		           
