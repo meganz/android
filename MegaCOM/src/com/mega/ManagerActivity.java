@@ -1,5 +1,15 @@
 package com.mega;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Shader.TileMode;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -11,11 +21,34 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ManagerActivity extends ActionBarActivity {
+	
+	public enum DrawerItem {
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
+
+		public String getTitle(Context context) {
+			switch(this)
+			{
+				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
+				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline);
+				case SHARED_WITH_ME: return context.getString(R.string.section_shared_with_me);
+				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
+				case CONTACTS: return context.getString(R.string.section_contacts);
+				case IMAGE_VIEWER: return context.getString(R.string.section_image_viewer);
+				case TRANSFERS: return context.getString(R.string.section_transfers);
+				case ACCOUNT: return context.getString(R.string.section_account);
+			}
+			return null;
+		}
+	}
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -29,9 +62,91 @@ public class ManagerActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manager);	
 		
+		ImageView imageProfile = (ImageView) findViewById(R.id.profile_photo);
+		Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
+		Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+		BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+        Paint paint = new Paint();
+        paint.setShader(shader);
+
+        Canvas c = new Canvas(circleBitmap);
+	    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, imBitmap.getWidth()/2, paint);
+        imageProfile.setImageBitmap(circleBitmap);
+		
 		mTitle = mDrawerTitle = getTitle();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+        
+        final float scale = getResources().getDisplayMetrics().density;
+        
+//        ImageView barStructure = (ImageView) findViewById(R.id.bar_structure);
+//        ImageView barFill = (ImageView) findViewById(R.id.bar_fill);
+//        
+//        Bitmap barSBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bar_structure);
+//        Bitmap barFBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bar_fill);
+//        
+//        barStructure.setImageBitmap(barSBitmap);
+//        int pixels = (int) (260 * scale + 0.5f);
+//        barStructure.getLayoutParams().width = pixels;
+//        pixels =  (int) (10 * scale + 0.5f);
+//        barStructure.getLayoutParams().height = pixels;
+//        
+//        barFill.setImageBitmap(barFBitmap);
+//        pixels = (int) (150 * scale + 0.5f);
+//        barStructure.getLayoutParams().width = pixels;
+//        pixels =  (int) (6 * scale + 0.5f);
+//        barStructure.getLayoutParams().height = pixels;
+        
+        
+        List<String> items = new ArrayList<String>();
+		for (DrawerItem item : DrawerItem.values()) {
+			items.add(item.getTitle(this));
+		}
+		
+//		View header = getLayoutInflater().inflate(R.layout.drawer_list_header, null);
+//		View footer = getLayoutInflater().inflate(R.layout.drawer_list_footer, null);
+//		
+//		mDrawerList.addHeaderView(header);
+//		mDrawerList.addFooterView(footer);
+        
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+				R.layout.drawer_list_item, items)
+				{
+					public View getView(int position, View rowView, ViewGroup parentView) {
+						TextView view = (TextView)super.getView(position, rowView, parentView);
+						switch(position)
+						{
+						case 0:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 1:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 2:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 3:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 4:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 5:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 6:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						case 7:
+							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+							break;
+						}
+						return view;
+					}
+				}
+				
+				);
                 
         getSupportActionBar().setIcon(R.drawable.ic_launcher);
         getSupportActionBar().setHomeButtonEnabled(true);
