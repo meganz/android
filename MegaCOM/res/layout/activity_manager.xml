@@ -62,8 +62,11 @@
             
             <ImageView
 		    android:id="@+id/profile_photo" 
-		    android:layout_width="80dp"
-		    android:layout_height="80dp"/>
+		    android:layout_width="55dp"
+		    android:layout_height="55dp"
+		    android:paddingLeft="5dp"
+		    android:paddingTop="5dp"
+		    android:paddingBottom="5dp" />
             
             <TableLayout 
                 android:layout_width="fill_parent"
@@ -80,9 +83,9 @@
                         android:layout_height="wrap_content"
                         android:text="User Name" 
                         android:textColor="#d2d2d2"
-                        android:paddingTop="10dp"
+                        android:paddingTop="5dp"
                         android:paddingLeft="10dp"
-                        android:textStyle="bold"/>
+                        android:textSize="18sp" />
 	            </TableRow>
 	            <TableRow
                     android:id="@+id/tableRow3"
@@ -92,9 +95,9 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:text="email@domain.com" 
-                        android:textColor="#d2d2d2"
+                        android:textColor="@color/color_mail_navigation_drawer"
                         android:paddingLeft="10dp"
-                        android:paddingBottom="10dp"/>
+                        android:paddingBottom="5dp"/>
 	            
 	            </TableRow>
                 
@@ -130,16 +133,19 @@
 	            android:text="Used Space" 
 	            android:textColor="#d2d2d2"
 	            android:paddingTop="10dp"
-	            android:paddingLeft="10dp" />
+	            android:paddingLeft="10dp"
+	            android:textSize="18sp"
+	            android:layout_gravity="left|bottom" />
 		    
 		    <TextView
+		        android:id="@+id/used_space"
 	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
-	            android:text="11 GB of 50 GB" 
+	            android:text="@string/used_space" 
 	            android:textColor="#d2d2d2"
 	            android:paddingTop="10dp"
 	            android:paddingRight="10dp"
-	            android:layout_gravity="right" />
+	            android:layout_gravity="right|bottom" />
             
         </TableRow>
         
@@ -151,10 +157,14 @@
                 
                 <ImageView
                     android:id="@+id/bar_structure"
-                    android:layout_width="270dp"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/bar_structure" />
+                    android:layout_gravity="center_vertical|left"
+                    android:src="@drawable/bar_structure" 
+                    android:paddingLeft="3dp" 
+                    android:paddingRight="3dp"
+                    android:paddingTop="3dp"
+                    android:paddingBottom="3dp"/>
                 
                 <ImageView
                     android:id="@+id/bar_fill"
@@ -162,9 +172,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical|left" 
                     android:src="@drawable/bar_fill"
-                    android:paddingLeft="2dp"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="10dp" />
+                    android:paddingLeft="5dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="10dp"
+                    android:layout_alignTop="@+id/bar_structure" />
                     
             </RelativeLayout>
         </TableRow>

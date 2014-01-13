@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.os.Bundle;
@@ -16,6 +17,10 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,8 +83,23 @@ public class ManagerActivity extends ActionBarActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         
-        final float scale = getResources().getDisplayMetrics().density;
+        TextView used_space = (TextView) findViewById(R.id.used_space);
+        String used = "11";
+        String total = "50";
         
+        String used_space_string = getString(R.string.used_space, used, total);
+        used_space.setText(used_space_string);
+        
+        Spannable wordtoSpan = new SpannableString(used_space_string);        
+
+        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.color_mail_navigation_drawer)), 6, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        used_space.setText(wordtoSpan);
+        
+//        final float scale = getResources().getDisplayMetrics().density;
+//        
 //        ImageView barStructure = (ImageView) findViewById(R.id.bar_structure);
 //        ImageView barFill = (ImageView) findViewById(R.id.bar_fill);
 //        

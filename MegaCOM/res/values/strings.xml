@@ -37,4 +37,5 @@
 	<string name="section_image_viewer">Image Viewer</string>
 	<string name="section_transfers">Transfers</string>
 	<string name="section_account">My Account</string>
+	<string name="used_space">%1$s GB of %2$s GB</string>
 </resources>
