@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -37,13 +38,148 @@
         android:text="@string/botonOcultarActionBar" />
 
 </RelativeLayout>
+
+<!-- THE DRAWER -->	
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="280dp"
+    android:layout_height="match_parent"
+    android:id="@+id/left_drawer"
+    android:layout_gravity="start"
+    android:background="#333333" >
+    
+    
+    <TableLayout 
+        android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		android:id="@+id/top_control_bar">
+		
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            
+            <ImageView
+		    android:id="@+id/profile_photo" 
+		    android:layout_width="80dp"
+		    android:layout_height="80dp"/>
+            
+            <TableLayout 
+                android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				android:id="@+id/table_right">
+			
+                <TableRow
+                    android:id="@+id/tableRow2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content">
+	            
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="User Name" 
+                        android:textColor="#d2d2d2"
+                        android:paddingTop="10dp"
+                        android:paddingLeft="10dp"
+                        android:textStyle="bold"/>
+	            </TableRow>
+	            <TableRow
+                    android:id="@+id/tableRow3"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:text="email@domain.com" 
+                        android:textColor="#d2d2d2"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="10dp"/>
+	            
+	            </TableRow>
+                
+            </TableLayout>
+            
+        </TableRow>
+		
+		
+		
+		<!--  <TextView 
+		    android:layout_width="280dp"
+		    android:layout_height="wrap_content"
+		    android:textAppearance="@android:style/TextAppearance.Medium"
+		    android:gravity="center_vertical"
+		    android:padding="10dp"
+		    android:drawableLeft="@drawable/ic_launcher"
+		    android:drawablePadding="10dp"
+		    android:textColor="#ff0000"
+		    android:text="PRUEBA" /> -->
+    </TableLayout>
+    
+    <TableLayout android:id="@+id/bottom_control_bar"
+		android:layout_width="fill_parent" 
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:stretchColumns="1">
+        
+        <TableRow>
+
+		    <TextView
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:text="Used Space" 
+	            android:textColor="#d2d2d2"
+	            android:paddingTop="10dp"
+	            android:paddingLeft="10dp" />
+		    
+		    <TextView
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:text="11 GB of 50 GB" 
+	            android:textColor="#d2d2d2"
+	            android:paddingTop="10dp"
+	            android:paddingRight="10dp"
+	            android:layout_gravity="right" />
+            
+        </TableRow>
+        
+        <TableRow>
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_span="2">
+                
+                <ImageView
+                    android:id="@+id/bar_structure"
+                    android:layout_width="270dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/bar_structure" />
+                
+                <ImageView
+                    android:id="@+id/bar_fill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|left" 
+                    android:src="@drawable/bar_fill"
+                    android:paddingLeft="2dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="10dp" />
+                    
+            </RelativeLayout>
+        </TableRow>
+		
+	</TableLayout>
 	
-	<ListView android:id="@+id/left_drawer"
-        android:layout_width="240dp"
+    <ListView android:id="@+id/left_drawer_list"
+        android:layout_width="280dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
         android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:background="#1e1e1e"/>
+        android:divider="#555555"
+        android:dividerHeight="1dp"
+        android:background="#333333"
+        android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar"/>
+</RelativeLayout>
+    
+	
 </android.support.v4.widget.DrawerLayout>
