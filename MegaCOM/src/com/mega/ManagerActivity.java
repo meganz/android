@@ -94,7 +94,7 @@ public class ManagerActivity extends ActionBarActivity {
 
         wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.color_mail_navigation_drawer)), 6, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), 6, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         used_space.setText(wordtoSpan);
         
@@ -176,8 +176,8 @@ public class ManagerActivity extends ActionBarActivity {
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
                 R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-                R.string.drawer_open,  /* "open drawer" description for accessibility */
-                R.string.drawer_close  /* "close drawer" description for accessibility */
+                R.string.app_name,  /* "open drawer" description for accessibility */
+                R.string.app_name  /* "close drawer" description for accessibility */
                 ) {
             public void onDrawerClosed(View view) {
                 supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
@@ -189,6 +189,11 @@ public class ManagerActivity extends ActionBarActivity {
         };
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        
+        
+        //FIRST FRAGMENT
+        FileBrowserListFragment fbF = new FileBrowserListFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbF).commit();
 
 	}
 	
@@ -205,18 +210,6 @@ public class ManagerActivity extends ActionBarActivity {
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
 	    return super.onCreateOptionsMenu(menu);
-	}
-	
-	public void onClickOcultar(View v){
-		ActionBar aB = this.getSupportActionBar();
-		aB.hide();
-	}
-	
-	public void onClickVer(View v){
-		ActionBar aB = this.getSupportActionBar();
-		if (!aB.isShowing())
-			aB.show();
-
 	}
 	
 	@Override

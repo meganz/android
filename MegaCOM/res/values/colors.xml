@@ -8,5 +8,8 @@
     <color name="mega">#db0605</color>
     <color name="text_login">#333333</color>
     <color name="used_space_OK">#1ea4e3</color>
-    <color name="color_mail_navigation_drawer">#858585</color>
+    <color name="navigation_drawer_mail">#858585</color>
+    <color name="navigation_drawer_text">#d2d2d2</color>
+    <color name="navigation_drawer_background">#333333</color>
+    <color name="navigation_drawer_divider">#555555</color>
 </resources>

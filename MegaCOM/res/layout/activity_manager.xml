@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -38,6 +38,12 @@
         android:text="@string/botonOcultarActionBar" />
 
 </RelativeLayout>
+-->
+
+<FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 <!-- THE DRAWER -->	
 
@@ -47,7 +53,7 @@
     android:layout_height="match_parent"
     android:id="@+id/left_drawer"
     android:layout_gravity="start"
-    android:background="#333333" >
+    android:background="@color/navigation_drawer_background" >
     
     
     <TableLayout 
@@ -82,7 +88,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:text="User Name" 
-                        android:textColor="#d2d2d2"
+                        android:textColor="@color/navigation_drawer_text"
                         android:paddingTop="5dp"
                         android:paddingLeft="10dp"
                         android:textSize="18sp" />
@@ -95,7 +101,7 @@
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:text="email@domain.com" 
-                        android:textColor="@color/color_mail_navigation_drawer"
+                        android:textColor="@color/navigation_drawer_mail"
                         android:paddingLeft="10dp"
                         android:paddingBottom="5dp"/>
 	            
@@ -131,7 +137,7 @@
 	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
 	            android:text="Used Space" 
-	            android:textColor="#d2d2d2"
+	            android:textColor="@color/navigation_drawer_text"
 	            android:paddingTop="10dp"
 	            android:paddingLeft="10dp"
 	            android:textSize="18sp"
@@ -142,7 +148,7 @@
 	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
 	            android:text="@string/used_space" 
-	            android:textColor="#d2d2d2"
+	            android:textColor="@color/navigation_drawer_text"
 	            android:paddingTop="10dp"
 	            android:paddingRight="10dp"
 	            android:layout_gravity="right|bottom" />
@@ -186,9 +192,9 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:choiceMode="singleChoice"
-        android:divider="#555555"
+        android:divider="@color/navigation_drawer_divider"
         android:dividerHeight="1dp"
-        android:background="#333333"
+        android:background="@color/navigation_drawer_background"
         android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar"/>
 </RelativeLayout>
     
