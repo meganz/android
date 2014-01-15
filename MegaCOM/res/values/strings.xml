@@ -25,9 +25,6 @@
     <string name="tos">I agree with MEGA\'s &lt;a href="http://g.static.mega.co.nz/pages/terms.html"&gt;terms of service&lt;/a&gt;</string>
     <string name="button_create_account_text">Create account</string>
     <string name="already_account">Already have an account?</string>
-    
-    <string name="drawer_open">Drawer open</string>
-	<string name="drawer_close">Drawer close</string>
 	
 	<string name="section_cloud_drive">Cloud Drive</string>
 	<string name="section_saved_for_offline">Saved for Offline</string>

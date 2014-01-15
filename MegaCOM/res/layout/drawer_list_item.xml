@@ -6,6 +6,6 @@
     android:padding="3dp"
     android:drawableLeft="@drawable/ic_launcher"
     android:drawablePadding="10dp"
-    android:textColor="#d2d2d2">
+    android:textColor="@color/navigation_drawer_text">
     
 </TextView>
