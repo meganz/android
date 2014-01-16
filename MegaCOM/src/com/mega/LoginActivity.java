@@ -5,14 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity{
+public class LoginActivity extends Activity implements OnClickListener{
 	
 	EditText et_password;
+	Button bRegister;
+	Button bLogin;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +24,10 @@ public class LoginActivity extends Activity{
 		setContentView(R.layout.activity_login);
 		
 		et_password = (EditText) findViewById(R.id.passwordText);
+		bRegister = (Button) findViewById(R.id.button_create_account_login);
+		bLogin = (Button) findViewById(R.id.button_login_login);
+		bRegister.setOnClickListener(this);		
+		bLogin.setOnClickListener(this);
 		
 		MySwitch loginSwitch = (MySwitch) findViewById(R.id.switch_login);
 		loginSwitch.setChecked(true);
@@ -40,6 +48,19 @@ public class LoginActivity extends Activity{
 		
 	}
 	
+	@Override
+	public void onClick(View v) {
+
+		switch(v.getId()){
+			case R.id.button_login_login:
+				onLoginClick(v);
+				break;
+			case R.id.button_create_account_login:
+				onRegisterClick(v);
+				break;
+		}
+	}
+	
 	public void onLoginClick(View v){
 		Intent intent = new Intent(this, ManagerActivity.class);
 		startActivity(intent);
@@ -51,4 +72,6 @@ public class LoginActivity extends Activity{
 		startActivity(intent);
 		finish();
 	}
+
+	
 }

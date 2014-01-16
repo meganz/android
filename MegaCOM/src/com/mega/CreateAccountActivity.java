@@ -7,9 +7,14 @@ import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class CreateAccountActivity extends Activity{
+public class CreateAccountActivity extends Activity implements OnClickListener{
+	
+	Button bRegister;
+	Button bLogin;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +27,11 @@ public class CreateAccountActivity extends Activity{
 		tos.setText(spanned);
 		tos.setLinkTextColor(getResources().getColor(R.color.mega));
 		
+		bRegister = (Button) findViewById(R.id.button_create_account_create);
+		bLogin = (Button) findViewById(R.id.button_login_create);
+		bRegister.setOnClickListener(this);
+		bLogin.setOnClickListener(this);
+		
 //		TextView termsView = (TextView) findViewById(R.id.terms);
 //		termsView.setText(R.string.tos2);
 //		termsView.setOnClickListener(new View.OnClickListener() {
@@ -32,6 +42,20 @@ public class CreateAccountActivity extends Activity{
 //				startActivity(intent);
 //			}
 //		});
+	}
+	
+	@Override
+	public void onClick(View v) {
+
+		switch (v.getId()) {
+		case R.id.button_create_account_create:
+			onCreateAccountClick(v);
+			break;
+			
+		case R.id.button_login_create:
+			onLoginClick(v);
+			break;
+		}		
 	}
 	
 	public void onLoginClick(View v){

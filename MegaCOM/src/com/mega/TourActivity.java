@@ -9,14 +9,18 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.Display;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class TourActivity extends Activity {
+public class TourActivity extends Activity implements OnClickListener {
 	
 	private TourImageAdapter adapter;
 	private ViewPager viewPager;
 	private ImageView bar;
+	private Button bRegister;
+	private Button bLogin;
 	
 	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
@@ -26,6 +30,11 @@ public class TourActivity extends Activity {
 		setContentView(R.layout.activity_tour);
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		bar = (ImageView) findViewById(R.id.barTour);
+		bRegister = (Button) findViewById(R.id.button_register_tour);
+		bLogin = (Button) findViewById(R.id.button_login_tour);
+		
+		bRegister.setOnClickListener(this);
+		bLogin.setOnClickListener(this);
 		
 		adapter = new TourImageAdapter(this);
 		viewPager.setAdapter(adapter);
@@ -63,6 +72,19 @@ public class TourActivity extends Activity {
 													}
 												});
 	}	
+	
+	@Override
+	public void onClick(View v) {
+
+		switch(v.getId()){
+		case R.id.button_register_tour:
+			onRegisterClick(v);
+			break;
+		case R.id.button_login_tour:
+			onLoginClick(v);
+			break;
+		}
+	}
 
 	public void onRegisterClick(View v){
 		Intent intent = new Intent(this, CreateAccountActivity.class);
@@ -75,4 +97,6 @@ public class TourActivity extends Activity {
 		startActivity(intent);
 		finish();
 	}
+
+	
 }
