@@ -98,12 +98,11 @@
 		    
              
 		    <Button
-		        android:id="@+id/btn_create_account"
+		        android:id="@+id/button_create_account_create"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
 		        android:text="@string/button_create_account_text" 
 		        android:layout_gravity="center"
-                android:onClick="onCreateAccountClick"
                 style="@style/button_MEGA" />
 		
 		</LinearLayout>
@@ -129,9 +128,9 @@
                 />
             
             <Button
+		        android:id="@+id/button_login_create"
                 style="@style/button_MEGA_inverse"
                 android:layout_gravity="center"
-                android:onClick="onLoginClick"
                 android:text="@string/login_text" >
             </Button>
             

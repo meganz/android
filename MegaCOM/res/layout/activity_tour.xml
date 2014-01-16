@@ -47,17 +47,17 @@
             >
             
             <Button
+                android:id="@+id/button_register_tour"
                 style="@style/button_MEGA"
                 android:layout_gravity="center"
-                android:onClick="onRegisterClick"
                 android:text="@string/create_account" 
                 android:gravity="center" >
             </Button>
             
             <Button
+                android:id="@+id/button_login_tour"
                 style="@style/button_MEGA_inverse"
                 android:layout_gravity="center"
-                android:onClick="onLoginClick"
                 android:text="@string/login_text"
                 android:gravity="center" >
             </Button>
