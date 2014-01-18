@@ -22,6 +22,7 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -167,7 +168,7 @@ public class ManagerActivity extends ActionBarActivity {
 				}
 				
 				);
-                
+        
         getSupportActionBar().setIcon(R.drawable.ic_launcher);
         getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -189,6 +190,7 @@ public class ManagerActivity extends ActionBarActivity {
         };
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.openDrawer(Gravity.LEFT);
         
         
         //FIRST FRAGMENT

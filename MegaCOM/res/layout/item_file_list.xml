@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+    
+    <ImageView
+        android:id="@+id/file_list_thumbnail"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp" />
+    
+    <TextView
+        android:id="@+id/file_list_text"
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:layout_toRightOf="@id/file_list_thumbnail"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp" />
+</RelativeLayout>
