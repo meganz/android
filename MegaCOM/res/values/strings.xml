@@ -35,4 +35,11 @@
 	<string name="section_transfers">Transfers</string>
 	<string name="section_account">My Account</string>
 	<string name="used_space">%1$s GB of %2$s GB</string>
+	
+	<string name="file_properties_available_offline">Available offline</string>
+	<string name="file_properties_available_offline_on">ON</string>
+	<string name="file_properties_available_offline_off">OFF</string>
+	<string name="file_properties_info_size">Size: </string>
+	<string name="file_properties_info_added">Added: </string>
+	<string name="file_properties_info_modified">Modified: </string>
 </resources>

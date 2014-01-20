@@ -19,12 +19,12 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="MEGA_COM"
+        android:label="@string/app_name"
         android:theme="@style/Theme.mega" >
         
         <activity
             android:name="TourActivity"
-            android:label="@string/login_activity"
+            android:label="@string/app_name"
             android:launchMode="singleTop" 
             android:theme="@style/login_activity"
             android:configChanges="orientation|screenSize"

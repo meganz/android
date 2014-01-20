@@ -7,9 +7,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,7 +18,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class FileBrowserListFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
@@ -80,11 +80,26 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
-        Toast toast = Toast.makeText(context,
-                "Item " + (position + 1) + ": " + rowItems.get(position),
-                Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-        toast.show();
+//        Toast toast = Toast.makeText(context,
+//                "Item " + (position + 1) + ": " + rowItems.get(position),
+//                Toast.LENGTH_SHORT);
+//        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
+//        toast.show();
+        
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        
+        FilePropertiesFragment fragment = new FilePropertiesFragment();
+        
+        Bundle bundle = new Bundle();
+        bundle.putInt("imageId", rowItems.get(position).getImageId());
+        bundle.putString("name", rowItems.get(position).getName());
+        fragment.setArguments(bundle);
+        
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 	
 	

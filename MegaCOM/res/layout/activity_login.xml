@@ -76,7 +76,7 @@
 			        android:textColor="@color/text_login"
 			        />		
        			  -->
-		            <com.mega.MySwitch
+		            <com.mega.components.MySwitch
 			        android:id="@+id/switch_login"
 			        style="@style/mySwitchStyle"
 			        android:layout_width="wrap_content"
