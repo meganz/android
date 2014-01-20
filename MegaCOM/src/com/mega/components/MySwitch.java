@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mega;
+package com.mega.components;
+
+import com.mega.R;
 
 import android.content.Context;
 import android.content.res.ColorStateList;

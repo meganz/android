@@ -8,20 +8,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.view.GravityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,10 +56,8 @@ public class ManagerActivity extends ActionBarActivity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
 
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manager);	
@@ -77,10 +71,15 @@ public class ManagerActivity extends ActionBarActivity {
         paint.setShader(shader);
 
         Canvas c = new Canvas(circleBitmap);
-	    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, imBitmap.getWidth()/2, paint);
+        int radius; 
+        if (imBitmap.getWidth() < imBitmap.getHeight())
+        	radius = imBitmap.getWidth()/2;
+        else
+        	radius = imBitmap.getHeight()/2;
+        
+	    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
         imageProfile.setImageBitmap(circleBitmap);
 		
-		mTitle = mDrawerTitle = getTitle();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         
@@ -199,6 +198,20 @@ public class ManagerActivity extends ActionBarActivity {
 
 	}
 	
+	
+	@Override
+	public void onBackPressed() {
+
+		FragmentManager fm = getSupportFragmentManager();
+		if (fm.getBackStackEntryCount() > 0){
+			fm.popBackStack();
+		}
+		else{
+			super.onBackPressed();	
+		}		
+	}
+
+
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
 		super.onPostCreate(savedInstanceState);
