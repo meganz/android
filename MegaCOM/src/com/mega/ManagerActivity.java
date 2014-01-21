@@ -55,6 +55,7 @@ public class ManagerActivity extends ActionBarActivity {
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private FileBrowserListFragment fbF;
 
 
     @Override
@@ -193,7 +194,7 @@ public class ManagerActivity extends ActionBarActivity {
         
         
         //FIRST FRAGMENT
-        FileBrowserListFragment fbF = new FileBrowserListFragment();
+        fbF = new FileBrowserListFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbF).commit();
 
 	}
@@ -202,12 +203,16 @@ public class ManagerActivity extends ActionBarActivity {
 	@Override
 	public void onBackPressed() {
 
-		FragmentManager fm = getSupportFragmentManager();
-		if (fm.getBackStackEntryCount() > 0){
-			fm.popBackStack();
-		}
-		else{
-			super.onBackPressed();	
+//		FragmentManager fm = getSupportFragmentManager();
+//		if (fm.getBackStackEntryCount() > 0){
+//			fm.popBackStack();
+//		}
+//		else{
+//			super.onBackPressed();	
+//		}
+		
+		if (fbF.onBackPressed() == 0){
+			super.onBackPressed();
 		}		
 	}
 
@@ -247,5 +252,7 @@ public class ManagerActivity extends ActionBarActivity {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
+	
+	
 
 }
