@@ -5,6 +5,7 @@ import java.util.List;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,6 +20,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +45,7 @@ public class MegaBrowserAdapter extends BaseAdapter {
         TextView textViewUpdated;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
+        ImageView arrowSelection;
         RelativeLayout optionsLayout;
         ImageButton optionOpen;
         ImageButton optionProperties;
@@ -72,6 +75,8 @@ public class MegaBrowserAdapter extends BaseAdapter {
 			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.file_list_option_properties);
 			holder.optionDownload = (ImageButton) convertView.findViewById(R.id.file_list_option_download);
 			holder.optionDelete = (ImageButton) convertView.findViewById(R.id.file_list_option_delete);
+			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
+			holder.arrowSelection.setVisibility(View.GONE);
 			convertView.setTag(holder);
 		}
 		else{
@@ -98,26 +103,38 @@ public class MegaBrowserAdapter extends BaseAdapter {
 									positionClicked = -1;
 									notifyDataSetChanged();
 								}
+								else{
+									positionClicked = _position;
+									notifyDataSetChanged();
+								}
 							}
 						}
 					});
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
+				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
-				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 72, context.getResources().getDisplayMetrics());
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));			
+				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
+				ListView list = (ListView) parent;
+				list.smoothScrollToPosition(_position);
 			}
 			else{
+				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 			}
 		}
 		else{
+			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
 		
 		holder.optionProperties.setTag(holder);
