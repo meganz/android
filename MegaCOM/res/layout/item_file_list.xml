@@ -53,19 +53,29 @@
         android:id="@+id/file_list_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/three_dots"
-        android:background="@null"
+        android:src="@drawable/three_dots_background_white"
+		android:background="@null" 
         android:layout_toRightOf="@id/file_list_updated"
         android:layout_alignTop="@id/file_list_filename"
         android:layout_alignParentRight="true"
-		android:paddingTop="30dp"
+		android:paddingTop="25dp"
         android:paddingLeft="5dp" />
+    
+    <ImageView
+        android:id="@+id/file_list_arrow_selection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_selection"
+        android:layout_toRightOf="@id/file_list_updated"
+		android:layout_alignBottom="@id/file_list_thumbnail"
+        android:layout_alignParentRight="true" />
     
     <RelativeLayout
         android:id="@+id/file_list_options"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/file_list_three_dots"
+        android:layout_below="@id/file_list_arrow_selection"
+        android:padding="0dp"
         android:background="#222222">
         
         <TableLayout
@@ -78,8 +88,8 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/file_list_option_open"
-		            android:paddingLeft="35dp"
-		            android:paddingTop="20dp"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
@@ -88,8 +98,8 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/file_list_option_properties"
-		            android:paddingLeft="35dp"
-		            android:paddingTop="20dp"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
@@ -98,8 +108,8 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/file_list_option_download"
-		            android:paddingLeft="35dp"
-		            android:paddingTop="20dp"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
 		            android:background="@null"
 		            android:layout_gravity="center_vertical" />
 	        
@@ -108,8 +118,8 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/file_list_option_delete"
-		            android:paddingLeft="35dp"
-		            android:paddingTop="20dp"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
 	        </TableRow>        
