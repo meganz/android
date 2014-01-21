@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +25,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	Context context;
 	ActionBar aB;
 	ListView listView;
+	MegaBrowserAdapter adapter;
 	
 	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
 	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
@@ -46,13 +48,9 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		MegaBrowserAdapter adapter = new MegaBrowserAdapter(context, rowItems);
+		adapter = new MegaBrowserAdapter(context, rowItems);
+		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
-		
-//		bVer = (Button) v.findViewById(R.id.buttonVer);
-//		bOcultar = (Button) v.findViewById(R.id.buttonOcultar);
-//		bVer.setOnClickListener(this);
-//		bOcultar.setOnClickListener(this);
 		
 		return v;
 	}
@@ -68,49 +66,32 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	public void onClick(View v) {
 
 		switch(v.getId()){
-//			case R.id.buttonVer:
-//				onClickVer(v);
-//				break;
-//			case R.id.buttonOcultar:
-//				onClickOcultar(v);
-//				break;
+
 		}
 	}
 	
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
-//        Toast toast = Toast.makeText(context,
-//                "Item " + (position + 1) + ": " + rowItems.get(position),
-//                Toast.LENGTH_SHORT);
-//        toast.setGravity(Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
-//        toast.show();
-        
-        FragmentManager fragmentManager = getFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        
-        FilePropertiesFragment fragment = new FilePropertiesFragment();
-        
-        Bundle bundle = new Bundle();
-        bundle.putInt("imageId", rowItems.get(position).getImageId());
-        bundle.putString("name", rowItems.get(position).getName());
-        fragment.setArguments(bundle);
-        
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+		
+		Intent i = new Intent(context, FilePropertiesActivity.class);
+		i.putExtra("imageId", rowItems.get(position).getImageId());
+		i.putExtra("name", rowItems.get(position).getName());
+		startActivity(i);
     }
 	
+	public int onBackPressed(){
+		
+		if (adapter.getPositionClicked() != -1){
+			adapter.setPositionClicked(-1);
+			adapter.notifyDataSetChanged();
+			return 1;
+		}
+		else{
+			return 0;
+		}
+	}
 	
-//	public void onClickOcultar(View v){
-//		aB.hide();
-//	}
-//	
-//	public void onClickVer(View v){
-//		if (!aB.isShowing())
-//			aB.show();
-//
-//	}	
+	
 
 }

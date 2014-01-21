@@ -45,18 +45,25 @@
         </activity>    
 
         <activity
-            android:name="ManagerActivity"
-            android:label="@string/manager_activity"
-            android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow" >            
-        </activity>     
-        
-        <activity
             android:name="CreateAccountActivity"
             android:label="@string/create_account_activity"
             android:theme="@style/login_activity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden" >
+        </activity>
+        
+        <activity
+            android:name="ManagerActivity"
+            android:label="@string/manager_activity"
+            android:launchMode="singleTop"
+            android:uiOptions="splitActionBarWhenNarrow" >            
+        </activity>
+        
+        <activity
+            android:name="FilePropertiesActivity"
+            android:label="@string/file_properties_activity"
+            android:launchMode="singleTop"
+            android:uiOptions="splitActionBarWhenNarrow" >            
         </activity>
     </application>
 

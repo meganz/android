@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants" >
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/file_list_item_layout" >
     
     <ImageView
         android:id="@+id/file_list_thumbnail"
@@ -60,4 +61,60 @@
 		android:paddingTop="30dp"
         android:paddingLeft="5dp" />
     
+    <RelativeLayout
+        android:id="@+id/file_list_options"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/file_list_three_dots"
+        android:background="#222222">
+        
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            
+            <TableRow>
+	            <ImageButton
+		            android:id="@+id/file_list_option_open"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_open"
+		            android:paddingLeft="35dp"
+		            android:paddingTop="20dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	        
+		        <ImageButton
+		            android:id="@+id/file_list_option_properties"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_properties"
+		            android:paddingLeft="35dp"
+		            android:paddingTop="20dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	        
+		        <ImageButton
+		            android:id="@+id/file_list_option_download"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_download"
+		            android:paddingLeft="35dp"
+		            android:paddingTop="20dp"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
+	        
+		        <ImageButton
+		            android:id="@+id/file_list_option_delete"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_delete"
+		            android:paddingLeft="35dp"
+		            android:paddingTop="20dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical" />
+	        </TableRow>        
+        </TableLayout>
+    </RelativeLayout>
+    
 </RelativeLayout>
+

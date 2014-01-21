@@ -13,6 +13,7 @@
     <color name="navigation_drawer_background">#333333</color>
     <color name="navigation_drawer_divider">#555555</color>
     <color name="file_list_second_row">#848484</color>
+    <color name="file_list_selected_row">#e5e5e5</color>
     <color name="border_file_properties">#cccccc</color>
     <color name="file_properties_available_layout">#eeeeee</color>
     <color name="file_properties_text_available">#666666</color>
