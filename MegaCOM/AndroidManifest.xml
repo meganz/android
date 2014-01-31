@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mega"
+    package="com.mega.android"
     android:installLocation="auto"
     android:versionCode="1593"
     android:versionName="1.5.10.2" >
@@ -56,7 +56,10 @@
             android:name="ManagerActivity"
             android:label="@string/manager_activity"
             android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow" >            
+            android:uiOptions="splitActionBarWhenNarrow" > 
+            
+            <meta-data android:name="android.support.UI_OPTIONS"
+                   android:value="splitActionBarWhenNarrow" />           
         </activity>
         
         <activity

@@ -1,11 +1,11 @@
-package com.mega;
+package com.mega.android;
 
-public class ItemFileListBrowser {
+public class ItemFileBrowser {
 	
 	private int imageId;
 	private String name;
 	
-	public ItemFileListBrowser(int _imageId, String _name){
+	public ItemFileBrowser(int _imageId, String _name){
 		imageId = _imageId;
 		name = _name;
 	}
