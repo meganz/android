@@ -15,8 +15,7 @@
  */
 package com.mega.components;
 
-import com.mega.R;
-
+import com.mega.android.R;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;

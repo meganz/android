@@ -1,4 +1,4 @@
-package com.mega;
+package com.mega.android;
 
 import com.mega.components.MySwitch;
 import com.mega.components.RoundedImageView;

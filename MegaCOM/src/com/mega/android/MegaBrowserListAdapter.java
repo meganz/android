@@ -1,4 +1,4 @@
-package com.mega;
+package com.mega.android;
 
 import java.util.List;
 
@@ -25,13 +25,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaBrowserAdapter extends BaseAdapter {
+public class MegaBrowserListAdapter extends BaseAdapter {
 	
 	Context context;
-	List<ItemFileListBrowser> rowItems;
+	List<ItemFileBrowser> rowItems;
 	int positionClicked;
 	
-	public MegaBrowserAdapter(Context _context, List<ItemFileListBrowser> _items) {
+	public MegaBrowserListAdapter(Context _context, List<ItemFileBrowser> _items) {
 		this.context = _context;
 		this.rowItems = _items;
 		this.positionClicked = -1;
@@ -83,7 +83,7 @@ public class MegaBrowserAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 		
-		ItemFileListBrowser rowItem = (ItemFileListBrowser) getItem(position);
+		ItemFileBrowser rowItem = (ItemFileBrowser) getItem(position);
 		
 		holder.textViewFileName.setText(rowItem.getName());
 		holder.textViewFileSize.setText("100 KB");

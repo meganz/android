@@ -1,4 +1,4 @@
-package com.mega;
+package com.mega.android;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -25,12 +26,12 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	Context context;
 	ActionBar aB;
 	ListView listView;
-	MegaBrowserAdapter adapter;
+	MegaBrowserListAdapter adapter;
 	
 	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
 	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
 	
-	List<ItemFileListBrowser> rowItems;
+	List<ItemFileBrowser> rowItems;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,9 +39,9 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 		
-		rowItems = new ArrayList<ItemFileListBrowser>();
+		rowItems = new ArrayList<ItemFileBrowser>();
         for (int i = 0; i < names.length; i++) {
-        	ItemFileListBrowser item = new ItemFileListBrowser(images[i], names[i]);
+        	ItemFileBrowser item = new ItemFileBrowser(images[i], names[i]);
             rowItems.add(item);
         }
         
@@ -48,7 +49,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		adapter = new MegaBrowserAdapter(context, rowItems);
+		adapter = new MegaBrowserListAdapter(context, rowItems);
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
 		

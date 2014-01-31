@@ -1,4 +1,4 @@
-package com.mega;
+package com.mega.android;
 
 import android.app.Activity;
 import android.content.Intent;

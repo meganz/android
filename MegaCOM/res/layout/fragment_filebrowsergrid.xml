@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FileBrowserListFragment" >
+
+    <GridView 
+        android:id="@+id/file_grid_view_browser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </GridView>
+<!--    
+    <ListView
+        android:id="@+id/file_list_view_browser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </ListView>
+    
+     <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/hello_world" />
+
+    <Button
+        android:id="@+id/buttonVer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonOcultar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/botonVerActionBar" />
+
+    <Button
+        android:id="@+id/buttonOcultar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:text="@string/botonOcultarActionBar" />
+-->
+</RelativeLayout>

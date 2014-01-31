@@ -1,8 +1,9 @@
-package com.mega;
+package com.mega.android;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,9 +13,10 @@ import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -26,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -55,14 +58,20 @@ public class ManagerActivity extends ActionBarActivity {
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    private FileBrowserListFragment fbF;
+    
+	private MenuItem searchMenuItem;
+	
+
+	private boolean isList = true;
+    private FileBrowserListFragment fbL;
+    private FileBrowserGridFragment fbG;
 
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manager);	
-		
+				
 		ImageView imageProfile = (ImageView) findViewById(R.id.profile_photo);
 		Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
 		Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -99,37 +108,10 @@ public class ManagerActivity extends ActionBarActivity {
         wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         used_space.setText(wordtoSpan);
         
-//        final float scale = getResources().getDisplayMetrics().density;
-//        
-//        ImageView barStructure = (ImageView) findViewById(R.id.bar_structure);
-//        ImageView barFill = (ImageView) findViewById(R.id.bar_fill);
-//        
-//        Bitmap barSBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bar_structure);
-//        Bitmap barFBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.bar_fill);
-//        
-//        barStructure.setImageBitmap(barSBitmap);
-//        int pixels = (int) (260 * scale + 0.5f);
-//        barStructure.getLayoutParams().width = pixels;
-//        pixels =  (int) (10 * scale + 0.5f);
-//        barStructure.getLayoutParams().height = pixels;
-//        
-//        barFill.setImageBitmap(barFBitmap);
-//        pixels = (int) (150 * scale + 0.5f);
-//        barStructure.getLayoutParams().width = pixels;
-//        pixels =  (int) (6 * scale + 0.5f);
-//        barStructure.getLayoutParams().height = pixels;
-        
-        
         List<String> items = new ArrayList<String>();
 		for (DrawerItem item : DrawerItem.values()) {
 			items.add(item.getTitle(this));
 		}
-		
-//		View header = getLayoutInflater().inflate(R.layout.drawer_list_header, null);
-//		View footer = getLayoutInflater().inflate(R.layout.drawer_list_footer, null);
-//		
-//		mDrawerList.addHeaderView(header);
-//		mDrawerList.addFooterView(footer);
         
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
 				R.layout.drawer_list_item, items)
@@ -192,13 +174,55 @@ public class ManagerActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerLayout.openDrawer(Gravity.LEFT);
         
-        
-        //FIRST FRAGMENT
-        fbF = new FileBrowserListFragment();
-        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbF).commit();
+        //Create the actionBar Menu
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
+        ImageButton customSearch = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_search);
+		customSearch.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (searchMenuItem != null) {
+					MenuItemCompat.expandActionView(searchMenuItem);
+				}
+			}
+		}); 
+		
+		ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+		customListGrid.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if (isList){
+					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+					ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+					customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+//					getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbG).commit();
+					isList = false;
+				}
+				else{
+					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+					ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+//			        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbL).commit();
+			        isList = true;					
+				}
+			}
+		});
+		
+		//INITIAL FRAGMENT
+		fbL = new FileBrowserListFragment();
+		fbG = new FileBrowserGridFragment();
+		
+		if (isList){
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+			customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+		}
+		else{
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+			customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+		}
 
 	}
-	
 	
 	@Override
 	public void onBackPressed() {
@@ -211,7 +235,7 @@ public class ManagerActivity extends ActionBarActivity {
 //			super.onBackPressed();	
 //		}
 		
-		if (fbF.onBackPressed() == 0){
+		if (fbL.onBackPressed() == 0){
 			super.onBackPressed();
 		}		
 	}
@@ -229,6 +253,17 @@ public class ManagerActivity extends ActionBarActivity {
 	    // Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
+	    
+	    searchMenuItem = menu.findItem(R.id.action_search);
+	    searchMenuItem.setVisible(false);
+	    final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	    final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+	    
+	    if (searchView != null) {
+			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+			searchView.setIconifiedByDefault(true);
+		}
+	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
