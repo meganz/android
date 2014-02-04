@@ -2,13 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileBrowserListFragment" >
+    tools:context=".FileBrowserListFragment"
+    android:background="@color/grid_background" >
 
-    <GridView 
+    <ListView 
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </GridView>
+        android:layout_height="match_parent" 
+        android:dividerHeight="0dp"
+		android:divider="@null">
+    </ListView>
 <!--    
     <ListView
         android:id="@+id/file_list_view_browser"

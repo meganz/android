@@ -19,4 +19,7 @@
     <color name="file_properties_text_available">#666666</color>
     <color name="file_properties_info_menu">#404040</color>
     <color name="file_properties_info_data">#999999</color>
+    <color name="grid_background">#ececec</color>
+    <color name="grid_item_border">#d4d4d4</color>
+    <color name="grid_item_separator">#e5e5e5</color>
 </resources>
