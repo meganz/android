@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -50,9 +51,9 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
         }
         
         gridView = (ListView) v.findViewById(R.id.file_grid_view_browser);
-//        gridView.setOnItemClickListener(this);
-//        gridView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        gridView.setOnItemClickListener(null);
         gridView.setItemsCanFocus(false);
+//        gridView.setEnabled(false);        
         
 		adapter = new MegaBrowserGridAdapter(context, items);
 		adapter.setPositionClicked(-1);
@@ -77,13 +78,12 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	}
 	
 	@Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,
-            long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		
-		Intent i = new Intent(context, FilePropertiesActivity.class);
-		i.putExtra("imageId", items.get(position).getImageId());
-		i.putExtra("name", items.get(position).getName());
-		startActivity(i);
+//		Intent i = new Intent(context, FilePropertiesActivity.class);
+//		i.putExtra("imageId", items.get(position).getImageId());
+//		i.putExtra("name", items.get(position).getName());
+//		startActivity(i);
     }
 	
 	public int onBackPressed(){

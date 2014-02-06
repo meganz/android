@@ -2,10 +2,7 @@
     android:id="@+id/file_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp">
+    android:background="@color/grid_background">
     
     <RelativeLayout 
         android:layout_width="172dp"
@@ -14,14 +11,17 @@
         android:background="@drawable/background_item_grid"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
         android:descendantFocusability="blocksDescendants" >
         
-        <ImageView
+        <ImageButton
 	        android:id="@+id/file_grid_thumbnail1"
 	        android:layout_width="157dp"
 	        android:layout_height="157dp"
-	        android:layout_marginLeft="5dp" 
-	        android:layout_centerHorizontal="true" />
+	        android:layout_centerHorizontal="true"
+	        android:scaleType="fitCenter"
+	        android:background="@null" />
         
         <View
 	        android:id="@+id/file_grid_separator1"
@@ -65,6 +65,72 @@
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>
         
+        <ImageView
+	        android:id="@+id/file_grid_arrow_selection1"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/arrow_selection_white_background"
+	        android:layout_below="@id/file_list_three_dots1"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentRight="true"
+			android:paddingRight="14dp" />
+               
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/file_grid_options1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/file_grid_item_layout1"
+        android:background="#222222"
+        android:layout_alignParentLeft="true">
+        
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            
+            <TableRow>
+	            <ImageButton
+		            android:id="@+id/file_grid_option_open1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_open"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_properties1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_properties"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_download1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_download"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
+	        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_delete1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_delete"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical" />
+	        </TableRow>        
+        </TableLayout>
     </RelativeLayout>
     
     <RelativeLayout 
@@ -74,16 +140,17 @@
         android:layout_toRightOf="@id/file_grid_item_layout2"
         android:background="@drawable/background_item_grid"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:descendantFocusability="blocksDescendants" >
+        android:layout_marginTop="5dp"
+        android:descendantFocusability="blocksDescendants"
+        android:translationX="-5dp" >
         
-        <ImageView
+        <ImageButton
 	        android:id="@+id/file_grid_thumbnail2"
 	        android:layout_width="157dp"
 	        android:layout_height="157dp"
-	        android:layout_marginLeft="5dp" 
-	        android:scaleType="fitCenter"
-	        android:layout_centerHorizontal="true" />
+	        android:layout_centerHorizontal="true"
+   	        android:scaleType="fitCenter" 
+   	        android:background="@null"/>
         
         <View
 	        android:id="@+id/file_grid_separator2"
@@ -126,157 +193,71 @@
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>
         
+        <ImageView
+	        android:id="@+id/file_grid_arrow_selection2"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/arrow_selection_white_background"
+	        android:layout_below="@id/file_list_three_dots2"
+			android:layout_alignParentBottom="true"
+			android:layout_alignParentRight="true"
+			android:paddingRight="14dp" />
+        
     </RelativeLayout>
 
-    <!-- 	<RelativeLayout
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:descendantFocusability="blocksDescendants"
-	    android:id="@+id/file_grid_item_layout1"
-	    android:background="@drawable/background_item_grid">
-	    
-	    <ImageView
-	        android:id="@+id/file_grid_thumbnail1"
-	        android:layout_width="85dp"
-	        android:layout_height="85dp"
-	        android:layout_marginLeft="5dp" 
-	        android:scaleType="fitCenter"
-	        android:layout_centerHorizontal="true" />
-	    
-	    <View
-	        android:id="@+id/file_grid_separator1"
-	 		android:layout_width="match_parent"
-	 		android:layout_height="2dp"
-	 		android:background="@color/grid_item_separator"
-	        android:scaleType="fitCenter"
-	        android:layout_marginLeft="6dp"
-	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/file_grid_thumbnail1"
-	 		 />
-	    
-	    <TableLayout
-	        android:id="@+id/file_grid_table11"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-			android:layout_below="@id/file_grid_thumbnail1"
-			android:stretchColumns="0,1" >
+    <RelativeLayout
+        android:id="@+id/file_grid_options2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/file_grid_item_layout2"
+        android:background="#222222">
+        
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            
+            <TableRow>
+	            <ImageButton
+		            android:id="@+id/file_grid_option_open2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_open"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
 	        
-	        <TableRow >
-	            <TableLayout 
-	                android:id="@+id/file_grid_table21"
-	        		android:layout_width="wrap_content"
-	        		android:layout_height="wrap_content">
-	        		<TableRow>
-	        		    <TextView
-					        android:id="@+id/file_grid_filename1"
-					        android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					
-					        android:paddingLeft="4dp"
-					        android:paddingTop="3dp" />
-	        		</TableRow>
-	        		
-	        		<TableRow >
-	        		    <TextView
-					        android:id="@+id/file_grid_filesize1"
-					        android:layout_width="wrap_content"
-					        android:layout_height="30dp"
-					        android:paddingLeft="5dp"
-					        android:paddingBottom="7dp"
-					        android:textColor="@color/file_list_second_row" />
-	        		</TableRow>
-	                
-	            </TableLayout>
-	            
-	            <ImageButton 
-			        android:id="@+id/file_list_three_dots1"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:src="@drawable/three_dots_background_white"
-					android:background="@null" 
-					android:paddingTop="10dp"
-			        android:paddingLeft="2dp"
-			        android:paddingRight="6dp"
-			        android:paddingBottom="4dp"
-			        android:layout_gravity="right" />
-	        </TableRow>
-	     </TableLayout>
-	</RelativeLayout>
-
-	<RelativeLayout 
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:descendantFocusability="blocksDescendants"
-	    android:id="@+id/file_grid_item_layout2"
-	    android:background="@drawable/background_item_grid"
-	    android:layout_toRightOf="@id/file_grid_item_layout1">
-	    
-	    <ImageView
-	        android:id="@+id/file_grid_thumbnail2"
-	        android:layout_width="85dp"
-	        android:layout_height="85dp"
-	        android:layout_marginLeft="5dp" 
-	        android:scaleType="fitCenter"
-	        android:layout_centerHorizontal="true" />
-	    
-	    <View
-	        android:id="@+id/file_grid_separator2"
-	 		android:layout_width="match_parent"
-	 		android:layout_height="2dp"
-	 		android:background="@color/grid_item_separator"
-	        android:scaleType="fitCenter"
-	        android:layout_marginLeft="6dp"
-	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/file_grid_thumbnail2"
-	 		 />
-	    
-	    <TableLayout
-	        android:id="@+id/file_grid_table12"
-	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-			android:layout_below="@id/file_grid_thumbnail2"
-			android:stretchColumns="0,1" >
+		        <ImageButton
+		            android:id="@+id/file_grid_option_properties2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_properties"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
 	        
-	        <TableRow >
-	            <TableLayout 
-	                android:id="@+id/file_grid_table22"
-	        		android:layout_width="wrap_content"
-	        		android:layout_height="wrap_content">
-	        		<TableRow>
-	        		    <TextView
-					        android:id="@+id/file_grid_filename2"
-					        android:layout_width="wrap_content"
-					        android:layout_height="wrap_content"
-					
-					        android:paddingLeft="4dp"
-					        android:paddingTop="3dp" />
-	        		</TableRow>
-	        		
-	        		<TableRow >
-	        		    <TextView
-					        android:id="@+id/file_grid_filesize2"
-					        android:layout_width="wrap_content"
-					        android:layout_height="30dp"
-					        android:paddingLeft="5dp"
-					        android:paddingBottom="7dp"
-					        android:textColor="@color/file_list_second_row" />
-	        		</TableRow>
-	                
-	            </TableLayout>
-	            
-	            <ImageButton 
-			        android:id="@+id/file_list_three_dots2"
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:src="@drawable/three_dots_background_white"
-					android:background="@null" 
-					android:paddingTop="10dp"
-			        android:paddingLeft="2dp"
-			        android:paddingRight="6dp"
-			        android:paddingBottom="4dp"
-			        android:layout_gravity="right" />
-	        </TableRow>
-	     </TableLayout>
-	</RelativeLayout>
-	-->
+		        <ImageButton
+		            android:id="@+id/file_grid_option_download2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_download"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
+	        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_delete2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_delete"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical" />
+	        </TableRow>        
+        </TableLayout>
+    </RelativeLayout>
+    
 </RelativeLayout>

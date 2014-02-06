@@ -235,9 +235,9 @@ public class ManagerActivity extends ActionBarActivity {
 //			super.onBackPressed();	
 //		}
 		
-		if (fbL.onBackPressed() == 0){
+		if ((fbL.onBackPressed() == 0) && (fbG.onBackPressed() == 0)){
 			super.onBackPressed();
-		}		
+		}
 	}
 
 
