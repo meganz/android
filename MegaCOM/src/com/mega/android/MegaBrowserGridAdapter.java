@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -64,13 +65,15 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
         ImageButton optionDownload2;
         ImageButton optionDelete2;
     }
+    
+	ViewHolder holder = null;
+	int positionG;
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	
 		final int _position = position;
-		
-		ViewHolder holder = null;
+		positionG = position;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -101,8 +104,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 				paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 				paramsIL2.addRule(RelativeLayout.RIGHT_OF, R.id.file_grid_item_layout1);
 				TranslateAnimation anim = new TranslateAnimation(Util.px2dp(-5*scaleW, outMetrics), Util.px2dp(-5*scaleW, outMetrics), 0, 0);
-		        anim.setFillAfter(true);
 		        anim.setDuration(0);
+		        
 		        holder.itemLayout2.startAnimation(anim);
 				holder.itemLayout2.setLayoutParams(paramsIL2);
 				
