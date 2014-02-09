@@ -51,6 +51,7 @@
 		             android:layout_height="wrap_content"
 		             android:text="@string/file_properties_available_offline"
 		             android:paddingLeft="30dp"
+		             android:paddingRight="50dp"
 					 android:layout_gravity="center_vertical|left"
 					 android:textStyle="bold"
 					 android:textColor="@color/file_properties_text_available" />
@@ -60,7 +61,6 @@
 		             android:layout_width="wrap_content"
 		             android:layout_height="wrap_content"
 		             android:text="@string/file_properties_available_offline_off"
-		             android:paddingLeft="50dp"
 					 android:layout_gravity="center_vertical|right"
 					 android:textStyle="bold"
 					 android:textColor="@color/file_properties_text_available" />

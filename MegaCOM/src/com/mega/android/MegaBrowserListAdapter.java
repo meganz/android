@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -10,7 +11,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +63,14 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 		
 		ViewHolder holder = null;
 		
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_file_list, parent, false);
@@ -72,9 +83,13 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
 			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.file_list_option_open);
+			holder.optionOpen.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.file_list_option_properties);
+			holder.optionProperties.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDownload = (ImageButton) convertView.findViewById(R.id.file_list_option_download);
+			holder.optionDownload.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDelete = (ImageButton) convertView.findViewById(R.id.file_list_option_delete);
+			holder.optionDelete.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 			convertView.setTag(holder);
