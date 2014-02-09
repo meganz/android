@@ -69,10 +69,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	ImageButton customListGrid;
 
+	private boolean firstTime = true;
+	
 	private boolean isListCloudDrive = true;
+	private boolean isListContacts = true;
     private FileBrowserListFragment fbL;
     private FileBrowserGridFragment fbG;
     private ContactsListFragment cL;
+    private ContactsGridFragment cG;
+    
 
 
     @Override
@@ -216,9 +221,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     public void selectDrawerItem(DrawerItem item){
     	switch (item){
     		case CLOUD_DRIVE:{
-    			if (fbG != null && fbL != null){
-    				mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			}
+    			   			
     			if (fbG == null){
     				fbG = new FileBrowserGridFragment();
     			}
@@ -233,18 +236,35 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
+    			
+    			if (!firstTime){
+    				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			}
+    			else{
+    				firstTime = false;
+    			}
+    			
     			break;
     		}
     		case CONTACTS:{
-    			if (cL != null){
-    				mDrawerLayout.closeDrawer(Gravity.LEFT);
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+    			
+    			if (cG == null){
+    				cG = new ContactsGridFragment();
     			}
     			if (cL == null){
-    				mDrawerLayout.closeDrawer(Gravity.LEFT);
     				cL = new ContactsListFragment();
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
     			}
+    			if (isListContacts){
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+    			}
+    			else{
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    			}
+				
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+
     			break;
     		}
     	}
@@ -274,7 +294,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 		}
 		else if (cL.isVisible()){
-			super.onBackPressed();
+			if (cL.onBackPressed() == 0){
+				super.onBackPressed();
+				return;
+			}
 		}
 	}
 
@@ -349,6 +372,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 						customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
 				        isListCloudDrive = true;					
+					}
+				}
+				else if (cL.isVisible() || cG.isVisible()){
+					if (isListContacts){
+						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
+						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+						customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+						isListContacts = false;
+					}
+					else{
+						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+						customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+						isListContacts = true;					
 					}
 				}
 				break;

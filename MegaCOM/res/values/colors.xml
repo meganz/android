@@ -22,4 +22,9 @@
     <color name="grid_background">#ececec</color>
     <color name="grid_item_border">#d4d4d4</color>
     <color name="grid_item_separator">#e5e5e5</color>
+    <color name="contact_properties_content_layout">#eeeeee</color>
+    <color name="contact_properties_text_content">#666666</color>
+    <color name="contact_properties_content_detailed">#9a9a9a</color>
+    <color name="contact_properties_info_menu">#404040</color>
+    <color name="contact_properties_info_data">#999999</color>
 </resources>

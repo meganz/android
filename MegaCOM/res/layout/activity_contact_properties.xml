@@ -1,0 +1,148 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FilePropertiesFragment" >
+    
+    <RelativeLayout 
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent">
+
+    
+     <TextView
+        android:id="@+id/contact_properties_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingLeft="30dp" />
+     
+     <ImageView
+         android:id="@+id/contact_properties_status"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content" 
+         android:layout_toRightOf="@id/contact_properties_name"
+         android:paddingLeft="7dp"
+         android:paddingTop="11dp"/>
+          
+     <com.mega.components.RoundedImageView 
+         android:id="@+id/contact_properties_image"
+         android:layout_width="wrap_content"
+         android:layout_height="270dp"
+         android:layout_centerHorizontal="true"
+         android:layout_below="@id/contact_properties_name"
+         android:paddingLeft="30dp"
+         android:paddingRight="30dp"
+         rounded:corner_radius="10dp" 
+         rounded:border_width="2dp"
+         rounded:border_color="@color/border_file_properties"
+         android:paddingBottom="10dp" 
+         android:paddingTop="10dp"/>
+     
+     <RelativeLayout
+         android:id="@+id/contact_properties_content"
+         android:layout_width="fill_parent"
+         android:layout_height="60dp"
+         android:background="@color/contact_properties_content_layout"
+         android:orientation="horizontal"
+         android:layout_below="@id/contact_properties_image">
+         
+         <TableLayout       		
+       		    android:layout_width="wrap_content"
+       		    android:layout_height="60dp" 
+       		    android:layout_gravity="center" >
+       		    
+             <TableRow>
+                 
+                 <TextView
+		             android:id="@+id/contact_properties_content_text"
+		             android:layout_width="wrap_content"
+		             android:layout_height="60dp"
+		             android:text="@string/contact_properties_content"
+		             android:paddingLeft="30dp"
+		             android:paddingRight="5dp"
+		             android:paddingTop="18dp"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:textColor="@color/contact_properties_text_content" />
+                 
+                 <TextView
+		             android:id="@+id/contact_properties_content_detailed"
+		             android:layout_width="wrap_content"
+		             android:layout_height="60dp"
+		             android:paddingTop="18dp"
+					 android:layout_gravity="center_vertical|right"
+					 android:textColor="@color/contact_properties_content_detailed"
+					 android:paddingRight="100dp" />
+                 
+             	<ImageButton 
+             	    android:id="@+id/contact_properties_content_eye"
+             	    android:layout_width="wrap_content"
+             	    android:layout_height="wrap_content"
+             	    android:src="@drawable/contact_properties_content_eye"
+             	    android:background="@null"
+             	    android:paddingTop="22dp"/>
+             	
+             </TableRow>
+       		    
+         </TableLayout>
+         
+     </RelativeLayout>
+     
+     <TableLayout 
+         android:layout_width="wrap_content"
+       	 android:layout_height="wrap_content" 
+       	 android:layout_gravity="center"
+       	 android:layout_below="@id/contact_properties_content" >
+         
+         <TableRow>
+             <TextView
+		             android:id="@+id/contact_properties_info_menu_email"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/contact_properties_info_email"
+		             android:textColor="@color/contact_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="15dp" />
+             
+             <TextView
+		             android:id="@+id/contact_properties_info_data_email"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="jra@mega.co.nz"
+		             android:textColor="@color/contact_properties_info_data"
+					 android:layout_gravity="center_vertical|left" 
+					 android:paddingLeft="4dp"
+					 android:paddingTop="15dp"/>
+         </TableRow>
+         
+         <TableRow>
+             <TextView
+		             android:id="@+id/contact_properties_info_menu_added"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/contact_properties_info_added"
+		             android:textColor="@color/contact_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="7dp" />
+             
+             <TextView
+		             android:id="@+id/contact_properties_info_data_added"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="November 22, 2013"
+		             android:textColor="@color/contact_properties_info_data"
+					 android:layout_gravity="center_vertical|left"
+					 android:paddingLeft="4dp"
+					 android:paddingTop="7dp" />
+         </TableRow>
+         
+         
+     </TableLayout>
+</RelativeLayout>
+</ScrollView>

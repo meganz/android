@@ -1,0 +1,108 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/contact_list_item_layout" >
+    
+    <ImageView
+        android:id="@+id/contact_list_thumbnail"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp" 
+        android:scaleType="fitCenter" />
+    
+    <TextView
+        android:id="@+id/contact_list_name"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/contact_list_thumbnail"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp" />
+    
+    <ImageView
+        android:id="@+id/contact_list_status_dot"
+        android:layout_width="wrap_content"
+		android:layout_height="30dp" 
+        android:layout_toRightOf="@id/contact_list_name" 
+        android:paddingTop="5dp"
+        android:paddingLeft="5dp" />
+    
+    <TextView
+        android:id="@+id/contact_list_content"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/contact_list_thumbnail"
+        android:layout_below="@id/contact_list_name"
+        android:paddingLeft="5dp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/file_list_second_row" />
+    
+    <ImageButton 
+        android:id="@+id/contact_list_three_dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/three_dots_background_white"
+		android:background="@null" 
+        android:layout_alignTop="@id/contact_list_name"
+        android:layout_alignParentRight="true"
+		android:paddingTop="25dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="15dp" />
+    
+    <ImageView
+        android:id="@+id/contact_list_arrow_selection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_selection"
+		android:layout_alignBottom="@id/contact_list_thumbnail"
+        android:layout_alignParentRight="true"
+        android:paddingRight="15dp" />
+    
+    <RelativeLayout
+        android:id="@+id/contact_list_options"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_list_arrow_selection"
+        android:padding="0dp"
+        android:background="#222222">
+        
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            
+            <TableRow>
+	            <ImageButton
+		            android:id="@+id/contact_list_option_properties"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/file_list_option_properties"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	        
+		        <ImageButton
+		            android:id="@+id/contact_list_option_send"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/contact_list_option_send"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
+	        
+		        <ImageButton
+		            android:id="@+id/contact_list_option_remove"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/contact_list_option_remove"
+		            android:paddingLeft="30dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical" />
+	        </TableRow>        
+        </TableLayout>
+    </RelativeLayout>
+    
+</RelativeLayout>
+
