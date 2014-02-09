@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener {
 	
 	TextView nameView;
+	TextView availableOfflineView;
 	RoundedImageView imageView;
 	RelativeLayout availableOfflineLayout;
 	MySwitch availableSwitch;	
@@ -29,6 +32,14 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
@@ -39,6 +50,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			nameView = (TextView) findViewById(R.id.file_properties_name);
 			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
 			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
+			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitch = (MySwitch) findViewById(R.id.file_properties_switch);
 			availableSwitch.setChecked(true);
 			availableSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -53,6 +65,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 					}			
 				}
 			});
+			
+			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			
 			nameView.setText(name);
 			imageView.setImageResource(imageId);

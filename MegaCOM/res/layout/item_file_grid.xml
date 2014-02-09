@@ -141,8 +141,7 @@
         android:background="@drawable/background_item_grid"
         android:layout_alignParentRight="true"
         android:layout_marginTop="5dp"
-        android:descendantFocusability="blocksDescendants"
-        android:translationX="-5dp" >
+        android:descendantFocusability="blocksDescendants" >
         
         <ImageButton
 	        android:id="@+id/file_grid_thumbnail2"

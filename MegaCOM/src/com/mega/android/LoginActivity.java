@@ -6,6 +6,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -47,6 +49,18 @@ public class LoginActivity extends Activity implements OnClickListener{
 			    }				
 			}
 		});
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+
+	    float density  = getResources().getDisplayMetrics().density;
+	    float dpHeight = outMetrics.heightPixels / density;
+	    float dpWidth  = outMetrics.widthPixels / density;
+	    
+	    String cadena;
+	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_";
+	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
 		
 	}
 	

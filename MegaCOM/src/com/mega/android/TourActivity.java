@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -71,6 +72,17 @@ public class TourActivity extends Activity implements OnClickListener {
 														bar.setImageResource(barImages[position]);
 													}
 												});
+		
+	    DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+
+	    float density  = getResources().getDisplayMetrics().density;
+	    float dpHeight = outMetrics.heightPixels / density;
+	    float dpWidth  = outMetrics.widthPixels / density;
+	    
+	    String cadena;
+	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_";
+	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
 	}	
 	
 	@Override

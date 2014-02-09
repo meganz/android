@@ -26,7 +26,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -34,7 +37,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ManagerActivity extends ActionBarActivity {
+public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener {
 	
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
@@ -61,10 +64,15 @@ public class ManagerActivity extends ActionBarActivity {
     
 	private MenuItem searchMenuItem;
 	
+	private static DrawerItem drawerItem;
+	private static DrawerItem lastDrawerItem;
+	
+	ImageButton customListGrid;
 
-	private boolean isList = true;
+	private boolean isListCloudDrive = true;
     private FileBrowserListFragment fbL;
     private FileBrowserGridFragment fbG;
+    private ContactsListFragment cL;
 
 
     @Override
@@ -151,6 +159,8 @@ public class ManagerActivity extends ActionBarActivity {
 				
 				);
         
+        mDrawerList.setOnItemClickListener(this);
+        
         getSupportActionBar().setIcon(R.drawable.ic_launcher);
         getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -172,7 +182,12 @@ public class ManagerActivity extends ActionBarActivity {
         };
         mDrawerToggle.setDrawerIndicatorEnabled(true);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerLayout.openDrawer(Gravity.LEFT);
+        if (savedInstanceState == null){
+        	mDrawerLayout.openDrawer(Gravity.LEFT);
+        }
+        else{
+			mDrawerLayout.closeDrawer(Gravity.LEFT);
+        }
         
         //Create the actionBar Menu
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -187,42 +202,53 @@ public class ManagerActivity extends ActionBarActivity {
 			}
 		}); 
 		
-		ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-		customListGrid.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if (isList){
-					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
-					ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-					customListGrid.setImageResource(R.drawable.ic_menu_action_list);
-//					getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbG).commit();
-					isList = false;
-				}
-				else{
-					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-					ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-//			        getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, fbL).commit();
-			        isList = true;					
-				}
-			}
-		});
+		customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+		customListGrid.setOnClickListener(this);
 		
-		//INITIAL FRAGMENT
-		fbL = new FileBrowserListFragment();
-		fbG = new FileBrowserGridFragment();
-		
-		if (isList){
-			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-			customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-		}
-		else{
-			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
-			customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+		if (drawerItem == null) {
+			drawerItem = DrawerItem.CLOUD_DRIVE;
 		}
 
+		//INITIAL FRAGMENT
+		selectDrawerItem(drawerItem);
 	}
+    
+    public void selectDrawerItem(DrawerItem item){
+    	switch (item){
+    		case CLOUD_DRIVE:{
+    			if (fbG != null && fbL != null){
+    				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			}
+    			if (fbG == null){
+    				fbG = new FileBrowserGridFragment();
+    			}
+    			if (fbL == null){
+    				fbL = new FileBrowserListFragment();
+    			}
+    			if (isListCloudDrive){
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+    			}
+    			else{
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    			}
+    			break;
+    		}
+    		case CONTACTS:{
+    			if (cL != null){
+    				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+    			}
+    			if (cL == null){
+    				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    				cL = new ContactsListFragment();
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+    			}
+    			break;
+    		}
+    	}
+    }
 	
 	@Override
 	public void onBackPressed() {
@@ -246,6 +272,9 @@ public class ManagerActivity extends ActionBarActivity {
 				super.onBackPressed();
 				return;
 			}
+		}
+		else if (cL.isVisible()){
+			super.onBackPressed();
 		}
 	}
 
@@ -296,7 +325,34 @@ public class ManagerActivity extends ActionBarActivity {
 	            return super.onOptionsItemSelected(item);
 	    }
 	}
-	
-	
 
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		selectDrawerItem(DrawerItem.values()[position]);
+	}
+
+	@Override
+	public void onClick(View v) {
+
+		switch(v.getId()){
+			case R.id.menu_action_bar_grid:{
+				if (fbL.isVisible() || fbG.isVisible()){
+					if (isListCloudDrive){
+						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+						customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+						isListCloudDrive = false;
+					}
+					else{
+						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+						customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+				        isListCloudDrive = true;					
+					}
+				}
+				break;
+			}
+		}
+	}
 }
