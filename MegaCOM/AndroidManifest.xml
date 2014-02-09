@@ -68,6 +68,13 @@
             android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow" >            
         </activity>
+        
+        <activity
+            android:name="ContactPropertiesActivity"
+            android:label="@string/contact_properties_activity"
+            android:launchMode="singleTop"
+            android:uiOptions="splitActionBarWhenNarrow" >            
+        </activity>
     </application>
 
 </manifest>

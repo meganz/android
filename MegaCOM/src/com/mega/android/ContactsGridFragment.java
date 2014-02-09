@@ -21,7 +21,7 @@ import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-public class ContactsListFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class ContactsGridFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
 	Context context;
 	ActionBar aB;
@@ -80,7 +80,6 @@ public class ContactsListFragment extends Fragment implements OnClickListener, O
 		Intent i = new Intent(context, ContactPropertiesActivity.class);
 		i.putExtra("imageId", rowItems.get(position).getImageId());
 		i.putExtra("name", rowItems.get(position).getName());
-		i.putExtra("position", position);
 		startActivity(i);
     }
 	

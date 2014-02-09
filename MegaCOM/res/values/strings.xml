@@ -44,4 +44,10 @@
 	<string name="file_properties_info_size">Size: </string>
 	<string name="file_properties_info_added">Added: </string>
 	<string name="file_properties_info_modified">Modified: </string>
+	
+	<string name="contact_properties_activity">Contact</string>
+	<string name="contact_properties_content">Content:</string>
+	<string name="contact_properties_info_email">E-mail: </string>
+	<string name="contact_properties_info_added">Added: </string>
+	
 </resources>
