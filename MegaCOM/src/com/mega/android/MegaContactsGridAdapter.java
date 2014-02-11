@@ -123,10 +123,11 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 					
 					@Override
 					public void onClick(View v) {
-						Intent i = new Intent(context, FilePropertiesActivity.class);
+						Intent i = new Intent(context, ContactPropertiesActivity.class);
 						ItemContact rowItem = (ItemContact) getItem(_position);
 						i.putExtra("imageId", rowItem.getImageId());
 						i.putExtra("name", rowItem.getName());
+						i.putExtra("position", _position);
 						context.startActivity(i);						
 					}
 				});
@@ -135,11 +136,12 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 					
 					@Override
 					public void onClick(View v) {
-						Intent i = new Intent(context, FilePropertiesActivity.class);
+						Intent i = new Intent(context, ContactPropertiesActivity.class);
 						ItemContact rowItem = (ItemContact) getItem(_position+1);
 						i.putExtra("imageId", rowItem.getImageId());
 						i.putExtra("name", rowItem.getName());
-						context.startActivity(i);						
+						i.putExtra("position", _position+1);
+						context.startActivity(i);	
 					}
 				});
 	            
