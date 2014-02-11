@@ -11,6 +11,9 @@
     
     <string name="manager_activity">MEGA_COM</string>
     
+    <string name="search_files_and_folders">Search</string>
+    
+    
     <string name="login_activity">Login</string>
     <string name="login_text">Login</string>
     <string name="email_text">e-mail</string>

@@ -27,4 +27,5 @@
     <color name="contact_properties_content_detailed">#9a9a9a</color>
     <color name="contact_properties_info_menu">#404040</color>
     <color name="contact_properties_info_data">#999999</color>
+    <color name="contact_list_second_row">#848484</color>
 </resources>

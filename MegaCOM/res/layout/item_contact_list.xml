@@ -1,15 +1,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/contact_list_item_layout" >
-    
-    <ImageView
-        android:id="@+id/contact_list_thumbnail"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginLeft="5dp" 
-        android:scaleType="fitCenter" />
+         
+    <com.mega.components.RoundedImageView 
+         android:id="@+id/contact_list_thumbnail"
+         android:layout_width="54dp"
+         android:layout_height="54dp"
+         android:layout_marginLeft="5dp" 
+         android:scaleType="fitCenter"
+         android:paddingTop="3dp"
+         rounded:corner_radius="27dp" 
+         rounded:border_width="2dp"
+         rounded:border_color="@color/border_file_properties"/>
     
     <TextView
         android:id="@+id/contact_list_name"

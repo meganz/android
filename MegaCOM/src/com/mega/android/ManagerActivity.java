@@ -272,14 +272,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	@Override
 	public void onBackPressed() {
-
-//		FragmentManager fm = getSupportFragmentManager();
-//		if (fm.getBackStackEntryCount() > 0){
-//			fm.popBackStack();
-//		}
-//		else{
-//			super.onBackPressed();	
-//		}
 		
 		if (fbL.isVisible()){
 			if (fbL.onBackPressed() == 0){
@@ -295,6 +287,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (cL.isVisible()){
 			if (cL.onBackPressed() == 0){
+				super.onBackPressed();
+				return;
+			}
+		}
+		else if (cG.isVisible()){
+			if (cG.onBackPressed() == 0){
 				super.onBackPressed();
 				return;
 			}
