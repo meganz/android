@@ -2,6 +2,8 @@ package com.mega.android;
 
 import java.util.List;
 
+import com.mega.components.RoundedImageView;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -48,7 +50,8 @@ public class MegaContactsListAdapter extends BaseAdapter {
 	
 	/*private view holder class*/
     private class ViewHolder {
-        ImageView imageView;
+    	RoundedImageView imageView;
+//        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
         ImageView statusImageView;
@@ -81,7 +84,7 @@ public class MegaContactsListAdapter extends BaseAdapter {
 			convertView = inflater.inflate(R.layout.item_contact_list, parent, false);
 			holder = new ViewHolder();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_item_layout);
-			holder.imageView = (ImageView) convertView.findViewById(R.id.contact_list_thumbnail);	        
+			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail);	        
 			holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_list_name);
 			holder.statusImageView = (ImageView) convertView.findViewById(R.id.contact_list_status_dot);
 			holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_list_content);
@@ -105,25 +108,7 @@ public class MegaContactsListAdapter extends BaseAdapter {
 		
 		holder.textViewContactName.setText(rowItem.getName());
 		holder.textViewContent.setText("5 Folders, 10 files");
-//		holder.imageView.setImageResource(rowItem.getImageId());
-		Bitmap imBitmap = BitmapFactory.decodeResource(((Activity) context).getResources(), rowItem.getImageId());
-		Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-
-		BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-        Paint paint = new Paint();
-        paint.setShader(shader);
-
-        Canvas c = new Canvas(circleBitmap);
-        int radius; 
-        if (imBitmap.getWidth() < imBitmap.getHeight()){
-        	radius = imBitmap.getWidth()/2;
-        }
-        else{
-        	radius = imBitmap.getHeight()/2;
-        }
-        
-	    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-        holder.imageView.setImageBitmap(circleBitmap);
+		holder.imageView.setImageResource(rowItem.getImageId());
         
         if (position < 2){
         	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
