@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
@@ -33,11 +35,23 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 	Context context;
 	List<ItemFileBrowser> rowItems;
 	int positionClicked;
-	
+	ArrayList<Integer> imageIds;
+	ArrayList<String> names;
+
+
 	public MegaBrowserListAdapter(Context _context, List<ItemFileBrowser> _items) {
 		this.context = _context;
 		this.rowItems = _items;
 		this.positionClicked = -1;
+		this.imageIds = new ArrayList<Integer>();
+		this.names = new ArrayList<String>();
+		
+		Iterator<ItemFileBrowser> it = rowItems.iterator();
+		while (it.hasNext()){
+			ItemFileBrowser item = it.next();
+			imageIds.add(item.getImageId());
+			names.add(item.getName());
+		}
 	}
 	
 	/*private view holder class*/
@@ -151,6 +165,22 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
+		
+		holder.optionOpen.setTag(holder);
+		holder.optionOpen.setOnClickListener(
+				new OnClickListener() {
+			
+					@Override
+					public void onClick(View v) {
+						Intent i = new Intent(context, FullScreenImageViewer.class);
+						i.putExtra("position", _position);
+						i.putExtra("names", names);
+						i.putExtra("imageIds", imageIds);
+						context.startActivity(i);	
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+				});
 		
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(
