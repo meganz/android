@@ -6,12 +6,13 @@ import com.mega.components.TouchImageView;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -23,12 +24,14 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 	private ArrayList<Integer> _imageIds;
 	private ArrayList<String> _names;
 	private LayoutInflater inflater;
+	private ActionBar aB;
 	
 	// constructor
 	public MegaFullScreenImageAdapter(Activity activity, ArrayList<Integer> imageIds, ArrayList<String> names) {
 		this._activity = activity;
 		this._imageIds = imageIds;
 		this._names = names;
+		this.aB = ((ActionBarActivity)activity).getSupportActionBar();
 	}
 
 	@Override
@@ -65,6 +68,13 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 		}); 
         
         title.setText(_names.get(position));
+        imgDisplay.setOnClickListener(new OnClickListener() {
+			
+				@Override
+				public void onClick(View v) {
+					
+				}
+			});
 
         ((ViewPager) container).addView(viewLayout);
 		

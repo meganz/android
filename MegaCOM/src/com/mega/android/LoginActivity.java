@@ -59,9 +59,6 @@ public class LoginActivity extends Activity implements OnClickListener{
 	    float dpWidth  = outMetrics.widthPixels / density;
 	    
 	    String cadena;
-	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_";
-	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
-		
 	}
 	
 	@Override

@@ -2,23 +2,32 @@ package com.mega.android;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
+import com.mega.components.ExtendedViewPager;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
-public class FullScreenImageViewer extends Activity{
+public class FullScreenImageViewer extends ActionBarActivity{
 	
-	private ViewPager viewPager;
+	private ExtendedViewPager viewPager;
 	private MegaFullScreenImageAdapter adapter;
+	ActionBar aB;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
 		
-		viewPager = (ViewPager) findViewById(R.id.image_viewer_pager);
+		aB = getSupportActionBar();
+		aB.hide();
+		
+		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
+//		setContentView(viewPager);
+		viewPager.setPageMargin(40);
 		
 		Intent i = getIntent();
 		int position = i.getIntExtra("position", 0);
