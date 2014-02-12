@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -32,12 +34,23 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 	
 	Context context;
 	List<ItemFileBrowser> rowItems;
+	ArrayList<Integer> imageIds;
+	ArrayList<String> names;
 	int positionClicked;
 	
 	public MegaBrowserGridAdapter(Context _context, List<ItemFileBrowser> _items) {
 		this.context = _context;
 		this.rowItems = _items;
 		this.positionClicked = -1;
+		this.imageIds = new ArrayList<Integer>();
+		this.names = new ArrayList<String>();
+		
+		Iterator<ItemFileBrowser> it = rowItems.iterator();
+		while (it.hasNext()){
+			ItemFileBrowser item = it.next();
+			imageIds.add(item.getImageId());
+			names.add(item.getName());
+		}
 	}
 	
 	/*private view holder class*/
@@ -111,29 +124,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 				
 				holder.imageView1 = (ImageButton) convertView.findViewById(R.id.file_grid_thumbnail1);
 	            holder.imageView2 = (ImageButton) convertView.findViewById(R.id.file_grid_thumbnail2);
-	            holder.imageView1.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						Intent i = new Intent(context, FilePropertiesActivity.class);
-						ItemFileBrowser rowItem = (ItemFileBrowser) getItem(_position);
-						i.putExtra("imageId", rowItem.getImageId());
-						i.putExtra("name", rowItem.getName());
-						context.startActivity(i);						
-					}
-				});
 	            
-	            holder.imageView2.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						Intent i = new Intent(context, FilePropertiesActivity.class);
-						ItemFileBrowser rowItem = (ItemFileBrowser) getItem(_position+1);
-						i.putExtra("imageId", rowItem.getImageId());
-						i.putExtra("name", rowItem.getName());
-						context.startActivity(i);						
-					}
-				});
 	            
 				RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
 				paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -202,6 +193,34 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 			else{
 				holder.itemLayout2.setVisibility(View.GONE);
 			}
+			
+			holder.imageView1.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", _position);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
+			});
+			
+			holder.imageView2.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", _position+1);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
+			});
 			
 			holder.imageButtonThreeDots1.setTag(holder);
 			holder.imageButtonThreeDots1.setOnClickListener(
@@ -286,6 +305,22 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 				params2.height = 0;
 			}
 			
+			holder.optionOpen1.setTag(holder);
+			holder.optionOpen1.setOnClickListener(
+					new OnClickListener() {
+				
+						@Override
+						public void onClick(View v) {
+							Intent i = new Intent(context, FullScreenImageViewer.class);
+							i.putExtra("position", _position);
+							i.putExtra("names", names);
+							i.putExtra("imageIds", imageIds);
+							context.startActivity(i);	
+							positionClicked = -1;
+							notifyDataSetChanged();
+						}
+					});
+			
 			holder.optionProperties1.setTag(holder);
 			holder.optionProperties1.setOnClickListener(
 						new OnClickListener() {
@@ -298,6 +333,22 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 								notifyDataSetChanged();
 							}
 						});
+			
+			holder.optionOpen2.setTag(holder);
+			holder.optionOpen2.setOnClickListener(
+					new OnClickListener() {
+				
+						@Override
+						public void onClick(View v) {
+							Intent i = new Intent(context, FullScreenImageViewer.class);
+							i.putExtra("position", _position+1);
+							i.putExtra("names", names);
+							i.putExtra("imageIds", imageIds);
+							context.startActivity(i);	
+							positionClicked = -1;
+							notifyDataSetChanged();
+						}
+					});
 			
 			holder.optionProperties2.setTag(holder);
 			holder.optionProperties2.setOnClickListener(

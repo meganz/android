@@ -34,6 +34,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal10, R.drawable.sal03, R.drawable.sal10, R.drawable.sal05, R.drawable.sal10, R.drawable.sal07, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09};
 	
 	List<ItemFileBrowser> rowItems;
+	ArrayList<Integer> imageIds;
+	ArrayList<String> namesArray;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,10 +43,14 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 		
+		namesArray = new ArrayList<String>();
+		imageIds = new ArrayList<Integer>();
 		rowItems = new ArrayList<ItemFileBrowser>();
         for (int i = 0; i < names.length; i++) {
         	ItemFileBrowser item = new ItemFileBrowser(images[i], names[i]);
             rowItems.add(item);
+            imageIds.add(item.getImageId());
+            namesArray.add(item.getName());
         }
         
         listView = (ListView) v.findViewById(R.id.file_list_view_browser);
@@ -77,9 +83,10 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
 		
-		Intent i = new Intent(context, FilePropertiesActivity.class);
-		i.putExtra("imageId", rowItems.get(position).getImageId());
-		i.putExtra("name", rowItems.get(position).getName());
+		Intent i = new Intent(context, FullScreenImageViewer.class);
+		i.putExtra("position", position);
+		i.putExtra("imageIds", imageIds);
+		i.putExtra("names", namesArray);
 		startActivity(i);
     }
 	

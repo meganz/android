@@ -69,6 +69,14 @@
         </activity>
         
         <activity
+            android:name="FullScreenImageViewer"
+            android:label="@string/full_screen_image_viewer_label"
+            android:launchMode="singleTop"
+            android:theme="@style/login_activity"
+            android:configChanges="orientation|screenSize" >
+        </activity>
+        
+        <activity
             android:name="FilePropertiesActivity"
             android:label="@string/file_properties_activity"
             android:launchMode="singleTop"
@@ -79,6 +87,7 @@
             android:name="ContactPropertiesActivity"
             android:label="@string/contact_properties_activity"
             android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize"
             android:uiOptions="splitActionBarWhenNarrow" >            
         </activity>
     </application>
