@@ -10,6 +10,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter {
 	
@@ -25,6 +27,9 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 	private ArrayList<String> _names;
 	private LayoutInflater inflater;
 	private ActionBar aB;
+	TouchImageView imgDisplay;
+	private SparseArray<TouchImageView> visibleImgs = new SparseArray<TouchImageView>();
+
 	
 	// constructor
 	public MegaFullScreenImageAdapter(Activity activity, ArrayList<Integer> imageIds, ArrayList<String> names) {
@@ -46,7 +51,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-		TouchImageView imgDisplay;
         Button btnClose;
         TextView title;
 		
@@ -54,7 +58,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
 		imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-        btnClose = (Button) viewLayout.findViewById(R.id.full_screen_image_viewer_close_button);
+		btnClose = (Button) viewLayout.findViewById(R.id.full_screen_image_viewer_close_button);
         title = (TextView) viewLayout.findViewById(R.id.full_screen_image_viewer_title);
         
         imgDisplay.setImageResource(_imageIds.get(position));
@@ -77,13 +81,20 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 			});
 
         ((ViewPager) container).addView(viewLayout);
+        
+        visibleImgs.put(position, imgDisplay);
 		
 		return viewLayout;
 	}
 	
 	@Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
  
     }
+	
+	public TouchImageView getVisibleImage(int position){
+		return visibleImgs.get(position);
+	}
 }

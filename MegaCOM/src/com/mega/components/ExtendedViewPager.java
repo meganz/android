@@ -3,12 +3,18 @@ package com.mega.components;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class ExtendedViewPager extends ViewPager {
+	
+	private Context _context;
 
 	public ExtendedViewPager(Context context) {
 	    super(context);
+		_context = context;
 	}
 
 	public ExtendedViewPager(Context context, AttributeSet attrs) {
@@ -23,5 +29,16 @@ public class ExtendedViewPager extends ViewPager {
 	        return super.canScroll(v, checkV, dx, x, y);
 	    }
 	}
+	
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent event) {
+		return super.onInterceptTouchEvent(event);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+	    return super.onTouchEvent(event);
+	}
+	
 
 }
