@@ -3,10 +3,8 @@ package com.mega.components;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 public class ExtendedViewPager extends ViewPager {
 	

@@ -15,12 +15,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-public class MegaFullScreenImageAdapter extends PagerAdapter {
+public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener  {
 	
 	private Activity _activity;
 	private ArrayList<Integer> _imageIds;
@@ -28,8 +25,8 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 	private LayoutInflater inflater;
 	private ActionBar aB;
 	TouchImageView imgDisplay;
+	View viewLayout;
 	private SparseArray<TouchImageView> visibleImgs = new SparseArray<TouchImageView>();
-
 	
 	// constructor
 	public MegaFullScreenImageAdapter(Activity activity, ArrayList<Integer> imageIds, ArrayList<String> names) {
@@ -51,35 +48,15 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 	
 	@Override
     public Object instantiateItem(ViewGroup container, int position) {
-        Button btnClose;
-        TextView title;
-		
+	
 		inflater = (LayoutInflater) _activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
+		viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
 		imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		btnClose = (Button) viewLayout.findViewById(R.id.full_screen_image_viewer_close_button);
-        title = (TextView) viewLayout.findViewById(R.id.full_screen_image_viewer_title);
         
         imgDisplay.setImageResource(_imageIds.get(position));
+        imgDisplay.setOnClickListener(this);
         
-        // close button click event
-        btnClose.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				_activity.finish();
-			}
-		}); 
-        
-        title.setText(_names.get(position));
-        imgDisplay.setOnClickListener(new OnClickListener() {
-			
-				@Override
-				public void onClick(View v) {
-					
-				}
-			});
-
         ((ViewPager) container).addView(viewLayout);
         
         visibleImgs.put(position, imgDisplay);
@@ -96,5 +73,20 @@ public class MegaFullScreenImageAdapter extends PagerAdapter {
 	
 	public TouchImageView getVisibleImage(int position){
 		return visibleImgs.get(position);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch(v.getId()){
+			case R.id.full_screen_image_viewer_image:{
+				if (aB.isShowing()){
+					aB.hide();
+				}
+				else{
+					aB.show();
+				}
+				break;
+			}
+		}
 	}
 }

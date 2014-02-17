@@ -1,22 +1,15 @@
 package com.mega.android;
 
-import com.mega.components.MySwitch;
 import com.mega.components.RoundedImageView;
 
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -32,10 +25,17 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 	TextView contentDetailedTextView;
 	ImageView statusImageView;
 	ImageButton eyeButton;
+	ActionBar aB;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		aB = getSupportActionBar();
+		aB.setHomeButtonEnabled(true);
+		aB.setDisplayShowTitleEnabled(false);
+		aB.setLogo(R.drawable.ic_action_navigation_accept);
+
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -87,6 +87,18 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 			}
 		
 		}
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	    // Respond to the action bar's Up/Home button
+		    case android.R.id.home:{
+		    	finish();
+		    	return true;
+		    }
+		}	    
+	    return super.onOptionsItemSelected(item);
 	}
 
 }
