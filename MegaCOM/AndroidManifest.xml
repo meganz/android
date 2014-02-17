@@ -72,7 +72,9 @@
             android:name="FullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize" >
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/full_screen_image_activity"
+            android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         
         <activity

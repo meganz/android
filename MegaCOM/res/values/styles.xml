@@ -78,7 +78,12 @@
       <item name="android:button">@drawable/btn_check_holo_light</item>
   </style>
     
-    <style name="login_activity" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="login_activity" parent="@style/Theme.AppCompat.Light">
         <item name="android:windowNoTitle">true</item>
+    </style>
+            
+    <style name="full_screen_image_activity" parent="@style/Theme.AppCompat.Light">
+        <!-- Support library compatibility -->
+        <item name="windowActionBarOverlay">true</item>
     </style>
 </resources>

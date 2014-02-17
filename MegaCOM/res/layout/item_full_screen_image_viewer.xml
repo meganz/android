@@ -9,27 +9,5 @@
         android:layout_height="fill_parent"
         android:scaleType="fitCenter" />
     
-    <TextView
-        android:id="@+id/full_screen_image_viewer_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true" />
-
-    <Button
-        android:id="@+id/full_screen_image_viewer_close_button"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="15dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp"
-        android:background="@drawable/button_background_full_image_viewer"
-        android:textColor="#ffffff"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="Close" />
 
 </RelativeLayout>
