@@ -40,6 +40,8 @@ public class RubbishBinGridFragment extends Fragment implements OnClickListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 			
+		aB.setTitle(getString(R.string.section_rubbish_bin));
+
 		View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
 		
 		items = new ArrayList<ItemFileBrowser>();

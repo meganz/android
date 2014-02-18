@@ -41,7 +41,10 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
+		aB.setTitle(getString(R.string.section_cloud_drive));
+		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+		
 		
 		namesArray = new ArrayList<String>();
 		imageIds = new ArrayList<Integer>();

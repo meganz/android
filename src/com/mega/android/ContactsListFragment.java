@@ -39,6 +39,8 @@ public class ContactsListFragment extends Fragment implements OnClickListener, O
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
+		aB.setTitle(getString(R.string.section_contacts));
+		
 		View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
 		
 		rowItems = new ArrayList<ItemContact>();
