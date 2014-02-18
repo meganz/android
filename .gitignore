@@ -4,3 +4,5 @@
 /.classpath
 /.project
 /proguard
+/obj
+/libs
