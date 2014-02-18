@@ -33,7 +33,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,10 +64,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     
+    private SearchView mSearchView;    
 	private MenuItem searchMenuItem;
 	
 	private static DrawerItem drawerItem;
 	private static DrawerItem lastDrawerItem;
+	
+	private TableLayout topControlBar;
+	private TableLayout bottomControlBar;
 	
 	ImageButton customListGrid;
 
@@ -73,10 +79,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
+	private boolean isListRubbishBin = true;
     private FileBrowserListFragment fbL;
     private FileBrowserGridFragment fbG;
     private ContactsListFragment cL;
     private ContactsGridFragment cG;
+    private RubbishBinListFragment rbL;
+    private RubbishBinGridFragment rbG;
     
 
 
@@ -105,6 +114,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
+        topControlBar = (TableLayout) findViewById(R.id.top_control_bar);
+        topControlBar.setOnClickListener(this);
+        bottomControlBar = (TableLayout) findViewById(R.id.bottom_control_bar);
+        bottomControlBar.setOnClickListener(this);
         
         TextView used_space = (TextView) findViewById(R.id.used_space);
         String used = "11";
@@ -197,15 +210,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
         //Create the actionBar Menu
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
-        ImageButton customSearch = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_search);
-		customSearch.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (searchMenuItem != null) {
-					MenuItemCompat.expandActionView(searchMenuItem);
-				}
-			}
-		}); 
+        
+        LinearLayout customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
+        customSearch.setOnClickListener(this);
 		
 		customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 		customListGrid.setOnClickListener(this);
@@ -267,34 +274,72 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
     			break;
     		}
+    		case RUBBISH_BIN:{
+    			
+    			if (rbG == null){
+    				rbG = new RubbishBinGridFragment();
+    			}
+    			if (rbL == null){
+    				rbL = new RubbishBinListFragment();
+    			}
+    			if (isListRubbishBin){
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbL).commit();
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+    			}
+    			else{
+    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    			}
+
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+    			break;
+    		}
     	}
     }
 	
 	@Override
 	public void onBackPressed() {
-		
-		if (fbL.isVisible()){
-			if (fbL.onBackPressed() == 0){
-				super.onBackPressed();
-				return;
+		if (fbL != null){
+			if (fbL.isVisible()){
+				if (fbL.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
+			}
+			else if (fbG.isVisible()){
+				if (fbG.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
 			}
 		}
-		else if (fbG.isVisible()){
-			if (fbG.onBackPressed() == 0){
-				super.onBackPressed();
-				return;
+		if (cL != null){
+			if (cL.isVisible()){
+				if (cL.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
+			}
+			else if (cG.isVisible()){
+				if (cG.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
 			}
 		}
-		else if (cL.isVisible()){
-			if (cL.onBackPressed() == 0){
-				super.onBackPressed();
-				return;
+		if (rbL != null){
+			if (rbL.isVisible()){
+				if (rbL.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
 			}
-		}
-		else if (cG.isVisible()){
-			if (cG.onBackPressed() == 0){
-				super.onBackPressed();
-				return;
+			else if (rbG.isVisible()){
+				if (rbG.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
 			}
 		}
 	}
@@ -309,16 +354,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    // Inflate the menu items for use in the action bar
+		
+		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
 	    
-	    searchMenuItem = menu.findItem(R.id.action_search);
-	    searchMenuItem.setVisible(false);
 	    final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	    final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-	    
-	    if (searchView != null) {
+		searchMenuItem = menu.findItem(R.id.action_search);
+		searchMenuItem.setVisible(false);
+		final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+		
+		if (searchView != null){
 			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 			searchView.setIconifiedByDefault(true);
 		}
@@ -331,19 +378,26 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
-		    case android.R.id.home:
-		    case R.id.home:
-		    case R.id.homeAsUp:
+		    case android.R.id.home:{
+//		    case R.id.home:
+//		    case R.id.homeAsUp:
 	    	//case 16908332: //Algo pasa con la CyanogenMod
 		    	if (mDrawerToggle.isDrawerIndicatorEnabled()) {
 					mDrawerToggle.onOptionsItemSelected(item);
 				}
 		    	return true;
-	        case R.id.action_settings:
+		    }
+	        case R.id.action_settings:{
 	        	Toast.makeText(this,  "Icono de preferencias clickado", Toast.LENGTH_SHORT).show();
 	            return true;
-            default:
+	        }
+	        case R.id.action_search:{
+	        	mSearchView.setIconified(false);
+	        	return true;
+	        }
+            default:{
 	            return super.onOptionsItemSelected(item);
+            }
 	    }
 	}
 
@@ -358,34 +412,71 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 		switch(v.getId()){
 			case R.id.menu_action_bar_grid:{
-				if (fbL.isVisible() || fbG.isVisible()){
-					if (isListCloudDrive){
-						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
-						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-						customListGrid.setImageResource(R.drawable.ic_menu_action_list);
-						isListCloudDrive = false;
-					}
-					else{
-						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-						customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-				        isListCloudDrive = true;					
-					}
-				}
-				else if (cL.isVisible() || cG.isVisible()){
-					if (isListContacts){
-						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
-						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-						customListGrid.setImageResource(R.drawable.ic_menu_action_list);
-						isListContacts = false;
-					}
-					else{
-						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
-						ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-						customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-						isListContacts = true;					
+				if (fbL != null){
+					if (fbL.isVisible() || fbG.isVisible()){
+						if (isListCloudDrive){
+							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							isListCloudDrive = false;
+						}
+						else{
+							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+					        isListCloudDrive = true;					
+						}
 					}
 				}
+				if (cL != null){
+					if (cL.isVisible() || cG.isVisible()){
+						if (isListContacts){
+							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
+							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							isListContacts = false;
+						}
+						else{
+							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							isListContacts = true;					
+						}
+					}
+				}
+				if (rbL != null){
+					if (rbL.isVisible() || rbG.isVisible()){
+						if (isListRubbishBin){
+							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
+							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							isListRubbishBin = false;
+						}
+						else{
+							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbL).commit();
+							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							isListRubbishBin = true;					
+						}
+					}
+				}
+				break;
+			}
+			case R.id.custom_search:{
+				if (searchMenuItem != null) {
+					MenuItemCompat.expandActionView(searchMenuItem);
+				}
+				else{
+					Toast.makeText(this, "HOLA!", Toast.LENGTH_LONG).show();
+				}
+				break;
+			}
+			case R.id.top_control_bar:{
+				Toast.makeText(this, "Link to \'My Account\' (top)", Toast.LENGTH_LONG).show();
+				break;
+			}
+			case R.id.bottom_control_bar:{
+				Toast.makeText(this, "Link to \'My Account\' (bottom)", Toast.LENGTH_LONG).show();
 				break;
 			}
 		}

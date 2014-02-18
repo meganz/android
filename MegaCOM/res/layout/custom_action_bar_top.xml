@@ -1,6 +1,6 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/custom_search"
+    android:id="@+id/custom_action_bar_layout"
     android:orientation="horizontal"
     android:layout_height="wrap_content"
     android:layout_width="wrap_content"
@@ -13,7 +13,13 @@
     
     <!-- style="?attr/actionButtonStyle" -->
     
-    <ImageButton android:id="@+id/menu_action_bar_search"
+    <LinearLayout
+        android:id="@+id/custom_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+   
+    
+      <ImageButton android:id="@+id/menu_action_bar_search"
         		android:src="@drawable/ic_menu_action_search"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -28,22 +34,28 @@
                  android:clickable="false"
                  android:focusable="false" 
                  android:background="@drawable/selectable_background_mega" />
-    
-    <ImageButton android:id="@+id/menu_action_bar_grid"
-        		android:src="@drawable/ic_menu_action_grid"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:layout_gravity="center"
-                 android:visibility="visible"
-                 android:layout_marginTop="4dip"
-                 android:layout_marginBottom="4dip"
-                 android:layout_marginLeft="4dip"
-                 android:layout_marginRight="4dip"
-                 android:scaleType="fitCenter"
-                 android:adjustViewBounds="true"
-                 android:clickable="false"
-                 android:focusable="false"
-                 android:background="@drawable/selectable_background_mega" />
-    
+	</LinearLayout>
+
+ 	<LinearLayout
+        android:id="@+id/custom_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+        
+	    <ImageButton android:id="@+id/menu_action_bar_grid"
+	        		android:src="@drawable/ic_menu_action_grid"
+	                 android:layout_width="wrap_content"
+	                 android:layout_height="wrap_content"
+	                 android:layout_gravity="center"
+	                 android:visibility="visible"
+	                 android:layout_marginTop="4dip"
+	                 android:layout_marginBottom="4dip"
+	                 android:layout_marginLeft="4dip"
+	                 android:layout_marginRight="4dip"
+	                 android:scaleType="fitCenter"
+	                 android:adjustViewBounds="true"
+	                 android:clickable="false"
+	                 android:focusable="false"
+	                 android:background="@drawable/selectable_background_mega" />
+    </LinearLayout>
     
 </LinearLayout>
