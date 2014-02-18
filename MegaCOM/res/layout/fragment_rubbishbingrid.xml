@@ -2,11 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileBrowserListFragment"
+    tools:context=".RubbishBinListFragment"
     android:background="@color/grid_background" >
 
     <ListView 
-        android:id="@+id/contact_grid_view_browser"
+        android:id="@+id/rubbishbin_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
         android:dividerHeight="0dp"

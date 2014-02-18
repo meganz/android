@@ -111,18 +111,7 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    // Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.activity_manager, menu);
-	    
-	    
-	    searchMenuItem = menu.findItem(R.id.action_search);
-	    searchMenuItem.setVisible(false);
-	    final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	    final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-	    
-	    if (searchView != null) {
-			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-			searchView.setIconifiedByDefault(true);
-		}
+	    inflater.inflate(R.menu.full_screen_image_view_menu, menu);
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}

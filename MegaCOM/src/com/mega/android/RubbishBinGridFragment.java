@@ -24,38 +24,36 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class ContactsGridFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class RubbishBinGridFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
 	Context context;
 	ActionBar aB;
 	ListView gridView;
-	MegaContactsGridAdapter adapter;
+	MegaRubbishBinGridAdapter adapter;
 	
-//	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
-//	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
-	public static final String[] names = new String[] { "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4"};
-	public static final Integer[] images = { R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus};
+	public static final String[] names = new String[] { "filename.ext", "filename.ext", "filename.ext", "filename.ext", "filename.ext", "filename.ext"};
+	public static final Integer[] images = { R.drawable.icorb01, R.drawable.icorb02, R.drawable.icorb03, R.drawable.icorb04, R.drawable.icorb05, R.drawable.icorb06};
 	
-	List<ItemContact> items;
+	List<ItemFileBrowser> items;
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 			
-		View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
+		View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
 		
-		items = new ArrayList<ItemContact>();
+		items = new ArrayList<ItemFileBrowser>();
         for (int i = 0; i < names.length; i++) {
-        	ItemContact item = new ItemContact(images[i], names[i]);
+        	ItemFileBrowser item = new ItemFileBrowser(images[i], names[i]);
             items.add(item);
         }
         
-        gridView = (ListView) v.findViewById(R.id.contact_grid_view_browser);
+        gridView = (ListView) v.findViewById(R.id.rubbishbin_grid_view);
         gridView.setOnItemClickListener(null);
         gridView.setItemsCanFocus(false);
 //        gridView.setEnabled(false);        
         
-		adapter = new MegaContactsGridAdapter(context, items);
+		adapter = new MegaRubbishBinGridAdapter(context, items);
 		adapter.setPositionClicked(-1);
 		gridView.setAdapter(adapter);
 		
