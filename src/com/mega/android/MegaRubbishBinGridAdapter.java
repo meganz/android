@@ -67,16 +67,12 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
         ImageButton imageButtonThreeDots2;
         ImageView arrowSelection1;
         RelativeLayout optionsLayout1;
-        ImageButton optionOpen1;
-        ImageButton optionProperties1;
-        ImageButton optionDownload1;
-        ImageButton optionDelete1;
+        ImageButton optionUndo1;
+        ImageButton optionDeletePermanently1;
         ImageView arrowSelection2;
         RelativeLayout optionsLayout2;
-        ImageButton optionOpen2;
-        ImageButton optionProperties2;
-        ImageButton optionDownload2;
-        ImageButton optionDelete2;
+        ImageButton optionUndo2;
+        ImageButton optionDeletePermanently2;
     }
     
 	ViewHolder holder = null;
@@ -127,16 +123,16 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 	            holder.imageView2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_thumbnail2);
 	            
 	            
-				RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
+				RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(75*scaleW, outMetrics),Util.px2dp(75*scaleH, outMetrics));
 				paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
 				holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-				paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+				paramsIV1.setMargins(Util.px2dp(41*scaleW, outMetrics), Util.px2dp(41*scaleH, outMetrics), Util.px2dp(41*scaleW, outMetrics), 0);
 				holder.imageView1.setLayoutParams(paramsIV1);
 				
-				RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
+				RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(75*scaleW, outMetrics),Util.px2dp(75*scaleH, outMetrics));
 				paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
 				holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-				paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
+				paramsIV2.setMargins(Util.px2dp(41*scaleW, outMetrics), Util.px2dp(41*scaleH, outMetrics), Util.px2dp(41*scaleW, outMetrics), 0);
 				holder.imageView2.setLayoutParams(paramsIV2);
 
 				holder.textViewFileName1 = (TextView) convertView.findViewById(R.id.rubbishbin_grid_filename1);
@@ -149,26 +145,18 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_three_dots2);
 				
 				holder.optionsLayout1 = (RelativeLayout) convertView.findViewById(R.id.rubbishbin_grid_options1);
-				holder.optionOpen1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_open1);
-				holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-				holder.optionProperties1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_properties1);
-				holder.optionProperties1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-				holder.optionDownload1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_download1);
-				holder.optionDownload1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-				holder.optionDelete1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_delete1);
-				holder.optionDelete1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+				holder.optionUndo1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_undo1);
+				holder.optionUndo1.setPadding(Util.px2dp((87*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+				holder.optionDeletePermanently1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_delete_permanently1);
+				holder.optionDeletePermanently1.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 				holder.arrowSelection1 = (ImageView) convertView.findViewById(R.id.rubbishbin_grid_arrow_selection1);
 				holder.arrowSelection1.setVisibility(View.GONE);
 
 				holder.optionsLayout2 = (RelativeLayout) convertView.findViewById(R.id.rubbishbin_grid_options2);
-				holder.optionOpen2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_open2);
-				holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-				holder.optionProperties2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_properties2);
-				holder.optionProperties2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-				holder.optionDownload2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_download2);
-				holder.optionDownload2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-				holder.optionDelete2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_delete2);
-				holder.optionDelete2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+				holder.optionUndo2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_undo2);
+				holder.optionUndo2.setPadding(Util.px2dp((87*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+				holder.optionDeletePermanently2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_delete_permanently2);
+				holder.optionDeletePermanently2.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 				holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.rubbishbin_grid_arrow_selection2);
 				holder.arrowSelection2.setVisibility(View.GONE);
 
@@ -306,59 +294,63 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 				params2.height = 0;
 			}
 			
-			holder.optionOpen1.setTag(holder);
-			holder.optionOpen1.setOnClickListener(
+			holder.optionUndo1.setTag(holder);
+			holder.optionUndo1.setOnClickListener(
 					new OnClickListener() {
 				
 						@Override
 						public void onClick(View v) {
-							Intent i = new Intent(context, FullScreenImageViewer.class);
-							i.putExtra("position", _position);
-							i.putExtra("names", names);
-							i.putExtra("imageIds", imageIds);
-							context.startActivity(i);	
+//							Intent i = new Intent(context, FullScreenImageViewer.class);
+//							i.putExtra("position", _position);
+//							i.putExtra("names", names);
+//							i.putExtra("imageIds", imageIds);
+//							context.startActivity(i);
+							Toast.makeText(context, "Undo", Toast.LENGTH_SHORT).show();
 							positionClicked = -1;
 							notifyDataSetChanged();
 						}
 					});
 			
-			holder.optionProperties1.setTag(holder);
-			holder.optionProperties1.setOnClickListener(
+			holder.optionDeletePermanently1.setTag(holder);
+			holder.optionDeletePermanently1.setOnClickListener(
 						new OnClickListener() {
 							public void onClick(View v) {
-								Intent i = new Intent(context, FilePropertiesActivity.class);
-								i.putExtra("imageId", rowItems.get(_position).getImageId());
-								i.putExtra("name", rowItems.get(_position).getName());
-								context.startActivity(i);							
+//								Intent i = new Intent(context, FilePropertiesActivity.class);
+//								i.putExtra("imageId", rowItems.get(_position).getImageId());
+//								i.putExtra("name", rowItems.get(_position).getName());
+//								context.startActivity(i);
+								Toast.makeText(context, "Delete permanently", Toast.LENGTH_SHORT).show();
 								positionClicked = -1;
 								notifyDataSetChanged();
 							}
 						});
 			
-			holder.optionOpen2.setTag(holder);
-			holder.optionOpen2.setOnClickListener(
+			holder.optionUndo2.setTag(holder);
+			holder.optionUndo2.setOnClickListener(
 					new OnClickListener() {
 				
 						@Override
 						public void onClick(View v) {
-							Intent i = new Intent(context, FullScreenImageViewer.class);
-							i.putExtra("position", _position+1);
-							i.putExtra("names", names);
-							i.putExtra("imageIds", imageIds);
-							context.startActivity(i);	
+//							Intent i = new Intent(context, FullScreenImageViewer.class);
+//							i.putExtra("position", _position+1);
+//							i.putExtra("names", names);
+//							i.putExtra("imageIds", imageIds);
+//							context.startActivity(i);
+							Toast.makeText(context, "Undo", Toast.LENGTH_SHORT).show();
 							positionClicked = -1;
 							notifyDataSetChanged();
 						}
 					});
 			
-			holder.optionProperties2.setTag(holder);
-			holder.optionProperties2.setOnClickListener(
+			holder.optionDeletePermanently2.setTag(holder);
+			holder.optionDeletePermanently2.setOnClickListener(
 						new OnClickListener() {
 							public void onClick(View v) {
-								Intent i = new Intent(context, FilePropertiesActivity.class);
-								i.putExtra("imageId", rowItems.get(_position+1).getImageId());
-								i.putExtra("name", rowItems.get(_position+1).getName());
-								context.startActivity(i);							
+//								Intent i = new Intent(context, FilePropertiesActivity.class);
+//								i.putExtra("imageId", rowItems.get(_position+1).getImageId());
+//								i.putExtra("name", rowItems.get(_position+1).getName());
+//								context.startActivity(i);
+								Toast.makeText(context, "Delete permanently", Toast.LENGTH_SHORT).show();
 								positionClicked = -1;
 								notifyDataSetChanged();
 							}

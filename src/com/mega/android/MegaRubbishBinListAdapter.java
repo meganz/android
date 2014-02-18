@@ -64,10 +64,8 @@ public class MegaRubbishBinListAdapter extends BaseAdapter {
         RelativeLayout itemLayout;
         ImageView arrowSelection;
         RelativeLayout optionsLayout;
-        ImageButton optionOpen;
-        ImageButton optionProperties;
-        ImageButton optionDownload;
-        ImageButton optionDelete;
+        ImageButton optionUndo;
+        ImageButton optionDeletePermanently;
     }
 
 	@Override
@@ -96,14 +94,10 @@ public class MegaRubbishBinListAdapter extends BaseAdapter {
 			holder.textViewUpdated = (TextView) convertView.findViewById(R.id.rubbishbin_list_updated);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.rubbishbin_list_options);
-			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_option_open);
-			holder.optionOpen.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_option_properties);
-			holder.optionProperties.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionDownload = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_option_download);
-			holder.optionDownload.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionDelete = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_option_delete);
-			holder.optionDelete.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+			holder.optionUndo = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_option_undo);
+			holder.optionUndo.setPadding(Util.px2dp((87*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionDeletePermanently = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_option_delete_permanently);
+			holder.optionDeletePermanently.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.rubbishbin_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 			convertView.setTag(holder);
@@ -166,30 +160,32 @@ public class MegaRubbishBinListAdapter extends BaseAdapter {
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
 		
-		holder.optionOpen.setTag(holder);
-		holder.optionOpen.setOnClickListener(
+		holder.optionUndo.setTag(holder);
+		holder.optionUndo.setOnClickListener(
 				new OnClickListener() {
 			
 					@Override
 					public void onClick(View v) {
-						Intent i = new Intent(context, FullScreenImageViewer.class);
-						i.putExtra("position", _position);
-						i.putExtra("names", names);
-						i.putExtra("imageIds", imageIds);
-						context.startActivity(i);	
+//						Intent i = new Intent(context, FullScreenImageViewer.class);
+//						i.putExtra("position", _position);
+//						i.putExtra("names", names);
+//						i.putExtra("imageIds", imageIds);
+//						context.startActivity(i);
+						Toast.makeText(context, "Undo", Toast.LENGTH_SHORT).show();
 						positionClicked = -1;
 						notifyDataSetChanged();
 					}
 				});
 		
-		holder.optionProperties.setTag(holder);
-		holder.optionProperties.setOnClickListener(
+		holder.optionDeletePermanently.setTag(holder);
+		holder.optionDeletePermanently.setOnClickListener(
 					new OnClickListener() {
 						public void onClick(View v) {
-							Intent i = new Intent(context, FilePropertiesActivity.class);
-							i.putExtra("imageId", rowItems.get(_position).getImageId());
-							i.putExtra("name", rowItems.get(_position).getName());
-							context.startActivity(i);							
+//							Intent i = new Intent(context, FilePropertiesActivity.class);
+//							i.putExtra("imageId", rowItems.get(_position).getImageId());
+//							i.putExtra("name", rowItems.get(_position).getName());
+//							context.startActivity(i);							
+							Toast.makeText(context, "Delete permanently", Toast.LENGTH_SHORT).show();
 							positionClicked = -1;
 							notifyDataSetChanged();
 						}
