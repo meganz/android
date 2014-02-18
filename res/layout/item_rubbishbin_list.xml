@@ -6,9 +6,11 @@
     
     <ImageView
         android:id="@+id/rubbishbin_list_thumbnail"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginLeft="5dp" 
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" 
         android:scaleType="fitCenter" />
     
     <TextView
@@ -84,44 +86,24 @@
             
             <TableRow>
 	            <ImageButton
-		            android:id="@+id/rubbishbin_list_option_open"
+		            android:id="@+id/rubbishbin_list_option_undo"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_open"
+		            android:src="@drawable/rubbisbin_list_option_undo"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
 		        <ImageButton
-		            android:id="@+id/rubbishbin_list_option_properties"
+		            android:id="@+id/rubbishbin_list_option_delete_permanently"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_properties"
+		            android:src="@drawable/rubbisbin_list_option_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
-		        <ImageButton
-		            android:id="@+id/rubbishbin_list_option_download"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_download"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null"
-		            android:layout_gravity="center_vertical" />
-	        
-		        <ImageButton
-		            android:id="@+id/rubbishbin_list_option_delete"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_delete"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical" />
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>

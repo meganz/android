@@ -17,8 +17,8 @@
         
         <ImageButton
 	        android:id="@+id/rubbishbin_grid_thumbnail1"
-	        android:layout_width="157dp"
-	        android:layout_height="157dp"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
 	        android:layout_centerHorizontal="true"
 	        android:scaleType="fitCenter"
 	        android:background="@null" />
@@ -32,7 +32,7 @@
 	        android:layout_marginLeft="6dp"
 	        android:layout_centerHorizontal="true"
 	        android:layout_below="@id/rubbishbin_grid_thumbnail1"
-	 		 />
+	 		android:layout_marginTop="41dp" />
         
         <TextView
 	        android:id="@+id/rubbishbin_grid_filename1"
@@ -91,44 +91,24 @@
             
             <TableRow>
 	            <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_open1"
+		            android:id="@+id/rubbishbin_grid_option_undo1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_open"
+		            android:src="@drawable/rubbisbin_list_option_undo"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
 		        <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_properties1"
+		            android:id="@+id/rubbishbin_grid_option_delete_permanently1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_properties"
+		            android:src="@drawable/rubbisbin_list_option_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
-		        <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_download1"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_download"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null"
-		            android:layout_gravity="center_vertical" />
-	        
-		        <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_delete1"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_delete"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical" />
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>
@@ -152,8 +132,8 @@
         
         <ImageButton
 	        android:id="@+id/rubbishbin_grid_thumbnail2"
-	        android:layout_width="157dp"
-	        android:layout_height="157dp"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
 	        android:layout_centerHorizontal="true"
    	        android:scaleType="fitCenter" 
    	        android:background="@null"/>
@@ -166,7 +146,8 @@
 	        android:scaleType="fitCenter"
 	        android:layout_marginLeft="6dp"
 	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/rubbishbin_grid_thumbnail2"/>
+	        android:layout_below="@id/rubbishbin_grid_thumbnail2"
+	        android:layout_marginTop="41dp" />
         
         <TextView
 	        android:id="@+id/rubbishbin_grid_filename2"
@@ -224,44 +205,24 @@
             
             <TableRow>
 	            <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_open2"
+		            android:id="@+id/rubbishbin_grid_option_undo2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_open"
+		            android:src="@drawable/rubbisbin_list_option_undo"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
 		        <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_properties2"
+		            android:id="@+id/rubbishbin_grid_option_delete_permanently2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_properties"
+		            android:src="@drawable/rubbisbin_list_option_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
-		        <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_download2"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_download"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null"
-		            android:layout_gravity="center_vertical" />
-	        
-		        <ImageButton
-		            android:id="@+id/rubbishbin_grid_option_delete2"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_delete"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical" />
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>
