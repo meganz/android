@@ -5,55 +5,54 @@ import java.util.ArrayList;
 import com.mega.components.ExtendedViewPager;
 import com.mega.components.TouchImageView;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-public class FullScreenImageViewer extends ActionBarActivity implements OnPageChangeListener{
+public class FullScreenImageViewer extends ActionBarActivity implements OnPageChangeListener, OnClickListener{
 	
 	private ExtendedViewPager viewPager;
 	private MegaFullScreenImageAdapter adapter;
-	private ActionBar aB;
+//	private ActionBar aB;
 	private int positionG;
-//	private TextView title; 
-//	private ImageView btnClose;
 	private ArrayList<String> names;
 	private ArrayList<Integer> imageIds;
 	
-	
-	private MenuItem searchMenuItem;
-
-	
+	private ImageView actionBarIcon;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
 		
-		aB = getSupportActionBar();
-//		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayShowTitleEnabled(false);
-		aB.setLogo(R.drawable.ic_action_navigation_accept);
-//		if (android.os.Build.VERSION _)
-//		ImageView logo = (ImageView) findViewById(R.id.homeAsUp);
-//	    logo.setImageResource(R.drawable.ic_action_navigation_accept);
-	    
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = getResources().getDisplayMetrics().density;
 		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+				
+//		aB = getSupportActionBar();
 //		aB.hide();
+//		aB.setHomeButtonEnabled(true);
+//		aB.setDisplayShowTitleEnabled(false);
+//		aB.setLogo(R.drawable.ic_action_navigation_accept);
+	    
 		
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
@@ -72,13 +71,8 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		
 		viewPager.setOnPageChangeListener(this);
 		
-//		title = (TextView) findViewById(R.id.full_screen_image_viewer_title);
-//        title.setText(names.get(positionG));
-//        
-//		btnClose = (ImageView) findViewById(R.id.full_screen_image_close);
-//		btnClose.setOnClickListener(this);
-		
-
+		actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+		actionBarIcon.setOnClickListener(this);
 	}
 
 	@Override
@@ -109,46 +103,33 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    // Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.full_screen_image_view_menu, menu);
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	    // Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	finish();
-		    	return true;
-		    }
-		}
-	    
-	    return super.onOptionsItemSelected(item);
-	}
-
 //	@Override
-//	public void onClick(View v) {
-//		
-//		switch (v.getId()) {
-//			case R.id.full_screen_image_close:{
-//				onClickClose();
-//				break;
-//			}
-//			case R.id.image_viewer_pager:{
-//				onClickViewPager();
-//				break;
-//			}
+//	public boolean onOptionsItemSelected(MenuItem item) {
+//	    switch (item.getItemId()) {
+//	    // Respond to the action bar's Up/Home button
+//		    case android.R.id.home:{
+//		    	finish();
+//		    	return true;
+//		    }
 //		}
+//	    
+//	    return super.onOptionsItemSelected(item);
 //	}
-//	
-//	public void onClickClose(){
-//		finish();
-//	}
-//	
-//	public void onClickViewPager(){
-//		btnClose.setVisibility(View.GONE);		
-//	}
+
+	@Override
+	public void onClick(View v) {
+
+		switch (v.getId()){
+			case R.id.full_image_viewer_icon:{
+				finish();
+				break;
+			}
+		}
+	}
 }
