@@ -2,12 +2,40 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:id="@+id/full_image_viewer_parent_layout" >
 
     <com.mega.components.ExtendedViewPager 
 	    android:id="@+id/image_viewer_pager"
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent" /> 
+	    android:layout_height="match_parent" />
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:id="@+id/image_viewer_layout_bottom"
+        android:background="#55dddddd"
+        android:layout_alignParentBottom="true">
+           
+    </RelativeLayout>
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:id="@+id/image_viewer_layout_top"
+        android:background="#55dddddd"
+        android:layout_alignParentTop="true">
+        
+        <ImageView 
+            android:id="@+id/full_image_viewer_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_navigation_accept"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"/>
+    
+    </RelativeLayout>
     
 <!-- <TextView
         android:id="@+id/full_screen_image_viewer_title"

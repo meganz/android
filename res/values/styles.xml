@@ -84,6 +84,7 @@
             
     <style name="full_screen_image_activity" parent="@style/Theme.AppCompat.Light">
         <!-- Support library compatibility -->
-        <item name="windowActionBarOverlay">true</item>
+        <!-- <item name="windowActionBarOverlay">true</item> -->
+        <item name="android:windowNoTitle">true</item>
     </style>
 </resources>

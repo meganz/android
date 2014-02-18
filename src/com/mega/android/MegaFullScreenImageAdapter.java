@@ -10,12 +10,16 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener  {
 	
@@ -27,6 +31,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	TouchImageView imgDisplay;
 	View viewLayout;
 	private SparseArray<TouchImageView> visibleImgs = new SparseArray<TouchImageView>();
+	private boolean aBshown = true;
 	
 	// constructor
 	public MegaFullScreenImageAdapter(Activity activity, ArrayList<Integer> imageIds, ArrayList<String> names) {
@@ -79,12 +84,47 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	public void onClick(View v) {
 		switch(v.getId()){
 			case R.id.full_screen_image_viewer_image:{
-				if (aB.isShowing()){
-					aB.hide();
+				
+				Display display = _activity.getWindowManager().getDefaultDisplay();
+				DisplayMetrics outMetrics = new DisplayMetrics ();
+			    display.getMetrics(outMetrics);
+			    float density  = _activity.getResources().getDisplayMetrics().density;
+				
+			    float scaleW = Util.getScaleW(outMetrics, density);
+			    float scaleH = Util.getScaleH(outMetrics, density);
+			    
+			    RelativeLayout bottomLayout = (RelativeLayout) _activity.findViewById(R.id.image_viewer_layout_bottom);
+			    RelativeLayout topLayout = (RelativeLayout) _activity.findViewById(R.id.image_viewer_layout_top);
+				if (aBshown){
+					TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+					animBottom.setDuration(1000);
+					animBottom.setFillAfter( true );
+					bottomLayout.setAnimation(animBottom);
+					
+					TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
+					animTop.setDuration(1000);
+					animTop.setFillAfter( true );
+					topLayout.setAnimation(animTop);
+					
+					aBshown = false;
 				}
-				else{
-					aB.show();
+				else{					
+					TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
+					animBottom.setDuration(1000);
+					animBottom.setFillAfter( true );
+					bottomLayout.setAnimation(animBottom);
+					
+					TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
+					animTop.setDuration(1000);
+					animTop.setFillAfter( true );
+					topLayout.setAnimation(animTop);
+					
+					aBshown = true;
 				}
+				
+				RelativeLayout activityLayout = (RelativeLayout) _activity.findViewById(R.id.full_image_viewer_parent_layout);
+				activityLayout.invalidate();
+				
 				break;
 			}
 		}
