@@ -35,17 +35,28 @@
 %feature("director") MegaTransferListener;
 %feature("director") MegaGlobalListener;
 %feature("director") MegaListener;
-%feature("director") TreeProcessor;
+//%feature("director") TreeProcessor;
 
 //Ignore internal classes
-%ignore MegaCurlHttpIO;
-%ignore PosixFileAccess;
+%ignore mega::MegaApiCurlHttpIO;
+%ignore mega::PosixFileSystemAccess;
+%ignore mega::MegaApiLinuxWaiter;
+%ignore mega::SqliteDbAccess;
 %ignore threadEntryPoint;
 %ignore HttpIO;
 %ignore MegaApp;
 %ignore FileAccess;
 %ignore SearchTreeProcessor;
 %ignore RequestQueue;
+%ignore TransferQueue;
+%ignore mega::File;
+%ignore MegaFile;
+%ignore MegaFileGet;
+%ignore MegaFilePut;
+%ignore MegaWaiter;
+%ignore MegaHttpIO;
+%ignore MegaFileSystemAccess;
+%ignore MegaDbAccess;
 
 //Don't wrap internal constructors
 //(these objects should be created internally only)
@@ -65,6 +76,7 @@
 %ignore MegaRequest::getNumDetails;
 %ignore MegaTransfer::MegaTransfer;
 %ignore MegaError::MegaError;
+%ignore MegaNode::MegaNode;
 
 //Don't wrap internal setters
 //(This objects should be modified internally only)
@@ -72,16 +84,62 @@
 %rename("$ignore", regextarget=1, fullname=1) "MegaTransfer::set.*";
 %rename("$ignore", regextarget=1, fullname=1) "MegaError::set.*";
 
+//Ignore sync features
+%ignore MegaApi::syncPathState;
+%ignore MegaApi::getSyncedNode;
+%ignore MegaApi::syncFolder;
+%ignore MegaApi::removeSync;
+%ignore MegaApi::getNumActiveSyncs;
+%ignore MegaApi::stopSyncs;
+%ignore MegaApi::getNumPendingUploads;
+%ignore MegaApi::getNumPendingDownloads;
+%ignore MegaApi::getTotalUploads;
+%ignore MegaApi::getTotalDownloads;
+%ignore MegaApi::resetTotalDownloads;
+%ignore MegaApi::resetTotalUploads;
+%ignore MegaApi::getLocalPath;
+%ignore MegaApi::updateStatics;
+%ignore MegaApi::update;
+%ignore MegaApi::isIndexing;
+%ignore MegaApi::isWaiting;
+%ignore MegaApi::isSynced;
+%ignore MegaApi::setExcludedNames;
+%ignore MegaApi::checkTransfer;
+%ignore MegaApi::isRegularTransfer;
+
+//Ignore still unsupported features
+%ignore MegaApi::setProxySettings;
+%ignore MegaApi::getAutoProxySettings;
+%ignore MegaApi::cancelTransfer;
+%ignore SizeProcessor;
+%ignore TreeProcessor;
+%ignore MegaNode::getNodeKey;
+%ignore MegaNode::getAttrString;
+%ignore MegaNode::getLocalPath;
+%ignore MegaRequest::getTransfer;
+%ignore MegaTransfer::getTransfer;
+
 //Tell SWIG that these classes exist to avoid warnings
 namespace mega {
+
+typedef uint64_t handle;
+typedef int error;
+
+class MegaApiLinuxWaiter {};
+class PosixFileSystemAccess {};
+class SqliteDbAccess {};
+class File {};
+class MegaApiCurlHttpIO {};
+class MegaFileSystemAccess {};
+class MegaWaiter {};
 class HttpIO {};
 class MegaApp {};
 class FileAccess {};
 class AccountDetails {};
-class AccountBalance {};
-class AccountSession {};
-class AccountPurchase {};
-class AccountTransaction {};
+//class AccountBalance {};
+//class AccountSession {};
+//class AccountPurchase {};
+//class AccountTransaction {};
 class User {};
 class Node {};
 class Share {};
@@ -103,8 +161,8 @@ class Share {};
 %newobject MegaApi::getMyEmail;
 
 
+typedef long long time_t;
 typedef long long uint64_t;
-typedef uint64_t handle;
 typedef uint32_t dstime;
 typedef long long int64_t;
 typedef int64_t m_off_t;
@@ -113,7 +171,7 @@ typedef int64_t m_off_t;
 %include "megaapi.h"
 
 //Tell SWIG about tempates
-%template(NodeList) ArrayWrapper<mega::Node*>;
+%template(NodeList) ArrayWrapper<MegaNode*>;
 %template(UserList) ArrayWrapper<mega::User*>;
 //%template(BalanceList) ArrayWrapper<mega::AccountBalance>;
 //%template(SessionList) ArrayWrapper<mega::AccountSession>;
@@ -171,6 +229,7 @@ public:
 	long long getTimestamp() { return $self->ts; }
 }
 
+/*
 %extend mega::AccountBalance
 {
 public:
@@ -207,6 +266,7 @@ public:
 	const char *getCurrency() { return $self->currency; }
 	double getDelta() { return $self->delta; }
 }
+*/
 
 %newobject mega::AccountDetails::getBalances;
 %newobject mega::AccountDetails::getSessions;

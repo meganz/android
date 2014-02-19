@@ -789,7 +789,7 @@ public:
     void share(MegaNode *node, mega::User* user, const char *level, MegaRequestListener *listener = NULL);
     void share(MegaNode* node, const char* email, const char *level, MegaRequestListener *listener = NULL);
 	void folderAccess(const char* megaFolderLink, MegaRequestListener *listener = NULL);
-	void importFileLink(const char* megaFileLink, mega::Node* parent, MegaRequestListener *listener = NULL);
+	void importFileLink(const char* megaFileLink, MegaNode* parent, MegaRequestListener *listener = NULL);
     void importPublicNode(MegaNode *publicNode, MegaNode *parent, MegaRequestListener *listener = NULL);
 	void getPublicNode(const char* megaFileLink, MegaRequestListener *listener = NULL);
     void exportNode(MegaNode *node, MegaRequestListener *listener = NULL);
@@ -846,7 +846,6 @@ public:
 
 	//Filesystem
     NodeList* getChildren(MegaNode *parent, int order=1);
-	mega::Node* getChildNode(mega::Node *parent, const char* name);
     MegaNode *getParentNode(MegaNode *node);
     const char* getNodePath(MegaNode *node);
     MegaNode *getNodeByPath(const char *path, MegaNode *n = NULL);
@@ -855,14 +854,12 @@ public:
     //User* getContact(const char* email);
 	NodeList *getInShares(mega::User* user);
     //ShareList *getOutShares(Node *node);
-	const char *getAccess(mega::Node* node);
-	bool processTree(mega::Node* node, TreeProcessor* processor, bool recursive = 1);
-	NodeList* search(mega::Node* node, const char* searchString, bool recursive = 1);
+	const char *getAccess(MegaNode* node);
     long long getSize(MegaNode *node);
     static const char *getBase64Handle(MegaNode *node);
 
-	MegaError checkAccess(mega::Node* node, const char *level);
-	MegaError checkMove(mega::Node* node, mega::Node* target);
+	MegaError checkAccess(MegaNode* node, const char *level);
+	MegaError checkMove(MegaNode* node, MegaNode* target);
 
     MegaNode *getRootNode();
     MegaNode* getInboxNode();
@@ -1053,6 +1050,11 @@ protected:
 	void sendPendingTransfers();
     bool is_syncable(const char* name);
 	char *stringToArray(string &buffer);
+
+	//Pending
+	mega::Node* getChildNode(mega::Node *parent, const char* name);
+	bool processTree(mega::Node* node, TreeProcessor* processor, bool recursive = 1);
+	NodeList* search(mega::Node* node, const char* searchString, bool recursive = 1);
 };
 
 
