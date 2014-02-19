@@ -39,6 +39,9 @@ public class RubbishBinListFragment extends Fragment implements OnClickListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
 		aB.setTitle(getString(R.string.section_rubbish_bin));
 
 		View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);

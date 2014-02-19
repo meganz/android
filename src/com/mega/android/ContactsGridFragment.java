@@ -41,7 +41,10 @@ public class ContactsGridFragment extends Fragment implements OnClickListener, O
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-			
+		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
 		aB.setTitle(getString(R.string.section_contacts));
 
 		View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
