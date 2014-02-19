@@ -1305,10 +1305,10 @@ void MegaApi::folderAccess(const char* megaFolderLink, MegaRequestListener *list
     waiter->notify();
 }
 
-void MegaApi::importFileLink(const char* megaFileLink, Node *parent, MegaRequestListener *listener)
+void MegaApi::importFileLink(const char* megaFileLink, MegaNode *parent, MegaRequestListener *listener)
 {
 	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_IMPORT_LINK, listener);
-	if(parent) request->setParentHandle(parent->nodehandle);
+	if(parent) request->setParentHandle(parent->getHandle());
 	request->setLink(megaFileLink);
 	requestQueue.push(request);
     waiter->notify();
@@ -1846,12 +1846,12 @@ ShareList* MegaApi::getOutShares(Node *node)
 }
 */
 
-const char *MegaApi::getAccess(Node* node)
+const char *MegaApi::getAccess(MegaNode* megaNode)
 {
-	if(!node) return NULL;
+	if(!megaNode) return NULL;
 
     MUTEX_LOCK(sdkMutex);
-	node = client->nodebyhandle(node->nodehandle);
+	Node *node = client->nodebyhandle(megaNode->getHandle());
 	if(!node)
 	{
         MUTEX_UNLOCK(sdkMutex);
@@ -3348,12 +3348,12 @@ void MegaApi::fireOnSyncStateChanged(MegaApi* api)
 }
 
 
-MegaError MegaApi::checkAccess(Node* node, const char *level)
+MegaError MegaApi::checkAccess(MegaNode* megaNode, const char *level)
 {
-	if(!node || !level)	return MegaError(API_EINTERNAL);
+	if(!megaNode || !level)	return MegaError(API_EINTERNAL);
 
     MUTEX_LOCK(sdkMutex);
-	node = client->nodebyhandle(node->nodehandle);
+	Node *node = client->nodebyhandle(megaNode->getHandle());
 	if(!node)
 	{
         MUTEX_UNLOCK(sdkMutex);
@@ -3372,13 +3372,13 @@ MegaError MegaApi::checkAccess(Node* node, const char *level)
 	return e;
 }
 
-MegaError MegaApi::checkMove(Node* node, Node* target)
+MegaError MegaApi::checkMove(MegaNode* megaNode, MegaNode* targetNode)
 {
-	if(!node || !target) return MegaError(API_EINTERNAL);
+	if(!megaNode || !targetNode) return MegaError(API_EINTERNAL);
 
     MUTEX_LOCK(sdkMutex);
-	node = client->nodebyhandle(node->nodehandle);
-	target = client->nodebyhandle(target->nodehandle);
+	Node *node = client->nodebyhandle(megaNode->getHandle());
+	Node *target = client->nodebyhandle(targetNode->getHandle());
 	if(!node || !target)
 	{
         MUTEX_UNLOCK(sdkMutex);

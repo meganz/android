@@ -15,7 +15,7 @@ LIB_JAVA_LIBRARY= -lcryptopp -lcurl
 LIB_PYTHON_LIBRARY= -lcryptopp -lcurl -lpython2.7
 LIB_ANDROID_LIBRARY= -lcryptopp -lcurl
 
-SOURCES= src/attrmap.cpp \
+CPP_SOURCES= src/attrmap.cpp \
     src/backofftimer.cpp \
     src/base64.cpp \
     src/command.cpp \
@@ -43,15 +43,15 @@ SOURCES= src/attrmap.cpp \
     src/waiter.cpp  \
     src/crypto/cryptopp.cpp  \
     src/db/sqlite.cpp  \
-    sqlite3.c \
     MegaProxySettings.cpp \
     src/posix/net.cpp  \
     src/posix/fs.cpp  \
     src/posix/posixwaiter.cpp \
     linux/megaapiwait.cpp \
     linux/megaapiposixhttpio.cpp \
-    android/glob.c
     
+C_SOURCES = sqlite3.c android/glob.c
+
 HEADERS= include/mega.h \
 	    include/mega/account.h \
 	    include/mega/attrmap.h \
@@ -94,7 +94,7 @@ HEADERS= include/mega.h \
         include/mega/config.h \
         android/glob.h
 
-OBJECTS=$(SOURCES:.cpp=.o)
+OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = megaapi.cpp
 C_WRAPPER_OBJECTS = megaapi.o
 

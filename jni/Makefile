@@ -44,10 +44,9 @@ OPENSSL_CONFIGURED=openssl/openssl/lib/libcrypto.a
 OPENSSL_PREFIX=$(JNI_PATH)/$(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)
 
 MEGA=mega
-MEGA_BINDING_FILES=$(addprefix $(MEGA)/, MakefileBindings Makefile.inc megaapi.i megaapi.cpp megaapi.h)
 MEGA_JAVA_OUTPUT_PATH=$(JNI_PATH)/../src
 MEGA_CONFIGURED=java_wrap.cxx
-
+MEGA_WRAPPER=megaapi.i
 
 all: $(CRYPTOPP) $(CURL) $(MEGA)
 	$(NDK_BUILD)
@@ -97,7 +96,8 @@ $(CURL_VERIFIED_SOURCES):
 
 $(MEGA): $(MEGA)/$(MEGA_CONFIGURED)
 
-$(MEGA)/$(MEGA_CONFIGURED):
+$(MEGA)/$(MEGA_CONFIGURED): $(MEGA)/$(MEGA_WRAPPER)
+	make clean_mega
 	make -C $(MEGA) -f MakefileBindings $(MEGA_CONFIGURED) JAVA_BASE_OUTPUT_PATH=$(MEGA_JAVA_OUTPUT_PATH)
 
 $(CRYPTOPP): $(CRYPTOPP_SOURCE_FOLDER)
