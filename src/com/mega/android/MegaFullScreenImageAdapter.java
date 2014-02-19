@@ -19,7 +19,6 @@ import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener  {
 	
@@ -128,5 +127,13 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				break;
 			}
 		}
+	}
+
+	public boolean isaBshown() {
+		return aBshown;
+	}
+
+	public void setaBshown(boolean aBshown) {
+		this.aBshown = aBshown;
 	}
 }

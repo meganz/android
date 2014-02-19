@@ -8,51 +8,51 @@ import com.mega.components.TouchImageView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 public class FullScreenImageViewer extends ActionBarActivity implements OnPageChangeListener, OnClickListener{
 	
-	private ExtendedViewPager viewPager;
+	private Display display;
+	private DisplayMetrics outMetrics;
+	private float density;
+	private float scaleW;
+	private float scaleH;
+	
+	private boolean aBshown = true;
+	
+
 	private MegaFullScreenImageAdapter adapter;
-//	private ActionBar aB;
 	private int positionG;
 	private ArrayList<String> names;
 	private ArrayList<Integer> imageIds;
 	
 	private ImageView actionBarIcon;
+	private RelativeLayout bottomLayout;
+    private RelativeLayout topLayout;
+	private ExtendedViewPager viewPager;	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_full_screen_image_viewer);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = getResources().getDisplayMetrics().density;
+	    density  = getResources().getDisplayMetrics().density;
 		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-				
-//		aB = getSupportActionBar();
-//		aB.hide();
-//		aB.setHomeButtonEnabled(true);
-//		aB.setDisplayShowTitleEnabled(false);
-//		aB.setLogo(R.drawable.ic_action_navigation_accept);
-	    
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
 		
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
@@ -73,6 +73,10 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		
 		actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
 		actionBarIcon.setOnClickListener(this);
+		
+		bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+	    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+		
 	}
 
 	@Override
@@ -108,19 +112,6 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
-	
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//	    switch (item.getItemId()) {
-//	    // Respond to the action bar's Up/Home button
-//		    case android.R.id.home:{
-//		    	finish();
-//		    	return true;
-//		    }
-//		}
-//	    
-//	    return super.onOptionsItemSelected(item);
-//	}
 
 	@Override
 	public void onClick(View v) {
@@ -130,6 +121,33 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 				finish();
 				break;
 			}
+		}
+	}
+	
+	@Override
+	public void onSaveInstanceState (Bundle savedInstanceState){
+		super.onSaveInstanceState(savedInstanceState);
+
+		savedInstanceState.putBoolean("aBshown", adapter.isaBshown());
+	}
+	
+	@Override
+	public void onRestoreInstanceState (Bundle savedInstanceState){
+		super.onRestoreInstanceState(savedInstanceState);
+		
+		aBshown = savedInstanceState.getBoolean("aBshown");
+		adapter.setaBshown(aBshown);
+		
+		if (!aBshown){
+			TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+			animBottom.setDuration(0);
+			animBottom.setFillAfter( true );
+			bottomLayout.setAnimation(animBottom);
+			
+			TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
+			animTop.setDuration(0);
+			animTop.setFillAfter( true );
+			topLayout.setAnimation(animTop);
 		}
 	}
 }
