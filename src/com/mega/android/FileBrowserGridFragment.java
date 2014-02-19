@@ -41,7 +41,10 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-			
+		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
 		aB.setTitle(getString(R.string.section_cloud_drive));
 
 		View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
