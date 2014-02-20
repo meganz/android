@@ -794,6 +794,8 @@ public:
 	void importFileLink(const char* megaFileLink, MegaNode* parent, MegaRequestListener *listener = NULL);
     void importPublicNode(MegaNode *publicNode, MegaNode *parent, MegaRequestListener *listener = NULL);
 	void getPublicNode(const char* megaFileLink, MegaRequestListener *listener = NULL);
+	void getThumbnail(MegaNode* node, char *dstFilePath, MegaRequestListener *listener = NULL);
+	void setThumbnail(MegaNode* node, char *srcFilePath, MegaRequestListener *listener = NULL);
     void exportNode(MegaNode *node, MegaRequestListener *listener = NULL);
 	void fetchNodes(MegaRequestListener *listener = NULL);
 	void getAccountDetails(MegaRequestListener *listener = NULL);
