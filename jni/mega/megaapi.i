@@ -110,7 +110,12 @@
 //Ignore still unsupported features
 %ignore MegaApi::setProxySettings;
 %ignore MegaApi::getAutoProxySettings;
-%ignore MegaApi::cancelTransfer;
+%ignore MegaApi::getSize;
+%ignore MegaApi::getDebug;
+%ignore MegaApi::setDebug;
+%ignore MegaApi::getRootNodeNames;
+%ignore MegaApi::getRootNodePaths;
+%ignore MegaApi::strdup;
 %ignore SizeProcessor;
 %ignore TreeProcessor;
 %ignore MegaNode::getNodeKey;
@@ -118,6 +123,7 @@
 %ignore MegaNode::getLocalPath;
 %ignore MegaRequest::getTransfer;
 %ignore MegaTransfer::getTransfer;
+%ignore MegaListener::onSyncStateChanged;
 
 //Tell SWIG that these classes exist to avoid warnings
 namespace mega {
@@ -147,6 +153,8 @@ class Share {};
 
 %newobject MegaError::copy;
 %newobject MegaRequest::copy;
+%newobject MegaNode::copy;
+%newobject MegaNode::getBase64Handle;
 %newobject MegaRequest::getPublicNode;
 
 %newobject MegaApi::getChildren;

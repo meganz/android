@@ -324,6 +324,11 @@ MegaNode::MegaNode(Node *node)
     }
 }
 
+MegaNode *MegaNode::copy()
+{
+	return new MegaNode(this);
+}
+
 MegaNode::~MegaNode()
 {
     delete name;
@@ -335,6 +340,12 @@ MegaNode *MegaNode::fromNode(Node *node)
     return new MegaNode(node);
 }
 
+const char *MegaNode::getBase64Handle()
+{
+    char *base64Handle = new char[12];
+    Base64::btoa((byte*)&(nodehandle),MegaClient::NODEHANDLE,base64Handle);
+    return base64Handle;
+}
 
 int MegaNode::getType() { return type; }
 const char* MegaNode::getName() { return name; }
@@ -919,10 +930,10 @@ void MegaTransferListener::onTransferTemporaryError(MegaApi *, MegaTransfer *tra
 MegaTransferListener::~MegaTransferListener() {}
 
 //Global callbacks
-void MegaGlobalListener::onUsersUpdate(MegaApi*, UserList *users)
-{ cout << "onUsersUpdate   Users: " << users->size() << endl; }
-void MegaGlobalListener::onNodesUpdate(MegaApi*, NodeList *nodes)
-{ cout << "onNodesUpdate   Nodes: " << nodes->size() << endl; }
+void MegaGlobalListener::onUsersUpdate(MegaApi*)
+{ cout << "onUsersUpdate" << endl; }
+void MegaGlobalListener::onNodesUpdate(MegaApi*)
+{ cout << "onNodesUpdate" << endl; }
 void MegaGlobalListener::onReloadNeeded(MegaApi*)
 { cout << "onReloadNeeded" << endl; }
 MegaGlobalListener::~MegaGlobalListener() {}
@@ -943,10 +954,10 @@ void MegaListener::onTransferUpdate(MegaApi *, MegaTransfer *transfer)
 { cout << "onTransferUpdate.   Name:  " << transfer->getFileName() << "    Progress: " << transfer->getTransferredBytes() << endl; }
 void MegaListener::onTransferTemporaryError(MegaApi *api, MegaTransfer *transfer, MegaError* e)
 { cout << "onTransferTemporaryError.   Name: " << transfer->getFileName() << "    Error: " << e->getErrorString() << endl; }
-void MegaListener::onUsersUpdate(MegaApi*, UserList *users)
-{ cout << "onUsersUpdate   Users: " << users->size() << endl; }
-void MegaListener::onNodesUpdate(MegaApi*, NodeList *nodes)
-{ cout << "onNodesUpdate   Nodes: " << nodes->size() << endl; }
+void MegaListener::onUsersUpdate(MegaApi*)
+{ cout << "onUsersUpdate" << endl; }
+void MegaListener::onNodesUpdate(MegaApi*)
+{ cout << "onNodesUpdate" << endl; }
 void MegaListener::onReloadNeeded(MegaApi*)
 { cout << "onReloadNeeded" << endl; }
 void MegaListener::onSyncStateChanged(MegaApi *api)
@@ -1555,7 +1566,7 @@ void MegaApi::cancelTransfer(Transfer *transfer, MegaRequestListener *listener)
     waiter->notify();
 }
 
-void MegaApi::cancelRegularTransfers(int direction, MegaRequestListener *listener)
+void MegaApi::cancelTransfers(int direction, MegaRequestListener *listener)
 {
     MegaRequest *request = new MegaRequest(MegaRequest::TYPE_CANCEL_TRANSFERS, listener);
     request->setParamType(direction);
@@ -1972,15 +1983,6 @@ long long MegaApi::getSize(MegaNode *n)
     return result;
 }
 
-const char *MegaApi::getBase64Handle(MegaNode *node)
-{
-    if(!node) return NULL;
-    char *base64Handle = new char[12];
-    handle nodehandle = node->getHandle();
-    Base64::btoa((byte*)&(nodehandle),MegaClient::NODEHANDLE,base64Handle);
-    return base64Handle;
-}
-
 SearchTreeProcessor::SearchTreeProcessor(const char *search) { this->search = search; }
 
 int SearchTreeProcessor::processNode(Node* node)
@@ -2353,13 +2355,13 @@ void MegaApi::users_updated(User** u, int count)
 	//if (count == 1) cout << "1 user received" << endl;
 	//else cout << count << " users received" << endl;
 
-    /*UserList* userList = new UserList(u, count);
+    //UserList* userList = new UserList(u, count);
 
-    MUTEX_UNLOCK(sdkMutex);
-	fireOnUsersUpdate(this, userList);
-    MUTEX_LOCK(sdkMutex);
+    //MUTEX_UNLOCK(sdkMutex);
+	fireOnUsersUpdate(this);
+    //MUTEX_LOCK(sdkMutex);
 
-    delete userList;*/
+    //delete userList;
 }
 
 void MegaApi::setattr_result(handle h, error e)
@@ -2856,15 +2858,15 @@ void MegaApi::debug_log(const char* message)
 // at which point their pointers will become invalid at that point.)
 void MegaApi::nodes_updated(Node** n, int count)
 {
-	NodeList *nodeList = NULL;
+	/*NodeList *nodeList = NULL;
     if(n != NULL)
     {
         vector<MegaNode *> list;
         for(int i=0; i<count; i++)
             list.push_back(MegaNode::fromNode(n[i]));
         nodeList = new NodeList(list.data(), count, true);
-    }
-    fireOnNodesUpdate(this, nodeList);
+    }*/
+    fireOnNodesUpdate(this);
 }
 
 // display account details/history
@@ -3314,22 +3316,22 @@ void MegaApi::fireOnTransferUpdate(MegaApi *api, MegaTransfer *transfer)
 	if(listener) listener->onTransferUpdate(api, transfer);
 }
 
-void MegaApi::fireOnUsersUpdate(MegaApi* api, UserList *users)
+void MegaApi::fireOnUsersUpdate(MegaApi* api)
 {
 	for(set<MegaGlobalListener *>::iterator it = globalListeners.begin(); it != globalListeners.end() ; it++)
-		(*it)->onUsersUpdate(api, users);
+		(*it)->onUsersUpdate(api);
 
 	for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
-		(*it)->onUsersUpdate(api, users);
+		(*it)->onUsersUpdate(api);
 }
 
-void MegaApi::fireOnNodesUpdate(MegaApi* api, NodeList *nodes)
+void MegaApi::fireOnNodesUpdate(MegaApi* api)
 {
 	for(set<MegaGlobalListener *>::iterator it = globalListeners.begin(); it != globalListeners.end() ; it++)
-		(*it)->onNodesUpdate(api, nodes);
+		(*it)->onNodesUpdate(api);
 
 	for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
-		(*it)->onNodesUpdate(api, nodes);
+		(*it)->onNodesUpdate(api);
 }
 
 void MegaApi::fireOnReloadNeeded(MegaApi* api)
@@ -3343,8 +3345,10 @@ void MegaApi::fireOnReloadNeeded(MegaApi* api)
 
 void MegaApi::fireOnSyncStateChanged(MegaApi* api)
 {
-    for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
-        (*it)->onSyncStateChanged(api);
+	return;
+
+    //for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
+    //    (*it)->onSyncStateChanged(api);
 }
 
 
