@@ -30,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaContactsGridAdapter extends BaseAdapter {
+public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListener{
 	
 	Context context;
 	List<ItemContact> rowItems;
@@ -66,6 +66,7 @@ public class MegaContactsGridAdapter extends BaseAdapter {
         ImageButton optionProperties2;
         ImageButton optionSend2;
         ImageButton optionRemove2;
+        int currentPosition;
     }
     
 	ViewHolder holder = null;
@@ -119,34 +120,14 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 				holder.imageView1.setPadding(0, Util.px2dp(5*scaleH, outMetrics), 0, Util.px2dp(5*scaleH, outMetrics));
 				holder.imageView2.setPadding(0, Util.px2dp(5*scaleH, outMetrics), 0, Util.px2dp(5*scaleH, outMetrics));
 
-	            holder.imageView1.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						Intent i = new Intent(context, ContactPropertiesActivity.class);
-						ItemContact rowItem = (ItemContact) getItem(_position);
-						i.putExtra("imageId", rowItem.getImageId());
-						i.putExtra("name", rowItem.getName());
-						i.putExtra("position", _position);
-						context.startActivity(i);						
-					}
-				});
+				holder.imageView1.setTag(holder);
+	            holder.imageView1.setOnClickListener(this);
 	            
-	            holder.imageView2.setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						Intent i = new Intent(context, ContactPropertiesActivity.class);
-						ItemContact rowItem = (ItemContact) getItem(_position+1);
-						i.putExtra("imageId", rowItem.getImageId());
-						i.putExtra("name", rowItem.getName());
-						i.putExtra("position", _position+1);
-						context.startActivity(i);	
-					}
-				});
+	            holder.imageView2.setTag(holder);
+	            holder.imageView2.setOnClickListener(this);
 	            
-	            holder.statusImage1 = (ImageView) convertView.findViewById(R.id.contact_list_status_dot1);
-	            holder.statusImage2 = (ImageView) convertView.findViewById(R.id.contact_list_status_dot2);
+	            holder.statusImage1 = (ImageView) convertView.findViewById(R.id.contact_grid_status_dot1);
+	            holder.statusImage2 = (ImageView) convertView.findViewById(R.id.contact_grid_status_dot2);
 	            if (position == 2){
 	            	holder.statusImage1.setImageResource(R.drawable.contact_yellow_dot);
 	            	holder.statusImage2.setImageResource(R.drawable.contact_red_dot);
@@ -170,8 +151,8 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 				holder.textViewFileSize1 = (TextView) convertView.findViewById(R.id.contact_grid_filesize1);
 				holder.textViewFileSize2 = (TextView) convertView.findViewById(R.id.contact_grid_filesize2);
 				
-				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots1);
-				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots2);
+				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.contact_grid_three_dots1);
+				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.contact_grid_three_dots2);
 				
 				holder.optionsLayout1 = (RelativeLayout) convertView.findViewById(R.id.contact_grid_options1);
 				holder.optionProperties1 = (ImageButton) convertView.findViewById(R.id.contact_grid_option_properties1);
@@ -192,6 +173,8 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 				holder.optionRemove2.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
 				holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.contact_grid_arrow_selection2);
 				holder.arrowSelection2.setVisibility(View.GONE);
+				
+				holder.currentPosition = position;
 
 				convertView.setTag(holder);
 			}
@@ -217,46 +200,10 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 			}
 			
 			holder.imageButtonThreeDots1.setTag(holder);
-			holder.imageButtonThreeDots1.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								if (positionClicked == -1){
-									positionClicked = _position;
-									notifyDataSetChanged();
-								}
-								else{
-									if (positionClicked == _position){
-										positionClicked = -1;
-										notifyDataSetChanged();
-									}
-									else{
-										positionClicked = _position;
-										notifyDataSetChanged();
-									}
-								}
-							}
-						});
+			holder.imageButtonThreeDots1.setOnClickListener(this);
 			
 			holder.imageButtonThreeDots2.setTag(holder);
-			holder.imageButtonThreeDots2.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								if (positionClicked == -1){
-									positionClicked = _position+1;
-									notifyDataSetChanged();
-								}
-								else{
-									if (positionClicked == (_position+1)){
-										positionClicked = -1;
-										notifyDataSetChanged();
-									}
-									else{
-										positionClicked = _position+1;
-										notifyDataSetChanged();
-									}
-								}
-							}
-						});
+			holder.imageButtonThreeDots2.setOnClickListener(this);
 			
 			if (positionClicked != -1){
 				if (positionClicked == position){
@@ -300,33 +247,10 @@ public class MegaContactsGridAdapter extends BaseAdapter {
 			}
 			
 			holder.optionProperties1.setTag(holder);
-			holder.optionProperties1.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								Intent i = new Intent(context, ContactPropertiesActivity.class);
-								i.putExtra("imageId", rowItems.get(_position).getImageId());
-								i.putExtra("name", rowItems.get(_position).getName());
-								i.putExtra("position", _position);
-								context.startActivity(i);							
-								positionClicked = -1;
-								notifyDataSetChanged();
-							}
-						});
+			holder.optionProperties1.setOnClickListener(this);
 			
 			holder.optionProperties2.setTag(holder);
-			holder.optionProperties2.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								
-								Intent i = new Intent(context, ContactPropertiesActivity.class);
-								i.putExtra("imageId", rowItems.get(_position+1).getImageId());
-								i.putExtra("name", rowItems.get(_position+1).getName());
-								i.putExtra("position", _position+1);
-								context.startActivity(i);							
-								positionClicked = -1;
-								notifyDataSetChanged();
-							}
-						});
+			holder.optionProperties2.setOnClickListener(this);
 		}
 		else{
 			if (convertView == null) {
@@ -359,4 +283,85 @@ public class MegaContactsGridAdapter extends BaseAdapter {
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
+
+	@Override
+	public void onClick(View v) {
+		ViewHolder holder = (ViewHolder) v.getTag();
+		int currentPosition = holder.currentPosition;
+
+		switch (v.getId()){
+			case R.id.contact_grid_option_properties1:{
+				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
+				i.putExtra("name", rowItems.get(currentPosition).getName());
+				i.putExtra("position", currentPosition);
+				context.startActivity(i);							
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_grid_option_properties2:{
+				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				i.putExtra("imageId", rowItems.get(currentPosition+1).getImageId());
+				i.putExtra("name", rowItems.get(currentPosition+1).getName());
+				i.putExtra("position", currentPosition+1);
+				context.startActivity(i);							
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_grid_three_dots1:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == currentPosition){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+			case R.id.contact_grid_three_dots2:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition+1;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == (currentPosition+1)){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition+1;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+			case R.id.contact_grid_thumbnail1:{
+				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				ItemContact rowItem = (ItemContact) getItem(currentPosition);
+				i.putExtra("imageId", rowItem.getImageId());
+				i.putExtra("name", rowItem.getName());
+				i.putExtra("position", currentPosition);
+				context.startActivity(i);
+				break;
+			}
+			case R.id.contact_grid_thumbnail2:{
+				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				ItemContact rowItem = (ItemContact) getItem(currentPosition+1);
+				i.putExtra("imageId", rowItem.getImageId());
+				i.putExtra("name", rowItem.getName());
+				i.putExtra("position", currentPosition+1);
+				context.startActivity(i);
+				break;
+			}
+		}
+	}
 }

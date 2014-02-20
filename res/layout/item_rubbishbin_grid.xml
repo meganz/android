@@ -52,7 +52,7 @@
 	        android:layout_below="@id/rubbishbin_grid_filename1" />
         
         <ImageButton 
-	        android:id="@+id/rubbishbin_list_three_dots1"
+	        android:id="@+id/rubbishbin_grid_three_dots1"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/three_dots_background_white"
@@ -70,7 +70,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/arrow_selection_white_background"
-	        android:layout_below="@id/rubbishbin_list_three_dots1"
+	        android:layout_below="@id/rubbishbin_grid_three_dots1"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
 			android:paddingRight="14dp" />
@@ -167,7 +167,7 @@
 	        android:layout_below="@id/rubbishbin_grid_filename2" />
         
         <ImageButton 
-	        android:id="@+id/rubbishbin_list_three_dots2"
+	        android:id="@+id/rubbishbin_grid_three_dots2"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/three_dots_background_white"
@@ -185,7 +185,7 @@
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/arrow_selection_white_background"
-	        android:layout_below="@id/rubbishbin_list_three_dots2"
+	        android:layout_below="@id/rubbishbin_grid_three_dots2"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
 			android:paddingRight="14dp" />

@@ -36,7 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaContactsListAdapter extends BaseAdapter {
+public class MegaContactsListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	List<ItemContact> rowItems;
@@ -62,6 +62,7 @@ public class MegaContactsListAdapter extends BaseAdapter {
         ImageButton optionProperties;
         ImageButton optionSend;
         ImageButton optionRemove;
+        int currentPosition;
     }
 
 	@Override
@@ -98,6 +99,7 @@ public class MegaContactsListAdapter extends BaseAdapter {
 			holder.optionRemove.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.contact_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
+			holder.currentPosition = position;
 			convertView.setTag(holder);
 		}
 		else{
@@ -121,25 +123,7 @@ public class MegaContactsListAdapter extends BaseAdapter {
         }
 		
 		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(
-					new OnClickListener() {
-						public void onClick(View v) {
-							if (positionClicked == -1){
-								positionClicked = _position;
-								notifyDataSetChanged();
-							}
-							else{
-								if (positionClicked == _position){
-									positionClicked = -1;
-									notifyDataSetChanged();
-								}
-								else{
-									positionClicked = _position;
-									notifyDataSetChanged();
-								}
-							}
-						}
-					});
+		holder.imageButtonThreeDots.setOnClickListener(this);
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
@@ -168,18 +152,7 @@ public class MegaContactsListAdapter extends BaseAdapter {
 		}
 		
 		holder.optionProperties.setTag(holder);
-		holder.optionProperties.setOnClickListener(
-					new OnClickListener() {
-						public void onClick(View v) {
-							Intent i = new Intent(context, ContactPropertiesActivity.class);
-							i.putExtra("imageId", rowItems.get(_position).getImageId());
-							i.putExtra("name", rowItems.get(_position).getName());
-							i.putExtra("position", _position);
-							context.startActivity(i);							
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-					});
+		holder.optionProperties.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -206,4 +179,40 @@ public class MegaContactsListAdapter extends BaseAdapter {
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
+    
+	@Override
+	public void onClick(View v) {
+		ViewHolder holder = (ViewHolder) v.getTag();
+		int currentPosition = holder.currentPosition;
+
+		switch (v.getId()){
+			case R.id.contact_list_option_properties:{
+				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
+				i.putExtra("name", rowItems.get(currentPosition).getName());
+				i.putExtra("position", currentPosition);
+				context.startActivity(i);							
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_list_three_dots:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == currentPosition){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+		}
+	}
 }

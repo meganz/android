@@ -3,7 +3,7 @@ include Application.mk
 ##################################################
 ### SET THE PATH TO YOUR ANDROID NDK DIRECTORY ###
 ##################################################
-NDK_ROOT=/home/fjaviersr/Development/android-ndk-r9
+NDK_ROOT=$(HOME)/android-ndk
 ##################################################
 
 NDK_BUILD=$(NDK_ROOT)/ndk-build

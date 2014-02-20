@@ -30,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaBrowserListAdapter extends BaseAdapter {
+public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	List<ItemFileBrowser> rowItems;
@@ -68,6 +68,7 @@ public class MegaBrowserListAdapter extends BaseAdapter {
         ImageButton optionProperties;
         ImageButton optionDownload;
         ImageButton optionDelete;
+        int currentPosition;
     }
 
 	@Override
@@ -106,6 +107,8 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 			holder.optionDelete.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
+			holder.currentPosition = position;
+			
 			convertView.setTag(holder);
 		}
 		else{
@@ -120,25 +123,7 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 		holder.imageView.setImageResource(rowItem.getImageId());
 		
 		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(
-					new OnClickListener() {
-						public void onClick(View v) {
-							if (positionClicked == -1){
-								positionClicked = _position;
-								notifyDataSetChanged();
-							}
-							else{
-								if (positionClicked == _position){
-									positionClicked = -1;
-									notifyDataSetChanged();
-								}
-								else{
-									positionClicked = _position;
-									notifyDataSetChanged();
-								}
-							}
-						}
-					});
+		holder.imageButtonThreeDots.setOnClickListener(this);
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
@@ -167,33 +152,10 @@ public class MegaBrowserListAdapter extends BaseAdapter {
 		}
 		
 		holder.optionOpen.setTag(holder);
-		holder.optionOpen.setOnClickListener(
-				new OnClickListener() {
-			
-					@Override
-					public void onClick(View v) {
-						Intent i = new Intent(context, FullScreenImageViewer.class);
-						i.putExtra("position", _position);
-						i.putExtra("names", names);
-						i.putExtra("imageIds", imageIds);
-						context.startActivity(i);	
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-				});
+		holder.optionOpen.setOnClickListener(this);
 		
 		holder.optionProperties.setTag(holder);
-		holder.optionProperties.setOnClickListener(
-					new OnClickListener() {
-						public void onClick(View v) {
-							Intent i = new Intent(context, FilePropertiesActivity.class);
-							i.putExtra("imageId", rowItems.get(_position).getImageId());
-							i.putExtra("name", rowItems.get(_position).getName());
-							context.startActivity(i);							
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-					});
+		holder.optionProperties.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -220,4 +182,49 @@ public class MegaBrowserListAdapter extends BaseAdapter {
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
+
+	@Override
+	public void onClick(View v) {
+		ViewHolder holder = (ViewHolder) v.getTag();
+		int currentPosition = holder.currentPosition;
+
+		switch (v.getId()){
+			case R.id.file_list_option_open:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_list_option_properties:{
+				Intent i = new Intent(context, FilePropertiesActivity.class);
+				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
+				i.putExtra("name", rowItems.get(currentPosition).getName());
+				context.startActivity(i);							
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_list_three_dots:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == currentPosition){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+		}		
+	}
 }
