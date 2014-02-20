@@ -349,6 +349,26 @@ public class MegaApiAndroid
 		megaApi.getPublicNode(megaFileLink);
 	}
 
+	public void getThumbnail(MegaNode node, String dstFilePath, MegaRequestListenerInterface listener)
+	{
+		megaApi.getThumbnail(node, dstFilePath, createDelegateRequestListener(listener));
+	}
+
+	public void getThumbnail(MegaNode node, String dstFilePath)
+	{
+		megaApi.getThumbnail(node, dstFilePath);
+	}
+
+	public void setThumbnail(MegaNode node, String srcFilePath, MegaRequestListenerInterface listener)
+	{
+		megaApi.setThumbnail(node, srcFilePath, createDelegateRequestListener(listener));
+	}
+
+	public void setThumbnail(MegaNode node, String srcFilePath)
+	{
+		megaApi.setThumbnail(node, srcFilePath);
+	}
+	  
 	public void exportNode(MegaNode node, MegaRequestListenerInterface listener)
 	{
 		megaApi.exportNode(node, createDelegateRequestListener(listener));

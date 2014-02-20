@@ -1342,6 +1342,16 @@ void MegaApi::getPublicNode(const char* megaFileLink, MegaRequestListener *liste
     waiter->notify();
 }
 
+void MegaApi::getThumbnail(MegaNode* node, char *dstFilePath, MegaRequestListener *listener)
+{
+	getNodeAttribute(node, 0, dstFilePath, listener);
+}
+
+void MegaApi::setThumbnail(MegaNode* node, char *srcFilePath, MegaRequestListener *listener)
+{
+	setNodeAttribute(node, 0, srcFilePath, listener);
+}
+
 void MegaApi::exportNode(MegaNode *node, MegaRequestListener *listener)
 {
 	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_EXPORT, listener);
