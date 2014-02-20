@@ -30,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaRubbishBinGridAdapter extends BaseAdapter {
+public class MegaRubbishBinGridAdapter extends BaseAdapter implements OnClickListener{
 	
 	Context context;
 	List<ItemFileBrowser> rowItems;
@@ -73,6 +73,7 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
         RelativeLayout optionsLayout2;
         ImageButton optionUndo2;
         ImageButton optionDeletePermanently2;
+        int currentPosition;
     }
     
 	ViewHolder holder = null;
@@ -141,8 +142,8 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 				holder.textViewFileSize1 = (TextView) convertView.findViewById(R.id.rubbishbin_grid_filesize1);
 				holder.textViewFileSize2 = (TextView) convertView.findViewById(R.id.rubbishbin_grid_filesize2);
 				
-				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_three_dots1);
-				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_list_three_dots2);
+				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_three_dots1);
+				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_three_dots2);
 				
 				holder.optionsLayout1 = (RelativeLayout) convertView.findViewById(R.id.rubbishbin_grid_options1);
 				holder.optionUndo1 = (ImageButton) convertView.findViewById(R.id.rubbishbin_grid_option_undo1);
@@ -159,6 +160,8 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 				holder.optionDeletePermanently2.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 				holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.rubbishbin_grid_arrow_selection2);
 				holder.arrowSelection2.setVisibility(View.GONE);
+				
+				holder.currentPosition = position;
 
 				convertView.setTag(holder);
 			}
@@ -183,75 +186,17 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 				holder.itemLayout2.setVisibility(View.GONE);
 			}
 			
-			holder.imageView1.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", _position);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}
-			});
+			holder.imageView1.setTag(holder);
+			holder.imageView1.setOnClickListener(this);
 			
-			holder.imageView2.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", _position+1);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}
-			});
+			holder.imageView2.setTag(holder);
+			holder.imageView2.setOnClickListener(this);
 			
 			holder.imageButtonThreeDots1.setTag(holder);
-			holder.imageButtonThreeDots1.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								if (positionClicked == -1){
-									positionClicked = _position;
-									notifyDataSetChanged();
-								}
-								else{
-									if (positionClicked == _position){
-										positionClicked = -1;
-										notifyDataSetChanged();
-									}
-									else{
-										positionClicked = _position;
-										notifyDataSetChanged();
-									}
-								}
-							}
-						});
+			holder.imageButtonThreeDots1.setOnClickListener(this);
 			
 			holder.imageButtonThreeDots2.setTag(holder);
-			holder.imageButtonThreeDots2.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								if (positionClicked == -1){
-									positionClicked = _position+1;
-									notifyDataSetChanged();
-								}
-								else{
-									if (positionClicked == (_position+1)){
-										positionClicked = -1;
-										notifyDataSetChanged();
-									}
-									else{
-										positionClicked = _position+1;
-										notifyDataSetChanged();
-									}
-								}
-							}
-						});
+			holder.imageButtonThreeDots2.setOnClickListener(this);
 			
 			if (positionClicked != -1){
 				if (positionClicked == position){
@@ -295,66 +240,16 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
 			}
 			
 			holder.optionUndo1.setTag(holder);
-			holder.optionUndo1.setOnClickListener(
-					new OnClickListener() {
-				
-						@Override
-						public void onClick(View v) {
-//							Intent i = new Intent(context, FullScreenImageViewer.class);
-//							i.putExtra("position", _position);
-//							i.putExtra("names", names);
-//							i.putExtra("imageIds", imageIds);
-//							context.startActivity(i);
-							Toast.makeText(context, "Undo", Toast.LENGTH_SHORT).show();
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-					});
+			holder.optionUndo1.setOnClickListener(this);
 			
 			holder.optionDeletePermanently1.setTag(holder);
-			holder.optionDeletePermanently1.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-//								Intent i = new Intent(context, FilePropertiesActivity.class);
-//								i.putExtra("imageId", rowItems.get(_position).getImageId());
-//								i.putExtra("name", rowItems.get(_position).getName());
-//								context.startActivity(i);
-								Toast.makeText(context, "Delete permanently", Toast.LENGTH_SHORT).show();
-								positionClicked = -1;
-								notifyDataSetChanged();
-							}
-						});
+			holder.optionDeletePermanently1.setOnClickListener(this);
 			
 			holder.optionUndo2.setTag(holder);
-			holder.optionUndo2.setOnClickListener(
-					new OnClickListener() {
-				
-						@Override
-						public void onClick(View v) {
-//							Intent i = new Intent(context, FullScreenImageViewer.class);
-//							i.putExtra("position", _position+1);
-//							i.putExtra("names", names);
-//							i.putExtra("imageIds", imageIds);
-//							context.startActivity(i);
-							Toast.makeText(context, "Undo", Toast.LENGTH_SHORT).show();
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-					});
+			holder.optionUndo2.setOnClickListener(this);
 			
 			holder.optionDeletePermanently2.setTag(holder);
-			holder.optionDeletePermanently2.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-//								Intent i = new Intent(context, FilePropertiesActivity.class);
-//								i.putExtra("imageId", rowItems.get(_position+1).getImageId());
-//								i.putExtra("name", rowItems.get(_position+1).getName());
-//								context.startActivity(i);
-								Toast.makeText(context, "Delete permanently", Toast.LENGTH_SHORT).show();
-								positionClicked = -1;
-								notifyDataSetChanged();
-							}
-						});
+			holder.optionDeletePermanently2.setOnClickListener(this);
 		}
 		else{
 			if (convertView == null) {
@@ -387,4 +282,92 @@ public class MegaRubbishBinGridAdapter extends BaseAdapter {
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
+
+	@Override
+	public void onClick(View v) {
+
+		ViewHolder holder = (ViewHolder) v.getTag();
+		int currentPosition = holder.currentPosition;
+		
+		switch(v.getId()){
+			case R.id.rubbishbin_grid_thumbnail1:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.rubbishbin_grid_thumbnail2:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition+1);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.rubbishbin_grid_three_dots1:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == currentPosition){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+			case R.id.rubbishbin_grid_three_dots2:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition + 1;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == (currentPosition + 1)){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+			case R.id.rubbishbin_grid_option_undo1:{
+				Toast.makeText(context, "Undo_position"+currentPosition, Toast.LENGTH_SHORT).show();
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.rubbishbin_grid_option_undo2:{
+				Toast.makeText(context, "Undo_position"+(currentPosition+1), Toast.LENGTH_SHORT).show();
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.rubbishbin_grid_option_delete_permanently1:{
+				Toast.makeText(context, "Delete permanently_position"+currentPosition, Toast.LENGTH_SHORT).show();
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.rubbishbin_grid_option_delete_permanently2:{
+				Toast.makeText(context, "Delete permanently_position"+(currentPosition+1), Toast.LENGTH_SHORT).show();
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+		}
+	}
 }

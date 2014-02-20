@@ -30,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaBrowserGridAdapter extends BaseAdapter {
+public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	List<ItemFileBrowser> rowItems;
@@ -77,6 +77,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
         ImageButton optionProperties2;
         ImageButton optionDownload2;
         ImageButton optionDelete2;
+        int currentPosition;
     }
     
 	ViewHolder holder = null;
@@ -145,8 +146,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 				holder.textViewFileSize1 = (TextView) convertView.findViewById(R.id.file_grid_filesize1);
 				holder.textViewFileSize2 = (TextView) convertView.findViewById(R.id.file_grid_filesize2);
 				
-				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.file_list_three_dots1);
-				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.file_list_three_dots2);
+				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.file_grid_three_dots1);
+				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.file_grid_three_dots2);
 				
 				holder.optionsLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_options1);
 				holder.optionOpen1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_open1);
@@ -171,6 +172,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 				holder.optionDelete2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 				holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.file_grid_arrow_selection2);
 				holder.arrowSelection2.setVisibility(View.GONE);
+				
+				holder.currentPosition = position;
 
 				convertView.setTag(holder);
 			}
@@ -195,75 +198,17 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 				holder.itemLayout2.setVisibility(View.GONE);
 			}
 			
-			holder.imageView1.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", _position);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}
-			});
+			holder.imageView1.setTag(holder);
+			holder.imageView1.setOnClickListener(this);
 			
-			holder.imageView2.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", _position+1);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}
-			});
+			holder.imageView2.setTag(holder);
+			holder.imageView2.setOnClickListener(this);
 			
 			holder.imageButtonThreeDots1.setTag(holder);
-			holder.imageButtonThreeDots1.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								if (positionClicked == -1){
-									positionClicked = _position;
-									notifyDataSetChanged();
-								}
-								else{
-									if (positionClicked == _position){
-										positionClicked = -1;
-										notifyDataSetChanged();
-									}
-									else{
-										positionClicked = _position;
-										notifyDataSetChanged();
-									}
-								}
-							}
-						});
+			holder.imageButtonThreeDots1.setOnClickListener(this);
 			
 			holder.imageButtonThreeDots2.setTag(holder);
-			holder.imageButtonThreeDots2.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								if (positionClicked == -1){
-									positionClicked = _position+1;
-									notifyDataSetChanged();
-								}
-								else{
-									if (positionClicked == (_position+1)){
-										positionClicked = -1;
-										notifyDataSetChanged();
-									}
-									else{
-										positionClicked = _position+1;
-										notifyDataSetChanged();
-									}
-								}
-							}
-						});
+			holder.imageButtonThreeDots2.setOnClickListener(this);
 			
 			if (positionClicked != -1){
 				if (positionClicked == position){
@@ -307,62 +252,16 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
 			}
 			
 			holder.optionOpen1.setTag(holder);
-			holder.optionOpen1.setOnClickListener(
-					new OnClickListener() {
-				
-						@Override
-						public void onClick(View v) {
-							Intent i = new Intent(context, FullScreenImageViewer.class);
-							i.putExtra("position", _position);
-							i.putExtra("names", names);
-							i.putExtra("imageIds", imageIds);
-							context.startActivity(i);	
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-					});
+			holder.optionOpen1.setOnClickListener(this);
 			
 			holder.optionProperties1.setTag(holder);
-			holder.optionProperties1.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								Intent i = new Intent(context, FilePropertiesActivity.class);
-								i.putExtra("imageId", rowItems.get(_position).getImageId());
-								i.putExtra("name", rowItems.get(_position).getName());
-								context.startActivity(i);							
-								positionClicked = -1;
-								notifyDataSetChanged();
-							}
-						});
+			holder.optionProperties1.setOnClickListener(this);
 			
 			holder.optionOpen2.setTag(holder);
-			holder.optionOpen2.setOnClickListener(
-					new OnClickListener() {
-				
-						@Override
-						public void onClick(View v) {
-							Intent i = new Intent(context, FullScreenImageViewer.class);
-							i.putExtra("position", _position+1);
-							i.putExtra("names", names);
-							i.putExtra("imageIds", imageIds);
-							context.startActivity(i);	
-							positionClicked = -1;
-							notifyDataSetChanged();
-						}
-					});
+			holder.optionOpen2.setOnClickListener(this);
 			
 			holder.optionProperties2.setTag(holder);
-			holder.optionProperties2.setOnClickListener(
-						new OnClickListener() {
-							public void onClick(View v) {
-								Intent i = new Intent(context, FilePropertiesActivity.class);
-								i.putExtra("imageId", rowItems.get(_position+1).getImageId());
-								i.putExtra("name", rowItems.get(_position+1).getName());
-								context.startActivity(i);							
-								positionClicked = -1;
-								notifyDataSetChanged();
-							}
-						});
+			holder.optionProperties2.setOnClickListener(this);
 		}
 		else{
 			if (convertView == null) {
@@ -395,4 +294,106 @@ public class MegaBrowserGridAdapter extends BaseAdapter {
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
+
+	@Override
+	public void onClick(View v) {
+
+		ViewHolder holder = (ViewHolder) v.getTag();
+		int currentPosition = holder.currentPosition;
+		
+		switch (v.getId()){
+			case R.id.file_grid_thumbnail1:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_grid_thumbnail2:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition+1);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_grid_three_dots1:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == currentPosition){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+			case R.id.file_grid_three_dots2:{
+				if (positionClicked == -1){
+					positionClicked = currentPosition+1;
+					notifyDataSetChanged();
+				}
+				else{
+					if (positionClicked == (currentPosition+1)){
+						positionClicked = -1;
+						notifyDataSetChanged();
+					}
+					else{
+						positionClicked = currentPosition+1;
+						notifyDataSetChanged();
+					}
+				}
+				break;
+			}
+			case R.id.file_grid_option_open1:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_grid_option_open2:{
+				Intent i = new Intent(context, FullScreenImageViewer.class);
+				i.putExtra("position", currentPosition+1);
+				i.putExtra("names", names);
+				i.putExtra("imageIds", imageIds);
+				context.startActivity(i);	
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_grid_option_properties1:{
+				Intent i = new Intent(context, FilePropertiesActivity.class);
+				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
+				i.putExtra("name", rowItems.get(currentPosition).getName());
+				context.startActivity(i);							
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_grid_option_properties2:{
+				Intent i = new Intent(context, FilePropertiesActivity.class);
+				i.putExtra("imageId", rowItems.get(currentPosition+1).getImageId());
+				i.putExtra("name", rowItems.get(currentPosition+1).getName());
+				context.startActivity(i);							
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+		}
+	}
 }
