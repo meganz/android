@@ -107,13 +107,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.optionDelete.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
-			holder.currentPosition = position;
 			
 			convertView.setTag(holder);
 		}
 		else{
 			holder = (ViewHolder) convertView.getTag();
 		}
+		
+		holder.currentPosition = position;
 		
 		ItemFileBrowser rowItem = (ItemFileBrowser) getItem(position);
 		

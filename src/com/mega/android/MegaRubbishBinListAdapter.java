@@ -102,14 +102,14 @@ public class MegaRubbishBinListAdapter extends BaseAdapter implements OnClickLis
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.rubbishbin_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 			
-			holder.currentPosition = position;
-			
 			convertView.setTag(holder);
 		}
 		else{
 			holder = (ViewHolder) convertView.getTag();
 		}
-		
+
+		holder.currentPosition = position;
+
 		ItemFileBrowser rowItem = (ItemFileBrowser) getItem(position);
 		
 		holder.textViewFileName.setText(rowItem.getName());
