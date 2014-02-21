@@ -174,14 +174,14 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.contact_grid_arrow_selection2);
 				holder.arrowSelection2.setVisibility(View.GONE);
 				
-				holder.currentPosition = position;
-
 				convertView.setTag(holder);
 			}
 			else{
 				holder = (ViewHolder) convertView.getTag();
 			}
-			
+
+			holder.currentPosition = position;
+
 			ItemContact rowItem1 = (ItemContact) getItem(position);
 			holder.imageView1.setImageResource(rowItem1.getImageId());
 			holder.textViewFileName1.setText(rowItem1.getName());
