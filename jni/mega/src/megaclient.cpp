@@ -58,8 +58,7 @@ bool MegaClient::decryptkey(const char* sk, byte* tk, int tl, SymmCipher* sc, in
 
     if (sl > 4 * FILENODEKEYLENGTH / 3 + 1)
     {
-        // RSA-encrypted key - decrypt and update on the server to save CPU
-        // time next time
+        // RSA-encrypted key - decrypt and update on the server to save space & client CPU time
         sl = sl / 4 * 3 + 3;
 
         if (sl > 4096)
@@ -202,7 +201,7 @@ void MegaClient::mergenewshares(bool notify)
 
                             if (notify)
                             {
-                                    notifynode(n);
+                                notifynode(n);
                             }
                         }
                     }
@@ -906,7 +905,7 @@ void MegaClient::exec()
 
                 if (!syncfsopsfailed)
                 {
-                    // no retrying local operations: process pending notifyqs
+                    // not retrying local operations: process pending notifyqs
                     for (it = syncs.begin(); it != syncs.end(); )
                     {
                         Sync* sync = *it++;
@@ -1458,8 +1457,6 @@ bool MegaClient::dispatch(direction_t d)
                     }
                 }
 
-                // uploads always start at position 0, downloads resume at the
-                // p
                 // dispatch request for temporary source/target URL
                 reqs[r].add(( ts->pendingcmd = ( d == PUT )
                         ? (Command*)new CommandPutFile(ts, putmbpscap)
@@ -3711,21 +3708,29 @@ void MegaClient::mapuser(handle uh, const char* email)
     }
 }
 
-// sharekey distribution request - walk array consisting of node/user handles
+// sharekey distribution request - walk array consisting of {node,user+}+ handle tuples
 // and submit public key requests
 void MegaClient::procsr(JSON* j)
 {
     User* u;
-    handle sh, uh;
+    handle sh = UNDEF, uh = UNDEF;
 
     if (!j->enterarray())
     {
         return;
     }
 
-    while (!ISUNDEF(sh = j->gethandle()) && !ISUNDEF(uh = j->gethandle()))
+    for (;;)
     {
-        if (nodebyhandle(sh) && ( u = finduser(uh)))
+		if (ISUNDEF(sh) && ISUNDEF(sh = j->gethandle())) break;
+
+        if (ISUNDEF(uh = j->gethandle(USERHANDLE)))
+        {
+            sh = UNDEF;
+            continue;
+        }
+
+        if (nodebyhandle(sh) && (u = finduser(uh)))
         {
             queuepubkeyreq(u, new PubKeyActionSendShareKey(sh));
         }
@@ -4641,11 +4646,12 @@ bool MegaClient::syncdown(LocalNode* l, string* localpath, bool rubbish)
     for (node_list::iterator it = l->node->children.begin(); it != l->node->children.end(); it++)
     {
         // node must be syncable, alive, decrypted and have its name defined to
-        // be considered
-        if (app->sync_syncable(*it)
+        // be considered - also, prevent clashes with the local debris folder
+        if ((app->sync_syncable(*it)
                 && (( *it )->syncdeleted == SYNCDEL_NONE )
                 && !( *it )->attrstring.size()
                 && (( ait = ( *it )->attrs.map.find('n')) != ( *it )->attrs.map.end()))
+			&& (l->parent || l->sync->debris != ait->second))
         {
             addchild(&nchildren, &ait->second, *it, &strings);
         }

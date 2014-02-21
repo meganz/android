@@ -118,7 +118,12 @@ class MegaWaiter : public MegaApiWinWaiter {};
 
 #else
 
+#ifdef __ANDROID__
+#include "android/megaapiandroidhttpio.h"
+#else
 #include "linux/megaapiposixhttpio.h"
+#endif
+
 #include "mega/posix/meganet.h"
 #include "mega/posix/megafs.h"
 #include "linux/megaapiwait.h"
@@ -139,6 +144,17 @@ class MegaApi;
 class MegaNode
 {
     public:
+
+		enum {
+			TYPE_UNKNOWN = -1,
+			TYPE_FILE = 0,
+			TYPE_FOLDER,
+			TYPE_ROOT,
+			TYPE_INCOMING,
+			TYPE_RUBBISH,
+			TYPE_MAIL
+		};
+
         MegaNode(const char *name, int type, m_off_t size, time_t ctime, time_t mtime, mega::handle nodehandle, string *nodekey, string *attrstring);
         MegaNode(MegaNode *node);
         ~MegaNode();
@@ -156,6 +172,8 @@ class MegaNode
         string* getNodeKey();
         string* getAttrString();
         int getTag();
+        bool isFile();
+        bool isFolder();
         bool isRemoved();
         bool isSyncDeleted();
         string getLocalPath();

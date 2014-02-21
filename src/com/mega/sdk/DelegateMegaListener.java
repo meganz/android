@@ -1,12 +1,9 @@
 package com.mega.sdk;
 
-import android.os.Handler;
-
 public class DelegateMegaListener extends MegaListener
 {
 	MegaApiAndroid megaApi;
 	MegaListenerInterface listener;
-	static Handler handler = new Handler();
 	
 	DelegateMegaListener(MegaApiAndroid megaApi, MegaListenerInterface listener)
 	{
@@ -25,7 +22,7 @@ public class DelegateMegaListener extends MegaListener
 		if(listener != null)
 		{
 			final MegaRequest requestCopy = request.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -42,7 +39,7 @@ public class DelegateMegaListener extends MegaListener
 		{
 			final MegaRequest requestCopy = request.copy();
 			final MegaError errorCopy = e.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -59,7 +56,7 @@ public class DelegateMegaListener extends MegaListener
 		{
 			final MegaRequest requestCopy = request.copy();
 			final MegaError errorCopy = e.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -75,7 +72,7 @@ public class DelegateMegaListener extends MegaListener
 		if(listener != null)
 		{
 			final MegaTransfer transferCopy = transfer.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -92,7 +89,7 @@ public class DelegateMegaListener extends MegaListener
 		{
 			final MegaTransfer transferCopy = transfer.copy();
 			final MegaError errorCopy = e.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -108,7 +105,7 @@ public class DelegateMegaListener extends MegaListener
 		if(listener != null)
 		{
 			final MegaTransfer transferCopy = transfer.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -125,7 +122,7 @@ public class DelegateMegaListener extends MegaListener
 		{
 			final MegaTransfer transferCopy = transfer.copy();
 			final MegaError errorCopy = e.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -140,7 +137,7 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -155,7 +152,7 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -170,7 +167,7 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {

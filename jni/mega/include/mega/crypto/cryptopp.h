@@ -34,8 +34,6 @@
 #include <cryptopp/nbtheory.h>
 #include <cryptopp/algparam.h>
 
-#define MEGA_API
-
 namespace mega {
 using namespace std;
 
