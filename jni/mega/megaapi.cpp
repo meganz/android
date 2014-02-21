@@ -366,6 +366,16 @@ bool MegaNode::isRemoved()
     return removed;
 }
 
+bool MegaNode::isFile()
+{
+	return type == TYPE_FILE;
+}
+
+bool MegaNode::isFolder()
+{
+	return (type != TYPE_FILE) && (type != TYPE_UNKNOWN);
+}
+
 bool MegaNode::isSyncDeleted()
 {
     return syncdeleted;

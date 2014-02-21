@@ -48,7 +48,7 @@ CPP_SOURCES= src/attrmap.cpp \
     src/posix/fs.cpp  \
     src/posix/posixwaiter.cpp \
     linux/megaapiwait.cpp \
-    linux/megaapiposixhttpio.cpp \
+    android/megaapiandroidhttpio.cpp
     
 C_SOURCES = sqlite3.c android/glob.c
 

@@ -1,12 +1,9 @@
 package com.mega.sdk;
 
-import android.os.Handler;
-
 class DelegateMegaRequestListener extends MegaRequestListener {
 
 	MegaApiAndroid megaApi;
 	MegaRequestListenerInterface listener;
-	static Handler handler = new Handler();
 	
 	DelegateMegaRequestListener(MegaApiAndroid megaApi, MegaRequestListenerInterface listener)
 	{
@@ -25,7 +22,7 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 		if(listener != null)
 		{
 			final MegaRequest requestCopy = request.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -42,7 +39,7 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 		{
 			final MegaRequest requestCopy = request.copy();
 			final MegaError errorCopy = e.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -60,7 +57,7 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 		{
 			final MegaRequest requestCopy = request.copy();
 			final MegaError errorCopy = e.copy();
-			handler.post(new Runnable()
+			MegaApiAndroid.handler.post(new Runnable()
 			{
 			    public void run() 
 			    {
