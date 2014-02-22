@@ -2,10 +2,10 @@ package com.mega.sdk;
 
 class DelegateMegaRequestListener extends MegaRequestListener {
 
-	MegaApiAndroid megaApi;
+	MegaApiJava megaApi;
 	MegaRequestListenerInterface listener;
 	
-	DelegateMegaRequestListener(MegaApiAndroid megaApi, MegaRequestListenerInterface listener)
+	DelegateMegaRequestListener(MegaApiJava megaApi, MegaRequestListenerInterface listener)
 	{
 		this.megaApi = megaApi;
 		this.listener = listener;
@@ -21,12 +21,16 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 	{
 		if(listener != null)
 		{
-			final MegaRequest requestCopy = request.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaRequest megaRequest;
+			if(megaApi.isRunCallbackThreaded())
+				megaRequest = request.copy();
+			else
+				megaRequest = request;
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-					listener.onRequestStart(megaApi, requestCopy);
+					listener.onRequestStart(megaApi, megaRequest);
 			    }
 			});
 		}
@@ -37,13 +41,24 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 	{
 		if(listener != null)
 		{
-			final MegaRequest requestCopy = request.copy();
-			final MegaError errorCopy = e.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaRequest megaRequest;
+			final MegaError megaError;
+			if(megaApi.isRunCallbackThreaded())
+			{
+				megaRequest = request.copy();
+				megaError = e.copy();
+			}
+			else
+			{
+				megaRequest = request;
+				megaError = e;
+			}
+			
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-			    	listener.onRequestFinish(megaApi, requestCopy, errorCopy);
+			    	listener.onRequestFinish(megaApi, megaRequest, megaError);
 			    }
 			});
 		}
@@ -55,13 +70,24 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 	{
 		if(listener != null)
 		{
-			final MegaRequest requestCopy = request.copy();
-			final MegaError errorCopy = e.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaRequest megaRequest;
+			final MegaError megaError;
+			if(megaApi.isRunCallbackThreaded())
+			{
+				megaRequest = request.copy();
+				megaError = e.copy();
+			}
+			else
+			{
+				megaRequest = request;
+				megaError = e;
+			}
+			
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-			    	listener.onRequestTemporaryError(megaApi, requestCopy, errorCopy);
+			    	listener.onRequestTemporaryError(megaApi, megaRequest, megaError);
 			    }
 			});
 		}

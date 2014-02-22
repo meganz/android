@@ -2,10 +2,10 @@ package com.mega.sdk;
 
 public class DelegateMegaGlobalListener extends MegaGlobalListener
 {
-	MegaApiAndroid megaApi;
+	MegaApiJava megaApi;
 	MegaGlobalListenerInterface listener;
 	
-	DelegateMegaGlobalListener(MegaApiAndroid megaApi, MegaGlobalListenerInterface listener)
+	DelegateMegaGlobalListener(MegaApiJava megaApi, MegaGlobalListenerInterface listener)
 	{
 		this.megaApi = megaApi;
 		this.listener = listener;
@@ -21,7 +21,7 @@ public class DelegateMegaGlobalListener extends MegaGlobalListener
 	{
 		if(listener != null)
 		{
-			MegaApiAndroid.handler.post(new Runnable()
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -36,7 +36,7 @@ public class DelegateMegaGlobalListener extends MegaGlobalListener
 	{
 		if(listener != null)
 		{
-			MegaApiAndroid.handler.post(new Runnable()
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -51,7 +51,7 @@ public class DelegateMegaGlobalListener extends MegaGlobalListener
 	{
 		if(listener != null)
 		{
-			MegaApiAndroid.handler.post(new Runnable()
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {

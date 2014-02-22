@@ -3,6 +3,7 @@ package com.mega.android;
 import android.util.Log;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
@@ -27,13 +28,13 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 			final String TAG = "MegaTestInternalListener";
 
 			@Override
-			public void onRequestStart(MegaApiAndroid api, MegaRequest request)
+			public void onRequestStart(MegaApiJava api, MegaRequest request)
 			{
 				Log.d(TAG, "onRequestStart");
 			}
 
 			@Override
-			public void onRequestFinish(MegaApiAndroid api, MegaRequest request, MegaError e)
+			public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e)
 			{
 				Log.d(TAG, "onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
 				if(e.getErrorCode() != MegaError.API_OK) 
@@ -43,7 +44,7 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 			}
 
 			@Override
-			public void onRequestTemporaryError(MegaApiAndroid api, MegaRequest request, MegaError e)
+			public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
 			{
 				Log.d(TAG, "onRequestTemporaryError");
 			}
@@ -51,13 +52,13 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 	}
 	
 	@Override
-	public void onRequestStart(MegaApiAndroid api, MegaRequest request)
+	public void onRequestStart(MegaApiJava api, MegaRequest request)
 	{
 		Log.d(TAG, "onRequestStart");
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiAndroid api, MegaRequest request, MegaError e)
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e)
 	{
 		Log.d(TAG, "onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
 		if(e.getErrorCode() != MegaError.API_OK) 
@@ -73,7 +74,7 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 	}
 
 	@Override
-	public void onRequestTemporaryError(MegaApiAndroid api, MegaRequest request, MegaError e)
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
 	{
 		Log.d(TAG, "onRequestTemporaryError");
 	}
