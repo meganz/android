@@ -2,10 +2,10 @@ package com.mega.sdk;
 
 public class DelegateMegaListener extends MegaListener
 {
-	MegaApiAndroid megaApi;
+	MegaApiJava megaApi;
 	MegaListenerInterface listener;
 	
-	DelegateMegaListener(MegaApiAndroid megaApi, MegaListenerInterface listener)
+	DelegateMegaListener(MegaApiJava megaApi, MegaListenerInterface listener)
 	{
 		this.megaApi = megaApi;
 		this.listener = listener;
@@ -21,12 +21,16 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			final MegaRequest requestCopy = request.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaRequest megaRequest;
+			if(megaApi.isRunCallbackThreaded())
+				megaRequest = request.copy();
+			else
+				megaRequest = request;
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-					listener.onRequestStart(megaApi, requestCopy);
+					listener.onRequestStart(megaApi, megaRequest);
 			    }
 			});
 		}
@@ -37,13 +41,23 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			final MegaRequest requestCopy = request.copy();
-			final MegaError errorCopy = e.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaRequest megaRequest;
+			final MegaError megaError;
+			if(megaApi.isRunCallbackThreaded())
+			{
+				megaRequest = request.copy();
+				megaError = e.copy();
+			}
+			else
+			{
+				megaRequest = request;
+				megaError = e;
+			}
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-			    	listener.onRequestFinish(megaApi, requestCopy, errorCopy);
+			    	listener.onRequestFinish(megaApi, megaRequest, megaError);
 			    }
 			});
 		}
@@ -54,13 +68,23 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			final MegaRequest requestCopy = request.copy();
-			final MegaError errorCopy = e.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaRequest megaRequest;
+			final MegaError megaError;
+			if(megaApi.isRunCallbackThreaded())
+			{
+				megaRequest = request.copy();
+				megaError = e.copy();
+			}
+			else
+			{
+				megaRequest = request;
+				megaError = e;
+			}
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-			    	listener.onRequestTemporaryError(megaApi, requestCopy, errorCopy);
+			    	listener.onRequestTemporaryError(megaApi, megaRequest, megaError);
 			    }
 			});
 		}
@@ -71,12 +95,16 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer transferCopy = transfer.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaTransfer megaTransfer;
+			if(megaApi.isRunCallbackThreaded())
+				megaTransfer = transfer.copy();
+			else
+				megaTransfer = transfer;
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-					listener.onTransferStart(megaApi, transferCopy);
+					listener.onTransferStart(megaApi, megaTransfer);
 			    }
 			});
 		}
@@ -86,14 +114,25 @@ public class DelegateMegaListener extends MegaListener
 	public void onTransferFinish(MegaApi api, MegaTransfer transfer, MegaError e)
 	{
 		if(listener != null)
-		{
-			final MegaTransfer transferCopy = transfer.copy();
-			final MegaError errorCopy = e.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+		{			
+			final MegaTransfer megaTransfer;
+			final MegaError megaError;
+			if(megaApi.isRunCallbackThreaded())
+			{
+				megaTransfer = transfer.copy();
+				megaError = e.copy();
+			}
+			else
+			{
+				megaTransfer = transfer;
+				megaError = e;
+			}
+			
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-					listener.onTransferFinish(megaApi, transferCopy, errorCopy);
+					listener.onTransferFinish(megaApi, megaTransfer, megaError);
 			    }
 			});
 		}
@@ -104,12 +143,16 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer transferCopy = transfer.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaTransfer megaTransfer;
+			if(megaApi.isRunCallbackThreaded())
+				megaTransfer = transfer.copy();
+			else
+				megaTransfer = transfer;
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-					listener.onTransferUpdate(megaApi, transferCopy);
+					listener.onTransferUpdate(megaApi, megaTransfer);
 			    }
 			});
 		}
@@ -120,13 +163,24 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer transferCopy = transfer.copy();
-			final MegaError errorCopy = e.copy();
-			MegaApiAndroid.handler.post(new Runnable()
+			final MegaTransfer megaTransfer;
+			final MegaError megaError;
+			if(megaApi.isRunCallbackThreaded())
+			{
+				megaTransfer = transfer.copy();
+				megaError = e.copy();
+			}
+			else
+			{
+				megaTransfer = transfer;
+				megaError = e;
+			}
+			
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
-					listener.onTransferTemporaryError(megaApi, transferCopy, errorCopy);
+					listener.onTransferTemporaryError(megaApi, megaTransfer, megaError);
 			    }
 			});
 		}
@@ -137,7 +191,7 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			MegaApiAndroid.handler.post(new Runnable()
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -152,7 +206,7 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			MegaApiAndroid.handler.post(new Runnable()
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
@@ -167,7 +221,7 @@ public class DelegateMegaListener extends MegaListener
 	{
 		if(listener != null)
 		{
-			MegaApiAndroid.handler.post(new Runnable()
+			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
 			    {
