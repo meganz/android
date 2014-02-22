@@ -99,12 +99,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.optionRemove.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.contact_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
-			holder.currentPosition = position;
 			convertView.setTag(holder);
 		}
 		else{
 			holder = (ViewHolder) convertView.getTag();
 		}
+
+		holder.currentPosition = position;
 		
 		ItemContact rowItem = (ItemContact) getItem(position);
 		
