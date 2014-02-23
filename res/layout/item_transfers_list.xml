@@ -2,10 +2,10 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
-    android:id="@+id/rubbishbin_list_item_layout" >
+    android:id="@+id/transfers_list_item_layout" >
     
     <ImageView
-        android:id="@+id/rubbishbin_list_thumbnail"
+        android:id="@+id/transfers_list_thumbnail"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginLeft="5dp"
@@ -14,68 +14,96 @@
         android:scaleType="fitCenter" />
     
     <TextView
-        android:id="@+id/rubbishbin_list_filename"
-        android:layout_width="fill_parent"
+        android:id="@+id/transfers_list_filename"
+        android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_toRightOf="@id/rubbishbin_list_thumbnail"
+        android:layout_toRightOf="@id/transfers_list_thumbnail"
         android:paddingLeft="5dp"
         android:paddingTop="7dp" />
     
-    <TextView
-        android:id="@+id/rubbishbin_list_filesize"
+    <ImageView 
+        android:id="@+id/transfers_list_one_dot"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_toRightOf="@id/rubbishbin_list_thumbnail"
-        android:layout_below="@+id/rubbishbin_list_filename"
-        android:paddingLeft="5dp"
-        android:paddingBottom="7dp"
-        android:textColor="@color/file_list_second_row" />
-    
-    <ImageView 
-        android:id="@+id/rubbishbin_list_one_dot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:src="@drawable/dot"
-        android:layout_toRightOf="@id/rubbishbin_list_filesize"
-        android:layout_alignTop="@id/rubbishbin_list_filesize"
+        android:layout_toRightOf="@id/transfers_list_filename"
         android:paddingTop="7dp"
         android:paddingLeft="5dp" />
     
     <TextView
-        android:id="@+id/rubbishbin_list_updated"
+        android:id="@+id/transfers_list_transfer_rate"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_toRightOf="@id/rubbishbin_list_one_dot"
-        android:layout_below="@+id/rubbishbin_list_filename"
+        android:layout_alignTop="@id/transfers_list_one_dot"
+        android:layout_toRightOf="@id/transfers_list_one_dot"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp"
+        android:textColor="@color/file_list_second_row" />
+    
+    <ImageView
+        android:id="@+id/transfers_list_completed_image"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/transfers_list_thumbnail"
+        android:layout_below="@id/transfers_list_filename"
+        android:paddingBottom="7dp"
+        android:paddingLeft="5dp" />
+    
+    <TextView
+        android:id="@+id/transfers_list_completed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/transfers_list_completed_image"
+        android:layout_below="@+id/transfers_list_filename"
         android:paddingLeft="5dp"
         android:paddingBottom="7dp"
         android:textColor="@color/file_list_second_row" />
     
+    <ImageView
+        android:id="@+id/transfers_list_bar_structure"
+        android:layout_width="250dp"
+        android:layout_height="25dp"
+        android:src="@drawable/bar_structure_transfers"
+        android:layout_below="@id/transfers_list_filename"
+        android:layout_toRightOf="@id/transfers_list_thumbnail" 
+        android:paddingLeft="5dp"
+        android:paddingBottom="7dp" />
+    
+    <ImageView
+        android:id="@+id/transfers_list_bar_fill"
+        android:layout_width="170dp"
+        android:layout_height="25dp"
+        android:src="@drawable/bar_fill_transfers"
+        android:layout_below="@id/transfers_list_filename"
+        android:layout_toRightOf="@id/transfers_list_thumbnail" 
+        android:paddingLeft="7dp"
+        android:paddingBottom="7dp" />
+    
     <ImageButton 
-        android:id="@+id/rubbishbin_list_three_dots"
+        android:id="@+id/transfers_list_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/three_dots_background_white"
 		android:background="@null" 
-        android:layout_alignTop="@id/rubbishbin_list_filename"
+        android:layout_alignTop="@id/transfers_list_filename"
         android:layout_alignParentRight="true"
 		android:paddingTop="25dp"
         android:paddingRight="15dp" />
     
     <ImageView
-        android:id="@+id/rubbishbin_list_arrow_selection"
+        android:id="@+id/transfers_list_arrow_selection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/arrow_selection"
-		android:layout_alignBottom="@id/rubbishbin_list_thumbnail"
+		android:layout_alignBottom="@id/transfers_list_thumbnail"
         android:layout_alignParentRight="true"
         android:paddingRight="15dp" />
     
     <RelativeLayout
-        android:id="@+id/rubbishbin_list_options"
+        android:id="@+id/transfers_list_options"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rubbishbin_list_arrow_selection"
+        android:layout_below="@id/transfers_list_arrow_selection"
         android:padding="0dp"
         android:background="#222222">
         
@@ -85,7 +113,7 @@
             
             <TableRow>
 	            <ImageButton
-		            android:id="@+id/rubbishbin_list_option_undo"
+		            android:id="@+id/transfers_list_option_undo"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/rubbisbin_list_option_undo"
@@ -95,7 +123,7 @@
 		            android:layout_gravity="center_vertical"/>
 	        
 		        <ImageButton
-		            android:id="@+id/rubbishbin_list_option_delete_permanently"
+		            android:id="@+id/transfers_list_option_delete_permanently"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/rubbisbin_list_option_delete"
