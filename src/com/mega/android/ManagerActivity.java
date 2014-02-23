@@ -74,6 +74,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private TableLayout bottomControlBar;
 	
 	ImageButton customListGrid;
+	LinearLayout customSearch;
 
 	private boolean firstTime = true;
 	
@@ -86,7 +87,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private ContactsGridFragment cG;
     private RubbishBinListFragment rbL;
     private RubbishBinGridFragment rbG;
-    
+    private TransfersFragment tF;    
 
 
     @Override
@@ -211,7 +212,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
         
-        LinearLayout customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
+        customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
         customSearch.setOnClickListener(this);
 		
 		customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
@@ -251,6 +252,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				firstTime = false;
     			}
     			
+    			customListGrid.setVisibility(View.VISIBLE);
+    			customSearch.setVisibility(View.VISIBLE);
+    			
     			break;
     		}
     		case CONTACTS:{
@@ -270,6 +274,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
 				
+    			customListGrid.setVisibility(View.VISIBLE);
+    			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
     			break;
@@ -290,6 +296,21 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
+
+    			customListGrid.setVisibility(View.VISIBLE);
+    			customSearch.setVisibility(View.VISIBLE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+    			break;
+    		}
+    		case TRANSFERS:{
+    			
+    			if (tF == null){
+    				tF = new TransfersFragment();
+    			}
+    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, tF).commit();
+    			customListGrid.setVisibility(View.GONE);
+    			customSearch.setVisibility(View.GONE);
 
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
@@ -337,6 +358,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 			else if (rbG.isVisible()){
 				if (rbG.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
+			}
+		}
+		if (tF != null){
+			if (tF.isVisible()){
+				if (tF.onBackPressed() == 0){
 					super.onBackPressed();
 					return;
 				}
