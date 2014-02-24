@@ -283,6 +283,8 @@ MegaNode::MegaNode(const char *name, int type, m_off_t size, time_t ctime, time_
     this->nodekey.assign(nodekey->data(),nodekey->size());
     this->removed = false;
     this->syncdeleted = false;
+    this->thumbnailAvailable = false;
+    this->previewAvailable = false;
     this->tag = 0;
 }
 
@@ -300,6 +302,8 @@ MegaNode::MegaNode(MegaNode *node)
     this->nodekey.assign(nodekey->data(),nodekey->size());
     this->removed = node->isRemoved();
     this->syncdeleted = node->isSyncDeleted();
+    this->thumbnailAvailable = node->hasThumbnail();
+    this->previewAvailable = node->hasPreview();
     this->tag = node->getTag();
     this->localPath = node->getLocalPath();
 }
@@ -316,6 +320,8 @@ MegaNode::MegaNode(Node *node)
     this->nodekey.assign(node->nodekey.data(),node->nodekey.size());
     this->removed = node->removed;
     this->syncdeleted = node->syncdeleted;
+    this->thumbnailAvailable = node->hasfileattribute(0);
+    this->previewAvailable = node->hasfileattribute(1);
     this->tag = node->tag;
     if(node->localnode)
     {
@@ -385,6 +391,17 @@ string MegaNode::getLocalPath()
 {
     return localPath;
 }
+
+bool MegaNode::hasThumbnail()
+{
+	return thumbnailAvailable;
+}
+
+bool MegaNode::hasPreview()
+{
+	return previewAvailable;
+}
+
 
 MegaRequest::MegaRequest(int type, MegaRequestListener *listener)
 {

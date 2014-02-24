@@ -1,9 +1,10 @@
-package com.mega.android;
+package com.mega.sdk;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,12 +12,15 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 
-public class ImageUtils
+public class MegaUtils
 {
 	private static int THUMBNAIL_SIZE = 120;
 	private static int THUMBNAIL_QUALITY = 90;
 	private static int PREVIEW_SIZE =  1000;
 	private static int PREVIEW_QUALITY = 90;
+
+	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
+	public static ArrayList<Long> pendingPreviews = new ArrayList<Long>();
 
 	private static Bitmap decodeFile(File f, int requiredSize) {
 		try {
