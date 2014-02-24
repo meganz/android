@@ -814,7 +814,9 @@ public:
 	void getPublicNode(const char* megaFileLink, MegaRequestListener *listener = NULL);
 	void getThumbnail(MegaNode* node, char *dstFilePath, MegaRequestListener *listener = NULL);
 	void setThumbnail(MegaNode* node, char *srcFilePath, MegaRequestListener *listener = NULL);
-    void exportNode(MegaNode *node, MegaRequestListener *listener = NULL);
+	void getPreview(MegaNode* node, char *dstFilePath, MegaRequestListener *listener = NULL);
+	void setPreview(MegaNode* node, char *srcFilePath, MegaRequestListener *listener = NULL);
+	void exportNode(MegaNode *node, MegaRequestListener *listener = NULL);
 	void fetchNodes(MegaRequestListener *listener = NULL);
 	void getAccountDetails(MegaRequestListener *listener = NULL);
 	void changePassword(const char *oldPassword, const char *newPassword, MegaRequestListener *listener = NULL);

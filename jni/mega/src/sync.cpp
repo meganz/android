@@ -528,8 +528,7 @@ LocalNode* Sync::checkpath(LocalNode* l, string* localpath, string* localname)
     return l;
 }
 
-// add or refresh local filesystem item from scan stack, add items to scan
-// stack
+// add or refresh local filesystem item from scan stack, add items to scan stack
 void Sync::procscanq(int q)
 {
     size_t t = dirnotify->notifyq[q].size();
