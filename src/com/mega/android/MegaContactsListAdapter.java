@@ -122,6 +122,9 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         else if (position == 3){
         	holder.statusImageView.setImageResource(R.drawable.contact_red_dot);
         }
+        else{
+        	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
+        }
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);

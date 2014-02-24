@@ -98,7 +98,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
 			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.file_list_option_open);
-			holder.optionOpen.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionOpen.setPadding(Util.px2dp((15*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.file_list_option_properties);
 			holder.optionProperties.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDownload = (ImageButton) convertView.findViewById(R.id.file_list_option_download);

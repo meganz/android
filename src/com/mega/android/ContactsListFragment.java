@@ -30,8 +30,8 @@ public class ContactsListFragment extends Fragment implements OnClickListener, O
 	
 //	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
 //	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
-	public static final String[] names = new String[] { "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4"};
-	public static final Integer[] images = { R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus};
+	public static final String[] names = new String[] { "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4", "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4", "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4"};
+	public static final Integer[] images = { R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus,  R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus,  R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus};
 	
 	List<ItemContact> rowItems;
 	
