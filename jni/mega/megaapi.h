@@ -177,6 +177,8 @@ class MegaNode
         bool isRemoved();
         bool isSyncDeleted();
         string getLocalPath();
+        bool hasThumbnail();
+        bool hasPreview();
 
     private:
         MegaNode(mega::Node *node);
@@ -194,6 +196,8 @@ class MegaNode
         int tag;
         bool removed;
         bool syncdeleted;
+        bool thumbAvailable;
+        bool previewAvailable;
 };
 
 struct MegaFile : public mega::File
