@@ -957,10 +957,18 @@ void MegaTransferListener::onTransferTemporaryError(MegaApi *, MegaTransfer *tra
 MegaTransferListener::~MegaTransferListener() {}
 
 //Global callbacks
+#ifdef __ANDROID__
 void MegaGlobalListener::onUsersUpdate(MegaApi*)
 { cout << "onUsersUpdate" << endl; }
 void MegaGlobalListener::onNodesUpdate(MegaApi*)
 { cout << "onNodesUpdate" << endl; }
+#else
+void MegaGlobalListener::onUsersUpdate(MegaApi*, UserList *)
+{ cout << "onUsersUpdate" << endl; }
+void MegaGlobalListener::onNodesUpdate(MegaApi*, NodeList *)
+{ cout << "onNodesUpdate" << endl; }
+#endif
+
 void MegaGlobalListener::onReloadNeeded(MegaApi*)
 { cout << "onReloadNeeded" << endl; }
 MegaGlobalListener::~MegaGlobalListener() {}
@@ -981,10 +989,19 @@ void MegaListener::onTransferUpdate(MegaApi *, MegaTransfer *transfer)
 { cout << "onTransferUpdate.   Name:  " << transfer->getFileName() << "    Progress: " << transfer->getTransferredBytes() << endl; }
 void MegaListener::onTransferTemporaryError(MegaApi *api, MegaTransfer *transfer, MegaError* e)
 { cout << "onTransferTemporaryError.   Name: " << transfer->getFileName() << "    Error: " << e->getErrorString() << endl; }
+
+#ifdef __ANDROID__
 void MegaListener::onUsersUpdate(MegaApi*)
 { cout << "onUsersUpdate" << endl; }
 void MegaListener::onNodesUpdate(MegaApi*)
 { cout << "onNodesUpdate" << endl; }
+#else
+void MegaListener::onUsersUpdate(MegaApi*, UserList *)
+{ cout << "onUsersUpdate" << endl; }
+void MegaListener::onNodesUpdate(MegaApi*, NodeList *)
+{ cout << "onNodesUpdate" << endl; }
+#endif
+
 void MegaListener::onReloadNeeded(MegaApi*)
 { cout << "onReloadNeeded" << endl; }
 void MegaListener::onSyncStateChanged(MegaApi *api)
@@ -2399,16 +2416,17 @@ void MegaApi::syncupdate_local_lockretry(bool waiting)
 // user addition/update (users never get deleted)
 void MegaApi::users_updated(User** u, int count)
 {
-	//if (count == 1) cout << "1 user received" << endl;
-	//else cout << count << " users received" << endl;
-
-    //UserList* userList = new UserList(u, count);
-
-    //MUTEX_UNLOCK(sdkMutex);
-	fireOnUsersUpdate(this);
-    //MUTEX_LOCK(sdkMutex);
-
-    //delete userList;
+#ifdef __ANDROID__
+    MUTEX_UNLOCK(sdkMutex);
+    fireOnUsersUpdate(this, NULL);
+    MUTEX_LOCK(sdkMutex);
+#else
+    UserList* userList = new UserList(u, count);
+    MUTEX_UNLOCK(sdkMutex);
+    fireOnUsersUpdate(this, userList);
+    MUTEX_LOCK(sdkMutex);
+    delete userList;
+#endif
 }
 
 void MegaApi::setattr_result(handle h, error e)
@@ -2905,15 +2923,23 @@ void MegaApi::debug_log(const char* message)
 // at which point their pointers will become invalid at that point.)
 void MegaApi::nodes_updated(Node** n, int count)
 {
-	/*NodeList *nodeList = NULL;
+#ifdef __ANDROID__
+    MUTEX_UNLOCK(sdkMutex);
+    fireOnNodesUpdate(this, NULL);
+    MUTEX_LOCK(sdkMutex);
+#else
+    NodeList *nodeList = NULL;
     if(n != NULL)
     {
         vector<MegaNode *> list;
         for(int i=0; i<count; i++)
             list.push_back(MegaNode::fromNode(n[i]));
         nodeList = new NodeList(list.data(), count, true);
-    }*/
-    fireOnNodesUpdate(this);
+    }
+    MUTEX_UNLOCK(sdkMutex);
+    fireOnNodesUpdate(this, nodeList);
+    MUTEX_LOCK(sdkMutex);
+#endif
 }
 
 // display account details/history
@@ -3363,22 +3389,44 @@ void MegaApi::fireOnTransferUpdate(MegaApi *api, MegaTransfer *transfer)
 	if(listener) listener->onTransferUpdate(api, transfer);
 }
 
-void MegaApi::fireOnUsersUpdate(MegaApi* api)
+void MegaApi::fireOnUsersUpdate(MegaApi* api, UserList *users)
 {
 	for(set<MegaGlobalListener *>::iterator it = globalListeners.begin(); it != globalListeners.end() ; it++)
-		(*it)->onUsersUpdate(api);
-
+    {
+#ifdef __ANDROID__
+        (*it)->onUsersUpdate(api);
+#else
+        (*it)->onUsersUpdate(api, users);
+#endif
+    }
 	for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
-		(*it)->onUsersUpdate(api);
+    {
+#ifdef __ANDROID__
+        (*it)->onUsersUpdate(api);
+#else
+        (*it)->onUsersUpdate(api, users);
+#endif
+    }
 }
 
-void MegaApi::fireOnNodesUpdate(MegaApi* api)
+void MegaApi::fireOnNodesUpdate(MegaApi* api, NodeList *nodes)
 {
 	for(set<MegaGlobalListener *>::iterator it = globalListeners.begin(); it != globalListeners.end() ; it++)
-		(*it)->onNodesUpdate(api);
-
+    {
+#ifdef __ANDROID__
+        (*it)->onNodesUpdate(api);
+#else
+        (*it)->onNodesUpdate(api, nodes);
+#endif
+    }
 	for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
-		(*it)->onNodesUpdate(api);
+    {
+#ifdef __ANDROID__
+        (*it)->onNodesUpdate(api);
+#else
+        (*it)->onNodesUpdate(api, nodes);
+#endif
+    }
 }
 
 void MegaApi::fireOnReloadNeeded(MegaApi* api)
@@ -3392,10 +3440,12 @@ void MegaApi::fireOnReloadNeeded(MegaApi* api)
 
 void MegaApi::fireOnSyncStateChanged(MegaApi* api)
 {
-	return;
+#ifdef __ANDROID__
+    return;
+#endif
 
-    //for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
-    //    (*it)->onSyncStateChanged(api);
+    for(set<MegaListener *>::iterator it = listeners.begin(); it != listeners.end() ; it++)
+        (*it)->onSyncStateChanged(api);
 }
 
 

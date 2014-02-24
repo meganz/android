@@ -1,3 +1,5 @@
+#define __ANDROID__
+
 %module(directors="1") mega
 %{
 #include "megaapi.h"
