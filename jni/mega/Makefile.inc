@@ -46,7 +46,7 @@ CPP_SOURCES= src/attrmap.cpp \
     MegaProxySettings.cpp \
     src/posix/net.cpp  \
     src/posix/fs.cpp  \
-    src/posix/posixwaiter.cpp \
+    src/posix/waiter.cpp \
     linux/megaapiwait.cpp \
     android/megaapiandroidhttpio.cpp
     

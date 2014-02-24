@@ -341,6 +341,7 @@ typedef enum { TREESTATE_NONE, TREESTATE_SYNCED, TREESTATE_PENDING, TREESTATE_SY
 
 struct Notification
 {
+	dstime timestamp;
     string path;
     LocalNode* localnode;
 };
