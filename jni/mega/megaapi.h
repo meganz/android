@@ -112,9 +112,9 @@ using namespace std;
 #include "MegaProxySettings.h"
 
 
-class MegaHttpIO : public MegaApiWinHttpIO {};
-class MegaFileSystemAccess : public WinFileSystemAccess {};
-class MegaWaiter : public MegaApiWinWaiter {};
+class MegaHttpIO : public mega::MegaApiWinHttpIO {};
+class MegaFileSystemAccess : public mega::WinFileSystemAccess {};
+class MegaWaiter : public mega::MegaApiWinWaiter {};
 
 #else
 
@@ -196,7 +196,7 @@ class MegaNode
         int tag;
         bool removed;
         bool syncdeleted;
-        bool thumbAvailable;
+        bool thumbnailAvailable;
         bool previewAvailable;
 };
 
@@ -618,8 +618,13 @@ class MegaGlobalListener
 {
 	public:
 	//Global callbacks
+#ifdef __ANDROID__
 	virtual void onUsersUpdate(MegaApi* api);
 	virtual void onNodesUpdate(MegaApi* api);
+#else
+    virtual void onUsersUpdate(MegaApi* api, UserList *users);
+    virtual void onNodesUpdate(MegaApi* api, NodeList *nodes);
+#endif
 	virtual void onReloadNeeded(MegaApi* api);
 	virtual ~MegaGlobalListener();
 };
@@ -635,8 +640,13 @@ class MegaListener
 	virtual void onTransferFinish(MegaApi* api, MegaTransfer *transfer, MegaError* e);
 	virtual void onTransferUpdate(MegaApi *api, MegaTransfer *transfer);
 	virtual void onTransferTemporaryError(MegaApi *api, MegaTransfer *transfer, MegaError* e);
+#ifdef __ANDROID__
 	virtual void onUsersUpdate(MegaApi* api);
 	virtual void onNodesUpdate(MegaApi* api);
+#else
+    virtual void onUsersUpdate(MegaApi* api, UserList *users);
+    virtual void onNodesUpdate(MegaApi* api, NodeList *nodes);
+#endif
 	virtual void onReloadNeeded(MegaApi* api);
     virtual void onSyncStateChanged(MegaApi *api);
 
@@ -833,6 +843,7 @@ public:
     void startDownload(MegaNode* node, const char* localFolder, MegaTransferListener *listener = NULL);
     void startPublicDownload(MegaNode* node, const char* localFolder, MegaTransferListener *listener = NULL);
     //	void startPublicDownload(handle nodehandle, const char * base64key, const char* localFolder, MegaTransferListener *listener = NULL);
+    bool isRegularTransfer(MegaTransfer *transfer);
     void cancelTransfer(MegaTransfer *transfer, MegaRequestListener *listener=NULL);
     void cancelTransfers(int direction, MegaRequestListener *listener=NULL);
     void pauseTransfers(bool pause, MegaRequestListener* listener=NULL);
@@ -905,8 +916,8 @@ protected:
 	void fireOnTransferFinish(MegaApi* api, MegaTransfer *transfer, MegaError e);
 	void fireOnTransferUpdate(MegaApi *api, MegaTransfer *transfer);
 	void fireOnTransferTemporaryError(MegaApi *api, MegaTransfer *transfer, MegaError e);
-	void fireOnUsersUpdate(MegaApi* api);
-	void fireOnNodesUpdate(MegaApi* api);
+    void fireOnUsersUpdate(MegaApi* api, UserList *users);
+    void fireOnNodesUpdate(MegaApi* api, NodeList *nodes);
 	void fireOnReloadNeeded(MegaApi* api);
     void fireOnSyncStateChanged(MegaApi* api);
 
@@ -1080,7 +1091,6 @@ protected:
     bool checkTransfer(mega::Transfer *transfer);
     void cancelTransfer(mega::Transfer *t, MegaRequestListener *listener=NULL);
     bool isRegularTransfer(mega::Transfer *transfer);
-    bool isRegularTransfer(MegaTransfer *transfer);
 };
 
 
