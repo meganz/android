@@ -3,6 +3,9 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaRequestListener;
+
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -87,12 +90,21 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private ContactsGridFragment cG;
     private RubbishBinListFragment rbL;
     private RubbishBinGridFragment rbG;
-    private TransfersFragment tF;    
+    private TransfersFragment tF; 
+    
+    static ManagerActivity managerActivity;
+    private MegaApiAndroid megaApi;
+    private MegaRequestListener requestListener;
 
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		managerActivity = this;
+		MegaApplication app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
+		
 		setContentView(R.layout.activity_manager);	
 				
 		ImageView imageProfile = (ImageView) findViewById(R.id.profile_photo);
