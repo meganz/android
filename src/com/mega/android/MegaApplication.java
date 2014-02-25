@@ -16,7 +16,7 @@ public class MegaApplication extends Application
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		//new MegaTest(getMegaApi()).start();
+//		new MegaTest(getMegaApi()).start();
 	}
 	
 	public MegaApiAndroid getMegaApi()

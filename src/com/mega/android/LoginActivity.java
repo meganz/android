@@ -1,12 +1,21 @@
 package com.mega.android;
 
 import com.mega.components.MySwitch;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListener;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,17 +25,30 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity implements OnClickListener{
+public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
 	
+	EditText et_user;
 	EditText et_password;
 	Button bRegister;
 	Button bLogin;
+	
+	final String TAG = "LoginActivity";
+	
+	static LoginActivity loginActivity;
+    private MegaApiAndroid megaApi;
+    private MegaRequestListener requestListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		loginActivity = this;
+		MegaApplication app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
+		
 		setContentView(R.layout.activity_login);
 		
+		et_user = (EditText) findViewById(R.id.emailText);
 		et_password = (EditText) findViewById(R.id.passwordText);
 		bRegister = (Button) findViewById(R.id.button_create_account_login);
 		bLogin = (Button) findViewById(R.id.button_login_login);
@@ -75,15 +97,57 @@ public class LoginActivity extends Activity implements OnClickListener{
 	}
 	
 	public void onLoginClick(View v){
-		Intent intent = new Intent(this, ManagerActivity.class);
-		startActivity(intent);
-		finish();
+		String username = et_user.getText().toString();
+		String password = et_password.getText().toString();
+		megaApi.login(username, password, LoginActivity.this);
 	}
 	
 	public void onRegisterClick(View v){
 		Intent intent = new Intent(this, CreateAccountActivity.class);
 		startActivity(intent);
 		finish();
+	}
+	
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request)
+	{
+		Log.d(TAG, "onRequestStart");
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e)
+	{
+		if (request.getRequestString().equals("login")){
+			Log.d(TAG, "onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
+			if(e.getErrorCode() != MegaError.API_OK) 
+				return;
+			
+			megaApi.fetchNodes(LoginActivity.this);
+		}
+		else if (request.getRequestString().equals("fetchnodes")){
+			Log.d(TAG, "onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
+			if(e.getErrorCode() != MegaError.API_OK) 
+				return;
+			
+			NodeList children = megaApi.getChildren(megaApi.getRootNode());
+			for(int i=0; i<children.size(); i++)
+			{
+				MegaNode node = children.get(i);
+				Log.d(TAG, "Node: " + node.getName() + 
+						(node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
+			}
+			
+
+			Intent intent = new Intent(this, ManagerActivity.class);
+			startActivity(intent);
+			finish();
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
+	{
+		Log.d(TAG, "onRequestTemporaryError");
 	}
 
 	
