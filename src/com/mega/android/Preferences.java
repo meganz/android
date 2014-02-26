@@ -55,6 +55,20 @@ public class Preferences extends PreferenceActivity{
 		return new UserCredentials(email, privateKey, publicKey);
 	}
 	
+	public static String encrypt(String original) {
+		if (original == null) {
+			return null;
+		}
+		try {
+			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
+			return Base64.encodeToString(encrypted, Base64.DEFAULT);
+		} catch (Exception e) {
+			log("ee");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public static String decrypt(String encodedString) {
 		if (encodedString == null) {
 			return null;
@@ -67,6 +81,22 @@ public class Preferences extends PreferenceActivity{
 			log("de");
 			return null;
 		}
+	}
+	
+	/*
+	 * Save user credentials
+	 */
+	public static void saveCredentials(Context context,
+			UserCredentials credentials) {
+		if(context == null) return;
+		SharedPreferences prefs = getPreferences(context);
+		Editor editor = prefs.edit();
+		editor.putString(Preferences.KEY_EMAIL, encrypt(credentials.getEmail()));
+		editor.putString(Preferences.KEY_PUBLIC_KEY,
+				encrypt(credentials.getPublicKey()));
+		editor.putString(Preferences.KEY_PRIVATE_KEY,
+				encrypt(credentials.getPrivateKey()));
+		editor.commit();
 	}
 	
 	/*

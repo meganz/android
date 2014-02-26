@@ -16,12 +16,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Credentials;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
@@ -48,10 +49,32 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	private String lastEmail;
 	private String lastPassword;
 	
+	private String confirmLink;
+	
 	static LoginActivity loginActivity;
     private MegaApiAndroid megaApi;
     private MegaRequestListener requestListener;
-	Handler handler;
+    UserCredentials credentials;
+	
+	/*
+	 * Task to process email and password
+	 */
+	private class HashTask extends AsyncTask<String, Void, String[]> {
+
+		@Override
+		protected String[] doInBackground(String... args) {
+			String privateKey = megaApi.getBase64PwKey(args[1]);
+			String publicKey = megaApi.getStringHash(privateKey, args[0]);
+			return new String[]{new String(privateKey), new String(publicKey)}; 
+		}
+
+		
+		@Override
+		protected void onPostExecute(String[] key) {
+			onKeysGenerated(key[0], key[1]);
+		}
+
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +101,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		loginActivity = this;
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
-		handler = new Handler();
-		
 		
 		setContentView(R.layout.activity_login);
 		
@@ -176,7 +197,30 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 		log("generating keys");
 		
-		//AQUI EN LA VERSION ANTERIOR HACE LO DE HASHTASK
+		new HashTask().execute(lastEmail, lastPassword);
+	}
+	
+	private void onKeysGenerated(final String privateKey, final String publicKey) {
+		log("key generation finished");
+
+		if (confirmLink == null) {
+			onKeysGeneratedLogin(privateKey, publicKey);
+		} 
+	}
+	
+	private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
+		
+		if(!Util.isOnline(this)){
+			try{ progress.dismiss(); } catch(Exception ex) {};
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		progress.setMessage(getString(R.string.login_connecting_to_server));
+		
+		credentials = new UserCredentials(lastEmail,privateKey, publicKey);
+		
+		megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
 	}
 	
 	/*
@@ -231,33 +275,58 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e)
-	{
-		if (request.getRequestString().equals("login")){
-			log("onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
-			if(e.getErrorCode() != MegaError.API_OK) 
-				return;
-			
-			megaApi.fetchNodes(LoginActivity.this);
-		}
-		else if (request.getRequestString().equals("fetchnodes")){
-			log("onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
-			if(e.getErrorCode() != MegaError.API_OK) 
-				return;
-			
-			NodeList children = megaApi.getChildren(megaApi.getRootNode());
-			for(int i=0; i<children.size(); i++)
-			{
-				MegaNode node = children.get(i);
-				log("Node: " + node.getName() + 
-						(node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
+		
+		if (request.getType() == MegaRequest.TYPE_FAST_LOGIN){
+			if (error.getErrorCode()!=MegaError.API_OK) {
+				String errorMessage;
+				if (error.getErrorCode() == MegaError.API_ENOENT) {
+					errorMessage = getString(R.string.error_incorrect_email_or_password);
+				}
+				else if (error.getErrorCode() == MegaError.API_ENOENT) {
+					errorMessage = getString(R.string.error_server_connection_problem);
+				}
+				else {
+					errorMessage = new String(error.getErrorString());
+				}
+				try{ progress.dismiss(); } catch (Exception e){};
+				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
-			
-
-			Intent intent = new Intent(this, ManagerActivity.class);
-			startActivity(intent);
-			finish();
+			else{
+				try{ progress.dismiss(); } catch (Exception e){};
+				Preferences.saveCredentials(loginActivity, credentials);
+				Intent intent = new Intent(loginActivity,ManagerActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+			}
 		}
+		
+//		if (request.getRequestString().equals("login")){
+//			log("onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
+//			if(e.getErrorCode() != MegaError.API_OK) 
+//				return;
+//			
+//			megaApi.fetchNodes(LoginActivity.this);
+//		}
+//		else if (request.getRequestString().equals("fetchnodes")){
+//			log("onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
+//			if(e.getErrorCode() != MegaError.API_OK) 
+//				return;
+//			
+//			NodeList children = megaApi.getChildren(megaApi.getRootNode());
+//			for(int i=0; i<children.size(); i++)
+//			{
+//				MegaNode node = children.get(i);
+//				log("Node: " + node.getName() + 
+//						(node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
+//			}
+//			
+//
+//			Intent intent = new Intent(this, ManagerActivity.class);
+//			startActivity(intent);
+//			finish();
+//		}
 	}
 
 	@Override
