@@ -22,6 +22,13 @@
     <string name="dots">···</string>
     <string name="new_to_mega">New to MEGA?</string>
     <string name="create_account">Create an account</string>
+    <string name="login_logging_in">Logging in</string>
+    <string name="error_enter_email">Please enter your email address</string>
+    <string name="error_invalid_email">Invalid email address</string>
+    <string name="error_enter_password">Please enter your password</string>
+    <string name="error_server_connection_problem">Network connection problem, please try again later</string>
+    <string name="login_generating_key">Calculating encryption keys, please wait</string>
+    
     
     <string name="create_account_activity">Create account</string>
     <string name="create_account_text">Create an account</string>

@@ -110,5 +110,7 @@ public class TourActivity extends Activity implements OnClickListener {
 		finish();
 	}
 
-	
+	public static void log(String message) {
+		Util.log("TourActivity", message);
+	}
 }
