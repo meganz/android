@@ -8,12 +8,14 @@ import com.mega.sdk.MegaRequestListener;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.MenuItemCompat;
@@ -103,6 +105,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		managerActivity = this;
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
+		
+		if (Preferences.getCredentials(this) == null){
+			logout(this, (MegaApplication)getApplication(), megaApi);
+			return;
+		}
 		
 		
 		setContentView(R.layout.activity_manager);	
@@ -521,5 +528,30 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				break;
 			}
 		}
+	}
+	
+	/*
+	 * Logout user
+	 */
+	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi) {
+//		context.stopService(new Intent(context, BackgroundService.class));
+//		context.stopService(new Intent(context, CameraSyncService.class));
+
+		Preferences.clearCredentials(context);
+		app.logout();
+		
+		if(managerActivity != null)
+		{
+			Intent intent = new Intent(managerActivity, TourActivity.class);
+	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			managerActivity.startActivity(intent);
+			managerActivity.finish();
+			managerActivity = null;
+		}
+	}
+	
+	public static void log(String message) {
+		Util.log("ManagerActivity", message);
 	}
 }
