@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListener;
+import com.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -44,7 +48,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener {
+public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface {
 	
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
@@ -435,8 +439,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 		    	return true;
 		    }
-	        case R.id.action_settings:{
-	        	Toast.makeText(this,  "Icono de preferencias clickado", Toast.LENGTH_SHORT).show();
+	        case R.id.action_logout:{
+	        	logout(this, (MegaApplication)getApplication(), megaApi);
+	        	Toast.makeText(this,  "Temporal Logout Button Clicked!", Toast.LENGTH_SHORT).show();
 	            return true;
 	        }
 	        case R.id.action_search:{
@@ -538,7 +543,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 //		context.stopService(new Intent(context, CameraSyncService.class));
 
 		Preferences.clearCredentials(context);
-		app.logout();
+		megaApi.logout();
 		
 		if(managerActivity != null)
 		{
@@ -549,6 +554,29 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			managerActivity.finish();
 			managerActivity = null;
 		}
+	}	
+	
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			log("logout request start");
+		}	
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+		if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			log("logout finished");
+		}		
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,MegaError e) {
+
+		if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			log("logout temporary error");
+		}		
 	}
 	
 	public static void log(String message) {
