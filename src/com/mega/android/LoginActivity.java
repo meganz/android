@@ -297,13 +297,28 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					progress.setMessage(getString(R.string.download_updating_filelist));
 				} 
 				catch (Exception e){};
-				
+
 				Preferences.saveCredentials(loginActivity, credentials);
+
+				megaApi.fetchNodes(loginActivity);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			if (error.getErrorCode()!=MegaError.API_OK) {
+				String errorMessage;
+				errorMessage = new String(error.getErrorString());
+				try{ progress.dismiss(); } catch (Exception e){};
+				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+			}
+			else{
+				try{ progress.dismiss(); } catch (Exception e){};
+
 				Intent intent = new Intent(loginActivity,ManagerActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
 				finish();
 			}
+			
 		}
 		
 //		if (request.getRequestString().equals("login")){
