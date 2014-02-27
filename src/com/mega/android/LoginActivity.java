@@ -293,7 +293,11 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
-				try{ progress.dismiss(); } catch (Exception e){};
+				try{ 
+					progress.setMessage(getString(R.string.download_updating_filelist));
+				} 
+				catch (Exception e){};
+				
 				Preferences.saveCredentials(loginActivity, credentials);
 				Intent intent = new Intent(loginActivity,ManagerActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

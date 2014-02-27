@@ -4,6 +4,7 @@
     <string name="app_name">MEGA_COM</string>
         
     <string name="action_logout">Logout</string>
+    <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
     <string name="hello_world">PEPE</string>
     <string name="botonOcultarActionBar">Ocultar</string>
@@ -30,6 +31,7 @@
     <string name="login_generating_key">Calculating encryption keys, please wait</string>
     <string name="login_connecting_to_server">Connecting to the server</string>
     <string name="error_incorrect_email_or_password">Incorrect email or password. Have you validated your email account?</string>    
+    <string name="download_updating_filelist">Updating file list</string>
     
     <string name="create_account_activity">Create account</string>
     <string name="create_account_text">Create an account</string>
