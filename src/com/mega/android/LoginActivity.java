@@ -287,7 +287,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					errorMessage = getString(R.string.error_server_connection_problem);
 				}
 				else {
-					errorMessage = new String(error.getErrorString());
+					errorMessage = error.getErrorString();
 				}
 				try{ progress.dismiss(); } catch (Exception e){};
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
@@ -306,12 +306,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (error.getErrorCode()!=MegaError.API_OK) {
 				String errorMessage;
-				errorMessage = new String(error.getErrorString());
+				errorMessage = error.getErrorString();
 				try{ progress.dismiss(); } catch (Exception e){};
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
-				try{ progress.dismiss(); } catch (Exception e){};
+//				try{ progress.dismiss(); } catch (Exception e){};
+//				NodeList children = megaApi.getChildren(megaApi.getRootNode());
+//				log("children.size() = " + children.size());
 
 				Intent intent = new Intent(loginActivity,ManagerActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
