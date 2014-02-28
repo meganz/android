@@ -6,9 +6,11 @@ import java.util.List;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListener;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.NodeList;
 
 import android.app.SearchManager;
 import android.content.Context;
@@ -115,8 +117,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		}
 		
+		setContentView(R.layout.activity_manager);
 		
-		setContentView(R.layout.activity_manager);	
+		MegaNode rootNode = megaApi.getRootNode();
+		if (rootNode == null){
+			megaApi.fetchNodes(this);
+		}
+		NodeList children = megaApi.getChildren(megaApi.getRootNode());
+//		for(int i=0; i<children.size(); i++)
+//		{
+//			MegaNode node = children.get(i);
+//			log("Node: " + node.getName() + (node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
+//		}
+		Toast.makeText(this, "children.size()="+children.size(), Toast.LENGTH_SHORT).show();
 				
 		ImageView imageProfile = (ImageView) findViewById(R.id.profile_photo);
 		Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
@@ -562,13 +575,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout request start");
 		}	
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			log("fecthnodes request start");
+
+		}
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
-		}		
+		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			log("fecthnodes request finished");
+		}
 	}
 
 	@Override
@@ -576,7 +596,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout temporary error");
-		}		
+		}	
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			log("fetchnodes temporary error");
+		}
 	}
 	
 	public static void log(String message) {
