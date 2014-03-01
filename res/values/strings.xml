@@ -28,7 +28,7 @@
     <string name="error_invalid_email">Invalid email address</string>
     <string name="error_enter_password">Please enter your password</string>
     <string name="error_server_connection_problem">Network connection problem, please try again later</string>
-    <string name="login_generating_key">Calculating encryption keys, please wait</string>
+    <string name="login_generating_key">Calculating encryption keys</string>
     <string name="login_connecting_to_server">Connecting to the server</string>
     <string name="error_incorrect_email_or_password">Incorrect email or password. Have you validated your email account?</string>    
     <string name="download_updating_filelist">Updating file list</string>
