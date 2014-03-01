@@ -31,6 +31,8 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView.OnEditorActionListener;
@@ -43,8 +45,16 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	EditText et_password;
 	Button bRegister;
 	Button bLogin;
+	LinearLayout loginLogin;
+	LinearLayout loginLoggingIn;
+	LinearLayout loginCreateAccount;
+	View loginDelimiter;
+	ProgressBar loginProgressBar;
+	TextView generatingKeysText;
+	TextView loggingInText;
+	TextView fetchingNodesText;
 	
-	private ProgressDialog progress;
+//	private ProgressDialog progress;
 	
 	private String lastEmail;
 	private String lastPassword;
@@ -104,6 +114,23 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 		setContentView(R.layout.activity_login);
 		
+		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
+		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
+		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
+		loginDelimiter = (View) findViewById(R.id.login_delimiter);
+		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
+		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
+		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
+		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
+		
+		loginLogin.setVisibility(View.VISIBLE);
+		loginCreateAccount.setVisibility(View.VISIBLE);
+		loginDelimiter.setVisibility(View.VISIBLE);
+		loginLoggingIn.setVisibility(View.GONE);
+		generatingKeysText.setVisibility(View.GONE);
+		loggingInText.setVisibility(View.GONE);
+		fetchingNodesText.setVisibility(View.GONE);
+		
 		et_user = (EditText) findViewById(R.id.emailText);
 		et_password = (EditText) findViewById(R.id.passwordText);
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
@@ -140,10 +167,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		});
 		
-		progress = new ProgressDialog(this);
-		progress.setMessage(getString(R.string.login_logging_in));
-		progress.setCancelable(false);
-		progress.setCanceledOnTouchOutside(false);
+//		progress = new ProgressDialog(this);
+//		progress.setMessage(getString(R.string.login_logging_in));
+//		progress.setCancelable(false);
+//		progress.setCanceledOnTouchOutside(false);
 	}
 	
 	@Override
@@ -185,12 +212,25 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 		if(!Util.isOnline(this))
 		{
+			loginLoggingIn.setVisibility(View.GONE);
+			loginLogin.setVisibility(View.VISIBLE);
+			loginDelimiter.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.VISIBLE);
+			generatingKeysText.setVisibility(View.GONE);
+			loggingInText.setVisibility(View.GONE);
+			fetchingNodesText.setVisibility(View.GONE);
+			
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
 			return;
 		}
 		
-		progress.setMessage(getString(R.string.login_generating_key));
-		progress.show();
+//		progress.setMessage(getString(R.string.login_generating_key));
+//		progress.show();
+		loginLogin.setVisibility(View.GONE);
+		loginDelimiter.setVisibility(View.GONE);
+		loginCreateAccount.setVisibility(View.GONE);
+		loginLoggingIn.setVisibility(View.VISIBLE);
+		generatingKeysText.setVisibility(View.VISIBLE);
 		
 		lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
 		lastPassword = et_password.getText().toString();
@@ -211,12 +251,21 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
 		
 		if(!Util.isOnline(this)){
-			try{ progress.dismiss(); } catch(Exception ex) {};
+//			try{ progress.dismiss(); } catch(Exception ex) {};
+			loginLoggingIn.setVisibility(View.GONE);
+			loginLogin.setVisibility(View.VISIBLE);
+			loginDelimiter.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.VISIBLE);
+			generatingKeysText.setVisibility(View.GONE);
+			loggingInText.setVisibility(View.GONE);
+			fetchingNodesText.setVisibility(View.GONE);
+			
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
 		}
 		
-		progress.setMessage(getString(R.string.login_connecting_to_server));
+//		progress.setMessage(getString(R.string.login_connecting_to_server));
+		loggingInText.setVisibility(View.VISIBLE);
 		
 		credentials = new UserCredentials(lastEmail,privateKey, publicKey);
 		
@@ -289,15 +338,25 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				else {
 					errorMessage = error.getErrorString();
 				}
-				try{ progress.dismiss(); } catch (Exception e){};
+//				try{ progress.dismiss(); } catch (Exception e){};
+				loginLoggingIn.setVisibility(View.GONE);
+				loginLogin.setVisibility(View.VISIBLE);
+				loginDelimiter.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.VISIBLE);
+				generatingKeysText.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.GONE);
+				fetchingNodesText.setVisibility(View.GONE);
+				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
-				try{ 
-					progress.setMessage(getString(R.string.download_updating_filelist));
-				} 
-				catch (Exception e){};
+//				try{ 
+//					progress.setMessage(getString(R.string.download_updating_filelist));
+//				} 
+//				catch (Exception e){};
 
+				fetchingNodesText.setVisibility(View.VISIBLE);
+				
 				Preferences.saveCredentials(loginActivity, credentials);
 
 				megaApi.fetchNodes(loginActivity);
@@ -307,7 +366,15 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			if (error.getErrorCode()!=MegaError.API_OK) {
 				String errorMessage;
 				errorMessage = error.getErrorString();
-				try{ progress.dismiss(); } catch (Exception e){};
+//				try{ progress.dismiss(); } catch (Exception e){};
+				loginLoggingIn.setVisibility(View.GONE);
+				loginLogin.setVisibility(View.VISIBLE);
+				loginDelimiter.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.VISIBLE);
+				generatingKeysText.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.GONE);
+				fetchingNodesText.setVisibility(View.GONE);
+				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
