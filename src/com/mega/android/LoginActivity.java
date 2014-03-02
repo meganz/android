@@ -65,6 +65,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     private MegaApiAndroid megaApi;
     private MegaRequestListener requestListener;
     UserCredentials credentials;
+    private boolean backWhileLogin;
 	
 	/*
 	 * Task to process email and password
@@ -89,6 +90,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		backWhileLogin = false;
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -381,11 +384,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 //				try{ progress.dismiss(); } catch (Exception e){};
 //				NodeList children = megaApi.getChildren(megaApi.getRootNode());
 //				log("children.size() = " + children.size());
-
-				Intent intent = new Intent(loginActivity,ManagerActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
+				if (!backWhileLogin){
+					Intent intent = new Intent(loginActivity,ManagerActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					startActivity(intent);
+					finish();
+				}
 			}
 			
 		}
@@ -421,6 +425,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
 	{
 		log("onRequestTemporaryError");
+	}
+	
+	@Override
+	public void onBackPressed() {
+		backWhileLogin = true;
+		super.onBackPressed();
 	}
 	
 	
