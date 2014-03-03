@@ -83,6 +83,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	private TableLayout topControlBar;
 	private TableLayout bottomControlBar;
+	private ImageView imageProfile;
+	private TextView used_space;
 	
 	ImageButton customListGrid;
 	LinearLayout customSearch;
@@ -118,148 +120,151 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		setContentView(R.layout.activity_manager);
-		
-		MegaNode rootNode = megaApi.getRootNode();
-		if (rootNode == null){
-			megaApi.fetchNodes(this);
-		}
-		NodeList children = megaApi.getChildren(megaApi.getRootNode());
-//		for(int i=0; i<children.size(); i++)
-//		{
-//			MegaNode node = children.get(i);
-//			log("Node: " + node.getName() + (node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
-//		}
-		Toast.makeText(this, "children.size()="+children.size(), Toast.LENGTH_SHORT).show();
-				
-		ImageView imageProfile = (ImageView) findViewById(R.id.profile_photo);
-		Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
-		Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 
-		BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-        Paint paint = new Paint();
-        paint.setShader(shader);
-
-        Canvas c = new Canvas(circleBitmap);
-        int radius; 
-        if (imBitmap.getWidth() < imBitmap.getHeight())
-        	radius = imBitmap.getWidth()/2;
-        else
-        	radius = imBitmap.getHeight()/2;
-        
-	    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-        imageProfile.setImageBitmap(circleBitmap);
-		
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		imageProfile = (ImageView) findViewById(R.id.profile_photo);
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         topControlBar = (TableLayout) findViewById(R.id.top_control_bar);
         topControlBar.setOnClickListener(this);
         bottomControlBar = (TableLayout) findViewById(R.id.bottom_control_bar);
         bottomControlBar.setOnClickListener(this);
-        
-        TextView used_space = (TextView) findViewById(R.id.used_space);
-        String used = "11";
-        String total = "50";
-        
-        String used_space_string = getString(R.string.used_space, used, total);
-        used_space.setText(used_space_string);
-        
-        Spannable wordtoSpan = new SpannableString(used_space_string);        
-
-        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), 6, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        used_space.setText(wordtoSpan);
-        
-        List<String> items = new ArrayList<String>();
-		for (DrawerItem item : DrawerItem.values()) {
-			items.add(item.getTitle(this));
+        used_space = (TextView) findViewById(R.id.used_space);
+		
+		MegaNode rootNode = megaApi.getRootNode();
+		if (rootNode == null){
+			logout(this, (MegaApplication)getApplication(), megaApi);
+			return;
 		}
-        
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-				R.layout.drawer_list_item, items)
-				{
-					public View getView(int position, View rowView, ViewGroup parentView) {
-						TextView view = (TextView)super.getView(position, rowView, parentView);
-						switch(position)
-						{
-						case 0:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 1:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 2:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 3:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 4:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 5:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 6:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
-						case 7:
-							view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-							break;
+		else{
+			NodeList children = megaApi.getChildren(megaApi.getRootNode());
+	//		for(int i=0; i<children.size(); i++)
+	//		{
+	//			MegaNode node = children.get(i);
+	//			log("Node: " + node.getName() + (node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
+	//		}
+			Toast.makeText(this, "children.size()="+children.size(), Toast.LENGTH_SHORT).show();
+					
+			Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
+			Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+	
+			BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+	        Paint paint = new Paint();
+	        paint.setShader(shader);
+	
+	        Canvas c = new Canvas(circleBitmap);
+	        int radius; 
+	        if (imBitmap.getWidth() < imBitmap.getHeight())
+	        	radius = imBitmap.getWidth()/2;
+	        else
+	        	radius = imBitmap.getHeight()/2;
+	        
+		    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
+	        imageProfile.setImageBitmap(circleBitmap);
+			
+	        String used = "11";
+	        String total = "50";
+	        
+	        String used_space_string = getString(R.string.used_space, used, total);
+	        used_space.setText(used_space_string);
+	        
+	        Spannable wordtoSpan = new SpannableString(used_space_string);        
+	
+	        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), 6, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	        used_space.setText(wordtoSpan);
+	        
+	        List<String> items = new ArrayList<String>();
+			for (DrawerItem item : DrawerItem.values()) {
+				items.add(item.getTitle(this));
+			}
+	        
+	        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+					R.layout.drawer_list_item, items)
+					{
+						public View getView(int position, View rowView, ViewGroup parentView) {
+							TextView view = (TextView)super.getView(position, rowView, parentView);
+							switch(position)
+							{
+							case 0:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 1:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 2:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 3:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 4:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 5:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 6:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							case 7:
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								break;
+							}
+							return view;
 						}
-						return view;
 					}
-				}
-				
-				);
-        
-        mDrawerList.setOnItemClickListener(this);
-        
-        getSupportActionBar().setIcon(R.drawable.ic_launcher);
-        getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,                  /* host Activity */
-                mDrawerLayout,         /* DrawerLayout object */
-                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-                R.string.app_name,  /* "open drawer" description for accessibility */
-                R.string.app_name  /* "close drawer" description for accessibility */
-                ) {
-            public void onDrawerClosed(View view) {
-                supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        if (savedInstanceState == null){
-        	mDrawerLayout.openDrawer(Gravity.LEFT);
-        }
-        else{
-			mDrawerLayout.closeDrawer(Gravity.LEFT);
-        }
-        
-        //Create the actionBar Menu
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
-        
-        customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
-        customSearch.setOnClickListener(this);
-		
-		customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-		customListGrid.setOnClickListener(this);
-		
-		if (drawerItem == null) {
-			drawerItem = DrawerItem.CLOUD_DRIVE;
+					
+					);
+	        
+	        mDrawerList.setOnItemClickListener(this);
+	        
+	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
+	        getSupportActionBar().setHomeButtonEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	        
+	        mDrawerToggle = new ActionBarDrawerToggle(
+	                this,                  /* host Activity */
+	                mDrawerLayout,         /* DrawerLayout object */
+	                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+	                R.string.app_name,  /* "open drawer" description for accessibility */
+	                R.string.app_name  /* "close drawer" description for accessibility */
+	                ) {
+	            public void onDrawerClosed(View view) {
+	                supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
+	            }
+	
+	            public void onDrawerOpened(View drawerView) {
+	                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+	            }
+	        };
+	        mDrawerToggle.setDrawerIndicatorEnabled(true);
+	        mDrawerLayout.setDrawerListener(mDrawerToggle);
+	        if (savedInstanceState == null){
+	        	mDrawerLayout.openDrawer(Gravity.LEFT);
+	        }
+	        else{
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+	        }
+	        
+	        //Create the actionBar Menu
+	        getSupportActionBar().setDisplayShowCustomEnabled(true);
+	        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
+	        
+	        customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
+	        customSearch.setOnClickListener(this);
+			
+			customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+			customListGrid.setOnClickListener(this);
+			
+			if (drawerItem == null) {
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+			}
+	
+			//INITIAL FRAGMENT
+			selectDrawerItem(drawerItem);
 		}
-
-		//INITIAL FRAGMENT
-		selectDrawerItem(drawerItem);
 	}
     
     public void selectDrawerItem(DrawerItem item){
