@@ -58,6 +58,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	
 	private String lastEmail;
 	private String lastPassword;
+	private String gPublicKey;
+	private String gPrivateKey;
 	
 	private String confirmLink;
 	
@@ -91,6 +93,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		loginActivity = this;
+		MegaApplication app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
 		backWhileLogin = false;
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -100,22 +106,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	    float density  = getResources().getDisplayMetrics().density;
 	    float dpHeight = outMetrics.heightPixels / density;
 	    float dpWidth  = outMetrics.widthPixels / density;
-		
-		if (Preferences.getCredentials(this) != null){
-			Intent intent = new Intent(this, ManagerActivity.class);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-			}
-			this.startActivity(intent);
-			this.finish();
-			return;
-		}
-		
-		loginActivity = this;
-		MegaApplication app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
-		
-		setContentView(R.layout.activity_login);
+	    
+	    setContentView(R.layout.activity_login);
 		
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
@@ -125,6 +117,32 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
 		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
+		
+		credentials = Preferences.getCredentials(this);
+		if (credentials != null){
+			MegaNode rootNode = megaApi.getRootNode();
+			if (rootNode != null){
+				Intent intent = new Intent(this, ManagerActivity.class);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				}
+				this.startActivity(intent);
+				this.finish();
+				return;
+			}
+			else{
+				loginLogin.setVisibility(View.GONE);
+				loginDelimiter.setVisibility(View.GONE);
+				loginCreateAccount.setVisibility(View.GONE);
+				loginLoggingIn.setVisibility(View.VISIBLE);
+				generatingKeysText.setVisibility(View.VISIBLE);
+				lastEmail = credentials.getEmail();
+				gPublicKey = credentials.getPublicKey();
+				gPrivateKey = credentials.getPrivateKey();
+				megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+				return;
+			}
+		}		
 		
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
