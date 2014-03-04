@@ -132,7 +132,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
-			logout(this, (MegaApplication)getApplication(), megaApi);
+			Intent intent = new Intent(managerActivity,LoginActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
 			return;
 		}
 		else{
