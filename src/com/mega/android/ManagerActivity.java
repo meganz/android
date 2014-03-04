@@ -140,11 +140,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else{
 			NodeList children = megaApi.getChildren(megaApi.getRootNode());
-	//		for(int i=0; i<children.size(); i++)
-	//		{
-	//			MegaNode node = children.get(i);
-	//			log("Node: " + node.getName() + (node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
-	//		}
+//			for(int i=0; i<children.size(); i++)
+//			{
+//				MegaNode node = children.get(i);
+//				log("Node: " + node.getName() + (node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
+//			}
 			Toast.makeText(this, "children.size()="+children.size(), Toast.LENGTH_SHORT).show();
 					
 			Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);

@@ -3,6 +3,10 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.NodeList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class FileBrowserListFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
@@ -27,38 +32,51 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	ActionBar aB;
 	ListView listView;
 	MegaBrowserListAdapter adapter;
+	MegaApiAndroid megaApi;
 	
 //	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
 //	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
-	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png", "salamanca11.png", "salamanca12.png", "salamanca13.png", "salamanca14.png", "salamanca15.png", "salamanca16.png", "salamanca17.png", "salamanca18.png", "salamanca19.png"};
-	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal10, R.drawable.sal03, R.drawable.sal10, R.drawable.sal05, R.drawable.sal10, R.drawable.sal07, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09};
+//	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png", "salamanca11.png", "salamanca12.png", "salamanca13.png", "salamanca14.png", "salamanca15.png", "salamanca16.png", "salamanca17.png", "salamanca18.png", "salamanca19.png"};
+//	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal10, R.drawable.sal03, R.drawable.sal10, R.drawable.sal05, R.drawable.sal10, R.drawable.sal07, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09};
 	
 	List<ItemFileBrowser> rowItems;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> namesArray;
 	
 	@Override
+	public void onCreate (Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		log("onCreate");
+
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+		
+		namesArray = new ArrayList<String>();
+		imageIds = new ArrayList<Integer>();
+		rowItems = new ArrayList<ItemFileBrowser>();
+		
+		NodeList children = megaApi.getChildren(megaApi.getRootNode());
+		for(int i=0; i<children.size(); i++){
+			MegaNode node = children.get(i);
+			ItemFileBrowser item = new ItemFileBrowser(R.drawable.sal01, node.getName());
+			rowItems.add(item);
+			imageIds.add(item.getImageId());
+            namesArray.add(item.getName());
+		}
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
+
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		aB.setTitle(getString(R.string.section_cloud_drive));
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-		
-		
-		namesArray = new ArrayList<String>();
-		imageIds = new ArrayList<Integer>();
-		rowItems = new ArrayList<ItemFileBrowser>();
-        for (int i = 0; i < names.length; i++) {
-        	ItemFileBrowser item = new ItemFileBrowser(images[i], names[i]);
-            rowItems.add(item);
-            imageIds.add(item.getImageId());
-            namesArray.add(item.getName());
-        }
-        
+		        
         listView = (ListView) v.findViewById(R.id.file_list_view_browser);
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -108,6 +126,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		}
 	}
 	
-	
+	private static void log(String log) {
+		Util.log("FileBrowserListFragment", log);
+	}
 
 }

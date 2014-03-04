@@ -24,7 +24,7 @@ public class Util {
 	public static float dpHeightAbs = 592;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	/*
 	 * Build error dialog
