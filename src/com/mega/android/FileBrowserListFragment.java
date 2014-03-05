@@ -40,8 +40,11 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 //	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal10, R.drawable.sal03, R.drawable.sal10, R.drawable.sal05, R.drawable.sal10, R.drawable.sal07, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09};
 	
 	List<ItemFileBrowser> rowItems;
-	ArrayList<Integer> imageIds;
-	ArrayList<String> namesArray;
+	
+	//Esto hay que quitarlo cuando haga el visor completo
+	ArrayList<String> namesArray = new ArrayList<String>();
+	ArrayList<Integer> imageIds = new ArrayList<Integer>();
+	//HASTA AQUI 
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -52,17 +55,20 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		namesArray = new ArrayList<String>();
-		imageIds = new ArrayList<Integer>();
 		rowItems = new ArrayList<ItemFileBrowser>();
 		
 		NodeList children = megaApi.getChildren(megaApi.getRootNode());
 		for(int i=0; i<children.size(); i++){
 			MegaNode node = children.get(i);
-			ItemFileBrowser item = new ItemFileBrowser(R.drawable.sal01, node.getName());
+			long nodeHandle = node.getHandle();	
+			log("nodeHandle=" + nodeHandle);
+			ItemFileBrowser item = new ItemFileBrowser(nodeHandle);
 			rowItems.add(item);
-			imageIds.add(item.getImageId());
-            namesArray.add(item.getName());
+			
+			//Esto hay que quitarlo cuando haga el visor completo
+			namesArray.add("NombrePrueba");
+			imageIds.add(R.drawable.sal01);
+			//HASTA AQUI
 		}
 	}
 	
