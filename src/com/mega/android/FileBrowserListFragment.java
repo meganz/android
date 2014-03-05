@@ -32,6 +32,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	ActionBar aB;
 	ListView listView;
 	MegaBrowserListAdapter adapter;
+	
 	MegaApiAndroid megaApi;
 	
 //	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
@@ -91,7 +92,13 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
 		
+		changeFolder(megaApi.getRootNode());
+		
 		return v;
+	}
+	
+	public void changeFolder(MegaNode newParentNode){
+		
 	}
 	
 	@Override

@@ -45,7 +45,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	int positionClicked;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
-	ArrayList<MegaNode> nodes;
+//	ArrayList<MegaNode> nodes;
 		
 	public MegaBrowserListAdapter(Context _context, List<ItemFileBrowser> _items) {
 		this.context = _context;
@@ -53,7 +53,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
-		this.nodes = new ArrayList<MegaNode>();
+//		this.nodes = new ArrayList<MegaNode>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -65,7 +65,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			ItemFileBrowser item = it.next();
 			log("handle: " + item.getNodeHandle());
 			MegaNode n = megaApi.getNodeByHandle(item.getNodeHandle());
-			nodes.add(n);
+//			nodes.add(n);
 			
 			imageIds.add(R.drawable.sal01);
 			names.add("NombrePrueba");
@@ -150,11 +150,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		else{
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+			
 			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 		}
 		
 		long nodeDate = node.getCreationTime();
-		holder.textViewUpdated.setText(Util.getDateString(nodeDate));
+		if (nodeDate != 0){
+			try{ 
+				holder.textViewUpdated.setText(Util.getDateString(nodeDate));
+			}
+			catch(Exception ex) {
+				holder.textViewUpdated.setText(""); 
+			}
+		}
+		else{
+			holder.textViewUpdated.setText("");
+		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);

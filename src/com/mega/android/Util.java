@@ -192,19 +192,19 @@ public class Util {
 		float TB = GB * 1024;
 		
 		if (size < KB){
-			sizeString = size + "B";
+			sizeString = size + " B";
 		}
 		else if (size < MB){
-			sizeString = decf.format(size/KB) + "KB";
+			sizeString = decf.format(size/KB) + " KB";
 		}
 		else if (size < GB){
-			sizeString = decf.format(size/MB) + "MB";
+			sizeString = decf.format(size/MB) + " MB";
 		}
 		else if (size < TB){
-			sizeString = decf.format(size/GB) + "GB";
+			sizeString = decf.format(size/GB) + " GB";
 		}
 		else{
-			sizeString = decf.format(size/TB) + "TB";
+			sizeString = decf.format(size/TB) + " TB";
 		}
 		
 		return sizeString;
