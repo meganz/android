@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -36,7 +40,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	List<ItemFileBrowser> rowItems;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
+//	ArrayList<MegaNode> nodes;
 	int positionClicked;
+	
+	MegaApiAndroid megaApi;
 	
 	public MegaBrowserGridAdapter(Context _context, List<ItemFileBrowser> _items) {
 		this.context = _context;
@@ -44,12 +51,22 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
+//		this.nodes = new ArrayList<MegaNode>();
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 		
 		Iterator<ItemFileBrowser> it = rowItems.iterator();
 		while (it.hasNext()){
 			ItemFileBrowser item = it.next();
-			imageIds.add(item.getImageId());
-			names.add(item.getName());
+			MegaNode n = megaApi.getNodeByHandle(item.getNodeHandle());
+//			nodes.add(n);
+			
+			//Esto hay que quitarlo cuando haga el visor completo
+			names.add("NombrePrueba");
+			imageIds.add(R.drawable.sal01);
+			//HASTA AQUI
 		}
 	}
 	
@@ -141,7 +158,15 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				holder.imageView2.setLayoutParams(paramsIV2);
 
 				holder.textViewFileName1 = (TextView) convertView.findViewById(R.id.file_grid_filename1);
+				holder.textViewFileName1.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+				holder.textViewFileName1.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
+				holder.textViewFileName1.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+				holder.textViewFileName1.setSingleLine(true);
 				holder.textViewFileName2 = (TextView) convertView.findViewById(R.id.file_grid_filename2);
+				holder.textViewFileName2.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+				holder.textViewFileName2.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
+				holder.textViewFileName2.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+				holder.textViewFileName2.setSingleLine(true);
 				
 				holder.textViewFileSize1 = (TextView) convertView.findViewById(R.id.file_grid_filesize1);
 				holder.textViewFileSize2 = (TextView) convertView.findViewById(R.id.file_grid_filesize2);
@@ -183,17 +208,37 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 
 			
 			ItemFileBrowser rowItem1 = (ItemFileBrowser) getItem(position);
-			holder.imageView1.setImageResource(rowItem1.getImageId());
-			holder.textViewFileName1.setText(rowItem1.getName());
-			holder.textViewFileSize1.setText("100 KB");
+			MegaNode node1 = megaApi.getNodeByHandle(rowItem1.getNodeHandle());
 			
+			holder.textViewFileName1.setText(node1.getName());
+			if (node1.isFolder()){
+				holder.textViewFileSize1.setText("");
+				holder.imageView1.setImageResource(R.drawable.mime_folder);
+			}
+			else{
+				long node1Size = node1.getSize();
+				holder.textViewFileSize1.setText(Util.getSizeString(node1Size));
+				holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+			}
+			
+						
 			ItemFileBrowser rowItem2;
+			MegaNode node2;
 			if (position < (getCount()-1)){
 				rowItem2 = (ItemFileBrowser) getItem(position+1);
-				holder.imageView2.setImageResource(rowItem2.getImageId());
-				holder.textViewFileName2.setText(rowItem2.getName());	
-				holder.itemLayout2.setVisibility(View.VISIBLE);
-				holder.textViewFileSize2.setText("100 KB");
+				node2 = megaApi.getNodeByHandle(rowItem2.getNodeHandle());
+				holder.textViewFileName2.setText(node2.getName());
+				if (node2.isFolder()){
+					holder.textViewFileSize2.setText("");
+					holder.imageView2.setImageResource(R.drawable.mime_folder);
+				}
+				else{
+					long node2Size = node2.getSize();
+					holder.textViewFileSize2.setText(Util.getSizeString(node2Size));
+					holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+				}
+				
+				holder.itemLayout2.setVisibility(View.VISIBLE);				
 			}
 			else{
 				holder.itemLayout2.setVisibility(View.GONE);
