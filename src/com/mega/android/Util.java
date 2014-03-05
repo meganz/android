@@ -1,5 +1,9 @@
 package com.mega.android;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.util.Date;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -176,6 +180,43 @@ public class Util {
 	        return true;
 	    }
 	    return false;
+	}
+	
+	public static String getSizeString(long size){
+		String sizeString = "";
+		DecimalFormat decf = new DecimalFormat("###.##");
+
+		float KB = 1024;
+		float MB = KB * 1024;
+		float GB = MB * 1024;
+		float TB = GB * 1024;
+		
+		if (size < KB){
+			sizeString = size + "B";
+		}
+		else if (size < MB){
+			sizeString = decf.format(size/KB) + "KB";
+		}
+		else if (size < GB){
+			sizeString = decf.format(size/MB) + "MB";
+		}
+		else if (size < TB){
+			sizeString = decf.format(size/GB) + "GB";
+		}
+		else{
+			sizeString = decf.format(size/TB) + "TB";
+		}
+		
+		return sizeString;
+	}
+	
+	public static String getDateString(long date){
+		DateFormat datf = DateFormat.getDateTimeInstance();
+		String dateString = "";
+		
+		dateString = datf.format(new Date(date*1000));
+		
+		return dateString;
 	}
 	
 	/*

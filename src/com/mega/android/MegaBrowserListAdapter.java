@@ -1,8 +1,14 @@
 package com.mega.android;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
 
 import android.app.Activity;
 import android.content.Context;
@@ -33,24 +39,37 @@ import android.widget.Toast;
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
+	MegaApiAndroid megaApi;
+
 	List<ItemFileBrowser> rowItems;
 	int positionClicked;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
-
-
+	ArrayList<MegaNode> nodes;
+		
 	public MegaBrowserListAdapter(Context _context, List<ItemFileBrowser> _items) {
 		this.context = _context;
 		this.rowItems = _items;
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
+		this.nodes = new ArrayList<MegaNode>();
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 		
 		Iterator<ItemFileBrowser> it = rowItems.iterator();
 		while (it.hasNext()){
+			//Esto lo tengo que quitar cuando haga el visor
 			ItemFileBrowser item = it.next();
-			imageIds.add(item.getImageId());
-			names.add(item.getName());
+			log("handle: " + item.getNodeHandle());
+			MegaNode n = megaApi.getNodeByHandle(item.getNodeHandle());
+			nodes.add(n);
+			
+			imageIds.add(R.drawable.sal01);
+			names.add("NombrePrueba");
+			//HASTA AQUI
 		}
 	}
 	
@@ -93,6 +112,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
+			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.textViewUpdated = (TextView) convertView.findViewById(R.id.file_list_updated);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
@@ -118,10 +139,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		ItemFileBrowser rowItem = (ItemFileBrowser) getItem(position);
 		
-		holder.textViewFileName.setText(rowItem.getName());
-		holder.textViewFileSize.setText("100 KB");
-		holder.textViewUpdated.setText("Updated: 1 week ago");
-		holder.imageView.setImageResource(rowItem.getImageId());
+		MegaNode node = megaApi.getNodeByHandle(rowItem.getNodeHandle());
+		
+		holder.textViewFileName.setText(node.getName());
+		
+		if (node.isFolder()){
+			holder.textViewFileSize.setText("");
+			holder.imageView.setImageResource(R.drawable.mime_folder);
+		}
+		else{
+			long nodeSize = node.getSize();
+			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+		}
+		
+		long nodeDate = node.getCreationTime();
+		holder.textViewUpdated.setText(Util.getDateString(nodeDate));
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
@@ -202,8 +235,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
-				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
-				i.putExtra("name", rowItems.get(currentPosition).getName());
+				MegaNode n = megaApi.getNodeByHandle(rowItems.get(currentPosition).getNodeHandle());
+				
+				if (n.isFolder()){
+					i.putExtra("imageId", R.drawable.mime_folder);
+				}
+				else{
+					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
+				}				
+				i.putExtra("name", n.getName());
 				context.startActivity(i);							
 				positionClicked = -1;
 				notifyDataSetChanged();
@@ -227,5 +267,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 		}		
+	}
+	
+	private static void log(String log) {
+		Util.log("MegaBrowserListAdapter", log);
 	}
 }
