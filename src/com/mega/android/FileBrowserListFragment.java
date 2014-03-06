@@ -34,12 +34,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	MegaBrowserListAdapter adapter;
 	
 	MegaApiAndroid megaApi;
-	
-//	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
-//	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
-//	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png", "salamanca11.png", "salamanca12.png", "salamanca13.png", "salamanca14.png", "salamanca15.png", "salamanca16.png", "salamanca17.png", "salamanca18.png", "salamanca19.png"};
-//	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal10, R.drawable.sal03, R.drawable.sal10, R.drawable.sal05, R.drawable.sal10, R.drawable.sal07, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09};
-	
+		
 	List<ItemFileBrowser> rowItems;
 	
 	//Esto hay que quitarlo cuando haga el visor completo
@@ -92,15 +87,9 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
 		
-		changeFolder(megaApi.getRootNode());
-		
 		return v;
 	}
-	
-	public void changeFolder(MegaNode newParentNode){
 		
-	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
