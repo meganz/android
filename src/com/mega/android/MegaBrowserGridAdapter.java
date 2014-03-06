@@ -12,6 +12,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.text.TextUtils;
@@ -66,7 +67,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	}
 	
 	/*private view holder class*/
-    private class ViewHolder {
+    public class ViewHolderBrowserGrid {
         ImageButton imageView1;
         TextView textViewFileName1;
         RelativeLayout itemLayout1;
@@ -90,9 +91,11 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
         ImageButton optionDownload2;
         ImageButton optionDelete2;
         int currentPosition;
+        long document1;
+        long document2;
     }
     
-	ViewHolder holder = null;
+    ViewHolderBrowserGrid holder = null;
 	int positionG;
 
 	@Override
@@ -113,7 +116,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		if ((position % 2) == 0){
 			if (convertView == null) {
 				convertView = inflater.inflate(R.layout.item_file_grid, parent, false);
-				holder = new ViewHolder();
+				holder = new ViewHolderBrowserGrid();
 				holder.itemLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout1);
 				holder.itemLayout2 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout2);
 				
@@ -196,10 +199,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				convertView.setTag(holder);
 			}
 			else{
-				holder = (ViewHolder) convertView.getTag();
+				holder = (ViewHolderBrowserGrid) convertView.getTag();
 				if (holder == null){
 					convertView = inflater.inflate(R.layout.item_file_grid, parent, false);
-					holder = new ViewHolder();
+					holder = new ViewHolderBrowserGrid();
 					holder.itemLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout1);
 					holder.itemLayout2 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout2);
 					
@@ -286,6 +289,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			holder.currentPosition = position;
 
 			MegaNode node1 = (MegaNode) getItem(position);
+			holder.document1 = node1.getHandle();
+			Bitmap thumb1 = null;
 			
 			holder.textViewFileName1.setText(node1.getName());
 			if (node1.isFolder()){
@@ -295,12 +300,54 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			else{
 				long node1Size = node1.getSize();
 				holder.textViewFileSize1.setText(Util.getSizeString(node1Size));
-				holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+				
+				if (node1.hasThumbnail()){
+					thumb1 = ThumbnailUtils.getThumbnailFromCache(node1);
+					if (thumb1 != null){
+						holder.imageView1.setImageBitmap(thumb1);
+					}
+					else{
+						thumb1 = ThumbnailUtils.getThumbnailFromFolder(node1, context);
+						if (thumb1 != null){
+							holder.imageView1.setImageBitmap(thumb1);
+						}
+						else{ 
+							try{
+								thumb1 = ThumbnailUtils.getThumbnailFromMegaGrid(node1, context, holder, megaApi, this, 1);
+							}
+							catch(Exception e){} //Too many AsyncTasks
+							
+							if (thumb1 != null){
+								holder.imageView1.setImageBitmap(thumb1);
+							}
+							else{
+								holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+							}
+						}
+					}
+				}
+				else{
+					if (ThumbnailUtils.isPossibleThumbnail(node1)){ 
+						String path = Util.getLocalFile(context, node1.getName(), node1.getSize(), null);
+						if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
+							holder.imageView1.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+						}
+						else{
+							holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());	
+						}
+					}
+					else{
+						holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+					}				
+				}
 			}
 			
 			MegaNode node2;
 			if (position < (getCount()-1)){
 				node2 = (MegaNode) getItem(position+1);
+				holder.document2 = node2.getHandle();
+				Bitmap thumb2 = null;
+				
 				holder.textViewFileName2.setText(node2.getName());
 				if (node2.isFolder()){
 					holder.textViewFileSize2.setText(getInfoFolder(node2));
@@ -309,7 +356,46 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				else{
 					long node2Size = node2.getSize();
 					holder.textViewFileSize2.setText(Util.getSizeString(node2Size));
-					holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+					
+					if (node2.hasThumbnail()){
+						thumb2 = ThumbnailUtils.getThumbnailFromCache(node2);
+						if (thumb2 != null){
+							holder.imageView2.setImageBitmap(thumb2);
+						}
+						else{
+							thumb2 = ThumbnailUtils.getThumbnailFromFolder(node2, context);
+							if (thumb2 != null){
+								holder.imageView2.setImageBitmap(thumb2);
+							}
+							else{ 
+								try{
+									thumb2 = ThumbnailUtils.getThumbnailFromMegaGrid(node2, context, holder, megaApi, this, 2);
+								}
+								catch(Exception e){} //Too many AsyncTasks
+								
+								if (thumb2 != null){
+									holder.imageView2.setImageBitmap(thumb2);
+								}
+								else{
+									holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+								}
+							}
+						}
+					}
+					else{
+						if (ThumbnailUtils.isPossibleThumbnail(node2)){ 
+							String path = Util.getLocalFile(context, node2.getName(), node2.getSize(), null);
+							if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
+								holder.imageView2.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+							}
+							else{
+								holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());	
+							}
+						}
+						else{
+							holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+						}				
+					}
 				}
 				
 				holder.itemLayout2.setVisibility(View.VISIBLE);				
@@ -448,7 +534,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	@Override
 	public void onClick(View v) {
 
-		ViewHolder holder = (ViewHolder) v.getTag();
+		ViewHolderBrowserGrid holder = (ViewHolderBrowserGrid) v.getTag();
 		int currentPosition = holder.currentPosition;
 		
 		switch (v.getId()){

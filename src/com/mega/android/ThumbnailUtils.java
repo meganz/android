@@ -4,7 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.mega.android.MegaBrowserListAdapter.ViewHolder;
+import com.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
+import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -26,14 +27,15 @@ public class ThumbnailUtils {
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
 	
-	static HashMap<Long, ThumbnailDownloadListenerList> listeners = new HashMap<Long, ThumbnailDownloadListenerList>();
+	static HashMap<Long, ThumbnailDownloadListenerList> listenersList = new HashMap<Long, ThumbnailDownloadListenerList>();
+	static HashMap<Long, ThumbnailDownloadListenerGrid> listenersGrid = new HashMap<Long, ThumbnailDownloadListenerGrid>();
 	
 	static class ThumbnailDownloadListenerList implements MegaRequestListenerInterface{
 		Context context;
-		ViewHolder holder;
+		ViewHolderBrowserList holder;
 		MegaBrowserListAdapter adapter;
 		
-		ThumbnailDownloadListenerList(Context context, ViewHolder holder, MegaBrowserListAdapter adapter){
+		ThumbnailDownloadListenerList(Context context, ViewHolderBrowserList holder, MegaBrowserListAdapter adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -87,6 +89,78 @@ public class ThumbnailUtils {
 		}
 	}
 	
+	static class ThumbnailDownloadListenerGrid implements MegaRequestListenerInterface{
+		Context context;
+		ViewHolderBrowserGrid holder;
+		MegaBrowserGridAdapter adapter;
+		int numView;
+		
+		ThumbnailDownloadListenerGrid(Context context, ViewHolderBrowserGrid holder, MegaBrowserGridAdapter adapter, int numView){
+			this.context = context;
+			this.holder = holder;
+			this.adapter = adapter;
+			this.numView = numView;
+		}
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
+			
+			log("Downloading thumbnail finished");
+			final long handle = request.getNodeHandle();
+			MegaNode node = api.getNodeByHandle(handle);
+			
+			pendingThumbnails.remove(handle);
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Downloading thumbnail OK: " + handle);
+				thumbnailCache.remove(handle);
+				
+				if (holder != null){
+					File thumbDir = getThumbFolder(context);
+					File thumb = new File(thumbDir, node.getBase64Handle());
+					if (thumb.exists()) {
+						if (thumb.length() > 0) {
+							final Bitmap bitmap = getBitmapForCache(thumb, context);
+							if (bitmap != null) {
+								thumbnailCache.put(handle, bitmap);
+								if (numView == 1){
+									if ((holder.document1 == handle)){
+										holder.imageView1.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										holder.imageView1.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
+								}
+								else if (numView == 2){
+									if ((holder.document2 == handle)){
+										holder.imageView2.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										holder.imageView2.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
 	/*
 	 * Get thumbnail folder
 	 */	
@@ -120,7 +194,7 @@ public class ThumbnailUtils {
 
 	}
 	
-	public static Bitmap getThumbnailFromMegaList(MegaNode document, Context context, ViewHolder viewHolder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
+	public static Bitmap getThumbnailFromMegaList(MegaNode document, Context context, ViewHolderBrowserList viewHolder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
 		
 		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 			log("the thumbnail is already downloaded or added to the list");
@@ -133,13 +207,33 @@ public class ThumbnailUtils {
 		
 		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerList listener = new ThumbnailDownloadListenerList(context, viewHolder, adapter);
-		listeners.put(document.getHandle(), listener);
+		listenersList.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle());
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
 		
 	}
+	
+	public static Bitmap getThumbnailFromMegaGrid(MegaNode document, Context context, ViewHolderBrowserGrid viewHolder, MegaApiAndroid megaApi, MegaBrowserGridAdapter adapter, int numView){
+		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+			log("the thumbnail is already downloaded or added to the list");
+			return thumbnailCache.get(document.getHandle());
+		}
+		
+		if (!Util.isOnline(context)){
+			return thumbnailCache.get(document.getHandle());
+		}
+		
+		pendingThumbnails.add(document.getHandle());
+		ThumbnailDownloadListenerGrid listener = new ThumbnailDownloadListenerGrid(context, viewHolder, adapter, numView);
+		listenersGrid.put(document.getHandle(), listener);
+		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle());
+		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
+		
+		return thumbnailCache.get(document.getHandle());
+	}
+
 	
 	/*
 	 * Load Bitmap for cache
