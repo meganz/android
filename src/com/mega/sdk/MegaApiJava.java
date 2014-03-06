@@ -378,6 +378,26 @@ public class MegaApiJava
 	{
 		megaApi.setThumbnail(node, srcFilePath);
 	}
+	
+	public void getPreview(MegaNode node, String dstFilePath, MegaRequestListenerInterface listener)
+	{
+		megaApi.getPreview(node, dstFilePath, createDelegateRequestListener(listener));
+	}
+	
+	public void getPreview(MegaNode node, String dstFilePath)
+	{
+		megaApi.getPreview(node, dstFilePath);
+	}
+	
+	public void setPreview(MegaNode node, String srcFilePath, MegaRequestListenerInterface listener)
+	{
+		megaApi.setPreview(node, srcFilePath, createDelegateRequestListener(listener));
+	}
+	
+	public void setPreview(MegaNode node, String srcFilePath)
+	{
+		megaApi.setPreview(node, srcFilePath);
+	}
 	  
 	public void exportNode(MegaNode node, MegaRequestListenerInterface listener)
 	{
