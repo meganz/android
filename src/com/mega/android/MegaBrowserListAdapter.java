@@ -9,7 +9,9 @@ import com.mega.sdk.NodeList;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -55,8 +57,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		//HASTA AQUI
 	}
 	
-	/*private view holder class*/
-    private class ViewHolder {
+	/*public static view holder class*/
+    public class ViewHolder {
         ImageView imageView;
         TextView textViewFileName;
         TextView textViewFileSize;
@@ -70,6 +72,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         ImageButton optionDownload;
         ImageButton optionDelete;
         int currentPosition;
+        long document;
     }
 
 	@Override
@@ -120,6 +123,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		holder.currentPosition = position;
 		
 		MegaNode node = (MegaNode) getItem(position);
+		holder.document = node.getHandle();
+		Bitmap thumb = null;
 		
 		holder.textViewFileName.setText(node.getName());
 		
@@ -131,7 +136,45 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			
-			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+			if (node.hasThumbnail()){
+				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+				if (thumb != null){
+					holder.imageView.setImageBitmap(thumb);
+				}
+				else{
+					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+					if (thumb != null){
+						holder.imageView.setImageBitmap(thumb);
+					}
+					else{ 
+						try{
+							thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+						}
+						catch(Exception e){} //Too many AsyncTasks
+						
+						if (thumb != null){
+							holder.imageView.setImageBitmap(thumb);
+						}
+						else{
+							holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+						}
+					}
+				}
+			}
+			else{
+				if (ThumbnailUtils.isPossibleThumbnail(node)){ 
+					String path = Util.getLocalFile(context, node.getName(), node.getSize(), null);
+					if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
+						holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+					}
+					else{
+						holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());	
+					}
+				}
+				else{
+					holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+				}				
+			}
 		}
 		
 		long nodeDate = node.getCreationTime();
@@ -293,4 +336,36 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	private static void log(String log) {
 		Util.log("MegaBrowserListAdapter", log);
 	}
+	
+	/*
+	 * Background task to load image
+	 */
+//	private class ImageGetTask extends AsyncTask<ViewHolder, Void, Bitmap> {
+//		private MegaNode _document;
+//		private ViewHolder _viewHolder;
+//		
+//		ImageGetTask(ViewHolder viewHolder){
+//			_document = megaApi.getNodeByHandle((Long)viewHolder.document);
+//			this._viewHolder = viewHolder;
+//		}
+//		
+//		@Override
+//		protected Bitmap doInBackground(ViewHolder... params){
+//			
+//			if (_document != null){
+//				log ("ImageGetTask doInBackground");
+//				Bitmap thumb = ThumbnailUtils.getThumbnailFromMegaList(_document, context, _viewHolder, megaApi);
+//				if (thumb != null){
+//					return thumb;
+//				}
+//			}
+//			
+//			return null;
+//		}
+//		
+//		@Override
+//		public void onPostExecute(Bitmap result) {
+//			
+//		}
+//	}
 }
