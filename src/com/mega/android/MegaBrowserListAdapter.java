@@ -58,7 +58,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	}
 	
 	/*public static view holder class*/
-    public class ViewHolder {
+    public class ViewHolderBrowserList {
         ImageView imageView;
         TextView textViewFileName;
         TextView textViewFileSize;
@@ -80,7 +80,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 		final int _position = position;
 		
-		ViewHolder holder = null;
+		ViewHolderBrowserList holder = null;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -93,7 +93,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_file_list, parent, false);
-			holder = new ViewHolder();
+			holder = new ViewHolderBrowserList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
@@ -117,7 +117,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			convertView.setTag(holder);
 		}
 		else{
-			holder = (ViewHolder) convertView.getTag();
+			holder = (ViewHolderBrowserList) convertView.getTag();
 		}
 		
 		holder.currentPosition = position;
@@ -283,7 +283,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		ViewHolder holder = (ViewHolder) v.getTag();
+		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		int currentPosition = holder.currentPosition;
 
 		switch (v.getId()){
