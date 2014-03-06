@@ -1,5 +1,6 @@
 package com.mega.android;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -12,8 +13,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
+import android.provider.MediaStore.Video;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -226,6 +231,87 @@ public class Util {
 		if (DEBUG) {
 			Log.e(origin, message + "");
 		}
+	}
+	
+	public static String getLocalFile(Context context, String fileName, long fileSize,
+			String destDir)
+	{
+		Cursor cursor = null;
+		try 
+		{
+			if(MimeType.typeForName(fileName).isImage())
+			{
+				final String[] projection = { MediaStore.Images.Media.DATA };
+				final String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Images.Media.SIZE + " = ?";
+				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+				
+		        cursor = context.getContentResolver().query(
+		                        Images.Media.EXTERNAL_CONTENT_URI, projection, selection,
+		                        selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			        String path =  cursor.getString(dataColumn);
+			        cursor.close();
+			        cursor = null;
+			        if(new File(path).exists()) return path;
+				}
+				if(cursor != null) cursor.close();
+			
+				cursor = context.getContentResolver().query(
+	                    Images.Media.INTERNAL_CONTENT_URI, projection, selection,
+	                    selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			        String path =  cursor.getString(dataColumn);
+			        cursor.close();
+			        cursor = null;
+			        if(new File(path).exists()) return path;
+				}
+				if(cursor != null) cursor.close();
+			}
+			else if(MimeType.typeForName(fileName).isVideo())
+			{
+				final String[] projection = { MediaStore.Video.Media.DATA };
+				final String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";
+				final String[] selectionArgs = { fileName, String.valueOf(fileSize) };
+				
+		        cursor = context.getContentResolver().query(
+                        Video.Media.EXTERNAL_CONTENT_URI, projection, selection,
+                        selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+			        String path =  cursor.getString(dataColumn);
+			        cursor.close();
+			        cursor = null;
+			        if(new File(path).exists()) return path;
+				}
+				if(cursor != null) cursor.close();
+			
+				cursor = context.getContentResolver().query(
+		                Video.Media.INTERNAL_CONTENT_URI, projection, selection,
+		                selectionArgs, null);
+				if (cursor != null && cursor.moveToFirst()) {
+			        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+			        String path =  cursor.getString(dataColumn);
+			        cursor.close();
+			        cursor = null;
+			        if(new File(path).exists()) return path;
+				}
+				if(cursor != null) cursor.close();
+			}	
+		} catch (Exception e) 
+		{
+			if(cursor != null) cursor.close();
+		}
+		
+		//Not found, searching in the download folder
+		if(destDir != null)
+		{
+			File file = new File(destDir, fileName);
+			if(file.exists() && (file.length() == fileSize))
+				return file.getAbsolutePath();
+		}
+		return null;
 	}
 
 }
