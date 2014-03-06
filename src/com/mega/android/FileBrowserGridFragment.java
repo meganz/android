@@ -36,13 +36,7 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	MegaBrowserGridAdapter adapter;
 	
 	MegaApiAndroid megaApi;
-	
-//	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png"};
-//	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal02, R.drawable.sal03, R.drawable.sal04, R.drawable.sal05, R.drawable.sal06, R.drawable.sal07, R.drawable.sal08, R.drawable.sal09, R.drawable.sal10};
-//	public static final String[] names = new String[] { "salamanca01.png", "salamanca02.png", "salamanca03.png", "salamanca04.png", "salamanca05.png", "salamanca06.png", "salamanca07.png", "salamanca08.png", "salamanca09.png", "salamanca10.png", "salamanca11.png", "salamanca12.png", "salamanca13.png", "salamanca14.png", "salamanca15.png", "salamanca16.png", "salamanca17.png", "salamanca18.png", "salamanca19.png"};
-//	public static final Integer[] images = { R.drawable.sal01, R.drawable.sal10, R.drawable.sal03, R.drawable.sal10, R.drawable.sal05, R.drawable.sal10, R.drawable.sal07, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09, R.drawable.sal10, R.drawable.sal09};
-	
-	List<ItemFileBrowser> rowItems;
+	NodeList nodes;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -52,17 +46,8 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		rowItems = new ArrayList<ItemFileBrowser>();
-		
-		NodeList children = megaApi.getChildren(megaApi.getRootNode());
-		for(int i=0; i<children.size(); i++){
-			MegaNode node = children.get(i);
-			long nodeHandle = node.getHandle();	
-			log("nodeHandle=" + nodeHandle);
-			ItemFileBrowser item = new ItemFileBrowser(nodeHandle);
-			rowItems.add(item);
-		}
+
+		nodes = megaApi.getChildren(megaApi.getRootNode());
 	}
 	
 	@Override
@@ -79,7 +64,7 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		gridView = (ListView) v.findViewById(R.id.file_grid_view_browser);
         gridView.setOnItemClickListener(null);
         gridView.setItemsCanFocus(false);
-		adapter = new MegaBrowserGridAdapter(context, rowItems);
+		adapter = new MegaBrowserGridAdapter(context, nodes);
 		adapter.setPositionClicked(-1);
 		gridView.setAdapter(adapter);
 		

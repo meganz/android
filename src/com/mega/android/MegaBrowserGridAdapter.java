@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.NodeList;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -37,37 +38,31 @@ import android.widget.Toast;
 public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
-	List<ItemFileBrowser> rowItems;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
-//	ArrayList<MegaNode> nodes;
+	
+	NodeList nodes;
 	int positionClicked;
 	
 	MegaApiAndroid megaApi;
 	
-	public MegaBrowserGridAdapter(Context _context, List<ItemFileBrowser> _items) {
+	public MegaBrowserGridAdapter(Context _context, NodeList _nodes) {
 		this.context = _context;
-		this.rowItems = _items;
+		this.nodes = _nodes;
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
-//		this.nodes = new ArrayList<MegaNode>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		Iterator<ItemFileBrowser> it = rowItems.iterator();
-		while (it.hasNext()){
-			ItemFileBrowser item = it.next();
-			MegaNode n = megaApi.getNodeByHandle(item.getNodeHandle());
-//			nodes.add(n);
-			
-			//Esto hay que quitarlo cuando haga el visor completo
+		//Esto hay que quitarlo cuando haga el visor completo
+		for (int i=0;i<nodes.size();i++){
 			names.add("NombrePrueba");
 			imageIds.add(R.drawable.sal01);
-			//HASTA AQUI
 		}
+		//HASTA AQUI
 	}
 	
 	/*private view holder class*/
@@ -290,9 +285,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 
 			holder.currentPosition = position;
 
-			
-			ItemFileBrowser rowItem1 = (ItemFileBrowser) getItem(position);
-			MegaNode node1 = megaApi.getNodeByHandle(rowItem1.getNodeHandle());
+			MegaNode node1 = (MegaNode) getItem(position);
 			
 			holder.textViewFileName1.setText(node1.getName());
 			if (node1.isFolder()){
@@ -305,12 +298,9 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
 			}
 			
-						
-			ItemFileBrowser rowItem2;
 			MegaNode node2;
 			if (position < (getCount()-1)){
-				rowItem2 = (ItemFileBrowser) getItem(position+1);
-				node2 = megaApi.getNodeByHandle(rowItem2.getNodeHandle());
+				node2 = (MegaNode) getItem(position+1);
 				holder.textViewFileName2.setText(node2.getName());
 				if (node2.isFolder()){
 					holder.textViewFileSize2.setText("");
@@ -404,17 +394,17 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
     public int getCount() {
-        return rowItems.size();
+        return nodes.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return rowItems.get(position);
+        return nodes.get(position);
     }
  
     @Override
     public long getItemId(int position) {
-        return rowItems.indexOf(getItem(position));
+        return position;
     }    
     
     public int getPositionClicked (){
@@ -508,8 +498,14 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_grid_option_properties1:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
-				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
-				i.putExtra("name", rowItems.get(currentPosition).getName());
+				MegaNode n = (MegaNode) getItem(currentPosition);
+				if (n.isFolder()){
+					i.putExtra("imageId", R.drawable.mime_folder);
+				}
+				else{
+					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
+				}				
+				i.putExtra("name", n.getName());
 				context.startActivity(i);							
 				positionClicked = -1;
 				notifyDataSetChanged();
@@ -517,8 +513,14 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_grid_option_properties2:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
-				i.putExtra("imageId", rowItems.get(currentPosition+1).getImageId());
-				i.putExtra("name", rowItems.get(currentPosition+1).getName());
+				MegaNode n = (MegaNode) getItem(currentPosition+1);
+				if (n.isFolder()){
+					i.putExtra("imageId", R.drawable.mime_folder);
+				}
+				else{
+					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
+				}				
+				i.putExtra("name", n.getName());
 				context.startActivity(i);							
 				positionClicked = -1;
 				notifyDataSetChanged();
