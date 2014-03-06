@@ -49,7 +49,8 @@
 	        android:paddingLeft="6dp"
 	        android:paddingBottom="7dp"
 	        android:textColor="@color/file_list_second_row"
-	        android:layout_below="@id/file_grid_filename1" />
+	        android:layout_below="@id/file_grid_filename1"
+	        android:textSize="12sp" />
         
         <ImageButton 
 	        android:id="@+id/file_grid_three_dots1"
@@ -183,7 +184,8 @@
 	        android:paddingLeft="6dp"
 	        android:paddingBottom="7dp"
 	        android:textColor="@color/file_list_second_row"
-	        android:layout_below="@id/file_grid_filename2" />
+	        android:layout_below="@id/file_grid_filename2" 
+	        android:textSize="12sp" />
         
         <ImageButton 
 	        android:id="@+id/file_grid_three_dots2"

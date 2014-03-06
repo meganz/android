@@ -28,7 +28,8 @@
         android:layout_below="@+id/file_list_filename"
         android:paddingLeft="3dp"
         android:paddingBottom="7dp"
-        android:textColor="@color/file_list_second_row" />
+        android:textColor="@color/file_list_second_row" 
+        android:textSize="12sp"/>
     
     <ImageView 
         android:id="@+id/file_list_one_dot"
@@ -37,7 +38,7 @@
         android:src="@drawable/dot"
         android:layout_toRightOf="@id/file_list_filesize"
         android:layout_alignTop="@id/file_list_filesize"
-        android:paddingTop="7dp"
+        android:paddingTop="6dp"
         android:paddingLeft="3dp" />
     
     <TextView
@@ -48,7 +49,8 @@
         android:layout_below="@+id/file_list_filename"
         android:paddingLeft="3dp"
         android:paddingBottom="7dp"
-        android:textColor="@color/file_list_second_row" />
+        android:textColor="@color/file_list_second_row"
+        android:textSize="12sp" />
     
     <ImageButton 
         android:id="@+id/file_list_three_dots"

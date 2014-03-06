@@ -289,7 +289,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			
 			holder.textViewFileName1.setText(node1.getName());
 			if (node1.isFolder()){
-				holder.textViewFileSize1.setText("");
+				holder.textViewFileSize1.setText(getInfoFolder(node1));
 				holder.imageView1.setImageResource(R.drawable.mime_folder);
 			}
 			else{
@@ -303,7 +303,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				node2 = (MegaNode) getItem(position+1);
 				holder.textViewFileName2.setText(node2.getName());
 				if (node2.isFolder()){
-					holder.textViewFileSize2.setText("");
+					holder.textViewFileSize2.setText(getInfoFolder(node2));
 					holder.imageView2.setImageResource(R.drawable.mime_folder);
 				}
 				else{
@@ -390,6 +390,36 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		}
 
 		return convertView;
+	}
+	
+	private String getInfoFolder (MegaNode n){
+		NodeList nL = megaApi.getChildren(n);
+		
+		int numFolders = 0;
+		int numFiles = 0;
+		
+		for (int i=0;i<nL.size();i++){
+			MegaNode c = nL.get(i);
+			if (c.isFolder()){
+				numFolders++;
+			}
+			else{
+				numFiles++;
+			}
+		}
+		
+		String info = "";
+		if (numFolders > 0){
+			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0){
+				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		else {
+			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+		}
+		
+		return info;
 	}
 
 	@Override

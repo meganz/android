@@ -14,6 +14,16 @@
     
     <string name="search_files_and_folders">Search</string>
     
+     <plurals name="general_num_files">
+        <item quantity="one">file</item>
+        <item quantity="other">files</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one">folder</item>
+        <item quantity="other">folders</item>
+    </plurals>
+    
     
     <string name="login_activity">Login</string>
     <string name="login_text">Login</string>
