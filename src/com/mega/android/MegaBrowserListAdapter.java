@@ -124,7 +124,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		holder.textViewFileName.setText(node.getName());
 		
 		if (node.isFolder()){
-			holder.textViewFileSize.setText("");
+			holder.textViewFileSize.setText(getInfoFolder(node));
 			holder.imageView.setImageResource(R.drawable.mime_folder);
 		}
 		else{
@@ -183,6 +183,36 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		holder.optionProperties.setOnClickListener(this);
 		
 		return convertView;
+	}
+	
+	private String getInfoFolder (MegaNode n){
+		NodeList nL = megaApi.getChildren(n);
+		
+		int numFolders = 0;
+		int numFiles = 0;
+		
+		for (int i=0;i<nL.size();i++){
+			MegaNode c = nL.get(i);
+			if (c.isFolder()){
+				numFolders++;
+			}
+			else{
+				numFiles++;
+			}
+		}
+		
+		String info = "";
+		if (numFolders > 0){
+			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0){
+				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		else {
+			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+		}
+		
+		return info;
 	}
 
 	@Override
