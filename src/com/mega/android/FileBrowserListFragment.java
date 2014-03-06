@@ -40,6 +40,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	//Esto hay que quitarlo cuando haga el visor completo
 	ArrayList<String> namesArray = new ArrayList<String>();
 	ArrayList<Integer> imageIds = new ArrayList<Integer>();
+	NodeList nodes;
 	//HASTA AQUI 
 	
 	@Override
@@ -53,13 +54,13 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 		rowItems = new ArrayList<ItemFileBrowser>();
 		
-		NodeList children = megaApi.getChildren(megaApi.getRootNode());
-		for(int i=0; i<children.size(); i++){
-			MegaNode node = children.get(i);
-			long nodeHandle = node.getHandle();	
-			log("nodeHandle=" + nodeHandle);
-			ItemFileBrowser item = new ItemFileBrowser(nodeHandle);
-			rowItems.add(item);
+		nodes = megaApi.getChildren(megaApi.getRootNode());
+		for(int i=0; i<nodes.size(); i++){
+//			MegaNode node = nodes.get(i);
+//			long nodeHandle = node.getHandle();	
+//			log("nodeHandle=" + nodeHandle);
+//			ItemFileBrowser item = new ItemFileBrowser(nodeHandle);
+//			rowItems.add(item);
 			
 			//Esto hay que quitarlo cuando haga el visor completo
 			namesArray.add("NombrePrueba");
@@ -83,7 +84,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		adapter = new MegaBrowserListAdapter(context, rowItems);
+		adapter = new MegaBrowserListAdapter(context, nodes);
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
 		

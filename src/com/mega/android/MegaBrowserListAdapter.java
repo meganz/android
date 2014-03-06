@@ -1,28 +1,18 @@
 package com.mega.android;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.opengl.Visibility;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,22 +24,20 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	MegaApiAndroid megaApi;
 
-	List<ItemFileBrowser> rowItems;
 	int positionClicked;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
-//	ArrayList<MegaNode> nodes;
+	NodeList nodes;
 		
-	public MegaBrowserListAdapter(Context _context, List<ItemFileBrowser> _items) {
+	public MegaBrowserListAdapter(Context _context, NodeList _nodes) {
 		this.context = _context;
-		this.rowItems = _items;
+		this.nodes = _nodes;
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
@@ -59,18 +47,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		Iterator<ItemFileBrowser> it = rowItems.iterator();
-		while (it.hasNext()){
-			//Esto lo tengo que quitar cuando haga el visor
-			ItemFileBrowser item = it.next();
-			log("handle: " + item.getNodeHandle());
-			MegaNode n = megaApi.getNodeByHandle(item.getNodeHandle());
-//			nodes.add(n);
-			
+		//Esto lo tengo que quitar cuando haga el visor
+		for (int i=0;i<nodes.size();i++){
 			imageIds.add(R.drawable.sal01);
 			names.add("NombrePrueba");
-			//HASTA AQUI
 		}
+		//HASTA AQUI
 	}
 	
 	/*private view holder class*/
@@ -137,9 +119,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		holder.currentPosition = position;
 		
-		ItemFileBrowser rowItem = (ItemFileBrowser) getItem(position);
-		
-		MegaNode node = megaApi.getNodeByHandle(rowItem.getNodeHandle());
+		MegaNode node = (MegaNode) getItem(position);
 		
 		holder.textViewFileName.setText(node.getName());
 		
@@ -207,17 +187,17 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
     public int getCount() {
-        return rowItems.size();
+        return nodes.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return rowItems.get(position);
+        return nodes.get(position);
     }
  
     @Override
     public long getItemId(int position) {
-        return rowItems.indexOf(getItem(position));
+        return position;
     }    
     
     public int getPositionClicked (){
@@ -246,7 +226,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
-				MegaNode n = megaApi.getNodeByHandle(rowItems.get(currentPosition).getNodeHandle());
+				MegaNode n = (MegaNode) getItem(currentPosition);
 				
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.mime_folder);
