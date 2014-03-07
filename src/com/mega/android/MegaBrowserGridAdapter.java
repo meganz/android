@@ -47,6 +47,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	
 	MegaApiAndroid megaApi;
 	
+	ArrayList<Long> historyNodes;
+	
+	ListView list;
+	
 	public MegaBrowserGridAdapter(Context _context, NodeList _nodes) {
 		this.context = _context;
 		this.nodes = _nodes;
@@ -58,12 +62,24 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
+		if (historyNodes == null){
+			historyNodes = new ArrayList<Long>();
+			historyNodes.add(megaApi.getRootNode().getHandle());
+		}
+		
 		//Esto hay que quitarlo cuando haga el visor completo
 		for (int i=0;i<nodes.size();i++){
 			names.add("NombrePrueba");
 			imageIds.add(R.drawable.sal01);
 		}
 		//HASTA AQUI
+	}
+	
+	public void setNodes(NodeList nodes){
+		this.nodes = nodes;
+		positionClicked = -1;
+		notifyDataSetChanged();
+		list.smoothScrollToPosition(0);
 	}
 	
 	/*private view holder class*/
@@ -101,6 +117,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	
+		list = (ListView) parent;
 		final int _position = position;
 		positionG = position;
 		
@@ -421,7 +438,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					holder.arrowSelection1.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout1.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
-					ListView list = (ListView) parent;
 					list.smoothScrollToPosition(_position);
 					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
@@ -431,7 +447,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					holder.arrowSelection2.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout2.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
-					ListView list = (ListView) parent;
 					list.smoothScrollToPosition(_position);
 					holder.arrowSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
@@ -539,23 +554,40 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		
 		switch (v.getId()){
 			case R.id.file_grid_thumbnail1:{
-				Intent i = new Intent(context, FullScreenImageViewer.class);
-				i.putExtra("position", currentPosition);
-				i.putExtra("names", names);
-				i.putExtra("imageIds", imageIds);
-				context.startActivity(i);	
-				positionClicked = -1;
-				notifyDataSetChanged();
+				MegaNode n = (MegaNode) getItem(currentPosition);
+				if (n.isFolder()){
+					historyNodes.add(n.getHandle());
+					nodes = megaApi.getChildren(n);
+					setNodes(nodes);
+				}
+				else{
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", currentPosition+1);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
 				break;
 			}
 			case R.id.file_grid_thumbnail2:{
-				Intent i = new Intent(context, FullScreenImageViewer.class);
-				i.putExtra("position", currentPosition+1);
-				i.putExtra("names", names);
-				i.putExtra("imageIds", imageIds);
-				context.startActivity(i);	
-				positionClicked = -1;
-				notifyDataSetChanged();
+				
+				MegaNode n = (MegaNode) getItem(currentPosition+1);
+				if (n.isFolder()){
+					historyNodes.add(n.getHandle());
+					nodes = megaApi.getChildren(n);
+					setNodes(nodes);
+				}
+				else{
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", currentPosition+1);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
 				break;
 			}
 			case R.id.file_grid_three_dots1:{
@@ -593,23 +625,41 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 			case R.id.file_grid_option_open1:{
-				Intent i = new Intent(context, FullScreenImageViewer.class);
-				i.putExtra("position", currentPosition);
-				i.putExtra("names", names);
-				i.putExtra("imageIds", imageIds);
-				context.startActivity(i);	
-				positionClicked = -1;
-				notifyDataSetChanged();
+				MegaNode n = (MegaNode) getItem(currentPosition);
+				if (n.isFolder()){
+					historyNodes.add(n.getHandle());
+					nodes = megaApi.getChildren(n);
+					setNodes(nodes);
+				}
+				else{
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", currentPosition);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
+				
 				break;
 			}
 			case R.id.file_grid_option_open2:{
-				Intent i = new Intent(context, FullScreenImageViewer.class);
-				i.putExtra("position", currentPosition+1);
-				i.putExtra("names", names);
-				i.putExtra("imageIds", imageIds);
-				context.startActivity(i);	
-				positionClicked = -1;
-				notifyDataSetChanged();
+				MegaNode n = (MegaNode) getItem(currentPosition+1);
+				if (n.isFolder()){
+					historyNodes.add(n.getHandle());
+					nodes = megaApi.getChildren(n);
+					setNodes(nodes);
+				}
+				else{
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", currentPosition+1);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
+				
 				break;
 			}
 			case R.id.file_grid_option_properties1:{
@@ -643,5 +693,17 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 		}
+	}
+	
+	public ArrayList<Long> getHistoryNodes(){
+		return historyNodes;
+	}
+	
+	public void setHistoryNodes(ArrayList<Long> historyNodes){
+		this.historyNodes = historyNodes;
+	}
+	
+	private static void log(String log) {
+		Util.log("MegaBrowserGridAdapter", log);
 	}
 }

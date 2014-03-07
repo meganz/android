@@ -38,14 +38,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	NodeList nodes;
 	
 	ArrayList<Long> historyNodes;
-		
+	
+	ListView list;
+	
 	public MegaBrowserListAdapter(Context _context, NodeList _nodes) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
-//		this.nodes = new ArrayList<MegaNode>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -68,6 +69,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.nodes = nodes;
 		positionClicked = -1;
 		notifyDataSetChanged();
+		list.smoothScrollToPosition(0);
 	}
 	
 	/*public static view holder class*/
@@ -91,6 +93,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	
+		list = (ListView) parent;
+		
 		final int _position = position;
 		
 		ViewHolderBrowserList holder = null;
@@ -213,7 +217,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
-				ListView list = (ListView) parent;
 				list.smoothScrollToPosition(_position);
 			}
 			else{
