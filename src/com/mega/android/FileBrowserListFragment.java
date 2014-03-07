@@ -146,6 +146,14 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		}
 	}
 	
+	public ArrayList<Long> getHistoryNodes(){
+		return adapter.getHistoryNodes();
+	}
+	
+	public void setHistoryNodes(ArrayList<Long> historyNodes){
+		adapter.setHistoryNodes(historyNodes);
+	}
+	
 	private static void log(String log) {
 		Util.log("FileBrowserListFragment", log);
 	}

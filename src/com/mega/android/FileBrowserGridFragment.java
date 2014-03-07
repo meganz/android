@@ -97,14 +97,33 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	
 	public int onBackPressed(){
 		
+		ArrayList<Long> historyNodes = adapter.getHistoryNodes();
+		
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 			return 1;
 		}
+		else if (historyNodes.size() > 1){
+			long handle = historyNodes.get(historyNodes.size()-2);
+			log("handle a retirar: " + handle);
+			historyNodes.remove(historyNodes.size()-1);
+			adapter.setHistoryNodes(historyNodes);
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(handle));
+			adapter.setNodes(nodes);
+			return 2;
+		}
 		else{
 			return 0;
 		}
+	}
+	
+	public ArrayList<Long> getHistoryNodes(){
+		return adapter.getHistoryNodes();
+	}
+	
+	public void setHistoryNodes(ArrayList<Long> historyNodes){
+		adapter.setHistoryNodes(historyNodes);
 	}
 	
 	private static void log(String log) {

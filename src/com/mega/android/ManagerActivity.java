@@ -281,10 +281,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				fbL = new FileBrowserListFragment();
     			}
     			if (isListCloudDrive){
+//    				fbL.setHistoryNodes(fbG.getHistoryNodes());
     				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
     			}
     			else{
+//    				fbG.setHistoryNodes(fbL.getHistoryNodes());
     				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
