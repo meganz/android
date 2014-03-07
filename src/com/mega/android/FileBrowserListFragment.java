@@ -36,7 +36,6 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	MegaApiAndroid megaApi;
 		
 	List<ItemFileBrowser> rowItems;
-	ArrayList<Long> historyNodes;
 	
 	//Esto hay que quitarlo cuando haga el visor completo
 	ArrayList<String> namesArray = new ArrayList<String>();
@@ -55,17 +54,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 		rowItems = new ArrayList<ItemFileBrowser>();
 		
-		if (historyNodes == null){
-			historyNodes = new ArrayList<Long>();
-			historyNodes.add(megaApi.getRootNode().getHandle());
-		}
 		nodes = megaApi.getChildren(megaApi.getRootNode());
 		for(int i=0; i<nodes.size(); i++){
-//			MegaNode node = nodes.get(i);
-//			long nodeHandle = node.getHandle();	
-//			log("nodeHandle=" + nodeHandle);
-//			ItemFileBrowser item = new ItemFileBrowser(nodeHandle);
-//			rowItems.add(item);
 			
 			//Esto hay que quitarlo cuando haga el visor completo
 			namesArray.add("NombrePrueba");
@@ -116,20 +106,26 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
             long id) {
 		
 		if (nodes.get(position).isFolder()){
+			ArrayList<Long> historyNodes = adapter.getHistoryNodes();
 			historyNodes.add(nodes.get(position).getHandle());
+			adapter.setHistoryNodes(historyNodes);
 			log("handle a meter: "+ nodes.get(position).getHandle());
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
 		}
-		
-//		Intent i = new Intent(context, FullScreenImageViewer.class);
-//		i.putExtra("position", position);
-//		i.putExtra("imageIds", imageIds);
-//		i.putExtra("names", namesArray);
-//		startActivity(i);
+		else{
+			Toast.makeText(context, "[IS FILE]Node handle clicked: " + nodes.get(position).getHandle(), Toast.LENGTH_SHORT).show();
+			Intent i = new Intent(context, FullScreenImageViewer.class);
+			i.putExtra("position", position);
+			i.putExtra("imageIds", imageIds);
+			i.putExtra("names", namesArray);
+			startActivity(i);
+		}
     }
 	
 	public int onBackPressed(){
+		
+		ArrayList<Long> historyNodes = adapter.getHistoryNodes();
 		
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
@@ -140,6 +136,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			long handle = historyNodes.get(historyNodes.size()-2);
 			log("handle a retirar: " + handle);
 			historyNodes.remove(historyNodes.size()-1);
+			adapter.setHistoryNodes(historyNodes);
 			nodes = megaApi.getChildren(megaApi.getNodeByHandle(handle));
 			adapter.setNodes(nodes);
 			return 2;
