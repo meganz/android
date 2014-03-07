@@ -57,6 +57,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		//HASTA AQUI
 	}
 	
+	public void setNodes(NodeList nodes){
+		this.nodes = nodes;
+		positionClicked = -1;
+		notifyDataSetChanged();
+	}
+	
 	/*public static view holder class*/
     public class ViewHolderBrowserList {
         ImageView imageView;
@@ -336,36 +342,4 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	private static void log(String log) {
 		Util.log("MegaBrowserListAdapter", log);
 	}
-	
-	/*
-	 * Background task to load image
-	 */
-//	private class ImageGetTask extends AsyncTask<ViewHolder, Void, Bitmap> {
-//		private MegaNode _document;
-//		private ViewHolder _viewHolder;
-//		
-//		ImageGetTask(ViewHolder viewHolder){
-//			_document = megaApi.getNodeByHandle((Long)viewHolder.document);
-//			this._viewHolder = viewHolder;
-//		}
-//		
-//		@Override
-//		protected Bitmap doInBackground(ViewHolder... params){
-//			
-//			if (_document != null){
-//				log ("ImageGetTask doInBackground");
-//				Bitmap thumb = ThumbnailUtils.getThumbnailFromMegaList(_document, context, _viewHolder, megaApi);
-//				if (thumb != null){
-//					return thumb;
-//				}
-//			}
-//			
-//			return null;
-//		}
-//		
-//		@Override
-//		public void onPostExecute(Bitmap result) {
-//			
-//		}
-//	}
 }
