@@ -36,6 +36,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
 	NodeList nodes;
+	
+	ArrayList<Long> historyNodes;
 		
 	public MegaBrowserListAdapter(Context _context, NodeList _nodes) {
 		this.context = _context;
@@ -47,6 +49,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+		
+		if (historyNodes == null){
+			historyNodes = new ArrayList<Long>();
+			historyNodes.add(megaApi.getRootNode().getHandle());
 		}
 		
 		//Esto lo tengo que quitar cuando haga el visor
@@ -291,22 +298,30 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	public void onClick(View v) {
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		int currentPosition = holder.currentPosition;
-
+		MegaNode n = (MegaNode) getItem(currentPosition);
+		
 		switch (v.getId()){
 			case R.id.file_list_option_open:{
-				Intent i = new Intent(context, FullScreenImageViewer.class);
-				i.putExtra("position", currentPosition);
-				i.putExtra("names", names);
-				i.putExtra("imageIds", imageIds);
-				context.startActivity(i);	
-				positionClicked = -1;
-				notifyDataSetChanged();
+				
+				if (n.isFolder()){
+					historyNodes.add(n.getHandle());
+					nodes = megaApi.getChildren(n);
+					setNodes(nodes);
+				}
+				else{
+					Intent i = new Intent(context, FullScreenImageViewer.class);
+					i.putExtra("position", currentPosition);
+					i.putExtra("names", names);
+					i.putExtra("imageIds", imageIds);
+					context.startActivity(i);	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}				
 				break;
 			}
 			case R.id.file_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
-				MegaNode n = (MegaNode) getItem(currentPosition);
-				
+			
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.mime_folder);
 				}
@@ -337,6 +352,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 		}		
+	}
+	
+	public ArrayList<Long> getHistoryNodes(){
+		return historyNodes;
+	}
+	
+	public void setHistoryNodes(ArrayList<Long> historyNodes){
+		this.historyNodes = historyNodes;
 	}
 	
 	private static void log(String log) {
