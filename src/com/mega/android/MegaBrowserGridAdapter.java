@@ -79,7 +79,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		this.nodes = nodes;
 		positionClicked = -1;
 		notifyDataSetChanged();
-		list.smoothScrollToPosition(0);
+//		list.smoothScrollToPosition(0);
+		if (list != null){
+			list.setSelection(0);
+		}
 	}
 	
 	/*private view holder class*/
