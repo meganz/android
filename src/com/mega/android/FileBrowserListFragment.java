@@ -37,6 +37,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 	List<ItemFileBrowser> rowItems;
 	
+	ArrayList<Long> historyNodes = null;
+	
 	//Esto hay que quitarlo cuando haga el visor completo
 	ArrayList<String> namesArray = new ArrayList<String>();
 	ArrayList<Integer> imageIds = new ArrayList<Integer>();
@@ -81,6 +83,11 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		listView.setItemsCanFocus(false);
 		adapter = new MegaBrowserListAdapter(context, nodes);
 		adapter.setPositionClicked(-1);
+		if (historyNodes != null){
+			adapter.setHistoryNodes(historyNodes);
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(historyNodes.get(historyNodes.size()-1)));
+			adapter.setNodes(nodes);
+		}
 		listView.setAdapter(adapter);
 		
 		return v;
@@ -151,8 +158,10 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	}
 	
 	public void setHistoryNodes(ArrayList<Long> historyNodes){
-		adapter.setHistoryNodes(historyNodes);
-	}
+		this.historyNodes = historyNodes;
+		if (adapter != null){
+			adapter.setHistoryNodes(historyNodes);
+		}	}
 	
 	private static void log(String log) {
 		Util.log("FileBrowserListFragment", log);

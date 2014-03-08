@@ -38,6 +38,8 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	MegaApiAndroid megaApi;
 	NodeList nodes;
 	
+	ArrayList<Long> historyNodes = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -66,6 +68,11 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
         gridView.setItemsCanFocus(false);
 		adapter = new MegaBrowserGridAdapter(context, nodes);
 		adapter.setPositionClicked(-1);
+		if (historyNodes != null){
+			adapter.setHistoryNodes(historyNodes);
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(historyNodes.get(historyNodes.size()-1)));
+			adapter.setNodes(nodes);
+		}
 		gridView.setAdapter(adapter);
 		
 		return v;
@@ -123,7 +130,11 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	}
 	
 	public void setHistoryNodes(ArrayList<Long> historyNodes){
-		adapter.setHistoryNodes(historyNodes);
+		
+		this.historyNodes = historyNodes;
+		if (adapter != null){
+			adapter.setHistoryNodes(historyNodes);
+		}
 	}
 	
 	private static void log(String log) {
