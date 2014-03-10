@@ -253,7 +253,9 @@ public class Util {
 			        String path =  cursor.getString(dataColumn);
 			        cursor.close();
 			        cursor = null;
-			        if(new File(path).exists()) return path;
+			        if(new File(path).exists()){
+			        	return path;
+			        }
 				}
 				if(cursor != null) cursor.close();
 			
@@ -312,6 +314,21 @@ public class Util {
 				return file.getAbsolutePath();
 		}
 		return null;
+	}
+	
+	/*
+	 * Check is file belongs to the app
+	 */
+	public static boolean isLocal(Context context, File file) {
+		File tmp = context.getDir("tmp", 0);
+		return file.getAbsolutePath().contains(tmp.getParent());
+	}
+	
+	/*
+	 * Check is file belongs to the app and temporary
+	 */
+	public static boolean isLocalTemp(Context context, File file) {
+		return isLocal(context, file) && file.getAbsolutePath().endsWith(".tmp");
 	}
 
 }

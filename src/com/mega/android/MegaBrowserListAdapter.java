@@ -1,5 +1,6 @@
 package com.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -26,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -155,6 +157,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		else{
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 			
 			if (node.hasThumbnail()){
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -175,24 +178,17 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}
-						else{
-							holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
-						}
 					}
 				}
 			}
 			else{
 				if (ThumbnailUtils.isPossibleThumbnail(node)){ 
 					String path = Util.getLocalFile(context, node.getName(), node.getSize(), null);
-					if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
+					if(path != null){ 
+						File actualFile = new File(path);
+						ThumbnailUtils.addLocalFile(megaApi, context, node, actualFile);
 						holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
 					}
-					else{
-						holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());	
-					}
-				}
-				else{
-					holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 				}				
 			}
 		}
