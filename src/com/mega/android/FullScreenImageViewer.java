@@ -19,6 +19,7 @@ import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class FullScreenImageViewer extends ActionBarActivity implements OnPageChangeListener, OnClickListener{
 	
@@ -35,6 +36,7 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 	private int positionG;
 	private ArrayList<String> names;
 	private ArrayList<Integer> imageIds;
+	private ArrayList<Long> imageHandles;
 	
 	private ImageView actionBarIcon;
 	private RelativeLayout bottomLayout;
@@ -62,13 +64,22 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		
 		names = i.getStringArrayListExtra("names");
 		imageIds = i.getIntegerArrayListExtra("imageIds");
-
+		long p = i.getLongExtra("handles",0 );
+		Toast.makeText(this, p + "", Toast.LENGTH_LONG).show();
+//		long [] p = i.getLongArrayExtra("handles");
+//		if (p == null){
+//			Toast.makeText(this, "NULL", Toast.LENGTH_LONG).show();
+//		}
+//		else{
+//			Toast.makeText(this, "SIZE: " + p.length, Toast.LENGTH_LONG).show();
+//		}
+		
 		adapter = new MegaFullScreenImageAdapter(FullScreenImageViewer.this,imageIds, names);
 		
 		viewPager.setAdapter(adapter);
 		
 		viewPager.setCurrentItem(positionG);
-		
+
 		viewPager.setOnPageChangeListener(this);
 		
 		actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
