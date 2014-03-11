@@ -66,19 +66,24 @@ bool WinFileAccess::fwrite(const byte* data, unsigned len, m_off_t pos)
     return WriteFile(hFile, (LPCVOID)data, (DWORD)len, &dwWritten, NULL) && dwWritten == len;
 }
 
-time_t FileTime_to_POSIX(FILETIME* ft) // NS (suppress style error)
+time_t FileTime_to_POSIX(FILETIME* ft)
 {
-    // takes the last modified date
     LARGE_INTEGER date;
 
     date.HighPart = ft->dwHighDateTime;
     date.LowPart = ft->dwLowDateTime;
 
-    // removes the diff between 1970 and 1601
-    date.QuadPart -= 11644473600000 * 10000;
+    // remove the diff between 1970 and 1601 and convert back from 100-nanoseconds to seconds
+    int64_t t = date.QuadPart - 11644473600000 * 10000;
 
-    // converts back from 100-nanoseconds to seconds
-    return date.QuadPart / 10000000;
+    // clamp
+    if (t < 0) return 0;
+    
+    t /= 10000000;
+    
+    if (t > (uint32_t)-1) t = (uint32_t)-1;
+
+    return t;
 }
 
 bool WinFileAccess::sysstat(time_t* mtime, m_off_t* size)
@@ -97,7 +102,7 @@ bool WinFileAccess::sysstat(time_t* mtime, m_off_t* size)
     }
 
     *mtime = FileTime_to_POSIX(&fad.ftLastWriteTime);
-    *size = ((m_off_t)fad.nFileSizeHigh << 32 ) + (m_off_t)fad.nFileSizeLow;
+    *size = ((m_off_t)fad.nFileSizeHigh << 32) + (m_off_t)fad.nFileSizeLow;
 
     return true;
 }
@@ -162,18 +167,25 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
             return false;
         }
 
-        type = ( fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) ? FOLDERNODE : FILENODE;
+        // ignore symlinks - they would otherwise be treated as moves
+        // also, ignore some other obscure filesystem object categories
+        if (fad.dwFileAttributes & SKIPATTRIBUTES)
+        {
+            retry = false;
+            return false;
+        }
+
+        type = (fad.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? FOLDERNODE : FILENODE;
     }
 
     // (race condition between GetFileAttributesEx()/FindFirstFile() possible -
     // fixable with the current Win32 API?)
-
     hFile = CreateFileW((LPCWSTR)name->data(),
                         read ? GENERIC_READ : GENERIC_WRITE,
                         FILE_SHARE_WRITE | FILE_SHARE_READ,
                         NULL,
                         read ? OPEN_EXISTING : OPEN_ALWAYS,
-                        (( type == FOLDERNODE ) ? FILE_FLAG_BACKUP_SEMANTICS : 0 ),
+                        ((type == FOLDERNODE) ? FILE_FLAG_BACKUP_SEMANTICS : 0),
                         NULL);
 
     name->resize(name->size() - 1);
@@ -189,9 +201,9 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
 
     mtime = FileTime_to_POSIX(&fad.ftLastWriteTime);
 
-    if (read && ( fsidvalid = !!GetFileInformationByHandle(hFile, &bhfi)))
+    if (read && (fsidvalid = !!GetFileInformationByHandle(hFile, &bhfi)))
     {
-        fsid = ((handle)bhfi.nFileIndexHigh << 32 ) | (handle)bhfi.nFileIndexLow;
+        fsid = ((handle)bhfi.nFileIndexHigh << 32) | (handle)bhfi.nFileIndexLow;
     }
 
     if (type == FOLDERNODE)
@@ -216,7 +228,7 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
 
     if (read)
     {
-        size = ((m_off_t)fad.nFileSizeHigh << 32 ) + (m_off_t)fad.nFileSizeLow;
+        size = ((m_off_t)fad.nFileSizeHigh << 32) + (m_off_t)fad.nFileSizeLow;
     }
 
     return true;
@@ -225,7 +237,7 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
 WinFileSystemAccess::WinFileSystemAccess()
 {
     pendingevents = 0;
-    localseparator.assign((char*)L"\\", sizeof( wchar_t ));
+    localseparator.assign((char*)L"\\", sizeof(wchar_t));
 }
 
 WinFileSystemAccess::~WinFileSystemAccess()
@@ -253,7 +265,7 @@ bool WinFileSystemAccess::istransientorexists(DWORD e)
 void WinFileSystemAccess::addevents(Waiter* w, int)
 {
     // overlapped completion wakes up WaitForMultipleObjectsEx()
-    ((WinWaiter*)w )->pendingfsevents = pendingevents;
+    ((WinWaiter*)w)->pendingfsevents = pendingevents;
 }
 
 // generate unique local filename in the same fs as relatedpath
@@ -269,21 +281,21 @@ void WinFileSystemAccess::tmpnamelocal(string* localname)
 
 void WinFileSystemAccess::path2local(string* path, string* local)
 {
-    local->resize(( path->size() + 1 ) * sizeof( wchar_t ));
+    local->resize((path->size() + 1) * sizeof(wchar_t));
 
-    local->resize(sizeof( wchar_t ) * ( MultiByteToWideChar(CP_UTF8, 0,
+    local->resize(sizeof(wchar_t) * (MultiByteToWideChar(CP_UTF8, 0,
                                                             path->c_str(),
                                                             -1,
                                                             (wchar_t*)local->data(),
-                                                            local->size() / sizeof( wchar_t ) + 1) - 1 ));
+                                                            local->size() / sizeof(wchar_t) + 1) - 1));
 }
 
 void WinFileSystemAccess::local2path(string* local, string* path)
 {
-    path->resize(( local->size() + 1 ) * 4 / sizeof( wchar_t ));
+    path->resize((local->size() + 1) * 4 / sizeof(wchar_t));
 
     path->resize(WideCharToMultiByte(CP_UTF8, 0, (wchar_t*)local->data(),
-                                     local->size() / sizeof( wchar_t ),
+                                     local->size() / sizeof(wchar_t),
                                      (char*)path->data(),
                                      path->size() + 1,
                                      NULL, NULL));
@@ -300,11 +312,11 @@ void WinFileSystemAccess::name2local(string* filename, const char* badchars)
     }
 
     // replace all occurrences of a badchar with %xx
-    for (int i = filename->size(); i--; )
+    for (int i = filename->size(); i--;)
     {
-        if (((unsigned char)( *filename )[i] < ' ' ) || strchr(badchars, ( *filename )[i]))
+        if (((unsigned char)(*filename)[i] < ' ') || strchr(badchars, (*filename)[i]))
         {
-            sprintf(buf, "%%%02x", (unsigned char)( *filename )[i]);
+            sprintf(buf, "%%%02x", (unsigned char)(*filename)[i]);
             filename->replace(i, 1, buf);
         }
     }
@@ -312,37 +324,35 @@ void WinFileSystemAccess::name2local(string* filename, const char* badchars)
     string t = *filename;
 
     // make space for the worst case
-    filename->resize(( t.size() + 1 ) * sizeof( wchar_t ));
+    filename->resize((t.size() + 1) * sizeof(wchar_t));
 
     // resize to actual result
-    filename->resize(sizeof( wchar_t ) * ( MultiByteToWideChar(CP_UTF8, 0, t.c_str(),
+    filename->resize(sizeof(wchar_t) * (MultiByteToWideChar(CP_UTF8, 0, t.c_str(),
                                                                -1,
                                                                (wchar_t*)filename->data(),
-                                                               filename->size() / sizeof( wchar_t ) + 1) - 1 ));
+                                                               filename->size() / sizeof(wchar_t) + 1) - 1));
 }
 
-// convert Windows 16-bit UNICODE to UTF-8, then unescape escaped forbidden
-// characters
-// by replacing occurrences of %xx (x being a lowercase hex digit) with the
-// encoded character
+// convert Windows 16-bit UNICODE to UTF-8, then unescape escaped forbidden characters
+// by replacing occurrences of %xx (x being a lowercase hex digit) with the encoded character
 void WinFileSystemAccess::local2name(string* filename)
 {
     char c;
     string t = *filename;
 
-    filename->resize(( t.size() + 1 ) * 4 / sizeof( wchar_t ));
+    filename->resize((t.size() + 1) * 4 / sizeof(wchar_t));
 
     filename->resize(WideCharToMultiByte(CP_UTF8, 0, (wchar_t*)t.data(),
-                                         t.size() / sizeof( wchar_t ),
+                                         t.size() / sizeof(wchar_t),
                                          (char*)filename->data(),
                                          filename->size() + 1,
                                          NULL, NULL));
 
-    for (int i = filename->size() - 2; i-- > 0; )
+    for (int i = filename->size() - 2; i-- > 0;)
     {
-        if ((( *filename )[i] == '%' ) && islchex(( *filename )[i + 1]) && islchex(( *filename )[i + 2]))
+        if (((*filename)[i] == '%') && islchex((*filename)[i + 1]) && islchex((*filename)[i + 2]))
         {
-            c = ( MegaClient::hexval(( *filename )[i + 1]) << 4 ) + MegaClient::hexval(( *filename )[i + 2]);
+            c = (MegaClient::hexval((*filename)[i + 1]) << 4) + MegaClient::hexval((*filename)[i + 2]);
             filename->replace(i, 3, &c, 1);
         }
     }
@@ -355,17 +365,17 @@ bool WinFileSystemAccess::getsname(string* name, string* sname)
 
     name->append("", 1);
 
-    r = name->size() / sizeof( wchar_t ) + 1;
+    r = name->size() / sizeof(wchar_t) + 1;
 
-    sname->resize(r * sizeof( wchar_t ));
+    sname->resize(r * sizeof(wchar_t));
     rr = GetShortPathNameW((LPCWSTR)name->data(), (LPWSTR)sname->data(), r);
 
-    sname->resize(rr * sizeof( wchar_t ));
+    sname->resize(rr * sizeof(wchar_t));
 
     if (rr >= r)
     {
         rr = GetShortPathNameW((LPCWSTR)name->data(), (LPWSTR)sname->data(), rr);
-        sname->resize(rr * sizeof( wchar_t ));
+        sname->resize(rr * sizeof(wchar_t));
     }
 
     name->resize(name->size() - 1);
@@ -379,9 +389,9 @@ bool WinFileSystemAccess::getsname(string* name, string* sname)
     // we are only interested in the path's last component
     wchar_t* ptr;
 
-    if (( ptr = wcsrchr((wchar_t*)sname->data(), '\\')) || ( ptr = wcsrchr((wchar_t*)sname->data(), ':')))
+    if ((ptr = wcsrchr((wchar_t*)sname->data(), '\\')) || (ptr = wcsrchr((wchar_t*)sname->data(), ':')))
     {
-        sname->erase(0, (char*)ptr - sname->data() + sizeof( wchar_t ));
+        sname->erase(0, (char*)ptr - sname->data() + sizeof(wchar_t));
     }
 
     return true;
@@ -461,6 +471,7 @@ bool WinFileSystemAccess::mkdirlocal(string* name, bool hidden)
     else if (hidden)
     {
         DWORD a = GetFileAttributesW((LPCWSTR)name->data());
+
         if (a != INVALID_FILE_ATTRIBUTES)
         {
             SetFileAttributesW((LPCWSTR)name->data(), a | FILE_ATTRIBUTE_HIDDEN);
@@ -509,11 +520,11 @@ bool WinFileSystemAccess::chdirlocal(string* name)
 
 size_t WinFileSystemAccess::lastpartlocal(string* name)
 {
-    for (size_t i = name->size() / sizeof( wchar_t ); i--; )
+    for (size_t i = name->size() / sizeof(wchar_t); i--;)
     {
-        if ((((wchar_t*)name->data())[i] == '\\' ) || (((wchar_t*)name->data())[i] == ':' ))
+        if ((((wchar_t*)name->data())[i] == '\\') || (((wchar_t*)name->data())[i] == ':'))
         {
-            return ( i + 1 ) * sizeof( wchar_t );
+            return (i + 1) * sizeof(wchar_t);
         }
     }
 
@@ -525,7 +536,7 @@ void WinFileSystemAccess::osversion(string* u)
     char buf[128];
     DWORD dwVersion = GetVersion();
 
-    sprintf(buf, "Windows %d.%d", (int)( LOBYTE(LOWORD(dwVersion))), (int)( HIBYTE(LOWORD(dwVersion))));
+    sprintf(buf, "Windows %d.%d", (int)(LOBYTE(LOWORD(dwVersion))), (int)(HIBYTE(LOWORD(dwVersion))));
 
     u->append(buf);
 }
@@ -543,7 +554,7 @@ VOID CALLBACK WinDirNotify::completion(DWORD dwErrorCode, DWORD dwBytes, LPOVERL
 {
     if (dwErrorCode != ERROR_OPERATION_ABORTED)
     {
-        ((WinDirNotify*)lpOverlapped->hEvent )->process(dwBytes);
+        ((WinDirNotify*)lpOverlapped->hEvent)->process(dwBytes);
     }
 }
 
@@ -557,7 +568,7 @@ void WinDirNotify::process(DWORD dwBytes)
     }
     else
     {
-        assert(dwBytes >= offsetof(FILE_NOTIFY_INFORMATION, FileName) + sizeof( wchar_t ));
+        assert(dwBytes >= offsetof(FILE_NOTIFY_INFORMATION, FileName) + sizeof(wchar_t));
 
         char* ptr = (char*)notifybuf[active].data();
 
@@ -573,10 +584,10 @@ void WinDirNotify::process(DWORD dwBytes)
         {
             FILE_NOTIFY_INFORMATION* fni = (FILE_NOTIFY_INFORMATION*)ptr;
 
-            if (( fni->FileNameLength < ignore.size())
+            if ((fni->FileNameLength < ignore.size())
                     || memcmp((char*)fni->FileName, ignore.data(), ignore.size())
-                    || (( fni->FileNameLength > ignore.size())
-                            && memcmp((char*)fni->FileName + ignore.size(), (char*)L"\\", sizeof( wchar_t ))))
+                    || ((fni->FileNameLength > ignore.size())
+                            && memcmp((char*)fni->FileName + ignore.size(), (char*)L"\\", sizeof(wchar_t))))
             {
                 notify(DIREVENTS, localrootnode, (char*)fni->FileName, fni->FileNameLength);
             }
@@ -622,7 +633,7 @@ void WinDirNotify::readchanges()
 
 WinDirNotify::WinDirNotify(string* localbasepath, string* ignore) : DirNotify(localbasepath, ignore)
 {
-    ZeroMemory(&overlapped, sizeof( overlapped ));
+    ZeroMemory(&overlapped, sizeof(overlapped));
 
     overlapped.hEvent = this;
 
@@ -631,7 +642,7 @@ WinDirNotify::WinDirNotify(string* localbasepath, string* ignore) : DirNotify(lo
     notifybuf[1].resize(65534);
 
     localbasepath->append("", 1);
-    if (( hDirectory = CreateFileW((LPCWSTR)localbasepath->data(),
+    if ((hDirectory = CreateFileW((LPCWSTR)localbasepath->data(),
                                    FILE_LIST_DIRECTORY,
                                    FILE_SHARE_READ | FILE_SHARE_WRITE,
                                    NULL,
@@ -671,10 +682,10 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
 {
     if (f)
     {
-        if (( hFind = ((WinFileAccess*)f )->hFind ) != INVALID_HANDLE_VALUE)
+        if ((hFind = ((WinFileAccess*)f)->hFind) != INVALID_HANDLE_VALUE)
         {
-            ffd = ((WinFileAccess*)f )->ffd;
-            ((WinFileAccess*)f )->hFind = INVALID_HANDLE_VALUE;
+            ffd = ((WinFileAccess*)f)->ffd;
+            ((WinFileAccess*)f)->hFind = INVALID_HANDLE_VALUE;
         }
     }
     else
@@ -695,7 +706,7 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
 
             while (p--)
             {
-                if (( bp[p] == '/' ) || ( bp[p] == '\\' ))
+                if ((bp[p] == '/') || (bp[p] == '\\'))
                 {
                     break;
                 }
@@ -703,7 +714,7 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
 
             if (p >= 0)
             {
-                globbase.assign((char*)bp, ( p + 1 ) * sizeof( wchar_t ));
+                globbase.assign((char*)bp, (p + 1) * sizeof(wchar_t));
             }
             else
             {
@@ -714,7 +725,7 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
         name->resize(name->size() - 5);
     }
 
-    if (!( ffdvalid = ( hFind != INVALID_HANDLE_VALUE )))
+    if (!(ffdvalid = (hFind != INVALID_HANDLE_VALUE)))
     {
         return false;
     }
@@ -724,30 +735,27 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
 
 bool WinDirAccess::dnext(string* name, nodetype_t* type)
 {
-    for (; ; )
+    for (; ;)
     {
         if (ffdvalid
-                && !( ffd.dwFileAttributes & ( FILE_ATTRIBUTE_TEMPORARY
-                                             | FILE_ATTRIBUTE_SYSTEM
-                                             | FILE_ATTRIBUTE_OFFLINE
-                                             | FILE_ATTRIBUTE_HIDDEN ))
-                && ( !( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-                        || ( *ffd.cFileName != '.' )
-                        || ( ffd.cFileName[1] && (( ffd.cFileName[1] != '.' ) || ffd.cFileName[2] ))))
+                && !(ffd.dwFileAttributes & WinFileAccess::SKIPATTRIBUTES)
+                && (!(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+                        || (*ffd.cFileName != '.')
+                        || (ffd.cFileName[1] && ((ffd.cFileName[1] != '.') || ffd.cFileName[2]))))
         {
-            name->assign((char*)ffd.cFileName, sizeof( wchar_t ) * wcslen(ffd.cFileName));
+            name->assign((char*)ffd.cFileName, sizeof(wchar_t) * wcslen(ffd.cFileName));
             name->insert(0, globbase);
 
             if (type)
             {
-                *type = ( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) ? FOLDERNODE : FILENODE;
+                *type = (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? FOLDERNODE : FILENODE;
             }
 
             ffdvalid = false;
             return true;
         }
 
-        if (!( ffdvalid = FindNextFileW(hFind, &ffd) != 0 ))
+        if (!(ffdvalid = FindNextFileW(hFind, &ffd) != 0))
         {
             return false;
         }

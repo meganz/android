@@ -2,7 +2,7 @@
  * @file mega/megaapp.h
  * @brief Mega SDK callback interface
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -75,6 +75,9 @@ struct MEGA_API MegaApp
 
     // node fetch result
     virtual void fetchnodes_result(error) { }
+
+    // nodes now (nearly) current
+    virtual void nodes_current() { }
 
     // node addition has failed
     virtual void putnodes_result(error, targettype_t, NewNode*) { }
@@ -154,6 +157,7 @@ struct MEGA_API MegaApp
     {
         return true;
     }
+
     virtual bool sync_syncable(const char*, string*, string*)
     {
         return true;

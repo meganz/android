@@ -23,3 +23,10 @@
 *.app
 /java_wrap.cxx
 /java_wrap.h
+
+*.deps*
+include/Makefile
+include/Makefile.in
+include/mega/config.h.in
+include/mega/stamp-h1
+

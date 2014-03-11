@@ -2,7 +2,7 @@
  * @file mega/megaclient.h
  * @brief Client access engine core logic
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -253,6 +253,9 @@ private:
     // update time at which next deferred transfer retry kicks in
     void nexttransferretry(direction_t d, dstime*);
 
+    // a TransferSlot chunk failed
+    bool chunkfailed;
+    
     // fetch state serialize from local cache
     bool fetchsc(DbTable*);
 
@@ -314,6 +317,9 @@ public:
     // scsn as read from sctable
     handle cachedscsn;
 
+    // have we just completed fetching new nodes?
+    bool statecurrent;
+
     // record type indicator for sctable
     enum { CACHEDSCSN, CACHEDNODE, CACHEDUSER } sctablerectype;
 
@@ -365,6 +371,9 @@ public:
 
     // transfer tslots
     transferslot_list tslots;
+
+    // next TransferSlot to doio() on
+    transferslot_list::iterator slotit;
 
     // FileFingerprint to node mapping
     fingerprint_set fingerprints;
@@ -509,6 +518,9 @@ public:
     // file attribute fetch failed
     void faf_failed(int);
 
+    // transfer chunk failed
+    void setchunkfailed();
+    
     // process object arrays by the API server
     int readnodes(JSON *, int, putsource_t = PUTNODES_APP, NewNode * = NULL, int = 0);
 
