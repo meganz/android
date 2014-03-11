@@ -2,7 +2,7 @@
  * @file posix/net.cpp
  * @brief POSIX network access layer (using cURL)
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -81,7 +81,7 @@ void CurlHttpIO::post(HttpReq* req, const char* data, unsigned len)
 
     req->in.clear();
 
-    if (( curl = curl_easy_init()))
+    if ((curl = curl_easy_init()))
     {
         curl_easy_setopt(curl, CURLOPT_URL,           req->posturl.c_str());
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS,    data ? data : req->out->data());
@@ -132,20 +132,18 @@ m_off_t CurlHttpIO::postpos(void* handle)
 // process events
 bool CurlHttpIO::doio()
 {
-    bool done;
-
-    done = 0;
+    bool done = false;
 
     CURLMsg *msg;
     int dummy;
 
     curl_multi_perform(curlm, &dummy);
 
-    while (( msg = curl_multi_info_read(curlm, &dummy)))
+    while ((msg = curl_multi_info_read(curlm, &dummy)))
     {
         HttpReq* req;
 
-        if (( curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, (char**)&req) == CURLE_OK ) && req)
+        if ((curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, (char**)&req) == CURLE_OK) && req)
         {
             req->httpio = NULL;
 
@@ -168,9 +166,10 @@ bool CurlHttpIO::doio()
                 }
 
                 req->status = req->httpstatus == 200 ? REQ_SUCCESS : REQ_FAILURE;
-                
+
                 inetstatus(req->status);
                 
+                success = true;
                 done = true;
             }
             else
@@ -191,7 +190,7 @@ size_t CurlHttpIO::write_data(void *ptr, size_t size, size_t nmemb, void *target
 {
     size *= nmemb;
 
-    ((HttpReq*)target )->put(ptr, size);
+    ((HttpReq*)target)->put(ptr, size);
 
     return size;
 }

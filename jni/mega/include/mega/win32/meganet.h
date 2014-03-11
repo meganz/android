@@ -2,7 +2,7 @@
  * @file mega/win32/meganet.h
  * @brief Win32 network access layer (using WinHTTP)
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -23,11 +23,9 @@
 #define HTTPIO_CLASS WinHttpIO
 
 #include "mega/megaclient.h"
-
 #include "megawaiter.h"
 
 namespace mega {
-
 extern bool debug;
 
 class MEGA_API WinHttpIO: public HttpIO
@@ -80,7 +78,6 @@ struct MEGA_API WinHttpContext
     unsigned postlen;
     const char* postdata;
 };
-
 } // namespace
 
 #endif

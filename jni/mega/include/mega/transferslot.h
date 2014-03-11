@@ -2,7 +2,7 @@
  * @file mega/transferslot.h
  * @brief Class for active transfer
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -24,6 +24,7 @@
 
 #include "http.h"
 #include "node.h"
+#include "backofftimer.h"
 
 namespace mega {
 // active transfer
@@ -80,6 +81,13 @@ struct MEGA_API TransferSlot
     // tslots list position
     transferslot_list::iterator slots_it;
 
+    // slot operation retry timer
+    bool retrying;
+    BackoffTimer retrybt;
+
+    // transfer failure flag
+    bool failure;
+    
     TransferSlot(Transfer*);
     ~TransferSlot();
 };

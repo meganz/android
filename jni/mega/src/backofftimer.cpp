@@ -2,7 +2,7 @@
  * @file backofftimer.cpp
  * @brief Generic timer facility with exponential backoff
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -88,7 +88,7 @@ dstime BackoffTimer::backoffdelta()
 
 dstime BackoffTimer::nextset() const
 {
-    return (int)next;
+    return next;
 }
 
 // event in the future: potentially updates waituntil

@@ -2,7 +2,7 @@
  * @file transferslot.cpp
  * @brief Class for active transfer
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -37,6 +37,9 @@ TransferSlot::TransferSlot(Transfer* ctransfer)
     lastdata = 0;
     errorcount = 0;
 
+    failure = false;
+    retrying = false;
+    
     fileattrsmutable = 0;
 
     reqs = NULL;
@@ -62,6 +65,12 @@ TransferSlot::~TransferSlot()
 
     if (slots_it != transfer->client->tslots.end())
     {
+        // advance main loop iterator if deleting next in line
+        if (transfer->client->slotit != transfer->client->tslots.end() && *transfer->client->slotit == this)
+        {
+            transfer->client->slotit++;
+        }
+
         transfer->client->tslots.erase(slots_it);
     }
 
@@ -73,7 +82,8 @@ TransferSlot::~TransferSlot()
     if (fa)
     {
         delete fa;
-        if (( transfer->type == GET ) && transfer->localfilename.size())
+
+        if ((transfer->type == GET) && transfer->localfilename.size())
         {
             transfer->client->fsaccess->unlinklocal(&transfer->localfilename);
         }
@@ -90,7 +100,7 @@ TransferSlot::~TransferSlot()
 // abort all HTTP connections
 void TransferSlot::disconnect()
 {
-    for (int i = connections; i--; )
+    for (int i = connections; i--;)
     {
         if (reqs[i])
         {
@@ -117,7 +127,7 @@ int64_t TransferSlot::macsmac(chunkmac_map* macs)
     m[0] ^= m[1];
     m[1] = m[2] ^ m[3];
 
-    return *(int64_t*)mac;
+    return MemAccess::get<int64_t>((const char*)mac);
 }
 
 // file transfer state machine
@@ -125,10 +135,14 @@ void TransferSlot::doio(MegaClient* client)
 {
     if (!fa)
     {
-        // this is a pending completion, retry every 200 ms
-        transfer->bt.backoff(2);
+        // this is a pending completion, retry every 200 ms by default
+        retrybt.backoff(2);
+        retrying = true;
+
         return transfer->complete();
     }
+
+    retrying = false;
 
     if (!tempurl.size())
     {
@@ -167,8 +181,8 @@ void TransferSlot::doio(MegaClient* client)
                                     == NewNode::UPLOADTOKENLEN)
                                 {
                                     memcpy(transfer->filekey, transfer->key.key, sizeof transfer->key.key);
-                                    ((int64_t*)transfer->filekey )[2] = transfer->ctriv;
-                                    ((int64_t*)transfer->filekey )[3] = macsmac(&transfer->chunkmacs);
+                                    ((int64_t*)transfer->filekey)[2] = transfer->ctriv;
+                                    ((int64_t*)transfer->filekey)[3] = macsmac(&transfer->chunkmacs);
                                     SymmCipher::xorblock(transfer->filekey + SymmCipher::KEYLENGTH, transfer->filekey);
 
                                     return transfer->complete();
@@ -190,7 +204,7 @@ void TransferSlot::doio(MegaClient* client)
                             if (progresscompleted == transfer->size)
                             {
                                 // verify meta MAC
-                                if (!progresscompleted || ( macsmac(&transfer->chunkmacs) == transfer->metamac ))
+                                if (!progresscompleted || (macsmac(&transfer->chunkmacs) == transfer->metamac))
                                 {
                                     return transfer->complete();
                                 }
@@ -221,7 +235,12 @@ void TransferSlot::doio(MegaClient* client)
                     }
                     else
                     {
-                        errorcount++;
+                        if (!failure)
+                        {
+                            failure = true;
+                            client->setchunkfailed();
+                        }
+
                         reqs[i]->status = REQ_PREPARED;
                     }
 
@@ -230,49 +249,52 @@ void TransferSlot::doio(MegaClient* client)
             }
         }
 
-        if (!reqs[i] || ( reqs[i]->status == REQ_READY ))
+        if (!failure)
         {
-            m_off_t npos = ChunkedHash::chunkceil(transfer->pos);
-
-            if (npos > transfer->size)
+            if (!reqs[i] || (reqs[i]->status == REQ_READY))
             {
-                npos = transfer->size;
-            }
+                m_off_t npos = ChunkedHash::chunkceil(transfer->pos);
 
-            if (( npos > transfer->pos ) || !transfer->size)
-            {
-                if (!reqs[i])
+                if (npos > transfer->size)
                 {
-                    reqs[i] = transfer->type == PUT ? (HttpReqXfer*)new HttpReqUL() : (HttpReqXfer*)new HttpReqDL();
+                    npos = transfer->size;
                 }
 
-                if (reqs[i]->prepare(fa, tempurl.c_str(), &transfer->key,
-                                     &transfer->chunkmacs, transfer->ctriv,
-                                     transfer->pos, npos))
+                if ((npos > transfer->pos) || !transfer->size)
                 {
-                    reqs[i]->status = REQ_PREPARED;
-                    transfer->pos = npos;
-                }
-                else
-                {
-                    if (!fa->retry)
+                    if (!reqs[i])
                     {
-                        return transfer->failed(API_EREAD);
+                        reqs[i] = transfer->type == PUT ? (HttpReqXfer*)new HttpReqUL() : (HttpReqXfer*)new HttpReqDL();
                     }
 
-                    // retry the read shortly
-                    backoff = 2;
+                    if (reqs[i]->prepare(fa, tempurl.c_str(), &transfer->key,
+                                         &transfer->chunkmacs, transfer->ctriv,
+                                         transfer->pos, npos))
+                    {
+                        reqs[i]->status = REQ_PREPARED;
+                        transfer->pos = npos;
+                    }
+                    else
+                    {
+                        if (!fa->retry)
+                        {
+                            return transfer->failed(API_EREAD);
+                        }
+
+                        // retry the read shortly
+                        backoff = 2;
+                    }
+                }
+                else if (reqs[i])
+                {
+                    reqs[i]->status = REQ_DONE;
                 }
             }
-            else if (reqs[i])
-            {
-                reqs[i]->status = REQ_DONE;
-            }
-        }
 
-        if (reqs[i] && ( reqs[i]->status == REQ_PREPARED ))
-        {
-            reqs[i]->post(client);
+            if (reqs[i] && (reqs[i]->status == REQ_PREPARED))
+            {
+                reqs[i]->post(client);
+            }
         }
     }
 
@@ -286,7 +308,7 @@ void TransferSlot::doio(MegaClient* client)
         progress();
     }
 
-    if (( Waiter::ds - lastdata >= XFERTIMEOUT ) || ( errorcount > 10 ))
+    if ((Waiter::ds - lastdata >= XFERTIMEOUT) || (errorcount > 10))
     {
         return transfer->failed(API_EFAILED);
     }
@@ -295,7 +317,7 @@ void TransferSlot::doio(MegaClient* client)
         if (!backoff)
         {
             // no other backoff: check again at XFERMAXFAIL
-            backoff = XFERTIMEOUT - ( Waiter::ds - lastdata );
+            backoff = XFERTIMEOUT - (Waiter::ds - lastdata);
         }
 
         transfer->bt.backoff(backoff);
@@ -309,7 +331,7 @@ void TransferSlot::progress()
 
     for (file_list::iterator it = transfer->files.begin(); it != transfer->files.end(); it++)
     {
-        ( *it )->progress();
+        (*it)->progress();
     }
 }
 } // namespace

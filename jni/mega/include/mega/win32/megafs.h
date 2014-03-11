@@ -1,8 +1,8 @@
 /**
  * @file mega/win32/megafs.h
- * @brief Win32 filesystem/directory access/notification (UNICODE)
+ * @brief Win32 filesystem/directory access/notification (Unicode)
  *
- * (c) 2013 by Mega Limited, Wellsford, New Zealand
+ * (c) 2013-2014 by Mega Limited, Wellsford, New Zealand
  *
  * This file is part of the MEGA SDK - Client Access Engine.
  *
@@ -111,6 +111,12 @@ class MEGA_API WinFileAccess : public FileAccess
 public:
     HANDLE hFind;
     WIN32_FIND_DATAW ffd;
+
+    // file attributes we skip for a variety of excellent reasons
+    static const DWORD SKIPATTRIBUTES = FILE_ATTRIBUTE_REPARSE_POINT
+                                        | FILE_ATTRIBUTE_TEMPORARY
+                                        | FILE_ATTRIBUTE_OFFLINE;
+
 
     bool fopen(string*, bool, bool);
     void updatelocalname(string*);
