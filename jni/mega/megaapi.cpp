@@ -112,7 +112,7 @@ static void createthumbnail(string* filename, unsigned size, string* result)
 				h = FreeImage_GetHeight(dib);
 		}
 
-		if (w >= 20 && w >= 20)
+        if (w >= 20 && h >= 20)
 		{
 				if (w < h)
 				{
@@ -181,12 +181,12 @@ bool MegaFile::failed(error e)
     return e != API_EKEY && e != API_EBLOCKED && transfer->failcount < 10;
 }
 
-MegaFile::MegaFile()
+MegaFile::MegaFile() : File()
 {
     seqno = ++nextseqno;
 }
 
-MegaFileGet::MegaFileGet(MegaClient *client, Node *n, string dstPath)
+MegaFileGet::MegaFileGet(MegaClient *client, Node *n, string dstPath) : MegaFile()
 {
     h = n->nodehandle;
     *(FileFingerprint*)this = *n;
@@ -214,7 +214,7 @@ MegaFileGet::MegaFileGet(MegaClient *client, Node *n, string dstPath)
     hprivate = true;
 }
 
-MegaFileGet::MegaFileGet(MegaClient *client, MegaNode *n, string dstPath)
+MegaFileGet::MegaFileGet(MegaClient *client, MegaNode *n, string dstPath) : MegaFile()
 {
     h = n->getHandle();
     name = n->getName();
@@ -242,7 +242,7 @@ void MegaFileGet::completed(Transfer*, LocalNode*)
     delete this;
 }
 
-MegaFilePut::MegaFilePut(MegaClient *client, string* clocalname, handle ch, const char* ctargetuser)
+MegaFilePut::MegaFilePut(MegaClient *client, string* clocalname, handle ch, const char* ctargetuser) : MegaFile()
 {
     // this assumes that the local OS uses an ASCII path separator, which should be true for most
     string separator = client->fsaccess->localseparator;
@@ -577,7 +577,8 @@ void MegaRequest::setAccess(const char* access)
 
 void MegaRequest::setFile(const char* file)
 {
-	if(this->file) delete [] this->file;
+    if(this->file)
+        delete [] this->file;
 	this->file = MegaApi::strdup(file);
 }
 
@@ -750,7 +751,7 @@ void MegaTransfer::setUpdateTime(long long updateTime) { this->updateTime = upda
 
 void MegaTransfer::setPublicNode(MegaNode *publicNode)
 {
-    if(this->publicNode) delete publicNode;
+    if(this->publicNode) delete this->publicNode;
     if(!publicNode) this->publicNode = NULL;
     else this->publicNode = new MegaNode(publicNode);
 }
@@ -1047,7 +1048,7 @@ MegaApi::MegaApi(const char *basePath)
     fsAccess = new MegaFileSystemAccess();
     string sBasePath = basePath;
     dbAccess = new MegaDbAccess(&sBasePath);
-    client = new MegaClient(this, waiter, httpio, fsAccess, dbAccess, "FhMgXbqb", "MEGAsync/1.0.7");
+    client = new MegaClient(this, waiter, httpio, fsAccess, dbAccess, "FhMgXbqb", "MEGAsync/1.0.11");
 
     //Start blocking thread
 	threadExit = 0;
@@ -1507,7 +1508,7 @@ void MegaApi::startUpload(const char* localPath, MegaNode* parent, int connectio
     {
         string path(localPath);
 #ifdef WIN32
-        if((path.size()<4) || path.compare(0, 4, "\\\\?\\"))
+        if((path.size()<2) || path.compare(0, 2, "\\\\"))
             path.insert(0, "\\\\?\\");
 #endif
         transfer->setPath(path.data());
@@ -1539,7 +1540,7 @@ void MegaApi::startDownload(handle nodehandle, const char* target, int connectio
     {
 #ifdef WIN32
         string path(target);
-        if((path.size()<4) || path.compare(0, 4, "\\\\?\\"))
+        if((path.size()<2) || path.compare(0, 2, "\\\\"))
             path.insert(0, "\\\\?\\");
         target = path.data();
 #endif
@@ -1576,14 +1577,18 @@ void MegaApi::startPublicDownload(MegaNode* node, const char* localFolder, MegaT
     {
         string path(localFolder);
 #ifdef WIN32
-        if((path.size()<4) || path.compare(0, 4, "\\\\?\\"))
+        if((path.size()<2) || path.compare(0, 2, "\\\\"))
             path.insert(0, "\\\\?\\");
 #endif
         transfer->setParentPath(path.data());
     }
 
-    transfer->setNodeHandle(node->getHandle());
-    transfer->setPublicNode(node);
+    if(node)
+    {
+        transfer->setNodeHandle(node->getHandle());
+        transfer->setPublicNode(node);
+    }
+
 	transferQueue.push(transfer);
     waiter->notify();
 }
@@ -1673,7 +1678,7 @@ treestate_t MegaApi::syncPathState(string* path)
     string prefix("\\\\?\\");
     string localPrefix;
     fsAccess->path2local(&prefix, &localPrefix);
-    if(path->size()<8 || memcmp(path->data(), localPrefix.data(), 8))
+    if(path->size()<4 || memcmp(path->data(), localPrefix.data(), 4))
         path->insert(0, localPrefix);
 #endif
 
@@ -1727,10 +1732,11 @@ void MegaApi::syncFolder(const char *localFolder, MegaNode *megaFolder)
     {
         string path(localFolder);
 #ifdef WIN32
-        if((path.size()<4) || path.compare(0, 4, "\\\\?\\"))
+        if((path.size()<2) || path.compare(0, 2, "\\\\"))
             path.insert(0, "\\\\?\\");
 #endif
         request->setFile(path.data());
+        path.clear();
     }
     requestQueue.push(request);
     waiter->notify();
@@ -2204,17 +2210,25 @@ void MegaApi::transfer_update(Transfer *tr)
 		transfer->setDeltaSize(tr->slot->progressreported - transfer->getTransferredBytes());
 		transfer->setTransferredBytes(tr->slot->progressreported);
 
-        if(Waiter::ds<transfer->getStartTime())
-            transfer->setStartTime(waiter->ds);
+        unsigned long long currentTime = Waiter::ds;
+        if(currentTime<transfer->getStartTime())
+            transfer->setStartTime(currentTime);
 
-        transfer->setSpeed((10*transfer->getTransferredBytes())/(waiter->ds-transfer->getStartTime()+1));
-		transfer->setUpdateTime(Waiter::ds);
+        long long speed = 0;
+        long long deltaTime = currentTime-transfer->getStartTime();
+        if(deltaTime<=0)
+            deltaTime = 1;
+        if(transfer->getTransferredBytes()>0)
+            speed = (10*transfer->getTransferredBytes())/deltaTime;
+
+        transfer->setSpeed(speed);
+        transfer->setUpdateTime(currentTime);
 
         //string th;
         //if (tr->type == GET) th = "TD ";
         //else th = "TU ";
         //cout << th << transfer->getFileName() << ": Update: " << tr->slot->progressreported/1024 << " KB of "
-        //     << transfer->getTotalBytes()/1024 << " KB, " << tr->slot->progressreported*10/(1024*(waiter->ds-transfer->getStartTime())+1) << " KB/s" << endl;
+        //     << transfer->getTotalBytes()/1024 << " KB, " << tr->slot->progressreported*10/(1024*(Waiter::ds-transfer->getStartTime())+1) << " KB/s" << endl;
 
         fireOnTransferUpdate(this, transfer);
 	}
@@ -2222,11 +2236,7 @@ void MegaApi::transfer_update(Transfer *tr)
 
 void MegaApi::transfer_failed(Transfer* tr, error e)
 {
-    MUTEX_UNLOCK(sdkMutex);
-    MUTEX_LOCK(sdkMutex);
-
     updateStatics();
-
     if(transferMap.find(tr) == transferMap.end()) return;
     MegaError megaError(e);
     MegaTransfer* transfer = transferMap.at(tr);
@@ -2264,12 +2274,22 @@ void MegaApi::transfer_complete(Transfer* tr)
 
     if(transferMap.find(tr) == transferMap.end()) return;
     MegaTransfer* transfer = transferMap.at(tr);
-    if(!transfer->getStartTime()) transfer->setStartTime(Waiter::ds);
-    if(Waiter::ds<transfer->getStartTime())
-        transfer->setStartTime(waiter->ds);
 
-    transfer->setSpeed((10*transfer->getTotalBytes())/(waiter->ds-transfer->getStartTime()+1));
-    transfer->setTime(waiter->ds);
+    unsigned long long currentTime = Waiter::ds;
+    if(!transfer->getStartTime())
+        transfer->setStartTime(currentTime);
+    if(currentTime<transfer->getStartTime())
+        transfer->setStartTime(currentTime);
+
+    long long speed = 0;
+    long long deltaTime = currentTime-transfer->getStartTime();
+    if(deltaTime<=0)
+        deltaTime = 1;
+    if(transfer->getTotalBytes()>0)
+        speed = (10*transfer->getTotalBytes())/deltaTime;
+
+    transfer->setSpeed(speed);
+    transfer->setTime(currentTime);
     transfer->setDeltaSize(tr->size - transfer->getTransferredBytes());
     transfer->setTransferredBytes(tr->size);
 
@@ -2417,14 +2437,10 @@ void MegaApi::syncupdate_local_lockretry(bool waiting)
 void MegaApi::users_updated(User** u, int count)
 {
 #ifdef __ANDROID__
-    MUTEX_UNLOCK(sdkMutex);
     fireOnUsersUpdate(this, NULL);
-    MUTEX_LOCK(sdkMutex);
 #else
     UserList* userList = new UserList(u, count);
-    MUTEX_UNLOCK(sdkMutex);
     fireOnUsersUpdate(this, userList);
-    MUTEX_LOCK(sdkMutex);
     delete userList;
 #endif
 }
@@ -2518,7 +2534,7 @@ void MegaApi::fetchnodes_result(error e)
             string localname;
             string utf8name(localFolder.toUtf8().constData());
     #ifdef WIN32
-            if((utf8name.size()<4) || utf8name.compare(0, 4, "\\\\?\\"))
+            if((utf8name.size()<2) || utf8name.compare(0, 2, "\\\\"))
                 utf8name.insert(0, "\\\\?\\");
     #endif
             client->fsaccess->path2local(&utf8name, &localname);
@@ -2924,9 +2940,7 @@ void MegaApi::debug_log(const char* message)
 void MegaApi::nodes_updated(Node** n, int count)
 {
 #ifdef __ANDROID__
-    MUTEX_UNLOCK(sdkMutex);
     fireOnNodesUpdate(this, NULL);
-    MUTEX_LOCK(sdkMutex);
 #else
     NodeList *nodeList = NULL;
     if(n != NULL)
@@ -2936,9 +2950,7 @@ void MegaApi::nodes_updated(Node** n, int count)
             list.push_back(MegaNode::fromNode(n[i]));
         nodeList = new NodeList(list.data(), count, true);
     }
-    MUTEX_UNLOCK(sdkMutex);
     fireOnNodesUpdate(this, nodeList);
-    MUTEX_LOCK(sdkMutex);
 #endif
 }
 
@@ -3997,9 +4009,6 @@ bool WildcardMatch(const char *pszString, const char *pszMatch)
 
 bool MegaApi::is_syncable(const char *name)
 {
-    MUTEX_UNLOCK(sdkMutex);
-    MUTEX_LOCK(sdkMutex);
-
     for(int i=0; i< excludedNames.size(); i++)
     {
         if(WildcardMatch(name, excludedNames[i].c_str()))
@@ -4596,7 +4605,8 @@ void MegaApi::setExcludedNames(vector<string> *excludedNames)
 
 char* MegaApi::strdup(const char* buffer)
 {
-	if(!buffer) return NULL;
+    if(!buffer)
+        return NULL;
 	int tam = strlen(buffer)+1;
 	char *newbuffer = new char[tam];
 	memcpy(newbuffer, buffer, tam);
