@@ -43,6 +43,24 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	ListView list;
 	
+	/*public static view holder class*/
+    public class ViewHolderBrowserList {
+        ImageView imageView;
+        TextView textViewFileName;
+        TextView textViewFileSize;
+        TextView textViewUpdated;
+        ImageButton imageButtonThreeDots;
+        RelativeLayout itemLayout;
+        ImageView arrowSelection;
+        RelativeLayout optionsLayout;
+        ImageButton optionOpen;
+        ImageButton optionProperties;
+        ImageButton optionDownload;
+        ImageButton optionDelete;
+        int currentPosition;
+        long document;
+    }
+	
 	public MegaBrowserListAdapter(Context _context, NodeList _nodes) {
 		this.context = _context;
 		this.nodes = _nodes;
@@ -76,24 +94,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 //		list.smoothScrollToPosition(0);
 	}
-	
-	/*public static view holder class*/
-    public class ViewHolderBrowserList {
-        ImageView imageView;
-        TextView textViewFileName;
-        TextView textViewFileSize;
-        TextView textViewUpdated;
-        ImageButton imageButtonThreeDots;
-        RelativeLayout itemLayout;
-        ImageView arrowSelection;
-        RelativeLayout optionsLayout;
-        ImageButton optionOpen;
-        ImageButton optionProperties;
-        ImageButton optionDownload;
-        ImageButton optionDelete;
-        int currentPosition;
-        long document;
-    }
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {

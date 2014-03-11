@@ -126,14 +126,12 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			intent.putExtra("position", position);
 			intent.putExtra("imageIds", imageIds);
 			intent.putExtra("names", namesArray);
-			ArrayList<Long> handles = new ArrayList<Long>();
-			for (int i=0;i<nodes.size();i++){
-				MegaNode n = nodes.get(i);
-				if (MimeType.typeForName(n.getName()).isImage()){
-					handles.add(n.getHandle());
-				}
+			if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+				intent.putExtra("parentNodeHandle", -1L);
 			}
-			intent.putExtra("handles", handles.get(0));
+			else{
+				intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+			}
 			startActivity(intent);
 		}
     }
