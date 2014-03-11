@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 import com.mega.components.ExtendedViewPager;
 import com.mega.components.TouchImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.NodeList;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,9 +46,17 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
     private RelativeLayout topLayout;
 	private ExtendedViewPager viewPager;	
 	
+	static FullScreenImageViewer fullScreenImageViewer;
+    private MegaApiAndroid megaApi;
+
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		fullScreenImageViewer = this;
+		MegaApplication app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
 		setContentView(R.layout.activity_full_screen_image_viewer);
 		
 		display = getWindowManager().getDefaultDisplay();
@@ -59,22 +70,32 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
 		
-		Intent i = getIntent();
-		positionG = i.getIntExtra("position", 0);
+		Intent intent = getIntent();
+		positionG = intent.getIntExtra("position", 0);
 		
-		names = i.getStringArrayListExtra("names");
-		imageIds = i.getIntegerArrayListExtra("imageIds");
-		long p = i.getLongExtra("handles",0 );
-		Toast.makeText(this, p + "", Toast.LENGTH_LONG).show();
-//		long [] p = i.getLongArrayExtra("handles");
-//		if (p == null){
-//			Toast.makeText(this, "NULL", Toast.LENGTH_LONG).show();
-//		}
-//		else{
-//			Toast.makeText(this, "SIZE: " + p.length, Toast.LENGTH_LONG).show();
-//		}
+		names = intent.getStringArrayListExtra("names");
+		imageIds = intent.getIntegerArrayListExtra("imageIds");
 		
-		adapter = new MegaFullScreenImageAdapter(FullScreenImageViewer.this,imageIds, names);
+		imageHandles = new ArrayList<Long>();
+		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
+		MegaNode parentNode;
+		if (parentNodeHandle == -1){
+			parentNode = megaApi.getRootNode();
+		}
+		else{
+			parentNode = megaApi.getNodeByHandle(parentNodeHandle);
+		}
+		
+		NodeList nodes = megaApi.getChildren(parentNode);
+		for (int i=0;i<nodes.size();i++){
+			MegaNode n = nodes.get(i);
+			if (MimeType.typeForName(n.getName()).isImage()){
+				imageHandles.add(n.getHandle());
+			}
+		}
+		Toast.makeText(this, ""+parentNode.getName() + "_" + imageHandles.size(), Toast.LENGTH_LONG).show();
+			
+		adapter = new MegaFullScreenImageAdapter(fullScreenImageViewer,imageIds, names, imageHandles, megaApi);
 		
 		viewPager.setAdapter(adapter);
 		
