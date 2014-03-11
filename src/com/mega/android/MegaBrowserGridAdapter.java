@@ -564,11 +564,20 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					setNodes(nodes);
 				}
 				else{
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", currentPosition+1);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
+					if (MimeType.typeForName(n.getName()).isImage()){
+						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						intent.putExtra("position", currentPosition);
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+						context.startActivity(intent);
+					}
+					else{
+						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
 				}
@@ -583,11 +592,20 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					setNodes(nodes);
 				}
 				else{
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", currentPosition+1);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
+					if (MimeType.typeForName(n.getName()).isImage()){
+						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						intent.putExtra("position", (currentPosition+1));
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+						context.startActivity(intent);
+					}
+					else{
+						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
 				}
@@ -635,11 +653,20 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					setNodes(nodes);
 				}
 				else{
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", currentPosition);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
+					if (MimeType.typeForName(n.getName()).isImage()){
+						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						intent.putExtra("position", currentPosition);
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+						context.startActivity(intent);
+					}
+					else{
+						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
 				}
@@ -654,11 +681,20 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					setNodes(nodes);
 				}
 				else{
-					Intent i = new Intent(context, FullScreenImageViewer.class);
-					i.putExtra("position", currentPosition+1);
-					i.putExtra("names", names);
-					i.putExtra("imageIds", imageIds);
-					context.startActivity(i);	
+					if (MimeType.typeForName(n.getName()).isImage()){
+						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						intent.putExtra("position", (currentPosition+1));
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+						context.startActivity(intent);
+					}
+					else{
+						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
 				}

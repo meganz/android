@@ -121,18 +121,20 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			adapter.setNodes(nodes);
 		}
 		else{
-			Toast.makeText(context, "[IS FILE]Node handle clicked: " + nodes.get(position).getHandle(), Toast.LENGTH_SHORT).show();
-			Intent intent = new Intent(context, FullScreenImageViewer.class);
-			intent.putExtra("position", position);
-			intent.putExtra("imageIds", imageIds);
-			intent.putExtra("names", namesArray);
-			if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-				intent.putExtra("parentNodeHandle", -1L);
+			if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+				Intent intent = new Intent(context, FullScreenImageViewer.class);
+				intent.putExtra("position", position);
+				if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+					intent.putExtra("parentNodeHandle", -1L);
+				}
+				else{
+					intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+				}
+				startActivity(intent);
 			}
 			else{
-				intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+				Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + nodes.get(position).getHandle(), Toast.LENGTH_SHORT).show();
 			}
-			startActivity(intent);
 		}
     }
 	

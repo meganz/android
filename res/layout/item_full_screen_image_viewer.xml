@@ -9,5 +9,15 @@
         android:layout_height="fill_parent"
         android:scaleType="fitCenter" />
     
+    <ProgressBar
+        android:id="@+id/login_progress_bar"
+        style="?android:attr/progressBarStyleLargeInverse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp" />
+    
 
 </RelativeLayout>
