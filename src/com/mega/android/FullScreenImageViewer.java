@@ -37,8 +37,6 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 
 	private MegaFullScreenImageAdapter adapter;
 	private int positionG;
-	private ArrayList<String> names;
-	private ArrayList<Integer> imageIds;
 	private ArrayList<Long> imageHandles;
 	
 	private ImageView actionBarIcon;
@@ -73,9 +71,6 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
 		
-		names = intent.getStringArrayListExtra("names");
-		imageIds = intent.getIntegerArrayListExtra("imageIds");
-		
 		imageHandles = new ArrayList<Long>();
 		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 		MegaNode parentNode;
@@ -87,15 +82,20 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		}
 		
 		NodeList nodes = megaApi.getChildren(parentNode);
+		int imageNumber = 0;
 		for (int i=0;i<nodes.size();i++){
 			MegaNode n = nodes.get(i);
 			if (MimeType.typeForName(n.getName()).isImage()){
 				imageHandles.add(n.getHandle());
+				if (i == positionG){
+					positionG = imageNumber; 
+				}
+				imageNumber++;
 			}
 		}
 		Toast.makeText(this, ""+parentNode.getName() + "_" + imageHandles.size(), Toast.LENGTH_LONG).show();
 			
-		adapter = new MegaFullScreenImageAdapter(fullScreenImageViewer,imageIds, names, imageHandles, megaApi);
+		adapter = new MegaFullScreenImageAdapter(fullScreenImageViewer,imageHandles, megaApi);
 		
 		viewPager.setAdapter(adapter);
 		

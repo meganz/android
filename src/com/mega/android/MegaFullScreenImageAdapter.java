@@ -11,8 +11,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.Display;
@@ -21,21 +19,14 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener  {
 	
 	private Activity activity;
-	private ArrayList<Integer> imageIds;
-	private ArrayList<String> names;
 	private ArrayList<Long> imageHandles;
 	private LayoutInflater inflater;
-	private ActionBar aB;
-	TouchImageView imgDisplay;
 	View viewLayout;
 	private SparseArray<TouchImageView> visibleImgs = new SparseArray<TouchImageView>();
 	private boolean aBshown = true;
@@ -45,17 +36,15 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	/*public static view holder class*/
     public class ViewHolderFullImage {
         TouchImageView imgDisplay;
+        ProgressBar progressBar;
         long document;
     }
 	
 	// constructor
-	public MegaFullScreenImageAdapter(Activity activity, ArrayList<Integer> imageIds, ArrayList<String> names, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
+	public MegaFullScreenImageAdapter(Activity activity, ArrayList<Long> imageHandles, MegaApiAndroid megaApi) {
 		this.activity = activity;
-		this.imageIds = imageIds;
-		this.names = names;
 		this.imageHandles = imageHandles;
 		this.megaApi = megaApi;
-		this.aB = ((ActionBarActivity)activity).getSupportActionBar();
 	}
 
 	@Override
@@ -78,33 +67,64 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
-		imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		imgDisplay.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
+		holder.imgDisplay.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 		
-        holder.imgDisplay = imgDisplay;
         holder.document = imageHandles.get(position);
 		Bitmap preview = null;
+		Bitmap thumb = null;
+		
+		//First load the thumbnail and show it and then the preview
+		if (node.hasThumbnail()){
+			thumb = ThumbnailUtils.getThumbnailFromCache(node);
+			if (thumb != null){
+				holder.imgDisplay.setImageBitmap(thumb);
+			}
+			else{
+				thumb = ThumbnailUtils.getThumbnailFromFolder(node, activity);
+				if (thumb != null){
+					holder.imgDisplay.setImageBitmap(thumb);
+				}
+				else{ 
+					try{
+						thumb = ThumbnailUtils.getThumbnailFromMegaFull(node, activity, holder, megaApi, this);
+					}
+					catch(Exception e){} //Too many AsyncTasks
+					
+					if (thumb != null){
+						holder.imgDisplay.setImageBitmap(thumb);
+					}
+				}
+			}
+		}
+		
+		//Then, load the preview
 		if (node.hasPreview()){
 			preview = PreviewUtils.getPreviewFromCache(node);
 			if (preview != null){
-				imgDisplay.setImageBitmap(preview);
-				Toast.makeText(activity, "HAS PREVIEW YES CACHE", Toast.LENGTH_LONG).show();
+				holder.imgDisplay.setImageBitmap(preview);
 			}
 			else{
 				preview = PreviewUtils.getPreviewFromFolder(node, activity);
 				if (preview != null){
-					imgDisplay.setImageBitmap(preview);
-					Toast.makeText(activity, "HAS PREVIEW NOT CACHE YES FOLDER", Toast.LENGTH_LONG).show();
+					holder.imgDisplay.setImageBitmap(preview);
 				}
 				else{
 					try{
-						log ("Descargando preview (" + position + ")");
 						preview = PreviewUtils.getPreviewFromMega(node, activity, holder, megaApi, this);
+						
+//						//Posible manera de subir varias previews. Aunque el adapter ya pre-carga la de antes y la de despues  
+//						public View getView(int position, View convertView, ViewGroup parent) {
+//							  int limit = Math.min(position + 4, getCount());
+//							  for (int i = position; i < limit; i++) {
+//							    AsyncImageLoader.prefetchImage(getItem(i).getImageUrl());
+//							  }
+//							}
 					}
 					catch(Exception e){} //Too many AsyncTasks
 					
 					if (preview != null){
-						imgDisplay.setImageBitmap(preview);
+						holder.imgDisplay.setImageBitmap(preview);
 					}					
 				}
 			}
@@ -112,11 +132,11 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 
 		}
         //imgDisplay.setImageResource(imageIds.get(position));
-        imgDisplay.setOnClickListener(this);
+		holder.imgDisplay.setOnClickListener(this);
         
         ((ViewPager) container).addView(viewLayout);
         
-        visibleImgs.put(position, imgDisplay);
+        visibleImgs.put(position, holder.imgDisplay);
 		
 		return viewLayout;
 	}

@@ -10,6 +10,7 @@ import java.util.HashMap;
 
 import com.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
+import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -42,7 +43,8 @@ public class ThumbnailUtils {
 	
 	static HashMap<Long, ThumbnailDownloadListenerList> listenersList = new HashMap<Long, ThumbnailDownloadListenerList>();
 	static HashMap<Long, ThumbnailDownloadListenerGrid> listenersGrid = new HashMap<Long, ThumbnailDownloadListenerGrid>();
-	
+	static HashMap<Long, ThumbnailDownloadListenerFull> listenersFull = new HashMap<Long, ThumbnailDownloadListenerFull>();
+
 	static class ThumbnailDownloadListenerList implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderBrowserList holder;
@@ -174,6 +176,65 @@ public class ThumbnailUtils {
 		}
 	}
 	
+	static class ThumbnailDownloadListenerFull implements MegaRequestListenerInterface{
+		Context context;
+		ViewHolderFullImage holder;
+		MegaFullScreenImageAdapter adapter;
+		
+		ThumbnailDownloadListenerFull(Context context, ViewHolderFullImage holder, MegaFullScreenImageAdapter adapter){
+			this.context = context;
+			this.holder = holder;
+			this.adapter = adapter;
+		}
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
+			
+			log("Downloading thumbnail finished");
+			final long handle = request.getNodeHandle();
+			MegaNode node = api.getNodeByHandle(handle);
+			
+			pendingThumbnails.remove(handle);
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Downloading thumbnail OK: " + handle);
+				thumbnailCache.remove(handle);
+				
+				if (holder != null){
+					File thumbDir = getThumbFolder(context);
+					File thumb = new File(thumbDir, node.getBase64Handle());
+					if (thumb.exists()) {
+						if (thumb.length() > 0) {
+							final Bitmap bitmap = getBitmapForCache(thumb, context);
+							if (bitmap != null) {
+								thumbnailCache.put(handle, bitmap);
+								if ((holder.document == handle)){
+									holder.imgDisplay.setImageBitmap(bitmap);
+									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+									holder.imgDisplay.startAnimation(fadeInAnimation);
+									adapter.notifyDataSetChanged();
+									log("Thumbnail update");
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
 	/*
 	 * Get thumbnail folder
 	 */	
@@ -245,6 +306,27 @@ public class ThumbnailUtils {
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
+	}
+	
+	public static Bitmap getThumbnailFromMegaFull(MegaNode document, Context context, ViewHolderFullImage viewHolder, MegaApiAndroid megaApi, MegaFullScreenImageAdapter adapter){
+		
+		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+			log("the thumbnail is already downloaded or added to the list");
+			return thumbnailCache.get(document.getHandle());
+		}
+		
+		if (!Util.isOnline(context)){
+			return thumbnailCache.get(document.getHandle());
+		}
+		
+		pendingThumbnails.add(document.getHandle());
+		ThumbnailDownloadListenerFull listener = new ThumbnailDownloadListenerFull(context, viewHolder, adapter);
+		listenersFull.put(document.getHandle(), listener);
+		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle());
+		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
+		
+		return thumbnailCache.get(document.getHandle());
+		
 	}
 	
 	/*
