@@ -347,18 +347,35 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					}
 				}
 				else{
-					if (ThumbnailUtils.isPossibleThumbnail(node1)){ 
-						String path = Util.getLocalFile(context, node1.getName(), node1.getSize(), null);
-						if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
-							holder.imageView1.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
-						}
-						else{
-							holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());	
-						}
+					thumb1 = ThumbnailUtils.getThumbnailFromCache(node1);
+					if (thumb1 != null){
+						holder.imageView1.setImageBitmap(thumb1);
 					}
 					else{
-						holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
-					}				
+						thumb1 = ThumbnailUtils.getThumbnailFromFolder(node1, context);
+						if (thumb1 != null){
+							holder.imageView1.setImageBitmap(thumb1);
+						}
+						else{ 
+							try{
+								ThumbnailUtils.createThumbnailGrid(context, node1, holder, megaApi, this, 1);
+							}
+							catch(Exception e){} //Too many AsyncTasks
+						}
+					}
+
+//					if (ThumbnailUtils.isPossibleThumbnail(node1)){ 
+//						String path = Util.getLocalFile(context, node1.getName(), node1.getSize(), null);
+//						if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
+//							holder.imageView1.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+//						}
+//						else{
+//							holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());	
+//						}
+//					}
+//					else{
+//						holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+//					}				
 				}
 			}
 			
@@ -403,18 +420,35 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 					}
 					else{
-						if (ThumbnailUtils.isPossibleThumbnail(node2)){ 
-							String path = Util.getLocalFile(context, node2.getName(), node2.getSize(), null);
-							if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
-								holder.imageView2.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
-							}
-							else{
-								holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());	
-							}
+						thumb2 = ThumbnailUtils.getThumbnailFromCache(node2);
+						if (thumb2 != null){
+							holder.imageView2.setImageBitmap(thumb2);
 						}
 						else{
-							holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
-						}				
+							thumb2 = ThumbnailUtils.getThumbnailFromFolder(node2, context);
+							if (thumb2 != null){
+								holder.imageView2.setImageBitmap(thumb2);
+							}
+							else{ 
+								try{
+									ThumbnailUtils.createThumbnailGrid(context, node2, holder, megaApi, this, 2);
+								}
+								catch(Exception e){} //Too many AsyncTasks
+							}
+						}
+
+//						if (ThumbnailUtils.isPossibleThumbnail(node2)){ 
+//							String path = Util.getLocalFile(context, node2.getName(), node2.getSize(), null);
+//							if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
+//								holder.imageView2.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+//							}
+//							else{
+//								holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());	
+//							}
+//						}
+//						else{
+//							holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+//						}				
 					}
 				}
 				

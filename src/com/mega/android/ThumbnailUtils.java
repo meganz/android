@@ -11,6 +11,8 @@ import java.util.HashMap;
 import com.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
+import com.mega.android.PreviewUtils.AttachPreviewTask;
+import com.mega.android.PreviewUtils.ResizerParams;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -20,6 +22,7 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,6 +31,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
@@ -340,230 +344,68 @@ public class ThumbnailUtils {
 		return bmp;
 	}
 	
-	/*
-	 * Check is thumbnail could be created from the document
-	 */
-	public static boolean isPossibleThumbnail(MegaNode document) {
-		if(document == null) return false;
-		
-		if (document.getSize() > 10l * 1024 * 1024) {
-			return false;
-		}
-		return MimeType.typeForName(document.getName()).isImage();
-	}
-	
-	/*
-	 * Add local cached file for later thumbnail creation
-	 */
-	public static boolean addLocalFile(MegaApiAndroid megaApi, Context context, MegaNode document,	File location) {
-		log("addLocalFile");
-		
-		if (!isPossibleThumbnail(document)) {
-			log("no image");
-			return false;
-		}
-		
-		if ((location != null) && location.exists()	&& location.length() == document.getSize() && !document.hasThumbnail()) 
-		{
-			log("Attaching new thumbnail");
-			ResizerParams params = new ResizerParams();
-			params.document = document;
-			params.file = location;
-			new AttachThumbnailTask(context, megaApi).execute(params);
-		}
-		
-		
-		return true;
-		
-	}
-	
-	static File transformThumbnail(File resultFile, Bitmap bitmap, MegaNode document)
-	{
-		int srcWidth = bitmap.getWidth();
-		int srcHeight = bitmap.getHeight();
-
-		if (srcWidth == 0 || srcHeight == 0) {
-			log("width or height is null");
-			return null;
-		}
-
-		double scale = (double) THUMBNAIL_SIZE
-				/ Math.min(srcWidth, srcHeight);
-		int translateX = 0;
-		int translateY = 0;
-		if (srcHeight > srcWidth) {
-			translateY = (srcHeight - srcWidth) / -3;
-		} else {
-			translateX = (srcWidth - srcHeight) / -2;
-		}
-
-		log(String.format("Translate x: %d y: %d ; Source w: %d h: %d",
-				translateX, translateY, srcWidth, srcHeight));
-		Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-		Bitmap scaled = Bitmap.createBitmap(THUMBNAIL_SIZE, THUMBNAIL_SIZE,
-				conf);
-		Canvas canvas = new Canvas(scaled);
-		canvas.setDensity(bitmap.getDensity());
-		Matrix matrix = new Matrix();
-		matrix.preTranslate(translateX, translateY);
-		matrix.postScale((float) scale, (float) scale);
-		canvas.drawBitmap(bitmap, matrix, null);
-		FileOutputStream stream;
-		try {
-			stream = new FileOutputStream(resultFile);
-			boolean success = scaled.compress(Bitmap.CompressFormat.JPEG,
-					85, stream);
-			if (!success) {
-				resultFile.delete();
-				return null;
-			}
-			File thumbFile = new File(resultFile.getParentFile(), document.getBase64Handle());
-			resultFile.renameTo(thumbFile);
-			return thumbFile;
-		} catch (FileNotFoundException e) {
-			log("file not found?");
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/*
-	 * Change image orientation based on EXIF image data
-	 */
-	static Bitmap fixExifOrientation(File file, Bitmap bitmap) {
-		int orientation = ExifInterface.ORIENTATION_UNDEFINED;
-		try {
-			ExifInterface exif = new ExifInterface(file.getAbsolutePath());
-			orientation = exif.getAttributeInt(
-					ExifInterface.TAG_ORIENTATION, orientation);
-		} catch (IOException e) {
-			// no exif data for this file
-		}
-		int rotation = 0;
-		if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
-			rotation = 90;
-		} else if (orientation == ExifInterface.ORIENTATION_ROTATE_180) {
-			rotation = 180;
-		} else if (orientation == ExifInterface.ORIENTATION_ROTATE_270) {
-			rotation = 270;
-		}
-		if (rotation == 0) {
-			log("no rotation");
-			return bitmap;
-		} else {
-			log("rotating " + rotation);
-			Matrix matrix = new Matrix();
-			matrix.postRotate(rotation);
-			return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-					bitmap.getHeight(), matrix, true);
-		}
-	}
-	
-	/*
-	 * Decode/resize Bitmap for require size
-	 */
-	static Bitmap decodeFile(File f, int REQUIRED_SIZE) {
-		try {
-			// Decode image size
-			BitmapFactory.Options o = new BitmapFactory.Options();
-			o.inJustDecodeBounds = true;
-			BitmapFactory.decodeStream(new FileInputStream(f), null, o);
-
-			// Find the correct scale value. It should be the power of 2.
-			int scale = 1;
-			while (o.outWidth / scale / 2 >= REQUIRED_SIZE
-					&& o.outHeight / scale / 2 >= REQUIRED_SIZE)
-				scale *= 2;
-
-			// Decode with inSampleSize
-			BitmapFactory.Options o2 = new BitmapFactory.Options();
-			o2.inSampleSize = scale;
-			return BitmapFactory.decodeStream(new FileInputStream(f), null,
-					o2);
-		} catch (FileNotFoundException e) {
-			//log("not found :(");
-		}
-		return null;
-	}
-	
 	public static class ResizerParams {
 		File file;
 		MegaNode document;
 	}
 	
-	static class AttachThumbnailTask extends AsyncTask<ResizerParams, Void, Boolean>
+	static class AttachThumbnailTaskGrid extends AsyncTask<ResizerParams, Void, Boolean>
 	{
 		Context context;
 		MegaApiAndroid megaApi;
 		File thumbFile;
 		ResizerParams param;
+		ViewHolderBrowserGrid holder;
+		MegaBrowserGridAdapter adapter;
+		int numView;
 		
-		AttachThumbnailTask(Context context, MegaApiAndroid megaApi)
+		AttachThumbnailTaskGrid(Context context, MegaApiAndroid megaApi, ViewHolderBrowserGrid holder, MegaBrowserGridAdapter adapter, int numView)
 		{
 			this.context = context;
 			this.megaApi = megaApi;
+			this.holder = holder;
+			this.adapter = adapter;
 			this.thumbFile = null;
 			this.param = null;
+			this.numView = numView;
 		}
 		
 		@Override
 		protected Boolean doInBackground(ResizerParams... params) {
-			log("AttachThumbnailStart");
+			log("AttachPreviewStart");
 			param = params[0];
-			File resultFile = new File(getThumbFolder(context), param.document.getBase64Handle() + ".tmp");
-			if (resultFile.exists()) {
-				resultFile.delete();
-			}
-			try {
-				resultFile.createNewFile();
-			} catch (IOException e) {
-				return false;
-			}
-
-			Bitmap bitmap = decodeFile(param.file, THUMBNAIL_SIZE * 2);
-			if (bitmap == null) {
-				resultFile.delete();
-				return false;
-			}
 			
-			bitmap = fixExifOrientation(param.file, bitmap);
-
-			if (Util.isLocalTemp(context, param.file)) {
-				param.file.delete();
-			}
-
-			if (bitmap == null) {
-				resultFile.delete();
-				return false;
-			}
-			int srcWidth = bitmap.getWidth();
-			int srcHeight = bitmap.getHeight();
-
-			if (srcWidth == 0 || srcHeight == 0) {
-				log("width or height is null");
-				resultFile.delete();
-				return true;
-			}
+			File thumbDir = getThumbFolder(context);
+			thumbFile = new File(thumbDir, param.document.getBase64Handle());
+			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
 			
-			thumbFile = transformThumbnail(resultFile, bitmap, param.document);
-			if(thumbFile == null) return false;
-			
-			if(megaApi==null) return false;
-			
-			thumbnailCache.remove(param.document.getHandle());
-			
-			return true;
+			return thumbCreated;
 		}
 
 		@Override
 		protected void onPostExecute(Boolean shouldContinueObject) {
-			onThumbnailGenerated(megaApi, thumbFile, param.document);
+			if (shouldContinueObject){
+				onThumbnailGeneratedGrid(megaApi, thumbFile, param.document, holder, adapter, numView);
+			}
 		}
 	}
 	
-	private static void onThumbnailGenerated(MegaApiAndroid megaApi, File thumbFile, MegaNode document){
-		log("calling setThumbnail: " + thumbFile.getAbsolutePath() + " Size: " + thumbFile.length());
+	private static void onThumbnailGeneratedGrid(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderBrowserGrid holder, MegaBrowserGridAdapter adapter, int numView){
+		log("onPreviewGenerated");
+		//Tengo que mostrarla
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+		if (numView == 1){
+			holder.imageView1.setImageBitmap(bitmap);
+		}
+		else if (numView == 2){
+			holder.imageView2.setImageBitmap(bitmap);
+		}
+		thumbnailCache.put(document.getHandle(), bitmap);
+		adapter.notifyDataSetChanged();
 		
+		//Y ahora subirla
 		megaApi.setThumbnail(document, thumbFile.getAbsolutePath(), new MegaListenerInterface() {
 			
 			@Override
@@ -622,6 +464,154 @@ public class ThumbnailUtils {
 			}
 		});
 		log("AttachThumbnailTask end");		
+	}
+	
+	static class AttachThumbnailTaskList extends AsyncTask<ResizerParams, Void, Boolean>
+	{
+		Context context;
+		MegaApiAndroid megaApi;
+		File thumbFile;
+		ResizerParams param;
+		ViewHolderBrowserList holder;
+		MegaBrowserListAdapter adapter;
+		
+		AttachThumbnailTaskList(Context context, MegaApiAndroid megaApi, ViewHolderBrowserList holder, MegaBrowserListAdapter adapter)
+		{
+			this.context = context;
+			this.megaApi = megaApi;
+			this.holder = holder;
+			this.adapter = adapter;
+			this.thumbFile = null;
+			this.param = null;
+		}
+		
+		@Override
+		protected Boolean doInBackground(ResizerParams... params) {
+			log("AttachPreviewStart");
+			param = params[0];
+			
+			File thumbDir = getThumbFolder(context);
+			thumbFile = new File(thumbDir, param.document.getBase64Handle());
+			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+
+			return thumbCreated;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean shouldContinueObject) {
+			if (shouldContinueObject){
+				onThumbnailGeneratedList(megaApi, thumbFile, param.document, holder, adapter);
+			}
+		}
+	}
+	
+	private static void onThumbnailGeneratedList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderBrowserList holder, MegaBrowserListAdapter adapter){
+		log("onPreviewGenerated");
+		//Tengo que mostrarla
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath(), options);
+		holder.imageView.setImageBitmap(bitmap);
+		thumbnailCache.put(document.getHandle(), bitmap);
+		adapter.notifyDataSetChanged();
+		
+		//Y ahora subirla
+		megaApi.setThumbnail(document, thumbFile.getAbsolutePath(), new MegaListenerInterface() {
+			
+			@Override
+			public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+				log("onTransferUpdate");
+			}
+			
+			@Override
+			public void onTransferTemporaryError(MegaApiJava api,
+					MegaTransfer transfer, MegaError e) {
+				log("onTransferTemporaryError");
+				
+			}
+			
+			@Override
+			public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+				log("onTransferStart");				
+			}
+			
+			@Override
+			public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+					MegaError e) {
+				log("onTransferFinish");
+			}
+			
+			@Override
+			public void onUsersUpdate(MegaApiJava api) {
+				log("onUsersUpdate");				
+			}
+			
+			@Override
+			public void onReloadNeeded(MegaApiJava api) {
+				log("onReloadNeeded");				
+			}
+			
+			@Override
+			public void onNodesUpdate(MegaApiJava api) {
+				log("onNodesUpdate");
+			}
+			
+			@Override
+			public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+					MegaError e) {
+				log("onRequestTemporaryError");
+			}
+			
+			@Override
+			public void onRequestStart(MegaApiJava api, MegaRequest request) {
+				log("onRequestStart");
+			}
+			
+			@Override
+			public void onRequestFinish(MegaApiJava api, MegaRequest request,
+					MegaError e) {
+				log("onRequestFinish");				
+			}
+		});
+		log("AttachThumbnailTask end");		
+	}
+	
+	
+	public static void createThumbnailList(Context context, MegaNode document, ViewHolderBrowserList holder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
+		
+		if (!MimeType.typeForName(document.getName()).isImage()) {
+			log("no image");
+			return;
+		}
+		
+		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		if(localPath != null) //Si la tengo en el sistema de ficheros
+		{
+			log("localPath no es nulo: " + localPath);
+			ResizerParams params = new ResizerParams();
+			params.document = document;
+			params.file = new File(localPath);
+			new AttachThumbnailTaskList(context, megaApi, holder, adapter).execute(params);
+		} //Si no, no hago nada
+		
+	}
+
+	public static void createThumbnailGrid(Context context, MegaNode document, ViewHolderBrowserGrid holder, MegaApiAndroid megaApi, MegaBrowserGridAdapter adapter, int numView){
+		
+		if (!MimeType.typeForName(document.getName()).isImage()) {
+			log("no image");
+			return;
+		}
+		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		if(localPath != null) //Si la tengo en el sistema de ficheros
+		{
+			log("localPath no es nulo: " + localPath);
+			ResizerParams params = new ResizerParams();
+			params.document = document;
+			params.file = new File(localPath);
+			new AttachThumbnailTaskGrid(context, megaApi, holder, adapter, numView).execute(params);
+		} //Si no, no hago nada
+		
 	}
 	
 	private static void log(String log) {

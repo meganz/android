@@ -182,14 +182,30 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				}
 			}
 			else{
-				if (ThumbnailUtils.isPossibleThumbnail(node)){ 
-					String path = Util.getLocalFile(context, node.getName(), node.getSize(), null);
-					if(path != null){ 
-						File actualFile = new File(path);
-						ThumbnailUtils.addLocalFile(megaApi, context, node, actualFile);
-						holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+				if (thumb != null){
+					holder.imageView.setImageBitmap(thumb);
+				}
+				else{
+					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+					if (thumb != null){
+						holder.imageView.setImageBitmap(thumb);
 					}
-				}				
+					else{ 
+						try{
+							ThumbnailUtils.createThumbnailList(context, node, holder, megaApi, this);
+						}
+						catch(Exception e){} //Too many AsyncTasks
+					}
+				}
+//				if (ThumbnailUtils.isPossibleThumbnail(node)){ 
+//					String path = Util.getLocalFile(context, node.getName(), node.getSize(), null);
+//					if(path != null){ 
+//						File actualFile = new File(path);
+//						ThumbnailUtils.addLocalFile(megaApi, context, node, actualFile);
+//						holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
+//					}
+//				}				
 			}
 		}
 		

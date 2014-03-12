@@ -10,7 +10,7 @@
         android:scaleType="fitCenter" />
     
     <ProgressBar
-        android:id="@+id/login_progress_bar"
+        android:id="@+id/full_screen_image_viewer_progress_bar"
         style="?android:attr/progressBarStyleLargeInverse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

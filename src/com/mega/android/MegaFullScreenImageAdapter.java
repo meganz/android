@@ -9,6 +9,7 @@ import com.mega.sdk.MegaNode;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -21,6 +22,7 @@ import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener  {
 	
@@ -70,6 +72,8 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 		
+		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
+		
         holder.document = imageHandles.get(position);
 		Bitmap preview = null;
 		Bitmap thumb = null;
@@ -103,11 +107,13 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			preview = PreviewUtils.getPreviewFromCache(node);
 			if (preview != null){
 				holder.imgDisplay.setImageBitmap(preview);
+				holder.progressBar.setVisibility(View.GONE);
 			}
 			else{
 				preview = PreviewUtils.getPreviewFromFolder(node, activity);
 				if (preview != null){
 					holder.imgDisplay.setImageBitmap(preview);
+					holder.progressBar.setVisibility(View.GONE);
 				}
 				else{
 					try{
@@ -125,11 +131,55 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 					
 					if (preview != null){
 						holder.imgDisplay.setImageBitmap(preview);
+						holder.progressBar.setVisibility(View.GONE);
 					}					
 				}
 			}
 			
 
+		}
+		else{ //Si no tiene previa, descargo la imagen al directorio de cache, la muestro, hago la previa y la subo
+			preview = PreviewUtils.getPreviewFromCache(node);
+			if (preview != null){
+				holder.imgDisplay.setImageBitmap(preview);
+				holder.progressBar.setVisibility(View.GONE);
+			}
+			else{
+				preview = PreviewUtils.getPreviewFromFolder(node, activity);
+				if (preview != null){
+					holder.imgDisplay.setImageBitmap(preview);
+					holder.progressBar.setVisibility(View.GONE);
+				}
+				else{
+					try{
+						PreviewUtils.createPreview(activity, node, holder, megaApi, this);
+					}
+					catch(Exception e){} //Too many AsyncTasks
+				}
+			}
+			
+//			String localPath = Util.getLocalFile(activity, node.getName(), node.getSize(), null); //if file already exists returns != null
+//			if(localPath != null)
+//			{
+//				log("localPath no es nulo: " + localPath);
+//				BitmapFactory.Options options = new BitmapFactory.Options();
+//				options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//				Bitmap bitmap = BitmapFactory.decodeFile(localPath, options);
+//				holder.imgDisplay.setImageBitmap(bitmap);
+//				holder.progressBar.setVisibility(View.GONE);
+//			}
+//			else{
+//				
+//				log("localPath es nulo");
+//				
+//				//First of all, try to look for an application to manage the file. If not, there must download the file without ACTION_VIEW intent
+//				Intent intent = new Intent(Intent.ACTION_VIEW);
+//				intent.setDataAndType(null, MimeType.typeForName(document.getName()).getType());
+//				if (isAvailable(this, intent)){			
+//					task.attach(this);
+//					task.download(document, Intent.ACTION_VIEW, null, null);
+//				}
+//			}
 		}
         //imgDisplay.setImageResource(imageIds.get(position));
 		holder.imgDisplay.setOnClickListener(this);
