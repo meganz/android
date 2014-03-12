@@ -7,10 +7,13 @@ import java.util.HashMap;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
 import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
+import com.mega.android.ThumbnailUtils.ResizerParams;
 import com.mega.android.ThumbnailUtils.ThumbnailDownloadListenerList;
 import com.mega.components.TouchImageView;
 import com.mega.sdk.MegaApiAndroid;
@@ -19,6 +22,7 @@ import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaUtils;
 
 public class PreviewUtils {
 	
@@ -28,7 +32,6 @@ public class PreviewUtils {
 	
 	static HashMap<Long, PreviewDownloadListener> listeners = new HashMap<Long, PreviewDownloadListener>();
 
-	
 	static class PreviewDownloadListener implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderFullImage holder;
@@ -42,8 +45,7 @@ public class PreviewUtils {
 		
 		@Override
 		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
+		
 		}
 		
 		@Override
@@ -69,8 +71,9 @@ public class PreviewUtils {
 								previewCache.put(handle, bitmap);
 								if ((holder.document == handle)){
 									holder.imgDisplay.setImageBitmap(bitmap);
-									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-									holder.imgDisplay.startAnimation(fadeInAnimation);
+//									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+//									holder.imgDisplay.startAnimation(fadeInAnimation);
+									holder.progressBar.setVisibility(View.GONE);
 									adapter.notifyDataSetChanged();
 									log("Preview update");
 								}
@@ -84,7 +87,6 @@ public class PreviewUtils {
 		
 		@Override
 		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
-			// TODO Auto-generated method stub
 			
 		}
 		
@@ -152,6 +154,86 @@ public class PreviewUtils {
 		bOpts.inInputShareable = true;
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
+	}
+	
+	public static void createPreview (Context context, MegaNode document, ViewHolderFullImage holder, MegaApiAndroid megaApi, MegaFullScreenImageAdapter adapter){
+		
+		if (!MimeType.typeForName(document.getName()).isImage()) {
+			log("no image");
+			return;
+		}
+		
+		String localPath = Util.getLocalFile(context, document.getName(), document.getSize(), null); //if file already exists returns != null
+		if(localPath != null) //Si la tengo en el sistema de ficheros
+		{
+			log("localPath no es nulo: " + localPath);
+			ResizerParams params = new ResizerParams();
+			params.document = document;
+			params.file = new File(localPath);
+			new AttachPreviewTask(context, megaApi, holder, adapter).execute(params);
+		}
+		else{	//Si no, me toca descargármela
+			
+		}
+	}
+	
+	public static class ResizerParams {
+		File file;
+		MegaNode document;
+	}
+	
+	static class AttachPreviewTask extends AsyncTask<ResizerParams, Void, Boolean>{
+		
+		Context context;
+		MegaApiAndroid megaApi;
+		File previewFile;
+		ResizerParams param;
+		ViewHolderFullImage holder;
+		MegaFullScreenImageAdapter adapter;
+		
+		AttachPreviewTask(Context context, MegaApiAndroid megaApi, ViewHolderFullImage holder, MegaFullScreenImageAdapter adapter)
+		{
+			this.context = context;
+			this.megaApi = megaApi;
+			this.holder = holder;
+			this.adapter = adapter;
+			this.previewFile = null;
+			this.param = null;
+		}
+		
+		@Override
+		protected Boolean doInBackground(ResizerParams... params) {
+			log("AttachPreviewStart");
+			param = params[0];
+			
+			File previewDir = getPreviewFolder(context);
+			previewFile = new File(previewDir, param.document.getBase64Handle());
+			boolean previewCreated = MegaUtils.createPreview(param.file, previewFile);
+			
+			return previewCreated;
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean shouldContinueObject) {
+			if (shouldContinueObject){
+				onPreviewGenerated(megaApi, previewFile, param.document, holder, adapter);
+			}
+		}
+	}
+	
+	private static void onPreviewGenerated(MegaApiAndroid megaApi, File previewFile, MegaNode document, ViewHolderFullImage holder, MegaFullScreenImageAdapter adapter){
+		log("onPreviewGenerated");
+		//Tengo que mostrarla
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		Bitmap bitmap = BitmapFactory.decodeFile(previewFile.getAbsolutePath(), options);
+		holder.imgDisplay.setImageBitmap(bitmap);
+		previewCache.put(document.getHandle(), bitmap);
+		holder.progressBar.setVisibility(View.GONE);
+		adapter.notifyDataSetChanged();
+		
+		//Y ahora subirla
+		megaApi.setPreview(document, previewFile.getAbsolutePath());		
 	}
 	
 	private static void log(String log) {
