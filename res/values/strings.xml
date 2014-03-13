@@ -75,4 +75,6 @@
 	
 	<string name="full_screen_image_viewer_label">Image Viewer</string>
 	
+	<string name="error_not_enough_free_space">Not enough free space</string>
+	
 </resources>
