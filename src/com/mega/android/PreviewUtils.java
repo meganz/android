@@ -78,6 +78,9 @@ public class PreviewUtils {
 				params.file = new File(localPath);
 				new AttachPreviewTask(context, megaApi, holder, adapter).execute(params);
 			}
+			else{
+				log("Error while downloading image: " + e.getErrorString());
+			}
 			
 		}
 		@Override
