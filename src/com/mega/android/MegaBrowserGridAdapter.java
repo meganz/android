@@ -320,6 +320,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			else{
 				long node1Size = node1.getSize();
 				holder.textViewFileSize1.setText(Util.getSizeString(node1Size));
+				holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
 				
 				if (node1.hasThumbnail()){
 					thumb1 = ThumbnailUtils.getThumbnailFromCache(node1);
@@ -393,6 +394,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				else{
 					long node2Size = node2.getSize();
 					holder.textViewFileSize2.setText(Util.getSizeString(node2Size));
+					holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
 					
 					if (node2.hasThumbnail()){
 						thumb2 = ThumbnailUtils.getThumbnailFromCache(node2);

@@ -130,8 +130,13 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 				int newPosition = viewPager.getCurrentItem();
 				positionG = newPosition;
 				
-				TouchImageView tIV = adapter.getVisibleImage(oldPosition);
-				tIV.setZoom(1);
+				try{
+					TouchImageView tIV = adapter.getVisibleImage(oldPosition);
+					if (tIV != null){
+						tIV.setZoom(1);
+					}
+				}
+				catch(Exception e){}
 //				title.setText(names.get(positionG));
 			}
 		}
