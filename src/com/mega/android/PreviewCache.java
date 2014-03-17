@@ -15,7 +15,7 @@ public class PreviewCache {
 	LruPreviewCache cache;
 	
 	public PreviewCache() {
-		cache = new LruPreviewCache(30);
+		cache = new LruPreviewCache(5);
 		nulls = new ArrayList<Long>();
 	}
 	

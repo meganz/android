@@ -39,9 +39,6 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	
 	ArrayList<Long> historyNodes = null;
 	
-	//Esto hay que quitarlo cuando haga el visor completo
-	ArrayList<String> namesArray = new ArrayList<String>();
-	ArrayList<Integer> imageIds = new ArrayList<Integer>();
 	NodeList nodes;
 	//HASTA AQUI 
 	
@@ -57,13 +54,6 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		rowItems = new ArrayList<ItemFileBrowser>();
 		
 		nodes = megaApi.getChildren(megaApi.getRootNode());
-		for(int i=0; i<nodes.size(); i++){
-			
-			//Esto hay que quitarlo cuando haga el visor completo
-			namesArray.add("NombrePrueba");
-			imageIds.add(R.drawable.sal01);
-			//HASTA AQUI
-		}
 	}
 	
 	@Override

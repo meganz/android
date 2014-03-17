@@ -77,6 +77,13 @@
         
       <item name="android:button">@drawable/btn_check_holo_light</item>
   </style>
+  
+    <style name="ProgressBarTheme.mega" parent="android:Widget.ProgressBar.Horizontal">
+      <item name="android:progressDrawable">@drawable/progress_horizontal_holo_light</item>
+      <item name="android:indeterminateDrawable">@drawable/progress_indeterminate_horizontal_holo_light</item>
+      <item name="android:minHeight">20dip</item>
+      <item name="android:maxHeight">20dip</item>
+  </style>
     
     <style name="login_activity" parent="@style/Theme.AppCompat.Light">
         <item name="android:windowNoTitle">true</item>

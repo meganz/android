@@ -66,13 +66,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			historyNodes = new ArrayList<Long>();
 			historyNodes.add(megaApi.getRootNode().getHandle());
 		}
-		
-		//Esto hay que quitarlo cuando haga el visor completo
-		for (int i=0;i<nodes.size();i++){
-			names.add("NombrePrueba");
-			imageIds.add(R.drawable.sal01);
-		}
-		//HASTA AQUI
 	}
 	
 	public void setNodes(NodeList nodes){
