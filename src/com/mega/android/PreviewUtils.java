@@ -41,6 +41,7 @@ public class PreviewUtils {
 	
 	static HashMap<Long, PreviewDownloadListener> listeners = new HashMap<Long, PreviewDownloadListener>();
 	static HashMap<Long, FullImageDownloadListener> fullImageListeners = new HashMap<Long, FullImageDownloadListener>();
+	static int numPreviewsToCreate = 0;
 
 	static class FullImageDownloadListener implements MegaTransferListenerInterface{
 		Context context;
@@ -76,6 +77,7 @@ public class PreviewUtils {
 				ResizerParams params = new ResizerParams();
 				params.document = node;
 				params.file = new File(localPath);
+				numPreviewsToCreate++;
 				new AttachPreviewTask(context, megaApi, holder, adapter).execute(params);
 			}
 			else{
@@ -213,10 +215,11 @@ public class PreviewUtils {
 	/*
 	 * Load Bitmap for cache
 	 */
-	private static Bitmap getBitmapForCache(File bmpFile, Context context) {
+	public static Bitmap getBitmapForCache(File bmpFile, Context context) {
 		BitmapFactory.Options bOpts = new BitmapFactory.Options();
 		bOpts.inPurgeable = true;
 		bOpts.inInputShareable = true;
+		log("TAM_IMAGEN_PREVIA " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
 	}
@@ -239,6 +242,7 @@ public class PreviewUtils {
 			ResizerParams params = new ResizerParams();
 			params.document = document;
 			params.file = new File(localPath);
+			numPreviewsToCreate++;
 			new AttachPreviewTask(context, megaApi, holder, adapter).execute(params);
 		}
 		else{	//Si no, me toca descargármela
@@ -255,6 +259,7 @@ public class PreviewUtils {
 					ResizerParams params = new ResizerParams();
 					params.document = document;
 					params.file = destination;
+					numPreviewsToCreate++;
 					new AttachPreviewTask(context, megaApi, holder, adapter).execute(params);
 					destination.deleteOnExit();
 					return;
@@ -349,6 +354,7 @@ public class PreviewUtils {
 		protected void onPostExecute(Boolean shouldContinueObject) {
 			if (shouldContinueObject){
 				onPreviewGenerated(megaApi, previewFile, param.document, holder, adapter);
+				numPreviewsToCreate--;
 			}
 		}
 	}
@@ -359,10 +365,13 @@ public class PreviewUtils {
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 		Bitmap bitmap = BitmapFactory.decodeFile(previewFile.getAbsolutePath(), options);
-		holder.imgDisplay.setImageBitmap(bitmap);
+//		if (holder.document == document.getHandle()){
+			holder.imgDisplay.setImageBitmap(bitmap);
+			holder.progressBar.setVisibility(View.GONE);
+			adapter.notifyDataSetChanged();
+//		}
 		previewCache.put(document.getHandle(), bitmap);
-		holder.progressBar.setVisibility(View.GONE);
-		adapter.notifyDataSetChanged();
+		
 		
 		//Y ahora subirla
 		megaApi.setPreview(document, previewFile.getAbsolutePath());		
