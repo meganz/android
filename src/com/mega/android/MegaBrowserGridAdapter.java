@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -47,24 +48,30 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	
 	MegaApiAndroid megaApi;
 	
-	ArrayList<Long> historyNodes;
+	long parentHandle;
 	
 	ListView list;
 	
-	public MegaBrowserGridAdapter(Context _context, NodeList _nodes) {
+	ListView listFragment;
+	ImageView emptyImageViewFragment;
+	TextView emptyTextViewFragment;
+	ActionBar aB;
+	
+	public MegaBrowserGridAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.context = _context;
 		this.nodes = _nodes;
+		this.parentHandle = _parentHandle;
+		this.listFragment = listView;
+		this.emptyImageViewFragment = emptyImageView;
+		this.emptyTextViewFragment = emptyTextView;
+		this.aB = aB;
+		
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		if (historyNodes == null){
-			historyNodes = new ArrayList<Long>();
-			historyNodes.add(megaApi.getRootNode().getHandle());
 		}
 	}
 	
@@ -357,19 +364,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 							catch(Exception e){} //Too many AsyncTasks
 						}
 					}
-
-//					if (ThumbnailUtils.isPossibleThumbnail(node1)){ 
-//						String path = Util.getLocalFile(context, node1.getName(), node1.getSize(), null);
-//						if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
-//							holder.imageView1.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
-//						}
-//						else{
-//							holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());	
-//						}
-//					}
-//					else{
-//						holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
-//					}				
 				}
 			}
 			
@@ -431,19 +425,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 								catch(Exception e){} //Too many AsyncTasks
 							}
 						}
-
-//						if (ThumbnailUtils.isPossibleThumbnail(node2)){ 
-//							String path = Util.getLocalFile(context, node2.getName(), node2.getSize(), null);
-//							if(path != null){ //AQUI TENDRIA QUE CREAR EL THUMBNAIL Y SUBIRLO (DE MOMENTO PONGO VECTOR)
-//								holder.imageView2.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
-//							}
-//							else{
-//								holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());	
-//							}
-//						}
-//						else{
-//							holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
-//						}				
 					}
 				}
 				
@@ -588,9 +569,28 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_grid_thumbnail1:{
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				if (n.isFolder()){
-					historyNodes.add(n.getHandle());
+					aB.setTitle(n.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+
+					parentHandle = n.getHandle();
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
+					
+					//If folder has no files
+					if (nodes.size() == 0){
+						listFragment.setVisibility(View.GONE);
+						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+						} else {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+						}
+					}
+					else{
+						listFragment.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){
@@ -616,9 +616,28 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				if (n.isFolder()){
-					historyNodes.add(n.getHandle());
+					aB.setTitle(n.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+
+					parentHandle = n.getHandle();
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
+					
+					//If folder has no files
+					if (nodes.size() == 0){
+						listFragment.setVisibility(View.GONE);
+						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+						} else {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+						}
+					}
+					else{
+						listFragment.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){
@@ -677,9 +696,28 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_grid_option_open1:{
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				if (n.isFolder()){
-					historyNodes.add(n.getHandle());
+					aB.setTitle(n.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+					
+					parentHandle = n.getHandle();
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
+					
+					//If folder has no files
+					if (nodes.size() == 0){
+						listFragment.setVisibility(View.GONE);
+						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+						} else {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+						}
+					}
+					else{
+						listFragment.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){
@@ -705,9 +743,28 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_grid_option_open2:{
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				if (n.isFolder()){
-					historyNodes.add(n.getHandle());
+					aB.setTitle(n.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+
+					parentHandle = n.getHandle();
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
+					
+					//If folder has no files
+					if (nodes.size() == 0){
+						listFragment.setVisibility(View.GONE);
+						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+						} else {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+						}
+					}
+					else{
+						listFragment.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){
@@ -763,12 +820,12 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		}
 	}
 	
-	public ArrayList<Long> getHistoryNodes(){
-		return historyNodes;
+	public long getParentHandle(){
+		return parentHandle;
 	}
 	
-	public void setHistoryNodes(ArrayList<Long> historyNodes){
-		this.historyNodes = historyNodes;
+	public void setParentHandle(long parentHandle){
+		this.parentHandle = parentHandle;
 	}
 	
 	private static void log(String log) {

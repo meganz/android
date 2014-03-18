@@ -24,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -33,13 +35,15 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	Context context;
 	ActionBar aB;
 	ListView gridView;
+	ImageView emptyImageView;
+	TextView emptyTextView;
 	MegaBrowserGridAdapter adapter;
 	
 	MegaApiAndroid megaApi;
 	NodeList nodes;
 	
-	ArrayList<Long> historyNodes = null;
-	
+	long parentHandle = -1;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -49,7 +53,14 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		nodes = megaApi.getChildren(megaApi.getRootNode());
+		if (parentHandle == -1){
+			parentHandle = megaApi.getRootNode().getHandle();
+			nodes = megaApi.getChildren(megaApi.getRootNode());
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			nodes = megaApi.getChildren(parentNode);
+		}
 	}
 	
 	@Override
@@ -59,20 +70,33 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
-		aB.setTitle(getString(R.string.section_cloud_drive));
-
+		
 		View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 		
 		gridView = (ListView) v.findViewById(R.id.file_grid_view_browser);
         gridView.setOnItemClickListener(null);
         gridView.setItemsCanFocus(false);
-		adapter = new MegaBrowserGridAdapter(context, nodes);
-		adapter.setPositionClicked(-1);
-		if (historyNodes != null){
-			adapter.setHistoryNodes(historyNodes);
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(historyNodes.get(historyNodes.size()-1)));
+        
+        emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
+		emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
+        
+		if (adapter == null){
+			adapter = new MegaBrowserGridAdapter(context, nodes, parentHandle, gridView, emptyImageView, emptyTextView, aB);
+		}
+		else{
+			adapter.setParentHandle(parentHandle);
 			adapter.setNodes(nodes);
 		}
+		
+		if (parentHandle == megaApi.getRootNode().getHandle()){
+			aB.setTitle(getString(R.string.section_cloud_drive));
+		}
+		else{
+			aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+		}
+		
+		adapter.setPositionClicked(-1);
+		
 		gridView.setAdapter(adapter);
 		
 		return v;
@@ -104,36 +128,47 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 	
 	public int onBackPressed(){
 		
-		ArrayList<Long> historyNodes = adapter.getHistoryNodes();
+		parentHandle = adapter.getParentHandle();
 		
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 			return 1;
 		}
-		else if (historyNodes.size() > 1){
-			long handle = historyNodes.get(historyNodes.size()-2);
-			log("handle a retirar: " + handle);
-			historyNodes.remove(historyNodes.size()-1);
-			adapter.setHistoryNodes(historyNodes);
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(handle));
-			adapter.setNodes(nodes);
-			return 2;
-		}
 		else{
-			return 0;
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+			if (parentNode != null){
+				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+					aB.setTitle(getString(R.string.section_cloud_drive));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				}
+				else{
+					aB.setTitle(parentNode.getName());					
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+				}
+				
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				parentHandle = parentNode.getHandle();
+				nodes = megaApi.getChildren(parentNode);
+				adapter.setNodes(nodes);
+				adapter.setParentHandle(parentHandle);
+				return 2;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 	
-	public ArrayList<Long> getHistoryNodes(){
-		return adapter.getHistoryNodes();
+	public long getParentHandle(){
+		return adapter.getParentHandle();
 	}
 	
-	public void setHistoryNodes(ArrayList<Long> historyNodes){
-		
-		this.historyNodes = historyNodes;
+	public void setParentHandle(long parentHandle){
+		this.parentHandle = parentHandle;
 		if (adapter != null){
-			adapter.setHistoryNodes(historyNodes);
+			adapter.setParentHandle(parentHandle);
 		}
 	}
 	

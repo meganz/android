@@ -23,7 +23,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class FileBrowserListFragment extends Fragment implements OnClickListener, OnItemClickListener{
@@ -31,13 +33,15 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 	Context context;
 	ActionBar aB;
 	ListView listView;
+	ImageView emptyImageView;
+	TextView emptyTextView;
 	MegaBrowserListAdapter adapter;
 	
 	MegaApiAndroid megaApi;
 		
 	List<ItemFileBrowser> rowItems;
 	
-	ArrayList<Long> historyNodes = null;
+	long parentHandle = -1;
 	
 	NodeList nodes;
 	//HASTA AQUI 
@@ -53,7 +57,14 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 		rowItems = new ArrayList<ItemFileBrowser>();
 		
-		nodes = megaApi.getChildren(megaApi.getRootNode());
+		if (parentHandle == -1){
+			parentHandle = megaApi.getRootNode().getHandle();
+			nodes = megaApi.getChildren(megaApi.getRootNode());
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			nodes = megaApi.getChildren(parentNode);
+		}
 	}
 	
 	@Override
@@ -63,7 +74,6 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
-		aB.setTitle(getString(R.string.section_cloud_drive));
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 		        
@@ -71,13 +81,27 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		adapter = new MegaBrowserListAdapter(context, nodes);
-		adapter.setPositionClicked(-1);
-		if (historyNodes != null){
-			adapter.setHistoryNodes(historyNodes);
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(historyNodes.get(historyNodes.size()-1)));
+		
+		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
+		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+		
+		if (adapter == null){
+			adapter = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB);
+		}
+		else{
+			adapter.setParentHandle(parentHandle);
 			adapter.setNodes(nodes);
 		}
+		
+		if (parentHandle == megaApi.getRootNode().getHandle()){
+			aB.setTitle(getString(R.string.section_cloud_drive));
+		}
+		else{
+			aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+		}
+		
+		adapter.setPositionClicked(-1);
+
 		listView.setAdapter(adapter);
 		
 		return v;
@@ -103,12 +127,31 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
             long id) {
 		
 		if (nodes.get(position).isFolder()){
-			ArrayList<Long> historyNodes = adapter.getHistoryNodes();
-			historyNodes.add(nodes.get(position).getHandle());
-			adapter.setHistoryNodes(historyNodes);
-			log("handle a meter: "+ nodes.get(position).getHandle());
+			MegaNode n = nodes.get(position);
+			
+			aB.setTitle(n.getName());
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			
+			parentHandle = nodes.get(position).getHandle();
+			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
+			
+			//If folder has no files
+			if (adapter.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+			}
 		}
 		else{
 			if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
@@ -129,37 +172,50 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
     }
 	
 	public int onBackPressed(){
-		
-		ArrayList<Long> historyNodes = adapter.getHistoryNodes();
+
+		parentHandle = adapter.getParentHandle();
 		
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
 			return 1;
 		}
-		else if (historyNodes.size() > 1){
-			long handle = historyNodes.get(historyNodes.size()-2);
-			log("handle a retirar: " + handle);
-			historyNodes.remove(historyNodes.size()-1);
-			adapter.setHistoryNodes(historyNodes);
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(handle));
-			adapter.setNodes(nodes);
-			return 2;
-		}
 		else{
-			return 0;
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+			if (parentNode != null){
+				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+					aB.setTitle(getString(R.string.section_cloud_drive));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				}
+				else{
+					aB.setTitle(parentNode.getName());					
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+				}
+				
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				parentHandle = parentNode.getHandle();
+				nodes = megaApi.getChildren(parentNode);
+				adapter.setNodes(nodes);
+				adapter.setParentHandle(parentHandle);
+				return 2;
+			}
+			else{
+				return 0;
+			}
 		}
 	}
 	
-	public ArrayList<Long> getHistoryNodes(){
-		return adapter.getHistoryNodes();
+	public long getParentHandle(){
+		return adapter.getParentHandle();
 	}
 	
-	public void setHistoryNodes(ArrayList<Long> historyNodes){
-		this.historyNodes = historyNodes;
+	public void setParentHandle(long parentHandle){
+		this.parentHandle = parentHandle;
 		if (adapter != null){
-			adapter.setHistoryNodes(historyNodes);
-		}	}
+			adapter.setParentHandle(parentHandle);
+		}
+	}
 	
 	private static void log(String log) {
 		Util.log("FileBrowserListFragment", log);

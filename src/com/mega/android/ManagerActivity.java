@@ -75,7 +75,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     
-    private SearchView mSearchView;    
+   	private SearchView mSearchView;    
 	private MenuItem searchMenuItem;
 	
 	private static DrawerItem drawerItem;
@@ -458,6 +458,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		    	if (mDrawerToggle.isDrawerIndicatorEnabled()) {
 					mDrawerToggle.onOptionsItemSelected(item);
 				}
+		    	else {
+		    		if (fbL != null){
+		    			if (fbL.isVisible()){
+		    				fbL.onBackPressed();
+		    			}
+		    			else if (fbG.isVisible()){
+		    				fbG.onBackPressed();
+		    			}
+		    		}
+				}
 		    	return true;
 		    }
 	        case R.id.action_logout:{
@@ -489,15 +499,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				if (fbL != null){
 					if (fbL.isVisible() || fbG.isVisible()){
 						if (isListCloudDrive){
+							fbG.setParentHandle(fbL.getParentHandle());
 							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
-							fbG.setHistoryNodes(fbL.getHistoryNodes());
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
 							isListCloudDrive = false;
 						}
 						else{
+							fbL.setParentHandle(fbG.getParentHandle());
 							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-							fbL.setHistoryNodes(fbG.getHistoryNodes());
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
 					        isListCloudDrive = true;					
@@ -610,6 +620,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fetchnodes temporary error");
 		}
+	}
+	
+	public ActionBarDrawerToggle getmDrawerToggle() {
+		return mDrawerToggle;
+	}
+
+	public void setmDrawerToggle(ActionBarDrawerToggle mDrawerToggle) {
+		this.mDrawerToggle = mDrawerToggle;
 	}
 	
 	public static void log(String message) {
