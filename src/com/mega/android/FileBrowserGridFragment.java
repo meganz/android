@@ -138,6 +138,9 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		else{
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 			if (parentNode != null){
+				gridView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
 				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 					aB.setTitle(getString(R.string.section_cloud_drive));	
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);

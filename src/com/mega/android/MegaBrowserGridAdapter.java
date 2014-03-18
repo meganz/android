@@ -580,6 +580,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					//If folder has no files
 					if (nodes.size() == 0){
 						listFragment.setVisibility(View.GONE);
+						emptyImageViewFragment.setVisibility(View.VISIBLE);
+						emptyTextViewFragment.setVisibility(View.VISIBLE);
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
 							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
@@ -590,6 +592,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					}
 					else{
 						listFragment.setVisibility(View.VISIBLE);
+						emptyImageViewFragment.setVisibility(View.GONE);
+						emptyTextViewFragment.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -627,6 +631,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					//If folder has no files
 					if (nodes.size() == 0){
 						listFragment.setVisibility(View.GONE);
+						emptyImageViewFragment.setVisibility(View.VISIBLE);
+						emptyTextViewFragment.setVisibility(View.VISIBLE);
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
 							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
@@ -637,6 +643,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					}
 					else{
 						listFragment.setVisibility(View.VISIBLE);
+						emptyImageViewFragment.setVisibility(View.GONE);
+						emptyTextViewFragment.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -707,6 +715,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					//If folder has no files
 					if (nodes.size() == 0){
 						listFragment.setVisibility(View.GONE);
+						emptyImageViewFragment.setVisibility(View.VISIBLE);
+						emptyTextViewFragment.setVisibility(View.VISIBLE);
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
 							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
@@ -717,6 +727,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					}
 					else{
 						listFragment.setVisibility(View.VISIBLE);
+						emptyImageViewFragment.setVisibility(View.GONE);
+						emptyTextViewFragment.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -754,6 +766,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					//If folder has no files
 					if (nodes.size() == 0){
 						listFragment.setVisibility(View.GONE);
+						emptyImageViewFragment.setVisibility(View.VISIBLE);
+						emptyTextViewFragment.setVisibility(View.VISIBLE);
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
 							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
@@ -764,6 +778,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					}
 					else{
 						listFragment.setVisibility(View.VISIBLE);
+						emptyImageViewFragment.setVisibility(View.GONE);
+						emptyTextViewFragment.setVisibility(View.GONE);
 					}
 				}
 				else{
