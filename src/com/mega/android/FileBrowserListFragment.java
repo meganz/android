@@ -8,8 +8,10 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -141,6 +143,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			//If folder has no files
 			if (adapter.getCount() == 0){
 				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 					emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
@@ -151,6 +155,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
 			}
 		}
 		else{
@@ -183,6 +189,9 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		else{
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 			if (parentNode != null){
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
 				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 					aB.setTitle(getString(R.string.section_cloud_drive));	
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
