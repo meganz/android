@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FileBrowserListFragment"
+    tools:context=".FileBrowserGridFragment"
     android:background="@color/grid_background" >
 
     <ListView 
@@ -12,5 +12,21 @@
         android:dividerHeight="0dp"
 		android:divider="@null">
     </ListView>
+    
+    <ImageView
+	    android:id="@+id/file_grid_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true" />
+    
+    <TextView
+	    android:id="@+id/file_grid_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/file_grid_empty_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

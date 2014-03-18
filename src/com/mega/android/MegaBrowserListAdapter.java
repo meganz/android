@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -39,9 +40,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	ArrayList<String> names;
 	NodeList nodes;
 	
-	ArrayList<Long> historyNodes;
+	long parentHandle = -1;
 	
 	ListView list;
+	
+	ListView listFragment;
+	ImageView emptyImageViewFragment;
+	TextView emptyTextViewFragment;
+	ActionBar aB;
 	
 	/*public static view holder class*/
     public class ViewHolderBrowserList {
@@ -61,20 +67,21 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         long document;
     }
 	
-	public MegaBrowserListAdapter(Context _context, NodeList _nodes) {
+	public MegaBrowserListAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.context = _context;
 		this.nodes = _nodes;
+		this.parentHandle = _parentHandle;
+		this.listFragment = listView;
+		this.emptyImageViewFragment = emptyImageView;
+		this.emptyTextViewFragment = emptyTextView;
+		this.aB = aB;
+		
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		if (historyNodes == null){
-			historyNodes = new ArrayList<Long>();
-			historyNodes.add(megaApi.getRootNode().getHandle());
 		}
 	}
 	
@@ -190,15 +197,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						}
 						catch(Exception e){} //Too many AsyncTasks
 					}
-				}
-//				if (ThumbnailUtils.isPossibleThumbnail(node)){ 
-//					String path = Util.getLocalFile(context, node.getName(), node.getSize(), null);
-//					if(path != null){ 
-//						File actualFile = new File(path);
-//						ThumbnailUtils.addLocalFile(megaApi, context, node, actualFile);
-//						holder.imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.mime_vector));
-//					}
-//				}				
+				}			
 			}
 		}
 		
@@ -315,9 +314,28 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_list_option_open:{
 				
 				if (n.isFolder()){
-					historyNodes.add(n.getHandle());
+					aB.setTitle(n.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+					
+					parentHandle = n.getHandle();
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
+					
+					//If folder has no files
+					if (getCount() == 0){
+						listFragment.setVisibility(View.GONE);
+						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+						} else {
+							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+						}
+					}
+					else{
+						listFragment.setVisibility(View.VISIBLE);
+					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){
@@ -374,12 +392,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}		
 	}
 	
-	public ArrayList<Long> getHistoryNodes(){
-		return historyNodes;
+	public long getParentHandle(){
+		return parentHandle;
 	}
 	
-	public void setHistoryNodes(ArrayList<Long> historyNodes){
-		this.historyNodes = historyNodes;
+	public void setParentHandle(long parentHandle){
+		this.parentHandle = parentHandle;
 	}
 	
 	private static void log(String log) {
