@@ -1,22 +1,15 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import com.mega.android.PreviewUtils.AttachPreviewTask;
-import com.mega.android.PreviewUtils.ResizerParams;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaListener;
 import com.mega.sdk.MegaListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
@@ -27,14 +20,9 @@ import com.mega.sdk.MegaUtils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.os.AsyncTask;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
 /*
  * Service to create thumbnails
@@ -81,7 +69,7 @@ public class ThumbnailUtils {
 				
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle());
+					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -142,7 +130,7 @@ public class ThumbnailUtils {
 				
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle());
+					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -212,7 +200,7 @@ public class ThumbnailUtils {
 				
 				if (holder != null){
 					File thumbDir = getThumbFolder(context);
-					File thumb = new File(thumbDir, node.getBase64Handle());
+					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
 					if (thumb.exists()) {
 						if (thumb.length() > 0) {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
@@ -255,7 +243,7 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromFolder(MegaNode node, Context context){
 		File thumbDir = getThumbFolder(context);
-		File thumb = new File(thumbDir, node.getBase64Handle());
+		File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
 		Bitmap bitmap = null;
 		if (thumb.exists()){
 			if (thumb.length() > 0){
@@ -286,7 +274,7 @@ public class ThumbnailUtils {
 		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerList listener = new ThumbnailDownloadListenerList(context, viewHolder, adapter);
 		listenersList.put(document.getHandle(), listener);
-		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle());
+		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
@@ -306,7 +294,7 @@ public class ThumbnailUtils {
 		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerGrid listener = new ThumbnailDownloadListenerGrid(context, viewHolder, adapter, numView);
 		listenersGrid.put(document.getHandle(), listener);
-		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle());
+		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
@@ -326,7 +314,7 @@ public class ThumbnailUtils {
 		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerFull listener = new ThumbnailDownloadListenerFull(context, viewHolder, adapter);
 		listenersFull.put(document.getHandle(), listener);
-		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle());
+		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());
@@ -376,7 +364,7 @@ public class ThumbnailUtils {
 			param = params[0];
 			
 			File thumbDir = getThumbFolder(context);
-			thumbFile = new File(thumbDir, param.document.getBase64Handle());
+			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
 			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
 			
 			return thumbCreated;
@@ -491,7 +479,7 @@ public class ThumbnailUtils {
 			param = params[0];
 			
 			File thumbDir = getThumbFolder(context);
-			thumbFile = new File(thumbDir, param.document.getBase64Handle());
+			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
 			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
