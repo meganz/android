@@ -3,8 +3,6 @@ package com.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 
-import com.mega.android.PreviewUtils.AttachPreviewTask;
-import com.mega.android.PreviewUtils.ResizerParams;
 import com.mega.components.TouchImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -19,7 +17,6 @@ import com.mega.sdk.MegaUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -33,7 +30,6 @@ import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface  {
 	
@@ -104,7 +100,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			}
 			else if(param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
-				File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle());
+				File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
 				log("INICIA LA DESCARGA DE " + node.getHandle());
 				pendingPreviews.add(node.getHandle());
 				megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);				
@@ -116,7 +112,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		
 		long handle;
     	Bitmap preview;
-    	File dir;
+    	File cacheDir;
     	File destination; 
     	
 		@Override
@@ -129,23 +125,19 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				return 0;
 			}
 			else{
-				File cacheDir = activity.getCacheDir();
-				dir = new File (cacheDir, node.getBase64Handle());
-				dir.mkdir();
-				dir.setReadable(true, false);
-				dir.setExecutable(true, false);
-				dir.setLastModified(System.currentTimeMillis());
-				destination = new File(dir, node.getName());
+				cacheDir = activity.getCacheDir();
+				destination = new File(cacheDir, node.getName());
 				
 				if (destination.exists()){
 					if (destination.length() == node.getSize()){
 						File previewDir = PreviewUtils.getPreviewFolder(activity);
-						File previewFile = new File(previewDir, node.getBase64Handle());
+						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
 						log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
 						boolean previewCreated = MegaUtils.createPreview(destination, previewFile);
 						
 						if (previewCreated){
 							preview = PreviewUtils.getBitmapForCache(previewFile, activity);
+							destination.delete();
 							return 0;
 						}
 						else{
@@ -157,14 +149,13 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 						return 1;
 					}
 				}
+
+				if (pendingFullImages.contains(node.getHandle())){
+					log("the image is already downloaded or added to the list");
+					return 1;
+				}
 				else{
-					if (pendingFullImages.contains(node.getHandle())){
-						log("the image is already downloaded or added to the list");
-						return 1;
-					}
-					else{
-						return 2;
-					}
+					return 2;
 				}
 			}
 		}
@@ -192,10 +183,9 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			else if (param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				pendingFullImages.add(handle);
-				log("Dir: " + dir);
 				log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
 				log("destination.getabsolutepath: " + destination.getAbsolutePath());
-				megaApi.startDownload(node, dir.getAbsolutePath() + "/", megaFullScreenImageAdapter);
+				megaApi.startDownload(node, cacheDir.getAbsolutePath() + "/", megaFullScreenImageAdapter);
 			}
 		}
 	}	
@@ -214,6 +204,10 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			File previewDir = PreviewUtils.getPreviewFolder(activity);
 			File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
 			boolean previewCreated = MegaUtils.createPreview(fullImage, previewFile);
+			
+			if (previewCreated){
+				fullImage.delete();
+			}
 			
 			return new String[]{params[0], previewCreated+""}; 
 		}
@@ -308,8 +302,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				holder.progressBar.setVisibility(View.GONE);
 			}
 			else{
-				
-				//Aqui hacer una AsyncTask que haga esto
 				try{
 					new PreviewAsyncTask().execute(node.getHandle());
 				}
@@ -317,22 +309,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 					//Too many AsyncTasks
 					log("Too many AsyncTasks");
 				} 
-//				preview = PreviewUtils.getPreviewFromFolder(node, activity);
-//				if (preview != null){
-//					holder.imgDisplay.setImageBitmap(preview);
-//					holder.progressBar.setVisibility(View.GONE);
-//				}
-//				else{
-//					if (pendingPreviews.contains(node.getHandle())){
-//						log("the preview is already downloaded or added to the list");
-//					}
-//					else{
-//						File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle());
-//						log("INICIA LA DESCARGA DE " + node.getHandle());
-//						pendingPreviews.add(node.getHandle());
-//						megaApi.getPreview(node,  previewFile.getAbsolutePath(), this);   
-//					}
-//				}
 			}
 		}
 		else{
@@ -342,7 +318,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				holder.progressBar.setVisibility(View.GONE);
 			}
 			else{
-				//Aqui hacer una AsyncTask que haga esto
 				try{
 					new PreviewDownloadAsyncTask().execute(node.getHandle());
 				}
@@ -350,60 +325,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 					//Too many AsyncTasks
 					log("Too many AsyncTasks");
 				}
-//				preview = PreviewUtils.getPreviewFromFolder(node, activity);
-//				if (preview != null){
-//					holder.imgDisplay.setImageBitmap(preview);
-//					holder.progressBar.setVisibility(View.GONE);
-//				}
-//				else{
-//					//Download the image and create the preview
-//					File cacheDir = activity.getCacheDir();
-//					File dir = new File (cacheDir, node.getBase64Handle());
-//					dir.mkdir();
-//					dir.setReadable(true, false);
-//					dir.setExecutable(true, false);
-//					dir.setLastModified(System.currentTimeMillis());
-//					File destination = new File(dir, node.getName());
-//					
-//					if (destination.exists()){
-//						if (destination.length() == node.getSize()){
-							
-//							try{
-//								new AttachPreviewTask().execute(node.getHandle()+"", destination.getAbsolutePath());
-//							}
-//							catch(Exception ex){
-//								//Too many AsyncTasks
-//								log("Too many AsyncTasks");
-//							}
-							
-//							File previewDir = PreviewUtils.getPreviewFolder(activity);
-//							File previewFile = new File(previewDir, node.getBase64Handle());
-//							log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
-//							boolean previewCreated = MegaUtils.createPreview(destination, previewFile);
-//							
-//							if (previewCreated){
-//								Bitmap bitmap = PreviewUtils.getBitmapForCache(previewFile, activity);
-//								visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
-//								visibleImgs.get(position).progressBar.setVisibility(View.GONE);
-//							}
-//						}
-//						else{
-//							destination.delete();
-//						}
-//					}
-//					else{
-//						if (pendingFullImages.contains(node.getHandle())){
-//							log("the image is already downloaded or added to the list");
-//						}
-//						else{
-//							pendingFullImages.add(node.getHandle());
-//							log("Dir: " + dir);
-//							log("document.name: " +  node.getName() + "_handle: " + node.getHandle());
-//							log("destination.getabsolutepath: " + destination.getAbsolutePath());
-//							megaApi.startDownload(node, dir.getAbsolutePath() + "/", this);
-//						}
-//					}
-//				}
 			}
 		}
 		
@@ -503,7 +424,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		
 		if (e.getErrorCode() == MegaError.API_OK){
 			File previewDir = PreviewUtils.getPreviewFolder(activity);
-			File preview = new File(previewDir, node.getBase64Handle());
+			File preview = new File(previewDir, node.getBase64Handle()+".jpg");
 			
 			if (preview.exists()) {
 				if (preview.length() > 0) {
@@ -574,40 +495,13 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				//Too many AsyncTasks
 				log("Too many AsyncTasks");
 			}
-			
-//			int position = 0;
-//			boolean holderIsVisible = false;
-//			for(int i = 0; i < visibleImgs.size(); i++) {
-//				position = visibleImgs.keyAt(i);
-//				ViewHolderFullImage holder = visibleImgs.get(position);
-//				if (holder.document == handle){
-//					holderIsVisible = true;
-//					break;
-//				}
-//			}
-//			
-//			if (holderIsVisible){
-//				String localPath = transfer.getPath();
-//				File fullImage = new File(localPath);
-//				
-//				File previewDir = PreviewUtils.getPreviewFolder(activity);
-//				File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-//				boolean previewCreated = MegaUtils.createPreview(fullImage, previewFile);
-//				
-//				if (previewCreated){
-//					Bitmap bitmap = PreviewUtils.getBitmapForCache(previewFile, activity);
-//					visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
-//					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
-//					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
-//				}
-//			}
 		}		
 			
 	}
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log ("Download updated: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
+//		log ("Download updated: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
 		
 		long handle = transfer.getNodeHandle();
 		
@@ -631,7 +525,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			else{
 				progressValue = (int) ((transfer.getTransferredBytes()/(float)transfer.getTotalBytes()) * 100);
 			}
-			log("PROGRESS VALUE: " + progressValue);
+//			log("PROGRESS VALUE: " + progressValue);
 			visibleImgs.get(position).downloadProgressBar.setProgress(progressValue);
 		}
 		
@@ -642,6 +536,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
 		log ("TEMPORARY ERROR (" + transfer.getFileName() + "): " + e.getErrorCode() + "_" + e.getErrorString() + "_" + e.getNextAttempt());
-		Util.showErrorAlertDialog("Temporary error: " + e.getErrorString(), true, activity);
+//		Util.showErrorAlertDialog("Temporary error: " + e.getErrorString(), true, activity);
 	}
 }
