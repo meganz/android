@@ -94,4 +94,5 @@
     <string name="download_touch_to_cancel">Touch to cancel download</string>
     <string name="error_file_size_greater_than_4gb">Most devices can\'t download files greater than 4GB. Your download will probably fail.</string>
 	
+    <string name="context_get_link">Share Link</string>
 </resources>

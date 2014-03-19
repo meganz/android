@@ -57,9 +57,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         RelativeLayout itemLayout;
         ImageView arrowSelection;
         RelativeLayout optionsLayout;
-        ImageButton optionOpen;
+//        ImageButton optionOpen;
         ImageButton optionProperties;
         ImageButton optionDownload;
+        ImageButton optionRename;
+        ImageButton optionCopy;
+        ImageButton optionMove;
+        ImageButton optionPublicLink;
         ImageButton optionDelete;
         int currentPosition;
         long document;
@@ -130,14 +134,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewUpdated = (TextView) convertView.findViewById(R.id.file_list_updated);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
-			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.file_list_option_open);
-			holder.optionOpen.setPadding(Util.px2dp((15*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.file_list_option_properties);
-			holder.optionProperties.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+//			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.file_list_option_open);
+//			holder.optionOpen.setPadding(Util.px2dp((15*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDownload = (ImageButton) convertView.findViewById(R.id.file_list_option_download);
-			holder.optionDownload.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionDownload.setPadding(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.file_list_option_properties);
+			holder.optionProperties.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionRename = (ImageButton) convertView.findViewById(R.id.file_list_option_rename);
+			holder.optionRename.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionCopy = (ImageButton) convertView.findViewById(R.id.file_list_option_copy);
+			holder.optionCopy.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionMove = (ImageButton) convertView.findViewById(R.id.file_list_option_move);
+			holder.optionMove.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionPublicLink = (ImageButton) convertView.findViewById(R.id.file_list_option_public_link);
+			holder.optionPublicLink.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
 			holder.optionDelete = (ImageButton) convertView.findViewById(R.id.file_list_option_delete);
-			holder.optionDelete.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+			holder.optionDelete.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), Util.px2dp((10*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 			
@@ -247,14 +259,29 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
 		
-		holder.optionOpen.setTag(holder);
-		holder.optionOpen.setOnClickListener(this);
+//		holder.optionOpen.setTag(holder);
+//		holder.optionOpen.setOnClickListener(this);
+		
+		holder.optionDownload.setTag(holder);
+		holder.optionDownload.setOnClickListener(this);
 		
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
 		
+		holder.optionRename.setTag(holder);
+		holder.optionRename.setOnClickListener(this);
+		
+		holder.optionCopy.setTag(holder);
+		holder.optionCopy.setOnClickListener(this);
+		
+		holder.optionMove.setTag(holder);
+		holder.optionMove.setOnClickListener(this);
+		
 		holder.optionDelete.setTag(holder);
 		holder.optionDelete.setOnClickListener(this);
+		
+		holder.optionPublicLink.setTag(holder);
+		holder.optionPublicLink.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -319,57 +346,57 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		MegaNode n = (MegaNode) getItem(currentPosition);
 		
 		switch (v.getId()){
-			case R.id.file_list_option_open:{
-				
-				if (n.isFolder()){
-					aB.setTitle(n.getName());
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = n.getHandle();
-					nodes = megaApi.getChildren(n);
-					setNodes(nodes);
-					listFragment.setSelection(0);
-					
-					//If folder has no files
-					if (getCount() == 0){
-						listFragment.setVisibility(View.GONE);
-						emptyImageViewFragment.setVisibility(View.VISIBLE);
-						emptyTextViewFragment.setVisibility(View.VISIBLE);
-						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-						}
-					}
-					else{
-						listFragment.setVisibility(View.VISIBLE);
-						emptyImageViewFragment.setVisibility(View.GONE);
-						emptyTextViewFragment.setVisibility(View.GONE);
-					}
-				}
-				else{
-					if (MimeType.typeForName(n.getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", currentPosition);
-						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-						}
-						context.startActivity(intent);
-					}
-					else{
-						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
-					}
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}				
-				break;
-			}
+//			case R.id.file_list_option_open:{
+//				
+//				if (n.isFolder()){
+//					aB.setTitle(n.getName());
+//					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+//					((ManagerActivity)context).supportInvalidateOptionsMenu();
+//					
+//					parentHandle = n.getHandle();
+//					nodes = megaApi.getChildren(n);
+//					setNodes(nodes);
+//					listFragment.setSelection(0);
+//					
+//					//If folder has no files
+//					if (getCount() == 0){
+//						listFragment.setVisibility(View.GONE);
+//						emptyImageViewFragment.setVisibility(View.VISIBLE);
+//						emptyTextViewFragment.setVisibility(View.VISIBLE);
+//						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+//						} else {
+//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//						}
+//					}
+//					else{
+//						listFragment.setVisibility(View.VISIBLE);
+//						emptyImageViewFragment.setVisibility(View.GONE);
+//						emptyTextViewFragment.setVisibility(View.GONE);
+//					}
+//				}
+//				else{
+//					if (MimeType.typeForName(n.getName()).isImage()){
+//						Intent intent = new Intent(context, FullScreenImageViewer.class);
+//						intent.putExtra("position", currentPosition);
+//						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+//							intent.putExtra("parentNodeHandle", -1L);
+//						}
+//						else{
+//							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+//						}
+//						context.startActivity(intent);
+//					}
+//					else{
+//						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+//					}
+//					positionClicked = -1;
+//					notifyDataSetChanged();
+//				}				
+//				break;
+//			}
 			case R.id.file_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 			
@@ -387,6 +414,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_list_option_delete:{
 				((ManagerActivity) context).moveToTrash(n);
+				break;
+			}
+			case R.id.file_list_option_public_link:{
+				((ManagerActivity) context).getPublicLinkAndShareIt(n);
 				break;
 			}
 			case R.id.file_list_three_dots:{
