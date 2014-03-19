@@ -42,8 +42,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	long parentHandle = -1;
 	
-	ListView list;
-	
 	ListView listFragment;
 	ImageView emptyImageViewFragment;
 	TextView emptyTextViewFragment;
@@ -87,10 +85,18 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setNodes(NodeList nodes){
 		this.nodes = nodes;
-		positionClicked = -1;
+		positionClicked = -1;	
 		notifyDataSetChanged();
-		if (list != null){
-			list.setSelection(0);
+		listFragment.clearFocus();
+		if (listFragment != null){
+			listFragment.post(new Runnable() {
+                @Override
+                public void run() {                	
+                    listFragment.setSelection(0);
+                }
+            });
+//			listFragment.setSelection(0);
+			log("La mando arriba");
 		}
 //		list.smoothScrollToPosition(0);
 	}
@@ -98,7 +104,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	
-		list = (ListView) parent;
+		listFragment = (ListView) parent;
 		
 		final int _position = position;
 		
@@ -224,7 +230,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
-				list.smoothScrollToPosition(_position);
+				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);
@@ -247,6 +253,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
+		
+		holder.optionDelete.setTag(holder);
+		holder.optionDelete.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -374,6 +383,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				context.startActivity(i);							
 				positionClicked = -1;
 				notifyDataSetChanged();
+				break;
+			}
+			case R.id.file_list_option_delete:{
+				((ManagerActivity) context).moveToTrash(n);
 				break;
 			}
 			case R.id.file_list_three_dots:{

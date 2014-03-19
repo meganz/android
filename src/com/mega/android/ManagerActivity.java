@@ -675,7 +675,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}	
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request start");
-
+		}
+		else if (request.getType() == MegaRequest.TYPE_MOVE){
+			log("move request start");
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			log("remove request start");
 		}
 	}
 
@@ -687,6 +692,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
 		}
+		else if (request.getType() == MegaRequest.TYPE_MOVE){
+			Toast.makeText(this, "File correctly moved to Rubbish bin", Toast.LENGTH_LONG).show();
+			if (fbL.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+				fbL.setNodes(nodes);
+//				fbL.setPositionClicked(-1);
+//				fbL.notifyDataSetChanged();	
+			}		
+			if (fbG.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+				fbG.setNodes(nodes);
+//				fbG.setPositionClicked(-1);
+//				fbG.notifyDataSetChanged();	
+			}	
+			log("move request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			Toast.makeText(this, "File correctly deleted from MEGA", Toast.LENGTH_LONG).show();
+			if (fbL.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+				fbL.setNodes(nodes);
+				fbL.setPositionClicked(-1);
+				fbL.notifyDataSetChanged();	
+			}
+			log("remove request finished");
+		}
 	}
 
 	@Override
@@ -697,6 +728,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}	
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fetchnodes temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_MOVE){
+			log("move temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			log("remove temporary error");
 		}
 	}
 	
@@ -820,6 +857,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 //			Util.showToast(this, R.string.download_began);
 		}
 		*/
+	}
+	
+	public void moveToTrash(final MegaNode document){
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		MegaNode rubbishNode = megaApi.getRubbishNode();
+
+		//Check if the node is not yet in the rubbish bin (if so, remove it)
+		MegaNode parent = document;
+		while (megaApi.getParentNode(parent) != null){
+			parent = megaApi.getParentNode(parent);
+		}
+			
+		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+			megaApi.moveNode(document, rubbishNode, this);
+		}
+		else{
+			megaApi.remove(document, this);
+		}
 	}
 	
 	/*
