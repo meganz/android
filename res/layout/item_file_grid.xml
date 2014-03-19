@@ -91,42 +91,82 @@
             android:layout_height="wrap_content">
             
             <TableRow>
-	            <ImageButton
+<!--  	            <ImageButton
 		            android:id="@+id/file_grid_option_open1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_open"
+		            android:src="@drawable/ic_action_collections_collection"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
+-->	        
+				<ImageButton
+		            android:id="@+id/file_grid_option_download1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_download"
+		            android:paddingLeft="5dp"
+		            android:paddingTop="10dp"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
+
 		        <ImageButton
 		            android:id="@+id/file_grid_option_properties1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_properties"
-		            android:paddingLeft="30dp"
+		            android:src="@drawable/ic_menu_properties"
+		            android:paddingLeft="20dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
+		        
 		        <ImageButton
-		            android:id="@+id/file_grid_option_download1"
+		            android:id="@+id/file_grid_option_rename1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_download"
-		            android:paddingLeft="30dp"
+		            android:src="@drawable/ic_menu_rename"
+		            android:paddingLeft="20dp"
 		            android:paddingTop="10dp"
-		            android:background="@null"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+		        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_copy1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_copy"
+		            android:paddingLeft="20dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+		        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_move1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_move"
+		            android:paddingLeft="20dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	            
+		        <ImageButton
+		            android:id="@+id/file_grid_option_public_link1"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_download_link"
+		            android:paddingLeft="20dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
 	        
 		        <ImageButton
 		            android:id="@+id/file_grid_option_delete1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_delete"
-		            android:paddingLeft="30dp"
+		            android:src="@drawable/ic_menu_discard"
+		            android:paddingLeft="20dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
@@ -225,42 +265,82 @@
             android:layout_height="wrap_content">
             
             <TableRow>
-	            <ImageButton
+<!--  	            <ImageButton
 		            android:id="@+id/file_grid_option_open2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_open"
+		            android:src="@drawable/ic_action_collections_collection"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
+-->	        
+				<ImageButton
+		            android:id="@+id/file_grid_option_download2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_download"
+		            android:paddingLeft="5dp"
+		            android:paddingTop="10dp"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
+
 		        <ImageButton
 		            android:id="@+id/file_grid_option_properties2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_properties"
-		            android:paddingLeft="30dp"
+		            android:src="@drawable/ic_menu_properties"
+		            android:paddingLeft="20dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
-	        
+		        
 		        <ImageButton
-		            android:id="@+id/file_grid_option_download2"
+		            android:id="@+id/file_grid_option_rename2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_download"
-		            android:paddingLeft="30dp"
+		            android:src="@drawable/ic_menu_rename"
+		            android:paddingLeft="20dp"
 		            android:paddingTop="10dp"
-		            android:background="@null"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+		        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_copy2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_copy"
+		            android:paddingLeft="20dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+		        
+		        <ImageButton
+		            android:id="@+id/file_grid_option_move2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_move"
+		            android:paddingLeft="20dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
+		            android:layout_gravity="center_vertical"/>
+	            
+		        <ImageButton
+		            android:id="@+id/file_grid_option_public_link2"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_menu_download_link"
+		            android:paddingLeft="20dp"
+		            android:paddingTop="10dp"
+		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
 	        
 		        <ImageButton
 		            android:id="@+id/file_grid_option_delete2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/file_list_option_delete"
-		            android:paddingLeft="30dp"
+		            android:src="@drawable/ic_menu_discard"
+		            android:paddingLeft="20dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />

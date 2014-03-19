@@ -682,6 +682,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			log("remove request start");
 		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			log("export request start");
+		}
 	}
 
 	@Override
@@ -693,32 +696,57 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("fecthnodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			Toast.makeText(this, "File correctly moved to Rubbish bin", Toast.LENGTH_LONG).show();
-			if (fbL.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-				fbL.setNodes(nodes);
-				fbL.getListView().invalidateViews();
-			}		
-			if (fbG.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-				fbG.setNodes(nodes);
-				fbG.getListView().invalidateViews();
-			}	
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "File correctly moved to Rubbish bin", Toast.LENGTH_LONG).show();
+				if (fbL.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+					fbL.setNodes(nodes);
+					fbL.getListView().invalidateViews();
+				}		
+				if (fbG.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+					fbG.setNodes(nodes);
+					fbG.getListView().invalidateViews();
+				}
+			}
+			else{
+				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+			}
 			log("move request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-			Toast.makeText(this, "File correctly deleted from MEGA", Toast.LENGTH_LONG).show();
-			if (fbL.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-				fbL.setNodes(nodes);
-				fbL.getListView().invalidateViews();
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "File correctly deleted from MEGA", Toast.LENGTH_LONG).show();
+				if (fbL.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+					fbL.setNodes(nodes);
+					fbL.getListView().invalidateViews();
+				}
+				if (fbG.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+					fbG.setNodes(nodes);
+					fbG.getListView().invalidateViews();
+				}
 			}
-			if (fbG.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-				fbG.setNodes(nodes);
-				fbG.getListView().invalidateViews();
+			else{
+				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
 			}
 			log("remove request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			if (e.getErrorCode() == MegaError.API_OK){
+				String link = request.getLink();
+				if (managerActivity != null){
+					Intent intent = new Intent(Intent.ACTION_SEND);
+					intent.setType("text/plain");
+					intent.putExtra(Intent.EXTRA_TEXT, link);
+					startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+				}
+			}
+			else{
+				Toast.makeText(this, "Impossible to get the link", Toast.LENGTH_LONG).show();
+			}
+			log("export request finished");
 		}
 	}
 
@@ -736,6 +764,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			log("remove temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			log("export temporary error");
 		}
 	}
 	
@@ -885,6 +916,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		else{
 			megaApi.remove(document, this);
 		}
+	}
+	
+	public void getPublicLinkAndShareIt(MegaNode document){
+		
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		megaApi.exportNode(document, this);
 	}
 	
 	/*

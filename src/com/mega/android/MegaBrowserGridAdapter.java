@@ -103,15 +103,23 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
         ImageButton imageButtonThreeDots2;
         ImageView arrowSelection1;
         RelativeLayout optionsLayout1;
-        ImageButton optionOpen1;
+//        ImageButton optionOpen1;
         ImageButton optionProperties1;
         ImageButton optionDownload1;
+        ImageButton optionRename1;
+        ImageButton optionCopy1;
+        ImageButton optionMove1;
+        ImageButton optionPublicLink1;
         ImageButton optionDelete1;
         ImageView arrowSelection2;
         RelativeLayout optionsLayout2;
-        ImageButton optionOpen2;
+//        ImageButton optionOpen2;
         ImageButton optionProperties2;
         ImageButton optionDownload2;
+        ImageButton optionRename2;
+        ImageButton optionCopy2;
+        ImageButton optionMove2;
+        ImageButton optionPublicLink2;
         ImageButton optionDelete2;
         int currentPosition;
         long document1;
@@ -198,26 +206,42 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			holder.imageButtonThreeDots2 = (ImageButton) v.findViewById(R.id.file_grid_three_dots2);
 			
 			holder.optionsLayout1 = (RelativeLayout) v.findViewById(R.id.file_grid_options1);
-			holder.optionOpen1 = (ImageButton) v.findViewById(R.id.file_grid_option_open1);
-			holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionProperties1 = (ImageButton) v.findViewById(R.id.file_grid_option_properties1);
-			holder.optionProperties1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+//			holder.optionOpen1 = (ImageButton) v.findViewById(R.id.file_grid_option_open1);
+//			holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDownload1 = (ImageButton) v.findViewById(R.id.file_grid_option_download1);
-			holder.optionDownload1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionDownload1.setPadding(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionProperties1 = (ImageButton) v.findViewById(R.id.file_grid_option_properties1);
+			holder.optionProperties1.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionRename1 = (ImageButton) v.findViewById(R.id.file_grid_option_rename1);
+			holder.optionRename1.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionCopy1 = (ImageButton) v.findViewById(R.id.file_grid_option_copy1);
+			holder.optionCopy1.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionMove1 = (ImageButton) v.findViewById(R.id.file_grid_option_move1);
+			holder.optionMove1.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionPublicLink1 = (ImageButton) v.findViewById(R.id.file_grid_option_public_link1);
+			holder.optionPublicLink1.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
 			holder.optionDelete1 = (ImageButton) v.findViewById(R.id.file_grid_option_delete1);
-			holder.optionDelete1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+			holder.optionDelete1.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), Util.px2dp((10*scaleW), outMetrics), 0);
 			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection1);
 			holder.arrowSelection1.setVisibility(View.GONE);
 
 			holder.optionsLayout2 = (RelativeLayout) v.findViewById(R.id.file_grid_options2);
-			holder.optionOpen2 = (ImageButton) v.findViewById(R.id.file_grid_option_open2);
-			holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionProperties2 = (ImageButton) v.findViewById(R.id.file_grid_option_properties2);
-			holder.optionProperties2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+//			holder.optionOpen2 = (ImageButton) v.findViewById(R.id.file_grid_option_open2);
+//			holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDownload2 = (ImageButton) v.findViewById(R.id.file_grid_option_download2);
-			holder.optionDownload2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionDownload2.setPadding(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionProperties2 = (ImageButton) v.findViewById(R.id.file_grid_option_properties2);
+			holder.optionProperties2.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionRename2 = (ImageButton) v.findViewById(R.id.file_grid_option_rename2);
+			holder.optionRename2.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionCopy2 = (ImageButton) v.findViewById(R.id.file_grid_option_copy2);
+			holder.optionCopy2.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionMove2 = (ImageButton) v.findViewById(R.id.file_grid_option_move2);
+			holder.optionMove2.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
+			holder.optionPublicLink2 = (ImageButton) v.findViewById(R.id.file_grid_option_public_link2);
+			holder.optionPublicLink2.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), 0, 0);
 			holder.optionDelete2 = (ImageButton) v.findViewById(R.id.file_grid_option_delete2);
-			holder.optionDelete2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+			holder.optionDelete2.setPadding(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((13*scaleH), outMetrics), Util.px2dp((10*scaleW), outMetrics), 0);
 			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection2);
 			holder.arrowSelection2.setVisibility(View.GONE);
 		
@@ -572,23 +596,53 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				params2.height = 0;
 			}
 			
-			holder.optionOpen1.setTag(holder);
-			holder.optionOpen1.setOnClickListener(this);
+//			holder.optionOpen1.setTag(holder);
+//			holder.optionOpen1.setOnClickListener(this);
+			
+//			holder.optionOpen2.setTag(holder);
+//			holder.optionOpen2.setOnClickListener(this);
+			
+			holder.optionDownload1.setTag(holder);
+			holder.optionDownload1.setOnClickListener(this);
 			
 			holder.optionProperties1.setTag(holder);
 			holder.optionProperties1.setOnClickListener(this);
 			
-			holder.optionOpen2.setTag(holder);
-			holder.optionOpen2.setOnClickListener(this);
+			holder.optionRename1.setTag(holder);
+			holder.optionRename1.setOnClickListener(this);
 			
-			holder.optionProperties2.setTag(holder);
-			holder.optionProperties2.setOnClickListener(this);
+			holder.optionCopy1.setTag(holder);
+			holder.optionCopy1.setOnClickListener(this);
+			
+			holder.optionMove1.setTag(holder);
+			holder.optionMove1.setOnClickListener(this);
 			
 			holder.optionDelete1.setTag(holder);
 			holder.optionDelete1.setOnClickListener(this);
 			
+			holder.optionPublicLink2.setTag(holder);
+			holder.optionPublicLink2.setOnClickListener(this);
+			
+			holder.optionDownload2.setTag(holder);
+			holder.optionDownload2.setOnClickListener(this);
+			
+			holder.optionProperties2.setTag(holder);
+			holder.optionProperties2.setOnClickListener(this);
+			
+			holder.optionRename2.setTag(holder);
+			holder.optionRename2.setOnClickListener(this);
+			
+			holder.optionCopy2.setTag(holder);
+			holder.optionCopy2.setOnClickListener(this);
+			
+			holder.optionMove2.setTag(holder);
+			holder.optionMove2.setOnClickListener(this);
+			
 			holder.optionDelete2.setTag(holder);
 			holder.optionDelete2.setOnClickListener(this);
+			
+			holder.optionPublicLink2.setTag(holder);
+			holder.optionPublicLink2.setOnClickListener(this);
 		}
 		else{
 			v = inflater.inflate(R.layout.item_file_empty_grid, parent, false);
@@ -800,110 +854,110 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				}
 				break;
 			}
-			case R.id.file_grid_option_open1:{
-				MegaNode n = (MegaNode) getItem(currentPosition);
-				if (n.isFolder()){
-					aB.setTitle(n.getName());
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = n.getHandle();
-					nodes = megaApi.getChildren(n);
-					setNodes(nodes);
-					listFragment.setSelection(0);
-					
-					//If folder has no files
-					if (nodes.size() == 0){
-						listFragment.setVisibility(View.GONE);
-						emptyImageViewFragment.setVisibility(View.VISIBLE);
-						emptyTextViewFragment.setVisibility(View.VISIBLE);
-						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-						}
-					}
-					else{
-						listFragment.setVisibility(View.VISIBLE);
-						emptyImageViewFragment.setVisibility(View.GONE);
-						emptyTextViewFragment.setVisibility(View.GONE);
-					}
-				}
-				else{
-					if (MimeType.typeForName(n.getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", currentPosition);
-						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-						}
-						context.startActivity(intent);
-					}
-					else{
-						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
-					}	
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}
-				
-				break;
-			}
-			case R.id.file_grid_option_open2:{
-				MegaNode n = (MegaNode) getItem(currentPosition+1);
-				if (n.isFolder()){
-					aB.setTitle(n.getName());
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-
-					parentHandle = n.getHandle();
-					nodes = megaApi.getChildren(n);
-					setNodes(nodes);
-					listFragment.setSelection(0);
-					
-					//If folder has no files
-					if (nodes.size() == 0){
-						listFragment.setVisibility(View.GONE);
-						emptyImageViewFragment.setVisibility(View.VISIBLE);
-						emptyTextViewFragment.setVisibility(View.VISIBLE);
-						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-						}
-					}
-					else{
-						listFragment.setVisibility(View.VISIBLE);
-						emptyImageViewFragment.setVisibility(View.GONE);
-						emptyTextViewFragment.setVisibility(View.GONE);
-					}
-				}
-				else{
-					if (MimeType.typeForName(n.getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", (currentPosition+1));
-						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-						}
-						context.startActivity(intent);
-					}
-					else{
-						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
-					}	
-					positionClicked = -1;
-					notifyDataSetChanged();
-				}
-				
-				break;
-			}
+//			case R.id.file_grid_option_open1:{
+//				MegaNode n = (MegaNode) getItem(currentPosition);
+//				if (n.isFolder()){
+//					aB.setTitle(n.getName());
+//					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+//					((ManagerActivity)context).supportInvalidateOptionsMenu();
+//					
+//					parentHandle = n.getHandle();
+//					nodes = megaApi.getChildren(n);
+//					setNodes(nodes);
+//					listFragment.setSelection(0);
+//					
+//					//If folder has no files
+//					if (nodes.size() == 0){
+//						listFragment.setVisibility(View.GONE);
+//						emptyImageViewFragment.setVisibility(View.VISIBLE);
+//						emptyTextViewFragment.setVisibility(View.VISIBLE);
+//						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+//						} else {
+//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//						}
+//					}
+//					else{
+//						listFragment.setVisibility(View.VISIBLE);
+//						emptyImageViewFragment.setVisibility(View.GONE);
+//						emptyTextViewFragment.setVisibility(View.GONE);
+//					}
+//				}
+//				else{
+//					if (MimeType.typeForName(n.getName()).isImage()){
+//						Intent intent = new Intent(context, FullScreenImageViewer.class);
+//						intent.putExtra("position", currentPosition);
+//						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+//							intent.putExtra("parentNodeHandle", -1L);
+//						}
+//						else{
+//							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+//						}
+//						context.startActivity(intent);
+//					}
+//					else{
+//						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+//					}	
+//					positionClicked = -1;
+//					notifyDataSetChanged();
+//				}
+//				
+//				break;
+//			}
+//			case R.id.file_grid_option_open2:{
+//				MegaNode n = (MegaNode) getItem(currentPosition+1);
+//				if (n.isFolder()){
+//					aB.setTitle(n.getName());
+//					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+//					((ManagerActivity)context).supportInvalidateOptionsMenu();
+//
+//					parentHandle = n.getHandle();
+//					nodes = megaApi.getChildren(n);
+//					setNodes(nodes);
+//					listFragment.setSelection(0);
+//					
+//					//If folder has no files
+//					if (nodes.size() == 0){
+//						listFragment.setVisibility(View.GONE);
+//						emptyImageViewFragment.setVisibility(View.VISIBLE);
+//						emptyTextViewFragment.setVisibility(View.VISIBLE);
+//						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+//						} else {
+//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//						}
+//					}
+//					else{
+//						listFragment.setVisibility(View.VISIBLE);
+//						emptyImageViewFragment.setVisibility(View.GONE);
+//						emptyTextViewFragment.setVisibility(View.GONE);
+//					}
+//				}
+//				else{
+//					if (MimeType.typeForName(n.getName()).isImage()){
+//						Intent intent = new Intent(context, FullScreenImageViewer.class);
+//						intent.putExtra("position", (currentPosition+1));
+//						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+//							intent.putExtra("parentNodeHandle", -1L);
+//						}
+//						else{
+//							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+//						}
+//						context.startActivity(intent);
+//					}
+//					else{
+//						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+//					}	
+//					positionClicked = -1;
+//					notifyDataSetChanged();
+//				}
+//				
+//				break;
+//			}
 			case R.id.file_grid_option_properties1:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				MegaNode n = (MegaNode) getItem(currentPosition);
