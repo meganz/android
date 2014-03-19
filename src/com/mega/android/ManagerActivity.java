@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,19 +12,28 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListener;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.NodeList;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -50,7 +61,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface {
+public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
 	
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
@@ -70,6 +81,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return null;
 		}
 	}
+	
+	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
+	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -269,6 +283,70 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			selectDrawerItem(drawerItem);
 		}
 	}
+    
+    @Override
+	protected void onResume() {
+    	super.onResume();
+    	managerActivity = this;
+    	
+    	log("Ejecuto el onResume");
+    	
+    	if(Preferences.getCredentials(this) == null){	
+			logout(this, (MegaApplication)getApplication(), megaApi);
+			return;
+		}
+    	
+    	Intent intent = getIntent();
+    	
+    	if (intent != null) {
+    		log("El intent es distinto de null");
+    		if (intent.getAction() != null){
+    			log("El getAction es distinto de null");
+    			if(intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
+    				log("Entro donde el intent");
+					Intent tempIntent = null;
+					String title = null;
+					String text = null;
+					if(intent.getAction().equals(ACTION_CANCEL_UPLOAD)){
+//						tempIntent = new Intent(this, UploadService.class);
+//						tempIntent.setAction(UploadService.ACTION_CANCEL);
+//						title = getString(R.string.upload_uploading);
+//						text = getString(R.string.upload_cancel_uploading);
+					}
+					else{
+						tempIntent = new Intent(this, DownloadService.class);
+						tempIntent.setAction(DownloadService.ACTION_CANCEL);
+						title = getString(R.string.download_downloading);
+						text = getString(R.string.download_cancel_downloading);
+						log("entro en el intent de cancelacion");
+					}
+					
+					final Intent cancelIntent = tempIntent;
+					AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+							title, text, null);
+					builder.setPositiveButton(getString(R.string.general_yes),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									startService(cancelIntent);
+								}
+							});
+					builder.setNegativeButton(getString(R.string.general_no), null);
+					final AlertDialog dialog = builder.create();
+					try {
+						log("Deberia aparecer el dialogo");
+						dialog.show(); 
+					}
+					catch(Exception ex)
+					{ 
+						log("Ha petado el dialogo");
+						startService(cancelIntent); 
+						}
+				}
+    			intent.setAction(null);
+				setIntent(null);
+    		}
+    	}
+    }
     
     public void selectDrawerItem(DrawerItem item){
     	switch (item){
@@ -630,7 +708,207 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		this.mDrawerToggle = mDrawerToggle;
 	}
 	
+	File destination;
+	
+	public void onFileClick(final MegaNode document){
+		Toast.makeText(this, "[IS FILE (not image)]Node handle clicked: downloading..." + document.getHandle(), Toast.LENGTH_SHORT).show();
+
+		//TODO: Here I should take the location from the preferences
+//		String downloadLocation = Environment.getExternalStorageDirectory().getAbsolutePath();
+		String downloadLocation = getCacheDir().getAbsolutePath();
+		
+		//Download in the background to prevent incomplete downloads.
+		File file = null;
+		
+		//See if it's already downloaded
+		String localPath = Util.getLocalFile(this, document.getName(), document.getSize(), downloadLocation);
+		if(localPath != null)
+		{	
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(document.getName()).getType());
+			if (isIntentAvailable(this, intent))
+				startActivity(intent);
+			else{
+				String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+				Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show();
+				Intent intentShare = new Intent(Intent.ACTION_SEND);
+				intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(document.getName()).getType());
+				if (isIntentAvailable(this, intentShare))
+					startActivity(intentShare);
+			}
+			return;
+		}
+		
+		// TODO: Download to default folder. This is done to maintain the folder structure. Uncomment in the future
+//		String treePath = megaApi.getNodePath(document);
+//		if(treePath != null){ 
+//			file = new File(downloadLocation, treePath);
+//		}
+//		else{
+//			file = new File(downloadLocation, document.getName());
+//		}
+//		File parent = file.getParentFile();
+//		parent.mkdirs();
+//		String path = parent.getAbsolutePath();
+//		
+//		
+//		try{
+//			StatFs stat = new StatFs(parent.getAbsolutePath());
+//			double availableFreeSpace = (double)stat.getAvailableBlocks()* (double)stat.getBlockSize();
+//			if(availableFreeSpace <document.getSize()){
+//				Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+//				return;
+//			}
+//		}catch(Exception ex){}
+//		
+//		
+//		Intent service = new Intent(this, DownloadService.class);
+//		service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+//		service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+//		service.putExtra(DownloadService.EXTRA_PATH, path);
+//		startService(service);
+		// END TODO
+		
+		// TODO: And comment this
+		try{
+			StatFs stat = new StatFs(downloadLocation);
+			double availableFreeSpace = (double)stat.getAvailableBlocks()* (double)stat.getBlockSize();
+			if(availableFreeSpace <document.getSize()){
+				Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+				return;
+			}
+		}catch(Exception ex){}
+		
+		Intent service = new Intent(this, DownloadService.class);
+		service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+		service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+		service.putExtra(DownloadService.EXTRA_PATH, downloadLocation);
+		startService(service);
+		// END TODO
+		
+
+		/*
+//		String downloadLocation = Environment.getExternalStorageDirectory().getAbsolutePath();
+		String downloadLocation = getCacheDir().getAbsolutePath();
+		long foregroundSize = 20 * 1024 * 1024;
+		if (document.getSize() > foregroundSize){
+			Toast.makeText(this, "File is larger than 20MB. DownloadService not yet implemented", Toast.LENGTH_LONG).show();
+		}
+		else{
+			File dir = new File(getCacheDir(), document.getBase64Handle());
+			dir.mkdir();
+			dir.setReadable(true, false);
+			dir.setExecutable(true, false);
+			dir.setLastModified(System.currentTimeMillis());
+			destination = new File(dir, document.getName());
+			destination.setReadable(true, false);
+			destination.setWritable(true, false);
+			if (destination.exists()){
+				if (destination.length() == document.getSize()){
+					Toast.makeText(this, "Ya descargado", Toast.LENGTH_LONG).show();
+				}
+				else{
+					destination.delete();
+				}
+			}
+			else{
+				log("Download to: " + destination.getAbsolutePath());
+				megaApi.startDownload(document, dir.getAbsolutePath() + "/", this);
+				Toast.makeText(this, "Download started (Internal memory)", Toast.LENGTH_LONG).show();
+			}
+//			megaApi.startDownload(document, downloadLocation + "/", this);
+//			Util.showToast(this, R.string.download_began);
+		}
+		*/
+	}
+	
+	/*
+	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
+	 */
+	public static boolean isIntentAvailable(Context ctx, Intent intent) {
+
+		final PackageManager mgr = ctx.getPackageManager();
+		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+		return list.size() > 0;
+	}
+	
 	public static void log(String message) {
 		Util.log("ManagerActivity", message);
+	}
+
+	@Override
+	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		log("Download started");
+	}
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+			MegaError e) {
+		log("Download finished");
+		if (e.getErrorCode() != MegaError.API_OK){
+			
+		}
+		else{
+			log("Dowload OK (" + transfer.getPath() + ")");
+			String finalPath = null;
+			try{
+				finalPath = destination.getCanonicalPath();
+			}
+			catch(Exception ex){
+				finalPath = destination.getAbsolutePath();
+			}
+			
+//			String tmpPath = finalPath + ".tmp";
+//			File tmpFile = new File(tmpPath);
+//			File finalFile = new File(finalPath);
+//			finalFile.renameTo(tmpFile);
+//			tmpFile.renameTo(finalFile);
+//			
+//			finalFile.setReadable(true, false);
+			
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setDataAndType(Uri.fromFile(destination), MimeType.typeForName(api.getNodeByHandle(transfer.getNodeHandle()).getName()).getType());
+			if (isIntentAvailable(this, intent))
+				startActivity(intent);
+			
+//			File destFile = new File(transfer.getPath());
+//			File ficheroPrueba = null;
+//			try {
+//				log("Canonical path: " + destFile.getCanonicalFile());
+//				ficheroPrueba = destFile.getCanonicalFile();
+//				
+//			} catch (IOException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			//En el fichero y en todas sus carpetas padres
+//			boolean resultado = destFile.setReadable(true, false);
+//			destFile.setWritable(true, false);
+//			log("SIZE OF THE FILE: " + destFile.length() + "___" + destFile.canRead() + "RESULTADO: " + resultado);
+//			
+////			File ficheroPrueba = new File(getCacheDir(), "pruebaCopiada.pdf");
+//			if (ficheroPrueba != null){
+//				destFile.renameTo(ficheroPrueba);	
+//			}			
+//			log("SIZE OF THE FILE: " + ficheroPrueba.length() + "___" + ficheroPrueba.canRead());
+//			Intent intent = new Intent(Intent.ACTION_VIEW);
+//			intent.setDataAndType(Uri.fromFile(ficheroPrueba), MimeType.typeForName(api.getNodeByHandle(transfer.getNodeHandle()).getName()).getType());
+//			if (isIntentAvailable(this, intent))
+//				startActivity(intent);
+		}
+		
+	}
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		log(transfer.getFileName() + "(" + (int)((transfer.getTransferredBytes()*100)/transfer.getTotalBytes()) + "%): " + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
+		
+	}
+
+	@Override
+	public void onTransferTemporaryError(MegaApiJava api,
+			MegaTransfer transfer, MegaError e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
