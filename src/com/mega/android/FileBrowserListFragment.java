@@ -139,6 +139,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
+			listView.setSelection(0);
 			
 			//If folder has no files
 			if (adapter.getCount() == 0){
@@ -206,6 +207,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
 				adapter.setNodes(nodes);
+				listView.setSelection(0);
 				adapter.setParentHandle(parentHandle);
 				return 2;
 			}
@@ -224,6 +226,10 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
 		}
+	}
+	
+	public ListView getListView(){
+		return listView;
 	}
 	
 	public void setNodes(NodeList nodes){
