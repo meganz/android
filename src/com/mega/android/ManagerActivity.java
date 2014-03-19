@@ -697,14 +697,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (fbL.isVisible()){
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
 				fbL.setNodes(nodes);
-//				fbL.setPositionClicked(-1);
-//				fbL.notifyDataSetChanged();	
+				fbL.getListView().invalidateViews();
 			}		
 			if (fbG.isVisible()){
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
 				fbG.setNodes(nodes);
-//				fbG.setPositionClicked(-1);
-//				fbG.notifyDataSetChanged();	
+				fbG.getListView().invalidateViews();
 			}	
 			log("move request finished");
 		}
@@ -713,8 +711,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (fbL.isVisible()){
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
 				fbL.setNodes(nodes);
-				fbL.setPositionClicked(-1);
-				fbL.notifyDataSetChanged();	
+				fbL.getListView().invalidateViews();
+			}
+			if (fbG.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+				fbG.setNodes(nodes);
+				fbG.getListView().invalidateViews();
 			}
 			log("remove request finished");
 		}

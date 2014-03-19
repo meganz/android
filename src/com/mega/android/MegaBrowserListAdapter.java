@@ -87,17 +87,16 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.nodes = nodes;
 		positionClicked = -1;	
 		notifyDataSetChanged();
-		listFragment.clearFocus();
-		if (listFragment != null){
-			listFragment.post(new Runnable() {
-                @Override
-                public void run() {                	
-                    listFragment.setSelection(0);
-                }
-            });
+//		listFragment.clearFocus();
+//		if (listFragment != null){
+//			listFragment.post(new Runnable() {
+//                @Override
+//                public void run() {                	
+//                    listFragment.setSelection(0);
+//                }
+//            });
 //			listFragment.setSelection(0);
-			log("La mando arriba");
-		}
+//		}
 //		list.smoothScrollToPosition(0);
 	}
 
@@ -330,6 +329,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					parentHandle = n.getHandle();
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
+					listFragment.setSelection(0);
 					
 					//If folder has no files
 					if (getCount() == 0){

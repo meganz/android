@@ -155,6 +155,7 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);
 				adapter.setNodes(nodes);
+				gridView.setSelection(0);
 				adapter.setParentHandle(parentHandle);
 				return 2;
 			}
@@ -173,6 +174,10 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
 		}
+	}
+	
+	public ListView getListView(){
+		return gridView;
 	}
 	
 	public void setNodes(NodeList nodes){
