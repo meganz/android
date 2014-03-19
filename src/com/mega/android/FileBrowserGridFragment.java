@@ -175,6 +175,24 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		}
 	}
 	
+	public void setNodes(NodeList nodes){
+		if (adapter != null){
+			adapter.setNodes(nodes);
+		}
+	}
+	
+	public void setPositionClicked(int positionClicked){
+		if (adapter != null){
+			adapter.setPositionClicked(positionClicked);
+		}
+	}
+	
+	public void notifyDataSetChanged(){
+		if (adapter != null){
+			adapter.notifyDataSetChanged();
+		}
+	}
+	
 	private static void log(String log) {
 		Util.log("FileBrowserGridFragment", log);
 	}
