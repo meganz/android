@@ -172,7 +172,7 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 				startActivity(intent);
 			}
 			else{
-				Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + nodes.get(position).getHandle(), Toast.LENGTH_SHORT).show();
+				((ManagerActivity) context).onFileClick(nodes.get(position));
 			}
 		}
     }

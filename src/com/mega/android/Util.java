@@ -19,6 +19,7 @@ import android.net.NetworkInfo;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -329,6 +330,16 @@ public class Util {
 	 */
 	public static boolean isLocalTemp(Context context, File file) {
 		return isLocal(context, file) && file.getAbsolutePath().endsWith(".tmp");
+	}
+	
+	/*
+	 * Get localized progress size
+	 */
+	public static String getProgressSize(Context context, long progress,
+			long size) {
+		return String.format("%s/%s",
+				Formatter.formatFileSize(context, progress),
+				Formatter.formatFileSize(context, size));
 	}
 
 }

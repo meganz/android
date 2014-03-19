@@ -2,6 +2,11 @@
 <resources>
 
     <string name="app_name">MEGA_COM</string>
+    
+    <string name="general_total_size">Total size</string>
+    <string name="general_x_of_x"> of </string>
+    <string name="general_yes">Yes</string>
+    <string name="general_no">No</string>
         
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
@@ -79,5 +84,14 @@
 	<string name="full_screen_image_viewer_label">Image Viewer</string>
 	
 	<string name="error_not_enough_free_space">Not enough free space</string>
+	
+	<string name="download_failed">Download failed</string>
+	<string name="download_downloaded">downloaded</string>
+	<string name="download_downloading">Downloading</string>
+    <string name="already_downloaded">Already downloaded</string>
+    <string name="download_began">Download has started</string>
+    <string name="download_cancel_downloading">Do you want to cancel the download?</string>
+    <string name="download_touch_to_cancel">Touch to cancel download</string>
+    <string name="error_file_size_greater_than_4gb">Most devices can\'t download files greater than 4GB. Your download will probably fail.</string>
 	
 </resources>
