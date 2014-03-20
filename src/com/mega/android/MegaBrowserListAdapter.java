@@ -449,6 +449,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity) context).showMove(handleList);
 				break;
 			}
+			case R.id.file_list_option_copy:{
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).showCopy(handleList);
+				break;
+			}
 			case R.id.file_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;

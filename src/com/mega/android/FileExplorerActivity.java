@@ -20,6 +20,7 @@ import android.widget.Toast;
 public class FileExplorerActivity extends ActionBarActivity implements OnClickListener{
 	
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
+	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	
 	/*
 	 * Select modes:
@@ -28,7 +29,7 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 	 * CAMERA - pick folder for camera sync destination
 	 */
 	private enum Mode {
-		UPLOAD, MOVE, CAMERA;
+		UPLOAD, MOVE, COPY, CAMERA;
 	}
 	
 	private Button uploadButton;
@@ -41,6 +42,7 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 	private Mode mode;
 	
 	private long[] moveFromHandles;
+	private long[] copyFromHandles;
 	
 	private boolean folderSelected = false;
 	
@@ -69,6 +71,16 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 				}
 				fe.setDisableNodes(list);
 			}
+			else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
+				mode = Mode.COPY;
+				copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
+				
+				ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
+				for (long n : copyFromHandles){
+					list.add(n);
+				}
+				fe.setDisableNodes(list);
+			}
 		}
 		
 		uploadButton = (Button) findViewById(R.id.file_explorer_button);
@@ -83,6 +95,9 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 		
 		if (mode == Mode.MOVE) {
 			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
+		}
+		else if (mode == Mode.COPY){
+			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
 		}
 		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
@@ -118,6 +133,20 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 					Intent intent = new Intent();
 					intent.putExtra("MOVE_TO", parentNode.getHandle());
 					intent.putExtra("MOVE_HANDLES", moveFromHandles);
+					setResult(RESULT_OK, intent);
+					log("finish!");
+					finish();
+				}
+				else if (mode == Mode.COPY){
+					long parentHandle = fe.getParentHandle();
+					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+					if(parentNode == null){
+						parentNode = megaApi.getRootNode();
+					}
+					
+					Intent intent = new Intent();
+					intent.putExtra("COPY_TO", parentNode.getHandle());
+					intent.putExtra("COPY_HANDLES", copyFromHandles);
 					setResult(RESULT_OK, intent);
 					log("finish!");
 					finish();
