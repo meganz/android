@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,6 +17,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
@@ -25,6 +27,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -340,6 +343,21 @@ public class Util {
 		return String.format("%s/%s",
 				Formatter.formatFileSize(context, progress),
 				Formatter.formatFileSize(context, size));
+	}
+	
+	/*
+	 * Set alpha transparency for view
+	 */
+	@SuppressLint("NewApi")
+	public static void setViewAlpha(View view, float alpha) {
+		if (Build.VERSION.SDK_INT >= 11) {
+			view.setAlpha(alpha);
+		} else {
+			AlphaAnimation anim = new AlphaAnimation(alpha, alpha);
+			anim.setDuration(0);
+			anim.setFillAfter(true);
+			view.startAnimation(anim);
+		}
 	}
 
 }
