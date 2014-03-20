@@ -95,74 +95,53 @@
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 -->	        
-				<ImageButton
+				<ImageView
 		            android:id="@+id/file_list_option_download"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_download"
-		            android:paddingLeft="5dp"
-		            android:paddingTop="10dp"
-		            android:background="@null"
 		            android:layout_gravity="center_vertical" />
 
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/file_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_properties"
-		            android:paddingLeft="20dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 		        
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/file_list_option_rename"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_rename"
-		            android:paddingLeft="20dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 		        
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/file_list_option_copy"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_copy"
-		            android:paddingLeft="20dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 		        
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/file_list_option_move"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_move"
-		            android:paddingLeft="20dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	            
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/file_list_option_public_link"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_download_link"
-		            android:paddingLeft="20dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
 	        
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/file_list_option_delete"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_discard"
-		            android:paddingLeft="20dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
 	        </TableRow>        
         </TableLayout>
