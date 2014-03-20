@@ -8,6 +8,7 @@
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
     <string name="general_move_to">Move</string>
+    <string name="general_copy_to">Copy</string>
             
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
