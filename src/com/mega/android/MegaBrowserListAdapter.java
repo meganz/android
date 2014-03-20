@@ -428,6 +428,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity) context).getPublicLinkAndShareIt(n);
 				break;
 			}
+			case R.id.file_list_option_rename:{
+				((ManagerActivity) context).showRenameDialog(n, n.getName());
+				break;
+			}
 			case R.id.file_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
