@@ -1013,6 +1013,16 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity) context).moveToTrash(n);
 				break;
 			}
+			case R.id.file_grid_option_rename1:{
+				MegaNode n = (MegaNode) getItem(currentPosition);
+				((ManagerActivity) context).showRenameDialog(n, n.getName());
+				break;
+			}
+			case R.id.file_grid_option_rename2:{
+				MegaNode n = (MegaNode) getItem(currentPosition+1);
+				((ManagerActivity) context).showRenameDialog(n, n.getName());
+				break;
+			}
 		}
 	}
 	

@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.MenuItemCompat;
@@ -44,21 +45,26 @@ import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
@@ -119,7 +125,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
     private MegaRequestListener requestListener;
-
+    
+    private static int EDIT_TEXT_ID = 1;
+    
+    private AlertDialog renameDialog;
+    
+    private Handler handler;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +143,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
+		
+		handler = new Handler();
 		
 		setContentView(R.layout.activity_manager);
 
@@ -685,6 +698,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
 			log("export request start");
 		}
+		else if(request.getType() == MegaRequest.TYPE_RENAME){
+			log("rename request start");
+		}
 	}
 
 	@Override
@@ -697,7 +713,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "File correctly moved to Rubbish bin", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
 				if (fbL.isVisible()){
 					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
 					fbL.setNodes(nodes);
@@ -716,7 +732,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "File correctly deleted from MEGA", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
 				if (fbL.isVisible()){
 					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
 					fbL.setNodes(nodes);
@@ -748,6 +764,24 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 			log("export request finished");
 		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
+				if (fbL.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+					fbL.setNodes(nodes);
+					fbL.getListView().invalidateViews();
+				}
+				if (fbG.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+					fbG.setNodes(nodes);
+					fbG.getListView().invalidateViews();
+				}
+			}
+			else{
+				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
+			}
+		}
 	}
 
 	@Override
@@ -766,6 +800,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("remove temporary error");
 		}
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			log("export temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
 			log("export temporary error");
 		}
 	}
@@ -930,6 +967,93 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		megaApi.exportNode(document, this);
+	}
+	
+	/*
+	 * Display keyboard
+	 */
+	private void showKeyboardDelayed(final View view) {
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				if (!fbL.isVisible() && !fbG.isVisible()) {
+					return;
+				}
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
+	
+	public void showRenameDialog(final MegaNode document, String text){
+		final EditText input = new EditText(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+		input.setImeActionLabel(getString(R.string.context_rename),
+				KeyEvent.KEYCODE_ENTER);
+		input.setText(text);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(final View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(document.getName()), null, input);
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						rename(document, value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		renameDialog = builder.create();
+		renameDialog.show();
+
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					renameDialog.dismiss();
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					rename(document, value);
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+	
+	private void rename(MegaNode document, String newName){
+		if (newName.equals(document.getName())) {
+			return;
+		}
+		
+		if(!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if (isFinishing()){
+			return;
+		}
+		
+		log("renaming " + document.getName() + " to " + newName);
+		
+		megaApi.renameNode(document, newName, this);
 	}
 	
 	/*
