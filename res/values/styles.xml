@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     
+    <style name="dialogActionButton" parent="@style/Widget.AppCompat.ActionButton"></style>
+    
     <style name="mySwitchStyle">
         <item name="switchTextAppearanceAttrib">@style/mySwitchTextAppearance</item>
         <item name="textOn">ON</item>

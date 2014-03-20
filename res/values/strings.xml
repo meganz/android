@@ -7,7 +7,8 @@
     <string name="general_x_of_x"> of </string>
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
-        
+    <string name="general_move_to">Move</string>
+            
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
@@ -96,4 +97,6 @@
 	
     <string name="context_get_link">Share Link</string>
     <string name="context_rename">Rename</string>
+    
+    <string name="menu_new_folder">New folder</string>
 </resources>

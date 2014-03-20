@@ -88,6 +88,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 	}
 	
+	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
+	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	
@@ -131,6 +133,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private AlertDialog renameDialog;
     
     private Handler handler;
+    
+    private boolean moveToRubbish = false;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -712,23 +716,45 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("fecthnodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
-				if (fbL.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-					fbL.setNodes(nodes);
-					fbL.getListView().invalidateViews();
-				}		
-				if (fbG.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-					fbG.setNodes(nodes);
-					fbG.getListView().invalidateViews();
+			if (moveToRubbish){
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
+					if (fbL.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+						fbL.setNodes(nodes);
+						fbL.getListView().invalidateViews();
+					}		
+					if (fbG.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+						fbG.setNodes(nodes);
+						fbG.getListView().invalidateViews();
+					}
 				}
+				else{
+					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				}
+				moveToRubbish = false;
+				log("move to rubbish request finished");
 			}
 			else{
-				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
+					if (fbL.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+						fbL.setNodes(nodes);
+						fbL.getListView().invalidateViews();
+					}		
+					if (fbG.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+						fbG.setNodes(nodes);
+						fbG.getListView().invalidateViews();
+					}
+				}
+				else{
+					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				}
+				log("move nodes request finished");
 			}
-			log("move request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -948,6 +974,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 			
 		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+			moveToRubbish = true;
 			megaApi.moveNode(document, rubbishNode, this);
 		}
 		else{
@@ -1056,6 +1083,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		megaApi.renameNode(document, newName, this);
 	}
 	
+	public void showMove(ArrayList<Long> handleList){
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("MOVE_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+	}
+	
 	/*
 	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
 	 */
@@ -1143,6 +1181,31 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
 		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
+		
+		if (intent == null) {
+			return;
+		}
+		if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
+			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
+			final int totalMoves = moveHandles.length;
+			
+			MegaNode parent = megaApi.getNodeByHandle(toHandle);
+			moveToRubbish = false;
+			for(int i=0; i<moveHandles.length;i++){
+				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+			}
+		}
 		
 	}
 }
