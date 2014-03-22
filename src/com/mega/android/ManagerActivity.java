@@ -17,6 +17,7 @@ import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.NodeList;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -136,6 +137,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private Handler handler;
     
     private boolean moveToRubbish = false;
+    
+    ProgressDialog statusDialog;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -720,6 +723,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("fecthnodes request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
@@ -761,6 +769,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
 				if (fbL.isVisible()){
@@ -780,6 +793,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("remove request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
 			if (e.getErrorCode() == MegaError.API_OK){
 				String link = request.getLink();
 				if (managerActivity != null){
@@ -795,6 +813,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("export request finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_RENAME){
+			
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
 				if (fbL.isVisible()){
@@ -813,6 +837,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
 				if (fbL.isVisible()){
@@ -870,11 +899,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	File destination;
 	
 	public void onFileClick(final MegaNode document){
-		Toast.makeText(this, "[IS FILE (not image)]Node handle clicked: downloading..." + document.getHandle(), Toast.LENGTH_SHORT).show();
-
+		
 		//TODO: Here I should take the location from the preferences
 //		String downloadLocation = Environment.getExternalStorageDirectory().getAbsolutePath();
 		String downloadLocation = getCacheDir().getAbsolutePath();
+		Toast.makeText(this, "ManagerActivity.onFileClick(final MegaNode document): Will download to " + downloadLocation + ", but with permission problem", Toast.LENGTH_LONG).show();
 		
 		//Download in the background to prevent incomplete downloads.
 		File file = null;
@@ -991,6 +1020,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;	
 		}
 		
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_move_to_trash));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		
 		MegaNode rubbishNode = megaApi.getRubbishNode();
 
 		//Check if the node is not yet in the rubbish bin (if so, remove it)
@@ -1018,6 +1058,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if(isFinishing()){
 			return;	
 		}
+		
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_creating_link));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
 		
 		megaApi.exportNode(document, this);
 	}
@@ -1104,6 +1155,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		}
 		
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_renaming));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		
 		log("renaming " + document.getName() + " to " + newName);
 		
 		megaApi.renameNode(document, newName, this);
@@ -1121,14 +1183,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void showCopy(ArrayList<Long> handleList){
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("COPY_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+//		Intent intent = new Intent(this, FileExplorerActivity.class);
+//		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+//		long[] longArray = new long[handleList.size()];
+//		for (int i=0; i<handleList.size(); i++){
+//			longArray[i] = handleList.get(i);
+//		}
+//		intent.putExtra("COPY_FROM", longArray);
+//		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+		Toast.makeText(this, "ManagerActivity.showCopy(ArrayList<Long> handleList): Code commented. Not yet working", Toast.LENGTH_LONG).show();
 	}
 	
 	/*
@@ -1239,6 +1302,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_moving));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+			
 			for(int i=0; i<moveHandles.length;i++){
 				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
 			}

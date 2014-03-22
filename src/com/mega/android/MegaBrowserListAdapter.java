@@ -90,6 +90,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setNodes(NodeList nodes){
 		this.nodes = nodes;
+		Toast.makeText(context, "NODE(0): " + nodes.get(0).getHandle() + "_" + ((MegaNode)getItem(0)).getHandle(), Toast.LENGTH_LONG).show();
 		positionClicked = -1;	
 		notifyDataSetChanged();
 //		listFragment.clearFocus();
@@ -107,6 +108,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		
+		View v;
 	
 		listFragment = (ListView) parent;
 		
@@ -416,6 +419,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //				}				
 //				break;
 //			}
+			case R.id.file_list_option_download:{
+				if (n.isFile()){
+					((ManagerActivity) context).onFileClick(n);
+				}
+				else{
+					Toast.makeText(context, "Not a file. Folder download not yet implemented", Toast.LENGTH_LONG).show();
+				}
+				break;
+			}
 			case R.id.file_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 			
