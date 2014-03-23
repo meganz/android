@@ -9,6 +9,7 @@
     <string name="general_no">No</string>
     <string name="general_move_to">Move</string>
     <string name="general_copy_to">Copy</string>
+    <string name="general_create">Create</string>
             
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
@@ -103,6 +104,8 @@
     <string name="context_creating_link">Creating link</string>
     <string name="context_moving_to_trash">Moving to trash</string>
     <string name="context_move_to_trash">Move to Rubbish Bin</string>
+    <string name="context_new_folder_name">Folder Name</string>
+    <string name="context_creating_folder">Creating folder</string>
   
     <string name="menu_new_folder">New folder</string>
 </resources>

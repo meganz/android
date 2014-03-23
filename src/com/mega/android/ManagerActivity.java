@@ -133,6 +133,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private static int EDIT_TEXT_ID = 1;
     
     private AlertDialog renameDialog;
+    private AlertDialog newFolderDialog;
     
     private Handler handler;
     
@@ -569,13 +570,25 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 		    	return true;
 		    }
-	        case R.id.action_logout:{
-	        	logout(this, (MegaApplication)getApplication(), megaApi);
-	        	Toast.makeText(this,  "Temporal Logout Button Clicked!", Toast.LENGTH_SHORT).show();
-	            return true;
-	        }
+//	        case R.id.action_logout:{
+//	        	logout(this, (MegaApplication)getApplication(), megaApi);
+//	        	Toast.makeText(this,  "Temporal Logout Button Clicked!", Toast.LENGTH_SHORT).show();
+//	            return true;
+//	        }
 	        case R.id.action_search:{
 	        	mSearchView.setIconified(false);
+	        	return true;
+	        }
+	        case R.id.action_new_folder:{
+	        	showNewFolderDialog(null);
+	        	return true;
+	        }
+	        case R.id.action_more_options:{
+	        	Toast.makeText(this, "More options button clicked", Toast.LENGTH_LONG).show();
+	        	return true;
+	        }
+	        case R.id.action_upload:{
+	        	Toast.makeText(this, "Upload button clicked", Toast.LENGTH_LONG).show();
 	        	return true;
 	        }
             default:{
@@ -711,6 +724,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("copy request start");
+		}
+		else if (request.getType() == MegaRequest.TYPE_MKDIR){
+			log("create folder start");
 		}
 	}
 
@@ -860,6 +876,26 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 			log("copy nodes request finished");
 		}
+		else if (request.getType() == MegaRequest.TYPE_MKDIR){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
+				if (fbL.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+					fbL.setNodes(nodes);
+					fbL.getListView().invalidateViews();
+				}		
+				if (fbG.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+					fbG.setNodes(nodes);
+					fbG.getListView().invalidateViews();
+				}
+			}
+		}
 	}
 
 	@Override
@@ -885,6 +921,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("copy temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_MKDIR){
+			log("create folder temporary error");
 		}
 	}
 	
@@ -1011,6 +1050,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void moveToTrash(final MegaNode document){
+		
+		if (fbL.isVisible()){
+			fbL.setPositionClicked(-1);
+			fbL.notifyDataSetChanged();
+		}
+		else if (fbG.isVisible()){
+			fbG.setPositionClicked(-1);
+			fbG.notifyDataSetChanged();
+		}
+		
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
@@ -1049,6 +1098,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
+		
+		if (fbL.isVisible()){
+			fbL.setPositionClicked(-1);
+			fbL.notifyDataSetChanged();
+		}
+		else if (fbG.isVisible()){
+			fbG.setPositionClicked(-1);
+			fbG.notifyDataSetChanged();
+		}
 		
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -1089,7 +1147,127 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}, 50);
 	}
 	
+	public void showNewFolderDialog(String editText){
+		
+		if (fbL.isVisible()){
+			fbL.setPositionClicked(-1);
+			fbL.notifyDataSetChanged();
+		}
+		else if (fbG.isVisible()){
+			fbG.setPositionClicked(-1);
+			fbG.notifyDataSetChanged();
+		}
+		
+		String text;
+		if (editText == null || editText.equals("")){
+			text = getString(R.string.context_new_folder_name);
+		}
+		else{
+			text = editText;
+		}
+		
+		final EditText input = new EditText(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					createFolder(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),
+				KeyEvent.KEYCODE_ENTER);
+		input.setText(text);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_new_folder),
+				null, input);
+		builder.setPositiveButton(getString(R.string.general_create),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						createFolder(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+	
+	private void createFolder(String title) {
+		
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		statusDialog = null;
+		try {
+			statusDialog = new ProgressDialog(this);
+			statusDialog.setMessage(getString(R.string.context_creating_folder));
+			statusDialog.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		
+		long parentHandle;
+		if (fbL.isVisible()){
+			parentHandle = fbL.getParentHandle();
+		}
+		else if (fbG.isVisible()){
+			parentHandle = fbG.getParentHandle();
+		}
+		else{
+			return;
+		}
+		
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+		
+		if (parentNode == null){
+			parentNode = megaApi.getRootNode();
+		}
+		
+		megaApi.createFolder(title, parentNode, this);
+		
+	}
+	
 	public void showRenameDialog(final MegaNode document, String text){
+		
+		if (fbL.isVisible()){
+			fbL.setPositionClicked(-1);
+			fbL.notifyDataSetChanged();
+		}
+		else if (fbG.isVisible()){
+			fbG.setPositionClicked(-1);
+			fbG.notifyDataSetChanged();
+		}
+		
 		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
@@ -1172,6 +1350,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void showMove(ArrayList<Long> handleList){
+		
+		if (fbL.isVisible()){
+			fbL.setPositionClicked(-1);
+			fbL.notifyDataSetChanged();
+		}
+		else if (fbG.isVisible()){
+			fbG.setPositionClicked(-1);
+			fbG.notifyDataSetChanged();
+		}
+		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -1183,6 +1371,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void showCopy(ArrayList<Long> handleList){
+		
+		if (fbL.isVisible()){
+			fbL.setPositionClicked(-1);
+			fbL.notifyDataSetChanged();
+		}
+		else if (fbG.isVisible()){
+			fbG.setPositionClicked(-1);
+			fbG.notifyDataSetChanged();
+		}
+		
 //		Intent intent = new Intent(this, FileExplorerActivity.class);
 //		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
 //		long[] longArray = new long[handleList.size()];

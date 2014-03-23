@@ -90,7 +90,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setNodes(NodeList nodes){
 		this.nodes = nodes;
-		Toast.makeText(context, "NODE(0): " + nodes.get(0).getHandle() + "_" + ((MegaNode)getItem(0)).getHandle(), Toast.LENGTH_LONG).show();
 		positionClicked = -1;	
 		notifyDataSetChanged();
 //		listFragment.clearFocus();
