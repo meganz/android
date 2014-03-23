@@ -19,12 +19,37 @@
         android:title="@string/action_search" />
 -->
 
-    <item
+	<item
+	    android:id="@+id/action_new_folder"
+	    android:orderInCategory="100"
+	    android:showAsAction="always"
+	    android:title="Create new folder"
+	    android:icon="@drawable/ic_menu_new_folder_dark"
+	    MEGA:showAsAction="ifRoom" />
+	
+	<item
+	    android:id="@+id/action_more_options"
+	    android:orderInCategory="105"
+	    android:showAsAction="always"
+	    android:title="More options"
+	    android:icon="@drawable/ic_action_content_new"
+	    MEGA:showAsAction="ifRoom" />
+	
+	<item
+	    android:id="@+id/action_upload"
+	    android:orderInCategory="110"
+	    android:showAsAction="always"
+	    android:title="More options"
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="ifRoom" />
+    
+<!--     <item
         android:id="@+id/action_logout"
-        android:orderInCategory="105"
+        android:orderInCategory="115"
         android:showAsAction="always"
         android:title="@string/action_logout"
         android:icon="@drawable/ic_launcher"
         MEGA:showAsAction="ifRoom"
         />
+         -->
 </menu>

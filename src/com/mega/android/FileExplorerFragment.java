@@ -174,4 +174,15 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			adapter.setParentHandle(parentHandle);
 		}
 	}
+	
+	public void setNodes(NodeList nodes){
+		this.nodes = nodes;
+		if (adapter != null){
+			adapter.setNodes(nodes);
+		}
+	}
+	
+	public ListView getListView(){
+		return listView;
+	}
 }
