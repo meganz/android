@@ -115,7 +115,12 @@
 	<string name="upload_to_video">Video</string>
 	<string name="upload_to_filesystem">Pick from File System</string>
 	<string name="upload_select_file_type">Select file type</string>
-	
+	<string name="upload_uploading">Uploading</string>
+	<string name="upload_touch_to_cancel">Touch to cancel upload</string>
+	<string name="upload_failed">Upload failed</string>
+	<string name="upload_uploaded">uploaded</string>
+	<string name="upload_cancel_uploading">Do you want to cancel the upload?</string>
+		
 	<string name="error_io_problem">Filesystem problem</string>
 	
 	<string name="manager_folder_is_empty">Empty Folder</string>
