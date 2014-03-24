@@ -8,6 +8,8 @@ import java.util.Set;
 public class MegaApiJava
 {
 	MegaApi megaApi;
+	GfxProcessor gfxProcessor;
+	
 	boolean isRunCallbackThreaded()
 	{
 		return false;
@@ -40,7 +42,13 @@ public class MegaApiJava
 	{
 		megaApi = new MegaApi(basePath);
 	}
-
+	
+	public MegaApiJava(String basePath, GfxProcessor gfxProcessor)
+	{
+		this.gfxProcessor = gfxProcessor;
+		megaApi = new MegaApi(basePath, gfxProcessor);
+	}
+	
 	public MegaApiJava()
 	{
 		megaApi = new MegaApi();

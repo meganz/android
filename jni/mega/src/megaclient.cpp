@@ -29,9 +29,8 @@ bool debug;
 // FIXME: instead of copying nodes, move if the source is in the rubbish to
 // reduce node creation load on the servers
 // FIXME: support filesystems with timestamp granularity > 1 s (FAT)?
-// FIXME: set folder timestamps
+// FIXME: replicate folder timestamps
 // FIXME: prevent synced folder from being moved into another synced folder
-// FIXME: treestate semantics
 
 // root URL for API access
 const char* const MegaClient::APIURL = "https://g.api.mega.co.nz/";
@@ -159,6 +158,7 @@ void MegaClient::mergenewshares(bool notify)
                     // outgoing share to user u deleted
                     if (n->outshares.erase(s->peer) && notify)
                     {
+                        n->changed.outshares = true;
                         notifynode(n);
                     }
 
@@ -200,6 +200,7 @@ void MegaClient::mergenewshares(bool notify)
 
                             if (notify)
                             {
+                                n->changed.outshares = true;
                                 notifynode(n);
                             }
                         }
@@ -223,6 +224,7 @@ void MegaClient::mergenewshares(bool notify)
 
                                 if (notify)
                                 {
+                                    n->changed.inshare = true;
                                     notifynode(n);
                                 }
                             }
@@ -370,20 +372,22 @@ void MegaClient::init()
     *scsn = 0;
 }
 
-MegaClient::MegaClient(MegaApp* a, Waiter* w, HttpIO* h, FileSystemAccess* f, DbAccess* d, const char* k, const char* u)
+MegaClient::MegaClient(MegaApp* a, Waiter* w, HttpIO* h, FileSystemAccess* f, DbAccess* d, GfxProc* g, const char* k, const char* u)
 {
     sctable = NULL;
     syncscanstate = false;
 
     init();
 
+    a->client = this;
+    g->client = this;
+
     app = a;
     waiter = w;
     httpio = h;
     fsaccess = f;
     dbaccess = d;
-
-    a->client = this;
+    gfx = g;
 
     slotit = tslots.end();
 
@@ -413,6 +417,8 @@ MegaClient::MegaClient(MegaApp* a, Waiter* w, HttpIO* h, FileSystemAccess* f, Db
     nextuh = 0;
     currsyncid = 0;
     reqtag = 0;
+
+    badhostcs = NULL;
 
     scsn[sizeof scsn - 1] = 0;
 
@@ -506,7 +512,7 @@ void MegaClient::exec()
                         }
                         else
                         {
-                            pendingfa[pair < handle, fatype > (fa->th, fa->type)] = pair<handle, int>(fah, fa->tag);
+                            pendingfa[pair<handle, fatype>(fa->th, fa->type)] = pair<handle, int>(fah, fa->tag);
                         }
 
                         delete fa;
@@ -817,6 +823,16 @@ void MegaClient::exec()
             break;
         }
 
+        if (badhostcs)
+        {
+            if (badhostcs->status == REQ_FAILURE || badhostcs->status == REQ_SUCCESS)
+            {
+                delete badhostcs->out;
+                delete badhostcs;
+                badhostcs = NULL;
+            }
+        }
+
         // fill transfer slots from the queue
         dispatchmore(PUT);
         dispatchmore(GET);
@@ -1044,12 +1060,10 @@ void MegaClient::exec()
                 }
 
                 // do we have pending local deletions? (don't process while
-                // we're still retrying failed fs locks or completing local
-                // ops!)
+                // we're still retrying failed fs locks or completing local ops!)
                 if (localsyncnotseen.size() && !syncfslockretry)
                 {
-                    // if all scanqs are complete, execute pending remote
-                    // deletions
+                    // if all scanqs are complete, execute pending remote deletions
                     for (it = syncs.begin(); it != syncs.end(); it++)
                     {
                         if ((*it)->dirnotify->notifyq[DirNotify::DIREVENTS].size()
@@ -1065,8 +1079,7 @@ void MegaClient::exec()
                              it != localsyncnotseen.end(); it++)
                         {
                             // we skip missing files once to cater for possible
-                            // move races (may have reappeared in a section
-                            // already scanned)
+                            // move races (may have reappeared in a section already scanned)
                             if (((*it)->notseen < 2) && ((*it)->scanseqno != (*it)->sync->scanseqno))
                             {
                                 (*it)->scanseqno = (*it)->sync->scanseqno;
@@ -1177,9 +1190,19 @@ void MegaClient::exec()
                 }
             }
         }
-    }
+    } while (httpio->doio() || (!pendingcs && reqs[r].cmdspending() && btcs.armed()));
 
-    while (httpio->doio() || (!pendingcs && reqs[r].cmdspending() && btcs.armed()));
+    if (!badhostcs && badhosts.size())
+    {
+        // report hosts affected by failed requests
+        badhostcs = new HttpReq();
+        badhostcs->posturl = APIURL;
+        badhostcs->posturl.append("pf?h");
+        badhostcs->out = new string(badhosts);
+        badhostcs->type = REQ_JSON;
+        badhostcs->post(this);
+        badhosts.clear();
+    }
 }
 
 // get next event time from all subsystems, then invoke the waiter if needed
@@ -1346,7 +1369,7 @@ bool MegaClient::abortbackoff()
 // returns true if dispatch occurred, false otherwise
 bool MegaClient::dispatch(direction_t d)
 {
-    // do we have any transfer tslots available?
+    // do we have any transfer slots available?
     if (!slotavail())
     {
         return false;
@@ -1439,8 +1462,7 @@ bool MegaClient::dispatch(direction_t d)
                 (*it)->prepare();
             }
 
-            // app-side transfer preparations (populate localname, create
-            // thumbnail...)
+            // app-side transfer preparations (populate localname, create thumbnail...)
             app->transfer_prepare(nextit->second);
         }
 
@@ -1465,11 +1487,18 @@ bool MegaClient::dispatch(direction_t d)
                 {
                     nextit->second->size = ts->fa->size;
                     nextit->second->chunkmacs.clear();
+
+                    // create thumbnail/preview imagery, if applicable (FIXME: do not re-create upon restart)
+                    if (gfx && nextit->second->localfilename.size() && !nextit->second->uploadhandle)
+                    {
+                        nextit->second->uploadhandle = getuploadhandle();
+
+                        gfx->gendimensionsputfa(ts->fa, &nextit->second->localfilename, nextit->second->uploadhandle, &nextit->second->key);
+                    }
                 }
                 else
                 {
-                    // downloads resume at the end of the last contiguous
-                    // completed block
+                    // downloads resume at the end of the last contiguous completed block
                     for (chunkmac_map::iterator it = nextit->second->chunkmacs.begin();
                          it != nextit->second->chunkmacs.end(); it++)
                     {
@@ -1477,6 +1506,7 @@ bool MegaClient::dispatch(direction_t d)
                         {
                             break;
                         }
+
                         nextit->second->pos = ChunkedHash::chunkceil(nextit->second->pos);
                     }
 
@@ -1737,7 +1767,7 @@ void MegaClient::procsc()
             case MAKENAMEID2('s', 'n'):
                 setscsn(&jsonsc);
                 break;
-
+                
             case EOO:
                 mergenewshares(1);
                 applykeys();
@@ -1959,7 +1989,7 @@ error MegaClient::getfa(Node* n, fatype t, int cancel)
         {
             *fafcp = new FileAttributeFetchChannel();
         }
-cout<< "Requesting attribute fah=" << hex << fah << endl;
+
         (*fafcp)->fahref = fah;
 
         // map returned handle to type/node upon retrieval response
@@ -1989,31 +2019,17 @@ void MegaClient::pendingattrstring(handle h, string* fa)
     }
 }
 
-// attach file attribute to a file
-// FIXME: to avoid unnecessary roundtrips to the attribute servers, also store
-// locally
-void MegaClient::putfa(Transfer* transfer, fatype t, const byte* data, unsigned len)
+// attach file attribute to a file (th can be upload or node handle)
+// FIXME: to avoid unnecessary roundtrips to the attribute servers, also cache locally
+void MegaClient::putfa(handle th, fatype t, SymmCipher* key, string* data)
 {
-    // build encrypted file attribute data block
-    byte* cdata;
-    unsigned clen = (len + SymmCipher::BLOCKSIZE - 1) & - SymmCipher::BLOCKSIZE;
+    // CBC-encrypt attribute data (padded to next multiple of BLOCKSIZE)
+    data->resize((data->size() + SymmCipher::BLOCKSIZE - 1) & -SymmCipher::BLOCKSIZE);
+    key->cbc_encrypt((byte*)data->data(), data->size());
 
-    cdata = new byte[clen];
+    newfa.push_back(new HttpReqCommandPutFA(this, th, t, data));
 
-    memcpy(cdata, data, len);
-    memset(cdata + len, 0, clen - len);
-
-    transfer->key.cbc_encrypt(cdata, clen);
-
-    if (!transfer->uploadhandle)
-    {
-        transfer->uploadhandle = getuploadhandle();
-    }
-
-    newfa.push_back(new HttpReqCommandPutFA(this, transfer->uploadhandle, t, cdata, clen));
-
-    // no other file attribute storage request currently in progress? POST this
-    // one.
+    // no other file attribute storage request currently in progress? POST this one.
     if (curfa == newfa.end())
     {
         curfa = newfa.begin();
@@ -2135,18 +2151,25 @@ void MegaClient::sc_updatenode()
                         if (u)
                         {
                             n->owner = u;
+                            n->changed.owner = true;
                         }
+
                         if (a)
                         {
                             Node::copystring(&n->attrstring, a);
+                            n->changed.attrs = true;
                         }
+
                         if (tm + 1)
                         {
                             n->clienttimestamp = tm;
+                            n->changed.clienttimestamp = true;
                         }
+
                         if (ts + 1)
                         {
                             n->ctime = ts;
+                            n->changed.ctime = true;
                         }
 
                         n->applykey();
@@ -2454,6 +2477,7 @@ void MegaClient::sc_fileattr()
                 if (fa && n)
                 {
                     Node::copystring(&n->fileattrstring, fa);
+                    n->changed.fileattrstring = true;
                     notifynode(n);
                 }
                 return;
@@ -2687,6 +2711,7 @@ error MegaClient::setattr(Node* n, const char** newattr)
         }
     }
 
+    n->changed.attrs = true;
     notifynode(n);
 
     reqs[r].add(new CommandSetAttr(this, n));
@@ -2823,6 +2848,7 @@ error MegaClient::rename(Node* n, Node* p, syncdel_t syncdel)
 
     if (n->setparent(p))
     {
+        n->changed.parent = true;
         notifynode(n);
 
         reqs[r].add(new CommandMoveNode(this, n, p, syncdel));
@@ -5607,15 +5633,29 @@ void MegaClient::putnodes_syncdebris_result(error e, NewNode* nn)
     syncdebrisadding = false;
 }
 
-// a chunk transfer request failed
-void MegaClient::setchunkfailed()
+// a chunk transfer request failed: record failed protocol & host
+void MegaClient::setchunkfailed(string* url)
 {
-    if (!chunkfailed)
+    if (!chunkfailed && url->size() > 19)
     {
         chunkfailed = true;
         httpio->success = false;
 
-        // FIXME: perform dummy API request
+        // record protocol and hostname
+        if (badhosts.size())
+        {
+            badhosts.append(",");
+        }
+
+        const char* ptr = url->c_str()+4;
+
+        if (*ptr == 's')
+        {
+            badhosts.append("S");
+            ptr++;
+        }
+        
+        badhosts.append(ptr+6,7);
     }
 }
 

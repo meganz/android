@@ -34,7 +34,7 @@ TransferSlot::TransferSlot(Transfer* ctransfer)
     starttime = 0;
     progressreported = 0;
     progresscompleted = 0;
-    lastdata = 0;
+    lastdata = Waiter::ds;
     errorcount = 0;
 
     failure = false;
@@ -238,7 +238,7 @@ void TransferSlot::doio(MegaClient* client)
                         if (!failure)
                         {
                             failure = true;
-                            client->setchunkfailed();
+                            client->setchunkfailed(&reqs[i]->posturl);
                         }
 
                         reqs[i]->status = REQ_PREPARED;
@@ -308,7 +308,20 @@ void TransferSlot::doio(MegaClient* client)
         progress();
     }
 
-    if ((Waiter::ds - lastdata >= XFERTIMEOUT) || (errorcount > 10))
+    if (Waiter::ds - lastdata >= XFERTIMEOUT && !failure)
+    {
+        failure = true;
+
+        for (int i = connections; i--; )
+        {
+            if (reqs[i])
+            {
+                client->setchunkfailed(&reqs[i]->posturl);
+            }
+        }
+    }
+
+    if (errorcount > 10)
     {
         return transfer->failed(API_EFAILED);
     }

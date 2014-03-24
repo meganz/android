@@ -1,6 +1,6 @@
 /**
  * @file win32/fs.cpp
- * @brief Win32 filesystem/directory access/notification (UNICODE)
+ * @brief Win32 filesystem/directory access/notification
  *
  * (c) 2013 by Mega Limited, Wellsford, New Zealand
  *
@@ -152,6 +152,8 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
     WIN32_FILE_ATTRIBUTE_DATA fad;
     BY_HANDLE_FILE_INFORMATION bhfi;
 
+    int added = WinFileSystemAccess::sanitizedriveletter(name);
+    
     name->append("", 1);
 
     if (write)
@@ -162,15 +164,16 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
     {
         if (!GetFileAttributesExW((LPCWSTR)name->data(), GetFileExInfoStandard, (LPVOID)&fad))
         {
-            name->resize(name->size() - 1);
             retry = WinFileSystemAccess::istransient(GetLastError());
+            name->resize(name->size() - added - 1);
             return false;
         }
 
         // ignore symlinks - they would otherwise be treated as moves
         // also, ignore some other obscure filesystem object categories
-        if (fad.dwFileAttributes & SKIPATTRIBUTES)
+        if (!added && (fad.dwFileAttributes & SKIPATTRIBUTES))
         {
+            name->resize(name->size() - 1);
             retry = false;
             return false;
         }
@@ -188,7 +191,7 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
                         ((type == FOLDERNODE) ? FILE_FLAG_BACKUP_SEMANTICS : 0),
                         NULL);
 
-    name->resize(name->size() - 1);
+    name->resize(name->size() - added - 1);
 
     // FIXME: verify that keeping the directory opened quashes the possibility
     // of a race condition between CreateFile() and FindFirstFile()
@@ -208,9 +211,7 @@ bool WinFileAccess::fopen(string* name, bool read, bool write)
 
     if (type == FOLDERNODE)
     {
-        // enumerate directory
         name->append((char*)L"\\*", 5);
-
         hFind = FindFirstFileW((LPCWSTR)name->data(), &ffd);
         name->resize(name->size() - 5);
 
@@ -240,8 +241,17 @@ WinFileSystemAccess::WinFileSystemAccess()
     localseparator.assign((char*)L"\\", sizeof(wchar_t));
 }
 
-WinFileSystemAccess::~WinFileSystemAccess()
-{}
+// append \ to bare Windows drive letter paths
+int WinFileSystemAccess::sanitizedriveletter(string* localpath)
+{
+    if (localpath->size() > sizeof(wchar_t) && !memcmp(localpath->data() + localpath->size() - sizeof(wchar_t), (char*)L":", sizeof(wchar_t)))
+    {
+        localpath->append((char*)L"\\", sizeof(wchar_t));
+        return sizeof(wchar_t);
+    }
+
+    return 0;
+}
 
 bool WinFileSystemAccess::istransient(DWORD e)
 {
@@ -415,7 +425,7 @@ bool WinFileSystemAccess::renamelocal(string* oldname, string* newname, bool rep
     return r;
 }
 
-bool WinFileSystemAccess::copylocal(string* oldname, string* newname)
+bool WinFileSystemAccess::copylocal(string* oldname, string* newname, time_t)
 {
     oldname->append("", 1);
     newname->append("", 1);
@@ -498,7 +508,8 @@ bool WinFileSystemAccess::setmtimelocal(string* name, time_t mtime)
         return false;
     }
 
-    ll = Int32x32To64(mtime, 10000000) + 116444736000000000;
+    ll = (mtime + 11644473600) * 10000000;
+
     lwt.dwLowDateTime = (DWORD)ll;
     lwt.dwHighDateTime = ll >> 32;
 
@@ -641,6 +652,8 @@ WinDirNotify::WinDirNotify(string* localbasepath, string* ignore) : DirNotify(lo
     notifybuf[0].resize(65534);
     notifybuf[1].resize(65534);
 
+    int added = WinFileSystemAccess::sanitizedriveletter(localbasepath);
+
     localbasepath->append("", 1);
     if ((hDirectory = CreateFileW((LPCWSTR)localbasepath->data(),
                                    FILE_LIST_DIRECTORY,
@@ -652,7 +665,8 @@ WinDirNotify::WinDirNotify(string* localbasepath, string* ignore) : DirNotify(lo
     {
         readchanges();
     }
-    localbasepath->resize(localbasepath->size() - 1);
+
+    localbasepath->resize(localbasepath->size() - added - 1);
 }
 
 WinDirNotify::~WinDirNotify()
@@ -694,6 +708,10 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
         {
             name->append((char*)L"\\*", 5);
         }
+        else
+        {
+            name->append("", 1);
+        }
 
         hFind = FindFirstFileW((LPCWSTR)name->data(), &ffd);
 
@@ -722,7 +740,7 @@ bool WinDirAccess::dopen(string* name, FileAccess* f, bool glob)
             }
         }
 
-        name->resize(name->size() - 5);
+        name->resize(name->size() - (glob ? 1 : 5));
     }
 
     if (!(ffdvalid = (hFind != INVALID_HANDLE_VALUE)))

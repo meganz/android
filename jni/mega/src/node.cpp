@@ -52,7 +52,7 @@ Node::Node(MegaClient* cclient, node_vector* dp, handle h, handle ph,
 
     size = s;
     owner = u;
-
+    
     copystring(&fileattrstring, fa);
 
     clienttimestamp = tm;
@@ -62,6 +62,7 @@ Node::Node(MegaClient* cclient, node_vector* dp, handle h, handle ph,
     sharekey = NULL;
 
     removed = 0;
+    memset(&changed,-1,sizeof changed);
 
     if (client)
     {
@@ -528,7 +529,7 @@ const char* Node::displayname()
 // returns position of file attribute or 0 if not present
 int Node::hasfileattribute(fatype t) const
 {
-    char buf[16];
+    char buf[24];
 
     sprintf(buf, ":%u*", t);
     return fileattrstring.find(buf) + 1;
