@@ -373,5 +373,18 @@ public class Util {
 				Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 		return sb;
 	}
+	
+	/*
+	 * Delete file if it belongs to the app
+	 */
+	public static void deleteIfLocal(Context context, File file) {
+		if (isLocal(context, file) && file.exists()) {
+			log("delete!");
+			file.delete();
+		}
+	}
 
+	private static void log(String message) {
+		log("Util", message);
+	}
 }

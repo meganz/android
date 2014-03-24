@@ -112,6 +112,11 @@
             android:name="DownloadService"
             android:exported="false" >
         </service>
+        
+        <service
+            android:name="UploadService"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

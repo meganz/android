@@ -334,10 +334,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					String title = null;
 					String text = null;
 					if(intent.getAction().equals(ACTION_CANCEL_UPLOAD)){
-//						tempIntent = new Intent(this, UploadService.class);
-//						tempIntent.setAction(UploadService.ACTION_CANCEL);
-//						title = getString(R.string.upload_uploading);
-//						text = getString(R.string.upload_cancel_uploading);
+						tempIntent = new Intent(this, UploadService.class);
+						tempIntent.setAction(UploadService.ACTION_CANCEL);
+						title = getString(R.string.upload_uploading);
+						text = getString(R.string.upload_cancel_uploading);
 					}
 					else{
 						tempIntent = new Intent(this, DownloadService.class);
@@ -1525,6 +1525,25 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			for (String path : paths) {
 				Toast.makeText(this, "Upload(" + i + "): " + path + " to MEGA." + parentNode.getName(), Toast.LENGTH_SHORT).show();
+				Intent uploadServiceIntent = new Intent (this, UploadService.class);
+				File file = new File (path);
+				if (file.isDirectory()){
+					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
+				}
+				else{
+					ShareInfo info = ShareInfo.infoFromFile(file);
+					if (info == null){
+						continue;
+					}
+					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+				}
+				
+				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
+				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				startService(uploadServiceIntent);
 				i++;
 			}
 			
