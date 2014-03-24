@@ -3,6 +3,8 @@ package com.mega.android;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
@@ -107,6 +109,23 @@ public class MimeType {
 	 */
 	public boolean isImage() {
 		return type.startsWith("image/");
+	}
+
+	/*
+	 * Once a file is downloaded, prior to create the preview, check if the file is really an image
+	 */
+	public boolean isImage(String path){
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+		if (options.outWidth != -1 && options.outHeight != -1) {
+		    // This is an image file.
+			return true;
+		}
+		else {
+		    // This is not an image file.
+			return false;
+		}
 	}
 	
 	/*
