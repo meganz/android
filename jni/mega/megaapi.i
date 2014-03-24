@@ -1,4 +1,5 @@
 #define __ANDROID__
+#define USE_ANDROID
 
 %module(directors="1") mega
 %{
@@ -37,6 +38,8 @@
 %feature("director") MegaTransferListener;
 %feature("director") MegaGlobalListener;
 %feature("director") MegaListener;
+%feature("director") GfxProcessor;
+
 //%feature("director") TreeProcessor;
 
 //Ignore internal classes
@@ -44,6 +47,7 @@
 %ignore mega::PosixFileSystemAccess;
 %ignore mega::MegaApiLinuxWaiter;
 %ignore mega::SqliteDbAccess;
+%ignore mega::GfxProcAndroid;
 %ignore threadEntryPoint;
 %ignore HttpIO;
 %ignore MegaApp;
@@ -59,6 +63,7 @@
 %ignore MegaHttpIO;
 %ignore MegaFileSystemAccess;
 %ignore MegaDbAccess;
+%ignore MegaGfxProc;
 
 //Don't wrap internal constructors
 //(these objects should be created internally only)
@@ -138,6 +143,7 @@ class PosixFileSystemAccess {};
 class SqliteDbAccess {};
 class File {};
 class MegaApiCurlHttpIO {};
+class GfxProcAndroid {};
 class MegaFileSystemAccess {};
 class MegaWaiter {};
 class HttpIO {};

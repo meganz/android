@@ -56,11 +56,13 @@ public:
 
     void name2local(string*, const char* = NULL);
     void local2name(string*);
+    
+    static int sanitizedriveletter(string*);
 
     bool getsname(string*, string*);
 
     bool renamelocal(string*, string*, bool);
-    bool copylocal(string*, string*);
+    bool copylocal(string*, string*, time_t);
     bool unlinklocal(string*);
     bool rmdirlocal(string*);
     bool mkdirlocal(string*, bool);
@@ -76,7 +78,6 @@ public:
     void osversion(string*);
 
     WinFileSystemAccess();
-    ~WinFileSystemAccess();
 };
 
 struct MEGA_API WinDirNotify : public DirNotify
@@ -114,6 +115,7 @@ public:
 
     // file attributes we skip for a variety of excellent reasons
     static const DWORD SKIPATTRIBUTES = FILE_ATTRIBUTE_REPARSE_POINT
+                                        | FILE_ATTRIBUTE_SYSTEM
                                         | FILE_ATTRIBUTE_TEMPORARY
                                         | FILE_ATTRIBUTE_OFFLINE;
 

@@ -65,6 +65,7 @@ typedef int64_t m_off_t;
 #elif USE_QT
 #include <QThread>
 #include <QMutex>
+#include "mega/gfx/qt.h"
 
 class MegaThread: public QThread
 {
@@ -100,6 +101,24 @@ protected:
 #define JOIN_THREAD(thread) thread->wait();
 #define DELETE_THREAD(thread) delete thread;
 
+class MegaGfxProc : public mega::GfxProcQT {};
+
+#endif
+
+#ifdef USE_ANDROID
+class GfxProcessor
+{
+public:
+	virtual bool readBitmap(const char* path) { return false; }
+	virtual int getWidth() { return 0; }
+	virtual int getHeight() { return 0; }
+	virtual char *resizeBitmap(int w, int h, int px, int py, int rw, int rh) { return NULL; }
+	virtual void freeBitmap() {}
+	virtual ~GfxProcessor() {};
+};
+
+#include "mega/gfx/android.h"
+class MegaGfxProc : public mega::GfxProcAndroid {};
 #endif
 
 using namespace std;
@@ -111,7 +130,6 @@ using namespace std;
 #include "win32/megaapiwait.h"
 #include "mega.h"
 #include "MegaProxySettings.h"
-
 
 class MegaHttpIO : public mega::MegaApiWinHttpIO {};
 class MegaFileSystemAccess : public mega::WinFileSystemAccess {};
@@ -782,7 +800,12 @@ public:
     static bool nodeComparatorAlphabeticalDESC  (MegaNode *i, MegaNode *j);
 	static bool userComparatorDefaultASC (mega::User *i, mega::User *j);
 
-    MegaApi(const char *basePath = NULL);
+	#ifdef __ANDROID__
+		MegaApi(const char *basePath = NULL, GfxProcessor* processor = NULL);
+	#else
+		MegaApi(const char *basePath = NULL);
+	#endif
+
 	virtual ~MegaApi();
 
 	//Multiple listener management.
@@ -928,6 +951,7 @@ protected:
     MegaWaiter *waiter;
     MegaFileSystemAccess *fsAccess;
     MegaDbAccess *dbAccess;
+    MegaGfxProc *gfxAccess;
 
 	RequestQueue requestQueue;
 	TransferQueue transferQueue;
