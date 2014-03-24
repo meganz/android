@@ -21,7 +21,10 @@ import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
+import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -358,6 +361,17 @@ public class Util {
 			anim.setFillAfter(true);
 			view.startAnimation(anim);
 		}
+	}
+	
+	/*
+	 * Make part of the string bold
+	 */
+	public static SpannableStringBuilder makeBold(String text, String boldText) {
+		SpannableStringBuilder sb = new SpannableStringBuilder(text);
+		StyleSpan bss = new StyleSpan(android.graphics.Typeface.BOLD);
+		sb.setSpan(bss, text.length() - boldText.length(), text.length(),
+				Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+		return sb;
 	}
 
 }

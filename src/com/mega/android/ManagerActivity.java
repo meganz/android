@@ -89,8 +89,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 	}
 	
+	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
+	public static int REQUEST_CODE_GET_LOCAL = 1003;
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -140,6 +142,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private boolean moveToRubbish = false;
     
     ProgressDialog statusDialog;
+    
+	public UploadHereDialog uploadDialog;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -588,7 +592,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	return true;
 	        }
 	        case R.id.action_upload:{
-	        	Toast.makeText(this, "Upload button clicked", Toast.LENGTH_LONG).show();
+				uploadDialog = new UploadHereDialog();
+				uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
 	        	return true;
 	        }
             default:{
@@ -1488,7 +1493,44 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if (intent == null) {
 			return;
 		}
-		if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			Toast.makeText(this, "REQUEST_CODE_GET " + intent.getData().toString(), Toast.LENGTH_LONG).show();
+//			intent.setAction(Intent.ACTION_GET_CONTENT);
+//			fragment.prepareFiles(this, this, intent);
+//			prepareProgress = Util.createProgress(this,
+//					getString(R.string.upload_prepare));
+//			dialogToShow = prepareProgress;
+		} 
+		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
+			
+			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
+			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
+			
+			int i = 0;
+			long parentHandle;
+			if (fbL.isVisible()){
+				parentHandle = fbL.getParentHandle();
+			}
+			else if (fbG.isVisible()){
+				parentHandle = fbG.getParentHandle();
+			}
+			else{
+				return;
+			}
+			
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+			
+			for (String path : paths) {
+				Toast.makeText(this, "Upload(" + i + "): " + path + " to MEGA." + parentNode.getName(), Toast.LENGTH_SHORT).show();
+				i++;
+			}
+			
+		}
+		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+		
 			if(!Util.isOnline(this)){
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;

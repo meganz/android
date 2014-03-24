@@ -10,6 +10,7 @@
     <string name="general_move_to">Move</string>
     <string name="general_copy_to">Copy</string>
     <string name="general_create">Create</string>
+    <string name="general_upload">File Upload</string>
             
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
@@ -108,4 +109,15 @@
     <string name="context_creating_folder">Creating folder</string>
   
     <string name="menu_new_folder">New folder</string>
+    
+    <string name="upload_to_image">Image</string>
+	<string name="upload_to_audio">Audio</string>
+	<string name="upload_to_video">Video</string>
+	<string name="upload_to_filesystem">Pick from File System</string>
+	<string name="upload_select_file_type">Select file type</string>
+	
+	<string name="error_io_problem">Filesystem problem</string>
+	
+	<string name="manager_folder_is_empty">Empty Folder</string>
+	<string name="manager_new_folder_name">Folder Name</string>
 </resources>
