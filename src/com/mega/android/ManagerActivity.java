@@ -1564,14 +1564,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			fbG.notifyDataSetChanged();
 		}
 		
-//		Intent intent = new Intent(this, FileExplorerActivity.class);
-//		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
-//		long[] longArray = new long[handleList.size()];
-//		for (int i=0; i<handleList.size(); i++){
-//			longArray[i] = handleList.get(i);
-//		}
-//		intent.putExtra("COPY_FROM", longArray);
-//		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("COPY_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
 		Toast.makeText(this, "ManagerActivity.showCopy(ArrayList<Long> handleList): Code commented. Not yet working", Toast.LENGTH_LONG).show();
 	}
 	
