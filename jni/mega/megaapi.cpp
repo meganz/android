@@ -4620,12 +4620,13 @@ TreeProcCopy::TreeProcCopy()
 
 void TreeProcCopy::allocnodes()
 {
-	nn = new NewNode[nc];
+	if(nc) nn = new NewNode[nc];
 }
 
 TreeProcCopy::~TreeProcCopy()
 {
-	delete[] nn;
+	//Will be deleted in putnodes_result
+	//delete[] nn;
 }
 
 // determine node tree size (nn = NULL) or write node tree to new nodes array
