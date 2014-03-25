@@ -583,12 +583,27 @@ public class MegaApiJava
 	{
 		return megaApi.getNodeByHandle(handle);
 	}
+	
+	public UserList getContacts() 
+	{
+		return megaApi.getContacts();
+	}
 
-	public NodeList getInShares(User user)
+	public MegaUser getContact(String email) 
+	{
+		return megaApi.getContact(email);
+	}
+
+	public NodeList getInShares(MegaUser user)
 	{
 		return megaApi.getInShares(user);
 	}
 
+	public NodeList getInShares()
+	{
+		return megaApi.getInShares();
+	}
+	
 	public String getAccess(MegaNode node)
 	{
 		return megaApi.getAccess(node);

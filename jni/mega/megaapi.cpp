@@ -145,6 +145,74 @@ void MegaFilePut::completed(Transfer* t, LocalNode*)
 }
 
 
+NodeList::NodeList()
+{ list = NULL; s = 0; }
+
+NodeList::NodeList(mega::Node** newlist, int size)
+{
+	list = NULL; s = size;
+	if(!size) return;
+
+	list = new MegaNode*[size];
+	for(int i=0; i<size; i++)
+		list[i] = MegaNode::fromNode(newlist[i]);
+}
+
+NodeList::~NodeList()
+{
+	if(!list) return;
+
+	for(int i=0; i<s; i++)
+		delete list[i];
+	delete [] list;
+}
+
+MegaNode *NodeList::get(int i)
+{
+	if(!list || (i < 0) || (i >= s))
+		return NULL;
+
+	return list[i];
+}
+
+int NodeList::size()
+{ return s; }
+
+
+UserList::UserList()
+{ list = NULL; s = 0; }
+
+UserList::UserList(mega::User** newlist, int size)
+{
+	list = NULL; s = size;
+	if(!size) return;
+
+	list = new MegaUser*[size];
+	for(int i=0; i<size; i++)
+		list[i] = MegaUser::fromUser(newlist[i]);
+}
+
+UserList::~UserList()
+{
+	if(!list) return;
+
+	for(int i=0; i<s; i++)
+		delete list[i];
+	delete [] list;
+}
+
+MegaUser *UserList::get(int i)
+{
+	if(!list || (i < 0) || (i >= s))
+		return NULL;
+
+	return list[i];
+}
+
+int UserList::size()
+{ return s; }
+
+
 MegaNode::MegaNode(const char *name, int type, m_off_t size, time_t ctime, time_t mtime, handle nodehandle, string *nodekey, string *attrstring)
 {
     this->name = MegaApi::strdup(name);
@@ -276,6 +344,37 @@ bool MegaNode::hasPreview()
 	return previewAvailable;
 }
 
+MegaUser::MegaUser(mega::User *user)
+{
+	email = MegaApi::strdup(user->email.c_str());
+	visibility = user->show;
+	ctime = user->ctime;
+}
+
+MegaUser::~MegaUser()
+{
+	delete email;
+}
+
+const char* MegaUser::getEmail()
+{
+	return email;
+}
+
+int MegaUser::getVisibility()
+{
+	return visibility;
+}
+
+time_t MegaUser::getTimestamp()
+{
+	return ctime;
+}
+
+MegaUser *MegaUser::fromUser(mega::User *user)
+{
+	return new MegaUser(user);
+}
 
 MegaRequest::MegaRequest(int type, MegaRequestListener *listener)
 {
@@ -1735,7 +1834,7 @@ bool MegaApi::userComparatorDefaultASC (User *i, User *j)
 	return 0;
 }
 
-/*
+
 UserList* MegaApi::getContacts()
 {
     MUTEX_LOCK(sdkMutex);
@@ -1747,40 +1846,64 @@ UserList* MegaApi::getContacts()
 		vector<User *>::iterator i = std::lower_bound(vUsers.begin(), vUsers.end(), u, MegaApi::userComparatorDefaultASC);
 		vUsers.insert(i, u);
 	}
-    UserList *userList = new UserList(&(vUsers[0]), vUsers.size(), true);
+    UserList *userList = new UserList(vUsers.data(), vUsers.size());
 
     MUTEX_UNLOCK(sdkMutex);
 
 	return userList;
 }
-*/
-/*
-User* MegaApi::getContact(const char* email)
+
+
+MegaUser* MegaApi::getContact(const char* email)
 {
     MUTEX_LOCK(sdkMutex);
-	User *user = client->finduser(email, 0);
+	MegaUser *user = MegaUser::fromUser(client->finduser(email, 0));
     MUTEX_UNLOCK(sdkMutex);
 	return user;
 }
-*/
 
-NodeList* MegaApi::getInShares(User *user)
+
+NodeList* MegaApi::getInShares(MegaUser *megaUser)
 {
-    if(!user) return new NodeList(NULL, 0, false);
+    if(!megaUser) return new NodeList();
 
     MUTEX_LOCK(sdkMutex);
-    vector<MegaNode*> vNodes;
+    vector<Node*> vNodes;
+    User *user = client->finduser(megaUser->getEmail(), 0);
+    if(!user) return new NodeList();
 
 	Node *n;
 	for (handle_set::iterator sit = user->sharing.begin(); sit != user->sharing.end(); sit++)
 	{
 		if ((n = client->nodebyhandle(*sit)))
-            vNodes.push_back(MegaNode::fromNode(n));
+            vNodes.push_back(n);
 	}
 	NodeList *nodeList;
-    if(vNodes.size()) nodeList = new NodeList(vNodes.data(), vNodes.size(), true);
-    else nodeList = new NodeList(NULL, 0, false);
+    if(vNodes.size()) nodeList = new NodeList(vNodes.data(), vNodes.size());
+    else nodeList = new NodeList();
 
+    MUTEX_UNLOCK(sdkMutex);
+	return nodeList;
+}
+
+NodeList* MegaApi::getInShares()
+{
+	MUTEX_LOCK(sdkMutex);
+
+    vector<Node*> vNodes;
+	for(user_map::iterator it = client->users.begin(); it != client->users.end(); it++)
+	{
+		User *user = &(it->second);
+		Node *n;
+
+		for (handle_set::iterator sit = user->sharing.begin(); sit != user->sharing.end(); sit++)
+		{
+			if ((n = client->nodebyhandle(*sit)))
+				vNodes.push_back(n);
+		}
+	}
+
+	NodeList *nodeList = new NodeList(vNodes.data(), vNodes.size());
     MUTEX_UNLOCK(sdkMutex);
 	return nodeList;
 }
@@ -1895,23 +2018,23 @@ bool MegaApi::processTree(Node* node, TreeProcessor* processor, bool recursive)
 
 NodeList* MegaApi::search(Node* node, const char* searchString, bool recursive)
 {
-    if(!node || !searchString) return new NodeList(NULL, 0, false);
+    if(!node || !searchString) return new NodeList();
 
     MUTEX_LOCK(sdkMutex);
 	node = client->nodebyhandle(node->nodehandle);
 	if(!node)
 	{
         MUTEX_UNLOCK(sdkMutex);
-        return new NodeList(NULL, 0, false);
+        return new NodeList();
 	}
 
 	SearchTreeProcessor searchProcessor(searchString);
 	processTree(node, &searchProcessor, recursive);
-    vector<MegaNode *>& vNodes = searchProcessor.getResults();
+    vector<Node *>& vNodes = searchProcessor.getResults();
 
 	NodeList *nodeList;
-    if(vNodes.size()) nodeList = new NodeList(vNodes.data(), vNodes.size(), true);
-    else nodeList = new NodeList(NULL, 0, false);
+    if(vNodes.size()) nodeList = new NodeList(vNodes.data(), vNodes.size());
+    else nodeList = new NodeList();
 
     MUTEX_UNLOCK(sdkMutex);
 
@@ -1944,13 +2067,13 @@ int SearchTreeProcessor::processNode(Node* node)
 	if(!node) return 1;
 	if(!search) return 0;
 #ifndef _WIN32
-    if(strcasestr(node->displayname(), search)!=NULL) results.push_back(MegaNode::fromNode(node));
+    if(strcasestr(node->displayname(), search)!=NULL) results.push_back(node);
 //TODO: Implement this for Windows
 #endif
 	return 1;
 }
 
-vector<MegaNode *> &SearchTreeProcessor::getResults()
+vector<Node *> &SearchTreeProcessor::getResults()
 {
 	return results;
 }
@@ -2804,7 +2927,7 @@ void MegaApi::nodes_updated(Node** n, int count)
     NodeList *nodeList = NULL;
     if(n != NULL)
     {
-        vector<MegaNode *> list;
+        vector<Node *> list;
         for(int i=0; i<count; i++)
         {
             Node *node = n[i];
@@ -2812,10 +2935,10 @@ void MegaApi::nodes_updated(Node** n, int count)
             {
                 node->changed.parent = false;
                 node->changed.attrs = false;
-                list.push_back(MegaNode::fromNode(node));
+                list.push_back(node);
             }
         }
-        nodeList = new NodeList(list.data(), list.size(), true);
+        nodeList = new NodeList(list.data(), list.size());
     }
     else
     {
@@ -3376,65 +3499,65 @@ MegaError MegaApi::checkMove(MegaNode* megaNode, MegaNode* targetNode)
 	return e;
 }
 
-bool MegaApi::nodeComparatorDefaultASC (MegaNode *i, MegaNode *j)
+bool MegaApi::nodeComparatorDefaultASC (Node *i, Node *j)
 {
-    if(i->getType() < j->getType()) return 0;
-    if(i->getType() > j->getType()) return 1;
-    if(strcasecmp(i->getName(), j->getName())<=0) return 1;
+    if(i->type < j->type) return 0;
+    if(i->type > j->type) return 1;
+    if(strcasecmp(i->displayname(), j->displayname())<=0) return 1;
 	return 0;
 }
 
-bool MegaApi::nodeComparatorDefaultDESC (MegaNode *i, MegaNode *j)
+bool MegaApi::nodeComparatorDefaultDESC (Node *i, Node *j)
 {
-    if(i->getType() < j->getType()) return 1;
-    if(i->getType() > j->getType()) return 0;
-    if(strcasecmp(i->getName(), j->getName())<=0) return 0;
+    if(i->type < j->type) return 1;
+    if(i->type > j->type) return 0;
+    if(strcasecmp(i->displayname(), j->displayname())<=0) return 0;
 	return 1;
 }
 
-bool MegaApi::nodeComparatorSizeASC (MegaNode *i, MegaNode *j)
-{ if(i->getSize() < j->getSize()) return 1; return 0;}
-bool MegaApi::nodeComparatorSizeDESC (MegaNode *i, MegaNode *j)
-{ if(i->getSize() < j->getSize()) return 0; return 1;}
+bool MegaApi::nodeComparatorSizeASC (Node *i, Node *j)
+{ if(i->size < j->size) return 1; return 0;}
+bool MegaApi::nodeComparatorSizeDESC (Node *i, Node *j)
+{ if(i->size < j->size) return 0; return 1;}
 
-bool MegaApi::nodeComparatorCreationASC  (MegaNode *i, MegaNode *j)
-{ if(i->getCreationTime() < j->getCreationTime()) return 1; return 0;}
-bool MegaApi::nodeComparatorCreationDESC  (MegaNode *i, MegaNode *j)
-{ if(i->getCreationTime() < j->getCreationTime()) return 0; return 1;}
+bool MegaApi::nodeComparatorCreationASC  (Node *i, Node *j)
+{ if(i->ctime < j->ctime) return 1; return 0;}
+bool MegaApi::nodeComparatorCreationDESC  (Node *i, Node *j)
+{ if(i->ctime < j->ctime) return 0; return 1;}
 
-bool MegaApi::nodeComparatorModificationASC  (MegaNode *i, MegaNode *j)
-{ if(i->getModificationTime() < j->getModificationTime()) return 1; return 0;}
-bool MegaApi::nodeComparatorModificationDESC  (MegaNode *i, MegaNode *j)
-{ if(i->getModificationTime() < j->getModificationTime()) return 0; return 1;}
+bool MegaApi::nodeComparatorModificationASC  (Node *i, Node *j)
+{ if(i->mtime < j->mtime) return 1; return 0;}
+bool MegaApi::nodeComparatorModificationDESC  (Node *i, Node *j)
+{ if(i->mtime < j->mtime) return 0; return 1;}
 
-bool MegaApi::nodeComparatorAlphabeticalASC  (MegaNode *i, MegaNode *j)
-{ if(strcasecmp(i->getName(), j->getName())<=0) return 1; return 0; }
-bool MegaApi::nodeComparatorAlphabeticalDESC  (MegaNode *i, MegaNode *j)
-{ if(strcasecmp(i->getName(), j->getName())<=0) return 0; return 1; }
+bool MegaApi::nodeComparatorAlphabeticalASC  (Node *i, Node *j)
+{ if(strcasecmp(i->displayname(), j->displayname())<=0) return 1; return 0; }
+bool MegaApi::nodeComparatorAlphabeticalDESC  (Node *i, Node *j)
+{ if(strcasecmp(i->displayname(), j->displayname())<=0) return 0; return 1; }
 
 
 NodeList *MegaApi::getChildren(MegaNode* p, int order)
 {
-    if(!p) return new NodeList(NULL, 0, false);
+    if(!p) return new NodeList();
 
     MUTEX_LOCK(sdkMutex);
     Node *parent = client->nodebyhandle(p->getHandle());
 	if(!parent)
 	{
         MUTEX_UNLOCK(sdkMutex);
-        return new NodeList(NULL, 0, false);
+        return new NodeList();
 	}
 
-    vector<MegaNode *> childrenNodes;
+    vector<Node *> childrenNodes;
 
 	if(!order || order>ORDER_ALPHABETICAL_DESC)
 	{
 		for (node_list::iterator it = parent->children.begin(); it != parent->children.end(); )
-            childrenNodes.push_back(MegaNode::fromNode(*it++));
+            childrenNodes.push_back(*it++);
 	}
 	else
 	{
-        bool (*comp)(MegaNode*, MegaNode*);
+        bool (*comp)(Node*, Node*);
 		switch(order)
 		{
 		case ORDER_DEFAULT_ASC: comp = MegaApi::nodeComparatorDefaultASC; break;
@@ -3452,16 +3575,16 @@ NodeList *MegaApi::getChildren(MegaNode* p, int order)
 
 		for (node_list::iterator it = parent->children.begin(); it != parent->children.end(); )
 		{
-            MegaNode *n = MegaNode::fromNode(*it++);
-            vector<MegaNode *>::iterator i = std::lower_bound(childrenNodes.begin(),
+            Node *n = *it++;
+            vector<Node *>::iterator i = std::lower_bound(childrenNodes.begin(),
 					childrenNodes.end(), n, comp);
             childrenNodes.insert(i, n);
 		}
 	}
     MUTEX_UNLOCK(sdkMutex);
 
-    if(childrenNodes.size()) return new NodeList(childrenNodes.data(), childrenNodes.size(), true);
-    else return new NodeList(NULL, 0, false);
+    if(childrenNodes.size()) return new NodeList(childrenNodes.data(), childrenNodes.size());
+    else return new NodeList();
 }
 
 
@@ -3755,14 +3878,12 @@ MegaNode* MegaApi::getNodeByHandle(handle handle)
 void MegaApi::setDebug(bool debug) { /*curl->setDebug(debug);*/ }
 bool MegaApi::getDebug() { return false; }//curl->getDebug(); }
 
-StringList *MegaApi::getRootNodeNames() { return rootNodeNames; }
-StringList *MegaApi::getRootNodePaths() { return rootNodePaths; }
-
-const char* MegaApi::rootnodenames[] = { "ROOT", "INBOX", "RUBBISH", "MAIL" };
-const char* MegaApi::rootnodepaths[] = { "/", "//in", "//bin", "//mail" };
-StringList * MegaApi::rootNodeNames = new StringList(rootnodenames, 4, false);
-StringList * MegaApi::rootNodePaths = new StringList(rootnodepaths, 4, false);
-
+//StringList *MegaApi::getRootNodeNames() { return rootNodeNames; }
+//StringList *MegaApi::getRootNodePaths() { return rootNodePaths; }
+//const char* MegaApi::rootnodenames[] = { "ROOT", "INBOX", "RUBBISH", "MAIL" };
+//const char* MegaApi::rootnodepaths[] = { "/", "//in", "//bin", "//mail" };
+//StringList * MegaApi::rootNodeNames = new StringList(rootnodenames, 4, false);
+//StringList * MegaApi::rootNodePaths = new StringList(rootnodepaths, 4, false);
 
 void MegaApi::sendPendingTransfers()
 {

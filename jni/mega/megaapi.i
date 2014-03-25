@@ -84,6 +84,8 @@
 %ignore MegaTransfer::MegaTransfer;
 %ignore MegaError::MegaError;
 %ignore MegaNode::MegaNode;
+%ignore MegaNode::fromNode;
+%ignore MegaUser::fromUser;
 
 //Don't wrap internal setters
 //(This objects should be modified internally only)
@@ -167,6 +169,7 @@ class Share {};
 
 %newobject MegaApi::getChildren;
 %newobject MegaApi::getContacts;
+%newobject MegaApi::getContact;
 %newobject MegaApi::getInShares;
 %newobject MegaApi::getOutShares;
 %newobject MegaApi::getNodePath;
@@ -187,44 +190,13 @@ typedef int64_t m_off_t;
 %include "megaapi.h"
 
 //Tell SWIG about tempates
-%template(NodeList) ArrayWrapper<MegaNode*>;
-%template(UserList) ArrayWrapper<mega::User*>;
 //%template(BalanceList) ArrayWrapper<mega::AccountBalance>;
 //%template(SessionList) ArrayWrapper<mega::AccountSession>;
 //%template(PurchaseList) ArrayWrapper<mega::AccountPurchase>;
 //%template(TransactionList) ArrayWrapper<mega::AccountTransaction>;
-%template(StringList) ArrayWrapper<const char*>;
-%template(ShareList) ArrayWrapper<mega::Share*>;
+//%template(StringList) ArrayWrapper<const char*>;
+//%template(ShareList) ArrayWrapper<mega::Share*>;
 
-//Constants for Python
-#ifdef SWIGPYTHON
-%constant int User_VISIBILITY_UNKNOWN = -1;
-%constant int User_HIDDEN = 0;
-%constant int User_VISIBLE = 1;
-%constant int User_ME = 2;
-%constant int Node_TYPE_UNKNOWN = -1;
-%constant int Node_FILENODE = 0;
-%constant int Node_FOLDERNODE = 1;
-%constant int Node_ROOTNODE = 2;
-%constant int Node_INCOMINGNODE = 3;
-%constant int Node_RUBBISHNODE = 4;
-%constant int Node_MAILNODE = 5;
-#endif
-
-
-%extend mega::User
-{
-public:
-#ifndef SWIGPYTHON
-	enum { VISIBILITY_UNKNOWN = -1, HIDDEN = 0, VISIBLE, ME };
-#endif
-	
-	const char* getEmail() { return $self->email.c_str(); }
-	int getVisibility()	{ return $self->show; }
-	long long getTimestamp() { return $self->ctime; }
-	const char *toString() { return $self->email.c_str(); }
-	const char *__str__() { return $self->email.c_str(); }
-}
 
 %extend mega::Share
 {
