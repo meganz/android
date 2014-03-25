@@ -34,6 +34,8 @@ import android.widget.TextView.OnEditorActionListener;
 
 public class FileExplorerActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface{
 	
+	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
+	
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	

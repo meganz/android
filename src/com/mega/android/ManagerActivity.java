@@ -1,16 +1,15 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListener;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
@@ -31,9 +30,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -68,8 +67,8 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface {
-	
+public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface {
+			
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
 
@@ -105,7 +104,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private MenuItem searchMenuItem;
 	
 	private static DrawerItem drawerItem;
-	private static DrawerItem lastDrawerItem;
 	
 	private TableLayout topControlBar;
 	private TableLayout bottomControlBar;
@@ -130,7 +128,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
-    private MegaRequestListener requestListener;
     
     private static int EDIT_TEXT_ID = 1;
     
@@ -144,6 +141,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     ProgressDialog statusDialog;
     
 	public UploadHereDialog uploadDialog;
+	
+	private List<ShareInfo> filePreparedInfos;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +155,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
+		
+		megaApi.addGlobalListener(this);
 		
 		handler = new Handler();
 		
@@ -308,6 +309,71 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			//INITIAL FRAGMENT
 			selectDrawerItem(drawerItem);
 		}
+	}
+    
+    @Override
+	protected void onSaveInstanceState(Bundle outState) {
+    	super.onSaveInstanceState(outState);
+    	
+    	long parentHandle = -1;
+    	int visibleFragment = -1;
+    	if (fbL != null){
+	    	if (fbL.isVisible()){
+	    		parentHandle = fbL.getParentHandle();
+	    		visibleFragment = 1;
+	    	}
+    	}
+    	if (fbG != null){
+    		if (fbG.isVisible()){
+    			parentHandle = fbG.getParentHandle();
+    			visibleFragment = 2;
+    		}
+    	}
+    	
+    	if (cL != null){
+    		if (cL.isVisible()){
+    			visibleFragment = 3;
+    		}
+    	}
+    	if (cG != null){
+    		if (cG.isVisible()){
+    			visibleFragment = 4;
+    		}
+    	}
+    	
+    	if (rbL != null){
+	    	if (rbL.isVisible()){
+	    		visibleFragment = 5;
+	    	}
+    	}
+    	
+    	if (rbG != null){
+	    	if (rbG.isVisible()){
+	    		visibleFragment = 6;
+	    	}
+    	}
+    	
+    	if (tF != null){
+	    	if (tF.isVisible()){
+	    		visibleFragment = 7;
+	    	}
+    	}
+    	
+    	outState.putInt("visibleFragment", visibleFragment);
+    	outState.putLong("parentHandle", parentHandle);
+    }
+    
+    @Override
+    protected void onDestroy(){
+    	super.onDestroy();
+    	
+    	megaApi.removeGlobalListener(this);
+    }
+    
+    @Override
+	protected void onNewIntent(Intent intent){
+    	super.onNewIntent(intent);
+    	setIntent(intent);    	
 	}
     
     @Override
@@ -464,6 +530,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
     			break;
     		}
+		default:
+			break;
     	}
     }
 	
@@ -526,6 +594,116 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public void onPostCreate(Bundle savedInstanceState){
 		super.onPostCreate(savedInstanceState);
 		mDrawerToggle.syncState();
+		
+//		if(savedInstanceState != null){
+//			int visibleFragment = savedInstanceState.getInt("visibleFragment");
+//			long parentHandle = savedInstanceState.getLong("parentHandle");
+//			switch (visibleFragment){
+//				case 1:{
+//					if (fbL == null){
+//						fbL = new FileBrowserListFragment();
+//					}
+//					if (fbG == null){
+//						fbG = new FileBrowserGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+//					
+//					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+//					NodeList nodes = null;
+//					if (parentNode != null){
+//						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));	
+//					}
+//					else{
+//						nodes = megaApi.getChildren(megaApi.getRootNode());
+//					}
+//					
+//					fbL.setNodes(nodes);
+//					fbL.getListView().invalidateViews();
+//					break;
+//				}
+//				case 2:{
+//					if (fbL == null){
+//						fbL = new FileBrowserListFragment();
+//					}
+//					if (fbG == null){
+//						fbG = new FileBrowserGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+//					
+//					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+//					NodeList nodes = null;
+//					if (parentNode != null){
+//						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));	
+//					}
+//					else{
+//						nodes = megaApi.getChildren(megaApi.getRootNode());
+//					}
+//					
+//					fbG.setNodes(nodes);
+//					fbG.getListView().invalidateViews();
+//					break;
+//				}
+//				case 3:{
+//					if (cL == null){
+//						cL = new ContactsListFragment();
+//					}
+//					if (cG == null){
+//						cG = new ContactsGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
+//					break;
+//				}
+//				case 4:{
+//					if (cL == null){
+//						cL = new ContactsListFragment();
+//					}
+//					if (cG == null){
+//						cG = new ContactsGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
+//					break;
+//				}
+//				case 5:{
+//					if (rbL == null){
+//						rbL = new RubbishBinListFragment();
+//					}
+//					if (rbG == null){
+//						rbG = new RubbishBinGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbL).commit();
+//					break;
+//				}
+//				case 6:{
+//					if (rbL == null){
+//						rbL = new RubbishBinListFragment();
+//					}
+//					if (rbG == null){
+//						rbG = new RubbishBinGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
+//					break;
+//				}
+//				case 7:{
+//					if (tF == null){
+//						tF = new TransfersFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, tF).commit();
+//				}
+//				default:{
+//					if (fbL == null){
+//						fbL = new FileBrowserListFragment();
+//					}
+//					if (fbG == null){
+//						fbG = new FileBrowserGridFragment();
+//					}
+//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
+//					NodeList nodes = megaApi.getChildren(megaApi.getRootNode());
+//					fbL.setNodes(nodes);
+//					fbL.getListView().invalidateViews();
+//					break;
+//				}					
+//			}			
+//		}
 	}
 
 	
@@ -1453,7 +1631,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 //				ficheroPrueba = destFile.getCanonicalFile();
 //				
 //			} catch (IOException e1) {
-//				// TODO Auto-generated catch block
 //				e1.printStackTrace();
 //			}
 //			//En el fichero y en todas sus carpetas padres
@@ -1483,8 +1660,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -1494,12 +1669,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		}
 		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
-			Toast.makeText(this, "REQUEST_CODE_GET " + intent.getData().toString(), Toast.LENGTH_LONG).show();
-//			intent.setAction(Intent.ACTION_GET_CONTENT);
-//			fragment.prepareFiles(this, this, intent);
-//			prepareProgress = Util.createProgress(this,
-//					getString(R.string.upload_prepare));
-//			dialogToShow = prepareProgress;
+			Uri uri = intent.getData();
+			intent.setAction(Intent.ACTION_GET_CONTENT);
+			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+			filePrepareTask.execute(intent);
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.upload_prepare));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
 		} 
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 			
@@ -1543,7 +1726,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				startService(uploadServiceIntent);
+				startService(uploadServiceIntent);				
 				i++;
 			}
 			
@@ -1593,6 +1776,95 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
 			}
 		}
+	}
+	
+	/*
+	 * Background task to process files for uploading
+	 */
+	private class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
+		Context context;
 		
+		FilePrepareTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected List<ShareInfo> doInBackground(Intent... params) {
+			return ShareInfo.processIntent(params[0], context);
+		}
+
+		@Override
+		protected void onPostExecute(List<ShareInfo> info) {
+			filePreparedInfos = info;
+			onIntentProcessed();
+		}
+	}
+	
+	/*
+	 * Handle processed upload intent
+	 */
+	public void onIntentProcessed() {
+		List<ShareInfo> infos = filePreparedInfos;
+		if (statusDialog != null) {
+			try { 
+				statusDialog.dismiss(); 
+			} 
+			catch(Exception ex){}
+		}
+		
+		long parentHandle = -1;
+		if (fbL.isVisible()){
+			parentHandle = fbL.getParentHandle();
+		}
+		else if (fbG.isVisible()){
+			parentHandle = fbG.getParentHandle();
+		}
+		
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle); 
+		if(parentNode == null){
+			Util.showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
+			return;
+		}
+			
+		if (infos == null) {
+			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
+					false, this);
+		} 
+		else {
+			Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
+					Toast.LENGTH_SHORT).show();
+			for (ShareInfo info : infos) {
+				Intent intent = new Intent(this, UploadService.class);
+				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+				startService(intent);
+			}
+		}
+	}
+
+	@Override
+	public void onUsersUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onNodesUpdate(MegaApiJava api) {
+		if (fbL.isVisible()){
+			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
+			fbL.setNodes(nodes);
+			fbL.getListView().invalidateViews();
+		}
+		if (fbG.isVisible()){
+			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
+			fbG.setNodes(nodes);
+			fbG.getListView().invalidateViews();
+		}
+	}
+
+	@Override
+	public void onReloadNeeded(MegaApiJava api) {
+		// TODO Fetch nodes from MEGA		
 	}
 }

@@ -468,64 +468,6 @@ public class ThumbnailUtils {
 		thumbnailCache.put(document.getHandle(), bitmap);
 		adapter.notifyDataSetChanged();
 		
-		//Y ahora subirla
-		megaApi.setThumbnail(document, thumbFile.getAbsolutePath(), new MegaListenerInterface() {
-			
-			@Override
-			public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-				log("onTransferUpdate");
-			}
-			
-			@Override
-			public void onTransferTemporaryError(MegaApiJava api,
-					MegaTransfer transfer, MegaError e) {
-				log("onTransferTemporaryError");
-				
-			}
-			
-			@Override
-			public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-				log("onTransferStart");				
-			}
-			
-			@Override
-			public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-					MegaError e) {
-				log("onTransferFinish");
-			}
-			
-			@Override
-			public void onUsersUpdate(MegaApiJava api) {
-				log("onUsersUpdate");				
-			}
-			
-			@Override
-			public void onReloadNeeded(MegaApiJava api) {
-				log("onReloadNeeded");				
-			}
-			
-			@Override
-			public void onNodesUpdate(MegaApiJava api) {
-				log("onNodesUpdate");
-			}
-			
-			@Override
-			public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-					MegaError e) {
-				log("onRequestTemporaryError");
-			}
-			
-			@Override
-			public void onRequestStart(MegaApiJava api, MegaRequest request) {
-				log("onRequestStart");
-			}
-			
-			@Override
-			public void onRequestFinish(MegaApiJava api, MegaRequest request,
-					MegaError e) {
-				log("onRequestFinish");				
-			}
-		});
 		log("AttachThumbnailTask end");		
 	}
 	
@@ -585,64 +527,6 @@ public class ThumbnailUtils {
 		thumbnailCache.put(document.getHandle(), bitmap);
 		adapter.notifyDataSetChanged();
 		
-		//Y ahora subirla
-		megaApi.setThumbnail(document, thumbFile.getAbsolutePath(), new MegaListenerInterface() {
-			
-			@Override
-			public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-				log("onTransferUpdate");
-			}
-			
-			@Override
-			public void onTransferTemporaryError(MegaApiJava api,
-					MegaTransfer transfer, MegaError e) {
-				log("onTransferTemporaryError");
-				
-			}
-			
-			@Override
-			public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-				log("onTransferStart");				
-			}
-			
-			@Override
-			public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-					MegaError e) {
-				log("onTransferFinish");
-			}
-			
-			@Override
-			public void onUsersUpdate(MegaApiJava api) {
-				log("onUsersUpdate");				
-			}
-			
-			@Override
-			public void onReloadNeeded(MegaApiJava api) {
-				log("onReloadNeeded");				
-			}
-			
-			@Override
-			public void onNodesUpdate(MegaApiJava api) {
-				log("onNodesUpdate");
-			}
-			
-			@Override
-			public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-					MegaError e) {
-				log("onRequestTemporaryError");
-			}
-			
-			@Override
-			public void onRequestStart(MegaApiJava api, MegaRequest request) {
-				log("onRequestStart");
-			}
-			
-			@Override
-			public void onRequestFinish(MegaApiJava api, MegaRequest request,
-					MegaError e) {
-				log("onRequestFinish");				
-			}
-		});
 		log("AttachThumbnailTask end");		
 	}
 	
@@ -695,64 +579,6 @@ public class ThumbnailUtils {
 		thumbnailCache.put(document.getHandle(), bitmap);
 		adapter.notifyDataSetChanged();
 		
-		//Y ahora subirla
-		megaApi.setThumbnail(document, thumbFile.getAbsolutePath(), new MegaListenerInterface() {
-			
-			@Override
-			public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-				log("onTransferUpdate");
-			}
-			
-			@Override
-			public void onTransferTemporaryError(MegaApiJava api,
-					MegaTransfer transfer, MegaError e) {
-				log("onTransferTemporaryError");
-				
-			}
-			
-			@Override
-			public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-				log("onTransferStart");				
-			}
-			
-			@Override
-			public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-					MegaError e) {
-				log("onTransferFinish");
-			}
-			
-			@Override
-			public void onUsersUpdate(MegaApiJava api) {
-				log("onUsersUpdate");				
-			}
-			
-			@Override
-			public void onReloadNeeded(MegaApiJava api) {
-				log("onReloadNeeded");				
-			}
-			
-			@Override
-			public void onNodesUpdate(MegaApiJava api) {
-				log("onNodesUpdate");
-			}
-			
-			@Override
-			public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-					MegaError e) {
-				log("onRequestTemporaryError");
-			}
-			
-			@Override
-			public void onRequestStart(MegaApiJava api, MegaRequest request) {
-				log("onRequestStart");
-			}
-			
-			@Override
-			public void onRequestFinish(MegaApiJava api, MegaRequest request,
-					MegaError e) {
-				log("onRequestFinish");				
-			}
-		});
 		log("AttachThumbnailTask end");		
 	}
 	

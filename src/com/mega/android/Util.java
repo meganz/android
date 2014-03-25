@@ -11,15 +11,22 @@ import javax.crypto.spec.SecretKeySpec;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
+import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -383,7 +390,7 @@ public class Util {
 			file.delete();
 		}
 	}
-
+	
 	private static void log(String message) {
 		log("Util", message);
 	}
