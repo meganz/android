@@ -120,6 +120,10 @@
 	<string name="upload_failed">Upload failed</string>
 	<string name="upload_uploaded">uploaded</string>
 	<string name="upload_cancel_uploading">Do you want to cancel the upload?</string>
+	<string name="upload_prepare">Processing file</string>
+	<string name="error_temporary_unavaible">Resource temporarily not available, please try again later</string>
+	<string name="upload_can_not_open">Cannot open selected file</string>
+	<string name="upload_began">Upload has started</string>
 		
 	<string name="error_io_problem">Filesystem problem</string>
 	
