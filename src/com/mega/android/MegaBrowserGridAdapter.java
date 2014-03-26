@@ -776,7 +776,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						context.startActivity(intent);
 					}
 					else{
-						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+						((ManagerActivity) context).onFileClick(n);
 					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
@@ -828,7 +828,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						context.startActivity(intent);
 					}
 					else{
-						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
+						((ManagerActivity) context).onFileClick(n);
 					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
@@ -973,24 +973,19 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 //				
 //				break;
 //			}
+			
 			case R.id.file_grid_option_download1:{
 				MegaNode n = (MegaNode) getItem(currentPosition);
-				if (n.isFile()){
-					((ManagerActivity) context).onFileClick(n);
-				}
-				else{
-					Toast.makeText(context, "Not a file. Folder download not yet implemented", Toast.LENGTH_LONG).show();
-				}
+				positionClicked = -1;
+				notifyDataSetChanged();
+				((ManagerActivity) context).onFileClick(n);
 				break;
 			}
 			case R.id.file_grid_option_download2:{
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
-				if (n.isFile()){
-					((ManagerActivity) context).onFileClick(n);
-				}
-				else{
-					Toast.makeText(context, "Not a file. Folder download not yet implemented", Toast.LENGTH_LONG).show();
-				}
+				positionClicked = -1;
+				notifyDataSetChanged();
+				((ManagerActivity) context).onFileClick(n);
 				break;
 			}
 			case R.id.file_grid_option_properties1:{

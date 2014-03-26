@@ -419,12 +419,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //				break;
 //			}
 			case R.id.file_list_option_download:{
-				if (n.isFile()){
-					((ManagerActivity) context).onFileClick(n);
-				}
-				else{
-					Toast.makeText(context, "Not a file. Folder download not yet implemented", Toast.LENGTH_LONG).show();
-				}
+				positionClicked = -1;
+				notifyDataSetChanged();
+				((ManagerActivity) context).onFileClick(n);
 				break;
 			}
 			case R.id.file_list_option_properties:{

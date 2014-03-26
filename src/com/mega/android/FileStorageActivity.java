@@ -154,7 +154,12 @@ public class FileStorageActivity extends ActionBarActivity implements OnClickLis
 		setFiles(newPath);
 		path = newPath;
 		windowTitle.setText(Util.makeBold(path.getAbsolutePath(), path.getName()));
-		button.setText(buttonPrefix + " " + path.getName());
+		if (path.getAbsolutePath().equals(Environment.getExternalStorageDirectory().getAbsolutePath())){
+			button.setText(buttonPrefix + " SD Card");
+		}
+		else{
+			button.setText(buttonPrefix + " " + path.getName());
+		}
 		if (mode == Mode.PICK_FOLDER) {
 			boolean writable = newPath.canWrite();
 			button.setEnabled(writable);
