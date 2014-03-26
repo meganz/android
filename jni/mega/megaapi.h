@@ -322,7 +322,7 @@ class MegaRequest
                 TYPE_CHANGE_PW, TYPE_UPLOAD, TYPE_LOGOUT, TYPE_FAST_LOGIN,
                 TYPE_GET_PUBLIC_NODE, TYPE_GET_ATTR_FILE,
                 TYPE_SET_ATTR_FILE, TYPE_RETRY_PENDING_CONNECTIONS,
-                TYPE_ADD_CONTACT, TYPE_CREATE_ACCOUNT, TYPE_FAST_CREATE_ACCOUNT,
+                TYPE_ADD_CONTACT, TYPE_REMOVE_CONTACT, TYPE_CREATE_ACCOUNT, TYPE_FAST_CREATE_ACCOUNT,
                 TYPE_CONFIRM_ACCOUNT, TYPE_FAST_CONFIRM_ACCOUNT,
                 TYPE_QUERY_SIGNUP_LINK, TYPE_ADD_SYNC, TYPE_REMOVE_SYNC,
                 TYPE_REMOVE_SYNCS, TYPE_PAUSE_TRANSFERS,
@@ -848,6 +848,7 @@ public:
 	void getAccountDetails(MegaRequestListener *listener = NULL);
 	void changePassword(const char *oldPassword, const char *newPassword, MegaRequestListener *listener = NULL);
 	void addContact(const char* email, MegaRequestListener* listener=NULL);
+	void removeContact(const char* email, MegaRequestListener* listener=NULL);
 	void logout(MegaRequestListener *listener = NULL);
 
 	//Transfers
