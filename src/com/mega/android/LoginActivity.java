@@ -341,7 +341,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request)
 	{
-		log("onRequestStart");
+		log("onRequestStart: " + request.getRequestString());
 	}
 
 	@Override
@@ -399,9 +399,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
-//				try{ progress.dismiss(); } catch (Exception e){};
-//				NodeList children = megaApi.getChildren(megaApi.getRootNode());
-//				log("children.size() = " + children.size());
 				if (!backWhileLogin){
 					Intent intent = new Intent(loginActivity,ManagerActivity.class);
 					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -411,38 +408,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 			
 		}
-		
-//		if (request.getRequestString().equals("login")){
-//			log("onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
-//			if(e.getErrorCode() != MegaError.API_OK) 
-//				return;
-//			
-//			megaApi.fetchNodes(LoginActivity.this);
-//		}
-//		else if (request.getRequestString().equals("fetchnodes")){
-//			log("onRequestFinish " + request.getRequestString() + " Result: " + e.getErrorCode());
-//			if(e.getErrorCode() != MegaError.API_OK) 
-//				return;
-//			
-//			NodeList children = megaApi.getChildren(megaApi.getRootNode());
-//			for(int i=0; i<children.size(); i++)
-//			{
-//				MegaNode node = children.get(i);
-//				log("Node: " + node.getName() + 
-//						(node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
-//			}
-//			
-//
-//			Intent intent = new Intent(this, ManagerActivity.class);
-//			startActivity(intent);
-//			finish();
-//		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
 	{
-		log("onRequestTemporaryError");
+		log("onRequestTemporaryError: " + request.getRequestString());
 	}
 	
 	@Override

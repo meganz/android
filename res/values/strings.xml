@@ -107,6 +107,7 @@
     <string name="context_move_to_trash">Move to Rubbish Bin</string>
     <string name="context_new_folder_name">Folder Name</string>
     <string name="context_creating_folder">Creating folder</string>
+    <string name="context_download_to">Save to</string>
   
     <string name="menu_new_folder">New folder</string>
     
