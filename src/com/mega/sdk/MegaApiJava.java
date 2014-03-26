@@ -555,7 +555,11 @@ public class MegaApiJava
 		megaApi.setUploadLimit(bpslimit);
 	}
 		  
-
+	public TransferList getTransfers()
+	{
+		return megaApi.getTransfers();
+	}
+	
 	/****************************************************************************************************/
 	//FILESYSTEM METHODS
 	/****************************************************************************************************/
