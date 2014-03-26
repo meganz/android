@@ -600,13 +600,27 @@ const char *MegaRequest::getRequestString() const
 		case TYPE_FETCH_NODES: return "fetchnodes";
 		case TYPE_ACCOUNT_DETAILS: return "accountdetails";
 		case TYPE_CHANGE_PW: return "changepw";
+		case TYPE_UPLOAD: return "upload";
 		case TYPE_LOGOUT: return "logout";
 		case TYPE_FAST_LOGIN: return "fastlogin";
 		case TYPE_GET_PUBLIC_NODE: return "getpublicnode";
 		case TYPE_GET_ATTR_FILE: return "getattrfile";
         case TYPE_SET_ATTR_FILE: return "setattrfile";
+        case TYPE_RETRY_PENDING_CONNECTIONS: return "retrypending";
+        case TYPE_ADD_CONTACT: return "addcontact";
+        case TYPE_REMOVE_CONTACT: return "removecontact";
         case TYPE_CREATE_ACCOUNT: return "createaccount";
-        case TYPE_ADD_SYNC: return "sync";
+        case TYPE_FAST_CREATE_ACCOUNT: return "fastcreateaccount";
+        case TYPE_CONFIRM_ACCOUNT: return "confirmaccount";
+        case TYPE_FAST_CONFIRM_ACCOUNT: return "fastconfirmaccount";
+        case TYPE_QUERY_SIGNUP_LINK: return "querysignuplink";
+        case TYPE_ADD_SYNC: return "addsync";
+        case TYPE_REMOVE_SYNC: return "removesync";
+        case TYPE_REMOVE_SYNCS: return "removesyncs";
+        case TYPE_PAUSE_TRANSFERS: return "pausetransfers";
+        case TYPE_CANCEL_TRANSFER: return "canceltransfer";
+        case TYPE_CANCEL_TRANSFERS: return "canceltransfers";
+        case TYPE_DELETE: return "delete";
 	}
 	return "unknown";
 }
@@ -1465,6 +1479,14 @@ void MegaApi::setNodeAttribute(MegaNode *node, int type, char *srcFilePath, Mega
 void MegaApi::addContact(const char* email, MegaRequestListener* listener)
 {
 	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_ADD_CONTACT, listener);
+	request->setEmail(email);
+	requestQueue.push(request);
+    waiter->notify();
+}
+
+void MegaApi::removeContact(const char* email, MegaRequestListener* listener)
+{
+	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_REMOVE_CONTACT, listener);
 	request->setEmail(email);
 	requestQueue.push(request);
     waiter->notify();
@@ -4329,6 +4351,13 @@ void MegaApi::sendPendingRequests()
 			const char *email = request->getEmail();
 			if(!email) { e = API_EARGS; break; }
 			e = client->invite(email, VISIBLE);
+			break;
+		}
+		case MegaRequest::TYPE_REMOVE_CONTACT:
+		{
+			const char *email = request->getEmail();
+			if(!email) { e = API_EARGS; break; }
+			e = client->invite(email, HIDDEN);
 			break;
 		}
 		case MegaRequest::TYPE_CREATE_ACCOUNT:
