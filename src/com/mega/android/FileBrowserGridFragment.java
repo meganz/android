@@ -53,6 +53,28 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+//		if (parentHandle == -1){
+//			parentHandle = megaApi.getRootNode().getHandle();
+//			nodes = megaApi.getChildren(megaApi.getRootNode());
+//		}
+//		else{
+//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+//			nodes = megaApi.getChildren(parentNode);
+//		}
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		
+		Bundle args = getArguments();
+		
+		parentHandle = args.getLong("parentHandle");
+		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
+		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
@@ -60,15 +82,16 @@ public class FileBrowserGridFragment extends Fragment implements OnClickListener
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
-		}
-	}
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		
-		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			
+			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+				aB.setTitle(getString(R.string.section_cloud_drive));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			}
+			else{
+				aB.setTitle(parentNode.getName());					
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+			}
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
