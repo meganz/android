@@ -121,6 +121,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	private boolean firstTime = true;
 	
+	long parentHandle;
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
@@ -308,6 +309,48 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 			customListGrid.setOnClickListener(this);
 			
+			parentHandle = -1;
+			if (savedInstanceState != null){
+				int visibleFragment = savedInstanceState.getInt("visibleFragment");
+				parentHandle = savedInstanceState.getLong("parentHandle");
+				switch (visibleFragment){
+					case 1:{
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						isListCloudDrive = true;
+						break;
+					}
+					case 2:{
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						isListCloudDrive = false;
+						break;
+					}
+					case 3:{
+						drawerItem = DrawerItem.CONTACTS;
+						isListContacts = true;
+						break;
+					}
+					case 4:{
+						drawerItem = DrawerItem.CONTACTS;
+						isListContacts = false;
+						break;
+					}
+					case 5:{
+						drawerItem = DrawerItem.RUBBISH_BIN;
+						isListRubbishBin = true;
+						break;
+					}
+					case 6:{
+						drawerItem = DrawerItem.RUBBISH_BIN;
+						isListRubbishBin = false;
+						break;
+					}
+					case 7:{
+						drawerItem = DrawerItem.TRANSFERS;
+						break;
+					}
+				}
+			}
+			
 			if (drawerItem == null) {
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 			}
@@ -449,13 +492,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     public void selectDrawerItem(DrawerItem item){
     	switch (item){
     		case CLOUD_DRIVE:{
-    			   			
+    			
+    			Bundle args = new Bundle();
+				args.putLong("parentHandle", parentHandle);
+    			
     			if (fbG == null){
     				fbG = new FileBrowserGridFragment();
+    				fbG.setArguments(args);
     			}
     			if (fbL == null){
     				fbL = new FileBrowserListFragment();
-    			}
+    				fbL.setArguments(args);
+    			}    			
+				
     			if (isListCloudDrive){
     				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
@@ -800,14 +849,22 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				if (fbL != null){
 					if (fbL.isVisible() || fbG.isVisible()){
 						if (isListCloudDrive){
-							fbG.setParentHandle(fbL.getParentHandle());
+							Bundle args = new Bundle();
+							parentHandle = fbL.getParentHandle();
+							args.putLong("parentHandle", parentHandle);
+							fbG.setArguments(args);
+//							fbG.setParentHandle(fbL.getParentHandle());
 							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
 							isListCloudDrive = false;
 						}
 						else{
-							fbL.setParentHandle(fbG.getParentHandle());
+							Bundle args = new Bundle();
+							parentHandle = fbG.getParentHandle();
+							args.putLong("parentHandle", parentHandle);
+							fbL.setArguments(args);
+//							fbL.setParentHandle(fbG.getParentHandle());
 							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);

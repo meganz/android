@@ -59,6 +59,28 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		
 		rowItems = new ArrayList<ItemFileBrowser>();
 		
+//		if (parentHandle == -1){
+//			parentHandle = megaApi.getRootNode().getHandle();
+//			nodes = megaApi.getChildren(megaApi.getRootNode());
+//		}
+//		else{
+//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+//			nodes = megaApi.getChildren(parentNode);
+//		}
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
+		
+		Bundle args = getArguments();
+		
+		parentHandle = args.getLong("parentHandle");
+		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
@@ -66,16 +88,17 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
-		}
-	}
-	
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-
-		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
-		}
+			
+			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+				aB.setTitle(getString(R.string.section_cloud_drive));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			}
+			else{
+				aB.setTitle(parentNode.getName());					
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+			}
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+		}		
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 		        
