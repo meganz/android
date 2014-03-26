@@ -1,7 +1,6 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -207,7 +206,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 //		}
 		
 		currentDir = getDir(document, currentIntent);
-		currentFile = new File (currentDir.getAbsolutePath() + "/" + document.getName());
+		currentFile = new File(currentDir, document.getName());
 		log("dir: " + currentDir.getAbsolutePath() + " file: " + document.getName() + "  Size: " + document.getSize());
 		if(!checkCurrentFile(document)){
 			return;
@@ -536,6 +535,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Download OK: " + transfer.getFileName());
 				downloadedSize += transfer.getTransferredBytes();
 				log("DOWNLOADFILE: " + transfer.getPath());
+				
+				File resultFile = new File(transfer.getPath());
+				File treeParent = resultFile.getParentFile();
+				while(treeParent != null)
+				{
+					treeParent.setReadable(true, false);
+					treeParent.setExecutable(true, false);
+					treeParent = treeParent.getParentFile();
+				}
+				resultFile.setReadable(true, false);
+				resultFile.setExecutable(true, false);
+				
 				onDownloadComplete();
 			}
 			else 
