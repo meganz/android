@@ -1,6 +1,10 @@
 package com.mega.android;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Date;
@@ -388,6 +392,23 @@ public class Util {
 		if (isLocal(context, file) && file.exists()) {
 			log("delete!");
 			file.delete();
+		}
+	}
+	
+	public static void copyFile(File source, File dest) throws IOException{
+
+		if (!source.getAbsolutePath().equals(dest.getAbsolutePath())){
+			FileChannel inputChannel = null;
+			FileChannel outputChannel = null;
+			FileInputStream inputStream = new FileInputStream(source);
+			FileOutputStream outputStream = new FileOutputStream(dest);
+			inputChannel = inputStream.getChannel();
+			outputChannel = outputStream.getChannel();
+			outputChannel.transferFrom(inputChannel, 0, inputChannel.size());    
+			inputChannel.close();
+			outputChannel.close();
+			inputStream.close();
+			outputStream.close();
 		}
 	}
 	
