@@ -1125,7 +1125,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		//TODO: Here I should take the location from the preferences
 //		String downloadLocation = Environment.getExternalStorageDirectory().getAbsolutePath();
 		String downloadLocation = getCacheDir().getAbsolutePath();
-		Toast.makeText(this, "ManagerActivity.onFileClick(final MegaNode document): Will download to " + downloadLocation + ", but with permission problem", Toast.LENGTH_LONG).show();
 		
 		//Download in the background to prevent incomplete downloads.
 		File file = null;
