@@ -173,6 +173,8 @@ public class FileBrowserListFragment extends Fragment implements OnClickListener
 				startActivity(intent);
 			}
 			else{
+				adapter.setPositionClicked(-1);
+				adapter.notifyDataSetChanged();
 				((ManagerActivity) context).onFileClick(nodes.get(position));
 			}
 		}
