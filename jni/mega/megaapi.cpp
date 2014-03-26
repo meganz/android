@@ -606,6 +606,8 @@ const char *MegaRequest::getRequestString() const
 		case TYPE_GET_PUBLIC_NODE: return "getpublicnode";
 		case TYPE_GET_ATTR_FILE: return "getattrfile";
         case TYPE_SET_ATTR_FILE: return "setattrfile";
+        case TYPE_GET_ATTR_USER: return "getattruser";
+        case TYPE_SET_ATTR_USER: return "setattruser";
         case TYPE_RETRY_PENDING_CONNECTIONS: return "retrypending";
         case TYPE_ADD_CONTACT: return "addcontact";
         case TYPE_REMOVE_CONTACT: return "removecontact";
@@ -1404,6 +1406,17 @@ void MegaApi::setPreview(MegaNode* node, char *srcFilePath, MegaRequestListener 
 	setNodeAttribute(node, 1, srcFilePath, listener);
 }
 
+void MegaApi::getUserAvatar(MegaUser* user, char *dstFilePath, MegaRequestListener *listener)
+{
+	getUserAttribute(user, 0, dstFilePath, listener);
+}
+
+/*
+void MegaApi::setUserAvatar(MegaUser* user, char *srcFilePath, MegaRequestListener *listener)
+{
+	setUserAttribute(user, 0, srcFilePath, listener);
+}*/
+
 void MegaApi::exportNode(MegaNode *node, MegaRequestListener *listener)
 {
 	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_EXPORT, listener);
@@ -1472,6 +1485,26 @@ void MegaApi::setNodeAttribute(MegaNode *node, int type, char *srcFilePath, Mega
 	request->setFile(srcFilePath);
     request->setParamType(type);
     if(node) request->setNodeHandle(node->getHandle());
+	requestQueue.push(request);
+    waiter->notify();
+}
+
+void MegaApi::getUserAttribute(MegaUser *user, int type, char *dstFilePath, MegaRequestListener *listener)
+{
+	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_GET_ATTR_USER, listener);
+	request->setFile(dstFilePath);
+    request->setParamType(type);
+    if(user) request->setEmail(user->getEmail());
+	requestQueue.push(request);
+    waiter->notify();
+}
+
+void MegaApi::setUserAttribute(MegaUser *user, int type, char *srcFilePath, MegaRequestListener *listener)
+{
+	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_SET_ATTR_USER, listener);
+	request->setFile(srcFilePath);
+    request->setParamType(type);
+    if(user) request->setEmail(user->getEmail());
 	requestQueue.push(request);
     waiter->notify();
 }
@@ -3024,19 +3057,27 @@ void MegaApi::putua_result(error e)
 void MegaApi::getua_result(error e)
 {
 	MegaError megaError(e);
-	//MegaRequest *request = requestMap[client->restag];
+	if(requestMap.find(client->restag) == requestMap.end()) return;
+	MegaRequest* request = requestMap.at(client->restag);
+	if(!request) return;
+
 	cout << "User attribute retrieval failed (" << megaError.getErrorString() << ")" << endl;
-	//fireOnRequestFinish(this, request, megaError);
+	fireOnRequestFinish(this, request, megaError);
 }
 
-void MegaApi::getua_result(byte* data, unsigned l)
+void MegaApi::getua_result(byte* data, unsigned len)
 {
-	//MegaError megaError(API_OK);
-	//MegaRequest *request = requestMap[client->restag];
-	cout << "Received " << l << " byte(s) of user attribute: ";
-	//fwrite(data,1,l,stdout);
-	//cout << endl;
-	//fireOnRequestFinish(this, request, megaError);
+	MegaError megaError(API_OK);
+	if(requestMap.find(client->restag) == requestMap.end()) return;
+	MegaRequest* request = requestMap.at(client->restag);
+	if(!request) return;
+
+	FileAccess *f = client->fsaccess->newfileaccess();
+	string filePath(request->getFile());
+	f->fopen(&filePath, false, true);
+	f->fwrite((const byte*)data, len, 0);
+	delete f;
+	fireOnRequestFinish(this, request, MegaError(API_OK));
 }
 
 // user attribute update notification
@@ -4321,6 +4362,28 @@ void MegaApi::sendPendingRequests()
 			if(!dstFilePath || !node) { e = API_EARGS; break; }
 
 			e = client->getfa(node, type);
+			break;
+		}
+		case MegaRequest::TYPE_GET_ATTR_USER:
+		{
+			const char* dstFilePath = request->getFile();
+            int type = request->getParamType();
+            User *user = client->finduser(request->getEmail(), 0);
+
+			if(!dstFilePath || !user || (type != 0)) { e = API_EARGS; break; }
+
+			client->getua(user, "a", false);
+			break;
+		}
+		case MegaRequest::TYPE_SET_ATTR_USER:
+		{
+			const char* dstFilePath = request->getFile();
+            int type = request->getParamType();
+            User *user = client->finduser(request->getEmail(), 0);
+
+			if(!dstFilePath || !user || (type != 0)) { e = API_EARGS; break; }
+
+			e = API_EACCESS; //TODO: Use putua
 			break;
 		}
 		case MegaRequest::TYPE_SET_ATTR_FILE:

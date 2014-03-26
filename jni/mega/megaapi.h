@@ -321,7 +321,8 @@ class MegaRequest
                 TYPE_EXPORT, TYPE_FETCH_NODES, TYPE_ACCOUNT_DETAILS,
                 TYPE_CHANGE_PW, TYPE_UPLOAD, TYPE_LOGOUT, TYPE_FAST_LOGIN,
                 TYPE_GET_PUBLIC_NODE, TYPE_GET_ATTR_FILE,
-                TYPE_SET_ATTR_FILE, TYPE_RETRY_PENDING_CONNECTIONS,
+                TYPE_SET_ATTR_FILE, TYPE_GET_ATTR_USER,
+                TYPE_SET_ATTR_USER, TYPE_RETRY_PENDING_CONNECTIONS,
                 TYPE_ADD_CONTACT, TYPE_REMOVE_CONTACT, TYPE_CREATE_ACCOUNT, TYPE_FAST_CREATE_ACCOUNT,
                 TYPE_CONFIRM_ACCOUNT, TYPE_FAST_CONFIRM_ACCOUNT,
                 TYPE_QUERY_SIGNUP_LINK, TYPE_ADD_SYNC, TYPE_REMOVE_SYNC,
@@ -843,6 +844,8 @@ public:
 	void setThumbnail(MegaNode* node, char *srcFilePath, MegaRequestListener *listener = NULL);
 	void getPreview(MegaNode* node, char *dstFilePath, MegaRequestListener *listener = NULL);
 	void setPreview(MegaNode* node, char *srcFilePath, MegaRequestListener *listener = NULL);
+	void getUserAvatar(MegaUser* user, char *dstFilePath, MegaRequestListener *listener = NULL);
+	//void setUserAvatar(MegaUser* user, char *srcFilePath, MegaRequestListener *listener = NULL);
 	void exportNode(MegaNode *node, MegaRequestListener *listener = NULL);
 	void fetchNodes(MegaRequestListener *listener = NULL);
 	void getAccountDetails(MegaRequestListener *listener = NULL);
@@ -1099,6 +1102,8 @@ protected:
 	void getAccountDetails(int storage, int transfer, int pro, int transactions, int purchases, int sessions, MegaRequestListener *listener = NULL);
     void getNodeAttribute(MegaNode* node, int type, char *dstFilePath, MegaRequestListener *listener = NULL);
     void setNodeAttribute(MegaNode* node, int type, char *srcFilePath, MegaRequestListener *listener = NULL);
+    void getUserAttribute(MegaUser* node, int type, char *dstFilePath, MegaRequestListener *listener = NULL);
+    void setUserAttribute(MegaUser* node, int type, char *srcFilePath, MegaRequestListener *listener = NULL);
     void startUpload(const char* localPath, MegaNode* parent, int connections, int maxSpeed, const char* fileName, MegaTransferListener *listener);
     void startUpload(const char* localPath, MegaNode* parent, int maxSpeed, MegaTransferListener *listener = NULL);
 	void startDownload(mega::handle nodehandle, const char* target, int connections, long startPos, long endPos, const char* base64key, MegaTransferListener *listener);

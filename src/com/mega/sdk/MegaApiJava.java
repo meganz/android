@@ -406,6 +406,16 @@ public class MegaApiJava
 	{
 		megaApi.setPreview(node, srcFilePath);
 	}
+	
+	public void getUserAvatar(MegaUser user, String dstFilePath, MegaRequestListenerInterface listener)
+	{
+		megaApi.getUserAvatar(user, dstFilePath, createDelegateRequestListener(listener));
+	}
+	
+	public void getUserAvatar(MegaUser user, String dstFilePath)
+	{
+		megaApi.getUserAvatar(user, dstFilePath);
+	}
 	  
 	public void exportNode(MegaNode node, MegaRequestListenerInterface listener)
 	{
