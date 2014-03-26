@@ -4328,7 +4328,7 @@ void MegaApi::sendPendingRequests()
 		{
 			const char *email = request->getEmail();
 			if(!email) { e = API_EARGS; break; }
-			client->invite(email, VISIBLE);
+			e = client->invite(email, VISIBLE);
 			break;
 		}
 		case MegaRequest::TYPE_CREATE_ACCOUNT:
