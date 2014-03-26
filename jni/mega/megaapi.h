@@ -510,6 +510,21 @@ class MegaTransfer
 		int lastBufferlength;
 };
 
+class TransferList
+{
+	public:
+		TransferList();
+		TransferList(MegaTransfer** newlist, int size);
+		virtual ~TransferList();
+
+		MegaTransfer* get(int i);
+		int size();
+
+	protected:
+		MegaTransfer** list;
+		int s;
+};
+
 class MegaError
 {
 	public:
@@ -865,6 +880,7 @@ public:
     void cancelTransfers(int direction, MegaRequestListener *listener=NULL);
     void pauseTransfers(bool pause, MegaRequestListener* listener=NULL);
     void setUploadLimit(int bpslimit);
+    TransferList *getTransfers();
 
     //Sync
     mega::treestate_t syncPathState(string *path);

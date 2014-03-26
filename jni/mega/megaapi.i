@@ -74,6 +74,8 @@
 %ignore ArrayWrapper::ArrayWrapper;
 %ignore NodeList::NodeList;
 %ignore UserList::UserList;
+%ignore TransferList::TransferList;
+
 //%ignore BalanceList::BalanceList;
 //%ignore SessionList::SessionList;
 //%ignore PurchaseList::PurchaseList;
@@ -169,6 +171,7 @@ class Share {};
 
 %newobject MegaApi::getChildren;
 %newobject MegaApi::getContacts;
+%newobject MegaApi::getTransfers;
 %newobject MegaApi::getContact;
 %newobject MegaApi::getInShares;
 %newobject MegaApi::getOutShares;
@@ -178,7 +181,6 @@ class Share {};
 %newobject MegaApi::search;
 %newobject MegaApi::ebcEncryptKey;
 %newobject MegaApi::getMyEmail;
-
 
 typedef long long time_t;
 typedef long long uint64_t;

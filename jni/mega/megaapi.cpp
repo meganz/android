@@ -213,6 +213,41 @@ int UserList::size()
 { return s; }
 
 
+
+TransferList::TransferList()
+{ list = NULL; s = 0; }
+
+TransferList::TransferList(MegaTransfer** newlist, int size)
+{
+	list = NULL; s = size;
+	if(!size) return;
+
+	list = new MegaTransfer*[size];
+	for(int i=0; i<size; i++)
+		list[i] = newlist[i]->copy();
+}
+
+TransferList::~TransferList()
+{
+	if(!list) return;
+
+	for(int i=0; i<s; i++)
+		delete list[i];
+	delete [] list;
+}
+
+MegaTransfer *TransferList::get(int i)
+{
+	if(!list || (i < 0) || (i >= s))
+		return NULL;
+
+	return list[i];
+}
+
+int TransferList::size()
+{ return s; }
+
+
 MegaNode::MegaNode(const char *name, int type, m_off_t size, time_t ctime, time_t mtime, handle nodehandle, string *nodekey, string *attrstring)
 {
     this->name = MegaApi::strdup(name);
@@ -1537,6 +1572,20 @@ void MegaApi::pauseTransfers(bool pause, MegaRequestListener* listener)
 void MegaApi::setUploadLimit(int bpslimit)
 {
     client->putmbpscap = bpslimit;
+}
+
+TransferList *MegaApi::getTransfers()
+{
+    MUTEX_LOCK(sdkMutex);
+
+    vector<MegaTransfer *> transfers;
+    for (map<mega::Transfer*, MegaTransfer *>::iterator it = transferMap.begin(); it != transferMap.end(); it++)
+    	transfers.push_back(it->second);
+
+    TransferList *result = new TransferList(transfers.data(), transfers.size());
+
+    MUTEX_UNLOCK(sdkMutex);
+    return result;
 }
 
 void MegaApi::startUpload(const char* localPath, MegaNode* parent, int connections, int maxSpeed, const char* fileName, MegaTransferListener *listener)
