@@ -1,7 +1,6 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +36,11 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -125,8 +125,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
-    private FileBrowserListFragment fbL;
-    private FileBrowserGridFragment fbG;
+	private FileBrowserFragment fb;
     private ContactsListFragment cL;
     private ContactsGridFragment cG;
     private RubbishBinListFragment rbL;
@@ -187,14 +186,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		}
 		else{
-			NodeList children = megaApi.getChildren(megaApi.getRootNode());
-//			for(int i=0; i<children.size(); i++)
-//			{
-//				MegaNode node = children.get(i);
-//				log("Node: " + node.getName() + (node.isFolder() ? " (folder)" : (" " + node.getSize() + " bytes")));
-//			}
-			Toast.makeText(this, "children.size()="+children.size(), Toast.LENGTH_SHORT).show();
-					
 			Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
 			Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 	
@@ -366,16 +357,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	
     	long parentHandle = -1;
     	int visibleFragment = -1;
-    	if (fbL != null){
-	    	if (fbL.isVisible()){
-	    		parentHandle = fbL.getParentHandle();
-	    		visibleFragment = 1;
-	    	}
-    	}
-    	if (fbG != null){
-    		if (fbG.isVisible()){
-    			parentHandle = fbG.getParentHandle();
-    			visibleFragment = 2;
+    	if (fb != null){
+    		if (fb.isVisible()){
+    			parentHandle = fb.getParentHandle();
+    			if (isListCloudDrive){
+    				visibleFragment = 1;
+    			}
+    			else{
+    				visibleFragment = 2;
+    			}
     		}
     	}
     	
@@ -430,7 +420,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	super.onResume();
     	managerActivity = this;
     	
-    	log("Ejecuto el onResume");
+    	log("onResume");
     	
     	if(Preferences.getCredentials(this) == null){	
 			logout(this, (MegaApplication)getApplication(), megaApi);
@@ -440,11 +430,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	Intent intent = getIntent();
     	
     	if (intent != null) {
-    		log("El intent es distinto de null");
+    		log("intent != null");
     		if (intent.getAction() != null){
-    			log("El getAction es distinto de null");
+    			log("getAction != null");
     			if(intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
-    				log("Entro donde el intent");
+    				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD");
 					Intent tempIntent = null;
 					String title = null;
 					String text = null;
@@ -459,7 +449,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						tempIntent.setAction(DownloadService.ACTION_CANCEL);
 						title = getString(R.string.download_downloading);
 						text = getString(R.string.download_cancel_downloading);
-						log("entro en el intent de cancelacion");
 					}
 					
 					final Intent cancelIntent = tempIntent;
@@ -474,14 +463,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					builder.setNegativeButton(getString(R.string.general_no), null);
 					final AlertDialog dialog = builder.create();
 					try {
-						log("Deberia aparecer el dialogo");
 						dialog.show(); 
 					}
-					catch(Exception ex)
-					{ 
-						log("Ha petado el dialogo");
+					catch(Exception ex)	{ 
 						startService(cancelIntent); 
-						}
+					}
 				}
     			intent.setAction(null);
 				setIntent(null);
@@ -492,28 +478,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     public void selectDrawerItem(DrawerItem item){
     	switch (item){
     		case CLOUD_DRIVE:{
-    			
-    			Bundle args = new Bundle();
-				args.putLong("parentHandle", parentHandle);
-    			
-    			if (fbG == null){
-    				fbG = new FileBrowserGridFragment();
-    				fbG.setArguments(args);
-    			}
-    			if (fbL == null){
-    				fbL = new FileBrowserListFragment();
-    				fbL.setArguments(args);
-    			}    			
+				if (fb == null){
+					fb = new FileBrowserFragment();
+					fb.setParentHandle(parentHandle);
+					fb.setIsList(isListCloudDrive);
+				}
 				
-    			if (isListCloudDrive){
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-    			}
-    			else{
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fb, "fb").commit();
+				if (isListCloudDrive){					
+					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+				}
+				else{
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
-    			
+    			    			
     			if (!firstTime){
     				mDrawerLayout.closeDrawer(Gravity.LEFT);
     			}
@@ -592,15 +570,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	@Override
 	public void onBackPressed() {
-		if (fbL != null){
-			if (fbL.isVisible()){
-				if (fbL.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
-				}
-			}
-			else if (fbG.isVisible()){
-				if (fbG.onBackPressed() == 0){
+		if (fb != null){
+			if (fb.isVisible()){
+				if (fb.onBackPressed() == 0){
 					super.onBackPressed();
 					return;
 				}
@@ -649,116 +621,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public void onPostCreate(Bundle savedInstanceState){
 		super.onPostCreate(savedInstanceState);
 		mDrawerToggle.syncState();
-		
-//		if(savedInstanceState != null){
-//			int visibleFragment = savedInstanceState.getInt("visibleFragment");
-//			long parentHandle = savedInstanceState.getLong("parentHandle");
-//			switch (visibleFragment){
-//				case 1:{
-//					if (fbL == null){
-//						fbL = new FileBrowserListFragment();
-//					}
-//					if (fbG == null){
-//						fbG = new FileBrowserGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-//					
-//					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//					NodeList nodes = null;
-//					if (parentNode != null){
-//						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));	
-//					}
-//					else{
-//						nodes = megaApi.getChildren(megaApi.getRootNode());
-//					}
-//					
-//					fbL.setNodes(nodes);
-//					fbL.getListView().invalidateViews();
-//					break;
-//				}
-//				case 2:{
-//					if (fbL == null){
-//						fbL = new FileBrowserListFragment();
-//					}
-//					if (fbG == null){
-//						fbG = new FileBrowserGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
-//					
-//					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//					NodeList nodes = null;
-//					if (parentNode != null){
-//						nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));	
-//					}
-//					else{
-//						nodes = megaApi.getChildren(megaApi.getRootNode());
-//					}
-//					
-//					fbG.setNodes(nodes);
-//					fbG.getListView().invalidateViews();
-//					break;
-//				}
-//				case 3:{
-//					if (cL == null){
-//						cL = new ContactsListFragment();
-//					}
-//					if (cG == null){
-//						cG = new ContactsGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
-//					break;
-//				}
-//				case 4:{
-//					if (cL == null){
-//						cL = new ContactsListFragment();
-//					}
-//					if (cG == null){
-//						cG = new ContactsGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
-//					break;
-//				}
-//				case 5:{
-//					if (rbL == null){
-//						rbL = new RubbishBinListFragment();
-//					}
-//					if (rbG == null){
-//						rbG = new RubbishBinGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbL).commit();
-//					break;
-//				}
-//				case 6:{
-//					if (rbL == null){
-//						rbL = new RubbishBinListFragment();
-//					}
-//					if (rbG == null){
-//						rbG = new RubbishBinGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
-//					break;
-//				}
-//				case 7:{
-//					if (tF == null){
-//						tF = new TransfersFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, tF).commit();
-//				}
-//				default:{
-//					if (fbL == null){
-//						fbL = new FileBrowserListFragment();
-//					}
-//					if (fbG == null){
-//						fbG = new FileBrowserGridFragment();
-//					}
-//					getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
-//					NodeList nodes = megaApi.getChildren(megaApi.getRootNode());
-//					fbL.setNodes(nodes);
-//					fbL.getListView().invalidateViews();
-//					break;
-//				}					
-//			}			
-//		}
 	}
 
 	
@@ -796,12 +658,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					mDrawerToggle.onOptionsItemSelected(item);
 				}
 		    	else {
-		    		if (fbL != null){
-		    			if (fbL.isVisible()){
-		    				fbL.onBackPressed();
-		    			}
-		    			else if (fbG.isVisible()){
-		    				fbG.onBackPressed();
+		    		if (fb != null){
+		    			if (fb.isVisible()){
+		    				fb.onBackPressed();
 		    			}
 		    		}
 				}
@@ -846,32 +705,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 		switch(v.getId()){
 			case R.id.menu_action_bar_grid:{
-				if (fbL != null){
-					if (fbL.isVisible() || fbG.isVisible()){
+				
+				if (fb != null){
+					if (fb.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fb");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commit();
+						
+						isListCloudDrive = !isListCloudDrive;
+						fb.setIsList(isListCloudDrive);
+						
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commit();
+						
 						if (isListCloudDrive){
-							Bundle args = new Bundle();
-							parentHandle = fbL.getParentHandle();
-							args.putLong("parentHandle", parentHandle);
-							fbG.setArguments(args);
-//							fbG.setParentHandle(fbL.getParentHandle());
-							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbG).commit();
-							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
-							isListCloudDrive = false;
-						}
-						else{
-							Bundle args = new Bundle();
-							parentHandle = fbG.getParentHandle();
-							args.putLong("parentHandle", parentHandle);
-							fbL.setArguments(args);
-//							fbL.setParentHandle(fbG.getParentHandle());
-							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbL).commit();
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-					        isListCloudDrive = true;					
+						}
+						else{
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
 						}
 					}
 				}
+
 				if (cL != null){
 					if (cL.isVisible() || cG.isVisible()){
 						if (isListContacts){
@@ -993,16 +852,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
-					if (fbL.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-						fbL.setNodes(nodes);
-						fbL.getListView().invalidateViews();
+					if (fb.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+						fb.setNodes(nodes);
+						fb.getListView().invalidateViews();
 					}		
-					if (fbG.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-						fbG.setNodes(nodes);
-						fbG.getListView().invalidateViews();
-					}
 				}
 				else{
 					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
@@ -1013,16 +867,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
-					if (fbL.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-						fbL.setNodes(nodes);
-						fbL.getListView().invalidateViews();
+					if (fb.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+						fb.setNodes(nodes);
+						fb.getListView().invalidateViews();
 					}		
-					if (fbG.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-						fbG.setNodes(nodes);
-						fbG.getListView().invalidateViews();
-					}
 				}
 				else{
 					Toast.makeText(this, "The file has not been moved", Toast.LENGTH_LONG).show();
@@ -1038,15 +887,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
-				if (fbL.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-					fbL.setNodes(nodes);
-					fbL.getListView().invalidateViews();
-				}
-				if (fbG.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-					fbG.setNodes(nodes);
-					fbG.getListView().invalidateViews();
+				if (fb.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					fb.setNodes(nodes);
+					fb.getListView().invalidateViews();
 				}
 			}
 			else{
@@ -1083,15 +927,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
-				if (fbL.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-					fbL.setNodes(nodes);
-					fbL.getListView().invalidateViews();
-				}
-				if (fbG.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-					fbG.setNodes(nodes);
-					fbG.getListView().invalidateViews();
+				if (fb.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					fb.setNodes(nodes);
+					fb.getListView().invalidateViews();
 				}
 			}
 			else{
@@ -1106,16 +945,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
-				if (fbL.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-					fbL.setNodes(nodes);
-					fbL.getListView().invalidateViews();
+				if (fb.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					fb.setNodes(nodes);
+					fb.getListView().invalidateViews();
 				}		
-				if (fbG.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-					fbG.setNodes(nodes);
-					fbG.getListView().invalidateViews();
-				}
 			}
 			else{
 				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
@@ -1130,16 +964,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
-				if (fbL.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-					fbL.setNodes(nodes);
-					fbL.getListView().invalidateViews();
+				if (fb.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					fb.setNodes(nodes);
+					fb.getListView().invalidateViews();
 				}		
-				if (fbG.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-					fbG.setNodes(nodes);
-					fbG.getListView().invalidateViews();
-				}
 			}
 		}
 	}
@@ -1193,133 +1022,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		intent.setClass(this, FileStorageActivity.class);
 		intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
-
-		
-/*		
-		//TODO: Here I should take the location from the preferences
-		String downloadLocation;
-		try {
-			downloadLocation = Environment.getExternalStorageDirectory().getCanonicalPath();
-		} catch (IOException e) {
-			downloadLocation = Environment.getExternalStorageDirectory().getAbsolutePath();
-			log("ABSOLUTE");
-		}
-//		String downloadLocation = getCacheDir().getAbsolutePath();
-		
-		//Download in the background to prevent incomplete downloads.
-		File file = null;
-		
-		//See if it's already downloaded
-		String localPath = Util.getLocalFile(this, document.getName(), document.getSize(), downloadLocation);
-		if(localPath != null)
-		{	
-			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(document.getName()).getType());
-			if (isIntentAvailable(this, intent))
-				startActivity(intent);
-			else{
-				String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
-				Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT).show();
-				Intent intentShare = new Intent(Intent.ACTION_SEND);
-				intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(document.getName()).getType());
-				if (isIntentAvailable(this, intentShare))
-					startActivity(intentShare);
-			}
-			return;
-		}
-		
-		// TODO: Download to default folder. This is done to maintain the folder structure. Uncomment in the future
-//		String treePath = megaApi.getNodePath(document);
-//		if(treePath != null){ 
-//			file = new File(downloadLocation, treePath);
-//		}
-//		else{
-//			file = new File(downloadLocation, document.getName());
-//		}
-//		File parent = file.getParentFile();
-//		parent.mkdirs();
-//		String path = parent.getAbsolutePath();
-//		
-//		
-//		try{
-//			StatFs stat = new StatFs(parent.getAbsolutePath());
-//			double availableFreeSpace = (double)stat.getAvailableBlocks()* (double)stat.getBlockSize();
-//			if(availableFreeSpace <document.getSize()){
-//				Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-//				return;
-//			}
-//		}catch(Exception ex){}
-//		
-//		
-//		Intent service = new Intent(this, DownloadService.class);
-//		service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-//		service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-//		service.putExtra(DownloadService.EXTRA_PATH, path);
-//		startService(service);
-		// END TODO
-		
-		// TODO: And comment this
-		try{
-			StatFs stat = new StatFs(downloadLocation);
-			double availableFreeSpace = (double)stat.getAvailableBlocks()* (double)stat.getBlockSize();
-			if(availableFreeSpace <document.getSize()){
-				Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-				return;
-			}
-		}catch(Exception ex){}
-		
-		Intent service = new Intent(this, DownloadService.class);
-		service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-		service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-		service.putExtra(DownloadService.EXTRA_PATH, downloadLocation);
-		startService(service);
-		// END TODO
-		
-
-		/*
-//		String downloadLocation = Environment.getExternalStorageDirectory().getAbsolutePath();
-		String downloadLocation = getCacheDir().getAbsolutePath();
-		long foregroundSize = 20 * 1024 * 1024;
-		if (document.getSize() > foregroundSize){
-			Toast.makeText(this, "File is larger than 20MB. DownloadService not yet implemented", Toast.LENGTH_LONG).show();
-		}
-		else{
-			File dir = new File(getCacheDir(), document.getBase64Handle());
-			dir.mkdir();
-			dir.setReadable(true, false);
-			dir.setExecutable(true, false);
-			dir.setLastModified(System.currentTimeMillis());
-			destination = new File(dir, document.getName());
-			destination.setReadable(true, false);
-			destination.setWritable(true, false);
-			if (destination.exists()){
-				if (destination.length() == document.getSize()){
-					Toast.makeText(this, "Ya descargado", Toast.LENGTH_LONG).show();
-				}
-				else{
-					destination.delete();
-				}
-			}
-			else{
-				log("Download to: " + destination.getAbsolutePath());
-				megaApi.startDownload(document, dir.getAbsolutePath() + "/", this);
-				Toast.makeText(this, "Download started (Internal memory)", Toast.LENGTH_LONG).show();
-			}
-//			megaApi.startDownload(document, downloadLocation + "/", this);
-//			Util.showToast(this, R.string.download_began);
-		}
-		*/
 	}
 	
 	public void moveToTrash(final MegaNode document){
 		
-		if (fbL.isVisible()){
-			fbL.setPositionClicked(-1);
-			fbL.notifyDataSetChanged();
-		}
-		else if (fbG.isVisible()){
-			fbG.setPositionClicked(-1);
-			fbG.notifyDataSetChanged();
+		if (fb.isVisible()){
+			fb.setPositionClicked(-1);
+			fb.notifyDataSetChanged();
 		}
 		
 		if (!Util.isOnline(this)){
@@ -1361,13 +1070,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
 		
-		if (fbL.isVisible()){
-			fbL.setPositionClicked(-1);
-			fbL.notifyDataSetChanged();
-		}
-		else if (fbG.isVisible()){
-			fbG.setPositionClicked(-1);
-			fbG.notifyDataSetChanged();
+		if (fb.isVisible()){
+			fb.setPositionClicked(-1);
+			fb.notifyDataSetChanged();
 		}
 		
 		if (!Util.isOnline(this)){
@@ -1400,7 +1105,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (!fbL.isVisible() && !fbG.isVisible()) {
+				if (!fb.isVisible()) {
 					return;
 				}
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1411,13 +1116,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showNewFolderDialog(String editText){
 		
-		if (fbL.isVisible()){
-			fbL.setPositionClicked(-1);
-			fbL.notifyDataSetChanged();
-		}
-		else if (fbG.isVisible()){
-			fbG.setPositionClicked(-1);
-			fbG.notifyDataSetChanged();
+		if (fb.isVisible()){
+			fb.setPositionClicked(-1);
+			fb.notifyDataSetChanged();
 		}
 		
 		String text;
@@ -1499,11 +1200,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		long parentHandle;
-		if (fbL.isVisible()){
-			parentHandle = fbL.getParentHandle();
-		}
-		else if (fbG.isVisible()){
-			parentHandle = fbG.getParentHandle();
+		if (fb.isVisible()){
+			parentHandle = fb.getParentHandle();
 		}
 		else{
 			return;
@@ -1521,13 +1219,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showRenameDialog(final MegaNode document, String text){
 		
-		if (fbL.isVisible()){
-			fbL.setPositionClicked(-1);
-			fbL.notifyDataSetChanged();
-		}
-		else if (fbG.isVisible()){
-			fbG.setPositionClicked(-1);
-			fbG.notifyDataSetChanged();
+		if (fb.isVisible()){
+			fb.setPositionClicked(-1);
+			fb.notifyDataSetChanged();
 		}
 		
 		final EditText input = new EditText(this);
@@ -1613,13 +1307,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showMove(ArrayList<Long> handleList){
 		
-		if (fbL.isVisible()){
-			fbL.setPositionClicked(-1);
-			fbL.notifyDataSetChanged();
-		}
-		else if (fbG.isVisible()){
-			fbG.setPositionClicked(-1);
-			fbG.notifyDataSetChanged();
+		if (fb.isVisible()){
+			fb.setPositionClicked(-1);
+			fb.notifyDataSetChanged();
 		}
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
@@ -1634,13 +1324,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showCopy(ArrayList<Long> handleList){
 		
-		if (fbL.isVisible()){
-			fbL.setPositionClicked(-1);
-			fbL.notifyDataSetChanged();
-		}
-		else if (fbG.isVisible()){
-			fbG.setPositionClicked(-1);
-			fbG.notifyDataSetChanged();
+		if (fb.isVisible()){
+			fb.setPositionClicked(-1);
+			fb.notifyDataSetChanged();
 		}
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
@@ -1664,10 +1350,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		return list.size() > 0;
 	}
 	
-	public static void log(String message) {
-		Util.log("ManagerActivity", message);
-	}
-
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download started");
@@ -1690,42 +1372,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				finalPath = destination.getAbsolutePath();
 			}
 			
-//			String tmpPath = finalPath + ".tmp";
-//			File tmpFile = new File(tmpPath);
-//			File finalFile = new File(finalPath);
-//			finalFile.renameTo(tmpFile);
-//			tmpFile.renameTo(finalFile);
-//			
-//			finalFile.setReadable(true, false);
-			
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			intent.setDataAndType(Uri.fromFile(destination), MimeType.typeForName(api.getNodeByHandle(transfer.getNodeHandle()).getName()).getType());
-			if (isIntentAvailable(this, intent))
+			if (isIntentAvailable(this, intent)){
 				startActivity(intent);
-			
-//			File destFile = new File(transfer.getPath());
-//			File ficheroPrueba = null;
-//			try {
-//				log("Canonical path: " + destFile.getCanonicalFile());
-//				ficheroPrueba = destFile.getCanonicalFile();
-//				
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
-//			//En el fichero y en todas sus carpetas padres
-//			boolean resultado = destFile.setReadable(true, false);
-//			destFile.setWritable(true, false);
-//			log("SIZE OF THE FILE: " + destFile.length() + "___" + destFile.canRead() + "RESULTADO: " + resultado);
-//			
-////			File ficheroPrueba = new File(getCacheDir(), "pruebaCopiada.pdf");
-//			if (ficheroPrueba != null){
-//				destFile.renameTo(ficheroPrueba);	
-//			}			
-//			log("SIZE OF THE FILE: " + ficheroPrueba.length() + "___" + ficheroPrueba.canRead());
-//			Intent intent = new Intent(Intent.ACTION_VIEW);
-//			intent.setDataAndType(Uri.fromFile(ficheroPrueba), MimeType.typeForName(api.getNodeByHandle(transfer.getNodeHandle()).getName()).getType());
-//			if (isIntentAvailable(this, intent))
-//				startActivity(intent);
+			}
 		}
 		
 	}
@@ -1733,7 +1384,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log(transfer.getFileName() + "(" + (int)((transfer.getTransferredBytes()*100)/transfer.getTotalBytes()) + "%): " + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
-		
 	}
 
 	@Override
@@ -1770,11 +1420,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			int i = 0;
 			long parentHandle;
-			if (fbL.isVisible()){
-				parentHandle = fbL.getParentHandle();
-			}
-			else if (fbG.isVisible()){
-				parentHandle = fbG.getParentHandle();
+			if (fb.isVisible()){
+				parentHandle = fb.getParentHandle();
 			}
 			else{
 				return;
@@ -1851,7 +1498,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for(int i=0; i<copyHandles.length;i++){
-//				Toast.makeText(this, "NODE" +i +  megaApi.getNodeByHandle(copyHandles[i]).getName() + "_" + parent.getName(), Toast.LENGTH_LONG).show();
 				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
 			}
 		}
@@ -2001,11 +1647,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		long parentHandle = -1;
-		if (fbL.isVisible()){
-			parentHandle = fbL.getParentHandle();
-		}
-		else if (fbG.isVisible()){
-			parentHandle = fbG.getParentHandle();
+		if (fb.isVisible()){
+			parentHandle = fb.getParentHandle();
 		}
 		
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle); 
@@ -2039,20 +1682,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
-		if (fbL.isVisible()){
-			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbL.getParentHandle()));
-			fbL.setNodes(nodes);
-			fbL.getListView().invalidateViews();
-		}
-		if (fbG.isVisible()){
-			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbG.getParentHandle()));
-			fbG.setNodes(nodes);
-			fbG.getListView().invalidateViews();
+		if (fb.isVisible()){
+			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+			fb.setNodes(nodes);
+			fb.getListView().invalidateViews();
 		}
 	}
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
 		// TODO Fetch nodes from MEGA		
+	}	
+
+	public static void log(String message) {
+		Util.log("ManagerActivity", message);
 	}
 }
