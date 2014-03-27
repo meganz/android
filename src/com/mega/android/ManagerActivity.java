@@ -715,6 +715,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						isListCloudDrive = !isListCloudDrive;
 						fb.setIsList(isListCloudDrive);
+						fb.setParentHandle(parentHandle);
 						
 						fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.attach(currentFragment);
@@ -1693,6 +1694,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public void onReloadNeeded(MegaApiJava api) {
 		// TODO Fetch nodes from MEGA		
 	}	
+	
+	public void setParentHandle(long parentHandle){
+		this.parentHandle = parentHandle;
+	}
 
 	public static void log(String message) {
 		Util.log("ManagerActivity", message);
