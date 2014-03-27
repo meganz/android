@@ -44,6 +44,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -680,7 +681,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	return true;
 	        }
 	        case R.id.action_more_options:{
-	        	Toast.makeText(this, "More options button clicked", Toast.LENGTH_LONG).show();
+	        	showMoreOptionsMenu();
 	        	return true;
 	        }
 	        case R.id.action_upload:{
@@ -784,6 +785,56 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				break;
 			}
 		}
+	}
+	
+	private void showMoreOptionsMenu(){
+
+		CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setItems(options, new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		    	switch(which){
+			    	case 0:{
+			    		Toast.makeText(managerActivity, "Refresh not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		break;
+			    	}
+			    	case 1:{
+			    		Toast.makeText(managerActivity, "Sort by not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		break;
+			    	}
+			    	case 2:{
+			    		Toast.makeText(managerActivity, "Help not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		break;
+			    	}
+			    	case 3:{
+			    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		break;
+			    	}			    	
+			    	case 4:{
+			    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+			    		break;
+			    	}
+		    	}
+		        
+		    }
+		});
+		builder.show();
+		
+//		final String[] option = new String[] { "Srot by...", "Help", "Upgrade Account", "Refresh", "Logout" };
+//		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, , option);
+//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//		builder.setAdapter(adapter, new DialogInterface.OnClickListener() { 
+//			public void onClick(DialogInterface dialog, int which) { 
+//				// TODO Auto-generated method stub 
+//			} 
+//		});
+		
+//		 PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_more_options));
+//		 MenuInflater inflater = popup.getMenuInflater();
+//		 inflater.inflate(R.menu.more_options_menu, popup.getMenu());
+//		 popup.show();
 	}
 	
 	/*
