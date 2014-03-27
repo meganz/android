@@ -72,7 +72,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
+			((ManagerActivity)context).setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(megaApi.getRootNode());
+			aB.setTitle(getString(R.string.section_cloud_drive));	
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
@@ -182,6 +186,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
 				
 				parentHandle = nodes.get(position).getHandle();
+				((ManagerActivity)context).setParentHandle(parentHandle);
 				adapterList.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position));
 				adapterList.setNodes(nodes);
@@ -231,6 +236,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 
 		if (isList){
 			parentHandle = adapterList.getParentHandle();
+			((ManagerActivity)context).setParentHandle(parentHandle);
 			
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);
@@ -255,6 +261,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
+					((ManagerActivity)context).setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(parentNode);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
@@ -268,6 +275,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		}
 		else{
 			parentHandle = adapterGrid.getParentHandle();
+			((ManagerActivity)context).setParentHandle(parentHandle);
 			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);
@@ -292,6 +300,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
+					((ManagerActivity)context).setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(parentNode);
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);

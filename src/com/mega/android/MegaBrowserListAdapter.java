@@ -74,6 +74,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
+		((ManagerActivity)context).setParentHandle(parentHandle);
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
 		this.emptyTextViewFragment = emptyTextView;
@@ -489,6 +490,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
+		((ManagerActivity)context).setParentHandle(parentHandle);
 	}
 	
 	private static void log(String log) {

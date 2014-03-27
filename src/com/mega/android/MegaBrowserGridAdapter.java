@@ -60,6 +60,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
+		((ManagerActivity)context).setParentHandle(parentHandle);
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
 		this.emptyTextViewFragment = emptyTextView;
@@ -740,6 +741,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 
 					parentHandle = n.getHandle();
+					((ManagerActivity)context).setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
 					listFragment.setSelection(0);
@@ -792,6 +794,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 
 					parentHandle = n.getHandle();
+					((ManagerActivity)context).setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
 					listFragment.setSelection(0);
@@ -1075,6 +1078,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
+		((ManagerActivity)context).setParentHandle(parentHandle);
 	}
 	
 	private static void log(String log) {
