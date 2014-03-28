@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mega.android"
     android:installLocation="auto"
-    android:versionCode="13"
-    android:versionName="0.12" >
+    android:versionCode="14"
+    android:versionName="0.13" >
 
     <uses-sdk
         android:minSdkVersion="9"
