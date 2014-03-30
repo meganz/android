@@ -11,6 +11,7 @@
     <string name="general_copy_to">Copy</string>
     <string name="general_create">Create</string>
     <string name="general_upload">File Upload</string>
+    <string name="general_download">Download</string>
             
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>

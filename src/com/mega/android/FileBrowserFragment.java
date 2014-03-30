@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
@@ -11,6 +12,7 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -18,19 +20,25 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	Context context;
 	ActionBar aB;
@@ -39,6 +47,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	TextView emptyTextView;
 	MegaBrowserListAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
+	FileBrowserFragment fileBrowserFragment = this;
 	
 	MegaApiAndroid megaApi;
 		
@@ -48,7 +57,92 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	boolean isList = true;
 	
 	NodeList nodes;
-	//HASTA AQUI 
+	
+	private ActionMode actionMode;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			List<MegaNode> documents = getSelectedDocuments();
+			
+			for (int i=0;i<documents.size();i++){
+				Toast.makeText(context, documents.get(i).getName() + "_" + documents.get(i).isFolder(), Toast.LENGTH_SHORT).show();
+			}
+			switch(item.getItemId()){
+				case R.id.cab_menu_move:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showMove(handleList);
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_browser_action, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			adapterList.setMultipleSelect(false);
+			listView.setOnItemLongClickListener(fileBrowserFragment);
+			clearSelections();
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			List<MegaNode> selected = getSelectedDocuments();
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
+			
+			// Rename
+			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "full").getErrorCode() == MegaError.API_OK)) {
+				showRename = true;
+			}
+			
+			// Link
+			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "owner").getErrorCode() == MegaError.API_OK)) {
+				showLink = true;
+			}
+			
+			if (selected.size() > 0) {
+				showDownload = true;
+				showTrash = true;
+				showMove = true;
+				showCopy = true;
+				for(int i=0; i<selected.size();i++)	{
+					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+						showTrash = false;
+						showMove = false;
+						break;
+					}
+				}
+			}
+			
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			
+			return false;
+		}
+		
+	}
+	
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -98,6 +192,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	        
 	        listView = (ListView) v.findViewById(R.id.file_list_view_browser);
 			listView.setOnItemClickListener(this);
+			listView.setOnItemLongClickListener(this);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			
@@ -120,6 +215,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			}
 			
 			adapterList.setPositionClicked(-1);
+			adapterList.setMultipleSelect(false);
 
 			listView.setAdapter(adapterList);
 			
@@ -178,59 +274,167 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
             long id) {
 		
 		if (isList){
-			if (nodes.get(position).isFolder()){
-				MegaNode n = nodes.get(position);
-				
-				aB.setTitle(n.getName());
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
-				
-				parentHandle = nodes.get(position).getHandle();
-				((ManagerActivity)context).setParentHandle(parentHandle);
-				adapterList.setParentHandle(parentHandle);
-				nodes = megaApi.getChildren(nodes.get(position));
-				adapterList.setNodes(nodes);
-				listView.setSelection(0);
-				
-				//If folder has no files
-				if (adapterList.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+			if (adapterList.isMultipleSelect()){
+				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+				if (checkedItems.get(position, false) == true){
+					listView.setItemChecked(position, true);
 				}
 				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}
+					listView.setItemChecked(position, false);
+				}				
+				updateActionModeTitle();
+				adapterList.notifyDataSetChanged();
 			}
 			else{
-				if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", position);
-					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-						intent.putExtra("parentNodeHandle", -1L);
+				if (nodes.get(position).isFolder()){
+					MegaNode n = nodes.get(position);
+					
+					aB.setTitle(n.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+					
+					parentHandle = nodes.get(position).getHandle();
+					((ManagerActivity)context).setParentHandle(parentHandle);
+					adapterList.setParentHandle(parentHandle);
+					nodes = megaApi.getChildren(nodes.get(position));
+					adapterList.setNodes(nodes);
+					listView.setSelection(0);
+					
+					//If folder has no files
+					if (adapterList.getCount() == 0){
+						listView.setVisibility(View.GONE);
+						emptyImageView.setVisibility(View.VISIBLE);
+						emptyTextView.setVisibility(View.VISIBLE);
+						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+						} else {
+							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextView.setText(R.string.file_browser_empty_folder);
+						}
 					}
 					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
 					}
-					startActivity(intent);
 				}
 				else{
-					adapterList.setPositionClicked(-1);
-					adapterList.notifyDataSetChanged();
-					((ManagerActivity) context).onFileClick(nodes.get(position));
+					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						intent.putExtra("position", position);
+						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+						}
+						startActivity(intent);
+					}
+					else{
+						adapterList.setPositionClicked(-1);
+						adapterList.notifyDataSetChanged();
+						((ManagerActivity) context).onFileClick(nodes.get(position));
+					}
 				}
 			}
 		}
     }
+	
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		Toast.makeText(context, "long click", Toast.LENGTH_LONG).show();
+		if (adapterList.getPositionClicked() == -1){
+			clearSelections();
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+			listView.setItemChecked(position, true);
+			adapterList.setMultipleSelect(true);
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
+		return true;
+	}
+	
+	/*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				listView.setItemChecked(checkedPosition, false);
+			}
+		}
+		updateActionModeTitle();
+	}
+	
+	private void updateActionModeTitle() {
+		if (actionMode == null || getActivity() == null) {
+			return;
+		}
+		List<MegaNode> documents = getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
+		Resources res = getActivity().getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = "";
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
+	
+	/*
+	 * Get list of all selected documents
+	 */
+	private List<MegaNode> getSelectedDocuments() {
+		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
+				if (document != null){
+					documents.add(document);
+				}
+			}
+		}
+		return documents;
+	}
+	
+	/*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		adapterList.setMultipleSelect(false);
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
 	
 	public int onBackPressed(){
 
@@ -426,5 +630,4 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	private static void log(String log) {
 		Util.log("FileBrowserFragment", log);
 	}
-
 }

@@ -4,12 +4,21 @@
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/file_list_item_layout" >
     
+    <CheckBox
+        android:id="@+id/file_list_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:checked="false"
+        android:focusable="false"
+        android:layout_centerVertical="true" />
+    
     <ImageView
         android:id="@+id/file_list_thumbnail"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginLeft="5dp" 
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:layout_toRightOf="@id/file_list_checkbox" />
     
     <TextView
         android:id="@+id/file_list_filename"

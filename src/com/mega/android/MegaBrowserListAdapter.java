@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
@@ -15,6 +16,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -23,6 +25,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -48,8 +51,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	TextView emptyTextViewFragment;
 	ActionBar aB;
 	
+	boolean multipleSelect;
+	
 	/*public static view holder class*/
     public class ViewHolderBrowserList {
+    	CheckBox checkbox;
         ImageView imageView;
         TextView textViewFileName;
         TextView textViewFileSize;
@@ -130,6 +136,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			convertView = inflater.inflate(R.layout.item_file_list, parent, false);
 			holder = new ViewHolderBrowserList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
+			holder.checkbox.setClickable(false);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -168,6 +176,24 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		else{
 			holder = (ViewHolderBrowserList) convertView.getTag();
+		}
+		
+		if (!multipleSelect){
+			holder.checkbox.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+		}
+		else{
+			holder.checkbox.setVisibility(View.VISIBLE);
+			holder.arrowSelection.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			
+			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				holder.checkbox.setChecked(true);
+			}
+			else{
+				holder.checkbox.setChecked(false);
+			}
 		}
 		
 		holder.currentPosition = position;
@@ -483,6 +509,18 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 		}		
 	}
+	
+	/*
+	 * Get document at specified position
+	 */
+	public MegaNode getDocumentAt(int position) {
+		try {
+			if(nodes != null){
+				return nodes.get(position);
+			}
+		} catch (IndexOutOfBoundsException e) {}
+		return null;
+	}
 		
 	public long getParentHandle(){
 		return parentHandle;
@@ -491,6 +529,17 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
 		((ManagerActivity)context).setParentHandle(parentHandle);
+	}
+	
+	public boolean isMultipleSelect() {
+		return multipleSelect;
+	}
+
+	public void setMultipleSelect(boolean multipleSelect) {
+		if(this.multipleSelect != multipleSelect){
+			this.multipleSelect = multipleSelect;
+			notifyDataSetChanged();
+		}
 	}
 	
 	private static void log(String log) {
