@@ -7,7 +7,8 @@
     <ListView
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent" 
+        android:choiceMode="multipleChoice">
     </ListView>
     
     <ImageView
