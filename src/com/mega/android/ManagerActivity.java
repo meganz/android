@@ -1064,10 +1064,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	File destination;
 	
-	public void onFileClick(final MegaNode document){
+	public void onFileClick(ArrayList<Long> handleList){
 		
-		long[] hashes = new long[1];
-		hashes[0] = document.getHandle();
+		long[] hashes = new long[handleList.size()];
+		for (int i=0;i<handleList.size();i++){
+			hashes[i] = handleList.get(i);
+		}
 		
 		Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
 		intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
@@ -1076,7 +1078,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 	}
 	
-	public void moveToTrash(final MegaNode document){
+	public void moveToTrash(ArrayList<Long> handleList){
 		
 		if (fb.isVisible()){
 			fb.setPositionClicked(-1);
@@ -1105,18 +1107,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		MegaNode rubbishNode = megaApi.getRubbishNode();
 
-		//Check if the node is not yet in the rubbish bin (if so, remove it)
-		MegaNode parent = document;
-		while (megaApi.getParentNode(parent) != null){
-			parent = megaApi.getParentNode(parent);
-		}
-			
-		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-			moveToRubbish = true;
-			megaApi.moveNode(document, rubbishNode, this);
-		}
-		else{
-			megaApi.remove(document, this);
+		for (int i=0;i<handleList.size();i++){
+			//Check if the node is not yet in the rubbish bin (if so, remove it)
+			MegaNode parent = megaApi.getNodeByHandle(handleList.get(i));
+			while (megaApi.getParentNode(parent) != null){
+				parent = megaApi.getParentNode(parent);
+			}
+				
+			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+				moveToRubbish = true;
+				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, this);
+			}
+			else{
+				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), this);
+			}
 		}
 	}
 	
@@ -1389,7 +1393,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		intent.putExtra("COPY_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
-		Toast.makeText(this, "ManagerActivity.showCopy(ArrayList<Long> handleList): Code commented. Not yet working", Toast.LENGTH_LONG).show();
 	}
 	
 	/*

@@ -778,7 +778,9 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						context.startActivity(intent);
 					}
 					else{
-						((ManagerActivity) context).onFileClick(n);
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(n.getHandle());
+						((ManagerActivity) context).onFileClick(handleList);
 					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
@@ -831,7 +833,9 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						context.startActivity(intent);
 					}
 					else{
-						((ManagerActivity) context).onFileClick(n);
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(n.getHandle());
+						((ManagerActivity) context).onFileClick(handleList);
 					}	
 					positionClicked = -1;
 					notifyDataSetChanged();
@@ -981,14 +985,18 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				positionClicked = -1;
 				notifyDataSetChanged();
-				((ManagerActivity) context).onFileClick(n);
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).onFileClick(handleList);
 				break;
 			}
 			case R.id.file_grid_option_download2:{
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				positionClicked = -1;
 				notifyDataSetChanged();
-				((ManagerActivity) context).onFileClick(n);
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).onFileClick(handleList);
 				break;
 			}
 			case R.id.file_grid_option_properties1:{
@@ -1023,12 +1031,16 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_grid_option_delete1:{
 				MegaNode n = (MegaNode) getItem(currentPosition);
-				((ManagerActivity) context).moveToTrash(n);
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).moveToTrash(handleList);
 				break;
 			}
 			case R.id.file_grid_option_delete2:{
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
-				((ManagerActivity) context).moveToTrash(n);
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).moveToTrash(handleList);
 				break;
 			}
 			case R.id.file_grid_option_rename1:{

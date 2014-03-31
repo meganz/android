@@ -448,7 +448,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_list_option_download:{
 				positionClicked = -1;
 				notifyDataSetChanged();
-				((ManagerActivity) context).onFileClick(n);
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).onFileClick(handleList);
 				break;
 			}
 			case R.id.file_list_option_properties:{
@@ -467,7 +469,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 			case R.id.file_list_option_delete:{
-				((ManagerActivity) context).moveToTrash(n);
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).moveToTrash(handleList);
 				break;
 			}
 			case R.id.file_list_option_public_link:{
