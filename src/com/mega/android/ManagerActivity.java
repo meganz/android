@@ -99,6 +99,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_GET_LOCAL = 1003;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	public static int REQUEST_CODE_REFRESH = 1005;
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -797,7 +798,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		    public void onClick(DialogInterface dialog, int which) {
 		    	switch(which){
 			    	case 0:{
-			    		Toast.makeText(managerActivity, "Refresh not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		Intent intent = new Intent(managerActivity, LoginActivity.class);
+			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+			    		intent.putExtra("PARENT_HANDLE", parentHandle);
+			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 			    		break;
 			    	}
 			    	case 1:{
@@ -1447,7 +1451,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		
 		if (intent == null) {
 			return;
@@ -1642,6 +1646,28 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 			}
 			Util.showToast(this, R.string.download_began);
+		}
+		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
+			parentHandle = intent.getLongExtra("PARENT_HANDLE", -1);
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode != null){
+				if (fb != null){
+					if (fb.isVisible()){
+						NodeList nodes = megaApi.getChildren(parentNode);
+						fb.setNodes(nodes);
+						fb.getListView().invalidateViews();
+					}
+				}
+			}
+			else{
+				if (fb != null){
+					if (fb.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getRootNode());
+						fb.setNodes(nodes);
+						fb.getListView().invalidateViews();
+					}
+				}
+			}
 		}
 	}
 	

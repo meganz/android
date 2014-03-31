@@ -41,6 +41,8 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
 	
+	public static String ACTION_REFRESH = "ACTION_REFRESH";
+	
 	EditText et_user;
 	EditText et_password;
 	Button bRegister;
@@ -68,6 +70,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     private MegaRequestListener requestListener;
     UserCredentials credentials;
     private boolean backWhileLogin;
+    private long parentHandle = -1;
 	
 	/*
 	 * Task to process email and password
@@ -120,27 +123,69 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 		credentials = Preferences.getCredentials(this);
 		if (credentials != null){
-			MegaNode rootNode = megaApi.getRootNode();
-			if (rootNode != null){
-				Intent intent = new Intent(this, ManagerActivity.class);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			Intent intentReceived = getIntent();
+			if ((intentReceived != null) && (intentReceived.getAction() != null)){
+				if (intentReceived.getAction().equals(ACTION_REFRESH)){
+					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+					loginLogin.setVisibility(View.GONE);
+					loginDelimiter.setVisibility(View.GONE);
+					loginCreateAccount.setVisibility(View.GONE);
+					loginLoggingIn.setVisibility(View.VISIBLE);
+					generatingKeysText.setVisibility(View.VISIBLE);
+					lastEmail = credentials.getEmail();
+					gPublicKey = credentials.getPublicKey();
+					gPrivateKey = credentials.getPrivateKey();
+					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+					return;
 				}
-				this.startActivity(intent);
-				this.finish();
-				return;
+				else{
+					MegaNode rootNode = megaApi.getRootNode();
+					if (rootNode != null){
+						Intent intent = new Intent(this, ManagerActivity.class);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						}
+						this.startActivity(intent);
+						this.finish();
+						return;
+					}
+					else{
+						loginLogin.setVisibility(View.GONE);
+						loginDelimiter.setVisibility(View.GONE);
+						loginCreateAccount.setVisibility(View.GONE);
+						loginLoggingIn.setVisibility(View.VISIBLE);
+						generatingKeysText.setVisibility(View.VISIBLE);
+						lastEmail = credentials.getEmail();
+						gPublicKey = credentials.getPublicKey();
+						gPrivateKey = credentials.getPrivateKey();
+						megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+						return;
+					}
+				}
 			}
 			else{
-				loginLogin.setVisibility(View.GONE);
-				loginDelimiter.setVisibility(View.GONE);
-				loginCreateAccount.setVisibility(View.GONE);
-				loginLoggingIn.setVisibility(View.VISIBLE);
-				generatingKeysText.setVisibility(View.VISIBLE);
-				lastEmail = credentials.getEmail();
-				gPublicKey = credentials.getPublicKey();
-				gPrivateKey = credentials.getPrivateKey();
-				megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
-				return;
+				MegaNode rootNode = megaApi.getRootNode();
+				if (rootNode != null){
+					Intent intent = new Intent(this, ManagerActivity.class);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					}
+					this.startActivity(intent);
+					this.finish();
+					return;
+				}
+				else{
+					loginLogin.setVisibility(View.GONE);
+					loginDelimiter.setVisibility(View.GONE);
+					loginCreateAccount.setVisibility(View.GONE);
+					loginLoggingIn.setVisibility(View.VISIBLE);
+					generatingKeysText.setVisibility(View.VISIBLE);
+					lastEmail = credentials.getEmail();
+					gPublicKey = credentials.getPublicKey();
+					gPrivateKey = credentials.getPrivateKey();
+					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+					return;
+				}
 			}
 		}		
 		
@@ -400,10 +445,19 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 			else{
 				if (!backWhileLogin){
-					Intent intent = new Intent(loginActivity,ManagerActivity.class);
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					startActivity(intent);
-					finish();
+					
+					if (parentHandle != -1){
+						Intent intent = new Intent();
+						intent.putExtra("PARENT_HANDLE", parentHandle);
+						setResult(RESULT_OK, intent);
+						finish();
+					}
+					else{
+						Intent intent = new Intent(loginActivity,ManagerActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						finish();
+					}
 				}
 			}
 			

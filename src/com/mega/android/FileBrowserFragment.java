@@ -9,15 +9,11 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -30,13 +26,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -66,9 +60,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaNode> documents = getSelectedDocuments();
 			
-			for (int i=0;i<documents.size();i++){
-				Toast.makeText(context, documents.get(i).getName() + "_" + documents.get(i).isFolder(), Toast.LENGTH_SHORT).show();
-			}
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
@@ -395,7 +386,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		Toast.makeText(context, "long click", Toast.LENGTH_LONG).show();
 		if (adapterList.getPositionClicked() == -1){
 			clearSelections();
 			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
