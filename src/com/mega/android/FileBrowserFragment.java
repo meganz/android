@@ -70,6 +70,34 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				Toast.makeText(context, documents.get(i).getName() + "_" + documents.get(i).isFolder(), Toast.LENGTH_SHORT).show();
 			}
 			switch(item.getItemId()){
+				case R.id.cab_menu_download:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).onFileClick(handleList);
+					break;
+				}
+				case R.id.cab_menu_rename:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						((ManagerActivity) context).showRenameDialog(documents.get(0), documents.get(0).getName());
+					}
+					break;
+				}
+				case R.id.cab_menu_copy:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showCopy(handleList);
+					break;
+				}	
 				case R.id.cab_menu_move:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -78,7 +106,29 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					clearSelections();
 					hideMultipleSelect();
 					((ManagerActivity) context).showMove(handleList);
+					break;
 				}
+				case R.id.cab_menu_share_link:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
+					}
+					break;
+				}
+				case R.id.cab_menu_trash:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).moveToTrash(handleList);
+					break;
+				}
+				
+				
+				
 			}
 			return false;
 		}
@@ -334,7 +384,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					else{
 						adapterList.setPositionClicked(-1);
 						adapterList.notifyDataSetChanged();
-						((ManagerActivity) context).onFileClick(nodes.get(position));
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						((ManagerActivity) context).onFileClick(handleList);
 					}
 				}
 			}
