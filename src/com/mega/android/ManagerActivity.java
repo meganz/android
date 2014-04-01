@@ -814,11 +814,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			    		break;
 			    	}
 			    	case 2:{
-			    		Toast.makeText(managerActivity, "Help not yet implemented (only refresh, logout)", Toast.LENGTH_SHORT).show();
+			    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
 			    		break;
 			    	}
 			    	case 3:{
-			    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (only refresh, logout)", Toast.LENGTH_SHORT).show();
+			    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
 			    		break;
 			    	}			    	
 			    	case 4:{
