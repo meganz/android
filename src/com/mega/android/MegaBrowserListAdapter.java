@@ -59,7 +59,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         ImageView imageView;
         TextView textViewFileName;
         TextView textViewFileSize;
-        TextView textViewUpdated;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
         ImageView arrowSelection;
@@ -143,7 +142,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-			holder.textViewUpdated = (TextView) convertView.findViewById(R.id.file_list_updated);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
 //			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.file_list_option_open);
@@ -253,19 +251,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					}
 				}			
 			}
-		}
-		
-		long nodeDate = node.getCreationTime();
-		if (nodeDate != 0){
-			try{ 
-				holder.textViewUpdated.setText(Util.getDateString(nodeDate));
-			}
-			catch(Exception ex) {
-				holder.textViewUpdated.setText(""); 
-			}
-		}
-		else{
-			holder.textViewUpdated.setText("");
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
