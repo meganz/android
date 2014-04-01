@@ -1,0 +1,144 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="#ffffff" >
+
+     <TableLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="0dp">
+        
+         <TableRow >
+             <TextView
+                  android:id="@+id/sort_by_default_text"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Default" 
+                  android:layout_gravity="center"
+                  android:textColor="#000000" />
+             
+	    	<ImageButton 
+		        android:id="@+id/sort_by_default_asc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_default_asc"/>
+	    	         
+            <ImageButton 
+		        android:id="@+id/sort_by_default_desc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_default_desc"/> 
+         </TableRow>
+    
+         <TableRow >
+             <TextView
+                  android:id="@+id/sort_by_az_text"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Name"
+                  android:layout_gravity="center" 
+                  android:textColor="#000000" />
+             
+	    	<ImageButton
+		        android:id="@+id/sort_by_az_asc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_az_asc"/>
+	    	         
+            <ImageButton
+		        android:id="@+id/sort_by_az_desc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_az_desc"/> 
+         </TableRow>
+         
+         <TableRow >
+             <TextView
+                  android:id="@+id/sort_by_size_text"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Size"
+                  android:layout_gravity="center"
+                  android:textColor="#000000" />
+             
+	    	<ImageButton
+		        android:id="@+id/sort_by_size_asc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_size_asc"/>
+	    	         
+            <ImageButton
+		        android:id="@+id/sort_by_size_desc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_size_desc"/> 
+         </TableRow>
+         
+         <TableRow >
+             <TextView
+                  android:id="@+id/sort_by_created_text"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Created" 
+                  android:layout_gravity="center"
+                  android:textColor="#000000" />
+             
+	    	<ImageButton
+		        android:id="@+id/sort_by_created_asc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_time_asc"/>
+	    	         
+            <ImageButton 
+		        android:id="@+id/sort_by_created_desc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_time_desc"/> 
+         </TableRow>
+         
+         <TableRow>
+             <TextView
+                  android:id="@+id/sort_by_modified_text"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="Modified" 
+                  android:layout_gravity="center"
+                  android:textColor="#000000"/>
+             
+             <ImageButton
+		        android:id="@+id/sort_by_modified_asc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_time_asc"/>
+	    	         
+            <ImageButton 
+		        android:id="@+id/sort_by_modified_desc"
+		        android:layout_width="70dp"
+		        android:layout_height="70dp"
+		        android:scaleType="fitCenter"
+		        style="@style/dialogActionButton"
+		        android:src="@drawable/sort_by_time_desc"/>
+         </TableRow>
+    </TableLayout>
+
+</LinearLayout>
