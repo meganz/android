@@ -100,6 +100,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public static int REQUEST_CODE_GET_LOCAL = 1003;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	public static int REQUEST_CODE_REFRESH = 1005;
+	public static int REQUEST_CODE_SORT_BY = 1006;
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -151,6 +152,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public UploadHereDialog uploadDialog;
 	
 	private List<ShareInfo> filePreparedInfos;
+	
+	private int orderGetChildren = 0;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -805,15 +808,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			    		break;
 			    	}
 			    	case 1:{
-			    		Toast.makeText(managerActivity, "Sort by not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
+			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
+			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
 			    		break;
 			    	}
 			    	case 2:{
-			    		Toast.makeText(managerActivity, "Help not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		Toast.makeText(managerActivity, "Help not yet implemented (only refresh, logout)", Toast.LENGTH_SHORT).show();
 			    		break;
 			    	}
 			    	case 3:{
-			    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (only logout)", Toast.LENGTH_SHORT).show();
+			    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (only refresh, logout)", Toast.LENGTH_SHORT).show();
 			    		break;
 			    	}			    	
 			    	case 4:{
@@ -821,7 +826,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			    		break;
 			    	}
 		    	}
-		        
 		    }
 		});
 		builder.show();
@@ -909,7 +913,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
 					if (fb.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 						fb.setNodes(nodes);
 						fb.getListView().invalidateViews();
 					}		
@@ -924,7 +928,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
 					if (fb.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 						fb.setNodes(nodes);
 						fb.getListView().invalidateViews();
 					}		
@@ -944,7 +948,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
 				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 					fb.setNodes(nodes);
 					fb.getListView().invalidateViews();
 				}
@@ -984,7 +988,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
 				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 					fb.setNodes(nodes);
 					fb.getListView().invalidateViews();
 				}
@@ -1002,7 +1006,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
 				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 					fb.setNodes(nodes);
 					fb.getListView().invalidateViews();
 				}		
@@ -1021,7 +1025,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
 				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 					fb.setNodes(nodes);
 					fb.getListView().invalidateViews();
 				}		
@@ -1653,7 +1657,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (parentNode != null){
 				if (fb != null){
 					if (fb.isVisible()){
-						NodeList nodes = megaApi.getChildren(parentNode);
+						NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						fb.setNodes(nodes);
 						fb.getListView().invalidateViews();
 					}
@@ -1662,7 +1666,29 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			else{
 				if (fb != null){
 					if (fb.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getRootNode());
+						NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+						fb.setNodes(nodes);
+						fb.getListView().invalidateViews();
+					}
+				}
+			}
+		}
+		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
+			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 0);
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode != null){
+				if (fb != null){
+					if (fb.isVisible()){
+						NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+						fb.setNodes(nodes);
+						fb.getListView().invalidateViews();
+					}
+				}
+			}
+			else{
+				if (fb != null){
+					if (fb.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 						fb.setNodes(nodes);
 						fb.getListView().invalidateViews();
 					}
@@ -1680,7 +1706,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		
 		folder.mkdir();
-		NodeList nodeList = megaApi.getChildren(parent);
+		NodeList nodeList = megaApi.getChildren(parent, orderGetChildren);
 		for(int i=0; i<nodeList.size(); i++){
 			MegaNode document = nodeList.get(i);
 			if (document.getType() == MegaNode.TYPE_FOLDER) {
@@ -1764,7 +1790,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
 		if (fb.isVisible()){
-			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()));
+			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
 			fb.setNodes(nodes);
 			fb.getListView().invalidateViews();
 		}
