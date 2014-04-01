@@ -108,6 +108,12 @@
             android:theme="@style/login_activity" >
         </activity>
         
+        <activity
+            android:name="SortByDialogActivity"
+            android:label="@string/general_sort_by"
+            android:theme="@android:style/Theme.Dialog">
+        </activity>
+        
         <service
             android:name="DownloadService"
             android:exported="false" >
