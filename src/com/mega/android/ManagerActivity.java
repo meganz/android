@@ -130,8 +130,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private boolean isListRubbishBin = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
-    private RubbishBinListFragment rbL;
-    private RubbishBinGridFragment rbG;
+	private RubbishBinFragment rbF;
     private TransfersFragment tF; 
     
     static ManagerActivity managerActivity;
@@ -383,16 +382,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		}
     	}
     	
-    	if (rbL != null){
-	    	if (rbL.isVisible()){
-	    		visibleFragment = 5;
-	    	}
-    	}
-    	
-    	if (rbG != null){
-	    	if (rbG.isVisible()){
-	    		visibleFragment = 6;
-	    	}
+    	if (rbF != null){
+    		if (rbF.isVisible()){
+    			if (isListRubbishBin){
+    				visibleFragment = 5;
+    			}
+    			else{
+    				visibleFragment = 6;
+    			}
+    		}
     	}
     	
     	if (tF != null){
@@ -531,21 +529,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		}
     		case RUBBISH_BIN:{
     			
-    			if (rbG == null){
-    				rbG = new RubbishBinGridFragment();
+    			if (rbF == null){
+    				rbF = new RubbishBinFragment();
+    				rbF.setIsList(isListRubbishBin);
     			}
-    			if (rbL == null){
-    				rbL = new RubbishBinListFragment();
-    			}
+    			
+    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbF, "rbF").commit();
     			if (isListRubbishBin){
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbL).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-    			}
-    			else{
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
+				}
+				else{
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
-
+    			
     			customListGrid.setVisibility(View.VISIBLE);
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -591,20 +587,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 		}
 		
-		if (rbL != null){
-			if (rbL.isVisible()){
-				if (rbL.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
-				}
-			}
-			else if (rbG.isVisible()){
-				if (rbG.onBackPressed() == 0){
-					super.onBackPressed();
+		if (rbF != null){
+			if (rbF.isVisible()){
+				if (rbF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
 					return;
 				}
 			}
 		}
+		
 		if (tF != null){
 			if (tF.isVisible()){
 				if (tF.onBackPressed() == 0){
@@ -755,20 +747,28 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						}
 					}
 				}
-
-				if (rbL != null){
-					if (rbL.isVisible() || rbG.isVisible()){
+				
+				if (rbF != null){
+					if (rbF.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("rbF");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commit();
+						
+						isListRubbishBin = !isListRubbishBin;
+						rbF.setIsList(isListRubbishBin);
+						
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commit();
+						
 						if (isListRubbishBin){
-							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbG).commit();
-							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
-							isListRubbishBin = false;
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
 						}
 						else{
-							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbL).commit();
-							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-							isListRubbishBin = true;					
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
 						}
 					}
 				}
