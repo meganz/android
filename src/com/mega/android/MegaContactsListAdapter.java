@@ -1,8 +1,11 @@
 package com.mega.android;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaUser;
+import com.mega.sdk.UserList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -39,12 +42,12 @@ import android.widget.Toast;
 public class MegaContactsListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
-	List<ItemContact> rowItems;
 	int positionClicked;
+	ArrayList<MegaUser> contacts;
 	
-	public MegaContactsListAdapter(Context _context, List<ItemContact> _items) {
+	public MegaContactsListAdapter(Context _context, ArrayList<MegaUser> _contacts) {
 		this.context = _context;
-		this.rowItems = _items;
+		this.contacts = _contacts;
 		this.positionClicked = -1;
 	}
 	
@@ -107,11 +110,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 
 		holder.currentPosition = position;
 		
-		ItemContact rowItem = (ItemContact) getItem(position);
+		MegaUser contact = (MegaUser) getItem(position);
 		
-		holder.textViewContactName.setText(rowItem.getName());
+//		ItemContact rowItem = (ItemContact) getItem(position);
+		
+		holder.textViewContactName.setText(contact.getEmail());
 		holder.textViewContent.setText("5 Folders, 10 files");
-		holder.imageView.setImageResource(rowItem.getImageId());
+		holder.imageView.setImageResource(R.drawable.jesus);
         
         if (position < 2){
         	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
@@ -163,17 +168,17 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 
 	@Override
     public int getCount() {
-        return rowItems.size();
+        return contacts.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return rowItems.get(position);
+        return contacts.get(position);
     }
  
     @Override
     public long getItemId(int position) {
-        return rowItems.indexOf(getItem(position));
+        return position;
     }    
     
     public int getPositionClicked (){
@@ -188,12 +193,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	public void onClick(View v) {
 		ViewHolder holder = (ViewHolder) v.getTag();
 		int currentPosition = holder.currentPosition;
-
+		MegaUser c = (MegaUser) getItem(currentPosition);
+		
 		switch (v.getId()){
 			case R.id.contact_list_option_properties:{
 				Intent i = new Intent(context, ContactPropertiesActivity.class);
-				i.putExtra("imageId", rowItems.get(currentPosition).getImageId());
-				i.putExtra("name", rowItems.get(currentPosition).getName());
+				i.putExtra("imageId", R.drawable.jesus);
+				i.putExtra("name", c.getEmail());
 				i.putExtra("position", currentPosition);
 				context.startActivity(i);							
 				positionClicked = -1;
@@ -218,5 +224,15 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				break;
 			}
 		}
+	}
+	
+	public void setContacts (ArrayList<MegaUser> contacts){
+		this.contacts = contacts;
+		positionClicked = -1;
+		notifyDataSetChanged();
+	}
+	
+	private static void log(String log) {
+		Util.log("MegaContactsListAdapter", log);
 	}
 }

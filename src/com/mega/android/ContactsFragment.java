@@ -3,6 +3,10 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaUser;
+import com.mega.sdk.UserList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +27,8 @@ import android.widget.ListView;
 
 public class ContactsFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
+	MegaApiAndroid megaApi;
+	
 	Context context;
 	ActionBar aB;
 	ListView listView;
@@ -31,10 +37,18 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	
 	boolean isList = true;
 	
-	public static final String[] names = new String[] { "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4", "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4", "Jesús Aragón 1", "Jesús Aragón 2", "Jesús Aragón 3", "Jesús Aragón 4"};
-	public static final Integer[] images = { R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus,  R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus,  R.drawable.jesus, R.drawable.jesus, R.drawable.jesus, R.drawable.jesus};
+	UserList contacts;
+	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
-	List<ItemContact> rowItems;
+	@Override
+	public void onCreate (Bundle savedInstanceState){
+		super.onCreate(savedInstanceState);
+		log("onCreate");
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,21 +59,27 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		}
 		aB.setTitle(getString(R.string.section_contacts));
 		
+		contacts = megaApi.getContacts();
+		visibleContacts.clear();
+		for (int i=0;i<contacts.size();i++){
+			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+				visibleContacts.add(contacts.get(i));
+			}
+		}
+		
+		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
 			
-			rowItems = new ArrayList<ItemContact>();
-	        for (int i = 0; i < names.length; i++) {
-	        	ItemContact item = new ItemContact(images[i], names[i]);
-	            rowItems.add(item);
-	        }
-	        
-	        listView = (ListView) v.findViewById(R.id.contacts_list_view);
+			listView = (ListView) v.findViewById(R.id.contacts_list_view);
 			listView.setOnItemClickListener(this);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			if (adapterList == null){
-				adapterList = new MegaContactsListAdapter(context, rowItems);
+				adapterList = new MegaContactsListAdapter(context, visibleContacts);
+			}
+			else{
+				adapterList.setContacts(visibleContacts);
 			}
 			
 			adapterList.setPositionClicked(-1);
@@ -70,18 +90,15 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		else{
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
-			rowItems = new ArrayList<ItemContact>();
-	        for (int i = 0; i < names.length; i++) {
-	        	ItemContact item = new ItemContact(images[i], names[i]);
-	        	rowItems.add(item);
-	        }
-	        
-	        listView = (ListView) v.findViewById(R.id.contact_grid_view_browser);
+			listView = (ListView) v.findViewById(R.id.contact_grid_view_browser);
 	        listView.setOnItemClickListener(null);
 	        listView.setItemsCanFocus(false);
 	        
 	        if (adapterGrid == null){
-	        	adapterGrid = new MegaContactsGridAdapter(context, rowItems);
+	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts);
+	        }
+	        else{
+	        	adapterGrid.setContacts(visibleContacts);
 	        }
 	        
 	        adapterGrid.setPositionClicked(-1);
@@ -112,8 +129,8 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		
 		if (isList){
 			Intent i = new Intent(context, ContactPropertiesActivity.class);
-			i.putExtra("imageId", rowItems.get(position).getImageId());
-			i.putExtra("name", rowItems.get(position).getName());
+			i.putExtra("imageId", R.drawable.jesus);
+			i.putExtra("name", contacts.get(position).getEmail());
 			i.putExtra("position", position);
 			startActivity(i);
 		}

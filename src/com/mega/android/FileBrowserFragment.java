@@ -45,8 +45,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	MegaApiAndroid megaApi;
 		
-	List<ItemFileBrowser> rowItems;
-	
 	long parentHandle = -1;
 	boolean isList = true;
 	
@@ -193,8 +191,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		rowItems = new ArrayList<ItemFileBrowser>();
 	}
 	
 	@Override
