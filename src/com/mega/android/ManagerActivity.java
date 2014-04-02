@@ -128,9 +128,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
-	private FileBrowserFragment fb;
-    private ContactsListFragment cL;
-    private ContactsGridFragment cG;
+	private FileBrowserFragment fbF;
+	private ContactsFragment cF;
     private RubbishBinListFragment rbL;
     private RubbishBinGridFragment rbG;
     private TransfersFragment tF; 
@@ -362,9 +361,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	
     	long parentHandle = -1;
     	int visibleFragment = -1;
-    	if (fb != null){
-    		if (fb.isVisible()){
-    			parentHandle = fb.getParentHandle();
+    	if (fbF != null){
+    		if (fbF.isVisible()){
+    			parentHandle = fbF.getParentHandle();
     			if (isListCloudDrive){
     				visibleFragment = 1;
     			}
@@ -373,15 +372,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			}
     		}
     	}
-    	
-    	if (cL != null){
-    		if (cL.isVisible()){
-    			visibleFragment = 3;
-    		}
-    	}
-    	if (cG != null){
-    		if (cG.isVisible()){
-    			visibleFragment = 4;
+    	if (cF != null){
+    		if (cF.isVisible()){
+    			if (isListContacts){
+    				visibleFragment = 3;
+    			}
+    			else{
+    				visibleFragment = 4;
+    			}
     		}
     	}
     	
@@ -483,13 +481,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     public void selectDrawerItem(DrawerItem item){
     	switch (item){
     		case CLOUD_DRIVE:{
-				if (fb == null){
-					fb = new FileBrowserFragment();
-					fb.setParentHandle(parentHandle);
-					fb.setIsList(isListCloudDrive);
+				if (fbF == null){
+					fbF = new FileBrowserFragment();
+					fbF.setParentHandle(parentHandle);
+					fbF.setIsList(isListCloudDrive);
 				}
 				
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fb, "fb").commit();
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
 				if (isListCloudDrive){					
 					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
 				}
@@ -511,23 +509,22 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		}
     		case CONTACTS:{
     			
-    			if (cG == null){
-    				cG = new ContactsGridFragment();
+    			if (cF == null){
+    				cF = new ContactsFragment();
+    				cF.setIsList(isListContacts);
     			}
-    			if (cL == null){
-    				cL = new ContactsListFragment();
-    			}
+    			
+    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cF, "cF").commit();
     			if (isListContacts){
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
     				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-    			}
-    			else{
-    				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
+				}
+				else{
     				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
     			}
-				
+    			
     			customListGrid.setVisibility(View.VISIBLE);
     			customSearch.setVisibility(View.VISIBLE);
+    			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
     			break;
@@ -575,28 +572,25 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	@Override
 	public void onBackPressed() {
-		if (fb != null){
-			if (fb.isVisible()){
-				if (fb.onBackPressed() == 0){
+		if (fbF != null){
+			if (fbF.isVisible()){
+				if (fbF.onBackPressed() == 0){
 					super.onBackPressed();
 					return;
 				}
 			}
 		}
-		if (cL != null){
-			if (cL.isVisible()){
-				if (cL.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
-				}
-			}
-			else if (cG.isVisible()){
-				if (cG.onBackPressed() == 0){
-					super.onBackPressed();
+		
+		if (cF != null){
+			if (cF.isVisible()){
+				if (cF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
 					return;
 				}
 			}
 		}
+		
 		if (rbL != null){
 			if (rbL.isVisible()){
 				if (rbL.onBackPressed() == 0){
@@ -663,9 +657,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					mDrawerToggle.onOptionsItemSelected(item);
 				}
 		    	else {
-		    		if (fb != null){
-		    			if (fb.isVisible()){
-		    				fb.onBackPressed();
+		    		if (fbF != null){
+		    			if (fbF.isVisible()){
+		    				fbF.onBackPressed();
 		    			}
 		    		}
 				}
@@ -711,16 +705,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		switch(v.getId()){
 			case R.id.menu_action_bar_grid:{
 				
-				if (fb != null){
-					if (fb.isVisible()){
-						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fb");
+				if (fbF != null){
+					if (fbF.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fbF");
 						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.detach(currentFragment);
 						fragTransaction.commit();
 						
 						isListCloudDrive = !isListCloudDrive;
-						fb.setIsList(isListCloudDrive);
-						fb.setParentHandle(parentHandle);
+						fbF.setIsList(isListCloudDrive);
+						fbF.setParentHandle(parentHandle);
 						
 						fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.attach(currentFragment);
@@ -736,23 +730,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						}
 					}
 				}
-
-				if (cL != null){
-					if (cL.isVisible() || cG.isVisible()){
+				
+				if (cF != null){
+					if (cF.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cF");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commit();
+						
+						isListContacts = !isListContacts;
+						cF.setIsList(isListContacts);
+						
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commit();
+						
 						if (isListContacts){
-							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cG).commit();
-							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
-							isListContacts = false;
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
 						}
 						else{
-							getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cL).commit();
-							ImageButton customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
-							isListContacts = true;					
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
 						}
 					}
 				}
+
 				if (rbL != null){
 					if (rbL.isVisible() || rbG.isVisible()){
 						if (isListRubbishBin){
@@ -912,10 +915,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
-					if (fb.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-						fb.setNodes(nodes);
-						fb.getListView().invalidateViews();
+					if (fbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
 					}		
 				}
 				else{
@@ -927,10 +930,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
-					if (fb.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-						fb.setNodes(nodes);
-						fb.getListView().invalidateViews();
+					if (fbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
 					}		
 				}
 				else{
@@ -947,10 +950,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
-				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-					fb.setNodes(nodes);
-					fb.getListView().invalidateViews();
+				if (fbF.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+					fbF.setNodes(nodes);
+					fbF.getListView().invalidateViews();
 				}
 			}
 			else{
@@ -987,10 +990,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
-				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-					fb.setNodes(nodes);
-					fb.getListView().invalidateViews();
+				if (fbF.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+					fbF.setNodes(nodes);
+					fbF.getListView().invalidateViews();
 				}
 			}
 			else{
@@ -1005,10 +1008,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
-				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-					fb.setNodes(nodes);
-					fb.getListView().invalidateViews();
+				if (fbF.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+					fbF.setNodes(nodes);
+					fbF.getListView().invalidateViews();
 				}		
 			}
 			else{
@@ -1024,10 +1027,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
-				if (fb.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-					fb.setNodes(nodes);
-					fb.getListView().invalidateViews();
+				if (fbF.isVisible()){
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+					fbF.setNodes(nodes);
+					fbF.getListView().invalidateViews();
 				}		
 			}
 		}
@@ -1088,9 +1091,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void moveToTrash(ArrayList<Long> handleList){
 		
-		if (fb.isVisible()){
-			fb.setPositionClicked(-1);
-			fb.notifyDataSetChanged();
+		if (fbF.isVisible()){
+			fbF.setPositionClicked(-1);
+			fbF.notifyDataSetChanged();
 		}
 		
 		if (!Util.isOnline(this)){
@@ -1134,9 +1137,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
 		
-		if (fb.isVisible()){
-			fb.setPositionClicked(-1);
-			fb.notifyDataSetChanged();
+		if (fbF.isVisible()){
+			fbF.setPositionClicked(-1);
+			fbF.notifyDataSetChanged();
 		}
 		
 		if (!Util.isOnline(this)){
@@ -1169,7 +1172,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (!fb.isVisible()) {
+				if (!fbF.isVisible()) {
 					return;
 				}
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1180,9 +1183,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showNewFolderDialog(String editText){
 		
-		if (fb.isVisible()){
-			fb.setPositionClicked(-1);
-			fb.notifyDataSetChanged();
+		if (fbF.isVisible()){
+			fbF.setPositionClicked(-1);
+			fbF.notifyDataSetChanged();
 		}
 		
 		String text;
@@ -1264,8 +1267,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		long parentHandle;
-		if (fb.isVisible()){
-			parentHandle = fb.getParentHandle();
+		if (fbF.isVisible()){
+			parentHandle = fbF.getParentHandle();
 		}
 		else{
 			return;
@@ -1283,9 +1286,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showRenameDialog(final MegaNode document, String text){
 		
-		if (fb.isVisible()){
-			fb.setPositionClicked(-1);
-			fb.notifyDataSetChanged();
+		if (fbF.isVisible()){
+			fbF.setPositionClicked(-1);
+			fbF.notifyDataSetChanged();
 		}
 		
 		final EditText input = new EditText(this);
@@ -1371,9 +1374,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showMove(ArrayList<Long> handleList){
 		
-		if (fb.isVisible()){
-			fb.setPositionClicked(-1);
-			fb.notifyDataSetChanged();
+		if (fbF.isVisible()){
+			fbF.setPositionClicked(-1);
+			fbF.notifyDataSetChanged();
 		}
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
@@ -1388,9 +1391,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showCopy(ArrayList<Long> handleList){
 		
-		if (fb.isVisible()){
-			fb.setPositionClicked(-1);
-			fb.notifyDataSetChanged();
+		if (fbF.isVisible()){
+			fbF.setPositionClicked(-1);
+			fbF.notifyDataSetChanged();
 		}
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
@@ -1483,8 +1486,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			int i = 0;
 			long parentHandle;
-			if (fb.isVisible()){
-				parentHandle = fb.getParentHandle();
+			if (fbF.isVisible()){
+				parentHandle = fbF.getParentHandle();
 			}
 			else{
 				return;
@@ -1655,20 +1658,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			parentHandle = intent.getLongExtra("PARENT_HANDLE", -1);
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode != null){
-				if (fb != null){
-					if (fb.isVisible()){
+				if (fbF != null){
+					if (fbF.isVisible()){
 						NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						fb.setNodes(nodes);
-						fb.getListView().invalidateViews();
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
 					}
 				}
 			}
 			else{
-				if (fb != null){
-					if (fb.isVisible()){
+				if (fbF != null){
+					if (fbF.isVisible()){
 						NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-						fb.setNodes(nodes);
-						fb.getListView().invalidateViews();
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -1677,20 +1680,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 0);
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			if (parentNode != null){
-				if (fb != null){
-					if (fb.isVisible()){
+				if (fbF != null){
+					if (fbF.isVisible()){
 						NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						fb.setNodes(nodes);
-						fb.getListView().invalidateViews();
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
 					}
 				}
 			}
 			else{
-				if (fb != null){
-					if (fb.isVisible()){
+				if (fbF != null){
+					if (fbF.isVisible()){
 						NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-						fb.setNodes(nodes);
-						fb.getListView().invalidateViews();
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -1754,8 +1757,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		long parentHandle = -1;
-		if (fb.isVisible()){
-			parentHandle = fb.getParentHandle();
+		if (fbF.isVisible()){
+			parentHandle = fbF.getParentHandle();
 		}
 		
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle); 
@@ -1789,10 +1792,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
-		if (fb.isVisible()){
-			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fb.getParentHandle()), orderGetChildren);
-			fb.setNodes(nodes);
-			fb.getListView().invalidateViews();
+		if (fbF.isVisible()){
+			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+			fbF.setNodes(nodes);
+			fbF.getListView().invalidateViews();
 		}
 	}
 
