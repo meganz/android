@@ -1,9 +1,15 @@
 package com.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
 import com.mega.sdk.UserList;
 
@@ -11,8 +17,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -39,21 +48,104 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	int positionClicked;
 	ArrayList<MegaUser> contacts;
 	
+	MegaApiAndroid megaApi;
+	
+	private class UserAvatarListenerGrid implements MegaRequestListenerInterface{
+		
+		Context context;
+		ViewHolderContactsGrid holder;
+		MegaContactsGridAdapter adapter;
+		int numView;
+		
+		public UserAvatarListenerGrid(Context context, ViewHolderContactsGrid holder, MegaContactsGridAdapter adapter, int numView){
+			this.context = context;
+			this.holder = holder;
+			this.adapter = adapter;
+			this.numView = numView;
+		}
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			log("onRequestStart()");
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,
+				MegaError e) {
+			log("onRequestFinish()");
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (numView == 1){
+					if (holder.contactMail1.compareTo(request.getEmail()) == 0){
+						File avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail1 + ".jpg");
+						Bitmap bitmap = null;
+						if (avatar.exists()){
+							if (avatar.length() > 0){
+								BitmapFactory.Options bOpts = new BitmapFactory.Options();
+								bOpts.inPurgeable = true;
+								bOpts.inInputShareable = true;
+								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+								if (bitmap == null) {
+									avatar.delete();
+								}
+								else{
+									holder.imageView1.setImageBitmap(bitmap);
+								}
+							}
+						}
+						adapter.notifyDataSetChanged();
+					}
+				}
+				else if (numView == 2){
+					if (holder.contactMail2.compareTo(request.getEmail()) == 0){
+						File avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail2 + ".jpg");
+						Bitmap bitmap = null;
+						if (avatar.exists()){
+							if (avatar.length() > 0){
+								BitmapFactory.Options bOpts = new BitmapFactory.Options();
+								bOpts.inPurgeable = true;
+								bOpts.inInputShareable = true;
+								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+								if (bitmap == null) {
+									avatar.delete();
+								}
+								else{
+									holder.imageView2.setImageBitmap(bitmap);
+								}
+							}
+						}
+						adapter.notifyDataSetChanged();
+					}
+				}
+			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,
+				MegaRequest request, MegaError e) {
+			log("onRequestTemporaryError()");
+		}
+		
+	}
+	
 	public MegaContactsGridAdapter(Context _context, ArrayList<MegaUser> _contacts) {
 		this.context = _context;
 		this.contacts = _contacts;
 		this.positionClicked = -1;
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 	}
 	
 	/*private view holder class*/
-    private class ViewHolder {
+    private class ViewHolderContactsGrid {
         RoundedImageView imageView1;
         ImageView statusImage1;
-        TextView textViewFileName1;
+        TextView textViewContactName1;
         RelativeLayout itemLayout1;
         RoundedImageView imageView2;
         ImageView statusImage2;
-        TextView textViewFileName2;
+        TextView textViewContactName2;
         RelativeLayout itemLayout2;
         TextView textViewFileSize1;
         TextView textViewFileSize2;
@@ -70,9 +162,11 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
         ImageButton optionSend2;
         ImageButton optionRemove2;
         int currentPosition;
+        String contactMail1;
+        String contactMail2;
     }
     
-	ViewHolder holder = null;
+    ViewHolderContactsGrid holder = null;
 	int positionG;
 
 	@Override
@@ -95,7 +189,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		
 		if ((position % 2) == 0){
 			v = inflater.inflate(R.layout.item_contact_grid, parent, false);
-			holder = new ViewHolder();
+			holder = new ViewHolderContactsGrid();
 			holder.itemLayout1 = (RelativeLayout) v.findViewById(R.id.contact_grid_item_layout1);
 			holder.itemLayout2 = (RelativeLayout) v.findViewById(R.id.contact_grid_item_layout2);
 			
@@ -150,8 +244,16 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
 			holder.imageView2.setLayoutParams(paramsIV2);
 
-			holder.textViewFileName1 = (TextView) v.findViewById(R.id.contact_grid_filename1);
-			holder.textViewFileName2 = (TextView) v.findViewById(R.id.contact_grid_filename2);
+			holder.textViewContactName1 = (TextView) v.findViewById(R.id.contact_grid_filename1);
+			holder.textViewContactName1.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewContactName1.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
+			holder.textViewContactName1.setEllipsize(TextUtils.TruncateAt.END);
+			holder.textViewContactName1.setSingleLine(true);
+			holder.textViewContactName2 = (TextView) v.findViewById(R.id.contact_grid_filename2);
+			holder.textViewContactName2.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewContactName2.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
+			holder.textViewContactName2.setEllipsize(TextUtils.TruncateAt.END);
+			holder.textViewContactName2.setSingleLine(true);
 			
 			holder.textViewFileSize1 = (TextView) v.findViewById(R.id.contact_grid_filesize1);
 			holder.textViewFileSize2 = (TextView) v.findViewById(R.id.contact_grid_filesize2);
@@ -193,14 +295,66 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			}
 
 			MegaUser contact1 = (MegaUser) getItem(position);
-			holder.imageView1.setImageResource(R.drawable.jesus);
-			holder.textViewFileName1.setText(contact1.getEmail());
+			holder.contactMail1 = contact1.getEmail();
+			holder.textViewContactName1.setText(contact1.getEmail());
+			
+			UserAvatarListenerGrid listener1 = new UserAvatarListenerGrid(context, holder, this, 1);
+			
+			File avatar1 = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail1 + ".jpg");
+			Bitmap bitmap1 = null;
+			if (avatar1.exists()){
+				if (avatar1.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					bitmap1 = BitmapFactory.decodeFile(avatar1.getAbsolutePath(), bOpts);
+					if (bitmap1 == null) {
+						avatar1.delete();
+						megaApi.getUserAvatar(contact1, context.getCacheDir().getAbsolutePath() + "/" + contact1.getEmail() + ".jpg", listener1);
+					}
+					else{
+						holder.imageView1.setImageBitmap(bitmap1);
+					}
+				}
+				else{
+					megaApi.getUserAvatar(contact1, context.getCacheDir().getAbsolutePath() + "/" + contact1.getEmail() + ".jpg", listener1);
+				}
+			}
+			else{
+				megaApi.getUserAvatar(contact1, context.getCacheDir().getAbsolutePath() + "/" + contact1.getEmail() + ".jpg", listener1);
+			}
 			
 			MegaUser contact2;
 			if (position < (getCount()-1)){
 				contact2 = (MegaUser) getItem(position+1);
-				holder.imageView2.setImageResource(R.drawable.jesus);
-				holder.textViewFileName2.setText(contact2.getEmail());	
+				holder.contactMail2 = contact2.getEmail();
+				holder.textViewContactName2.setText(contact2.getEmail());
+				
+				UserAvatarListenerGrid listener2 = new UserAvatarListenerGrid(context, holder, this, 2);
+				File avatar2 = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail2 + ".jpg");
+				Bitmap bitmap2 = null;
+				if (avatar2.exists()){
+					if (avatar2.length() > 0){
+						BitmapFactory.Options bOpts = new BitmapFactory.Options();
+						bOpts.inPurgeable = true;
+						bOpts.inInputShareable = true;
+						bitmap2 = BitmapFactory.decodeFile(avatar2.getAbsolutePath(), bOpts);
+						if (bitmap2 == null) {
+							avatar2.delete();
+							megaApi.getUserAvatar(contact2, context.getCacheDir().getAbsolutePath() + "/" + contact2.getEmail() + ".jpg", listener2);
+						}
+						else{
+							holder.imageView2.setImageBitmap(bitmap2);
+						}
+					}
+					else{
+						megaApi.getUserAvatar(contact2, context.getCacheDir().getAbsolutePath() + "/" + contact2.getEmail() + ".jpg", listener2);
+					}
+				}
+				else{
+					megaApi.getUserAvatar(contact2, context.getCacheDir().getAbsolutePath() + "/" + contact2.getEmail() + ".jpg", listener2);
+				}
+				
 				holder.itemLayout2.setVisibility(View.VISIBLE);
 			}
 			else{
@@ -292,7 +446,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 
 	@Override
 	public void onClick(View v) {
-		ViewHolder holder = (ViewHolder) v.getTag();
+		ViewHolderContactsGrid holder = (ViewHolderContactsGrid) v.getTag();
 		int currentPosition = holder.currentPosition;
 
 		switch (v.getId()){
