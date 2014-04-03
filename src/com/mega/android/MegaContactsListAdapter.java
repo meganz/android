@@ -1,9 +1,15 @@
 package com.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
 import com.mega.sdk.UserList;
 
@@ -45,14 +51,72 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	int positionClicked;
 	ArrayList<MegaUser> contacts;
 	
+	MegaApiAndroid megaApi;
+	
+	private class UserAvatarListenerList implements MegaRequestListenerInterface{
+
+		Context context;
+		ViewHolderContactsList holder;
+		MegaContactsListAdapter adapter;
+		
+		public UserAvatarListenerList(Context context, ViewHolderContactsList holder, MegaContactsListAdapter adapter) {
+			this.context = context;
+			this.holder = holder;
+			this.adapter = adapter;
+		}
+		
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			log("onRequestStart()");
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,
+				MegaError e) {
+			log("onRequestFinish()");
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (holder.contactMail.compareTo(request.getEmail()) == 0){
+					File avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					Bitmap bitmap = null;
+					if (avatar.exists()){
+						if (avatar.length() > 0){
+							BitmapFactory.Options bOpts = new BitmapFactory.Options();
+							bOpts.inPurgeable = true;
+							bOpts.inInputShareable = true;
+							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+							if (bitmap == null) {
+								avatar.delete();
+							}
+							else{
+								holder.imageView.setImageBitmap(bitmap);
+							}
+						}
+					}
+					adapter.notifyDataSetChanged();
+				}
+			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,
+				MegaRequest request, MegaError e) {
+			log("onRequestTemporaryError");
+		}
+		
+	}
+	
 	public MegaContactsListAdapter(Context _context, ArrayList<MegaUser> _contacts) {
 		this.context = _context;
 		this.contacts = _contacts;
 		this.positionClicked = -1;
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 	}
 	
 	/*private view holder class*/
-    private class ViewHolder {
+    private class ViewHolderContactsList {
     	RoundedImageView imageView;
 //        ImageView imageView;
         TextView textViewContactName;
@@ -66,6 +130,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         ImageButton optionSend;
         ImageButton optionRemove;
         int currentPosition;
+        String contactMail;
     }
 
 	@Override
@@ -73,7 +138,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	
 		final int _position = position;
 		
-		ViewHolder holder = null;
+		ViewHolderContactsList holder = null;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -86,7 +151,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_contact_list, parent, false);
-			holder = new ViewHolder();
+			holder = new ViewHolderContactsList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_item_layout);
 			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail);	        
 			holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_list_name);
@@ -105,19 +170,44 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			convertView.setTag(holder);
 		}
 		else{
-			holder = (ViewHolder) convertView.getTag();
+			holder = (ViewHolderContactsList) convertView.getTag();
 		}
 
 		holder.currentPosition = position;
 		
 		MegaUser contact = (MegaUser) getItem(position);
+		holder.contactMail = contact.getEmail();
 		
 //		ItemContact rowItem = (ItemContact) getItem(position);
 		
+		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
 		holder.textViewContactName.setText(contact.getEmail());
+		File avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		Bitmap bitmap = null;
+		if (avatar.exists()){
+			if (avatar.length() > 0){
+				BitmapFactory.Options bOpts = new BitmapFactory.Options();
+				bOpts.inPurgeable = true;
+				bOpts.inInputShareable = true;
+				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				if (bitmap == null) {
+					avatar.delete();
+					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
+				else{
+					holder.imageView.setImageBitmap(bitmap);
+				}
+			}
+			else{
+				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			}
+		}	
+		else{
+			megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+		}
+		
 		holder.textViewContent.setText("5 Folders, 10 files");
-		holder.imageView.setImageResource(R.drawable.jesus);
-        
+		
         if (position < 2){
         	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
         }
@@ -191,7 +281,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
     
 	@Override
 	public void onClick(View v) {
-		ViewHolder holder = (ViewHolder) v.getTag();
+		ViewHolderContactsList holder = (ViewHolderContactsList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		MegaUser c = (MegaUser) getItem(currentPosition);
 		
