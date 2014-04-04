@@ -62,7 +62,8 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
 		for (int i=0;i<contacts.size();i++){
-			if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
 				visibleContacts.add(contacts.get(i));
 			}
 		}
