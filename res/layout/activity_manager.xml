@@ -50,6 +50,7 @@
 	            android:layout_height="wrap_content">
 	            
                     <TextView
+                        android:id="@+id/profile_user_name"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:text="User Name" 
@@ -63,6 +64,7 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content">
                     <TextView
+                        android:id="@+id/profile_user_email"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:text="email@domain.com" 

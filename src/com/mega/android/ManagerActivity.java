@@ -16,7 +16,9 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
+import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.UserList;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -117,7 +119,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private TableLayout topControlBar;
 	private TableLayout bottomControlBar;
 	private ImageView imageProfile;
+	private TextView userName;
+	private TextView userEmail;
 	private TextView used_space;
+	
+	MegaUser contact = null;
 	
 	ImageButton customListGrid;
 	LinearLayout customSearch;
@@ -172,6 +178,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		setContentView(R.layout.activity_manager);
 
 		imageProfile = (ImageView) findViewById(R.id.profile_photo);
+		userEmail = (TextView) findViewById(R.id.profile_user_email);
+		userName = (TextView) findViewById(R.id.profile_user_name);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         topControlBar = (TableLayout) findViewById(R.id.top_control_bar);
@@ -189,22 +197,70 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		}
 		else{
-			Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
-			Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-	
-			BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-	        Paint paint = new Paint();
-	        paint.setShader(shader);
-	
-	        Canvas c = new Canvas(circleBitmap);
-	        int radius; 
-	        if (imBitmap.getWidth() < imBitmap.getHeight())
-	        	radius = imBitmap.getWidth()/2;
-	        else
-	        	radius = imBitmap.getHeight()/2;
-	        
-		    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-	        imageProfile.setImageBitmap(circleBitmap);
+			
+			UserList contacts = megaApi.getContacts();
+			for (int i=0; i < contacts.size(); i++){
+				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
+					contact = contacts.get(i);
+				}
+			}
+			
+			if (contact != null){
+				userEmail.setText(contact.getEmail());
+				File avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+				Bitmap imBitmap = null;
+				if (avatar.exists()){
+					if (avatar.length() > 0){
+						BitmapFactory.Options bOpts = new BitmapFactory.Options();
+						bOpts.inPurgeable = true;
+						bOpts.inInputShareable = true;
+						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						if (imBitmap == null) {
+							avatar.delete();
+							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						}
+						else{
+							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+							
+							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+					        Paint paint = new Paint();
+					        paint.setShader(shader);
+					
+					        Canvas c = new Canvas(circleBitmap);
+					        int radius; 
+					        if (imBitmap.getWidth() < imBitmap.getHeight())
+					        	radius = imBitmap.getWidth()/2;
+					        else
+					        	radius = imBitmap.getHeight()/2;
+					        
+						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
+					        imageProfile.setImageBitmap(circleBitmap);
+						}
+					}
+					else{
+						megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+					}
+				}
+				else{
+					megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+				}
+			}
+//			Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
+//			Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+//	
+//			BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+//	        Paint paint = new Paint();
+//	        paint.setShader(shader);
+//	
+//	        Canvas c = new Canvas(circleBitmap);
+//	        int radius; 
+//	        if (imBitmap.getWidth() < imBitmap.getHeight())
+//	        	radius = imBitmap.getWidth()/2;
+//	        else
+//	        	radius = imBitmap.getHeight()/2;
+//	        
+//		    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
+//	        imageProfile.setImageBitmap(circleBitmap);
 			
 	        String used = "11";
 	        String total = "50";
@@ -1033,6 +1089,42 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					fbF.getListView().invalidateViews();
 				}		
 			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				File avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				Bitmap imBitmap = null;
+				if (avatar.exists()){
+					if (avatar.length() > 0){
+						BitmapFactory.Options bOpts = new BitmapFactory.Options();
+						bOpts.inPurgeable = true;
+						bOpts.inInputShareable = true;
+						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						if (imBitmap == null) {
+							avatar.delete();
+						}
+						else{
+							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+							
+							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+					        Paint paint = new Paint();
+					        paint.setShader(shader);
+					
+					        Canvas c = new Canvas(circleBitmap);
+					        int radius; 
+					        if (imBitmap.getWidth() < imBitmap.getHeight())
+					        	radius = imBitmap.getWidth()/2;
+					        else
+					        	radius = imBitmap.getHeight()/2;
+					        
+						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
+					        imageProfile.setImageBitmap(circleBitmap);
+						}
+					}
+				}
+			}
+			log("avatar user downloaded");
 		}
 	}
 
