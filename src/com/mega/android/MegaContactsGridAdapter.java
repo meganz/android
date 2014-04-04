@@ -8,9 +8,11 @@ import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
+import com.mega.sdk.NodeList;
 import com.mega.sdk.UserList;
 
 import android.annotation.SuppressLint;
@@ -147,8 +149,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
         ImageView statusImage2;
         TextView textViewContactName2;
         RelativeLayout itemLayout2;
-        TextView textViewFileSize1;
-        TextView textViewFileSize2;
+        TextView textViewContent1;
+        TextView textViewContent2;
         ImageButton imageButtonThreeDots1;
         ImageButton imageButtonThreeDots2;
         ImageView arrowSelection1;
@@ -255,8 +257,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			holder.textViewContactName2.setEllipsize(TextUtils.TruncateAt.END);
 			holder.textViewContactName2.setSingleLine(true);
 			
-			holder.textViewFileSize1 = (TextView) v.findViewById(R.id.contact_grid_filesize1);
-			holder.textViewFileSize2 = (TextView) v.findViewById(R.id.contact_grid_filesize2);
+			holder.textViewContent1 = (TextView) v.findViewById(R.id.contact_grid_filesize1);
+			holder.textViewContent2 = (TextView) v.findViewById(R.id.contact_grid_filesize2);
 			
 			holder.imageButtonThreeDots1 = (ImageButton) v.findViewById(R.id.contact_grid_three_dots1);
 			holder.imageButtonThreeDots2 = (ImageButton) v.findViewById(R.id.contact_grid_three_dots2);
@@ -324,6 +326,9 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				megaApi.getUserAvatar(contact1, context.getCacheDir().getAbsolutePath() + "/" + contact1.getEmail() + ".jpg", listener1);
 			}
 			
+			NodeList nodes1 = megaApi.getInShares(contact1);
+			holder.textViewContent1.setText(getDescription(nodes1));
+			
 			MegaUser contact2;
 			if (position < (getCount()-1)){
 				contact2 = (MegaUser) getItem(position+1);
@@ -354,6 +359,9 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				else{
 					megaApi.getUserAvatar(contact2, context.getCacheDir().getAbsolutePath() + "/" + contact2.getEmail() + ".jpg", listener2);
 				}
+				
+				NodeList nodes2 = megaApi.getInShares(contact2);
+				holder.textViewContent2.setText(getDescription(nodes2));
 				
 				holder.itemLayout2.setVisibility(View.VISIBLE);
 			}
@@ -533,6 +541,39 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		this.contacts = contacts;
 		positionClicked = -1;
 		notifyDataSetChanged();
+	}
+	
+	public String getDescription(NodeList nodes){
+		int numFolders = 0;
+		int numFiles = 0;
+		
+		for (int i=0;i<nodes.size();i++){
+			MegaNode c = nodes.get(i);
+			if (c.isFolder()){
+				numFolders++;
+			}
+			else{
+				numFiles++;
+			}
+		}
+		
+		String info = "";
+		if (numFolders > 0){
+			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0){
+				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		else {
+			if (numFiles == 0){
+				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			}
+			else{
+				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		
+		return info;
 	}
 	
 	private static void log(String log) {

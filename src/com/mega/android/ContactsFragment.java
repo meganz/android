@@ -129,9 +129,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		
 		if (isList){
 			Intent i = new Intent(context, ContactPropertiesActivity.class);
-			i.putExtra("imageId", R.drawable.jesus);
-			i.putExtra("name", contacts.get(position).getEmail());
-			i.putExtra("position", position);
+			i.putExtra("name", visibleContacts.get(position).getEmail());
 			startActivity(i);
 		}
     }
