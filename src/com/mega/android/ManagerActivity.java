@@ -20,6 +20,7 @@ import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.UserList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -50,8 +51,11 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils.TruncateAt;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -70,6 +74,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -163,6 +168,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		managerActivity = this;
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+	    
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
@@ -179,7 +193,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 		imageProfile = (ImageView) findViewById(R.id.profile_photo);
 		userEmail = (TextView) findViewById(R.id.profile_user_email);
+		userEmail.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		userEmail.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
+		userEmail.setSingleLine();
+		userEmail.setEllipsize(TruncateAt.END);
 		userName = (TextView) findViewById(R.id.profile_user_name);
+		userName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		userName.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
+		userName.setSingleLine();
+		userName.setEllipsize(TruncateAt.END);
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer_list);
         topControlBar = (TableLayout) findViewById(R.id.top_control_bar);
@@ -207,6 +229,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (contact != null){
 				userEmail.setText(contact.getEmail());
+				String userNameString = contact.getEmail();
+				String [] sp = userNameString.split("@");
+				if (sp.length != 0){
+					userNameString = sp[0];
+					userName.setText(userNameString);
+				}
+				
 				File avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
 				Bitmap imBitmap = null;
 				if (avatar.exists()){
@@ -245,22 +274,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
 				}
 			}
-//			Bitmap imBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.jesus);
-//			Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-//	
-//			BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
-//	        Paint paint = new Paint();
-//	        paint.setShader(shader);
-//	
-//	        Canvas c = new Canvas(circleBitmap);
-//	        int radius; 
-//	        if (imBitmap.getWidth() < imBitmap.getHeight())
-//	        	radius = imBitmap.getWidth()/2;
-//	        else
-//	        	radius = imBitmap.getHeight()/2;
-//	        
-//		    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
-//	        imageProfile.setImageBitmap(circleBitmap);
 			
 	        String used = "11";
 	        String total = "50";
