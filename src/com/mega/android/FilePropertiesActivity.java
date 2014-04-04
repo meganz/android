@@ -51,6 +51,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			setContentView(R.layout.activity_file_properties);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
 			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
+			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
+			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
 			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitch = (MySwitch) findViewById(R.id.file_properties_switch);

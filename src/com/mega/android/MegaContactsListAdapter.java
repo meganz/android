@@ -8,9 +8,11 @@ import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
+import com.mega.sdk.NodeList;
 import com.mega.sdk.UserList;
 
 import android.app.Activity;
@@ -206,7 +208,11 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
 		}
 		
-		holder.textViewContent.setText("5 Folders, 10 files");
+		NodeList sharedNodes = megaApi.getInShares(contact);
+		
+		String sharedNodesDescription = getDescription(sharedNodes);
+		
+		holder.textViewContent.setText(sharedNodesDescription);
 		
         if (position < 2){
         	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
@@ -288,9 +294,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		switch (v.getId()){
 			case R.id.contact_list_option_properties:{
 				Intent i = new Intent(context, ContactPropertiesActivity.class);
-				i.putExtra("imageId", R.drawable.jesus);
 				i.putExtra("name", c.getEmail());
-				i.putExtra("position", currentPosition);
 				context.startActivity(i);							
 				positionClicked = -1;
 				notifyDataSetChanged();
@@ -320,6 +324,39 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		this.contacts = contacts;
 		positionClicked = -1;
 		notifyDataSetChanged();
+	}
+	
+	public String getDescription(NodeList nodes){
+		int numFolders = 0;
+		int numFiles = 0;
+		
+		for (int i=0;i<nodes.size();i++){
+			MegaNode c = nodes.get(i);
+			if (c.isFolder()){
+				numFolders++;
+			}
+			else{
+				numFiles++;
+			}
+		}
+		
+		String info = "";
+		if (numFolders > 0){
+			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0){
+				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		else {
+			if (numFiles == 0){
+				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			}
+			else{
+				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		
+		return info;
 	}
 	
 	private static void log(String log) {
