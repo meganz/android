@@ -52,6 +52,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	ActionBar aB;
 	
 	boolean multipleSelect;
+	boolean isContact = false;
 	
 	/*public static view holder class*/
     public class ViewHolderBrowserList {
@@ -75,11 +76,16 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         long document;
     }
 	
-	public MegaBrowserListAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
+	public MegaBrowserListAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, boolean isContact) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
-		((ManagerActivity)context).setParentHandle(parentHandle);
+		if (!isContact){
+			((ManagerActivity)context).setParentHandle(parentHandle);
+		}
+		else{
+			((ContactFileListActivity)context).setParentHandle(parentHandle);
+		}
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
 		this.emptyTextViewFragment = emptyTextView;
@@ -88,6 +94,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
+		
+		this.isContact = isContact;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -435,7 +443,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				((ManagerActivity) context).onFileClick(handleList);
+				if (!isContact){
+					((ManagerActivity) context).onFileClick(handleList);
+				}
 				break;
 			}
 			case R.id.file_list_option_properties:{
@@ -456,27 +466,37 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_list_option_delete:{
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				((ManagerActivity) context).moveToTrash(handleList);
+				if (!isContact){
+					((ManagerActivity) context).moveToTrash(handleList);
+				}
 				break;
 			}
 			case R.id.file_list_option_public_link:{
-				((ManagerActivity) context).getPublicLinkAndShareIt(n);
+				if (!isContact){
+					((ManagerActivity) context).getPublicLinkAndShareIt(n);
+				}
 				break;
 			}
 			case R.id.file_list_option_rename:{
-				((ManagerActivity) context).showRenameDialog(n, n.getName());
+				if (!isContact){
+					((ManagerActivity) context).showRenameDialog(n, n.getName());
+				}
 				break;
 			}
 			case R.id.file_list_option_move:{
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				((ManagerActivity) context).showMove(handleList);
+				if (!isContact){
+					((ManagerActivity) context).showMove(handleList);
+				}
 				break;
 			}
 			case R.id.file_list_option_copy:{
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				((ManagerActivity) context).showCopy(handleList);
+				if (!isContact){
+					((ManagerActivity) context).showCopy(handleList);
+				}
 				break;
 			}
 			case R.id.file_list_three_dots:{
@@ -517,7 +537,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-		((ManagerActivity)context).setParentHandle(parentHandle);
+		if (!isContact){
+			((ManagerActivity)context).setParentHandle(parentHandle);
+		}
+		else{
+			((ContactFileListActivity)context).setParentHandle(parentHandle);
+		}
 	}
 	
 	public boolean isMultipleSelect() {

@@ -87,6 +87,8 @@
 	<string name="contact_properties_info_email">E-mail: </string>
 	<string name="contact_properties_info_added">Added: </string>
 	
+	<string name="contact_file_list_activity">Content</string>
+	
 	<string name="full_screen_image_viewer_label">Image Viewer</string>
 	
 	<string name="error_not_enough_free_space">Not enough free space</string>

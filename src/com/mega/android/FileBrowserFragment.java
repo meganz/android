@@ -237,7 +237,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB);
+				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, false);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);

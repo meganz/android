@@ -49,9 +49,11 @@
          android:layout_below="@id/contact_properties_image">
          
          <TableLayout       		
-       		    android:layout_width="wrap_content"
+             	android:id="@+id/contact_properties_content_table"
+       		    android:layout_width="fill_parent"
        		    android:layout_height="60dp" 
-       		    android:layout_gravity="center" >
+       		    android:layout_gravity="center"
+       		    android:background="@drawable/selectable_background_mega" >
        		    
              <TableRow>
                  
@@ -81,8 +83,8 @@
              	    android:layout_width="wrap_content"
              	    android:layout_height="wrap_content"
              	    android:src="@drawable/contact_properties_content_eye"
-             	    android:background="@null"
-             	    android:paddingTop="22dp"/>
+             	    android:paddingTop="22dp"
+             	    android:background="@null" />
              	
              </TableRow>
        		    
