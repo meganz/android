@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import com.mega.components.RoundedImageView;
@@ -15,27 +16,35 @@ import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ContactFileListActivity extends ActionBarActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener {
+public class ContactFileListActivity extends ActionBarActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener, OnClickListener {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
+	ContactFileListActivity contactFileListActivity = this;
 	
 	String userEmail;
 	
@@ -44,6 +53,7 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	ImageView statusDot;
 	TextView textViewContent;
 	
+	RelativeLayout contactLayout;
 	ListView listView;
 	ImageView emptyImage;
 	TextView emptyText;
@@ -56,6 +66,138 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	long parentHandle = -1;
 	
 	Stack<Long> parentHandleStack = new Stack<Long>();
+	
+	private ActionMode actionMode;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			List<MegaNode> documents = getSelectedDocuments();
+			
+			switch(item.getItemId()){
+				case R.id.cab_menu_download:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+//					((ManagerActivity) context).onFileClick(handleList);
+					break;
+				}
+				case R.id.cab_menu_rename:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+//						((ManagerActivity) context).showRenameDialog(documents.get(0), documents.get(0).getName());
+					}
+					break;
+				}
+				case R.id.cab_menu_copy:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+//					((ManagerActivity) context).showCopy(handleList);
+					break;
+				}	
+				case R.id.cab_menu_move:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+//					((ManagerActivity) context).showMove(handleList);
+					break;
+				}
+				case R.id.cab_menu_share_link:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+//						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
+					}
+					break;
+				}
+				case R.id.cab_menu_trash:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+//					((ManagerActivity) context).moveToTrash(handleList);
+					break;
+				}
+				
+				
+				
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_browser_action, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			adapter.setMultipleSelect(false);
+			listView.setOnItemLongClickListener(contactFileListActivity);
+			clearSelections();
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			List<MegaNode> selected = getSelectedDocuments();
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
+			
+			// Rename
+			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "full").getErrorCode() == MegaError.API_OK)) {
+				showRename = true;
+			}
+			
+			// Link
+			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "owner").getErrorCode() == MegaError.API_OK)) {
+				showLink = true;
+			}
+			
+			if (selected.size() > 0) {
+				showDownload = true;
+				showTrash = true;
+				showMove = true;
+				showCopy = true;
+				for(int i=0; i<selected.size();i++)	{
+					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+						showTrash = false;
+						showMove = false;
+						break;
+					}
+				}
+			}
+			
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			
+			return false;
+		}
+		
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +230,8 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			imageView = (RoundedImageView) findViewById(R.id.contact_file_list_thumbnail);
 			statusDot = (ImageView) findViewById(R.id.contact_file_list_status_dot);
 			textViewContent = (TextView) findViewById(R.id.contact_file_list_content);
+			contactLayout = (RelativeLayout) findViewById(R.id.contact_file_list_contact_layout);
+			contactLayout.setOnClickListener(this);
 			
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
@@ -241,7 +385,15 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (adapter.isMultipleSelect()){
-			
+			SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				listView.setItemChecked(position, true);
+			}
+			else{
+				listView.setItemChecked(position, false);
+			}				
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
 		}
 		else{
 			if (contactNodes.get(position).isFolder()){
@@ -334,9 +486,110 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	}
 
 	@Override
-	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
-			long arg3) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+		if (adapter.getPositionClicked() == -1){
+			clearSelections();
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+			listView.setItemChecked(position, true);
+			adapter.setMultipleSelect(true);
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
+		return true;
+	}
+	
+	/*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				listView.setItemChecked(checkedPosition, false);
+			}
+		}
+		updateActionModeTitle();
+	}
+	
+	private void updateActionModeTitle() {
+		if (actionMode == null) {
+			return;
+		}
+		List<MegaNode> documents = getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
+		Resources res = getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = "";
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
+
+	/*
+	 * Get list of all selected documents
+	 */
+	private List<MegaNode> getSelectedDocuments() {
+		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				MegaNode document = adapter.getDocumentAt(checkedItems.keyAt(i));
+				if (document != null){
+					documents.add(document);
+				}
+			}
+		}
+		return documents;
+	}
+	
+	/*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		adapter.setMultipleSelect(false);
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
+	
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()){
+			case R.id.contact_file_list_contact_layout:{
+				Intent i = new Intent(this, ContactPropertiesActivity.class);
+				i.putExtra("name", contact.getEmail());
+				startActivity(i);
+				finish();
+				break;
+			}
+		}
 	}
 }
