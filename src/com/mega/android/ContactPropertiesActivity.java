@@ -13,6 +13,7 @@ import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,7 +42,10 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 	TextView infoAdded;
 	ImageView statusImageView;
 	ImageButton eyeButton;
+	TableLayout contentTable;
 	ActionBar aB;
+	
+	String userEmail;
 	
 	MegaApiAndroid megaApi;
 	
@@ -68,7 +73,7 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			String userEmail = extras.getString("name");
+			userEmail = extras.getString("name");
 			
 			setContentView(R.layout.activity_contact_properties);
 			nameView = (TextView) findViewById(R.id.contact_properties_name);
@@ -80,7 +85,9 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 			contentDetailedTextView = (TextView) findViewById(R.id.contact_properties_content_detailed);
 			statusImageView = (ImageView) findViewById(R.id.contact_properties_status);
 			eyeButton = (ImageButton) findViewById(R.id.contact_properties_content_eye);
-			eyeButton.setOnClickListener(this);
+			contentTable = (TableLayout) findViewById(R.id.contact_properties_content_table);
+//			eyeButton.setOnClickListener(this);
+			contentTable.setOnClickListener(this);
 			
 			infoEmail = (TextView) findViewById(R.id.contact_properties_info_data_email);
 			infoAdded = (TextView) findViewById(R.id.contact_properties_info_data_added);
@@ -127,8 +134,15 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
-			case R.id.contact_properties_content_eye:{
-				Toast.makeText(this, "EYE BUTTON", Toast.LENGTH_LONG).show();
+//			case R.id.contact_properties_content_eye:{
+//				Toast.makeText(this, "EYE BUTTON", Toast.LENGTH_LONG).show();
+//				break;
+//			}
+			case R.id.contact_properties_content_table:{
+				Intent i = new Intent(this, ContactFileListActivity.class);
+				i.putExtra("name", userEmail);
+				startActivity(i);
+				finish();
 				break;
 			}
 		

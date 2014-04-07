@@ -96,6 +96,14 @@
             android:uiOptions="splitActionBarWhenNarrow" >            
         </activity>
         
+        <activity
+            android:name="ContactFileListActivity"
+            android:label="@string/contact_file_list_activity"
+            android:launchMode="singleTop"
+            android:configChanges="orientation|screenSize"
+            android:uiOptions="splitActionBarWhenNarrow" >            
+        </activity>
+        
         <activity 
             android:name="FileExplorerActivity"
             android:label="@string/app_name"
