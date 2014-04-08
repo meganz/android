@@ -586,6 +586,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			
 	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
 	    			uploadMenuItem.setIcon(R.drawable.ic_menu_upload_here_dark);
+	    			uploadMenuItem.setEnabled(true);
 	    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
     			}
     			
@@ -611,9 +612,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
-    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
-    			uploadMenuItem.setVisible(false);
-
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			uploadMenuItem.setEnabled(false);
+	    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+    			}
     			break;
     		}
     		case RUBBISH_BIN:{
@@ -728,15 +736,27 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		if (fbF != null){
 			if (fbF.isVisible()){
-				uploadMenuItem.setVisible(true);
-				createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+    			createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+    			uploadMenuItem.setIcon(R.drawable.ic_menu_upload_here_dark);
+    			uploadMenuItem.setEnabled(true);
+    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
 			}
 		}
 		
 		if (cF != null){
 			if (cF.isVisible()){
-				uploadMenuItem.setVisible(false);
-				createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+				createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			uploadMenuItem.setEnabled(false);
+    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
 			}
 		}
 	    	    
@@ -950,6 +970,40 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				break;
 			}
 			case CONTACTS:{
+				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setItems(options, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				    	switch(which){
+					    	case 0:{
+					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
+					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+					    		intent.putExtra("PARENT_HANDLE", parentHandle);
+					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		break;
+					    	}
+					    	case 1:{
+					    		Toast.makeText(managerActivity, "Sort by (in contacts) not yet implemented (it's implemented on CLOUD_DRIVE)", Toast.LENGTH_LONG).show();
+					    		break;
+					    	}
+					    	case 2:{
+					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}
+					    	case 3:{
+					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}			    	
+					    	case 4:{
+					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+					    		break;
+					    	}
+				    	}
+				    }
+				});
+				builder.show();
 				break;
 			}
 		}
