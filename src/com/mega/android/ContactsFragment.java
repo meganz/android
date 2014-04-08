@@ -109,6 +109,26 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		}	
 	}
 	
+	public void setContacts(UserList contacts){
+		this.contacts = contacts;
+		
+		visibleContacts.clear();
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}
+		
+		if (isList){
+			adapterList.setContacts(visibleContacts);
+		}
+		else{
+			adapterGrid.setContacts(visibleContacts);
+		}
+		
+	}
+	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -165,6 +185,36 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	
 	public boolean getIsList(){
 		return isList;
+	}
+	
+	public void setPositionClicked(int positionClicked){
+		if (isList){
+			if (adapterList != null){
+				adapterList.setPositionClicked(positionClicked);
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.setPositionClicked(positionClicked);
+			}	
+		}		
+	}
+	
+	public void notifyDataSetChanged(){
+		if (isList){
+			if (adapterList != null){
+				adapterList.notifyDataSetChanged();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.notifyDataSetChanged();
+			}
+		}
+	}
+	
+	public ListView getListView(){
+		return listView;
 	}
 	
 	private static void log(String log) {
