@@ -49,6 +49,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils.TruncateAt;
@@ -119,6 +120,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
    	private SearchView mSearchView;    
 	private MenuItem searchMenuItem;
 	
+	private MenuItem createFolderMenuItem;
+	private MenuItem uploadMenuItem;
+	private MenuItem moreOptionsMenuItem;
+	
 	private static DrawerItem drawerItem;
 	
 	private TableLayout topControlBar;
@@ -151,6 +156,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     
     private AlertDialog renameDialog;
     private AlertDialog newFolderDialog;
+    private AlertDialog addContactDialog;
     
     private Handler handler;
     
@@ -572,6 +578,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			customListGrid.setVisibility(View.VISIBLE);
     			customSearch.setVisibility(View.VISIBLE);
     			
+
+    			if (createFolderMenuItem != null){
+	    			createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+	    			uploadMenuItem.setIcon(R.drawable.ic_menu_upload_here_dark);
+	    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+    			}
+    			
     			break;
     		}
     		case CONTACTS:{
@@ -593,6 +610,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			customSearch.setVisibility(View.VISIBLE);
     			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+    			uploadMenuItem.setVisible(false);
 
     			break;
     		}
@@ -701,6 +721,24 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 			searchView.setIconifiedByDefault(true);
 		}
+		
+		uploadMenuItem = menu.findItem(R.id.action_upload);
+		moreOptionsMenuItem = menu.findItem(R.id.action_more_options);
+		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
+		
+		if (fbF != null){
+			if (fbF.isVisible()){
+				uploadMenuItem.setVisible(true);
+				createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+			}
+		}
+		
+		if (cF != null){
+			if (cF.isVisible()){
+				uploadMenuItem.setVisible(false);
+				createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+			}
+		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -736,7 +774,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	return true;
 	        }
 	        case R.id.action_new_folder:{
-	        	showNewFolderDialog(null);
+	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
+	        		showNewFolderDialog(null);
+	        	}
+	        	else if (drawerItem == DrawerItem.CONTACTS){
+	        		showNewContactDialog(null);
+	        	}
 	        	return true;
 	        }
 	        case R.id.action_more_options:{
@@ -757,6 +800,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
+		drawerItem = DrawerItem.values()[position];
 		selectDrawerItem(DrawerItem.values()[position]);
 	}
 
@@ -865,56 +909,50 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	private void showMoreOptionsMenu(){
 
-		CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
-		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setItems(options, new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int which) {
-		    	switch(which){
-			    	case 0:{
-			    		Intent intent = new Intent(managerActivity, LoginActivity.class);
-			    		intent.setAction(LoginActivity.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandle);
-			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-			    		break;
-			    	}
-			    	case 1:{
-			    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-			    		break;
-			    	}
-			    	case 2:{
-			    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-			    		break;
-			    	}
-			    	case 3:{
-			    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-			    		break;
-			    	}			    	
-			    	case 4:{
-			    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-			    		break;
-			    	}
-		    	}
-		    }
-		});
-		builder.show();
-		
-//		final String[] option = new String[] { "Srot by...", "Help", "Upgrade Account", "Refresh", "Logout" };
-//		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, , option);
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//		builder.setAdapter(adapter, new DialogInterface.OnClickListener() { 
-//			public void onClick(DialogInterface dialog, int which) { 
-//				// TODO Auto-generated method stub 
-//			} 
-//		});
-		
-//		 PopupMenu popup = new PopupMenu(this, findViewById(R.id.action_more_options));
-//		 MenuInflater inflater = popup.getMenuInflater();
-//		 inflater.inflate(R.menu.more_options_menu, popup.getMenu());
-//		 popup.show();
+		switch(drawerItem){
+			case CLOUD_DRIVE:{
+				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setItems(options, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				    	switch(which){
+					    	case 0:{
+					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
+					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+					    		intent.putExtra("PARENT_HANDLE", parentHandle);
+					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		break;
+					    	}
+					    	case 1:{
+					    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
+					    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
+					    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
+					    		break;
+					    	}
+					    	case 2:{
+					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}
+					    	case 3:{
+					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}			    	
+					    	case 4:{
+					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+					    		break;
+					    	}
+				    	}
+				    }
+				});
+				builder.show();
+				break;
+			}
+			case CONTACTS:{
+				break;
+			}
+		}
 	}
 	
 	/*
@@ -1139,6 +1177,23 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 			log("avatar user downloaded");
 		}
+		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
+			
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
+				if (cF.isVisible()){	
+					UserList contacts = megaApi.getContacts();
+					cF.setContacts(contacts);
+					cF.getListView().invalidateViews();
+				}
+			}
+			log("add contact");
+		}
 	}
 
 	@Override
@@ -1167,6 +1222,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_MKDIR){
 			log("create folder temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			log("get user attribute temporary error");
+		}
+		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
+			log("add contact temporary error");
 		}
 	}
 	
@@ -1286,6 +1347,70 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}, 50);
 	}
 	
+	public void showNewContactDialog(String editText){
+		if (cF.isVisible()){
+			cF.setPositionClicked(-1);
+			cF.notifyDataSetChanged();
+		}
+		
+		String text;
+		if ((editText == null) || editText.equals("")){
+			text = getString(R.string.context_new_contact_name);
+		}
+		else{
+			text = editText;
+		}
+		
+		final EditText input = new EditText(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					addContact(value);
+					addContactDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_add),
+				KeyEvent.KEYCODE_ENTER);
+		input.setText(text);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_add_contact),
+				null, input);
+		builder.setPositiveButton(getString(R.string.general_add),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						addContact(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		addContactDialog = builder.create();
+		addContactDialog.show();
+	}
+	
 	public void showNewFolderDialog(String editText){
 		
 		if (fbF.isVisible()){
@@ -1348,6 +1473,30 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+	}
+	
+	private void addContact(String contactEmail){
+		
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		statusDialog = null;
+		try {
+			statusDialog = new ProgressDialog(this);
+			statusDialog.setMessage(getString(R.string.context_adding_contact));
+			statusDialog.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		
+		megaApi.addContact(contactEmail, this);
 	}
 	
 	private void createFolder(String title) {
@@ -1892,15 +2041,23 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api) {
-		// TODO Auto-generated method stub
+		if (cF != null){
+			if (cF.isVisible()){	
+				UserList contacts = megaApi.getContacts();
+				cF.setContacts(contacts);
+				cF.getListView().invalidateViews();
+			}
+		}
 	}
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
-		if (fbF.isVisible()){
-			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-			fbF.setNodes(nodes);
-			fbF.getListView().invalidateViews();
+		if (fbF != null){
+			if (fbF.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+				fbF.setNodes(nodes);
+				fbF.getListView().invalidateViews();
+			}
 		}
 	}
 
