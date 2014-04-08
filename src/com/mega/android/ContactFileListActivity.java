@@ -164,24 +164,23 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			boolean showTrash = false;
 			
 			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "full").getErrorCode() == MegaError.API_OK)) {
-				showRename = true;
-			}
-			
-			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "owner").getErrorCode() == MegaError.API_OK)) {
-				showLink = true;
+			if(selected.size() == 1){
+				if ((megaApi.checkAccess(selected.get(0), "full").getErrorCode() == MegaError.API_OK) || 
+					(megaApi.checkAccess(selected.get(0), "rw").getErrorCode() == MegaError.API_OK)) {
+					showRename = true;
+				}
 			}
 			
 			if (selected.size() > 0) {
 				showDownload = true;
-				showTrash = true;
-				showMove = true;
 				showCopy = true;
-				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+				for (int i=0; i<selected.size(); i++){
+					if ((megaApi.checkAccess(selected.get(i), "full").getErrorCode() == MegaError.API_OK) ||
+						(megaApi.checkAccess(selected.get(i), "rw").getErrorCode() == MegaError.API_OK)){
+						showTrash = true;
+					}
+					else{
 						showTrash = false;
-						showMove = false;
 						break;
 					}
 				}
