@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
@@ -152,8 +153,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
-//			holder.optionOpen = (ImageButton) convertView.findViewById(R.id.file_list_option_open);
-//			holder.optionOpen.setPadding(Util.px2dp((15*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDownload = (ImageView) convertView.findViewById(R.id.file_list_option_download);
 			holder.optionDownload.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
@@ -272,6 +271,38 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
 				listFragment.smoothScrollToPosition(_position);
+				
+				holder.optionDownload.setVisibility(View.VISIBLE);
+				holder.optionProperties.setVisibility(View.VISIBLE);
+				holder.optionCopy.setVisibility(View.VISIBLE);
+				holder.optionMove.setVisibility(View.GONE);
+				holder.optionPublicLink.setVisibility(View.GONE);
+				if ((megaApi.checkAccess(node, "full").getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(node, "rw").getErrorCode() == MegaError.API_OK)) {
+					holder.optionRename.setVisibility(View.VISIBLE);
+					holder.optionDelete.setVisibility(View.VISIBLE);
+					
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionProperties.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionRename.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionCopy.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionDelete.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				}
+				else{
+					holder.optionRename.setVisibility(View.GONE);
+					holder.optionDelete.setVisibility(View.GONE);
+					
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				}
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);

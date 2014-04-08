@@ -423,6 +423,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (drawerItem == null) {
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 			}
+			else{
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+			}
 	
 			//INITIAL FRAGMENT
 			selectDrawerItem(drawerItem);
@@ -1018,6 +1021,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 		Preferences.clearCredentials(context);
 		megaApi.logout();
+		drawerItem = null;
 		
 		if(managerActivity != null)
 		{

@@ -134,10 +134,13 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
-//			case R.id.contact_properties_content_eye:{
-//				Toast.makeText(this, "EYE BUTTON", Toast.LENGTH_LONG).show();
-//				break;
-//			}
+			case R.id.contact_properties_content_eye:{
+				Intent i = new Intent(this, ContactFileListActivity.class);
+				i.putExtra("name", userEmail);
+				startActivity(i);
+				finish();
+				break;
+			}
 			case R.id.contact_properties_content_table:{
 				Intent i = new Intent(this, ContactFileListActivity.class);
 				i.putExtra("name", userEmail);
