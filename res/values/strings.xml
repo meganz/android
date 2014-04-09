@@ -107,6 +107,7 @@
     <string name="context_rename">Rename</string>
     <string name="context_renaming">Renaming</string>
     <string name="context_moving">Moving document</string>
+    <string name="context_copying">Copying document</string>
     <string name="context_creating_link">Creating link</string>
     <string name="context_moving_to_trash">Moving to trash</string>
     <string name="context_move_to_trash">Move to Rubbish Bin</string>

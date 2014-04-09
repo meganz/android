@@ -168,7 +168,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	private List<ShareInfo> filePreparedInfos;
 	
-	private int orderGetChildren = 0;
+	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -1873,6 +1873,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
 			final long toHandle = intent.getLongExtra("COPY_TO", 0);
 			final int totalCopy = copyHandles.length;
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_copying));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
 			
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			for(int i=0; i<copyHandles.length;i++){
