@@ -112,6 +112,7 @@
     <string name="context_creating_link">Creating link</string>
     <string name="context_moving_to_trash">Moving to trash</string>
     <string name="context_move_to_trash">Move to Rubbish Bin</string>
+    <string name="context_delete_from_mega">Delete from MEGA</string>
     <string name="context_new_folder_name">Folder Name</string>
     <string name="context_new_contact_name">Contact email</string>
     <string name="context_creating_folder">Creating folder</string>

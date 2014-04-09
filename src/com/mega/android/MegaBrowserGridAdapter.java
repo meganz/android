@@ -987,6 +987,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).moveToTrash(handleList);
 				break;
 			}
@@ -994,16 +996,22 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).moveToTrash(handleList);
 				break;
 			}
 			case R.id.file_grid_option_rename1:{
 				MegaNode n = (MegaNode) getItem(currentPosition);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).showRenameDialog(n, n.getName());
 				break;
 			}
 			case R.id.file_grid_option_rename2:{
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).showRenameDialog(n, n.getName());
 				break;
 			}
@@ -1011,6 +1019,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).showMove(handleList);
 				break;
 			}
@@ -1018,6 +1028,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).showMove(handleList);
 				break;
 			}
@@ -1025,6 +1037,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).showCopy(handleList);
 				break;
 			}
@@ -1032,6 +1046,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
+				setPositionClicked(-1);
+				notifyDataSetChanged();
 				((ManagerActivity) context).showCopy(handleList);
 				break;
 			}
