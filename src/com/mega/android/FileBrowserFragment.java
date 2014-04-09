@@ -203,7 +203,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
-			((ManagerActivity)context).setParentHandle(parentHandle);
+			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 			nodes = megaApi.getChildren(megaApi.getRootNode());
 			aB.setTitle(getString(R.string.section_cloud_drive));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -237,7 +237,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, false);
+				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -269,7 +269,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 	        
 			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB);
+				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
@@ -331,7 +331,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = nodes.get(position).getHandle();
-					((ManagerActivity)context).setParentHandle(parentHandle);
+					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position));
 					adapterList.setNodes(nodes);
@@ -478,7 +478,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 
 		if (isList){
 			parentHandle = adapterList.getParentHandle();
-			((ManagerActivity)context).setParentHandle(parentHandle);
+			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 			
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);
@@ -503,7 +503,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandle(parentHandle);
+					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 					nodes = megaApi.getChildren(parentNode);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
@@ -517,7 +517,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		}
 		else{
 			parentHandle = adapterGrid.getParentHandle();
-			((ManagerActivity)context).setParentHandle(parentHandle);
+			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);
@@ -542,7 +542,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandle(parentHandle);
+					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 					nodes = megaApi.getChildren(parentNode);
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);

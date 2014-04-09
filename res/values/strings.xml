@@ -73,6 +73,7 @@
 	<string name="used_space">%1$s GB of %2$s GB</string>
 	
 	<string name="file_browser_empty_cloud_drive">Empty Cloud Drive</string>
+	<string name="file_browser_empty_rubbish_bin">Empty Rubbish Bin</string>
     <string name="file_browser_empty_folder">Empty Folder</string>
 	
 	<string name="file_properties_activity">Properties</string>
