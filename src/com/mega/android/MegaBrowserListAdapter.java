@@ -272,20 +272,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
 				listFragment.smoothScrollToPosition(_position);
 				
-				holder.optionDownload.setVisibility(View.VISIBLE);
-				holder.optionProperties.setVisibility(View.VISIBLE);
-				holder.optionCopy.setVisibility(View.VISIBLE);
-				holder.optionMove.setVisibility(View.GONE);
-				holder.optionPublicLink.setVisibility(View.GONE);
-				holder.optionRename.setVisibility(View.GONE);
-				holder.optionDelete.setVisibility(View.GONE);
-				
-				holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				if (isContact){
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.VISIBLE);
+					holder.optionCopy.setVisibility(View.VISIBLE);
+					holder.optionMove.setVisibility(View.GONE);
+					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRename.setVisibility(View.GONE);
+					holder.optionDelete.setVisibility(View.GONE);
+					
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				}
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);
