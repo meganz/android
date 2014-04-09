@@ -509,10 +509,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 			case R.id.file_list_option_copy:{
+				positionClicked = -1;
+				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
 				if (!isContact){
 					((ManagerActivity) context).showCopy(handleList);
+				}
+				else{
+					((ContactFileListActivity) context).showCopy(handleList);
 				}
 				break;
 			}

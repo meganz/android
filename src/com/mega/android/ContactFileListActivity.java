@@ -12,12 +12,14 @@ import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,6 +28,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
@@ -48,7 +51,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ContactFileListActivity extends ActionBarActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener, OnClickListener {
+public class ContactFileListActivity extends ActionBarActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
@@ -77,9 +80,18 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	
 	private ActionMode actionMode;
 	
+	ProgressDialog statusDialog;
+	
+	public static int REQUEST_CODE_GET = 1000;
+	public static int REQUEST_CODE_GET_LOCAL = 1003;
+	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	
-	private int orderGetChildren = 0;
+	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
+	public UploadHereDialog uploadDialog;
+	
+	private List<ShareInfo> filePreparedInfos;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -113,7 +125,8 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 					}
 					clearSelections();
 					hideMultipleSelect();
-//					((ManagerActivity) context).showCopy(handleList);
+					
+					showCopy(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -210,6 +223,8 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
 		}
 		
+		megaApi.addGlobalListener(this);
+		
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
@@ -295,6 +310,46 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 		}
 	}
 	
+	@Override
+    protected void onDestroy(){
+    	super.onDestroy();
+    	
+    	megaApi.removeGlobalListener(this);
+    }
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.activity_contact_file_list, menu);
+	    
+//	    MenuItem nullItem = menu.findItem(R.id.action_contact_file_list_null);
+//	    nullItem.setEnabled(false);
+	    
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		// Handle presses on the action bar items
+	    switch (item.getItemId()) {
+		    case android.R.id.home:{
+		    	onBackPressed();
+		    	return true;
+		    }
+		    case R.id.action_contact_file_list_upload:{
+				uploadDialog = new UploadHereDialog();
+				uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+	        	return true;
+	        }
+		    default:{
+	            return super.onOptionsItemSelected(item);
+	        }
+	    }
+	}
+	
 	public String getDescription(NodeList nodes){
 		int numFolders = 0;
 		int numFiles = 0;
@@ -333,18 +388,6 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	    // Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	onBackPressed();
-		    	return true;
-		    }
-		}	    
-	    return super.onOptionsItemSelected(item);
-	}
-
-	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart");
 	}
@@ -372,6 +415,28 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 					}
 				}
 			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_COPY){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren);
+				adapter.setNodes(nodes);
+				listView.invalidateViews();
+//				if (fbF.isVisible()){
+//					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+//					fbF.setNodes(nodes);
+//					fbF.getListView().invalidateViews();
+//				}		
+			}
+			else{
+				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
+			}
+			log("copy nodes request finished");
 		}
 	}
 
@@ -609,13 +674,79 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 	}
 	
+	public void showCopy(ArrayList<Long> handleList){
+		
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("COPY_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+	}
+	
 	@Override
 	protected void onActivityResult (int requestCode, int resultCode, Intent intent){
 		if (intent == null){
 			return;
 		}
 		
-		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+		
+		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			Uri uri = intent.getData();
+			intent.setAction(Intent.ACTION_GET_CONTENT);
+			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+			filePrepareTask.execute(intent);
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.upload_prepare));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+		} 	
+		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
+			
+			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
+			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
+			
+			int i = 0;
+			
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+			
+			for (String path : paths) {
+				Toast.makeText(this, "Upload(" + i + "): " + path + " to MEGA." + parentNode.getName(), Toast.LENGTH_SHORT).show();
+				Intent uploadServiceIntent = new Intent (this, UploadService.class);
+				File file = new File (path);
+				if (file.isDirectory()){
+					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
+				}
+				else{
+					ShareInfo info = ShareInfo.infoFromFile(file);
+					if (info == null){
+						continue;
+					}
+					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+				}
+				
+				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
+				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				startService(uploadServiceIntent);				
+				i++;
+			}
+			
+		}
+		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			double availableFreeSpace = Double.MAX_VALUE;
@@ -702,6 +833,90 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			}
 			Util.showToast(this, R.string.download_began);
 		}
+		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_copying));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+			
+			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
+			final long toHandle = intent.getLongExtra("COPY_TO", 0);
+			final int totalCopy = copyHandles.length;
+			
+			MegaNode parent = megaApi.getNodeByHandle(toHandle);
+			for(int i=0; i<copyHandles.length;i++){
+				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
+			}
+		}
+	}
+	
+	/*
+	 * Background task to process files for uploading
+	 */
+	private class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
+		Context context;
+		
+		FilePrepareTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected List<ShareInfo> doInBackground(Intent... params) {
+			return ShareInfo.processIntent(params[0], context);
+		}
+
+		@Override
+		protected void onPostExecute(List<ShareInfo> info) {
+			filePreparedInfos = info;
+			onIntentProcessed();
+		}
+	}
+	
+	/*
+	 * Handle processed upload intent
+	 */
+	public void onIntentProcessed() {
+		List<ShareInfo> infos = filePreparedInfos;
+		if (statusDialog != null) {
+			try { 
+				statusDialog.dismiss(); 
+			} 
+			catch(Exception ex){}
+		}
+		
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle); 
+		if(parentNode == null){
+			Util.showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
+			return;
+		}
+			
+		if (infos == null) {
+			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
+					false, this);
+		} 
+		else {
+			Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
+					Toast.LENGTH_SHORT).show();
+			for (ShareInfo info : infos) {
+				Intent intent = new Intent(this, UploadService.class);
+				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+				startService(intent);
+			}
+		}
 	}
 	
 	/*
@@ -734,5 +949,24 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 				dlFiles.put(document, folder.getAbsolutePath());
 			}
 		}
+	}
+
+	@Override
+	public void onUsersUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onNodesUpdate(MegaApiJava api) {
+		NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren);
+		adapter.setNodes(nodes);
+		listView.invalidateViews();
+	}
+
+	@Override
+	public void onReloadNeeded(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
 	}
 }
