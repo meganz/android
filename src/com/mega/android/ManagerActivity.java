@@ -729,7 +729,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if (tF != null){
 			if (tF.isVisible()){
 				if (tF.onBackPressed() == 0){
-					super.onBackPressed();
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
 					return;
 				}
 			}
@@ -1129,11 +1130,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
-					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
-					}		
+					if (fbF != null){
+						if (fbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
+					}
+					if (rbF != null){
+						if (rbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
 				}
 				else{
 					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
@@ -1144,11 +1154,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
-					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
-					}		
+					if (fbF != null){
+						if (fbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
+					}
+					if (rbF != null){
+						if (rbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
 				}
 				else{
 					Toast.makeText(this, "The file has not been moved", Toast.LENGTH_LONG).show();
@@ -1164,10 +1183,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
-				if (fbF.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-					fbF.setNodes(nodes);
-					fbF.getListView().invalidateViews();
+				if (fbF != null){
+					if (fbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
+					}
+				}
+				if (rbF != null){
+					if (rbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
 				}
 			}
 			else{
@@ -1204,10 +1232,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
-				if (fbF.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-					fbF.setNodes(nodes);
-					fbF.getListView().invalidateViews();
+				if (fbF != null){
+					if (fbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
+					}
+				}
+				if (rbF != null){
+					if (rbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
 				}
 			}
 			else{
@@ -1222,11 +1259,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
-				if (fbF.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-					fbF.setNodes(nodes);
-					fbF.getListView().invalidateViews();
-				}		
+				if (fbF != null){
+					if (fbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
+					}
+				}
+				if (rbF != null){
+					if (rbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
+				}
 			}
 			else{
 				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
@@ -1241,11 +1287,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
-				if (fbF.isVisible()){
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-					fbF.setNodes(nodes);
-					fbF.getListView().invalidateViews();
-				}		
+				if (fbF != null){
+					if (fbF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
+					}
+				}
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
@@ -1364,11 +1412,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void moveToTrash(ArrayList<Long> handleList){
 		
-		if (fbF.isVisible()){
-			fbF.setPositionClicked(-1);
-			fbF.notifyDataSetChanged();
-		}
-		
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
@@ -1377,17 +1420,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if(isFinishing()){
 			return;	
 		}
-		
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.context_move_to_trash));
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
 		
 		MegaNode rubbishNode = megaApi.getRubbishNode();
 
@@ -1400,20 +1432,35 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				
 			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
 				moveToRubbish = true;
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.context_move_to_trash));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
 				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, this);
 			}
 			else{
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.context_delete_from_mega));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
 				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), this);
 			}
 		}
 	}
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
-		
-		if (fbF.isVisible()){
-			fbF.setPositionClicked(-1);
-			fbF.notifyDataSetChanged();
-		}
 		
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -1445,7 +1492,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (!fbF.isVisible()) {
+				if (!fbF.isVisible() && !rbF.isVisible() && !cF.isVisible()) {
 					return;
 				}
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1647,11 +1694,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showRenameDialog(final MegaNode document, String text){
 		
-		if (fbF.isVisible()){
-			fbF.setPositionClicked(-1);
-			fbF.notifyDataSetChanged();
-		}
-		
 		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
@@ -1735,11 +1777,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showMove(ArrayList<Long> handleList){
 		
-		if (fbF.isVisible()){
-			fbF.setPositionClicked(-1);
-			fbF.notifyDataSetChanged();
-		}
-		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -1751,11 +1788,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void showCopy(ArrayList<Long> handleList){
-		
-		if (fbF.isVisible()){
-			fbF.setPositionClicked(-1);
-			fbF.notifyDataSetChanged();
-		}
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
@@ -2174,6 +2206,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 				fbF.setNodes(nodes);
 				fbF.getListView().invalidateViews();
+			}
+		}
+		else if (rbF != null){
+			if (rbF.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+				rbF.setNodes(nodes);
+				rbF.getListView().invalidateViews();
 			}
 		}
 	}
