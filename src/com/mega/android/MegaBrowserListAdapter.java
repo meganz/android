@@ -41,8 +41,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	MegaApiAndroid megaApi;
 
 	int positionClicked;
-	ArrayList<Integer> imageIds;
-	ArrayList<String> names;
 	NodeList nodes;
 	
 	long parentHandle = -1;
@@ -53,7 +51,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	ActionBar aB;
 	
 	boolean multipleSelect;
-	boolean isContact = false;
+	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
 	
 	/*public static view holder class*/
     public class ViewHolderBrowserList {
@@ -77,26 +75,37 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         long document;
     }
 	
-	public MegaBrowserListAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, boolean isContact) {
+	public MegaBrowserListAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
-		if (!isContact){
-			((ManagerActivity)context).setParentHandle(parentHandle);
+		switch(type){
+			case ManagerActivity.FILE_BROWSER_ADAPTER:{
+				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				break;
+			}
+			case ManagerActivity.CONTACT_FILE_ADAPTER:{
+				((ContactFileListActivity)context).setParentHandle(parentHandle);
+				break;
+			}
+			case ManagerActivity.RUBBISH_BIN_ADAPTER:{
+				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+				break;
+			}
+			default:{
+				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				break;
+			}
 		}
-		else{
-			((ContactFileListActivity)context).setParentHandle(parentHandle);
-		}
+
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
 		this.emptyTextViewFragment = emptyTextView;
 		this.aB = aB;
 		
 		this.positionClicked = -1;
-		this.imageIds = new ArrayList<Integer>();
-		this.names = new ArrayList<String>();
 		
-		this.isContact = isContact;
+		this.type = type;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -272,7 +281,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
 				listFragment.smoothScrollToPosition(_position);
 				
-				if (isContact){
+				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					holder.optionCopy.setVisibility(View.VISIBLE);
@@ -403,67 +412,16 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		MegaNode n = (MegaNode) getItem(currentPosition);
 		
 		switch (v.getId()){
-//			case R.id.file_list_option_open:{
-//				
-//				if (n.isFolder()){
-//					aB.setTitle(n.getName());
-//					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = n.getHandle();
-//					nodes = megaApi.getChildren(n);
-//					setNodes(nodes);
-//					listFragment.setSelection(0);
-//					
-//					//If folder has no files
-//					if (getCount() == 0){
-//						listFragment.setVisibility(View.GONE);
-//						emptyImageViewFragment.setVisibility(View.VISIBLE);
-//						emptyTextViewFragment.setVisibility(View.VISIBLE);
-//						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-//							emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
-//						} else {
-//							emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-//							emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-//						}
-//					}
-//					else{
-//						listFragment.setVisibility(View.VISIBLE);
-//						emptyImageViewFragment.setVisibility(View.GONE);
-//						emptyTextViewFragment.setVisibility(View.GONE);
-//					}
-//				}
-//				else{
-//					if (MimeType.typeForName(n.getName()).isImage()){
-//						Intent intent = new Intent(context, FullScreenImageViewer.class);
-//						intent.putExtra("position", currentPosition);
-//						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
-//							intent.putExtra("parentNodeHandle", -1L);
-//						}
-//						else{
-//							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-//						}
-//						context.startActivity(intent);
-//					}
-//					else{
-//						Toast.makeText(context, "[IS FILE (not image)]Node handle clicked: " + n.getHandle(), Toast.LENGTH_SHORT).show();
-//					}
-//					positionClicked = -1;
-//					notifyDataSetChanged();
-//				}				
-//				break;
-//			}
 			case R.id.file_list_option_download:{
 				positionClicked = -1;
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				if (!isContact){
-					((ManagerActivity) context).onFileClick(handleList);
+				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
+					((ContactFileListActivity)context).onFileClick(handleList);
 				}
 				else{
-					((ContactFileListActivity)context).onFileClick(handleList);
+					((ManagerActivity) context).onFileClick(handleList);
 				}
 				break;
 			}
@@ -485,19 +443,19 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_list_option_delete:{
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				if (!isContact){
+				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).moveToTrash(handleList);
 				}
 				break;
 			}
 			case R.id.file_list_option_public_link:{
-				if (!isContact){
+				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).getPublicLinkAndShareIt(n);
 				}
 				break;
 			}
 			case R.id.file_list_option_rename:{
-				if (!isContact){
+				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).showRenameDialog(n, n.getName());
 				}
 				break;
@@ -505,7 +463,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_list_option_move:{
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				if (!isContact){
+				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).showMove(handleList);
 				}
 				break;
@@ -515,7 +473,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
-				if (!isContact){
+				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).showCopy(handleList);
 				}
 				else{
@@ -561,12 +519,24 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-		if (!isContact){
-			((ManagerActivity)context).setParentHandle(parentHandle);
+		switch(type){
+		case ManagerActivity.FILE_BROWSER_ADAPTER:{
+			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+			break;
 		}
-		else{
+		case ManagerActivity.CONTACT_FILE_ADAPTER:{
 			((ContactFileListActivity)context).setParentHandle(parentHandle);
+			break;
 		}
+		case ManagerActivity.RUBBISH_BIN_ADAPTER:{
+			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+			break;
+		}
+		default:{
+			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+			break;
+		}
+	}
 	}
 	
 	public boolean isMultipleSelect() {

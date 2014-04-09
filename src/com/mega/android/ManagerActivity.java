@@ -113,6 +113,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	
+	final public static int FILE_BROWSER_ADAPTER = 2000;
+	final public static int CONTACT_FILE_ADAPTER = 2001;
+	final public static int RUBBISH_BIN_ADAPTER = 2002;
+	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -140,7 +144,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	private boolean firstTime = true;
 	
-	long parentHandle;
+	long parentHandleBrowser;
+	long parentHandleRubbish;
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
@@ -378,10 +383,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 			customListGrid.setOnClickListener(this);
 			
-			parentHandle = -1;
+			parentHandleBrowser = -1;
+			parentHandleRubbish = -1;
 			if (savedInstanceState != null){
+				firstTime = false;
 				int visibleFragment = savedInstanceState.getInt("visibleFragment");
-				parentHandle = savedInstanceState.getLong("parentHandle");
+				parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser");
+				parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish");
 				switch (visibleFragment){
 					case 1:{
 						drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -436,11 +444,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	protected void onSaveInstanceState(Bundle outState) {
     	super.onSaveInstanceState(outState);
     	
-    	long parentHandle = -1;
+    	long pHBrowser = -1;
+    	long pHRubbish = -1;
     	int visibleFragment = -1;
     	if (fbF != null){
+    		pHBrowser = fbF.getParentHandle();
     		if (fbF.isVisible()){
-    			parentHandle = fbF.getParentHandle();
     			if (isListCloudDrive){
     				visibleFragment = 1;
     			}
@@ -461,6 +470,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	}
     	
     	if (rbF != null){
+    		pHRubbish = rbF.getParentHandle();
     		if (rbF.isVisible()){
     			if (isListRubbishBin){
     				visibleFragment = 5;
@@ -478,7 +488,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	}
     	
     	outState.putInt("visibleFragment", visibleFragment);
-    	outState.putLong("parentHandle", parentHandle);
+    	outState.putLong("parentHandleBrowser", pHBrowser);
+    	outState.putLong("parentHandleRubbish", pHRubbish);
     }
     
     @Override
@@ -559,9 +570,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		case CLOUD_DRIVE:{
 				if (fbF == null){
 					fbF = new FileBrowserFragment();
-					fbF.setParentHandle(parentHandle);
+					fbF.setParentHandle(megaApi.getRootNode().getHandle());
 					fbF.setIsList(isListCloudDrive);
 				}
+				
+				fbF.setIsList(isListCloudDrive);
+				fbF.setParentHandle(parentHandleBrowser);
 				
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
 				if (isListCloudDrive){					
@@ -631,8 +645,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			if (rbF == null){
     				rbF = new RubbishBinFragment();
+    				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
     				rbF.setIsList(isListRubbishBin);
     			}
+    			
+    			rbF.setIsList(isListRubbishBin);
+    			rbF.setParentHandle(parentHandleRubbish);
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbF, "rbF").commit();
     			if (isListRubbishBin){
@@ -645,6 +663,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			customListGrid.setVisibility(View.VISIBLE);
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			uploadMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+	    		}
 
     			break;
     		}
@@ -762,6 +791,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
 			}
 		}
+		
+		if (rbF != null){
+			if (rbF.isVisible()){
+				createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			createFolderMenuItem.setEnabled(false);
+    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			uploadMenuItem.setEnabled(false);
+    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+			}
+		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -782,6 +825,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		    		if (fbF != null){
 		    			if (fbF.isVisible()){
 		    				fbF.onBackPressed();
+		    			}
+		    		}
+		    		if (rbF != null){
+		    			if (rbF.isVisible()){
+		    				rbF.onBackPressed();
 		    			}
 		    		}
 				}
@@ -842,7 +890,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						isListCloudDrive = !isListCloudDrive;
 						fbF.setIsList(isListCloudDrive);
-						fbF.setParentHandle(parentHandle);
+						fbF.setParentHandle(parentHandleBrowser);
 						
 						fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.attach(currentFragment);
@@ -893,6 +941,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						isListRubbishBin = !isListRubbishBin;
 						rbF.setIsList(isListRubbishBin);
+						rbF.setParentHandle(parentHandleRubbish);
 						
 						fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.attach(currentFragment);
@@ -944,7 +993,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    	case 0:{
 					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
 					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandle);
+					    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 					    		break;
 					    	}
@@ -983,7 +1032,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    	case 0:{
 					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
 					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandle);
+					    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 					    		break;
 					    	}
@@ -1811,7 +1860,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 			
 			for (String path : paths) {
-				Toast.makeText(this, "Upload(" + i + "): " + path + " to MEGA." + parentNode.getName(), Toast.LENGTH_SHORT).show();
 				Intent uploadServiceIntent = new Intent (this, UploadService.class);
 				File file = new File (path);
 				if (file.isDirectory()){
@@ -1978,8 +2026,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
-			parentHandle = intent.getLongExtra("PARENT_HANDLE", -1);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 			if (parentNode != null){
 				if (fbF != null){
 					if (fbF.isVisible()){
@@ -2001,7 +2049,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 0);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
 			if (parentNode != null){
 				if (fbF != null){
 					if (fbF.isVisible()){
@@ -2135,8 +2183,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		// TODO Fetch nodes from MEGA		
 	}	
 	
-	public void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
+	public void setParentHandleBrowser(long parentHandleBrowser){
+		this.parentHandleBrowser = parentHandleBrowser;
+	}
+	
+	public void setParentHandleRubbish(long parentHandleRubbish){
+		this.parentHandleRubbish = parentHandleRubbish;
 	}
 
 	public static void log(String message) {

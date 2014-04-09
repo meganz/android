@@ -296,7 +296,7 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			}
 			
 			if (adapter == null){
-				adapter = new MegaBrowserListAdapter(this, contactNodes, -1, listView, emptyImage, emptyText, aB, true);
+				adapter = new MegaBrowserListAdapter(this, contactNodes, -1, listView, emptyImage, emptyText, aB, ManagerActivity.CONTACT_FILE_ADAPTER);
 			}
 			else{
 				adapter.setNodes(contactNodes);
@@ -722,7 +722,6 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			}
 			
 			for (String path : paths) {
-				Toast.makeText(this, "Upload(" + i + "): " + path + " to MEGA." + parentNode.getName(), Toast.LENGTH_SHORT).show();
 				Intent uploadServiceIntent = new Intent (this, UploadService.class);
 				File file = new File (path);
 				if (file.isDirectory()){
