@@ -46,6 +46,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
@@ -168,7 +169,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     
     private boolean moveToRubbish = false;
     
-    private int numClearRubbishBin = 0;
+    private boolean isClearRubbishBin = false;
     
     ProgressDialog statusDialog;
     
@@ -177,11 +178,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private List<ShareInfo> filePreparedInfos;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
+	ActionBar aB;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		managerActivity = this;
+		if (aB == null){
+			aB = getSupportActionBar();
+		}
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -578,13 +584,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				if (fbF == null){
 					fbF = new FileBrowserFragment();
 					fbF.setParentHandle(megaApi.getRootNode().getHandle());
+					parentHandleBrowser = megaApi.getRootNode().getHandle();
 					fbF.setIsList(isListCloudDrive);
 					fbF.setOrder(orderGetChildren);
+					NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+					fbF.setNodes(nodes);
 				}
 				else{
 					fbF.setIsList(isListCloudDrive);
 					fbF.setParentHandle(parentHandleBrowser);
 					fbF.setOrder(orderGetChildren);
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+					fbF.setNodes(nodes);
 				}
 				
 				
@@ -657,13 +668,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			if (rbF == null){
     				rbF = new RubbishBinFragment();
     				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+    				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
     				rbF.setIsList(isListRubbishBin);
     				rbF.setOrder(orderGetChildren);
+    				NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+    				rbF.setNodes(nodes);
     			}
     			else{
     				rbF.setIsList(isListRubbishBin);
     				rbF.setParentHandle(parentHandleRubbish);
     				rbF.setOrder(orderGetChildren);
+    				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
+    				rbF.setNodes(nodes);
     			}
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbF, "rbF").commit();
@@ -848,11 +864,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 		    	return true;
 		    }
-//	        case R.id.action_logout:{
-//	        	logout(this, (MegaApplication)getApplication(), megaApi);
-//	        	Toast.makeText(this,  "Temporal Logout Button Clicked!", Toast.LENGTH_SHORT).show();
-//	            return true;
-//	        }
 	        case R.id.action_search:{
 	        	mSearchView.setIconified(false);
 	        	return true;
@@ -1231,13 +1242,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
+			
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
+				if (statusDialog.isShowing()){
+					try { 
+						statusDialog.dismiss();	
+					} 
+					catch (Exception ex) {}
+					Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
+				}
+				
 				if (fbF != null){
 					if (fbF.isVisible()){
 						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -1247,9 +1262,21 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 				if (rbF != null){
 					if (rbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
+						if (isClearRubbishBin){
+							isClearRubbishBin = false;
+							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+							rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+							NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+							aB.setTitle(getString(R.string.section_rubbish_bin));	
+							getmDrawerToggle().setDrawerIndicatorEnabled(true);
+						}
+						else{
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
 					}
 				}
 			}
@@ -1467,6 +1494,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void moveToTrash(ArrayList<Long> handleList){
 		
+		isClearRubbishBin = false;
+		
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
@@ -1487,31 +1516,36 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				
 			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
 				moveToRubbish = true;
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.context_move_to_trash));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
 				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, this);
 			}
 			else{
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.context_delete_from_mega));
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
 				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), this);
 			}
+		}
+		
+		if (moveToRubbish){
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_move_to_trash));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+		}
+		else{
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_delete_from_mega));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
 		}
 	}
 	
@@ -1725,7 +1759,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 			statusDialog = temp;
 			
-			numClearRubbishBin = rubbishNodes.size();
+			isClearRubbishBin = true;
 			for (int i=0; i<rubbishNodes.size(); i++){
 				megaApi.remove(rubbishNodes.get(i), this);
 			}
@@ -2355,6 +2389,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
+		try { 
+			statusDialog.dismiss();	
+		} 
+		catch (Exception ex) {}
+		
 		if (fbF != null){
 			if (fbF.isVisible()){
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -2364,9 +2403,21 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		if (rbF != null){
 			if (rbF.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-				rbF.setNodes(nodes);
-				rbF.getListView().invalidateViews();
+				if (isClearRubbishBin){
+					isClearRubbishBin = false;
+					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+					rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+					NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+					rbF.setNodes(nodes);
+					rbF.getListView().invalidateViews();
+					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				}
+				else{
+					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+					rbF.setNodes(nodes);
+					rbF.getListView().invalidateViews();
+				}				
 			}
 		}
 	}

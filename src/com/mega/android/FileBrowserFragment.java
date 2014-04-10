@@ -259,6 +259,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 
 			listView.setAdapter(adapterList);
 			
+			setNodes(nodes);
+			
 			return v;
 		}
 		else{
@@ -289,6 +291,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			adapterGrid.setPositionClicked(-1);
 			
 			listView.setAdapter(adapterGrid);
+			
+			setNodes(nodes);
 			
 			return v;
 		}		
