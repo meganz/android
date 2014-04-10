@@ -162,10 +162,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     private AlertDialog renameDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog addContactDialog;
+    private AlertDialog clearRubbishBinDialog;
     
     private Handler handler;
     
     private boolean moveToRubbish = false;
+    
+    private int numClearRubbishBin = 0;
     
     ProgressDialog statusDialog;
     
@@ -385,9 +388,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			parentHandleBrowser = -1;
 			parentHandleRubbish = -1;
+			orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 			if (savedInstanceState != null){
 				firstTime = false;
 				int visibleFragment = savedInstanceState.getInt("visibleFragment");
+				orderGetChildren = savedInstanceState.getInt("orderGetChildren");
 				parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser");
 				parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish");
 				switch (visibleFragment){
@@ -447,6 +452,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	long pHBrowser = -1;
     	long pHRubbish = -1;
     	int visibleFragment = -1;
+    	int order = this.orderGetChildren;
     	if (fbF != null){
     		pHBrowser = fbF.getParentHandle();
     		if (fbF.isVisible()){
@@ -487,6 +493,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    	}
     	}
     	
+    	outState.putInt("orderGetChildren", order);
     	outState.putInt("visibleFragment", visibleFragment);
     	outState.putLong("parentHandleBrowser", pHBrowser);
     	outState.putLong("parentHandleRubbish", pHRubbish);
@@ -572,10 +579,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					fbF = new FileBrowserFragment();
 					fbF.setParentHandle(megaApi.getRootNode().getHandle());
 					fbF.setIsList(isListCloudDrive);
+					fbF.setOrder(orderGetChildren);
+				}
+				else{
+					fbF.setIsList(isListCloudDrive);
+					fbF.setParentHandle(parentHandleBrowser);
+					fbF.setOrder(orderGetChildren);
 				}
 				
-				fbF.setIsList(isListCloudDrive);
-				fbF.setParentHandle(parentHandleBrowser);
 				
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
 				if (isListCloudDrive){					
@@ -647,10 +658,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				rbF = new RubbishBinFragment();
     				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
     				rbF.setIsList(isListRubbishBin);
+    				rbF.setOrder(orderGetChildren);
     			}
-    			
-    			rbF.setIsList(isListRubbishBin);
-    			rbF.setParentHandle(parentHandleRubbish);
+    			else{
+    				rbF.setIsList(isListRubbishBin);
+    				rbF.setParentHandle(parentHandleRubbish);
+    				rbF.setOrder(orderGetChildren);
+    			}
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbF, "rbF").commit();
     			if (isListRubbishBin){
@@ -671,8 +685,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			
 	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			uploadMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			createFolderMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
 	    		}
 
     			break;
@@ -799,8 +812,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			uploadMenuItem.setVisible(true);
     			moreOptionsMenuItem.setVisible(true);
     			
-    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			createFolderMenuItem.setEnabled(false);
+    			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
     			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			uploadMenuItem.setEnabled(false);
     			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
@@ -851,6 +863,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	}
 	        	else if (drawerItem == DrawerItem.CONTACTS){
 	        		showNewContactDialog(null);
+	        	}
+	        	
+	        	else if (drawerItem == DrawerItem.RUBBISH_BIN){
+	        		showClearRubbishBinDialog(null);
 	        	}
 	        	return true;
 	        }
@@ -1047,6 +1063,45 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    	}
 					    	case 3:{
 					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}			    	
+					    	case 4:{
+					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+					    		break;
+					    	}
+				    	}
+				    }
+				});
+				builder.show();
+				break;
+			}
+			case RUBBISH_BIN:{
+				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setItems(options, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				    	switch(which){
+					    	case 0:{
+					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
+					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+					    		intent.putExtra("PARENT_HANDLE", parentHandleRubbish);
+					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		break;
+					    	}
+					    	case 1:{
+					    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
+					    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
+					    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
+					    		break;
+					    	}
+					    	case 2:{
+					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}
+					    	case 3:{
+					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
 					    		break;
 					    	}			    	
 					    	case 4:{
@@ -1500,6 +1555,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			}
 		}, 50);
 	}
+
+	public void showClearRubbishBinDialog(String editText){
+		if (rbF.isVisible()){
+			rbF.setPositionClicked(-1);
+			rbF.notifyDataSetChanged();
+		}
+		
+		String text;
+		if ((editText == null) || editText.equals("")){
+			text = getString(R.string.context_clear_rubbish);
+		}
+		else{
+			text = editText;
+		}
+		
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_clear_rubbish), null, null);
+		builder.setPositiveButton(getString(R.string.general_empty),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						clearRubbishBin();
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		clearRubbishBinDialog = builder.create();
+		clearRubbishBinDialog.show();
+	}
 	
 	public void showNewContactDialog(String editText){
 		if (cF.isVisible()){
@@ -1627,6 +1708,28 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
+	}
+	
+	private void clearRubbishBin(){
+		if (rbF != null){
+			NodeList rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode());
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_delete_from_mega));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+			
+			numClearRubbishBin = rubbishNodes.size();
+			for (int i=0; i<rubbishNodes.size(); i++){
+				megaApi.remove(rubbishNodes.get(i), this);
+			}
+		}
 	}
 	
 	private void addContact(String contactEmail){
@@ -2058,45 +2161,96 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
-			parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-			if (parentNode != null){
-				if (fbF != null){
-					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
+			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+				if (parentNode != null){
+					if (fbF != null){
+						if (fbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if (fbF != null){
+						if (fbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
 					}
 				}
 			}
-			else{
-				if (fbF != null){
-					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
+			else if (drawerItem == DrawerItem.RUBBISH_BIN){
+				parentHandleRubbish = intent.getLongExtra("PARENT_HANDLE", -1);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
+				if (parentNode != null){
+					if (rbF != null){
+						if (rbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if (rbF != null){
+						if (rbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
 					}
 				}
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
-			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 0);
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-			if (parentNode != null){
-				if (fbF != null){
-					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
+			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
+			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+				if (parentNode != null){
+					if (fbF != null){
+						if (fbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							fbF.setOrder(orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if (fbF != null){
+						if (fbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+							fbF.setOrder(orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
 					}
 				}
 			}
-			else{
-				if (fbF != null){
-					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
+			else if (drawerItem == DrawerItem.RUBBISH_BIN){
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
+				if (parentNode != null){
+					if (rbF != null){
+						if (rbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							rbF.setOrder(orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if (rbF != null){
+						if (rbF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							rbF.setOrder(orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
 					}
 				}
 			}
@@ -2208,7 +2362,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				fbF.getListView().invalidateViews();
 			}
 		}
-		else if (rbF != null){
+		if (rbF != null){
 			if (rbF.isVisible()){
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 				rbF.setNodes(nodes);

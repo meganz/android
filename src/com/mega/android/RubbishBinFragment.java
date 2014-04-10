@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
@@ -43,6 +44,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 	
 	boolean isList = true;
 	long parentHandle = -1;
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	NodeList nodes;
 	
@@ -204,14 +206,14 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRubbishNode().getHandle();
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-			nodes = megaApi.getChildren(megaApi.getRubbishNode());
+			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 			aB.setTitle(getString(R.string.section_rubbish_bin));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 			if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));	
@@ -345,7 +347,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					parentHandle = nodes.get(position).getHandle();
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 					adapterList.setParentHandle(parentHandle);
-					nodes = megaApi.getChildren(nodes.get(position));
+					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					
@@ -503,7 +505,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-					nodes = megaApi.getChildren(parentNode);
+					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					adapterList.setParentHandle(parentHandle);
@@ -542,7 +544,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-					nodes = megaApi.getChildren(parentNode);
+					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);
 					adapterGrid.setParentHandle(parentHandle);
@@ -662,6 +664,10 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 				adapterGrid.notifyDataSetChanged();
 			}
 		}
+	}
+	
+	public void setOrder(int orderGetChildren){
+		this.orderGetChildren = orderGetChildren;
 	}
 	
 	private static void log(String log) {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
@@ -31,6 +32,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -47,6 +49,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		
 	long parentHandle = -1;
 	boolean isList = true;
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	NodeList nodes;
 	
@@ -204,14 +207,14 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
 			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			nodes = megaApi.getChildren(megaApi.getRootNode());
+			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 			aB.setTitle(getString(R.string.section_cloud_drive));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 				aB.setTitle(getString(R.string.section_cloud_drive));	
@@ -333,7 +336,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					parentHandle = nodes.get(position).getHandle();
 					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 					adapterList.setParentHandle(parentHandle);
-					nodes = megaApi.getChildren(nodes.get(position));
+					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					
@@ -504,7 +507,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-					nodes = megaApi.getChildren(parentNode);
+					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					adapterList.setParentHandle(parentHandle);
@@ -543,7 +546,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-					nodes = megaApi.getChildren(parentNode);
+					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);
 					adapterGrid.setParentHandle(parentHandle);
@@ -663,6 +666,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	public boolean getIsList(){
 		return isList;
+	}
+	
+	public void setOrder(int orderGetChildren){
+		this.orderGetChildren = orderGetChildren;
 	}
 	
 	private static void log(String log) {
