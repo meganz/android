@@ -14,6 +14,7 @@
     <string name="general_download">Download</string>
     <string name="general_sort_by">Sort by</string>
     <string name="general_add">Add</string>
+    <string name="general_empty">Empty</string>
             
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
@@ -118,6 +119,7 @@
     <string name="context_creating_folder">Creating folder</string>
     <string name="context_adding_contact">Adding contact</string>
     <string name="context_download_to">Save to</string>
+    <string name="context_clear_rubbish">Clear Rubbish Bin</string>
   
     <string name="menu_new_folder">New folder</string>
     <string name="menu_add_contact">Add contact</string>
