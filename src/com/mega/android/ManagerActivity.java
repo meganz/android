@@ -1581,8 +1581,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				if (!fbF.isVisible() && !rbF.isVisible() && !cF.isVisible()) {
-					return;
+				if (fbF != null){
+					if (!fbF.isVisible()){
+						return;
+					}
+				}
+				if (rbF != null){
+					if (rbF.isVisible()){
+						return;
+					}
+				}
+				if (cF != null){
+					if (cF.isVisible()){
+						return;
+					}
 				}
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
