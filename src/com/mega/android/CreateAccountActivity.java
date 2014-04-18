@@ -145,6 +145,10 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	 */
 	private void submitForm() {
 		log("submit form!");
+		
+		Preferences.clearCredentials(this);
+		megaApi.logout();
+		
 		if (!validateForm()) {
 			return;
 		}
@@ -251,7 +255,8 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 		creatingAccountLayout.setVisibility(View.VISIBLE);
 		creatingAccountTextView.setVisibility(View.VISIBLE);
 		createAccountProgressBar.setVisibility(View.VISIBLE);
-		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
+		megaApi.createAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), userPassword.getText().toString(), userName.getText().toString(), this);
+//		megaApi.fastCreateAccount(userEmail.getText().toString().trim().toLowerCase(Locale.ENGLISH), privateKey, userName.getText().toString().trim(), this);
 	}
 	
 	@Override
@@ -264,6 +269,7 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 			MegaError e) {
 		log("onRequestFinish");
 		if (e.getErrorCode() != MegaError.API_OK) {
+			log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
 			String message = e.getErrorString();
 			if (e.getErrorCode() == MegaError.API_EEXIST) {
 				message = getString(R.string.error_email_registered);
@@ -302,8 +308,7 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	}
 
 	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
 		log ("onRequestTemporaryError");
 	}
 	
