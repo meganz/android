@@ -62,7 +62,17 @@
     <string name="tos">I agree with MEGA\'s &lt;a href="http://g.static.mega.co.nz/pages/terms.html"&gt;terms of service&lt;/a&gt;</string>
     <string name="button_create_account_text">Create account</string>
     <string name="already_account">Already have an account?</string>
-	
+    
+    <string name="create_account_no_terms">You have to accept our terms of service.</string>
+	<string name="error_enter_username">Please enter your name.</string>
+    <string name="error_short_password">Password is too short</string>
+    <string name="error_passwords_dont_match">Passwords don&quot;t match</string>
+    <string name="error_email_registered">This e-mail address has already registered an account with MEGA.</string>
+    
+    <string name="create_account_confirm_title">Confirmation required</string>
+    <string name="create_account_confirm">Please check your e-mail and click the link to login and confirm your account</string>
+    <string name="create_account_creating_account">Connecting to the server: creating account</string>
+    
 	<string name="section_cloud_drive">Cloud Drive</string>
 	<string name="section_saved_for_offline">Saved for Offline</string>
 	<string name="section_shared_with_me">Shared with me</string>
