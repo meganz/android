@@ -13,15 +13,16 @@
         android:gravity="center" >
         
 	    <LinearLayout 
+	        android:id="@+id/create_account_create_layout"
 	        android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="40dp"
+            android:paddingBottom="10dp"
             android:paddingTop="40dp" 
             android:background="@color/background" >
 	
 		    <TextView
-		        android:id="@+id/createAccountTextView"
+		        android:id="@+id/create_account_text_view"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:textSize="28sp"
@@ -30,7 +31,7 @@
 		        android:layout_gravity="center" />
 		    
 		    <EditText
-		        android:id="@+id/nameText"
+		        android:id="@+id/create_account_name_text"
 		        android:inputType="text"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
@@ -40,7 +41,7 @@
 		        style="@style/InputField" />	
 		    
 		    <EditText
-		        android:id="@+id/emailText"
+		        android:id="@+id/create_account_email_text"
 		        android:inputType="textEmailAddress"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
@@ -50,7 +51,17 @@
 		        style="@style/InputField" />		
 		    
 		    <EditText
-		        android:id="@+id/passwordText"
+		        android:id="@+id/create_account_password_text"
+		        android:inputType="textPassword"
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:hint="@string/password_text"
+		        android:imeOptions="actionNext"
+		        android:layout_gravity="center"
+		        style="@style/InputField" />
+		    
+		    <EditText
+		        android:id="@+id/create_account_password_text_confirm"
 		        android:inputType="textPassword"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
@@ -67,7 +78,7 @@
 		        <TableRow>
 		            
 		            <CheckBox
-				        android:id="@+id/chkTOS"
+				        android:id="@+id/create_account_chkTOS"
 				        android:layout_width="wrap_content"
 				        android:layout_height="wrap_content"
 				        style="@style/checkbox_MEGA" 
@@ -110,6 +121,7 @@
 	    <include layout="@layout/delimiter" />
 
         <LinearLayout
+            android:id="@+id/create_account_login_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -121,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="22sp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="@dimen/standard_margin"
                 android:textColor="@color/text_login"
                 android:text="@string/already_account"
@@ -135,6 +147,44 @@
             </Button>
             
         </LinearLayout>
+        
+        <LinearLayout
+		    android:id="@+id/create_account_creating_layout"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+		    android:orientation="vertical"
+		    android:gravity="center_horizontal|center_vertical" >
+        
+		    <ImageView 
+		        android:id="@+id/create_account_mega_logo"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/login_mega_logo"
+		        android:layout_marginTop="100dp"/>
+		    
+		    <TextView
+		        android:id="@+id/create_account_generating_keys_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/login_generating_key"
+		        android:layout_marginTop="30dp" />
+		    
+		    <TextView
+		        android:id="@+id/create_account_creating_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/create_account_creating_account" 
+		        android:layout_marginTop="5dp"/>
+		    
+		    <ProgressBar
+		        android:id="@+id/create_account_progress_bar"
+		        style="?android:attr/progressBarStyleLargeInverse"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:layout_marginTop="30dp" />
+	    
+	    </LinearLayout>
 	
 	</LinearLayout>
 	
