@@ -22,7 +22,7 @@
             android:id="@+id/login_login_layout" >
 	
 		    <TextView
-		        android:id="@+id/loginTextView"
+		        android:id="@+id/login_text_view"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:textSize="28sp"
@@ -31,7 +31,7 @@
 		        android:layout_gravity="center" />
 		    
 		    <EditText
-		        android:id="@+id/emailText"
+		        android:id="@+id/login_email_text"
 		        android:inputType="textEmailAddress"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
@@ -41,7 +41,7 @@
 		        style="@style/InputField" />		
 		    
 		    <EditText
-		        android:id="@+id/passwordText"
+		        android:id="@+id/login_password_text"
 		        android:inputType="textPassword"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
@@ -154,41 +154,55 @@
 		    android:orientation="vertical"
 		    android:gravity="center_horizontal|center_vertical" >
         
-	    <ImageView 
-	        android:id="@+id/login_mega_logo"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/login_mega_logo"
-	        android:layout_marginTop="100dp"/>
-	    
-	    <TextView
-	        android:id="@+id/login_generating_keys_text"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/login_generating_key"
-	        android:layout_marginTop="30dp" />
-	    
-	    <TextView
-	        android:id="@+id/login_logging_in_text"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/login_connecting_to_server" 
-	        android:layout_marginTop="5dp"/>
-	    
-	    <TextView
-	        android:id="@+id/login_fetch_nodes_text"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/download_updating_filelist"
-	        android:layout_marginTop="5dp" />
-	    
-	    <ProgressBar
-	        android:id="@+id/login_progress_bar"
-	        style="?android:attr/progressBarStyleLargeInverse"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center"
-	        android:layout_marginTop="30dp" />
+		    <ImageView 
+		        android:id="@+id/login_mega_logo"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/login_mega_logo"
+		        android:layout_marginTop="100dp"/>
+		    
+		    <TextView
+		        android:id="@+id/login_query_signup_link_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/login_querying_signup_link"
+		        android:layout_marginTop="30dp" />
+		    
+		    <TextView
+		        android:id="@+id/login_generating_keys_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/login_generating_key"
+		        android:layout_marginTop="30dp" />
+		    
+		    <TextView
+		        android:id="@+id/login_confirm_account_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/login_confirming_account"
+		        android:layout_marginTop="5dp" />
+		    
+		    <TextView
+		        android:id="@+id/login_logging_in_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/login_connecting_to_server" 
+		        android:layout_marginTop="5dp"/>
+		    
+		    <TextView
+		        android:id="@+id/login_fetch_nodes_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/download_updating_filelist"
+		        android:layout_marginTop="5dp" />
+		    
+		    <ProgressBar
+		        android:id="@+id/login_progress_bar"
+		        style="?android:attr/progressBarStyleLargeInverse"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:layout_marginTop="30dp" />
 	    
 	</LinearLayout>
 	

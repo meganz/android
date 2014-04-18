@@ -73,6 +73,22 @@
                 android:resource="@xml/searchable" />         
         </activity>
         
+        <activity android:name="OpenLinkActivity" android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" ></action>
+                <category android:name="android.intent.category.DEFAULT" ></category>
+                <category android:name="android.intent.category.BROWSABLE" ></category>
+                <data android:host="mega.co.nz" android:scheme="https" > </data>
+            </intent-filter>
+            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" ></action>
+                <category android:name="android.intent.category.DEFAULT" ></category>
+                <category android:name="android.intent.category.BROWSABLE" ></category>
+                <data android:scheme="mega" > </data>
+            </intent-filter>
+        </activity>
+        
         <activity
             android:name="FullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"

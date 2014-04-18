@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -42,7 +43,10 @@ import android.widget.Toast;
 public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
 	
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
+	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
+	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 	
+	TextView loginTitle;
 	EditText et_user;
 	EditText et_password;
 	Button bRegister;
@@ -53,6 +57,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	View loginDelimiter;
 	ProgressBar loginProgressBar;
 	TextView generatingKeysText;
+	TextView queryingSignupLinkText;
+	TextView confirmingAccountText;
 	TextView loggingInText;
 	TextView fetchingNodesText;
 	
@@ -112,82 +118,19 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	    
 	    setContentView(R.layout.activity_login);
 		
+	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
 		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
 		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
+		queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
+		confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
 		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		
-		credentials = Preferences.getCredentials(this);
-		if (credentials != null){
-			Intent intentReceived = getIntent();
-			if ((intentReceived != null) && (intentReceived.getAction() != null)){
-				if (intentReceived.getAction().equals(ACTION_REFRESH)){
-					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
-					loginLogin.setVisibility(View.GONE);
-					loginDelimiter.setVisibility(View.GONE);
-					loginCreateAccount.setVisibility(View.GONE);
-					loginLoggingIn.setVisibility(View.VISIBLE);
-					generatingKeysText.setVisibility(View.VISIBLE);
-					lastEmail = credentials.getEmail();
-					gPublicKey = credentials.getPublicKey();
-					gPrivateKey = credentials.getPrivateKey();
-					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
-					return;
-				}
-				else{
-					MegaNode rootNode = megaApi.getRootNode();
-					if (rootNode != null){
-						Intent intent = new Intent(this, ManagerActivity.class);
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-						}
-						this.startActivity(intent);
-						this.finish();
-						return;
-					}
-					else{
-						loginLogin.setVisibility(View.GONE);
-						loginDelimiter.setVisibility(View.GONE);
-						loginCreateAccount.setVisibility(View.GONE);
-						loginLoggingIn.setVisibility(View.VISIBLE);
-						generatingKeysText.setVisibility(View.VISIBLE);
-						lastEmail = credentials.getEmail();
-						gPublicKey = credentials.getPublicKey();
-						gPrivateKey = credentials.getPrivateKey();
-						megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
-						return;
-					}
-				}
-			}
-			else{
-				MegaNode rootNode = megaApi.getRootNode();
-				if (rootNode != null){
-					Intent intent = new Intent(this, ManagerActivity.class);
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-					}
-					this.startActivity(intent);
-					this.finish();
-					return;
-				}
-				else{
-					loginLogin.setVisibility(View.GONE);
-					loginDelimiter.setVisibility(View.GONE);
-					loginCreateAccount.setVisibility(View.GONE);
-					loginLoggingIn.setVisibility(View.VISIBLE);
-					generatingKeysText.setVisibility(View.VISIBLE);
-					lastEmail = credentials.getEmail();
-					gPublicKey = credentials.getPublicKey();
-					gPrivateKey = credentials.getPrivateKey();
-					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
-					return;
-				}
-			}
-		}		
+		loginTitle.setText(R.string.login_activity);
 		
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
@@ -196,9 +139,11 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		generatingKeysText.setVisibility(View.GONE);
 		loggingInText.setVisibility(View.GONE);
 		fetchingNodesText.setVisibility(View.GONE);
+		queryingSignupLinkText.setVisibility(View.GONE);
+		confirmingAccountText.setVisibility(View.GONE);
 		
-		et_user = (EditText) findViewById(R.id.emailText);
-		et_password = (EditText) findViewById(R.id.passwordText);
+		et_user = (EditText) findViewById(R.id.login_email_text);
+		et_password = (EditText) findViewById(R.id.login_password_text);
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
 			
 			@Override
@@ -233,10 +178,84 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		});
 		
-//		progress = new ProgressDialog(this);
-//		progress.setMessage(getString(R.string.login_logging_in));
-//		progress.setCancelable(false);
-//		progress.setCanceledOnTouchOutside(false);
+		Intent intentReceived = getIntent();
+		if (intentReceived != null && ACTION_CONFIRM.equals(intentReceived.getAction())) {
+			handleConfirmationIntent(intentReceived);
+			return;
+		}
+		
+		credentials = Preferences.getCredentials(this);
+		if (credentials != null){
+			if ((intentReceived != null) && (intentReceived.getAction() != null)){
+				if (intentReceived.getAction().equals(ACTION_REFRESH)){
+					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+					loginLogin.setVisibility(View.GONE);
+					loginDelimiter.setVisibility(View.GONE);
+					loginCreateAccount.setVisibility(View.GONE);
+					queryingSignupLinkText.setVisibility(View.GONE);
+					confirmingAccountText.setVisibility(View.GONE);
+					loginLoggingIn.setVisibility(View.VISIBLE);
+					generatingKeysText.setVisibility(View.VISIBLE);
+					lastEmail = credentials.getEmail();
+					gPublicKey = credentials.getPublicKey();
+					gPrivateKey = credentials.getPrivateKey();
+					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+					return;
+				}
+				else{
+					MegaNode rootNode = megaApi.getRootNode();
+					if (rootNode != null){
+						Intent intent = new Intent(this, ManagerActivity.class);
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+						}
+						this.startActivity(intent);
+						this.finish();
+						return;
+					}
+					else{
+						loginLogin.setVisibility(View.GONE);
+						loginDelimiter.setVisibility(View.GONE);
+						loginCreateAccount.setVisibility(View.GONE);
+						queryingSignupLinkText.setVisibility(View.GONE);
+						confirmingAccountText.setVisibility(View.GONE);
+						loginLoggingIn.setVisibility(View.VISIBLE);
+						generatingKeysText.setVisibility(View.VISIBLE);
+						lastEmail = credentials.getEmail();
+						gPublicKey = credentials.getPublicKey();
+						gPrivateKey = credentials.getPrivateKey();
+						megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+						return;
+					}
+				}
+			}
+			else{
+				MegaNode rootNode = megaApi.getRootNode();
+				if (rootNode != null){
+					Intent intent = new Intent(this, ManagerActivity.class);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					}
+					this.startActivity(intent);
+					this.finish();
+					return;
+				}
+				else{
+					loginLogin.setVisibility(View.GONE);
+					loginDelimiter.setVisibility(View.GONE);
+					loginCreateAccount.setVisibility(View.GONE);
+					queryingSignupLinkText.setVisibility(View.GONE);
+					confirmingAccountText.setVisibility(View.GONE);
+					loginLoggingIn.setVisibility(View.VISIBLE);
+					generatingKeysText.setVisibility(View.VISIBLE);
+					lastEmail = credentials.getEmail();
+					gPublicKey = credentials.getPublicKey();
+					gPrivateKey = credentials.getPrivateKey();
+					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+					return;
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -254,9 +273,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	
 	public void onLoginClick(View v){
 		submitForm();
-//		String username = et_user.getText().toString();
-//		String password = et_password.getText().toString();
-//		megaApi.login(username, password, LoginActivity.this);
 	}
 	
 	public void onRegisterClick(View v){
@@ -282,6 +298,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			loginLogin.setVisibility(View.VISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.VISIBLE);
+			queryingSignupLinkText.setVisibility(View.GONE);
+			confirmingAccountText.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
@@ -290,13 +308,13 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			return;
 		}
 		
-//		progress.setMessage(getString(R.string.login_generating_key));
-//		progress.show();
 		loginLogin.setVisibility(View.GONE);
 		loginDelimiter.setVisibility(View.GONE);
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
 		generatingKeysText.setVisibility(View.VISIBLE);
+		queryingSignupLinkText.setVisibility(View.GONE);
+		confirmingAccountText.setVisibility(View.GONE);
 		
 		lastEmail = et_user.getText().toString().toLowerCase(Locale.ENGLISH).trim();
 		lastPassword = et_password.getText().toString();
@@ -306,22 +324,44 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		new HashTask().execute(lastEmail, lastPassword);
 	}
 	
-	private void onKeysGenerated(final String privateKey, final String publicKey) {
+	private void onKeysGenerated(String privateKey, String publicKey) {
 		log("key generation finished");
 
+		this.gPrivateKey = privateKey;
+		this.gPublicKey = publicKey;
+		
 		if (confirmLink == null) {
 			onKeysGeneratedLogin(privateKey, publicKey);
 		} 
+		else{
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), true, this);
+				return;
+			}
+			
+			loginLogin.setVisibility(View.GONE);
+			loginDelimiter.setVisibility(View.GONE);
+			loginCreateAccount.setVisibility(View.GONE);
+			loginLoggingIn.setVisibility(View.VISIBLE);
+			generatingKeysText.setVisibility(View.VISIBLE);
+			queryingSignupLinkText.setVisibility(View.GONE);
+			confirmingAccountText.setVisibility(View.VISIBLE);
+			fetchingNodesText.setVisibility(View.GONE);
+			
+			log("fastConfirm");
+			megaApi.fastConfirmAccount(confirmLink, privateKey, this);
+		}
 	}
 	
 	private void onKeysGeneratedLogin(final String privateKey, final String publicKey) {
 		
 		if(!Util.isOnline(this)){
-//			try{ progress.dismiss(); } catch(Exception ex) {};
 			loginLoggingIn.setVisibility(View.GONE);
 			loginLogin.setVisibility(View.VISIBLE);
 			loginDelimiter.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.VISIBLE);
+			queryingSignupLinkText.setVisibility(View.GONE);
+			confirmingAccountText.setVisibility(View.GONE);
 			generatingKeysText.setVisibility(View.GONE);
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
@@ -330,7 +370,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			return;
 		}
 		
-//		progress.setMessage(getString(R.string.login_connecting_to_server));
 		loggingInText.setVisibility(View.VISIBLE);
 		
 		credentials = new UserCredentials(lastEmail,privateKey, publicKey);
@@ -393,7 +432,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		
 		if (request.getType() == MegaRequest.TYPE_FAST_LOGIN){
-			if (error.getErrorCode()!=MegaError.API_OK) {
+			if (error.getErrorCode() != MegaError.API_OK) {
 				String errorMessage;
 				if (error.getErrorCode() == MegaError.API_ENOENT) {
 					errorMessage = getString(R.string.error_incorrect_email_or_password);
@@ -404,11 +443,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				else {
 					errorMessage = error.getErrorString();
 				}
-//				try{ progress.dismiss(); } catch (Exception e){};
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.VISIBLE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
@@ -416,10 +456,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
-//				try{ 
-//					progress.setMessage(getString(R.string.download_updating_filelist));
-//				} 
-//				catch (Exception e){};
 
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				
@@ -429,10 +465,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			if (error.getErrorCode()!=MegaError.API_OK) {
+			if (error.getErrorCode() != MegaError.API_OK) {
 				String errorMessage;
 				errorMessage = error.getErrorString();
-//				try{ progress.dismiss(); } catch (Exception e){};
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
@@ -440,6 +475,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
 				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
@@ -459,8 +496,51 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						finish();
 					}
 				}
-			}
+			}	
+		}
+		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){
+			String s = "";
+			loginLogin.setVisibility(View.VISIBLE);
+			loginDelimiter.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.VISIBLE);
+			loginLoggingIn.setVisibility(View.GONE);
+			generatingKeysText.setVisibility(View.GONE);
+			queryingSignupLinkText.setVisibility(View.GONE);
+			confirmingAccountText.setVisibility(View.GONE);
+			fetchingNodesText.setVisibility(View.GONE);
 			
+			if(error.getErrorCode() == MegaError.API_OK){
+				s = request.getEmail();
+				et_user.setText(s);
+				et_password.requestFocus();
+			}
+			else{
+				Util.showErrorAlertDialog(error.getErrorString(), true, LoginActivity.this);
+				confirmLink = null;
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_FAST_CONFIRM_ACCOUNT){
+			if (error.getErrorCode() == MegaError.API_OK){
+				log("fastConfirm finished - OK");
+				onKeysGeneratedLogin(gPrivateKey, gPublicKey);
+			}
+			else{
+				loginLogin.setVisibility(View.VISIBLE);
+				loginDelimiter.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.VISIBLE);
+				loginLoggingIn.setVisibility(View.GONE);
+				generatingKeysText.setVisibility(View.GONE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
+				fetchingNodesText.setVisibility(View.GONE);
+				
+				if (error.getErrorCode() == MegaError.API_ENOENT){
+					Util.showErrorAlertDialog(getString(R.string.error_incorrect_email_or_password), false, LoginActivity.this);
+				}
+				else{
+					Util.showErrorAlertDialog(error.getErrorString(), false, LoginActivity.this);
+				}
+			}
 		}
 	}
 
@@ -476,6 +556,47 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		super.onBackPressed();
 	}
 	
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+	
+	public void onNewIntent(Intent intent){
+		if (intent != null && ACTION_CONFIRM.equals(intent.getAction())) {
+			handleConfirmationIntent(intent);
+		}
+	}
+	
+	/*
+	 * Handle intent from confirmation email
+	 */
+	private void handleConfirmationIntent(Intent intent) {
+		confirmLink = intent.getStringExtra(EXTRA_CONFIRMATION);
+		loginTitle.setText(R.string.login_confirm_account);
+		bLogin.setText(R.string.login_confirm_account);
+		updateConfirmEmail(confirmLink);
+	}
+	
+	/*
+	 * Get email address from confirmation code and set to emailView
+	 */
+	private void updateConfirmEmail(String link) {
+		if(!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), true, this);
+			return;
+		}
+		
+		loginLogin.setVisibility(View.GONE);
+		loginDelimiter.setVisibility(View.GONE);
+		loginCreateAccount.setVisibility(View.GONE);
+		loginLoggingIn.setVisibility(View.VISIBLE);
+		generatingKeysText.setVisibility(View.GONE);
+		queryingSignupLinkText.setVisibility(View.VISIBLE);
+		confirmingAccountText.setVisibility(View.GONE);
+		fetchingNodesText.setVisibility(View.GONE);
+		log("querySignupLink");
+		megaApi.querySignupLink(link, this);
+	}
 	
 	
 	public static void log(String message) {

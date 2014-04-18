@@ -55,6 +55,10 @@
     <string name="login_connecting_to_server">Connecting to the server</string>
     <string name="error_incorrect_email_or_password">Incorrect email or password. Have you validated your email account?</string>    
     <string name="download_updating_filelist">Updating file list</string>
+    <string name="login_confirm_account">Confirm account</string>
+    <string name="login_querying_signup_link">Checking validation link</string>
+    <string name="login_confirming_account">Activating account</string>
+    
     
     <string name="create_account_activity">Create account</string>
     <string name="create_account_text">Create an account</string>
