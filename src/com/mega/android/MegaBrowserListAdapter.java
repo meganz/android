@@ -92,6 +92,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 				break;
 			}
+			case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
+				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+				break;
+			}
 			default:{
 				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 				break;
@@ -317,6 +321,28 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionRename.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					holder.optionDelete.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				}
+				else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.VISIBLE);
+					holder.optionCopy.setVisibility(View.VISIBLE);
+					holder.optionMove.setVisibility(View.GONE);
+					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRename.setVisibility(View.VISIBLE);
+					holder.optionDelete.setVisibility(View.VISIBLE);
+					
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionProperties.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionCopy.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionMove.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionRename.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					holder.optionDelete.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 				}
 			}
@@ -560,6 +586,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		case ManagerActivity.RUBBISH_BIN_ADAPTER:{
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+			break;
+		}
+		case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
+			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 			break;
 		}
 		default:{

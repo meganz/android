@@ -213,13 +213,13 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 			if (parentNode == null){
 				parentNode = megaApi.getRubbishNode();
 				parentHandle = parentNode.getHandle();
 				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 			}
+			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 			if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));	
@@ -384,6 +384,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", position);
+						intent.putExtra("adapterType", ManagerActivity.RUBBISH_BIN_ADAPTER);
 						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 							intent.putExtra("parentNodeHandle", -1L);
 						}

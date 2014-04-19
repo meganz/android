@@ -75,7 +75,26 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
 		MegaNode parentNode;
 		if (parentNodeHandle == -1){
-			parentNode = megaApi.getRootNode();
+			int adapterType = intent.getIntExtra("adapterType", 0);
+			switch(adapterType){
+				case ManagerActivity.FILE_BROWSER_ADAPTER:{
+					parentNode = megaApi.getRootNode();
+					break;
+				}
+				case ManagerActivity.RUBBISH_BIN_ADAPTER:{
+					parentNode = megaApi.getRubbishNode();
+					break;
+				}
+				case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
+					parentNode = megaApi.getInboxNode();
+					break;
+				}
+				default:{
+					parentNode = megaApi.getRootNode();
+					break;
+				}
+			}
+			
 		}
 		else{
 			parentNode = megaApi.getNodeByHandle(parentNodeHandle);

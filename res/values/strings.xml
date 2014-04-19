@@ -92,6 +92,7 @@
 	
 	<string name="file_browser_empty_cloud_drive">Empty Cloud Drive</string>
 	<string name="file_browser_empty_rubbish_bin">Empty Rubbish Bin</string>
+	<string name="file_browser_empty_shared_with_me">Empty Inbox</string>
     <string name="file_browser_empty_folder">Empty Folder</string>
 	
 	<string name="file_properties_activity">Properties</string>
