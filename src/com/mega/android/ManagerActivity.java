@@ -113,6 +113,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
+	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -180,6 +181,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	ActionBar aB;
+	
+	String urlLink = "";
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -536,7 +539,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		log("intent != null");
     		if (intent.getAction() != null){
     			log("getAction != null");
-    			if(intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
+    			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
+    				handleOpenLinkIntent(intent);
+					intent.setAction(null);
+					setIntent(null);
+    			}
+    			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD");
 					Intent tempIntent = null;
 					String title = null;
@@ -577,6 +585,73 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		}
     	}
     }
+    
+    /*
+	 * Open MEGA link from intent from another app
+	 */
+	private void handleOpenLinkIntent(Intent intent) {
+		final String url = intent.getDataString();
+		log("url: " + url);
+
+		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
+			importLink(url);
+			intent.setData(null);
+		}
+	}
+	
+	/*
+	 * Show Import Dialog
+	 */
+	private void importLink(final String url) {
+		this.urlLink = url;
+		String[] parts = parseDownloadUrl(url);
+		if (parts == null) {
+			if (url != null && url.matches("^https://mega.co.nz/#F!.+$")){
+				Util.showErrorAlertDialog("importLink: Folder links not yet implemented", false, this);
+			}
+			else{
+				Util.showErrorAlertDialog(getString(R.string.manager_download_from_link_incorrect), false, this);
+			}
+			return;
+		}
+		
+		if(!Util.isOnline(this))
+		{
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),
+					false, this);
+			return;
+		}
+
+		if(this.isFinishing()) return;
+		
+		ProgressDialog temp = null;
+		try {
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.general_loading));
+			temp.show();
+		}
+		catch(Exception ex)
+		{ return; }
+		
+		final ProgressDialog progress = temp;
+		
+		megaApi.getPublicNode(url, this);
+	}
+	
+	/*
+	 * Check MEGA url and parse if valid
+	 */
+	private String[] parseDownloadUrl(String url) {
+		if (url == null) {
+			return null;
+		}
+		if (!url.matches("^https://mega.co.nz/#!.*!.*$")) {
+			return null;
+		}
+		String[] parts = url.split("!");
+		if(parts.length != 3) return null;
+		return new String[] { parts[1], parts[2] };
+	}
     
     public void selectDrawerItem(DrawerItem item){
     	switch (item){
@@ -1430,6 +1505,41 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 			}
 			log("add contact");
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
+			MegaNode n = request.getPublicNode();
+			
+			if (e.getErrorCode() != MegaError.API_OK) {
+				Util.showErrorAlertDialog(e, ManagerActivity.this);
+				return;
+			}
+			
+			if (n == null){
+				Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, ManagerActivity.this);
+				return;
+			}
+			
+			MegaNode parentNode = null;
+			if (fbF != null){
+				if (fbF.isVisible()){
+					parentHandleBrowser = fbF.getParentHandle();
+					parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+				}
+			}
+			
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+				parentHandleBrowser = megaApi.getRootNode().getHandle();
+			}
+			
+			ImportDialog importDialog = new ImportDialog();
+			importDialog.setMegaApi(megaApi);
+			importDialog.setInfo(n, parentNode.getHandle(), urlLink);
+			if(!ManagerActivity.this.isFinishing())	{
+				try { 
+					importDialog.show(getSupportFragmentManager(), "fragment_import"); 
+				} catch(Exception ex) {};
+			}
 		}
 	}
 
