@@ -12,6 +12,8 @@ import java.util.Date;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.mega.sdk.MegaError;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -94,6 +96,15 @@ public class Util {
 			Util.showToast(activity, message); 
 		}
 	}
+	
+	public static void showErrorAlertDialog(MegaError error, Activity activity) {
+		showErrorAlertDialog(error.getErrorString(), false, activity);
+	}
+	
+	public static void showErrorAlertDialog(int errorCode, Activity activity) {
+		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+	}
+	
 	/*
 	 * Build custom dialog
 	 * @param activity Source activity

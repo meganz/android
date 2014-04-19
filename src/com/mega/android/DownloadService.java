@@ -8,6 +8,8 @@ import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
 
@@ -37,7 +39,7 @@ import android.widget.Toast;
 /*
  * Background service to download files
  */
-public class DownloadService extends Service implements MegaTransferListenerInterface{
+public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface{
 
 	// Action to stop download
 	public static String ACTION_CANCEL = "CANCEL_DOWNLOAD";
@@ -199,11 +201,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return;
 		}
 		
-//		if(url != null){
-//			log("Public node");
-//			megaApi.getPublicNode(url, publicNodeListener);
-//			return;
-//		}
+		if(url != null){
+			log("Public node");
+			megaApi.getPublicNode(url, this);
+			return;
+		}
 		
 		currentDir = getDir(document, currentIntent);
 		currentFile = new File(currentDir, document.getName());
@@ -506,6 +508,33 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
+	
+	/*
+	 * Create new file to download to
+	 */
+	private File getFile(MegaNode document, Intent intent) {
+		boolean toDownloads = (intent.hasExtra(EXTRA_PATH) == false);
+		File file, destDir;
+		if (toDownloads) {
+			destDir = Environment
+					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		} else {
+			destDir = new File(intent.getStringExtra(EXTRA_PATH));
+		}
+		file = new File(destDir, new String(document.getName()));
+		for (int i = 0;; i++) {
+			String name = i == 0 ? new String(document.getName()) : (i + 1) + "_"
+					+ new String(document.getName());
+			file = new File(destDir, name);
+			if (file.exists() && (file.length() != document.getSize())) {
+				continue;
+			}
+			break;
+		}
+		
+		log("save to " + file.getAbsolutePath());
+		return file;
+	}
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
@@ -588,5 +617,38 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			MegaTransfer transfer, MegaError e) {
 		log("Download Temporary Error");
 		
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		log("onRequestStart: " + request.getName());
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("Public node received");
+		if (e.getErrorCode() != MegaError.API_OK) {
+			log("Public node error");
+			lastError = e.getErrorCode();
+			processQueue();
+			return;
+		}
+		else {
+			MegaNode node = request.getPublicNode().copy();
+			currentFile = getFile(node, currentIntent);
+			if(!checkCurrentFile(node)) return;
+			
+			log("Public node download launched");
+			if(!wl.isHeld()) wl.acquire();
+			if(!lock.isHeld()) lock.acquire();
+			megaApi.startPublicDownload(node, currentFile.getAbsolutePath(), this);
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestTemporaryError: " + request.getName());
 	}
 }
