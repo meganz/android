@@ -39,12 +39,19 @@ public class OpenLinkActivity extends Activity {
 		// Download link
 		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
 			log("open link url");
-			Intent openIntent = new Intent(this, ManagerActivity.class);
-			openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
-			openIntent.setData(Uri.parse(url));
-			startActivity(openIntent);
-			finish();
+//			Intent openIntent = new Intent(this, ManagerActivity.class);
+//			openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//			openIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+//			openIntent.setData(Uri.parse(url));
+//			startActivity(openIntent);
+//			finish();
+			
+			Intent errorIntent = new Intent(this, ManagerActivity.class);
+			errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(errorIntent);
+			finish();			
+			Toast toast = Toast.makeText(getApplicationContext(), "File link (not implemented yet)", Toast.LENGTH_LONG);
+			toast.show();
 			return;
 		}
 		

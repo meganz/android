@@ -118,6 +118,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
+	final public static int SHARED_WITH_ME_ADAPTER = 2003;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -148,12 +149,15 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	long parentHandleBrowser;
 	long parentHandleRubbish;
+	long parentHandleSharedWithMe;
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
+	private boolean isListSharedWithMe = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
+	private SharedWithMeFragment swmF;
     private TransfersFragment tF; 
     
     static ManagerActivity managerActivity;
@@ -397,6 +401,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			
 			parentHandleBrowser = -1;
 			parentHandleRubbish = -1;
+			parentHandleSharedWithMe = -1;
 			orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 			if (savedInstanceState != null){
 				firstTime = false;
@@ -404,6 +409,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				orderGetChildren = savedInstanceState.getInt("orderGetChildren");
 				parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser");
 				parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish");
+				parentHandleSharedWithMe = savedInstanceState.getLong("parentHandleSharedWithMe");
 				switch (visibleFragment){
 					case 1:{
 						drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -439,6 +445,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						drawerItem = DrawerItem.TRANSFERS;
 						break;
 					}
+					case 8:{
+						drawerItem = DrawerItem.SHARED_WITH_ME;
+						isListSharedWithMe = true;
+						break;
+					}
+					case 9:{
+						drawerItem = DrawerItem.SHARED_WITH_ME;
+						isListSharedWithMe = false;
+						break;
+					}
 				}
 			}
 			
@@ -460,6 +476,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	
     	long pHBrowser = -1;
     	long pHRubbish = -1;
+    	long phSharedWithMe = -1;
     	int visibleFragment = -1;
     	int order = this.orderGetChildren;
     	if (fbF != null){
@@ -496,6 +513,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		}
     	}
     	
+    	if (swmF != null){
+    		phSharedWithMe = swmF.getParentHandle();
+    		if (swmF.isVisible()){
+    			if (isListSharedWithMe){
+    				visibleFragment = 8;
+    			}
+    			else{
+    				visibleFragment = 9;
+    			}
+    		}
+    	}
+    	
     	if (tF != null){
 	    	if (tF.isVisible()){
 	    		visibleFragment = 7;
@@ -506,6 +535,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	outState.putInt("visibleFragment", visibleFragment);
     	outState.putLong("parentHandleBrowser", pHBrowser);
     	outState.putLong("parentHandleRubbish", pHRubbish);
+    	outState.putLong("parentHandleSharedWithMe", phSharedWithMe);
     }
     
     @Override
@@ -633,7 +663,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		catch(Exception ex)
 		{ return; }
 		
-		final ProgressDialog progress = temp;
+		statusDialog = temp;
 		
 		megaApi.getPublicNode(url, this);
 	}
@@ -781,6 +811,50 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
     			break;
     		}
+    		case SHARED_WITH_ME:{
+    			
+    			if (swmF == null){
+    				swmF = new SharedWithMeFragment();
+    				swmF.setParentHandle(megaApi.getInboxNode().getHandle());
+    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
+    				swmF.setIsList(isListSharedWithMe);
+    				swmF.setOrder(orderGetChildren);
+    				NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+    				swmF.setNodes(nodes);
+    			}
+    			else{
+    				swmF.setIsList(isListSharedWithMe);
+    				swmF.setParentHandle(parentHandleSharedWithMe);
+    				swmF.setOrder(orderGetChildren);
+    				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
+    				swmF.setNodes(nodes);
+    			}
+    			
+    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, swmF, "swmF").commit();
+    			if (isListSharedWithMe){
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+				}
+				else{
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    			}
+    			
+    			customListGrid.setVisibility(View.VISIBLE);
+    			customSearch.setVisibility(View.VISIBLE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			uploadMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+	    		}
+    			
+    			break;
+    		}
     		case TRANSFERS:{
     			
     			if (tF == null){
@@ -801,6 +875,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	@Override
 	public void onBackPressed() {
+		try { 
+			statusDialog.dismiss();	
+		} 
+		catch (Exception ex) {}
+		
 		if (fbF != null){
 			if (fbF.isVisible()){
 				if (fbF.onBackPressed() == 0){
@@ -823,6 +902,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if (rbF != null){
 			if (rbF.isVisible()){
 				if (rbF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					return;
+				}
+			}
+		}
+		
+		if (swmF != null){
+			if (swmF.isVisible()){
+				if (swmF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
 					return;
@@ -909,6 +998,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
 			}
 		}
+		
+		if (swmF != null){
+			if (swmF.isVisible()){
+				createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			uploadMenuItem.setEnabled(false);
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			createFolderMenuItem.setEnabled(false);
+    		}
+		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -934,6 +1036,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		    		if (rbF != null){
 		    			if (rbF.isVisible()){
 		    				rbF.onBackPressed();
+		    			}
+		    		}
+		    		if (swmF != null){
+		    			if (swmF.isVisible()){
+		    				swmF.onBackPressed();
 		    			}
 		    		}
 				}
@@ -1051,6 +1158,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						fragTransaction.commit();
 						
 						if (isListRubbishBin){
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+						}
+						else{
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+						}
+					}
+				}
+				
+				if (swmF != null){
+					if (swmF.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("swmF");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commit();
+						
+						isListSharedWithMe = !isListSharedWithMe;
+						swmF.setIsList(isListSharedWithMe);
+						swmF.setParentHandle(parentHandleSharedWithMe);
+						
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commit();
+						
+						if (isListSharedWithMe){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
 						}
@@ -1200,6 +1333,45 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				builder.show();
 				break;
 			}
+			case SHARED_WITH_ME:{
+				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setItems(options, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				    	switch(which){
+					    	case 0:{
+					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
+					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+					    		intent.putExtra("PARENT_HANDLE", parentHandleSharedWithMe);
+					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		break;
+					    	}
+					    	case 1:{
+					    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
+					    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
+					    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
+					    		break;
+					    	}
+					    	case 2:{
+					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}
+					    	case 3:{
+					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}			    	
+					    	case 4:{
+					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+					    		break;
+					    	}
+				    	}
+				    }
+				});
+				builder.show();
+				break;
+			}
 		}
 	}
 	
@@ -1285,6 +1457,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 							rbF.getListView().invalidateViews();
 						}
 					}
+					
+					if (swmF != null){
+						if (swmF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+							swmF.setNodes(nodes);
+							swmF.getListView().invalidateViews();
+						}
+					}
 				}
 				else{
 					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
@@ -1307,6 +1487,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
+						}
+					}
+					if (swmF != null){
+						if (swmF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+							swmF.setNodes(nodes);
+							swmF.getListView().invalidateViews();
 						}
 					}
 				}
@@ -1352,6 +1539,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
+					}
+				}
+				if (swmF != null){
+					if (swmF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						swmF.setNodes(nodes);
+						swmF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -1403,6 +1597,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						rbF.getListView().invalidateViews();
 					}
 				}
+				if (swmF != null){
+					if (swmF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						swmF.setNodes(nodes);
+						swmF.getListView().invalidateViews();
+					}
+				}
 			}
 			else{
 				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
@@ -1428,6 +1629,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 						rbF.setNodes(nodes);
 						rbF.getListView().invalidateViews();
+					}
+				}
+				if (swmF != null){
+					if (swmF.isVisible()){
+						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						swmF.setNodes(nodes);
+						swmF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -1507,6 +1715,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			log("add contact");
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
+			
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
 			MegaNode n = request.getPublicNode();
 			
 			if (e.getErrorCode() != MegaError.API_OK) {
@@ -1535,11 +1749,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			ImportDialog importDialog = new ImportDialog();
 			importDialog.setMegaApi(megaApi);
 			importDialog.setInfo(n, parentNode.getHandle(), urlLink);
-			if(!ManagerActivity.this.isFinishing())	{
-				try { 
-					importDialog.show(getSupportFragmentManager(), "fragment_import"); 
-				} catch(Exception ex) {};
-			}
+			try { 
+				importDialog.show(getSupportFragmentManager(), "fragment_import"); 
+			} catch(Exception ex) {
+				Toast.makeText(this, "Error al mostrar el dialog: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+			};
 		}
 	}
 
@@ -1703,6 +1917,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 				if (cF != null){
 					if (cF.isVisible()){
+						return;
+					}
+				}
+				if (swmF != null){
+					if (swmF.isVisible()){
 						return;
 					}
 				}
@@ -2361,6 +2580,28 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					}
 				}
 			}
+			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				parentHandleSharedWithMe = intent.getLongExtra("PARENT_HANDLE", -1);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSharedWithMe);
+				if (parentNode != null){
+					if (swmF != null){
+						if (swmF.isVisible()){
+							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							swmF.setNodes(nodes);
+							swmF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if (swmF != null){
+						if (swmF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+							swmF.setNodes(nodes);
+							swmF.getListView().invalidateViews();
+						}
+					}
+				}
+			}
 		}
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
@@ -2406,6 +2647,29 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 							rbF.setOrder(orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
+						}
+					}
+				}
+			}
+			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSharedWithMe);
+				if (parentNode != null){
+					if (swmF != null){
+						if (swmF.isVisible()){
+							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							swmF.setOrder(orderGetChildren);
+							swmF.setNodes(nodes);
+							swmF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if (swmF != null){
+						if (swmF.isVisible()){
+							NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+							swmF.setOrder(orderGetChildren);
+							swmF.setNodes(nodes);
+							swmF.getListView().invalidateViews();
 						}
 					}
 				}
@@ -2542,6 +2806,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}				
 			}
 		}
+		if (swmF != null){
+			if (swmF.isVisible()){
+				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+				swmF.setNodes(nodes);
+				swmF.getListView().invalidateViews();
+			}
+		}
 	}
 
 	@Override
@@ -2555,6 +2826,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void setParentHandleRubbish(long parentHandleRubbish){
 		this.parentHandleRubbish = parentHandleRubbish;
+	}
+	
+	public void setParentHandleSharedWithMe(long parentHandleSharedWithMe){
+		this.parentHandleSharedWithMe = parentHandleSharedWithMe;
 	}
 
 	public static void log(String message) {
