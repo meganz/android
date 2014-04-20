@@ -18,7 +18,14 @@
     <string name="general_loading">Loading&#8230;</string>
     <string name="general_importing">Importing&#8230;</string>
     <string name="general_import">Import</string>
-            
+    <string name="general_updating">Updating&#8230;</string>  
+    <string name="general_storage">Storage</string>
+    <string name="general_bandwidth">Bandwidth</string> 
+    
+    <string name="general_pro_1">Pro I</string>
+    <string name="general_pro_2">Pro II</string>
+    <string name="general_pro_3">Pro III</string>
+    
     <string name="action_logout">Logout</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
@@ -163,4 +170,31 @@
 	<string name="manager_folder_is_empty">Empty Folder</string>
 	<string name="manager_new_folder_name">Folder Name</string>
 	<string name="manager_download_from_link_incorrect">Incorrect link format</string>
+	
+	<string name="my_account_activity">Account</string>
+    <string name="my_account_total_space">Storage Space</string>
+    <string name="my_account_free_space">Free Space</string>
+    <string name="my_account_used_space">Used space</string>
+    <string name="my_account_upgrade_pro">Upgrade to Pro</string>
+    <string name="my_account_change_password">Change password</string>
+    
+    <string name="my_account_changing_password">Changing password</string>
+    <string name="my_account_change_password_oldPassword">Current password</string>
+    <string name="my_account_change_password_newPassword1">New password</string>
+    <string name="my_account_change_password_newPassword2">Confirm new password</string>
+    <string name="my_account_change_password_error">Incorrect current password or the new passwords you provided do not match. Please try again.</string>
+    <string name="my_account_change_password_OK">Password changed successfully</string>
+    
+    <string name="change_password_activity">Change password</string>
+    
+    <string name="upgrade_activity">Pro Membership</string>
+    <string name="upgrade_choose_package">Choose your Package</string>
+    <string name="upgrade_select_pricing">Select pricing</string>
+    <string name="upgrade_per_month">per month</string>
+    <string name="upgrade_per_year">per year</string>
+    
+    <string name="error_entity_not_found">Entity not found</string>
+    <string name="error_user_blocked">Owner of this file is blocked</string>
+    
+    
 </resources>

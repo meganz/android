@@ -1,0 +1,165 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UpgradePaymentActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+        
+        <!-- Account type -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_secondary"
+            android:gravity="center_vertical"
+            >
+            <ImageView 
+                android:id="@+id/package_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                android:src="@drawable/pro_2"
+                />
+            <TextView
+                android:id="@+id/package_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                />
+        </LinearLayout>
+        
+        <include layout="@layout/delimiter" />
+        
+        <!-- Storage -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            >
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                android:src="@drawable/ic_storage"
+                />
+            <TextView
+                android:id="@+id/storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginLeft="@dimen/standard_margin"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/mega"
+                android:layout_marginLeft="@dimen/standard_margin_half"
+                android:text="@string/general_storage"
+                />
+        </LinearLayout>
+        
+        <!-- Bandwidth -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            >
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                android:src="@drawable/ic_bandwidth"
+                />
+            <TextView
+                android:id="@+id/bandwidth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginLeft="@dimen/standard_margin"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginLeft="@dimen/standard_margin_half"
+                android:textColor="@color/mega"
+                android:text="@string/general_bandwidth"
+                />
+        </LinearLayout>
+
+        <!-- Select Pricing -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@color/mega"
+            >
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                android:src="@drawable/pro_2"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:text="@string/upgrade_select_pricing"
+                />
+        </LinearLayout>
+        
+        
+         <!-- Per month -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/list_selector_holo_light"
+            android:onClick="onMonthlyClick"
+            >
+            <TextView
+                android:id="@+id/per_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin_double"
+                />
+        </LinearLayout>
+        
+        <include layout="@layout/delimiter" />
+        
+        <!-- Per year -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/list_selector_holo_light"
+            android:onClick="onYearlyClick"
+            >
+            <TextView
+                android:id="@+id/per_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/mega"
+                android:layout_margin="@dimen/standard_margin_double"
+                />
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_save_17"
+                />
+        </LinearLayout>
+        
+        <include layout="@layout/delimiter" />
+        
+    </LinearLayout>
+
+</ScrollView>

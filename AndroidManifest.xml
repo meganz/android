@@ -138,6 +138,21 @@
             android:theme="@android:style/Theme.Dialog">
         </activity>
         
+        <activity
+            android:name="ChangePasswordActivity"
+            android:label="@string/change_password_activity" >
+        </activity>
+        
+        <activity
+            android:name="UpgradeActivity"
+            android:label="@string/upgrade_activity" >
+        </activity>
+        
+        <activity
+            android:name="UpgradePaymentActivity"
+            android:label="@string/upgrade_activity" >
+        </activity>
+        
         <service
             android:name="DownloadService"
             android:exported="false" >

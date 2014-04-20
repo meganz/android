@@ -159,6 +159,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private RubbishBinFragment rbF;
 	private SharedWithMeFragment swmF;
     private TransfersFragment tF; 
+    private MyAccountFragment maF;
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
@@ -455,6 +456,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						isListSharedWithMe = false;
 						break;
 					}
+					case 10:{
+						drawerItem = DrawerItem.ACCOUNT;
+						break;
+					}
 				}
 			}
 			
@@ -529,6 +534,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    	if (tF.isVisible()){
 	    		visibleFragment = 7;
 	    	}
+    	}
+    	
+    	if (maF != null){
+    		if (maF.isVisible()){
+    			visibleFragment = 10;
+    		}
     	}
     	
     	outState.putInt("orderGetChildren", order);
@@ -855,6 +866,31 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			break;
     		}
+    		case ACCOUNT:{
+    			
+    			if (maF == null){
+    				maF = new MyAccountFragment();
+    			}
+    			
+    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, maF, "maF").commit();
+    			customListGrid.setVisibility(View.GONE);
+    			customSearch.setVisibility(View.GONE);
+    			
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			uploadMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+	    		}
+    			
+    			break;
+    		}
     		case TRANSFERS:{
     			
     			if (tF == null){
@@ -866,6 +902,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			uploadMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+	    		}
+    			
     			break;
     		}
 		default:
@@ -922,6 +969,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if (tF != null){
 			if (tF.isVisible()){
 				if (tF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					return;
+				}
+			}
+		}
+		
+		if (maF != null){
+			if (maF.isVisible()){
+				if (maF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
 					return;
@@ -1010,6 +1067,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
     		}
+		}
+		
+		if (maF != null){
+			if (maF.isVisible()){
+				createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			uploadMenuItem.setEnabled(false);
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			createFolderMenuItem.setEnabled(false);
+			}
+		}
+		
+		if (tF != null){
+			if (tF.isVisible()){
+				createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			uploadMenuItem.setEnabled(false);
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			createFolderMenuItem.setEnabled(false);
+			}
 		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
@@ -1244,8 +1327,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    		break;
 					    	}
 					    	case 3:{
-					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
+					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+								startActivity(intent);
+								break;
 					    	}			    	
 					    	case 4:{
 					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
@@ -1281,8 +1365,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    		break;
 					    	}
 					    	case 3:{
-					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
+					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+								startActivity(intent);
+								break;
 					    	}			    	
 					    	case 4:{
 					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
@@ -1320,7 +1405,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    		break;
 					    	}
 					    	case 3:{
-					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+								startActivity(intent);
 					    		break;
 					    	}			    	
 					    	case 4:{
@@ -1359,10 +1445,38 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					    		break;
 					    	}
 					    	case 3:{
-					    		Toast.makeText(managerActivity, "Upgrade Account not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
+					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+								startActivity(intent);
+								break;
 					    	}			    	
 					    	case 4:{
+					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+					    		break;
+					    	}
+				    	}
+				    }
+				});
+				builder.show();
+				break;
+			}			
+			case ACCOUNT:{
+				CharSequence options[] = new CharSequence[] {"Help", "Upgrade Account", "Logout"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setItems(options, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				    	switch(which){
+					    	case 0:{
+					    		Toast.makeText(managerActivity, "Help not yet implemented (logout is implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}
+					    	case 1:{
+					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+								startActivity(intent);
+								break;
+					    	}			    	
+					    	case 2:{
 					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
 					    		break;
 					    	}

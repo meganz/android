@@ -17,11 +17,13 @@ import com.mega.sdk.MegaError;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.ConnectivityManager;
@@ -54,6 +56,28 @@ public class Util {
 	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = true;
+	
+	/*
+	 * Create progress dialog helper
+	 */
+	public static ProgressDialog createProgress(Context context, String message) {
+		ProgressDialog progress = new ProgressDialog(context);
+		progress.setMessage(message);
+		progress.setCancelable(false);
+		progress.setCanceledOnTouchOutside(false);
+		return progress;
+	}
+	
+	/*
+	 * Create progress dialog with resId
+	 */
+	public static ProgressDialog createProgress(Context context, int stringResId) {
+		return createProgress(context, context.getString(stringResId));
+	}
+	
+	public static void showErrorAlertDialogFinish(MegaError error, Activity activity) {
+		showErrorAlertDialog(error.getErrorString(), true, activity);
+	}
 	
 	/*
 	 * Build error dialog
@@ -421,6 +445,14 @@ public class Util {
 			inputStream.close();
 			outputStream.close();
 		}
+	}
+	
+	/*
+	 * Start activity to open URL
+	 */
+	public static void openUrl(Context context, String url) {
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		context.startActivity(intent);
 	}
 	
 	private static void log(String message) {
