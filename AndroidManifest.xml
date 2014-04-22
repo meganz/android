@@ -100,8 +100,7 @@
         <activity
             android:name="FilePropertiesActivity"
             android:label="@string/file_properties_activity"
-            android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow" >            
+            android:launchMode="singleTop">            
         </activity>
         
         <activity
