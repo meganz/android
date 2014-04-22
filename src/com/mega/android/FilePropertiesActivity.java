@@ -8,22 +8,32 @@ import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.NodeList;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +55,11 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	
 	ProgressDialog statusDialog;
 	
+	private static int EDIT_TEXT_ID = 1;
+	private Handler handler;
+	
+	private AlertDialog renameDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,6 +69,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			megaApi = app.getMegaApi();
 		}
 		filePropertiesActivity = this;
+		handler = new Handler();
 		
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
@@ -74,7 +90,10 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			String name = extras.getString("name");
 			handle = extras.getLong("handle", -1);
 			node = megaApi.getNodeByHandle(handle);
-			
+			if (node != null){
+				name = node.getName();
+			}
+					
 			setContentView(R.layout.activity_file_properties);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
 			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
@@ -124,8 +143,108 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    	getPublicLinkAndShareIt(node);
 		    	return true;
 		    }
+		    case R.id.action_file_properties_rename:{
+		    	showRenameDialog(node, node.getName());
+		    	return true;
+		    }
 		}	    
 	    return super.onOptionsItemSelected(item);
+	}
+	
+	/*
+	 * Display keyboard
+	 */
+	private void showKeyboardDelayed(final View view) {
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
+	
+	public void showRenameDialog(final MegaNode document, String text){
+		
+		final EditText input = new EditText(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+		input.setImeActionLabel(getString(R.string.context_rename),
+				KeyEvent.KEYCODE_ENTER);
+		input.setText(text);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(final View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(document.getName()), null, input);
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						rename(document, value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		renameDialog = builder.create();
+		renameDialog.show();
+
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					renameDialog.dismiss();
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					rename(document, value);
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+	
+	private void rename(MegaNode document, String newName){
+		if (newName.equals(document.getName())) {
+			return;
+		}
+		
+		if(!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if (isFinishing()){
+			return;
+		}
+		
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_renaming));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		
+		log("renaming " + document.getName() + " to " + newName);
+		
+		megaApi.renameNode(document, newName, this);
 	}
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
@@ -192,6 +311,21 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				Toast.makeText(this, "Impossible to get the link", Toast.LENGTH_LONG).show();
 			}
 			log("export request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
+			
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
+				nameView.setText(megaApi.getNodeByHandle(request.getNodeHandle()).getName());
+			}			
+			else{
+				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 
