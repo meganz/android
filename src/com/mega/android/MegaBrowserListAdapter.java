@@ -475,6 +475,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			case R.id.file_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
+				i.putExtra("handle", n.getHandle());
 			
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.mime_folder);

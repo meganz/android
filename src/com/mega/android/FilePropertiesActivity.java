@@ -2,7 +2,16 @@ package com.mega.android;
 
 import com.mega.components.MySwitch;
 import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -19,7 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener {
+public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface {
 	
 	TextView nameView;
 	TextView availableOfflineView;
@@ -28,9 +37,23 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	MySwitch availableSwitch;	
 	ActionBar aB;
 	
+	MegaNode node;
+	long handle;
+	
+	private MegaApiAndroid megaApi = null;
+	public FilePropertiesActivity filePropertiesActivity;
+	
+	ProgressDialog statusDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (megaApi == null){
+			MegaApplication app = (MegaApplication)getApplication();
+			megaApi = app.getMegaApi();
+		}
+		filePropertiesActivity = this;
 		
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
@@ -49,6 +72,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		if (extras != null){
 			int imageId = extras.getInt("imageId");
 			String name = extras.getString("name");
+			handle = extras.getLong("handle", -1);
+			node = megaApi.getNodeByHandle(handle);
 			
 			setContentView(R.layout.activity_file_properties);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
@@ -95,8 +120,37 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    	finish();
 		    	return true;
 		    }
+		    case R.id.action_file_properties_get_link:{
+		    	getPublicLinkAndShareIt(node);
+		    	return true;
+		    }
 		}	    
 	    return super.onOptionsItemSelected(item);
+	}
+	
+	public void getPublicLinkAndShareIt(MegaNode document){
+		
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_creating_link));
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		
+		megaApi.exportNode(document, this);
 	}
 	
 	@Override
@@ -110,4 +164,44 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		log("onRequestStart: " + request.getName());
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestFinish");
+		if (request.getType() == MegaRequest.TYPE_EXPORT){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				String link = request.getLink();
+				if (filePropertiesActivity != null){
+					Intent intent = new Intent(Intent.ACTION_SEND);
+					intent.setType("text/plain");
+					intent.putExtra(Intent.EXTRA_TEXT, link);
+					startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+				}
+			}
+			else{
+				Toast.makeText(this, "Impossible to get the link", Toast.LENGTH_LONG).show();
+			}
+			log("export request finished");
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestTemporaryError: " + request.getName());
+	}
+
+	public static void log(String message) {
+		Util.log("FilePropertiesActivity", message);
+	}
 }
