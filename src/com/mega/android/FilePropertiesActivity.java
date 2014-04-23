@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.util.ArrayList;
+
 import com.mega.components.MySwitch;
 import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
@@ -59,6 +61,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	private Handler handler;
 	
 	private AlertDialog renameDialog;
+
+	boolean moveToRubbish = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +151,9 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    	showRenameDialog(node, node.getName());
 		    	return true;
 		    }
+		    case R.id.action_file_properties_remove:{
+		    	moveToTrash(node.getHandle());
+		    }
 		}	    
 	    return super.onOptionsItemSelected(item);
 	}
@@ -162,6 +169,60 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
+	}
+	
+	public void moveToTrash(long handle){
+		
+		moveToRubbish = false;
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		MegaNode rubbishNode = megaApi.getRubbishNode();
+
+		//Check if the node is not yet in the rubbish bin (if so, remove it)
+		MegaNode parent = megaApi.getNodeByHandle(handle);
+		while (megaApi.getParentNode(parent) != null){
+			parent = megaApi.getParentNode(parent);
+		}
+			
+		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+			moveToRubbish = true;
+			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, this);
+		}
+		else{
+			megaApi.remove(megaApi.getNodeByHandle(handle), this);
+		}
+		
+		if (moveToRubbish){
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_move_to_trash));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+		}
+		else{
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_delete_from_mega));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+		}
 	}
 	
 	public void showRenameDialog(final MegaNode document, String text){
@@ -326,6 +387,51 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			else{
 				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
 			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_MOVE){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (moveToRubbish){
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
+					finish();
+				}
+				else{
+					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				}
+				moveToRubbish = false;
+				log("move to rubbish request finished");
+			}
+			else{
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(this, "The file has not been moved", Toast.LENGTH_LONG).show();
+				}
+				log("move nodes request finished");
+			}
+		}
+else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (statusDialog.isShowing()){
+					try { 
+						statusDialog.dismiss();	
+					} 
+					catch (Exception ex) {}
+					Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
+				}
+				finish();
+			}
+			else{
+				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+			}
+			log("remove request finished");
 		}
 	}
 
