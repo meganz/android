@@ -1,7 +1,12 @@
 package com.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.MySwitch;
 import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
@@ -18,8 +23,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StatFs;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
@@ -63,6 +72,9 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	private AlertDialog renameDialog;
 
 	boolean moveToRubbish = false;
+	
+	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +155,12 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    	finish();
 		    	return true;
 		    }
+		    case R.id.action_file_properties_download:{
+		    	ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(node.getHandle());
+				downloadNode(handleList);
+				return true;
+		    }
 		    case R.id.action_file_properties_get_link:{
 		    	getPublicLinkAndShareIt(node);
 		    	return true;
@@ -153,6 +171,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    }
 		    case R.id.action_file_properties_remove:{
 		    	moveToTrash(node.getHandle());
+		    	return true;
 		    }
 		}	    
 	    return super.onOptionsItemSelected(item);
@@ -169,6 +188,20 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
+	}
+	
+	public void downloadNode(ArrayList<Long> handleList){
+		
+		long[] hashes = new long[handleList.size()];
+		for (int i=0;i<handleList.size();i++){
+			hashes[i] = handleList.get(i);
+		}
+		
+		Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+		intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+		intent.setClass(this, FileStorageActivity.class);
+		intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 	}
 	
 	public void moveToTrash(long handle){
@@ -439,6 +472,134 @@ else if (request.getType() == MegaRequest.TYPE_REMOVE){
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestTemporaryError: " + request.getName());
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		
+		if (intent == null) {
+			return;
+		}
+		
+		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+			log("local folder selected");
+			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
+			double availableFreeSpace = Double.MAX_VALUE;
+			try{
+				StatFs stat = new StatFs(parentPath);
+				availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+			}
+			catch(Exception ex){}
+			
+			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
+			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
+			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
+			
+			if(hashes.length == 1){
+				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					if(localPath != null){	
+						try { 
+							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
+						}
+						catch(Exception e) {}
+						
+						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+						if (isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else{
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							if (isIntentAvailable(this, intentShare))
+								startActivity(intentShare);
+							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+						}								
+						return;
+					}
+				}
+			}
+			
+			for (long hash : hashes) {
+				MegaNode node = megaApi.getNodeByHandle(hash);
+				if(node != null){
+					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+					if (node.getType() == MegaNode.TYPE_FOLDER) {
+						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+					} else {
+						dlFiles.put(node, parentPath);
+					}
+					
+					for (MegaNode document : dlFiles.keySet()) {
+						
+						String path = dlFiles.get(document);
+						
+						if(availableFreeSpace <document.getSize()){
+							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							continue;
+						}
+						
+						Intent service = new Intent(this, DownloadService.class);
+						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+						service.putExtra(DownloadService.EXTRA_URL, url);
+						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+						service.putExtra(DownloadService.EXTRA_PATH, path);
+						startService(service);
+					}
+				}
+				else if(url != null) {
+					if(availableFreeSpace < size) {
+						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+						continue;
+					}
+					
+					Intent service = new Intent(this, DownloadService.class);
+					service.putExtra(DownloadService.EXTRA_HASH, hash);
+					service.putExtra(DownloadService.EXTRA_URL, url);
+					service.putExtra(DownloadService.EXTRA_SIZE, size);
+					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+					startService(service);
+				}
+				else {
+					log("node not found");
+				}
+			}
+			Util.showToast(this, R.string.download_began);
+		}
+	}
+	
+	/*
+	 * Get list of all child files
+	 */
+	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
+		
+		if (megaApi.getRootNode() == null)
+			return;
+		
+		folder.mkdir();
+		NodeList nodeList = megaApi.getChildren(parent);
+		for(int i=0; i<nodeList.size(); i++){
+			MegaNode document = nodeList.get(i);
+			if (document.getType() == MegaNode.TYPE_FOLDER) {
+				File subfolder = new File(folder, new String(document.getName()));
+				getDlList(dlFiles, document, subfolder);
+			} 
+			else {
+				dlFiles.put(document, folder.getAbsolutePath());
+			}
+		}
+	}
+	
+	/*
+	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
+	 */
+	public static boolean isIntentAvailable(Context ctx, Intent intent) {
+
+		final PackageManager mgr = ctx.getPackageManager();
+		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+		return list.size() > 0;
 	}
 
 	public static void log(String message) {

@@ -37,13 +37,13 @@
 	    android:title="Copy"
 	    MEGA:showAsAction="never" />
 	
-	<item
+<!-- 	<item
 	    android:id="@+id/action_file_properties_send_link"
 	    android:orderInCategory="125"
 	    android:showAsAction="always"
 	    android:title="Send link"
 	    MEGA:showAsAction="never" />
-	
+	-->
 	<item
 	    android:id="@+id/action_file_properties_remove"
 	    android:orderInCategory="130"
