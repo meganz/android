@@ -73,6 +73,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 
 	boolean moveToRubbish = false;
 	
+	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
+	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	
 	
@@ -173,6 +175,18 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    	moveToTrash(node.getHandle());
 		    	return true;
 		    }
+		    case R.id.action_file_properties_move:{
+		    	ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(node.getHandle());
+		    	showMove(handleList);
+		    	return true;
+		    }
+		    case R.id.action_file_properties_copy:{
+		    	ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(node.getHandle());
+		    	showCopy(handleList);
+		    	return true;
+		    }
 		}	    
 	    return super.onOptionsItemSelected(item);
 	}
@@ -190,6 +204,30 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		}, 50);
 	}
 	
+	public void showCopy(ArrayList<Long> handleList){
+		
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("COPY_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+	}
+	
+	public void showMove(ArrayList<Long> handleList){
+		
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("MOVE_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+	}
+
 	public void downloadNode(ArrayList<Long> handleList){
 		
 		long[] hashes = new long[handleList.size()];
@@ -441,6 +479,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
+					finish();
 				}
 				else{
 					Toast.makeText(this, "The file has not been moved", Toast.LENGTH_LONG).show();
@@ -448,7 +487,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				log("move nodes request finished");
 			}
 		}
-else if (request.getType() == MegaRequest.TYPE_REMOVE){
+		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			
 			
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -465,6 +504,20 @@ else if (request.getType() == MegaRequest.TYPE_REMOVE){
 				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
 			}
 			log("remove request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_COPY){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
+			}
+			else{
+				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
+			}
+			log("copy nodes request finished");
 		}
 	}
 
@@ -567,6 +620,61 @@ else if (request.getType() == MegaRequest.TYPE_REMOVE){
 				}
 			}
 			Util.showToast(this, R.string.download_began);
+		}
+		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+			
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
+			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
+			final int totalMoves = moveHandles.length;
+			
+			MegaNode parent = megaApi.getNodeByHandle(toHandle);
+			moveToRubbish = false;
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_moving));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+			
+			for(int i=0; i<moveHandles.length;i++){
+				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+			}
+		}
+		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
+			final long toHandle = intent.getLongExtra("COPY_TO", 0);
+			final int totalCopy = copyHandles.length;
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_copying));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+			
+			MegaNode parent = megaApi.getNodeByHandle(toHandle);
+			for(int i=0; i<copyHandles.length;i++){
+				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
+			}
 		}
 	}
 	
