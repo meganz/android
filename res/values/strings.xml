@@ -20,7 +20,8 @@
     <string name="general_import">Import</string>
     <string name="general_updating">Updating&#8230;</string>  
     <string name="general_storage">Storage</string>
-    <string name="general_bandwidth">Bandwidth</string> 
+    <string name="general_bandwidth">Bandwidth</string>
+    <string name="general_removing_offline">Removing files from device</string> 
     
     <string name="general_pro_1">Pro I</string>
     <string name="general_pro_2">Pro II</string>

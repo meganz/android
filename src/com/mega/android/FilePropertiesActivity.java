@@ -1,6 +1,8 @@
 package com.mega.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,9 +122,29 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitch = (MySwitch) findViewById(R.id.file_properties_switch);
-			availableSwitch.setChecked(true);
-			availableSwitch.setOnCheckedChangeListener(this);
 			
+			File destination = null;
+			if (getExternalFilesDir(null) != null){
+				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+			}
+			else{
+				destination = new File(getFilesDir(), node.getHandle()+"");
+			}
+			
+			if (destination.exists() && destination.isDirectory()){
+				File offlineFile = new File(destination, node.getName());
+				if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+					availableSwitch.setChecked(false);
+				}
+				else{
+					availableSwitch.setChecked(true);
+				}
+			}
+			else{
+				availableSwitch.setChecked(true);
+			}
+			
+			availableSwitch.setOnCheckedChangeListener(this);			
 			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			
 			nameView.setText(name);
@@ -142,12 +164,114 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		if(isChecked){
-			Toast.makeText(getApplicationContext(), "HA PASADO A OFF", Toast.LENGTH_LONG).show();
+			ProgressDialog statusDialog = null;
+			try {
+				statusDialog = new ProgressDialog(this);
+				statusDialog.setMessage(getString(R.string.general_removing_offline));
+				statusDialog.show();
+			}
+			catch(Exception ex){}
+			
+			removeOffline();
+			
+			try{
+				statusDialog.dismiss();
+			}
+			catch(Exception e){}
+			
 		}
 		else{
-			Toast.makeText(getApplicationContext(), "HA PASADO A ON", Toast.LENGTH_LONG).show();
+			saveOffline();
 		}		
 	}
+	
+	public void saveOffline (){
+		
+		if (node.isFile()){
+			File destination = null;
+			if (getExternalFilesDir(null) != null){
+				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+			}
+			else{
+				destination = new File(getFilesDir(), node.getHandle()+"");
+			}
+			
+			if (destination.exists() && destination.isDirectory()){
+				File offlineFile = new File(destination, node.getName());
+				Toast.makeText(this, offlineFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+				if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+					return;
+				}
+			}
+			
+			destination.mkdirs();
+			
+			double availableFreeSpace = Double.MAX_VALUE;
+			try{
+				StatFs stat = new StatFs(destination.getAbsolutePath());
+				availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+			}
+			catch(Exception ex){}
+			
+			Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+			if (node.getType() == MegaNode.TYPE_FOLDER) {
+				getDlList(dlFiles, node, new File(destination, new String(node.getName())));
+			} else {
+				dlFiles.put(node, destination.getAbsolutePath());
+			}
+			
+			for (MegaNode document : dlFiles.keySet()) {
+				
+				String path = dlFiles.get(document);
+				
+				if(availableFreeSpace <document.getSize()){
+					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+					continue;
+				}
+				
+				String url = null;
+				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+				service.putExtra(DownloadService.EXTRA_URL, url);
+				service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+				service.putExtra(DownloadService.EXTRA_PATH, path);
+				startService(service);
+			}
+		}
+		else if (node.isFolder()){
+			Toast.makeText(this, "IS FOLDER (not yet implemented)", Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	public void removeOffline(){
+		if (node.isFile()){
+			File destination = null;
+			if (getExternalFilesDir(null) != null){
+				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+			}
+			else{
+				destination = new File(getFilesDir(), node.getHandle()+"");
+			}
+			
+			try{
+				delete(destination);
+			}
+			catch(Exception e){};
+			
+		}
+		else if (node.isFolder()){
+			Toast.makeText(this, "Folder remove (not yet implemented)", Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	void delete(File f) throws IOException {
+		  if (f.isDirectory()) {
+		    for (File c : f.listFiles())
+		      delete(c);
+		  }
+		  if (!f.delete())
+		    throw new FileNotFoundException("Failed to delete file: " + f);
+		}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
