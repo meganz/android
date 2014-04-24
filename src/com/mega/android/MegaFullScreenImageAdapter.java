@@ -125,7 +125,12 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				return 0;
 			}
 			else{
-				cacheDir = activity.getCacheDir();
+				if (activity.getExternalCacheDir() != null){
+					cacheDir = activity.getExternalCacheDir();
+				}
+				else{
+					cacheDir = activity.getCacheDir();
+				}
 				destination = new File(cacheDir, node.getName());
 				
 				if (destination.exists()){
