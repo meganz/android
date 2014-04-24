@@ -27,6 +27,10 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,6 +52,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -119,36 +124,94 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
 			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
 			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
+			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleH), outMetrics));
 			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitch = (MySwitch) findViewById(R.id.file_properties_switch);
 			
-			File destination = null;
-			if (getExternalFilesDir(null) != null){
-				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
-			}
-			else{
-				destination = new File(getFilesDir(), node.getHandle()+"");
-			}
+			imageView.setImageResource(imageId);
+			nameView.setText(name);
 			
-			if (destination.exists() && destination.isDirectory()){
-				File offlineFile = new File(destination, node.getName());
-				if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-					availableSwitch.setChecked(false);
+			File destination = null;
+			File offlineFile = null;
+			if (node.isFile()){
+			
+				destination = null;
+				if (getExternalFilesDir(null) != null){
+					destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+				}
+				else{
+					destination = new File(getFilesDir(), node.getHandle()+"");
+				}
+				
+				if (destination.exists() && destination.isDirectory()){
+					offlineFile = new File(destination, node.getName());
+					if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+						availableSwitch.setChecked(false);
+					}
+					else{
+						availableSwitch.setChecked(true);
+					}
 				}
 				else{
 					availableSwitch.setChecked(true);
 				}
+				
+				availableSwitch.setOnCheckedChangeListener(this);			
+				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			}
 			else{
-				availableSwitch.setChecked(true);
+				availableOfflineLayout.setVisibility(View.GONE);
 			}
 			
-			availableSwitch.setOnCheckedChangeListener(this);			
-			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			
-			nameView.setText(name);
-			imageView.setImageResource(imageId);
+			Bitmap thumb = null;
+			Bitmap preview = null;
+			//If image
+			if (node.isFile()){
+				if (node.hasThumbnail()){
+					if (!availableSwitch.isChecked()){
+						if (offlineFile != null){
+							
+							BitmapFactory.Options options = new BitmapFactory.Options();
+							options.inJustDecodeBounds = true;
+							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+							
+							ExifInterface exif;
+							int orientation = ExifInterface.ORIENTATION_NORMAL;
+							try {
+								exif = new ExifInterface(offlineFile.getAbsolutePath());
+								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+							} catch (IOException e) {}  
+							
+							// Calculate inSampleSize
+						    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
+						    
+						    // Decode bitmap with inSampleSize set
+						    options.inJustDecodeBounds = false;
+						    
+						    thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+							if (thumb != null){
+								thumb = Util.rotateBitmap(thumb, orientation);
+								
+								imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+					else{
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null){
+							imageView.setImageBitmap(thumb);
+						}
+						else{
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
+							if (thumb != null){
+								imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 	
@@ -164,24 +227,14 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		if(isChecked){
-			ProgressDialog statusDialog = null;
-			try {
-				statusDialog = new ProgressDialog(this);
-				statusDialog.setMessage(getString(R.string.general_removing_offline));
-				statusDialog.show();
-			}
-			catch(Exception ex){}
-			
-			removeOffline();
-			
-			try{
-				statusDialog.dismiss();
-			}
-			catch(Exception e){}
-			
+			if (node.isFile()){
+				removeOffline();
+			}			
 		}
 		else{
-			saveOffline();
+			if (node.isFile()){
+				saveOffline();
+			}
 		}		
 	}
 	
@@ -198,7 +251,6 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			
 			if (destination.exists() && destination.isDirectory()){
 				File offlineFile = new File(destination, node.getName());
-				Toast.makeText(this, offlineFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
 				if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
 					return;
 				}
