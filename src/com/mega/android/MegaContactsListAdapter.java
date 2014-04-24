@@ -78,7 +78,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			log("onRequestFinish()");
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					File avatar = null;
+					if (context.getExternalCacheDir() != null){
+						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					}
+					else{
+						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					}
 					Bitmap bitmap = null;
 					if (avatar.exists()){
 						if (avatar.length() > 0){
@@ -184,7 +190,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
 		holder.textViewContactName.setText(contact.getEmail());
-		File avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+		}
 		Bitmap bitmap = null;
 		if (avatar.exists()){
 			if (avatar.length() > 0){
@@ -194,18 +206,33 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 				if (bitmap == null) {
 					avatar.delete();
-					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
+					else{
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
 				}
 				else{
 					holder.imageView.setImageBitmap(bitmap);
 				}
 			}
 			else{
-				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				if (context.getExternalCacheDir() != null){
+					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
+				}
+				else{
+					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
+				}			
 			}
 		}	
 		else{
-			megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			if (context.getExternalCacheDir() != null){
+				megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			}
+			else{
+				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			}
 		}
 		
 		NodeList sharedNodes = megaApi.getInShares(contact);

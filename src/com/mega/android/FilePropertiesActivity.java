@@ -49,7 +49,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface {
+public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener{
 	
 	TextView nameView;
 	TextView availableOfflineView;
@@ -121,18 +121,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitch = (MySwitch) findViewById(R.id.file_properties_switch);
 			availableSwitch.setChecked(true);
-			availableSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-				
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					if(isChecked){
-						Toast.makeText(getApplicationContext(), "HA PASADO A OFF", Toast.LENGTH_LONG).show();
-					}
-					else{
-						Toast.makeText(getApplicationContext(), "HA PASADO A ON", Toast.LENGTH_LONG).show();
-					}			
-				}
-			});
+			availableSwitch.setOnCheckedChangeListener(this);
 			
 			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			
@@ -147,6 +136,17 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		switch (v.getId()) {
 		
 		}
+	}
+	
+
+	@Override
+	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+		if(isChecked){
+			Toast.makeText(getApplicationContext(), "HA PASADO A OFF", Toast.LENGTH_LONG).show();
+		}
+		else{
+			Toast.makeText(getApplicationContext(), "HA PASADO A ON", Toast.LENGTH_LONG).show();
+		}		
 	}
 	
 	@Override

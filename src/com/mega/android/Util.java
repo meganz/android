@@ -373,7 +373,14 @@ public class Util {
 	 * Check is file belongs to the app
 	 */
 	public static boolean isLocal(Context context, File file) {
-		File tmp = context.getDir("tmp", 0);
+		File tmp = null;
+		if (context.getExternalCacheDir() != null){
+			tmp = new File (context.getExternalCacheDir(), "tmp");
+		}
+		else{
+			tmp = context.getDir("tmp", 0);
+		}
+			
 		return file.getAbsolutePath().contains(tmp.getParent());
 	}
 	

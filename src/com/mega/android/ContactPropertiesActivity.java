@@ -97,7 +97,13 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 			MegaUser contact = megaApi.getContact(userEmail);
 			contentDetailedTextView.setText(getDescription(megaApi.getInShares(contact)));
 			
-			File avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			File avatar = null;
+			if (getExternalCacheDir() != null){
+				avatar = new File(getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			}
+			else{
+				avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			}
 			Bitmap imBitmap = null;
 			if (avatar.exists()){
 				if (avatar.length() > 0){
@@ -107,7 +113,12 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 					if (imBitmap == null) {
 						avatar.delete();
-						megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+						if (getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+						}
+						else{
+							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+						}
 					}
 					else{
 						imageView.setImageBitmap(imBitmap);
@@ -208,7 +219,13 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if (e.getErrorCode() == MegaError.API_OK){
-				File avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				File avatar = null;
+				if (getExternalCacheDir() != null){
+					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				}
+				else{
+					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				}
 				Bitmap imBitmap = null;
 				if (avatar.exists()){
 					if (avatar.length() > 0){

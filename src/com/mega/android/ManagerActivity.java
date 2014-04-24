@@ -196,7 +196,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		if (aB == null){
 			aB = getSupportActionBar();
 		}
-		
+
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -264,7 +264,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					userName.setText(userNameString);
 				}
 				
-				File avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+				File avatar = null;
+				if (getExternalCacheDir() != null){
+					avatar = new File(getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+				}
+				else{
+					avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+				}
 				Bitmap imBitmap = null;
 				if (avatar.exists()){
 					if (avatar.length() > 0){
@@ -274,7 +280,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 						if (imBitmap == null) {
 							avatar.delete();
-							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+							if (getExternalCacheDir() != null){
+								megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+							}
+							else{
+								megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+							}
 						}
 						else{
 							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -295,11 +306,21 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						}
 					}
 					else{
-						megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						if (getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						}
+						else{
+							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+						}
 					}
 				}
 				else{
-					megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+					if (getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+					}
+					else{
+						megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", this);
+					}
 				}
 			}
 			
@@ -1778,7 +1799,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				File avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				File avatar = null;
+				if (getExternalCacheDir() != null){
+					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				}
+				else{
+					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				}
 				Bitmap imBitmap = null;
 				if (avatar.exists()){
 					if (avatar.length() > 0){
@@ -2617,7 +2644,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						String path = dlFiles.get(document);
 						
-						if(availableFreeSpace <document.getSize()){
+						if(availableFreeSpace < document.getSize()){
 							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
 							continue;
 						}

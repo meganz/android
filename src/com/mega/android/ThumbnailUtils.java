@@ -293,8 +293,15 @@ public class ThumbnailUtils {
 	 */	
 	public static File getThumbFolder(Context context) {
 		if (thumbDir == null) {
-			thumbDir = context.getDir("thumbnailsMEGA", 0);
+			if (context.getExternalCacheDir() != null){
+				thumbDir = new File (context.getExternalCacheDir(), "thumbnailsMEGA");
+				thumbDir.mkdirs();
+			}
+			else{
+				thumbDir = context.getDir("thumbnailsMEGA", 0);
+			}
 		}
+		log("getThumbFolder(): thumbDir= " + thumbDir);
 		return thumbDir;
 	}
 	
@@ -336,6 +343,7 @@ public class ThumbnailUtils {
 		ThumbnailDownloadListenerList listener = new ThumbnailDownloadListenerList(context, viewHolder, adapter);
 		listenersList.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
+		log("Lo descargare aqui: " + thumbFile.getAbsolutePath());
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		
 		return thumbnailCache.get(document.getHandle());

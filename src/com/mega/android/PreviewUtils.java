@@ -42,7 +42,13 @@ public class PreviewUtils {
 	 */	
 	public static File getPreviewFolder(Context context) {
 		if (previewDir == null) {
-			previewDir = context.getDir("previewsMEGA", 0);
+			if (context.getExternalCacheDir() != null){
+				previewDir = new File (context.getExternalCacheDir(), "previewsMEGA");
+				previewDir.mkdirs();
+			}
+			else{
+				previewDir = context.getDir("previewsMEGA", 0);
+			}
 		}
 		return previewDir;
 	}

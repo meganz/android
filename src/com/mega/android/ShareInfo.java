@@ -192,9 +192,12 @@ public class ShareInfo {
 					return;
 				}
 				
-				file = File.createTempFile(
-						String.valueOf("file" + System.currentTimeMillis()
-								% 1000), ".tmp", context.getCacheDir());
+				if (context.getExternalCacheDir() != null){
+					file = File.createTempFile(String.valueOf("file" + System.currentTimeMillis()% 1000), ".tmp", context.getExternalCacheDir());
+				}
+				else{
+					file = File.createTempFile(String.valueOf("file" + System.currentTimeMillis()% 1000), ".tmp", context.getCacheDir());
+				}
 				OutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
 				int bufferSize = 1024;
 				byte[] buffer = new byte[bufferSize];
