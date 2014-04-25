@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -50,7 +51,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	boolean isList = true;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	ArrayList<String> paths = new ArrayList<String>();
+	ArrayList<String> paths = null;
 	
 //	private ActionMode actionMode;
 //	
@@ -189,6 +190,13 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		log("onCreate");
+		
+		if (paths == null){
+			paths = new ArrayList<String>();
+		}
+		else{
+			paths.clear();
+		}
 	}
 	
 	@Override
@@ -231,7 +239,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 			
 			if (adapterList == null){
-				adapterList = new MegaOfflineListAdapter(context, paths, listView, emptyImageView, emptyTextView, aB);
+				adapterList = new MegaOfflineListAdapter(this, context, paths, listView, emptyImageView, emptyTextView, aB);
 			}
 			else{
 				adapterList.setPaths(paths);
@@ -300,6 +308,23 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
+		
+		if (isList){
+			String currentPath = paths.get(position);
+			File currentFile = new File (currentPath);
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+			if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+				context.startActivity(viewIntent);
+			}
+			else{
+				Intent intentShare = new Intent(Intent.ACTION_SEND);
+				intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+				if (ManagerActivity.isIntentAvailable(context, intentShare)){
+					context.startActivity(intentShare);
+				}
+			}
+		}
 		
 //		if (isList){
 //			if (adapterList.isMultipleSelect()){
@@ -592,6 +617,30 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				adapterGrid.notifyDataSetChanged();
 			}
 		}
+	}
+	
+	public void refreshPaths(){
+		
+		paths.clear();
+		
+		File offlineDirectory = null;
+		if (context.getExternalFilesDir(null) != null){
+			offlineDirectory = context.getExternalFilesDir(null);
+		}
+		else{
+			offlineDirectory = context.getFilesDir();
+		}
+		
+		File[] fList = offlineDirectory.listFiles();
+		for (File f : fList){
+			if (f.isDirectory()){
+				File[] document = f.listFiles();
+				paths.add(document[0].getAbsolutePath());
+			}
+		}
+		
+		setPaths(paths);
+		listView.invalidateViews();
 	}
 	
 	public void setIsList(boolean isList){
