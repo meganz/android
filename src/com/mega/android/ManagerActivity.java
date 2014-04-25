@@ -154,12 +154,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
 	private boolean isListSharedWithMe = true;
+	private boolean isListOffline = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
 	private SharedWithMeFragment swmF;
     private TransfersFragment tF; 
     private MyAccountFragment maF;
+    private OfflineFragment oF;
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
@@ -936,6 +938,42 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			break;
     		}
+    		case SAVED_FOR_OFFLINE:{
+    			if (oF == null){
+    				oF = new OfflineFragment();
+    				oF.setIsList(isListOffline);
+    			}
+    			else{
+    				oF.setIsList(isListOffline);
+    			}
+    			
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, oF, "oF").commit();
+				if (isListCloudDrive){					
+					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+				}
+				else{
+    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    			}
+    			    			
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+   			
+    			customListGrid.setVisibility(View.VISIBLE);
+    			customSearch.setVisibility(View.VISIBLE);
+    			
+
+    			if (createFolderMenuItem != null){
+	    			createFolderMenuItem.setVisible(true);
+	    			uploadMenuItem.setVisible(true);
+	    			moreOptionsMenuItem.setVisible(true);
+	    			
+	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			uploadMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+    			}
+    			
+    			break;
+    		}
 		default:
 			break;
     	}
@@ -1001,6 +1039,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			if (maF.isVisible()){
 				if (maF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					return;
+				}
+			}
+		}
+		
+		if (oF != null){
+			if (oF.isVisible()){
+				if (oF.onBackPressed() == 0){
+					drawerItem = drawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
 					return;
 				}
@@ -1105,6 +1153,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		if (tF != null){
 			if (tF.isVisible()){
+				createFolderMenuItem.setVisible(true);
+    			uploadMenuItem.setVisible(true);
+    			moreOptionsMenuItem.setVisible(true);
+    			
+    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			uploadMenuItem.setEnabled(false);
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			createFolderMenuItem.setEnabled(false);
+			}
+		}
+		
+		if (oF != null){
+			if (oF.isVisible()){
 				createFolderMenuItem.setVisible(true);
     			uploadMenuItem.setVisible(true);
     			moreOptionsMenuItem.setVisible(true);
