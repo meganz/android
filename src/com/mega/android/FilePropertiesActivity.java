@@ -317,13 +317,16 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	}
 	
 	void delete(File f) throws IOException {
-		  if (f.isDirectory()) {
-		    for (File c : f.listFiles())
-		      delete(c);
-		  }
-		  if (!f.delete())
-		    throw new FileNotFoundException("Failed to delete file: " + f);
+		if (f.isDirectory()) {
+			for (File c : f.listFiles()){
+				delete(c);
+			}
 		}
+		
+		if (!f.delete()){
+			throw new FileNotFoundException("Failed to delete file: " + f);
+		}
+	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
