@@ -8,8 +8,8 @@ local_c_includes := \
         $(LOCAL_PATH)/../curl/curl/include \
         $(LOCAL_PATH)/../cryptopp \
         $(LOCAL_PATH)/.. \
-        $(LOCAL_PATH)/include \
-        $(LOCAL_PATH)/include/mega/posix \
+        $(LOCAL_PATH)/sdk/include \
+        $(LOCAL_PATH)/sdk/include/mega/posix \
         $(LOCAL_PATH)/android
 
 include $(CLEAR_VARS)

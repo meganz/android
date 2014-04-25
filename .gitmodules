@@ -1,0 +1,3 @@
+[submodule "jni/mega/sdk"]
+	path = jni/mega/sdk
+	url = https://github.com/meganz/sdk.git

@@ -29,12 +29,17 @@ DEALINGS IN THE SOFTWARE.
 #define PREFER_STDARG
 #include "megaapi.h"
 
+#ifdef __APPLE__
+    #include "xlocale.h"
+    #include "strings.h"
+#endif
+
 #ifdef USE_QT
     #include "platform/Platform.h"
     #include "control/Utilities.h"
 #else
     #define QT_TR_NOOP(x) (x)
-    #define LOG(x) 
+    #define LOG(x)
 #endif
 
 #ifdef _WIN32
@@ -314,7 +319,7 @@ MegaNode *MegaNode::copy()
 
 MegaNode::~MegaNode()
 {
-    delete name;
+    delete [] name;
 }
 
 MegaNode *MegaNode::fromNode(Node *node)
@@ -1082,7 +1087,7 @@ MegaApi::MegaApi(const char *basePath)
     gfxAccess->setProcessor(processor);
 #endif
 
-    client = new MegaClient(this, waiter, httpio, fsAccess, dbAccess, gfxAccess, "FhMgXbqb", "MEGAsync/1.0.12");
+    client = new MegaClient(this, waiter, httpio, fsAccess, dbAccess, gfxAccess, "FhMgXbqb", "MEGAsync/1.0.15");
 
     //Start blocking thread
 	threadExit = 0;
@@ -1318,8 +1323,8 @@ void MegaApi::loop()
         MUTEX_UNLOCK(sdkMutex);
 	}
 
-    delete dbAccess; //Warning, it's deleted in MegaClient's destructor
-    //delete client;
+    //delete dbAccess; //Warning, it's deleted in MegaClient's destructor
+    delete client;
     //delete httpio;
     //delete waiter;
     //delete fsAccess;
@@ -2171,8 +2176,10 @@ int SearchTreeProcessor::processNode(Node* node)
 	if(!node) return 1;
 	if(!search) return 0;
 #ifndef _WIN32
+#ifndef __APPLE__
     if(strcasestr(node->displayname(), search)!=NULL) results.push_back(node);
-//TODO: Implement this for Windows
+//TODO: Implement this for Windows and MacOS
+#endif
 #endif
 	return 1;
 }
@@ -2625,7 +2632,7 @@ void MegaApi::fetchnodes_result(error e)
     #endif
             client->fsaccess->path2local(&utf8name, &localname);
             LOG("addSync");
-            error syncError = client->addsync(&localname, "Rubbish", NULL, node, -1);
+            error syncError = client->addsync(&localname, DEBRISFOLDER, NULL, node, -1);
             fireOnRequestFinish(this, syncRequest, MegaError(syncError));
         }
     }
@@ -2927,7 +2934,7 @@ void MegaApi::openfilelink_result(error result)
 
 // the requested link was opened successfully
 // (it is the application's responsibility to delete n!)
-void MegaApi::openfilelink_result(handle ph, const byte* key, m_off_t size, string* a, const char* fa, time_t ts, time_t tm, int)
+void MegaApi::openfilelink_result(handle ph, const byte* key, m_off_t size, string* a, const char* fa, m_time_t ts, m_time_t tm, int)
 {
     LOG("openfilelink_result");
 	//cout << "Importing " << n->displayname() << "..." << endl;
@@ -3285,7 +3292,7 @@ void MegaApi::checkfile_result(handle h, error e)
     LOG("Link check failed");
 }
 
-void MegaApi::checkfile_result(handle h, error e, byte* filekey, m_off_t size, time_t ts, time_t tm, string* filename, string* fingerprint, string* fileattrstring)
+void MegaApi::checkfile_result(handle h, error e, byte* filekey, m_off_t size, m_time_t ts, m_time_t tm, string* filename, string* fingerprint, string* fileattrstring)
 {
     LOG("Link check OK");
 }
@@ -4521,7 +4528,7 @@ void MegaApi::sendPendingRequests()
             string localname;
             client->fsaccess->path2local(&utf8name, &localname);
             LOG("addSync");
-            e = client->addsync(&localname, "Rubbish", NULL, node, -1);
+            e = client->addsync(&localname, DEBRISFOLDER, NULL, node, -1);
             if(!e)
             {
                 client->restag = nextTag;
@@ -4664,7 +4671,8 @@ void MegaApi::updateStatics()
     while(it != end)
     {
         Transfer *transfer = it->second;
-        if(transfer->failcount<2) downloadCount++;
+        if((transfer->failcount<2) || (transfer->slot && (Waiter::ds - transfer->slot->lastdata) < TransferSlot::XFERTIMEOUT))
+            downloadCount++;
         it++;
     }
 
@@ -4673,7 +4681,8 @@ void MegaApi::updateStatics()
     while(it != end)
     {
         Transfer *transfer = it->second;
-        if(transfer->failcount<2) uploadCount++;
+        if((transfer->failcount<2) || (transfer->slot && (Waiter::ds - transfer->slot->lastdata) < TransferSlot::XFERTIMEOUT))
+            uploadCount++;
         it++;
     }
     MUTEX_UNLOCK(sdkMutex);
