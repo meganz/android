@@ -15,85 +15,85 @@ LIB_JAVA_LIBRARY= -lcryptopp -lcurl
 LIB_PYTHON_LIBRARY= -lcryptopp -lcurl -lpython2.7
 LIB_ANDROID_LIBRARY= -lcryptopp -lcurl
 
-CPP_SOURCES= src/attrmap.cpp \
-    src/backofftimer.cpp \
-    src/base64.cpp \
-    src/command.cpp \
-    src/commands.cpp \
-    src/db.cpp \
-    src/file.cpp \
-    src/fileattributefetch.cpp \
-    src/filefingerprint.cpp \
-    src/filesystem.cpp \
-    src/http.cpp \
-    src/json.cpp \
-    src/megaclient.cpp \
-    src/node.cpp \
-    src/pubkeyaction.cpp \
-    src/request.cpp \
-    src/serialize64.cpp \
-    src/share.cpp \
-    src/sharenodekeys.cpp \
-    src/sync.cpp \
-    src/transfer.cpp \
-    src/transferslot.cpp \
-    src/treeproc.cpp \
-    src/user.cpp \
-    src/utils.cpp \
-    src/waiter.cpp  \
-    src/crypto/cryptopp.cpp  \
-    src/db/sqlite.cpp  \
+CPP_SOURCES= sdk/src/attrmap.cpp \
+    sdk/src/backofftimer.cpp \
+    sdk/src/base64.cpp \
+    sdk/src/command.cpp \
+    sdk/src/commands.cpp \
+    sdk/src/db.cpp \
+    sdk/src/file.cpp \
+    sdk/src/fileattributefetch.cpp \
+    sdk/src/filefingerprint.cpp \
+    sdk/src/filesystem.cpp \
+    sdk/src/http.cpp \
+    sdk/src/json.cpp \
+    sdk/src/megaclient.cpp \
+    sdk/src/node.cpp \
+    sdk/src/pubkeyaction.cpp \
+    sdk/src/request.cpp \
+    sdk/src/serialize64.cpp \
+    sdk/src/share.cpp \
+    sdk/src/sharenodekeys.cpp \
+    sdk/src/sync.cpp \
+    sdk/src/transfer.cpp \
+    sdk/src/transferslot.cpp \
+    sdk/src/treeproc.cpp \
+    sdk/src/user.cpp \
+    sdk/src/utils.cpp \
+    sdk/src/waiterbase.cpp  \
+    sdk/src/crypto/cryptopp.cpp  \
+    sdk/src/db/sqlite.cpp  \
     MegaProxySettings.cpp \
-    src/posix/net.cpp  \
-    src/posix/fs.cpp  \
-    src/posix/waiter.cpp \
+    sdk/src/posix/net.cpp  \
+    sdk/src/posix/fs.cpp  \
+    sdk/src/posix/waiter.cpp \
     linux/megaapiwait.cpp \
     android/megaapiandroidhttpio.cpp \
-    src/gfx.cpp \
-    src/gfx/android.cpp
+    sdk/src/gfx.cpp \
+    android/mega/gfx/android.cpp
     
 C_SOURCES = sqlite3.c android/glob.c
 
-HEADERS= include/mega.h \
-	    include/mega/account.h \
-	    include/mega/attrmap.h \
-	    include/mega/backofftimer.h \
-	    include/mega/base64.h \
-	    include/mega/command.h \
-	    include/mega/console.h \
-	    include/mega/db.h \
-	    include/mega/file.h \
-	    include/mega/fileattributefetch.h \
-	    include/mega/filefingerprint.h \
-	    include/mega/filesystem.h \
-	    include/mega/http.h \
-	    include/mega/json.h \
-	    include/mega/megaapp.h \
-	    include/mega/megaclient.h \
-	    include/mega/node.h \
-	    include/mega/pubkeyaction.h \
-	    include/mega/request.h \
-	    include/mega/serialize64.h \
-	    include/mega/share.h \
-	    include/mega/sharenodekeys.h \
-	    include/mega/sync.h \
-	    include/mega/transfer.h \
-	    include/mega/transferslot.h \
-	    include/mega/treeproc.h \
-	    include/mega/types.h \
-	    include/mega/user.h \
-	    include/mega/utils.h \
-	    include/mega/waiter.h \
-	    include/mega/crypto/cryptopp.h  \
-	    include/mega/db/sqlite.h  \
+HEADERS= sdk/include/mega.h \
+	    sdk/include/mega/account.h \
+	    sdk/include/mega/attrmap.h \
+	    sdk/include/mega/backofftimer.h \
+	    sdk/include/mega/base64.h \
+	    sdk/include/mega/command.h \
+	    sdk/include/mega/console.h \
+	    sdk/include/mega/db.h \
+	    sdk/include/mega/file.h \
+	    sdk/include/mega/fileattributefetch.h \
+	    sdk/include/mega/filefingerprint.h \
+	    sdk/include/mega/filesystem.h \
+	    sdk/include/mega/http.h \
+	    sdk/include/mega/json.h \
+	    sdk/include/mega/megaapp.h \
+	    sdk/include/mega/megaclient.h \
+	    sdk/include/mega/node.h \
+	    sdk/include/mega/pubkeyaction.h \
+	    sdk/include/mega/request.h \
+	    sdk/include/mega/serialize64.h \
+	    sdk/include/mega/share.h \
+	    sdk/include/mega/sharenodekeys.h \
+	    sdk/include/mega/sync.h \
+	    sdk/include/mega/transfer.h \
+	    sdk/include/mega/transferslot.h \
+	    sdk/include/mega/treeproc.h \
+	    sdk/include/mega/types.h \
+	    sdk/include/mega/user.h \
+	    sdk/include/mega/utils.h \
+	    sdk/include/mega/waiter.h \
+	    sdk/include/mega/crypto/cryptopp.h  \
+	    sdk/include/mega/db/sqlite.h  \
 	    megaapi.h \
 	    MegaProxySettings.h \
-	    include/mega/posix/meganet.h  \
-        include/mega/posix/megasys.h  \
-        include/mega/posix/megafs.h  \
-        include/mega/posix/megawaiter.h \
+	    sdk/include/mega/posix/meganet.h  \
+        sdk/include/mega/posix/megasys.h  \
+        sdk/include/mega/posix/megafs.h  \
+        sdk/include/mega/posix/megawaiter.h \
         linux/megaapiwait.h  \
-        include/mega/config.h \
+        sdk/include/mega/config.h \
         android/glob.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
