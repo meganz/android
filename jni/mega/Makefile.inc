@@ -93,7 +93,7 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/posix/megafs.h  \
         sdk/include/mega/posix/megawaiter.h \
         linux/megaapiwait.h  \
-        sdk/include/mega/config.h \
+        android/mega/config.h \
         android/glob.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
