@@ -45,7 +45,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	TextView emptyTextView;
 	MegaOfflineListAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
-	OfflineFragment fileBrowserFragment = this;
+	OfflineFragment offlineFragment = this;
 	
 	long parentHandle = -1;
 	boolean isList = true;
@@ -53,137 +53,76 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	ArrayList<String> paths = null;
 	
-//	private ActionMode actionMode;
-//	
-//	private class ActionBarCallBack implements ActionMode.Callback {
-//
-//		@Override
-//		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//			List<MegaNode> documents = getSelectedDocuments();
-//			
-//			switch(item.getItemId()){
-//				case R.id.cab_menu_download:{
-//					ArrayList<Long> handleList = new ArrayList<Long>();
-//					for (int i=0;i<documents.size();i++){
-//						handleList.add(documents.get(i).getHandle());
-//					}
-//					clearSelections();
-//					hideMultipleSelect();
-//					((ManagerActivity) context).onFileClick(handleList);
-//					break;
-//				}
-//				case R.id.cab_menu_rename:{
-//					clearSelections();
-//					hideMultipleSelect();
-//					if (documents.size()==1){
-//						((ManagerActivity) context).showRenameDialog(documents.get(0), documents.get(0).getName());
-//					}
-//					break;
-//				}
-//				case R.id.cab_menu_copy:{
-//					ArrayList<Long> handleList = new ArrayList<Long>();
-//					for (int i=0;i<documents.size();i++){
-//						handleList.add(documents.get(i).getHandle());
-//					}
-//					clearSelections();
-//					hideMultipleSelect();
-//					((ManagerActivity) context).showCopy(handleList);
-//					break;
-//				}	
-//				case R.id.cab_menu_move:{
-//					ArrayList<Long> handleList = new ArrayList<Long>();
-//					for (int i=0;i<documents.size();i++){
-//						handleList.add(documents.get(i).getHandle());
-//					}
-//					clearSelections();
-//					hideMultipleSelect();
-//					((ManagerActivity) context).showMove(handleList);
-//					break;
-//				}
-//				case R.id.cab_menu_share_link:{
-//					clearSelections();
-//					hideMultipleSelect();
-//					if (documents.size()==1){
-//						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
-//					}
-//					break;
-//				}
-//				case R.id.cab_menu_trash:{
-//					ArrayList<Long> handleList = new ArrayList<Long>();
-//					for (int i=0;i<documents.size();i++){
-//						handleList.add(documents.get(i).getHandle());
-//					}
-//					clearSelections();
-//					hideMultipleSelect();
-//					((ManagerActivity) context).moveToTrash(handleList);
-//					break;
-//				}
-//				
-//				
-//				
-//			}
-//			return false;
-//		}
-//
-//		@Override
-//		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//			MenuInflater inflater = mode.getMenuInflater();
-//			inflater.inflate(R.menu.file_browser_action, menu);
-//			return true;
-//		}
-//
-//		@Override
-//		public void onDestroyActionMode(ActionMode arg0) {
-//			adapterList.setMultipleSelect(false);
-//			listView.setOnItemLongClickListener(fileBrowserFragment);
-//			clearSelections();
-//		}
-//
-//		@Override
-//		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//			List<MegaNode> selected = getSelectedDocuments();
-//			boolean showDownload = false;
-//			boolean showRename = false;
-//			boolean showCopy = false;
-//			boolean showMove = false;
-//			boolean showLink = false;
-//			boolean showTrash = false;
-//			
-//			// Rename
-//			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "full").getErrorCode() == MegaError.API_OK)) {
-//				showRename = true;
-//			}
-//			
-//			// Link
-//			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "owner").getErrorCode() == MegaError.API_OK)) {
-//				showLink = true;
-//			}
-//			
-//			if (selected.size() > 0) {
-//				showDownload = true;
-//				showTrash = true;
-//				showMove = true;
-//				showCopy = true;
-//				for(int i=0; i<selected.size();i++)	{
-//					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-//						showTrash = false;
-//						showMove = false;
-//						break;
-//					}
-//				}
-//			}
-//			
-//			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-//			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-//			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-//			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-//			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-//			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
-//			
-//			return false;
-//		}
-//		
-//	}
+	private ActionMode actionMode;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			List<String> documents = getSelectedDocuments();
+			
+			switch(item.getItemId()){
+				case R.id.cab_menu_trash:{
+					
+					for (int i=0;i<documents.size();i++){
+						File f = new File(documents.get(i));
+						try{
+							Util.deleteFolderAndSubfolders(f.getParentFile());
+						}
+						catch(Exception e){};
+					}
+					
+					clearSelections();
+					hideMultipleSelect();
+					refreshPaths();
+					break;
+				}
+				
+				
+				
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_browser_action, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			adapterList.setMultipleSelect(false);
+			listView.setOnItemLongClickListener(offlineFragment);
+			clearSelections();
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			List<String> selected = getSelectedDocuments();
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
+			
+			if (selected.size() > 0) {
+				showTrash = true;
+			}
+			
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			
+			return false;
+		}
+		
+	}
 	
 	
 	@Override
@@ -256,37 +195,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		}
 		else{
 			return null;
-//			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
-//			
-//			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
-//			listView.setOnItemClickListener(null);
-//			listView.setItemsCanFocus(false);
-//	        
-//	        emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-//			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-//	        
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
-//			}
-//			else{
-//				adapterGrid.setParentHandle(parentHandle);
-//				adapterGrid.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-//			
-//			adapterGrid.setPositionClicked(-1);
-//			
-//			listView.setAdapter(adapterGrid);
-//			
-//			setNodes(nodes);
-//			
-//			return v;
 		}		
 	}
 		
@@ -310,159 +218,104 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
             long id) {
 		
 		if (isList){
-			String currentPath = paths.get(position);
-			File currentFile = new File (currentPath);
-			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-			if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-				context.startActivity(viewIntent);
+			if (adapterList.isMultipleSelect()){
+				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+				if (checkedItems.get(position, false) == true){
+					listView.setItemChecked(position, true);
+				}
+				else{
+					listView.setItemChecked(position, false);
+				}				
+				updateActionModeTitle();
+				adapterList.notifyDataSetChanged();
 			}
 			else{
-				Intent intentShare = new Intent(Intent.ACTION_SEND);
-				intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, intentShare)){
-					context.startActivity(intentShare);
+				String currentPath = paths.get(position);
+				File currentFile = new File (currentPath);
+				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+					context.startActivity(viewIntent);
+				}
+				else{
+					Intent intentShare = new Intent(Intent.ACTION_SEND);
+					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+					if (ManagerActivity.isIntentAvailable(context, intentShare)){
+						context.startActivity(intentShare);
+					}
 				}
 			}
 		}
-		
-//		if (isList){
-//			if (adapterList.isMultipleSelect()){
-//				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//				if (checkedItems.get(position, false) == true){
-//					listView.setItemChecked(position, true);
-//				}
-//				else{
-//					listView.setItemChecked(position, false);
-//				}				
-//				updateActionModeTitle();
-//				adapterList.notifyDataSetChanged();
-//			}
-//			else{
-//				if (nodes.get(position).isFolder()){
-//					MegaNode n = nodes.get(position);
-//					
-//					aB.setTitle(n.getName());
-//					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = nodes.get(position).getHandle();
-//					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//					adapterList.setParentHandle(parentHandle);
-//					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-//					adapterList.setNodes(nodes);
-//					listView.setSelection(0);
-//					
-//					//If folder has no files
-//					if (adapterList.getCount() == 0){
-//						listView.setVisibility(View.GONE);
-//						emptyImageView.setVisibility(View.VISIBLE);
-//						emptyTextView.setVisibility(View.VISIBLE);
-//						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-//							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-//							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-//						} else {
-//							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//							emptyTextView.setText(R.string.file_browser_empty_folder);
-//						}
-//					}
-//					else{
-//						listView.setVisibility(View.VISIBLE);
-//						emptyImageView.setVisibility(View.GONE);
-//						emptyTextView.setVisibility(View.GONE);
-//					}
-//				}
-//				else{
-//					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
-//						Intent intent = new Intent(context, FullScreenImageViewer.class);
-//						intent.putExtra("position", position);
-//						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
-//						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-//							intent.putExtra("parentNodeHandle", -1L);
-//						}
-//						else{
-//							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-//						}
-//						startActivity(intent);
-//					}
-//					else{
-//						adapterList.setPositionClicked(-1);
-//						adapterList.notifyDataSetChanged();
-//						ArrayList<Long> handleList = new ArrayList<Long>();
-//						handleList.add(nodes.get(position).getHandle());
-//						((ManagerActivity) context).onFileClick(handleList);
-//					}
-//				}
-//			}
-//		}
     }
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-//		if (adapterList.getPositionClicked() == -1){
-//			clearSelections();
-//			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-//			listView.setItemChecked(position, true);
-//			adapterList.setMultipleSelect(true);
-//			updateActionModeTitle();
-//			listView.setOnItemLongClickListener(null);
-//		}
+		if (adapterList.getPositionClicked() == -1){
+			clearSelections();
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+			listView.setItemChecked(position, true);
+			adapterList.setMultipleSelect(true);
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
 		return true;
 	}
 	
 	/*
 	 * Clear all selected items
 	 */
-//	private void clearSelections() {
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				int checkedPosition = checkedItems.keyAt(i);
-//				listView.setItemChecked(checkedPosition, false);
-//			}
-//		}
-//		updateActionModeTitle();
-//	}
+	private void clearSelections() {
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				listView.setItemChecked(checkedPosition, false);
+			}
+		}
+		updateActionModeTitle();
+	}
 	
-//	private void updateActionModeTitle() {
-//		if (actionMode == null || getActivity() == null) {
-//			return;
-//		}
-//		List<String> documents = getSelectedDocuments();
-//		int files = 0;
-//		int folders = 0;
-//		for (String document : documents) {
-//			if (document.isFile()) {
-//				files++;
-//			} else if (document.isFolder()) {
-//				folders++;
-//			}
-//		}
-//		Resources res = getActivity().getResources();
-//		String format = "%d %s";
-//		String filesStr = String.format(format, files,
-//				res.getQuantityString(R.plurals.general_num_files, files));
-//		String foldersStr = String.format(format, folders,
-//				res.getQuantityString(R.plurals.general_num_folders, folders));
-//		String title;
-//		if (files == 0 && folders == 0) {
-//			title = "";
-//		} else if (files == 0) {
-//			title = foldersStr;
-//		} else if (folders == 0) {
-//			title = filesStr;
-//		} else {
-//			title = foldersStr + ", " + filesStr;
-//		}
-//		actionMode.setTitle(title);
-//		try {
-//			actionMode.invalidate();
-//		} catch (NullPointerException e) {
-//			e.printStackTrace();
-//			log("oninvalidate error");
-//		}
-//		// actionMode.
-//	}
+	private void updateActionModeTitle() {
+		if (actionMode == null || getActivity() == null) {
+			return;
+		}
+		List<String> documents = getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (String document : documents) {
+			File f = new File(document);
+			if (f.isFile()) {
+				files++;
+			} 
+			else {
+				folders++;
+			}
+		}
+		Resources res = getActivity().getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = "";
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
 	
 	/*
 	 * Get list of all selected documents
@@ -485,10 +338,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
-//		adapterList.setMultipleSelect(false);
-//		if (actionMode != null) {
-//			actionMode.finish();
-//		}
+		adapterList.setMultipleSelect(false);
+		if (actionMode != null) {
+			actionMode.finish();
+		}
 	}
 	
 	public int onBackPressed(){
