@@ -1358,6 +1358,31 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						}
 					}
 				}
+				
+				if (oF != null){
+					if (oF.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oF");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commit();
+						
+						isListOffline = !isListOffline;
+						oF.setIsList(isListOffline);
+						
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commit();
+						
+						if (isListOffline){
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+						}
+						else{
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+						}
+					}
+				}
 				break;
 			}
 			case R.id.custom_search:{
