@@ -91,14 +91,14 @@
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 
-		        <ImageView
+<!-- 		        <ImageView
 		            android:id="@+id/offline_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_menu_properties"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
-		        
+-->	        
 		        <ImageView
 		            android:id="@+id/offline_list_option_delete"
 		            android:layout_width="wrap_content"
