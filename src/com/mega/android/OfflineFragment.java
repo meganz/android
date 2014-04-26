@@ -1,6 +1,7 @@
 package com.mega.android;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaOfflineListAdapter adapterList;
-	MegaBrowserGridAdapter adapterGrid;
+	MegaOfflineGridAdapter adapterGrid;
 	OfflineFragment offlineFragment = this;
 	
 	long parentHandle = -1;
@@ -169,11 +170,19 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				offlineDirectory = context.getFilesDir();
 			}
 			
+			paths.clear();			
 			File[] fList = offlineDirectory.listFiles();
 			for (File f : fList){
 				if (f.isDirectory()){
 					File[] document = f.listFiles();
-					paths.add(document[0].getAbsolutePath());
+					if (document.length == 0){
+						try {
+							Util.deleteFolderAndSubfolders(f);
+						} catch (Exception e) {}
+					}
+					else{
+						paths.add(document[0].getAbsolutePath());
+					}
 				}
 			}
 			
@@ -194,7 +203,45 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			return v;
 		}
 		else{
-			return null;
+			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
+			
+			listView = (ListView) v.findViewById(R.id.offline_grid_view_browser);
+			listView.setOnItemClickListener(null);
+			listView.setItemsCanFocus(false);
+	        
+	        emptyImageView = (ImageView) v.findViewById(R.id.offline_grid_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.offline_grid_empty_text);
+			
+			paths.clear();	
+			File offlineDirectory = null;
+			if (context.getExternalFilesDir(null) != null){
+				offlineDirectory = context.getExternalFilesDir(null);
+			}
+			else{
+				offlineDirectory = context.getFilesDir();
+			}
+			
+			File[] fList = offlineDirectory.listFiles();
+			for (File f : fList){
+				if (f.isDirectory()){
+					File[] document = f.listFiles();
+					paths.add(document[0].getAbsolutePath());
+				}
+			}
+	        
+			if (adapterGrid == null){
+				adapterGrid = new MegaOfflineGridAdapter(this, context, paths, listView, emptyImageView, emptyTextView, aB);
+			}
+			else{
+				adapterGrid.setPaths(paths);
+			}
+			adapterGrid.setPositionClicked(-1);
+			
+			listView.setAdapter(adapterGrid);
+			
+			setPaths(paths);
+			
+			return v;
 		}		
 	}
 		
@@ -509,6 +556,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	private static void log(String log) {
-		Util.log("FileBrowserFragment", log);
+		Util.log("OfflineFragment", log);
 	}
 }
