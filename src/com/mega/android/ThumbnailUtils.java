@@ -309,6 +309,14 @@ public class ThumbnailUtils {
 		return thumbnailCache.get(node.getHandle());
 	}
 	
+	public static Bitmap getThumbnailFromCache(long handle){
+		return thumbnailCache.get(handle);
+	}
+	
+	public static void setThumbnailCache(long handle, Bitmap bitmap){
+		thumbnailCache.put(handle, bitmap);
+	}
+	
 	public static Bitmap getThumbnailFromFolder(MegaNode node, Context context){
 		File thumbDir = getThumbFolder(context);
 		File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");

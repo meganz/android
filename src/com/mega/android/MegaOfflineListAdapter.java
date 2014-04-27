@@ -111,6 +111,8 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (thumb != null){
 				thumb = Util.rotateBitmap(thumb, orientation);
+				long handle = Long.parseLong(currentFile.getParentFile().getName());
+				ThumbnailUtils.setThumbnailCache(handle, thumb);
 				return thumb;
 			}
 			
@@ -230,13 +232,21 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		holder.imageView.setImageResource(MimeType.typeForName(currentFile.getName()).getIconResourceId());
 		
 		if (MimeType.typeForName(currentFile.getName()).isImage()){
+			Bitmap thumb = null;
+			long handle = Long.parseLong(currentFile.getParentFile().getName());
 			
-			try{
-				new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+			thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+			if (thumb != null){
+				holder.imageView.setImageBitmap(thumb);
 			}
-			catch(Exception e){
-				//Too many AsyncTasks
-			}			
+			else{
+				try{
+					new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+				}
+				catch(Exception e){
+					//Too many AsyncTasks
+				}
+			}
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
