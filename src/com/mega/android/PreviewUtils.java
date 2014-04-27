@@ -57,6 +57,14 @@ public class PreviewUtils {
 		return previewCache.get(node.getHandle());
 	}
 	
+	public static Bitmap getPreviewFromCache(long handle){
+		return previewCache.get(handle);
+	}
+	
+	public static void setPreviewCache(long handle, Bitmap bitmap){
+		previewCache.put(handle, bitmap);
+	}
+	
 	public static Bitmap getPreviewFromFolder(MegaNode node, Context context){
 		File previewDir = getPreviewFolder(context);
 		File preview = new File(previewDir, node.getBase64Handle()+".jpg");

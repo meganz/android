@@ -275,7 +275,6 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
-		holder = new ViewHolderFullImage();			
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
