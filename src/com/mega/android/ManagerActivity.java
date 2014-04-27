@@ -1,6 +1,7 @@
 package com.mega.android;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1596,6 +1597,33 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				builder.show();
 				break;
 			}
+			case SAVED_FOR_OFFLINE:{
+				CharSequence options[] = new CharSequence[] {"Help", "Upgrade Account", "Logout"};
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setItems(options, new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				    	switch(which){
+					    	case 0:{
+					    		Toast.makeText(managerActivity, "Help not yet implemented (logout is implemented)", Toast.LENGTH_SHORT).show();
+					    		break;
+					    	}
+					    	case 1:{
+					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+								startActivity(intent);
+								break;
+					    	}			    	
+					    	case 2:{
+					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+					    		break;
+					    	}
+				    	}
+				    }
+				});
+				builder.show();
+				break;
+			}
 		}
 	}
 	
@@ -1605,6 +1633,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi) {
 //		context.stopService(new Intent(context, BackgroundService.class));
 //		context.stopService(new Intent(context, CameraSyncService.class));
+		
+		File offlineDirectory = null;
+		if (context.getExternalFilesDir(null) != null){
+			offlineDirectory = context.getExternalFilesDir(null);
+		}
+		else{
+			offlineDirectory = context.getFilesDir();
+		}
+		
+		try {
+			Util.deleteFolderAndSubfolders(offlineDirectory);
+		} catch (IOException e) {}
 
 		Preferences.clearCredentials(context);
 		megaApi.logout();
