@@ -73,58 +73,61 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 //        ImageView optionProperties;
         ImageView optionDelete;
         int currentPosition;
+        String currentPath;
     }
     
-    //It's not correctly implemented
-//    private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
-//
-//    	ViewHolderOfflineList holder;
-//    	
-//    	public OfflineThumbnailAsyncTask(ViewHolderOfflineList holder) {
-//			this.holder = holder;
-//		}
-//    	
-//		@Override
-//		protected Bitmap doInBackground(String... params) {
-//
-//			String currentPath = params[0];
-//			File currentFile = new File(currentPath);
-//			
-//			BitmapFactory.Options options = new BitmapFactory.Options();
-//			options.inJustDecodeBounds = true;
-//			Bitmap thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-//			
-//			ExifInterface exif;
-//			int orientation = ExifInterface.ORIENTATION_NORMAL;
-//			try {
-//				exif = new ExifInterface(currentFile.getAbsolutePath());
-//				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-//			} catch (IOException e) {}  
-//			
-//			// Calculate inSampleSize
-//		    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
-//		    
-//		    // Decode bitmap with inSampleSize set
-//		    options.inJustDecodeBounds = false;
-//		    
-//		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-//			if (thumb != null){
-//				thumb = Util.rotateBitmap(thumb, orientation);
-//				return thumb;
-//			}
-//			
-//			return null;
-//		}
-//		
-//		@Override
-//		protected void onPostExecute(Bitmap thumb){
-//			if (thumb != null){
-//				holder.imageView.setImageBitmap(thumb);
-//				Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-//				holder.imageView.startAnimation(fadeInAnimation);
-//			}
-//		}    	
-//    }
+    private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
+
+    	ViewHolderOfflineList holder;
+    	String currentPath;
+    	
+    	public OfflineThumbnailAsyncTask(ViewHolderOfflineList holder) {
+			this.holder = holder;
+		}
+    	
+		@Override
+		protected Bitmap doInBackground(String... params) {
+
+			currentPath = params[0];
+			File currentFile = new File(currentPath);
+			
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			Bitmap thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			
+			ExifInterface exif;
+			int orientation = ExifInterface.ORIENTATION_NORMAL;
+			try {
+				exif = new ExifInterface(currentFile.getAbsolutePath());
+				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+			} catch (IOException e) {}  
+			
+			// Calculate inSampleSize
+		    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
+		    
+		    // Decode bitmap with inSampleSize set
+		    options.inJustDecodeBounds = false;
+		    
+		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			if (thumb != null){
+				thumb = Util.rotateBitmap(thumb, orientation);
+				return thumb;
+			}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Bitmap thumb){
+			if (thumb != null){
+				if (holder.currentPath.equals(currentPath)){
+					holder.imageView.setImageBitmap(thumb);
+					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+					holder.imageView.startAnimation(fadeInAnimation);
+				}
+			}
+		}    	
+    }
 	
 	public MegaOfflineListAdapter(OfflineFragment _fragment, Context _context, ArrayList<String> _paths, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.fragment = _fragment;
@@ -219,20 +222,22 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		String currentPath = (String) getItem(position);
 		File currentFile = new File(currentPath);
 		
+		holder.currentPath = currentPath;
+		
 		long fileSize = currentFile.length();
 		holder.textViewFileName.setText(currentFile.getName());
 		holder.textViewFileSize.setText(Util.getSizeString(fileSize));
 		holder.imageView.setImageResource(MimeType.typeForName(currentFile.getName()).getIconResourceId());
 		
-//		if (MimeType.typeForName(currentFile.getName()).isImage()){
-//			
-//			try{
-//				new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
-//			}
-//			catch(Exception e){
-//				//Too many AsyncTasks
-//			}			
-//		}
+		if (MimeType.typeForName(currentFile.getName()).isImage()){
+			
+			try{
+				new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+			}
+			catch(Exception e){
+				//Too many AsyncTasks
+			}			
+		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
