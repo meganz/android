@@ -279,16 +279,26 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			else{
 				String currentPath = paths.get(position);
 				File currentFile = new File (currentPath);
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-					context.startActivity(viewIntent);
+				
+				if (MimeType.typeForName(currentFile.getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", position);
+					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+					intent.putExtra("parentNodeHandle", -1L);
+					startActivity(intent);
 				}
 				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, intentShare)){
-						context.startActivity(intentShare);
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+						context.startActivity(viewIntent);
+					}
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+							context.startActivity(intentShare);
+						}
 					}
 				}
 			}

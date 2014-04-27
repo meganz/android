@@ -119,6 +119,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
 	final public static int SHARED_WITH_ME_ADAPTER = 2003;
+	final public static int OFFLINE_ADAPTER = 2004;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
