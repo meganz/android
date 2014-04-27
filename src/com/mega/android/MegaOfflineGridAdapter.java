@@ -58,65 +58,69 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 	TextView emptyTextViewFragment;
 	ActionBar aB;
 	
-	//It's not correctly implemented
-//	private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
-//
-//		ViewHolderOfflineGrid holder;
-//    	int cell = 0;
-//    	
-//    	public OfflineThumbnailAsyncTask(ViewHolderOfflineGrid holder, int cell) {
-//			this.holder = holder;
-//			this.cell = cell;
-//		}
-//    	
-//		@Override
-//		protected Bitmap doInBackground(String... params) {
-//
-//			String currentPath = params[0];
-//			File currentFile = new File(currentPath);
-//			
-//			BitmapFactory.Options options = new BitmapFactory.Options();
-//			options.inJustDecodeBounds = true;
-//			Bitmap thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-//			
-//			ExifInterface exif;
-//			int orientation = ExifInterface.ORIENTATION_NORMAL;
-//			try {
-//				exif = new ExifInterface(currentFile.getAbsolutePath());
-//				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-//			} catch (IOException e) {}  
-//			
-//			// Calculate inSampleSize
-//		    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
-//		    
-//		    // Decode bitmap with inSampleSize set
-//		    options.inJustDecodeBounds = false;
-//		    
-//		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
-//			if (thumb != null){
-//				thumb = Util.rotateBitmap(thumb, orientation);
-//				return thumb;
-//			}
-//			
-//			return null;
-//		}
-//		
-//		@Override
-//		protected void onPostExecute(Bitmap thumb){
-//			if (thumb != null){
-//				if (cell == 0){
-//					holder.imageView1.setImageBitmap(thumb);
-//					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-//					holder.imageView1.startAnimation(fadeInAnimation);
-//				}
-//				else if (cell == 1){
-//					holder.imageView2.setImageBitmap(thumb);
-//					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-//					holder.imageView2.startAnimation(fadeInAnimation);
-//				}
-//			}
-//		}    	
-//    }
+	private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
+
+		ViewHolderOfflineGrid holder;
+		String currentPath;
+    	int cell = 0;
+    	
+    	public OfflineThumbnailAsyncTask(ViewHolderOfflineGrid holder, int cell) {
+			this.holder = holder;
+			this.cell = cell;
+		}
+    	
+		@Override
+		protected Bitmap doInBackground(String... params) {
+
+			currentPath = params[0];
+			File currentFile = new File(currentPath);
+			
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			Bitmap thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			
+			ExifInterface exif;
+			int orientation = ExifInterface.ORIENTATION_NORMAL;
+			try {
+				exif = new ExifInterface(currentFile.getAbsolutePath());
+				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+			} catch (IOException e) {}  
+			
+			// Calculate inSampleSize
+		    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
+		    
+		    // Decode bitmap with inSampleSize set
+		    options.inJustDecodeBounds = false;
+		    
+		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			if (thumb != null){
+				thumb = Util.rotateBitmap(thumb, orientation);
+				return thumb;
+			}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Bitmap thumb){
+			if (thumb != null){
+				if (cell == 0){
+					if (holder.currentPath1.equals(currentPath)){
+						holder.imageView1.setImageBitmap(thumb);
+						Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+						holder.imageView1.startAnimation(fadeInAnimation);
+					}
+				}
+				else if (cell == 1){
+					if (holder.currentPath2.equals(currentPath)){
+						holder.imageView2.setImageBitmap(thumb);
+						Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+						holder.imageView2.startAnimation(fadeInAnimation);
+					}
+				}
+			}
+		}    	
+    }
 		
 	public MegaOfflineGridAdapter(OfflineFragment _fragment, Context _context, ArrayList<String> _paths, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.fragment = _fragment;
@@ -158,6 +162,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
         ImageButton optionOpen2;
         ImageView optionDelete2;
         int currentPosition;
+        String currentPath1;
+        String currentPath2;
     }
     
     ViewHolderOfflineGrid holder = null;
@@ -261,39 +267,45 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 
 			String currentPath1 = (String) getItem(position);
 			File currentFile1 = new File(currentPath1);
+			
+			holder.currentPath1 = currentPath1;
+			
 			long fileSize1 = currentFile1.length();
 			holder.textViewFileName1.setText(currentFile1.getName());
 			holder.textViewFileSize1.setText(Util.getSizeString(fileSize1));
 			holder.imageView1.setImageResource(MimeType.typeForName(currentFile1.getName()).getIconResourceId());
 			
-//			if (MimeType.typeForName(currentFile1.getName()).isImage()){
-//				
-//				try{
-//					new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
-//				}
-//				catch(Exception e){
-//					//Too many AsyncTasks
-//				}			
-//			}
+			if (MimeType.typeForName(currentFile1.getName()).isImage()){
+				
+				try{
+					new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
+				}
+				catch(Exception e){
+					//Too many AsyncTasks
+				}			
+			}
 			
 			String currentPath2 = "";
 			if (position < (getCount()-1)){
 				currentPath2 = (String) getItem(position+1);
 				File currentFile2 = new File(currentPath2);
+				
+				holder.currentPath2 = currentPath2;
+				
 				long fileSize2 = currentFile2.length();
 				holder.textViewFileName2.setText(currentFile2.getName());
 				holder.textViewFileSize2.setText(Util.getSizeString(fileSize2));
 				holder.imageView2.setImageResource(MimeType.typeForName(currentFile2.getName()).getIconResourceId());
 				
-//				if (MimeType.typeForName(currentFile1.getName()).isImage()){
-//					
-//					try{
-//						new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile1.getAbsolutePath());
-//					}
-//					catch(Exception e){
-//						//Too many AsyncTasks
-//					}			
-//				}
+				if (MimeType.typeForName(currentFile2.getName()).isImage()){
+					
+					try{
+						new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile2.getAbsolutePath());
+					}
+					catch(Exception e){
+						//Too many AsyncTasks
+					}			
+				}
 				
 				holder.itemLayout2.setVisibility(View.VISIBLE);				
 			}
