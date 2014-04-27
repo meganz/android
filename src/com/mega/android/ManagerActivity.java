@@ -1390,16 +1390,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					MenuItemCompat.expandActionView(searchMenuItem);
 				}
 				else{
-					Toast.makeText(this, "HOLA!", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, "searchMenuItem == null", Toast.LENGTH_LONG).show();
 				}
 				break;
 			}
 			case R.id.top_control_bar:{
-				Toast.makeText(this, "Link to \'My Account\' (top)", Toast.LENGTH_LONG).show();
+				drawerItem = DrawerItem.ACCOUNT;
+				selectDrawerItem(drawerItem);
 				break;
 			}
 			case R.id.bottom_control_bar:{
-				Toast.makeText(this, "Link to \'My Account\' (bottom)", Toast.LENGTH_LONG).show();
+				drawerItem = DrawerItem.ACCOUNT;
+				selectDrawerItem(drawerItem);
 				break;
 			}
 		}
