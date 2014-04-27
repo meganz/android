@@ -470,26 +470,21 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}	
 		}
 		else{
-//			if (adapterGrid != null){
-//				adapterGrid.setNodes(nodes);
-//				if (adapterGrid.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyTextView.setVisibility(View.VISIBLE);
-//					if (megaApi.getRootNode().getHandle()==parentHandle) {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-//						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-//					} else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextView.setText(R.string.file_browser_empty_folder);
-//					}
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//				}			
-//			}
+			if (adapterGrid != null){
+				adapterGrid.setPaths(paths);
+				if (adapterGrid.getCount() == 0){
+					listView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
+				}
+				else{
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}			
+			}
 		}
 	}
 	
