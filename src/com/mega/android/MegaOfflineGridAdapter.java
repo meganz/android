@@ -95,6 +95,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (thumb != null){
 				thumb = Util.rotateBitmap(thumb, orientation);
+				long handle = Long.parseLong(currentFile.getParentFile().getName());
+				ThumbnailUtils.setThumbnailCache(handle, thumb);
 				return thumb;
 			}
 			
@@ -276,13 +278,21 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			holder.imageView1.setImageResource(MimeType.typeForName(currentFile1.getName()).getIconResourceId());
 			
 			if (MimeType.typeForName(currentFile1.getName()).isImage()){
+				Bitmap thumb1 = null;
+				long handle = Long.parseLong(currentFile1.getParentFile().getName());
 				
-				try{
-					new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
+				thumb1 = ThumbnailUtils.getThumbnailFromCache(handle);
+				if (thumb1 != null){
+					holder.imageView1.setImageBitmap(thumb1);
 				}
-				catch(Exception e){
-					//Too many AsyncTasks
-				}			
+				else{
+					try{
+						new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
+					}
+					catch(Exception e){
+						//Too many AsyncTasks
+					}		
+				}
 			}
 			
 			String currentPath2 = "";
@@ -299,12 +309,21 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				
 				if (MimeType.typeForName(currentFile2.getName()).isImage()){
 					
-					try{
-						new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile2.getAbsolutePath());
+					Bitmap thumb2 = null;
+					long handle = Long.parseLong(currentFile2.getParentFile().getName());
+					
+					thumb2 = ThumbnailUtils.getThumbnailFromCache(handle);
+					if (thumb2 != null){
+						holder.imageView2.setImageBitmap(thumb2);
 					}
-					catch(Exception e){
-						//Too many AsyncTasks
-					}			
+					else{
+						try{
+							new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile2.getAbsolutePath());
+						}
+						catch(Exception e){
+							//Too many AsyncTasks
+						}			
+					}
 				}
 				
 				holder.itemLayout2.setVisibility(View.VISIBLE);				
