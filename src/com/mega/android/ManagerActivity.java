@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
+import com.mega.sdk.AccountDetails;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -55,6 +56,7 @@ import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils.TruncateAt;
+import android.text.format.Formatter;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
@@ -140,7 +142,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private ImageView imageProfile;
 	private TextView userName;
 	private TextView userEmail;
-	private TextView used_space;
+	private TextView usedSpace;
+	
+	ImageView barFill;
+	ImageView barStructure;
 	
 	MegaUser contact = null;
 	
@@ -240,9 +245,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
         topControlBar.setOnClickListener(this);
         bottomControlBar = (TableLayout) findViewById(R.id.bottom_control_bar);
         bottomControlBar.setOnClickListener(this);
-        used_space = (TextView) findViewById(R.id.used_space);
-		
-		MegaNode rootNode = megaApi.getRootNode();
+        usedSpace = (TextView) findViewById(R.id.used_space);
+        barFill = (ImageView) findViewById(R.id.bar_fill);
+        barStructure = (ImageView) findViewById(R.id.bar_structure);
+        
+       MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			Intent intent = new Intent(managerActivity,LoginActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -328,19 +335,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 			}
 			
-	        String used = "11";
-	        String total = "50";
+			usedSpace.setText("");
 	        
-	        String used_space_string = getString(R.string.used_space, used, total);
-	        used_space.setText(used_space_string);
-	        
-	        Spannable wordtoSpan = new SpannableString(used_space_string);        
-	
-	        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), 6, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 9, 11, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-	        used_space.setText(wordtoSpan);
+	        megaApi.getAccountDetails(this);
 	        
 	        List<String> items = new ArrayList<String>();
 			for (DrawerItem item : DrawerItem.values()) {
@@ -1692,7 +1689,48 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		if (request.getType() == MegaRequest.TYPE_LOGOUT){
+		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+			log ("account_details request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				AccountDetails accountInfo = request.getAccountDetails();
+				
+				long totalStorage = accountInfo.getMaxStorage();
+				long usedStorage = accountInfo.getUsedStorage();
+				
+				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
+				String total = "";
+				if (totalStorage >= 1024){
+					totalStorage = totalStorage / 1024;
+					total = total + totalStorage + " TB";
+				}
+				else{
+					 total = total + totalStorage + " GB";
+				}
+
+				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
+				String used = "";
+				if (usedStorage >= 1024){
+					usedStorage = usedStorage / 1024;
+					used = used + usedStorage + " TB";
+				}
+				else{
+					used = used + usedStorage + " GB";
+				}
+				
+		        String usedSpaceString = getString(R.string.used_space, used, total);
+		        usedSpace.setText(usedSpaceString);
+		        
+		        Spannable wordtoSpan = new SpannableString(usedSpaceString);        
+		
+		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 4, used.length() + 4 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        usedSpace.setText(wordtoSpan);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){

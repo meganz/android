@@ -96,7 +96,7 @@
 	<string name="section_image_viewer">Image Viewer</string>
 	<string name="section_transfers">Transfers</string>
 	<string name="section_account">My Account</string>
-	<string name="used_space">%1$s GB of %2$s GB</string>
+	<string name="used_space">%1$s of %2$s</string>
 	
 	<string name="file_browser_empty_cloud_drive">Empty Cloud Drive</string>
 	<string name="file_browser_empty_rubbish_bin">Empty Rubbish Bin</string>
