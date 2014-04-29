@@ -45,7 +45,6 @@ public class TourActivity extends Activity implements OnClickListener {
 		int screenWidth = 0;
 		int screenHeight = 0;
 		
-		//EL CAMBIO DE ORIENTACION NO FUNCIONA
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
         	display.getSize(size);
         	screenWidth = size.x;

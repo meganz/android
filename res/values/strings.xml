@@ -53,6 +53,7 @@
     <string name="login_text">Login</string>
     <string name="email_text">e-mail</string>
     <string name="password_text">password</string>
+    <string name="confirm_password_text">confirm password</string>
     <string name="abc">ABC</string>
     <string name="dots">···</string>
     <string name="new_to_mega">New to MEGA?</string>

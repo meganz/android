@@ -65,7 +65,7 @@
 		        android:inputType="textPassword"
 		        android:layout_width="fill_parent"
 		        android:layout_height="fill_parent"
-		        android:hint="@string/password_text"
+		        android:hint="@string/confirm_password_text"
 		        android:imeOptions="actionDone"
 		        android:layout_gravity="center"
 		        style="@style/InputField" />
