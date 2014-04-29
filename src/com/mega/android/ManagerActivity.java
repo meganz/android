@@ -79,6 +79,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -142,10 +143,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private ImageView imageProfile;
 	private TextView userName;
 	private TextView userEmail;
+	private TextView usedSpaceText;
 	private TextView usedSpace;
 	
-	ImageView barFill;
-	ImageView barStructure;
+//	ImageView barFill;
+//	ImageView barStructure;
+	ProgressBar usedSpaceBar;
 	
 	MegaUser contact = null;
 	
@@ -246,10 +249,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
         bottomControlBar = (TableLayout) findViewById(R.id.bottom_control_bar);
         bottomControlBar.setOnClickListener(this);
         usedSpace = (TextView) findViewById(R.id.used_space);
-        barFill = (ImageView) findViewById(R.id.bar_fill);
-        barStructure = (ImageView) findViewById(R.id.bar_structure);
+        usedSpaceText = (TextView) findViewById(R.id.used_space_text);
+        usedSpaceBar = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
-       MegaNode rootNode = megaApi.getRootNode();
+        usedSpaceBar.setProgress(0);
+//        barFill = (ImageView) findViewById(R.id.bar_fill);
+//        barStructure = (ImageView) findViewById(R.id.bar_structure);
+        
+        MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			Intent intent = new Intent(managerActivity,LoginActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -335,7 +342,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}
 			}
 			
-			usedSpace.setText("");
+			bottomControlBar.setVisibility(View.GONE);
 	        
 	        megaApi.getAccountDetails(this);
 	        
@@ -1661,7 +1668,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		if (request.getType() == MegaRequest.TYPE_LOGOUT){
+		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+			log("account_details request start");
+		}
+		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout request start");
 		}	
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -1720,14 +1730,36 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				
 		        String usedSpaceString = getString(R.string.used_space, used, total);
 		        usedSpace.setText(usedSpaceString);
+		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
 		        
-		        Spannable wordtoSpan = new SpannableString(usedSpaceString);        
-		
-		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_OK)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        bottomControlBar.setVisibility(View.VISIBLE);
+		        
+		        int usedPerc = (int)((100 * usedStorage) / totalStorage);
+		        if (usedPerc < 90){
+		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
+		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        }
+		        else if ((usedPerc >= 90) && (usedPerc <= 95)){
+		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
+		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        }
+		        else{
+		        	if (usedPerc > 100){
+			        	usedPerc = 100;
+			        }
+		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));    
+		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        }
+		        usedSpaceBar.setProgress(usedPerc);
+		        
+		                
+				
+		        
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 4, used.length() + 4 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        usedSpace.setText(wordtoSpan);
+		        
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
