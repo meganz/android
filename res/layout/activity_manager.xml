@@ -88,9 +88,10 @@
         <TableRow>
 
 		    <TextView
+		        android:id="@+id/used_space_text"
 	            android:layout_width="fill_parent"
 	            android:layout_height="wrap_content"
-	            android:text="Used Space" 
+	            android:text="@string/used_space_text" 
 	            android:textColor="@color/navigation_drawer_text"
 	            android:paddingTop="10dp"
 	            android:paddingLeft="10dp"
@@ -114,8 +115,15 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_span="2">
+	            
+                <ProgressBar
+				    android:id="@+id/manager_used_space_bar"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content" 
+					style="@style/MEGAProgressBar"  
+					android:layout_margin="5dip" />
                 
-                <ImageView
+<!--                 <ImageView
                     android:id="@+id/bar_structure"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -136,7 +144,7 @@
                     android:paddingTop="5dp"
                     android:paddingBottom="10dp"
                     android:layout_alignTop="@+id/bar_structure" />
-                    
+ -->               
             </RelativeLayout>
         </TableRow>
 		
