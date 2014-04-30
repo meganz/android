@@ -9,10 +9,10 @@ import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -25,7 +25,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-public class FullScreenImageViewer extends ActionBarActivity implements OnPageChangeListener, OnClickListener{
+public class FullScreenImageViewer extends Activity implements OnPageChangeListener, OnClickListener{
 	
 	private Display display;
 	private DisplayMetrics outMetrics;
@@ -228,13 +228,13 @@ public class FullScreenImageViewer extends ActionBarActivity implements OnPageCh
 		}
 	}
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.full_screen_image_view_menu, menu);
-	    	    
-	    return super.onCreateOptionsMenu(menu);
-	}
+//	@Override
+//	public boolean onCreateOptionsMenu(Menu menu) {
+//	    MenuInflater inflater = getMenuInflater();
+//	    inflater.inflate(R.menu.full_screen_image_view_menu, menu);
+//	    	    
+//	    return super.onCreateOptionsMenu(menu);
+//	}
 
 	@Override
 	public void onClick(View v) {
