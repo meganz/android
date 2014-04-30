@@ -188,17 +188,21 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
-		log("onCreate");
-		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		super.onCreate(savedInstanceState);
+		log("onCreate");		
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 		
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
