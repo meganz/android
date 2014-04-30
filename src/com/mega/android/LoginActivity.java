@@ -76,6 +76,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     private MegaRequestListener requestListener;
     UserCredentials credentials;
     private boolean backWhileLogin;
+    private boolean loginClicked = false;
     private long parentHandle = -1;
 	
 	/*
@@ -101,6 +102,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		loginClicked = false;
 		
 		loginActivity = this;
 		MegaApplication app = (MegaApplication)getApplication();
@@ -263,6 +266,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 
 		switch(v.getId()){
 			case R.id.button_login_login:
+				loginClicked = true;
 				onLoginClick(v);
 				break;
 			case R.id.button_create_account_login:
@@ -553,7 +557,15 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	public void onBackPressed() {
 		backWhileLogin = true;
-		super.onBackPressed();
+		
+		if (loginClicked){
+			super.onBackPressed();
+		}
+		else{
+			Intent intent = new Intent(this, TourActivity.class);
+			startActivity(intent);
+			finish();
+		}
 	}
 	
 	@Override
