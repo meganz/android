@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import com.mega.components.LoopViewPager;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -17,8 +19,9 @@ import android.widget.Toast;
 
 public class TourActivity extends Activity implements OnClickListener {
 	
+	
 	private TourImageAdapter adapter;
-	private ViewPager viewPager;
+	private LoopViewPager viewPager;
 	private ImageView bar;
 	private Button bRegister;
 	private Button bLogin;
@@ -29,7 +32,7 @@ public class TourActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_tour);
-		viewPager = (ViewPager) findViewById(R.id.pager);
+		viewPager = (LoopViewPager) findViewById(R.id.pager);
 		bar = (ImageView) findViewById(R.id.barTour);
 		bRegister = (Button) findViewById(R.id.button_register_tour);
 		bLogin = (Button) findViewById(R.id.button_login_tour);
