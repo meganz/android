@@ -130,6 +130,13 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 		}		
 	}
 	
+	@Override
+	public void onBackPressed(){
+		Intent intent = new Intent(this, TourActivity.class);
+		startActivity(intent);
+		finish();
+	}
+	
 	public void onLoginClick(View v){
 		Intent intent = new Intent(this, LoginActivity.class);
 		startActivity(intent);
