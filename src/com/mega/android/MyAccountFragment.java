@@ -10,9 +10,12 @@ import com.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,8 +44,17 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 	long usedStorage;
 	int proLevel;
 	
+	Context context;
+	ActionBar aB;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup group, Bundle savedInstanceState) {
+		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
+		aB.setTitle(getString(R.string.section_account));
+		
 		super.onCreateView(inflater, group, savedInstanceState);
 		View view = inflater.inflate(R.layout.activity_my_account, null);
 		megaApi = ((MegaApplication)getActivity().getApplication()).getMegaApi();
@@ -76,6 +88,13 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 		});
 		return view;
 	}
+	
+	@Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        context = activity;
+        aB = ((ActionBarActivity)activity).getSupportActionBar();
+    }
 	
 	@Override
 	public void onResume() {
