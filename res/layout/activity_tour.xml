@@ -22,7 +22,7 @@
 	       
 	       <com.mega.components.LoopViewPager
 	           android:id="@+id/pager"
-	           android:layout_width="fill_parent"
+	           android:layout_width="wrap_content"
 	           android:layout_height="wrap_content"
 	           android:layout_gravity="center" />
 	       
@@ -38,6 +38,7 @@
 	    <include layout="@layout/delimiter" />
 
         <LinearLayout
+            android:id="@+id/tour_login_create"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

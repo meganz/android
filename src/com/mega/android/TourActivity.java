@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class TourActivity extends Activity implements OnClickListener {
@@ -25,6 +26,8 @@ public class TourActivity extends Activity implements OnClickListener {
 	private ImageView bar;
 	private Button bRegister;
 	private Button bLogin;
+	private LinearLayout tourLoginCreate;
+	int heightGrey = 0;
 	
 	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
@@ -43,23 +46,24 @@ public class TourActivity extends Activity implements OnClickListener {
 		adapter = new TourImageAdapter(this);
 		viewPager.setAdapter(adapter);
 		viewPager.setCurrentItem(0);
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		int screenWidth = 0;
-		int screenHeight = 0;
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
-        	display.getSize(size);
-        	screenWidth = size.x;
-        	screenHeight = size.y;
-		}
-		else{
-			screenWidth = display.getWidth();
-			screenHeight = display.getHeight();
-		}
+	    Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = getResources().getDisplayMetrics().density;
 		
-		viewPager.getLayoutParams().width = screenWidth;
-		viewPager.getLayoutParams().height = screenWidth;
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+	    
+	    float dpHeight = outMetrics.heightPixels / density;
+	    float dpWidth  = outMetrics.widthPixels / density;
+	    
+	    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
+	    
+	    viewPager.getLayoutParams().height = Util.px2dp((350*scaleH), outMetrics);
+		
+//		viewPager.getLayoutParams().width = screenWidth;
+//		viewPager.getLayoutParams().height = screenWidth;
 
 		viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
 													
@@ -74,18 +78,20 @@ public class TourActivity extends Activity implements OnClickListener {
 														bar.setImageResource(barImages[position]);
 													}
 												});
-		
-	    DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-
-	    float density  = getResources().getDisplayMetrics().density;
-	    float dpHeight = outMetrics.heightPixels / density;
-	    float dpWidth  = outMetrics.widthPixels / density;
 	    
-	    String cadena;
-	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_";
-	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
+//	    String cadena;
+//	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_heightPix" + outMetrics.heightPixels;
+//	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
+	    
+	    tourLoginCreate = (LinearLayout) findViewById(R.id.tour_login_create);
 	}	
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		
+//		Toast.makeText(this, "onWindow: HEIGHT: " + tourLoginCreate.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();
+	}
 	
 	@Override
 	public void onClick(View v) {

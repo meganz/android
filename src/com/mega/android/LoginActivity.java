@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Credentials;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -32,8 +33,10 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView.OnEditorActionListener;
@@ -51,6 +54,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	EditText et_password;
 	Button bRegister;
 	Button bLogin;
+	ImageView loginThreeDots;
+	MySwitch loginSwitch;
+	TextView loginABC;
 	LinearLayout loginLogin;
 	LinearLayout loginLoggingIn;
 	LinearLayout loginCreateAccount;
@@ -61,6 +67,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	TextView confirmingAccountText;
 	TextView loggingInText;
 	TextView fetchingNodesText;
+	
+	int heightGrey = 0;
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 //	private ProgressDialog progress;
 	
@@ -111,13 +123,15 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 		backWhileLogin = false;
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-
-	    float density  = getResources().getDisplayMetrics().density;
-	    float dpHeight = outMetrics.heightPixels / density;
-	    float dpWidth  = outMetrics.widthPixels / density;
+	    density  = getResources().getDisplayMetrics().density;
+		
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
+	    
+	    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
 	    
 	    setContentView(R.layout.activity_login);
 		
@@ -134,6 +148,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		
 		loginTitle.setText(R.string.login_activity);
+		loginTitle.setTextSize(28*scaleH);
 		
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
@@ -164,7 +179,20 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		bRegister.setOnClickListener(this);		
 		bLogin.setOnClickListener(this);
 		
-		MySwitch loginSwitch = (MySwitch) findViewById(R.id.switch_login);
+		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((40*scaleH), outMetrics));
+		
+		((LinearLayout.LayoutParams)bLogin.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+		((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+		
+		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
+		
+		loginThreeDots.setPadding(0, Util.px2dp((20*scaleH), outMetrics), Util.px2dp((4*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics));
+		
+		loginABC = (TextView) findViewById(R.id.ABC);
+		
+		((TableRow.LayoutParams)loginABC.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((5*scaleH), outMetrics));
+		
+		loginSwitch = (MySwitch) findViewById(R.id.switch_login);
 		loginSwitch.setChecked(true);
 		
 		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -180,6 +208,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			    }				
 			}
 		});
+		
+		((TableRow.LayoutParams)loginSwitch.getLayoutParams()).setMargins(Util.px2dp((1*scaleH), outMetrics), Util.px2dp((8*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0);
 		
 		Intent intentReceived = getIntent();
 		if (intentReceived != null && ACTION_CONFIRM.equals(intentReceived.getAction())) {
@@ -261,6 +291,21 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		}
 	}
 	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		int diffHeight = heightGrey - loginCreateAccount.getTop();
+		
+		int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
+		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
+		
+//		Toast.makeText(this, "onWindow: HEIGHT: " + loginCreateAccount.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();
+//		int marginBottom = 37; //related to a 533dp height
+//		float dpHeight = outMetrics.heightPixels / density;
+//		marginBottom =  marginBottom + (int) ((dpHeight - 533) / 6);
+//		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((marginBottom*scaleH), outMetrics));
+	}
+
 	@Override
 	public void onClick(View v) {
 
