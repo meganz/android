@@ -57,6 +57,8 @@
     <string name="abc">ABC</string>
     <string name="dots">···</string>
     <string name="new_to_mega">New to MEGA?</string>
+    <string name="tour_text_1">Lorem ipsum dolor sit amet</string>
+    <string name="tour_text_2">Sed ut perspiciatis unde omnis iste natus</string>
     <string name="create_account">Create an account</string>
     <string name="login_logging_in">Logging in</string>
     <string name="error_enter_email">Please enter your email address</string>

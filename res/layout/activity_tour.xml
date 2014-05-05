@@ -41,24 +41,42 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="20dp" 
+            android:paddingTop="10dp" 
             android:paddingBottom="20dp"
             android:gravity="center_horizontal"
             >
+	       
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:layout_marginBottom="@dimen/standard_margin"
+                android:textColor="@color/text_login"
+                android:text="@string/tour_text_1"
+                />
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginBottom="@dimen/standard_margin"
+                android:textColor="@color/text_login"
+                android:text="@string/tour_text_2"
+                />
             
             <Button
-                android:id="@+id/button_register_tour"
+                android:id="@+id/button_login_tour"
                 style="@style/button_MEGA"
                 android:layout_gravity="center"
-                android:text="@string/create_account" 
+                android:text="@string/login_text"
                 android:gravity="center" >
             </Button>
             
             <Button
-                android:id="@+id/button_login_tour"
+                android:id="@+id/button_register_tour"
                 style="@style/button_MEGA_inverse"
                 android:layout_gravity="center"
-                android:text="@string/login_text"
+                android:text="@string/create_account" 
                 android:gravity="center" >
             </Button>
             
