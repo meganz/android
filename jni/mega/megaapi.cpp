@@ -2304,6 +2304,7 @@ void MegaApi::transfer_update(Transfer *tr)
 		transfer->setTransferredBytes(tr->slot->progressreported);
 
         unsigned long long currentTime = Waiter::ds;
+        unsigned long long lastTime = transfer->getUpdateTime();
         if(currentTime<transfer->getStartTime())
             transfer->setStartTime(currentTime);
 
@@ -2323,7 +2324,9 @@ void MegaApi::transfer_update(Transfer *tr)
         //cout << th << transfer->getFileName() << ": Update: " << tr->slot->progressreported/1024 << " KB of "
         //     << transfer->getTotalBytes()/1024 << " KB, " << tr->slot->progressreported*10/(1024*(Waiter::ds-transfer->getStartTime())+1) << " KB/s" << endl;
 
-        fireOnTransferUpdate(this, transfer);
+        if (lastTime != currentTime){
+        	fireOnTransferUpdate(this, transfer);
+        }
 	}
 }
 
