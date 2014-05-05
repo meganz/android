@@ -3,6 +3,10 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.TransferList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class TransfersFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
@@ -35,9 +40,25 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	ArrayList<Integer> imageIds;
 	ArrayList<String> namesArray;
 	
+	MegaApiAndroid megaApi;
+	
+	@Override
+	public void onCreate (Bundle savedInstanceState){
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+		
+		super.onCreate(savedInstanceState);
+		log("onCreate");		
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 		
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
@@ -45,6 +66,9 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		aB.setTitle(getString(R.string.section_transfers));
 
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
+		
+		TransferList tL = megaApi.getTransfers();		
+		Toast.makeText(context, "tL.size()=" + tL.size(), Toast.LENGTH_LONG).show();
 		
 		namesArray = new ArrayList<String>();
 		imageIds = new ArrayList<Integer>();
@@ -105,6 +129,8 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		}
 	}
 	
-	
+	private static void log(String log) {
+		Util.log("TransfersFragment", log);
+	}
 
 }

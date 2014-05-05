@@ -10,6 +10,7 @@
     <color name="used_space_ok">#1ea4e3</color>
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>
+    <color name="transfer_progress">#cccccc</color>
     <color name="navigation_drawer_mail">#858585</color>
     <color name="navigation_drawer_text">#d2d2d2</color>
     <color name="navigation_drawer_background">#333333</color>

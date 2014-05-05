@@ -26,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,8 +63,9 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
         TextView textViewCompleted;
         ImageView imageViewOneDot;
         TextView textViewRate;
-        ImageView imageViewBarStructure;
-        ImageView imageViewBarFill;
+//        ImageView imageViewBarStructure;
+//        ImageView imageViewBarFill;
+        ProgressBar transferProgressBar;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
         ImageView arrowSelection;
@@ -99,8 +101,9 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.textViewCompleted = (TextView) convertView.findViewById(R.id.transfers_list_completed_text);
 			holder.imageViewOneDot = (ImageView) convertView.findViewById(R.id.transfers_list_one_dot);
 			holder.textViewRate = (TextView) convertView.findViewById(R.id.transfers_list_transfer_rate);
-			holder.imageViewBarStructure = (ImageView) convertView.findViewById(R.id.transfers_list_bar_structure);
-			holder.imageViewBarFill = (ImageView) convertView.findViewById(R.id.transfers_list_bar_fill);
+//			holder.imageViewBarStructure = (ImageView) convertView.findViewById(R.id.transfers_list_bar_structure);
+//			holder.imageViewBarFill = (ImageView) convertView.findViewById(R.id.transfers_list_bar_fill);
+			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_bar); 
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.transfers_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.transfers_list_options);
 			holder.optionUndo = (ImageButton) convertView.findViewById(R.id.transfers_list_option_undo);
@@ -128,25 +131,30 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.imageViewCompleted.setImageResource(R.drawable.transferok);
 			holder.imageViewOneDot.setVisibility(View.GONE);
 			holder.textViewRate.setVisibility(View.GONE);	
-			holder.imageViewBarStructure.setVisibility(View.GONE);
-			holder.imageViewBarFill.setVisibility(View.GONE);
+//			holder.imageViewBarStructure.setVisibility(View.GONE);
+//			holder.imageViewBarFill.setVisibility(View.GONE);
+			holder.transferProgressBar.setVisibility(View.GONE);
 		}
 		else if (position == 6 || position == 7){
 			holder.textViewCompleted.setText("Queued");
 			holder.imageViewCompleted.setImageResource(R.drawable.transferqueued);
 			holder.imageViewOneDot.setVisibility(View.GONE);
 			holder.textViewRate.setVisibility(View.GONE);
-			holder.imageViewBarStructure.setVisibility(View.GONE);
-			holder.imageViewBarFill.setVisibility(View.GONE);
+//			holder.imageViewBarStructure.setVisibility(View.GONE);
+//			holder.imageViewBarFill.setVisibility(View.GONE);
+			holder.transferProgressBar.setVisibility(View.GONE);
 		}
 		else{
 			holder.imageViewOneDot.setVisibility(View.VISIBLE);
 			holder.textViewRate.setVisibility(View.VISIBLE);
-			holder.imageViewBarStructure.setVisibility(View.VISIBLE);
-			holder.imageViewBarFill.setVisibility(View.VISIBLE);
+//			holder.imageViewBarStructure.setVisibility(View.VISIBLE);
+//			holder.imageViewBarFill.setVisibility(View.VISIBLE);
+			holder.transferProgressBar.setVisibility(View.VISIBLE);
 			holder.textViewRate.setText("600 KB/s");
-			holder.imageViewBarStructure.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
-			holder.imageViewBarFill.getLayoutParams().width = Util.px2dp((170*scaleW), outMetrics);
+//			holder.imageViewBarStructure.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+//			holder.imageViewBarFill.getLayoutParams().width = Util.px2dp((170*scaleW), outMetrics);
+			holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+			holder.transferProgressBar.setProgress(65);
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
