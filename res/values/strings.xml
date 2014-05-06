@@ -202,5 +202,7 @@
     <string name="error_entity_not_found">Entity not found</string>
     <string name="error_user_blocked">Owner of this file is blocked</string>
     
+    <string name="file_properties_get_link">The link has been copied to the clipboard</string>
+    
     
 </resources>

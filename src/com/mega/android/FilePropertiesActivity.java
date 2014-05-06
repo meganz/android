@@ -19,6 +19,7 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.NodeList;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -77,6 +78,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	MegaNode node;
 	long handle;
 	
+	boolean availableOfflineBoolean = false;
+	
 	private MegaApiAndroid megaApi = null;
 	public FilePropertiesActivity filePropertiesActivity;
 	
@@ -92,6 +95,10 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	
+	MenuItem downloadMenuItem; 
+	
+	boolean shareIt = true;
 	
 	
 	@Override
@@ -179,17 +186,24 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				if (destination.exists() && destination.isDirectory()){
 					offlineFile = new File(destination, node.getName());
 					if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+						availableOfflineBoolean = true;
 						availableSwitchOffline.setVisibility(View.VISIBLE);
 						availableSwitchOnline.setVisibility(View.GONE);
 					}
 					else{
+						availableOfflineBoolean = false;
 						availableSwitchOffline.setVisibility(View.GONE);
 						availableSwitchOnline.setVisibility(View.VISIBLE);
+						removeOffline();
+						supportInvalidateOptionsMenu();
 					}
 				}
 				else{
+					availableOfflineBoolean = false;
 					availableSwitchOffline.setVisibility(View.GONE);
 					availableSwitchOnline.setVisibility(View.VISIBLE);
+					removeOffline();
+					supportInvalidateOptionsMenu();
 				}
 				
 				
@@ -224,35 +238,35 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			//If image
 			if (node.isFile()){
 				if (node.hasThumbnail()){
-//					if (!availableSwitch.isChecked()){
-//						if (offlineFile != null){
-//							
-//							BitmapFactory.Options options = new BitmapFactory.Options();
-//							options.inJustDecodeBounds = true;
-//							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-//							
-//							ExifInterface exif;
-//							int orientation = ExifInterface.ORIENTATION_NORMAL;
-//							try {
-//								exif = new ExifInterface(offlineFile.getAbsolutePath());
-//								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-//							} catch (IOException e) {}  
-//							
-//							// Calculate inSampleSize
-//						    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
-//						    
-//						    // Decode bitmap with inSampleSize set
-//						    options.inJustDecodeBounds = false;
-//						    
-//						    thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-//							if (thumb != null){
-//								thumb = Util.rotateBitmap(thumb, orientation);
-//								
-//								imageView.setImageBitmap(thumb);
-//							}
-//						}
-//					}
-//					else{
+					if (availableOfflineBoolean){
+						if (offlineFile != null){
+							
+							BitmapFactory.Options options = new BitmapFactory.Options();
+							options.inJustDecodeBounds = true;
+							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+							
+							ExifInterface exif;
+							int orientation = ExifInterface.ORIENTATION_NORMAL;
+							try {
+								exif = new ExifInterface(offlineFile.getAbsolutePath());
+								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+							} catch (IOException e) {}  
+							
+							// Calculate inSampleSize
+						    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
+						    
+						    // Decode bitmap with inSampleSize set
+						    options.inJustDecodeBounds = false;
+						    
+						    thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+							if (thumb != null){
+								thumb = Util.rotateBitmap(thumb, orientation);
+								
+								imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+					else{
 						thumb = ThumbnailUtils.getThumbnailFromCache(node);
 						if (thumb != null){
 							imageView.setImageBitmap(thumb);
@@ -263,7 +277,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 								imageView.setImageBitmap(thumb);
 							}
 						}
-//					}
+					}
 				}
 			}
 		}
@@ -281,35 +295,25 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		if (isChecked){
+			availableOfflineBoolean = false;
 			availableSwitchOffline.setVisibility(View.GONE);
 			availableSwitchOnline.setVisibility(View.VISIBLE);
 			availableSwitchOffline.setChecked(false);			
 			if (node.isFile()){
 				removeOffline();
 			}
+			supportInvalidateOptionsMenu();
 		}
 		else{
+			availableOfflineBoolean = true;
 			availableSwitchOffline.setVisibility(View.VISIBLE);
 			availableSwitchOnline.setVisibility(View.GONE);
 			availableSwitchOnline.setChecked(true);
 			if (node.isFile()){
 				saveOffline();
 			}
-		}
-//		if(isChecked){
-//			if (node.isFile()){
-//				removeOffline();
-////				availableSwitch.setmTrackDrawable(getResources().getDrawable(R.drawable.switch_track_online));
-////				availableSwitch.wrapView();
-//			}			
-//		}
-//		else{
-//			if (node.isFile()){
-//				saveOffline();
-////				availableSwitch.setmTrackDrawable(getResources().getDrawable(R.drawable.switch_track_offline));
-////				availableSwitch.wrapView();
-//			}
-//		}		
+			supportInvalidateOptionsMenu();
+		}		
 	}
 	
 	public void saveOffline (){
@@ -411,12 +415,58 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    	return true;
 		    }
 		    case R.id.action_file_properties_download:{
-		    	ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(node.getHandle());
-				downloadNode(handleList);
+		    	if (!availableOfflineBoolean){
+			    	ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(node.getHandle());
+					downloadNode(handleList);
+		    	}
+		    	else{
+		    		
+		    		File destination = null;
+					File offlineFile = null;
+					if (getExternalFilesDir(null) != null){
+						destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+					}
+					else{
+						destination = new File(getFilesDir(), node.getHandle()+"");
+					}
+					
+					if (destination.exists() && destination.isDirectory()){
+						offlineFile = new File(destination, node.getName());
+						if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+							availableOfflineBoolean = true;
+							availableSwitchOffline.setVisibility(View.VISIBLE);
+							availableSwitchOnline.setVisibility(View.GONE);
+						}
+						else{
+							availableOfflineBoolean = false;
+							removeOffline();
+							supportInvalidateOptionsMenu();
+						}
+					}
+					else{
+						availableOfflineBoolean = false;
+						removeOffline();
+						supportInvalidateOptionsMenu();
+					}
+		    		Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setDataAndType(Uri.fromFile(offlineFile), MimeType.typeForName(offlineFile.getName()).getType());
+					if (isIntentAvailable(this, intent)){
+						startActivity(intent);
+					}
+					else{
+						Toast.makeText(this, "There is not any app installed in the device to open this file", Toast.LENGTH_LONG).show();
+					}
+		    	}
 				return true;
 		    }
 		    case R.id.action_file_properties_get_link:{
+		    	shareIt = false;
+		    	getPublicLinkAndShareIt(node);
+		    	return true;
+		    }
+		    case R.id.action_file_properties_send_link:{
+		    	shareIt = true;
 		    	getPublicLinkAndShareIt(node);
 		    	return true;
 		    }
@@ -664,7 +714,14 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_file_properties, menu);
 	   
+	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
 	    
+	    if (availableOfflineBoolean){
+	    	downloadMenuItem.setIcon(R.drawable.ic_action_collections_collection_dark);
+	    }
+	    else{
+	    	downloadMenuItem.setIcon(R.drawable.ic_menu_download_dark);
+	    }
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -673,6 +730,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		log("onRequestStart: " + request.getName());
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
@@ -686,10 +744,24 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			if (e.getErrorCode() == MegaError.API_OK){
 				String link = request.getLink();
 				if (filePropertiesActivity != null){
-					Intent intent = new Intent(Intent.ACTION_SEND);
-					intent.setType("text/plain");
-					intent.putExtra(Intent.EXTRA_TEXT, link);
-					startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+					if (shareIt){
+						Intent intent = new Intent(Intent.ACTION_SEND);
+						intent.setType("text/plain");
+						intent.putExtra(Intent.EXTRA_TEXT, link);
+						startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+					}
+					else{
+						if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+						    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+						    clipboard.setText(link);
+						} else {
+						    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+				            clipboard.setPrimaryClip(clip);
+						}
+						
+						Toast.makeText(this, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+					}
 				}
 			}
 			else{
