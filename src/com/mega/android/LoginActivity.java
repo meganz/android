@@ -480,6 +480,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		
+		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_FAST_LOGIN){
 			if (error.getErrorCode() != MegaError.API_OK) {
 				String errorMessage;
