@@ -24,12 +24,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
+import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,6 +36,9 @@ import android.os.Handler;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
+import android.text.format.DateUtils;
+import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
@@ -51,19 +53,26 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener{
 	
+	ImageView iconView;
 	TextView nameView;
 	TextView availableOfflineView;
 	RoundedImageView imageView;
 	RelativeLayout availableOfflineLayout;
-	MySwitch availableSwitch;	
+	MySwitch availableSwitchOnline;
+	MySwitch availableSwitchOffline;
 	ActionBar aB;
+	
+	TextView sizeTextView;
+	TextView sizeTitleTextView;
+	TextView addedTextView;
+	TextView modifiedTextView;
 	
 	MegaNode node;
 	long handle;
@@ -120,21 +129,44 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			}
 					
 			setContentView(R.layout.activity_file_properties);
+			iconView = (ImageView) findViewById(R.id.file_properties_icon);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
 			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
 			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
-			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
-			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleH), outMetrics));
+			imageView.getLayoutParams().height = Util.px2dp((270*scaleH), outMetrics);
+			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((9*scaleH), outMetrics));
 			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
-			availableSwitch = (MySwitch) findViewById(R.id.file_properties_switch);
+			availableSwitchOnline = (MySwitch) findViewById(R.id.file_properties_switch_online);
+			availableSwitchOnline.setChecked(true);
+			availableSwitchOffline = (MySwitch) findViewById(R.id.file_properties_switch_offline);
+			availableSwitchOffline.setChecked(false);
+			availableSwitchOnline.setOnCheckedChangeListener(this);			
+			availableSwitchOffline.setOnCheckedChangeListener(this);			
 			
+			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
+			sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
+			addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
+			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
+						
 			imageView.setImageResource(imageId);
 			nameView.setText(name);
+			nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+			nameView.setSingleLine();
+			nameView.setTypeface(null, Typeface.BOLD);
 			
+			iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
+			iconView.setImageResource(imageId);
+			((RelativeLayout.LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
+
+
 			File destination = null;
 			File offlineFile = null;
 			if (node.isFile()){
+				
+				sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
+				
+				sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
 			
 				destination = null;
 				if (getExternalFilesDir(null) != null){
@@ -147,21 +179,43 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				if (destination.exists() && destination.isDirectory()){
 					offlineFile = new File(destination, node.getName());
 					if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-						availableSwitch.setChecked(false);
+						availableSwitchOffline.setVisibility(View.VISIBLE);
+						availableSwitchOnline.setVisibility(View.GONE);
 					}
 					else{
-						availableSwitch.setChecked(true);
+						availableSwitchOffline.setVisibility(View.GONE);
+						availableSwitchOnline.setVisibility(View.VISIBLE);
 					}
 				}
 				else{
-					availableSwitch.setChecked(true);
+					availableSwitchOffline.setVisibility(View.GONE);
+					availableSwitchOnline.setVisibility(View.VISIBLE);
 				}
 				
-				availableSwitch.setOnCheckedChangeListener(this);			
+				
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			}
 			else{
-				availableOfflineLayout.setVisibility(View.GONE);
+				sizeTitleTextView.setText(getString(R.string.file_properties_info_size_folder));
+				
+				sizeTextView.setText(getInfoFolder(node));
+				
+				availableOfflineLayout.setVisibility(View.INVISIBLE);
+			}
+			
+			if (node.getCreationTime() != 0){
+				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+				
+				if (node.getModificationTime() != 0){
+					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
+				}
+				else{
+					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}	
+				}
+			}
+			else{
+				addedTextView.setText("");
+				modifiedTextView.setText("");
 			}
 			
 			
@@ -170,35 +224,35 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			//If image
 			if (node.isFile()){
 				if (node.hasThumbnail()){
-					if (!availableSwitch.isChecked()){
-						if (offlineFile != null){
-							
-							BitmapFactory.Options options = new BitmapFactory.Options();
-							options.inJustDecodeBounds = true;
-							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-							
-							ExifInterface exif;
-							int orientation = ExifInterface.ORIENTATION_NORMAL;
-							try {
-								exif = new ExifInterface(offlineFile.getAbsolutePath());
-								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-							} catch (IOException e) {}  
-							
-							// Calculate inSampleSize
-						    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
-						    
-						    // Decode bitmap with inSampleSize set
-						    options.inJustDecodeBounds = false;
-						    
-						    thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-							if (thumb != null){
-								thumb = Util.rotateBitmap(thumb, orientation);
-								
-								imageView.setImageBitmap(thumb);
-							}
-						}
-					}
-					else{
+//					if (!availableSwitch.isChecked()){
+//						if (offlineFile != null){
+//							
+//							BitmapFactory.Options options = new BitmapFactory.Options();
+//							options.inJustDecodeBounds = true;
+//							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+//							
+//							ExifInterface exif;
+//							int orientation = ExifInterface.ORIENTATION_NORMAL;
+//							try {
+//								exif = new ExifInterface(offlineFile.getAbsolutePath());
+//								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+//							} catch (IOException e) {}  
+//							
+//							// Calculate inSampleSize
+//						    options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
+//						    
+//						    // Decode bitmap with inSampleSize set
+//						    options.inJustDecodeBounds = false;
+//						    
+//						    thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+//							if (thumb != null){
+//								thumb = Util.rotateBitmap(thumb, orientation);
+//								
+//								imageView.setImageBitmap(thumb);
+//							}
+//						}
+//					}
+//					else{
 						thumb = ThumbnailUtils.getThumbnailFromCache(node);
 						if (thumb != null){
 							imageView.setImageBitmap(thumb);
@@ -209,7 +263,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 								imageView.setImageBitmap(thumb);
 							}
 						}
-					}
+//					}
 				}
 			}
 		}
@@ -219,23 +273,43 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
-		
+			
 		}
 	}
 	
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		if(isChecked){
+		if (isChecked){
+			availableSwitchOffline.setVisibility(View.GONE);
+			availableSwitchOnline.setVisibility(View.VISIBLE);
+			availableSwitchOffline.setChecked(false);			
 			if (node.isFile()){
 				removeOffline();
-			}			
+			}
 		}
 		else{
+			availableSwitchOffline.setVisibility(View.VISIBLE);
+			availableSwitchOnline.setVisibility(View.GONE);
+			availableSwitchOnline.setChecked(true);
 			if (node.isFile()){
 				saveOffline();
 			}
-		}		
+		}
+//		if(isChecked){
+//			if (node.isFile()){
+//				removeOffline();
+////				availableSwitch.setmTrackDrawable(getResources().getDrawable(R.drawable.switch_track_online));
+////				availableSwitch.wrapView();
+//			}			
+//		}
+//		else{
+//			if (node.isFile()){
+//				saveOffline();
+////				availableSwitch.setmTrackDrawable(getResources().getDrawable(R.drawable.switch_track_offline));
+////				availableSwitch.wrapView();
+//			}
+//		}		
 	}
 	
 	public void saveOffline (){
@@ -887,6 +961,36 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		final PackageManager mgr = ctx.getPackageManager();
 		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 		return list.size() > 0;
+	}
+	
+	private String getInfoFolder (MegaNode n){
+		NodeList nL = megaApi.getChildren(n);
+		
+		int numFolders = 0;
+		int numFiles = 0;
+		
+		for (int i=0;i<nL.size();i++){
+			MegaNode c = nL.get(i);
+			if (c.isFolder()){
+				numFolders++;
+			}
+			else{
+				numFiles++;
+			}
+		}
+		
+		String info = "";
+		if (numFolders > 0){
+			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0){
+				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		}
+		else {
+			info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+		}
+		
+		return info;
 	}
 
 	public static void log(String message) {

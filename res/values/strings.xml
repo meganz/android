@@ -111,7 +111,8 @@
 	<string name="file_properties_available_offline">Available offline</string>
 	<string name="file_properties_available_offline_on">ON</string>
 	<string name="file_properties_available_offline_off">OFF</string>
-	<string name="file_properties_info_size">Size: </string>
+	<string name="file_properties_info_size_file">Size: </string>
+	<string name="file_properties_info_size_folder">Content: </string>
 	<string name="file_properties_info_added">Added: </string>
 	<string name="file_properties_info_modified">Modified: </string>
 	

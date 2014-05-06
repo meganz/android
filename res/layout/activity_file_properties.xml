@@ -8,27 +8,37 @@
     
     <RelativeLayout 
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent">
+	    android:layout_height="match_parent"
+	    android:id="@+id/file_properties_layout">
 
+        
+        <ImageView
+            android:id="@+id/file_properties_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="30dp"/>
     
-     <TextView
-        android:id="@+id/file_properties_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingLeft="30dp" />
-          
-     <com.mega.components.RoundedImageView 
-         android:id="@+id/file_properties_image"
-         android:layout_width="wrap_content"
-         android:layout_height="270dp"
-         android:layout_centerHorizontal="true"
-         android:layout_below="@id/file_properties_name"
-         android:paddingLeft="30dp"
-         android:paddingRight="30dp"
-         rounded:corner_radius="10dp" 
-         rounded:border_width="2dp"
-         rounded:border_color="@color/border_file_properties" />
+	     <com.mega.components.RoundedImageView 
+	         android:id="@+id/file_properties_image"
+	         android:layout_width="wrap_content"
+	         android:layout_height="270dp"
+	         android:layout_centerHorizontal="true"
+	         android:layout_below="@id/file_properties_icon"
+	         android:paddingLeft="30dp"
+	         android:paddingRight="30dp"
+	         rounded:corner_radius="10dp" 
+	         rounded:border_width="2dp"
+	         rounded:border_color="@color/border_file_properties" />
+	     
+	     <TextView
+	        android:id="@+id/file_properties_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:paddingTop="5dp"
+	        android:layout_toRightOf="@id/file_properties_icon"
+	        android:layout_alignBottom="@id/file_properties_icon"
+	        android:layout_alignRight="@id/file_properties_image"/>
      
      <RelativeLayout
          android:id="@+id/file_properties_available_offline"
@@ -66,7 +76,7 @@
 					 android:textColor="@color/file_properties_text_available" />
                  
              	<com.mega.components.MySwitch
-			        android:id="@+id/file_properties_switch"
+			        android:id="@+id/file_properties_switch_online"
 			        style="@style/mySwitchStyle"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
@@ -79,7 +89,23 @@
 			        mySwitch:textOn=""
 			        mySwitch:textOnThumb="false"
 			        mySwitch:thumb="@drawable/switch_thumb"
-			        mySwitch:track="@drawable/switch_track" />
+			        mySwitch:track="@drawable/switch_track_online" />
+             	
+             	<com.mega.components.MySwitch
+			        android:id="@+id/file_properties_switch_offline"
+			        style="@style/mySwitchStyle"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_marginBottom="0dp"
+			        android:layout_marginRight="5dp"
+			        android:layout_marginTop="10dp"
+			        android:layout_marginLeft="5dp"
+			        android:layout_gravity="center_vertical|center_horizontal"
+			        mySwitch:textOff=""
+			        mySwitch:textOn=""
+			        mySwitch:textOnThumb="false"
+			        mySwitch:thumb="@drawable/switch_thumb"
+			        mySwitch:track="@drawable/switch_track_offline" />
                  
                  <TextView
 		             android:id="@+id/file_properties_available_offline_off"
@@ -107,7 +133,7 @@
 		             android:id="@+id/file_properties_info_menu_size"
 		             android:layout_width="wrap_content"
 		             android:layout_height="wrap_content"
-		             android:text="@string/file_properties_info_size"
+		             android:text="@string/file_properties_info_size_file"
 		             android:textColor="@color/file_properties_info_menu"
 					 android:layout_gravity="center_vertical|left"
 					 android:textStyle="bold"
@@ -118,7 +144,6 @@
 		             android:id="@+id/file_properties_info_data_size"
 		             android:layout_width="wrap_content"
 		             android:layout_height="wrap_content"
-		             android:text="2.4 MB"
 		             android:textColor="@color/file_properties_info_data"
 					 android:layout_gravity="center_vertical|left" 
 					 android:paddingLeft="4dp"
@@ -141,7 +166,6 @@
 		             android:id="@+id/file_properties_info_data_added"
 		             android:layout_width="wrap_content"
 		             android:layout_height="wrap_content"
-		             android:text="November 22, 2013"
 		             android:textColor="@color/file_properties_info_data"
 					 android:layout_gravity="center_vertical|left"
 					 android:paddingLeft="4dp"
@@ -165,7 +189,6 @@
 		             android:id="@+id/file_properties_info_data_modified"
 		             android:layout_width="wrap_content"
 		             android:layout_height="wrap_content"
-		             android:text="November 23, 2013"
 		             android:textColor="@color/file_properties_info_data"
 					 android:layout_gravity="center_vertical|left"
 					 android:paddingLeft="4dp"
@@ -173,24 +196,5 @@
 					 android:paddingBottom="15dp" />
          </TableRow>
      </TableLayout>
-     <!-- 
-    <Button
-        android:id="@+id/buttonVer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonOcultar"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:text="@string/botonVerActionBar" />
-
-    <Button
-        android:id="@+id/buttonOcultar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="28dp"
-        android:text="@string/botonOcultarActionBar" />
--->
 </RelativeLayout>
 </ScrollView>
