@@ -2515,7 +2515,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 		input.setImeActionLabel(getString(R.string.context_rename),
@@ -2525,6 +2524,22 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {
 				if (hasFocus) {
+					String [] s = document.getName().split("\\.");
+					if (s != null){
+						int numParts = s.length;
+						int lastSelectedPos = 0;
+						if (numParts == 1){
+							input.setSelection(0, input.getText().length());
+						}
+						else if (numParts > 1){
+							for (int i=0; i<(numParts-1);i++){
+								lastSelectedPos += s[i].length(); 
+								lastSelectedPos++;
+							}
+							lastSelectedPos--; //The last point should not be selected)
+							input.setSelection(0, lastSelectedPos);
+						}
+					}
 					showKeyboardDelayed(v);
 				}
 			}
