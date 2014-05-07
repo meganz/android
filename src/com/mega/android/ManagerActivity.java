@@ -41,6 +41,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -1639,9 +1640,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 //		context.stopService(new Intent(context, CameraSyncService.class));
 		
 		File offlineDirectory = null;
-		if (context.getExternalFilesDir(null) != null){
-			offlineDirectory = context.getExternalFilesDir(null);
+		if (Environment.getExternalStorageDirectory() != null){
+			offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 		}
+//		if (context.getExternalFilesDir(null) != null){
+//			offlineDirectory = context.getExternalFilesDir(null);
+//		}
 		else{
 			offlineDirectory = context.getFilesDir();
 		}
@@ -2524,23 +2528,28 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {
 				if (hasFocus) {
-					String [] s = document.getName().split("\\.");
-					if (s != null){
-						int numParts = s.length;
-						int lastSelectedPos = 0;
-						if (numParts == 1){
-							input.setSelection(0, input.getText().length());
-						}
-						else if (numParts > 1){
-							for (int i=0; i<(numParts-1);i++){
-								lastSelectedPos += s[i].length(); 
-								lastSelectedPos++;
-							}
-							lastSelectedPos--; //The last point should not be selected)
-							input.setSelection(0, lastSelectedPos);
-						}
+					if (document.isFolder()){
+						input.setSelection(0, input.getText().length());
 					}
-					showKeyboardDelayed(v);
+					else{
+						String [] s = document.getName().split("\\.");
+						if (s != null){
+							int numParts = s.length;
+							int lastSelectedPos = 0;
+							if (numParts == 1){
+								input.setSelection(0, input.getText().length());
+							}
+							else if (numParts > 1){
+								for (int i=0; i<(numParts-1);i++){
+									lastSelectedPos += s[i].length(); 
+									lastSelectedPos++;
+								}
+								lastSelectedPos--; //The last point should not be selected)
+								input.setSelection(0, lastSelectedPos);
+							}
+						}
+						showKeyboardDelayed(v);
+					}
 				}
 			}
 		});

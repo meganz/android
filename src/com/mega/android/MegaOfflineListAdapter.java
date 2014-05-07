@@ -233,18 +233,22 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		
 		if (MimeType.typeForName(currentFile.getName()).isImage()){
 			Bitmap thumb = null;
-			long handle = Long.parseLong(currentFile.getParentFile().getName());
-			
-			thumb = ThumbnailUtils.getThumbnailFromCache(handle);
-			if (thumb != null){
-				holder.imageView.setImageBitmap(thumb);
-			}
-			else{
-				try{
-					new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+//			long handle = Long.parseLong(currentFile.getParentFile().getName());
+			String [] s = currentFile.getName().split("_");
+			if (s.length > 0){
+				long handle = Long.parseLong(s[0]);
+				
+				thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+				if (thumb != null){
+					holder.imageView.setImageBitmap(thumb);
 				}
-				catch(Exception e){
-					//Too many AsyncTasks
+				else{
+					try{
+						new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+					}
+					catch(Exception e){
+						//Too many AsyncTasks
+					}
 				}
 			}
 		}

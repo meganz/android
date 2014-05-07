@@ -12,6 +12,7 @@ import com.mega.sdk.NodeList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.DisplayMetrics;
@@ -84,9 +85,12 @@ public class FullScreenImageViewer extends Activity implements OnPageChangeListe
 		adapterType = intent.getIntExtra("adapterType", 0);
 		if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
 			File offlineDirectory = null;
-			if (getExternalFilesDir(null) != null){
-				offlineDirectory = getExternalFilesDir(null);
+			if (Environment.getExternalStorageDirectory() != null){
+				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 			}
+//			if (getExternalFilesDir(null) != null){
+//				offlineDirectory = getExternalFilesDir(null);
+//			}
 			else{
 				offlineDirectory = getFilesDir();
 			}
@@ -96,24 +100,35 @@ public class FullScreenImageViewer extends Activity implements OnPageChangeListe
 			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
 			for (File f : fList){
-				if (f.isDirectory()){
-					File[] document = f.listFiles();
-					if (document.length == 0){
-						try {
-							Util.deleteFolderAndSubfolders(f);
-						} catch (Exception e) {}
+				if (MimeType.typeForName(f.getName()).isImage()){
+					paths.add(f.getAbsolutePath());
+					if (index == positionG){
+						positionG = imageNumber; 
 					}
-					else{
-						if (MimeType.typeForName(document[0].getName()).isImage()){
-							paths.add(document[0].getAbsolutePath());
-							if (index == positionG){
-								positionG = imageNumber; 
-							}
-							imageNumber++;
-						}
-						index++;
-					}
+					imageNumber++;
 				}
+				index++;
+				
+				
+				
+//				if (f.isDirectory()){
+//					File[] document = f.listFiles();
+//					if (document.length == 0){
+//						try {
+//							Util.deleteFolderAndSubfolders(f);
+//						} catch (Exception e) {}
+//					}
+//					else{
+//						if (MimeType.typeForName(document[0].getName()).isImage()){
+//							paths.add(document[0].getAbsolutePath());
+//							if (index == positionG){
+//								positionG = imageNumber; 
+//							}
+//							imageNumber++;
+//						}
+//						index++;
+//					}
+//				}
 			}
 			Toast.makeText(this, "Offline: _" + paths.size(), Toast.LENGTH_LONG).show();
 			
