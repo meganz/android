@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -163,9 +164,12 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);
 			
 			File offlineDirectory = null;
-			if (context.getExternalFilesDir(null) != null){
-				offlineDirectory = context.getExternalFilesDir(null);
+			if (Environment.getExternalStorageDirectory() != null){
+				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 			}
+//			if (context.getExternalFilesDir(null) != null){
+//				offlineDirectory = context.getExternalFilesDir(null);
+//			}
 			else{
 				offlineDirectory = context.getFilesDir();
 			}
@@ -173,17 +177,19 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			paths.clear();			
 			File[] fList = offlineDirectory.listFiles();
 			for (File f : fList){
-				if (f.isDirectory()){
-					File[] document = f.listFiles();
-					if (document.length == 0){
-						try {
-							Util.deleteFolderAndSubfolders(f);
-						} catch (Exception e) {}
-					}
-					else{
-						paths.add(document[0].getAbsolutePath());
-					}
-				}
+				paths.add(f.getAbsolutePath());
+				
+//				if (f.isDirectory()){
+//					File[] document = f.listFiles();
+//					if (document.length == 0){
+//						try {
+//							Util.deleteFolderAndSubfolders(f);
+//						} catch (Exception e) {}
+//					}
+//					else{
+//						paths.add(document[0].getAbsolutePath());
+//					}
+//				}
 			}
 			
 			if (adapterList == null){
@@ -214,19 +220,23 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			
 			paths.clear();	
 			File offlineDirectory = null;
-			if (context.getExternalFilesDir(null) != null){
-				offlineDirectory = context.getExternalFilesDir(null);
+			if (Environment.getExternalStorageDirectory() != null){
+				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 			}
+//			if (context.getExternalFilesDir(null) != null){
+//				offlineDirectory = context.getExternalFilesDir(null);
+//			}
 			else{
 				offlineDirectory = context.getFilesDir();
 			}
 			
 			File[] fList = offlineDirectory.listFiles();
 			for (File f : fList){
-				if (f.isDirectory()){
-					File[] document = f.listFiles();
-					paths.add(document[0].getAbsolutePath());
-				}
+				paths.add(f.getAbsolutePath());
+//				if (f.isDirectory()){
+//					File[] document = f.listFiles();
+//					paths.add(document[0].getAbsolutePath());
+//				}
 			}
 	        
 			if (adapterGrid == null){
@@ -529,19 +539,23 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		paths.clear();
 		
 		File offlineDirectory = null;
-		if (context.getExternalFilesDir(null) != null){
-			offlineDirectory = context.getExternalFilesDir(null);
+		if (Environment.getExternalStorageDirectory() != null){
+			offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 		}
+//		if (context.getExternalFilesDir(null) != null){
+//			offlineDirectory = context.getExternalFilesDir(null);
+//		}
 		else{
 			offlineDirectory = context.getFilesDir();
 		}
 		
 		File[] fList = offlineDirectory.listFiles();
 		for (File f : fList){
-			if (f.isDirectory()){
-				File[] document = f.listFiles();
-				paths.add(document[0].getAbsolutePath());
-			}
+			paths.add(f.getAbsolutePath());
+//			if (f.isDirectory()){
+//				File[] document = f.listFiles();
+//				paths.add(document[0].getAbsolutePath());
+//			}
 		}
 		
 		setPaths(paths);

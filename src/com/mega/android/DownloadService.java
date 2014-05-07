@@ -1,6 +1,11 @@
 package com.mega.android;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -32,6 +38,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.text.InputFilter.LengthFilter;
 import android.text.format.Formatter;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -47,6 +54,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_HASH = "DOCUMENT_HASH";
 	public static String EXTRA_URL = "DOCUMENT_URL";
 	public static String EXTRA_PATH = "SAVE_PATH";
+	public static String EXTRA_OFFLINE = "IS_OFFLINE";
 	
 	private int totalCount = 0;
 	private int successCount = 0;
@@ -58,6 +66,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	
 	private boolean isForeground = false;
 	private boolean canceled;
+	
+	private boolean isOffline = false;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -163,6 +173,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		long hash = intent.getLongExtra(EXTRA_HASH, 0);
 		String url = intent.getStringExtra(EXTRA_URL);
 		MegaNode document = megaApi.getNodeByHandle(hash);
+		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
 		
 		if((document == null) && (url == null)){
 			log("Node not found");
@@ -241,8 +252,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if (doneCount == totalCount){
 			onQueueComplete();
-		}
-		
+		}		
 	}
 	
 	/*
@@ -474,6 +484,67 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				resultFile.setReadable(true, false);
 				resultFile.setExecutable(true, false);
+				
+				String filePath = transfer.getPath();
+				
+				if (isOffline){
+					
+					String[] s = filePath.split(transfer.getFileName());
+					String newFileName = "";
+					newFileName = s[0] + transfer.getNodeHandle() + "_" + transfer.getFileName();
+					
+					File o = new File(filePath + ".mega");
+					if (o.exists()){
+						log("ESTE SI QUE EXISTE!!!");
+						File d = new File(newFileName);
+						d.setReadable(true, false);
+						d.setExecutable(true, false);
+						o.renameTo(d);
+					}
+						
+					
+					if (resultFile.exists()){
+						File d = new File(newFileName);
+						d.setReadable(true, false);
+						d.setExecutable(true, false);
+						resultFile.renameTo(d);
+					}
+					
+					MediaScannerConnection.scanFile(this,
+							new String[] { newFileName }, null,
+					        new MediaScannerConnection.OnScanCompletedListener() {
+					      		public void onScanCompleted(String path, Uri uri) {
+					      			log("Scanned Offline: " + path);
+					      		}
+					 		}
+					);
+					log("isoffline");
+					
+				}
+				else{
+					log("no es isoffline");
+					MediaScannerConnection.scanFile(this,
+							new String[] { filePath }, null,
+					        new MediaScannerConnection.OnScanCompletedListener() {
+					      		public void onScanCompleted(String path, Uri uri) {
+					      			log("Scanned: " + path);
+					      		}
+					 		}
+					);
+				}
+				
+//				if (Environment.getExternalStorageDirectory() != null){
+//					MediaScannerConnection.scanFile(this,
+//							new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR}, null,
+//					        new MediaScannerConnection.OnScanCompletedListener() {
+//					      		public void onScanCompleted(String path, Uri uri) {
+//					      			log("Scanned: " + path);
+//					      		}
+//					 		}
+//					);
+//				}
+	
+				
 				
 				onDownloadComplete(true);
 			}

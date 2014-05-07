@@ -64,6 +64,8 @@ public class Util {
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = true;
 	
+	public static String offlineDIR = "MEGA/MEGA Offline";  
+	
 	/*
 	 * Create progress dialog helper
 	 */

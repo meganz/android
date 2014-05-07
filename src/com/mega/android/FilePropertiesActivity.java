@@ -31,8 +31,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.media.ExifInterface;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
@@ -176,16 +178,19 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
 			
 				destination = null;
-				if (getExternalFilesDir(null) != null){
-					destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/");
 				}
+//				if (getExternalFilesDir(null) != null){
+//					destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+//				}
 				else{
 					destination = new File(getFilesDir(), node.getHandle()+"");
 				}
 				
 				if (destination.exists() && destination.isDirectory()){
-					offlineFile = new File(destination, node.getName());
-					if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+					offlineFile = new File(destination, node.getHandle() + "_" + node.getName());
+					if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getHandle() + "_" + node.getName())){ //This means that is already available offline
 						availableOfflineBoolean = true;
 						availableSwitchOffline.setVisibility(View.VISIBLE);
 						availableSwitchOnline.setVisibility(View.GONE);
@@ -320,16 +325,19 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		
 		if (node.isFile()){
 			File destination = null;
-			if (getExternalFilesDir(null) != null){
-				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+			if (Environment.getExternalStorageDirectory() != null){
+				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/");
 			}
+//			if (getExternalFilesDir(null) != null){
+//				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+//			}
 			else{
 				destination = new File(getFilesDir(), node.getHandle()+"");
 			}
 			
 			if (destination.exists() && destination.isDirectory()){
-				File offlineFile = new File(destination, node.getName());
-				if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+				File offlineFile = new File(destination, node.getHandle() + "_" + node.getName());
+				if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getHandle() + "_" + node.getName())){ //This means that is already available offline
 					return;
 				}
 			}
@@ -365,6 +373,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				service.putExtra(DownloadService.EXTRA_URL, url);
 				service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
 				service.putExtra(DownloadService.EXTRA_PATH, path);
+				service.putExtra(DownloadService.EXTRA_OFFLINE, true);
 				startService(service);
 			}
 		}
@@ -376,22 +385,36 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	public void removeOffline(){
 		if (node.isFile()){
 			File destination = null;
-			if (getExternalFilesDir(null) != null){
-				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+			if (Environment.getExternalStorageDirectory() != null){
+				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/");
 			}
+//			if (getExternalFilesDir(null) != null){
+//				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+//			}
 			else{
 				destination = new File(getFilesDir(), node.getHandle()+"");
 			}
 			
 			try{
-				delete(destination);
+				File offlineFile = new File(destination, node.getHandle() + "_" + node.getName());
+				delete(offlineFile);
 			}
 			catch(Exception e){};
 			
+			MediaScannerConnection.scanFile(this,
+					new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR}, null,
+			        new MediaScannerConnection.OnScanCompletedListener() {
+			      		public void onScanCompleted(String path, Uri uri) {
+			      			log("Scanned: " + path);
+			      		}
+			 		}
+			);			
 		}
 		else if (node.isFolder()){
 			Toast.makeText(this, "Folder remove (not yet implemented)", Toast.LENGTH_LONG).show();
 		}
+		
+		
 	}
 	
 	void delete(File f) throws IOException {
@@ -424,16 +447,19 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    		
 		    		File destination = null;
 					File offlineFile = null;
-					if (getExternalFilesDir(null) != null){
-						destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+					if (Environment.getExternalStorageDirectory() != null){
+						destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/");
 					}
+//					if (getExternalFilesDir(null) != null){
+//						destination = new File (getExternalFilesDir(null), node.getHandle()+"");
+//					}
 					else{
 						destination = new File(getFilesDir(), node.getHandle()+"");
 					}
 					
 					if (destination.exists() && destination.isDirectory()){
-						offlineFile = new File(destination, node.getName());
-						if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+						offlineFile = new File(destination, node.getHandle() + "_" + node.getName());
+						if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getHandle() + "_" + node.getName())){ //This means that is already available offline
 							availableOfflineBoolean = true;
 							availableSwitchOffline.setVisibility(View.VISIBLE);
 							availableSwitchOnline.setVisibility(View.GONE);
@@ -625,23 +651,28 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {
 				if (hasFocus) {
-					String [] s = node.getName().split("\\.");
-					if (s != null){
-						int numParts = s.length;
-						int lastSelectedPos = 0;
-						if (numParts == 1){
-							input.setSelection(0, input.getText().length());
-						}
-						else if (numParts > 1){
-							for (int i=0; i<(numParts-1);i++){
-								lastSelectedPos += s[i].length(); 
-								lastSelectedPos++;
-							}
-							lastSelectedPos--; //The last point should not be selected)
-							input.setSelection(0, lastSelectedPos);
-						}
+					if (node.isFolder()){
+						input.setSelection(0, input.getText().length());
 					}
-					showKeyboardDelayed(v);
+					else{
+						String [] s = node.getName().split("\\.");
+						if (s != null){
+							int numParts = s.length;
+							int lastSelectedPos = 0;
+							if (numParts == 1){
+								input.setSelection(0, input.getText().length());
+							}
+							else if (numParts > 1){
+								for (int i=0; i<(numParts-1);i++){
+									lastSelectedPos += s[i].length(); 
+									lastSelectedPos++;
+								}
+								lastSelectedPos--; //The last point should not be selected)
+								input.setSelection(0, lastSelectedPos);
+							}
+						}
+						showKeyboardDelayed(v);
+					}
 				}
 			}
 		});
