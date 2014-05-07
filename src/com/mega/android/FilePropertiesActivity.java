@@ -462,32 +462,28 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		    }
 		    case R.id.action_file_properties_get_link:{
 		    	shareIt = false;
-		    	getPublicLinkAndShareIt(node);
+		    	getPublicLinkAndShareIt();
 		    	return true;
 		    }
 		    case R.id.action_file_properties_send_link:{
 		    	shareIt = true;
-		    	getPublicLinkAndShareIt(node);
+		    	getPublicLinkAndShareIt();
 		    	return true;
 		    }
 		    case R.id.action_file_properties_rename:{
-		    	showRenameDialog(node, node.getName());
+		    	showRenameDialog();
 		    	return true;
 		    }
 		    case R.id.action_file_properties_remove:{
-		    	moveToTrash(node.getHandle());
+		    	moveToTrash();
 		    	return true;
 		    }
 		    case R.id.action_file_properties_move:{
-		    	ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(node.getHandle());
-		    	showMove(handleList);
+		    	showMove();
 		    	return true;
 		    }
 		    case R.id.action_file_properties_copy:{
-		    	ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(node.getHandle());
-		    	showCopy(handleList);
+		    	showCopy();
 		    	return true;
 		    }
 		}	    
@@ -507,7 +503,10 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		}, 50);
 	}
 	
-	public void showCopy(ArrayList<Long> handleList){
+	public void showCopy(){
+		
+		ArrayList<Long> handleList = new ArrayList<Long>();
+		handleList.add(node.getHandle());
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
@@ -519,7 +518,10 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
 	}
 	
-	public void showMove(ArrayList<Long> handleList){
+	public void showMove(){
+		
+		ArrayList<Long> handleList = new ArrayList<Long>();
+		handleList.add(node.getHandle());
 		
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
@@ -545,8 +547,9 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 	}
 	
-	public void moveToTrash(long handle){
+	public void moveToTrash(){
 		
+		long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -599,27 +602,51 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		}
 	}
 	
-	public void showRenameDialog(final MegaNode document, String text){
+	public void showRenameDialog(){
 		
 		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setSelectAllOnFocus(true);
+		input.setText(node.getName());
+		input.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				input.performLongClick();
+			}
+		});
+
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 		input.setImeActionLabel(getString(R.string.context_rename),
 				KeyEvent.KEYCODE_ENTER);
-		input.setText(text);
+
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {
 				if (hasFocus) {
+					String [] s = node.getName().split("\\.");
+					if (s != null){
+						int numParts = s.length;
+						int lastSelectedPos = 0;
+						if (numParts == 1){
+							input.setSelection(0, input.getText().length());
+						}
+						else if (numParts > 1){
+							for (int i=0; i<(numParts-1);i++){
+								lastSelectedPos += s[i].length(); 
+								lastSelectedPos++;
+							}
+							lastSelectedPos--; //The last point should not be selected)
+							input.setSelection(0, lastSelectedPos);
+						}
+					}
 					showKeyboardDelayed(v);
 				}
 			}
 		});
 
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(document.getName()), null, input);
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(node.getName()), null, input);
 		builder.setPositiveButton(getString(R.string.context_rename),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -627,7 +654,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 						if (value.length() == 0) {
 							return;
 						}
-						rename(document, value);
+						rename(value);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -644,7 +671,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 					if (value.length() == 0) {
 						return true;
 					}
-					rename(document, value);
+					rename(value);
 					return true;
 				}
 				return false;
@@ -652,8 +679,8 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		});
 	}
 	
-	private void rename(MegaNode document, String newName){
-		if (newName.equals(document.getName())) {
+	private void rename(String newName){
+		if (newName.equals(node.getName())) {
 			return;
 		}
 		
@@ -677,12 +704,12 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		}
 		statusDialog = temp;
 		
-		log("renaming " + document.getName() + " to " + newName);
+		log("renaming " + node.getName() + " to " + newName);
 		
-		megaApi.renameNode(document, newName, this);
+		megaApi.renameNode(node, newName, this);
 	}
 	
-	public void getPublicLinkAndShareIt(MegaNode document){
+	public void getPublicLinkAndShareIt(){
 		
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -704,7 +731,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		}
 		statusDialog = temp;
 		
-		megaApi.exportNode(document, this);
+		megaApi.exportNode(node, this);
 	}
 	
 	@Override
@@ -734,6 +761,9 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
+		
+		node = megaApi.getNodeByHandle(request.getNodeHandle());
+		
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_EXPORT){
 			try { 
