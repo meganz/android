@@ -1,11 +1,8 @@
 package com.mega.android;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
@@ -14,7 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -33,7 +29,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -136,8 +131,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		View v;
-	
 		listFragment = (ListView) parent;
 		
 		final int _position = position;
@@ -361,9 +354,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
-		
-//		holder.optionOpen.setTag(holder);
-//		holder.optionOpen.setOnClickListener(this);
 		
 		holder.optionDownload.setTag(holder);
 		holder.optionDownload.setOnClickListener(this);

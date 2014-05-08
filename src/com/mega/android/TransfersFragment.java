@@ -1,19 +1,12 @@
 package com.mega.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -21,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -32,13 +24,6 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	ActionBar aB;
 	ListView listView;
 	MegaTransfersAdapter adapter;
-	
-	public static final String[] names = new String[] { "filename.ext", "filename.ext", "filename.ext", "filename.ext", "filename.ext", "filename.ext", "filename.ext", "filename.ext"};
-	public static final Integer[] images = { R.drawable.icot01, R.drawable.icot02, R.drawable.icot03, R.drawable.icot04, R.drawable.icot05, R.drawable.icot06, R.drawable.icot07, R.drawable.icot08};
-	
-	List<ItemFileBrowser> rowItems;
-	ArrayList<Integer> imageIds;
-	ArrayList<String> namesArray;
 	
 	MegaApiAndroid megaApi;
 	
@@ -70,21 +55,11 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		TransferList tL = megaApi.getTransfers();		
 		Toast.makeText(context, "tL.size()=" + tL.size(), Toast.LENGTH_LONG).show();
 		
-		namesArray = new ArrayList<String>();
-		imageIds = new ArrayList<Integer>();
-		rowItems = new ArrayList<ItemFileBrowser>();
-        for (int i = 0; i < names.length; i++) {
-        	ItemFileBrowser item = new ItemFileBrowser(images[i], names[i]);
-            rowItems.add(item);
-            imageIds.add(item.getImageId());
-            namesArray.add(item.getName());
-        }
-        
-        listView = (ListView) v.findViewById(R.id.transfers_list_view);
+		listView = (ListView) v.findViewById(R.id.transfers_list_view);
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		adapter = new MegaTransfersAdapter(context, rowItems);
+		adapter = new MegaTransfersAdapter(context, tL, aB);
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
 		
