@@ -495,7 +495,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					
 					File o = new File(filePath + ".mega");
 					if (o.exists()){
-						log("ESTE SI QUE EXISTE!!!");
 						File d = new File(newFileName);
 						d.setReadable(true, false);
 						d.setExecutable(true, false);
@@ -522,7 +521,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					
 				}
 				else{
-					log("no es isoffline");
+					log("not offline");
 					MediaScannerConnection.scanFile(this,
 							new String[] { filePath }, null,
 					        new MediaScannerConnection.OnScanCompletedListener() {

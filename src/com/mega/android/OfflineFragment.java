@@ -174,22 +174,28 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				offlineDirectory = context.getFilesDir();
 			}
 			
-			paths.clear();			
-			File[] fList = offlineDirectory.listFiles();
-			for (File f : fList){
-				paths.add(f.getAbsolutePath());
-				
-//				if (f.isDirectory()){
-//					File[] document = f.listFiles();
-//					if (document.length == 0){
-//						try {
-//							Util.deleteFolderAndSubfolders(f);
-//						} catch (Exception e) {}
-//					}
-//					else{
-//						paths.add(document[0].getAbsolutePath());
-//					}
-//				}
+			paths.clear();	
+			
+			if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
+				File[] fList = offlineDirectory.listFiles();
+				for (File f : fList){
+					paths.add(f.getAbsolutePath());
+					
+	//				if (f.isDirectory()){
+	//					File[] document = f.listFiles();
+	//					if (document.length == 0){
+	//						try {
+	//							Util.deleteFolderAndSubfolders(f);
+	//						} catch (Exception e) {}
+	//					}
+	//					else{
+	//						paths.add(document[0].getAbsolutePath());
+	//					}
+	//				}
+				}
+			}
+			else{
+				offlineDirectory.mkdirs();
 			}
 			
 			if (adapterList == null){
@@ -230,15 +236,20 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				offlineDirectory = context.getFilesDir();
 			}
 			
-			File[] fList = offlineDirectory.listFiles();
-			for (File f : fList){
-				paths.add(f.getAbsolutePath());
-//				if (f.isDirectory()){
-//					File[] document = f.listFiles();
-//					paths.add(document[0].getAbsolutePath());
-//				}
+			if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
+				File[] fList = offlineDirectory.listFiles();
+				for (File f : fList){
+					paths.add(f.getAbsolutePath());
+	//				if (f.isDirectory()){
+	//					File[] document = f.listFiles();
+	//					paths.add(document[0].getAbsolutePath());
+	//				}
+				}
 			}
-	        
+			else{
+				offlineDirectory.mkdirs();
+			}
+			
 			if (adapterGrid == null){
 				adapterGrid = new MegaOfflineGridAdapter(this, context, paths, listView, emptyImageView, emptyTextView, aB);
 			}
@@ -548,14 +559,19 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		else{
 			offlineDirectory = context.getFilesDir();
 		}
+		if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
 		
-		File[] fList = offlineDirectory.listFiles();
-		for (File f : fList){
-			paths.add(f.getAbsolutePath());
-//			if (f.isDirectory()){
-//				File[] document = f.listFiles();
-//				paths.add(document[0].getAbsolutePath());
-//			}
+			File[] fList = offlineDirectory.listFiles();
+			for (File f : fList){
+				paths.add(f.getAbsolutePath());
+	//			if (f.isDirectory()){
+	//				File[] document = f.listFiles();
+	//				paths.add(document[0].getAbsolutePath());
+	//			}
+			}
+		}
+		else{
+			offlineDirectory.mkdirs();
 		}
 		
 		setPaths(paths);
