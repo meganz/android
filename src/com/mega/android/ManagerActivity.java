@@ -134,8 +134,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private MenuItem searchMenuItem;
 	
 	private MenuItem createFolderMenuItem;
-	private MenuItem uploadMenuItem;
-	private MenuItem moreOptionsMenuItem;
+	private MenuItem rubbishBinMenuItem;
+	private MenuItem addMenuItem;
+	private MenuItem refreshMenuItem;
+	private MenuItem sortByMenuItem;
+	private MenuItem helpMenuItem;
+	private MenuItem upgradeAccountMenuItem;
+	private MenuItem logoutMenuItem;
 	
 	private static DrawerItem drawerItem;
 	
@@ -349,7 +354,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        
 	        List<String> items = new ArrayList<String>();
 			for (DrawerItem item : DrawerItem.values()) {
-				items.add(item.getTitle(this));
+				if (!item.equals(DrawerItem.RUBBISH_BIN)){
+					items.add(item.getTitle(this));
+				}
 			}
 	        
 	        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
@@ -360,28 +367,25 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 							switch(position)
 							{
 							case 0:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_cloud,0,0,0);
 								break;
 							case 1:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_saved,0,0,0);
 								break;
 							case 2:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_shared,0,0,0);
 								break;
 							case 3:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_contacts,0,0,0);
 								break;
 							case 4:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_photosync,0,0,0);
 								break;
 							case 5:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_transfers,0,0,0);
 								break;
 							case 6:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
-								break;
-							case 7:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_account,0,0,0);
 								break;
 							}
 							return view;
@@ -747,10 +751,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
 				if (isListCloudDrive){					
-					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+					customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 				}
 				else{
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
     			}
     			    			
     			if (!firstTime){
@@ -766,13 +770,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
     			if (createFolderMenuItem != null){
 	    			createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+	    			rubbishBinMenuItem.setVisible(true);
+	    			addMenuItem.setVisible(true);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
 	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
-	    			uploadMenuItem.setIcon(R.drawable.ic_menu_upload_here_dark);
-	    			uploadMenuItem.setEnabled(true);
-	    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
+	    			rubbishBinMenuItem.setEnabled(true);
+	    			addMenuItem.setIcon(R.drawable.ic_menu_add);
+	    			addMenuItem.setEnabled(true);
     			}
     			
     			break;
@@ -786,10 +796,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cF, "cF").commit();
     			if (isListContacts){
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+    				customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 				}
 				else{
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
     			}
     			
     			customListGrid.setVisibility(View.VISIBLE);
@@ -799,13 +809,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
     			if (createFolderMenuItem != null){
     				createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+    				rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
-	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			uploadMenuItem.setEnabled(false);
-	    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
     			}
     			break;
     		}
@@ -830,10 +846,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbF, "rbF").commit();
     			if (isListRubbishBin){
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+    				customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 				}
 				else{
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
     			}
     			
     			customListGrid.setVisibility(View.VISIBLE);
@@ -842,11 +858,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			if (createFolderMenuItem != null){
     				createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+    				rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
-	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			uploadMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
 	    		}
 
@@ -873,10 +896,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, swmF, "swmF").commit();
     			if (isListSharedWithMe){
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+    				customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 				}
 				else{
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
     			}
     			
     			customListGrid.setVisibility(View.VISIBLE);
@@ -884,12 +907,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+    				createFolderMenuItem.setVisible(false);
+    				rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
-	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			uploadMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
 	    		}
@@ -909,12 +939,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+    				createFolderMenuItem.setVisible(false);
+    				rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
-	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			uploadMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
 	    		}
@@ -933,12 +970,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
     			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+    				createFolderMenuItem.setVisible(false);
+    				rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
-	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			uploadMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
 	    		}
@@ -956,10 +1000,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, oF, "oF").commit();
 				if (isListCloudDrive){					
-					customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+					customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 				}
 				else{
-    				customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
     			}
     			    			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -969,12 +1013,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			
 
     			if (createFolderMenuItem != null){
-	    			createFolderMenuItem.setVisible(true);
-	    			uploadMenuItem.setVisible(true);
-	    			moreOptionsMenuItem.setVisible(true);
+	    			createFolderMenuItem.setVisible(false);
+	    			rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
 	    			
-	    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			uploadMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
     			}
@@ -1089,57 +1140,88 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			searchView.setIconifiedByDefault(true);
 		}
 		
-		uploadMenuItem = menu.findItem(R.id.action_upload);
-		moreOptionsMenuItem = menu.findItem(R.id.action_more_options);
+		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
+		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
+		
+		refreshMenuItem = menu.findItem(R.id.action_menu_refresh);
+		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
+		helpMenuItem = menu.findItem(R.id.action_menu_help);
+		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
+		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		
 		if (fbF != null){
 			if (fbF.isVisible()){
     			createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+    			rubbishBinMenuItem.setVisible(true);
+    			addMenuItem.setVisible(true);
+    			refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);   			
     			
     			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
-    			uploadMenuItem.setIcon(R.drawable.ic_menu_upload_here_dark);
-    			uploadMenuItem.setEnabled(true);
-    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
+    			rubbishBinMenuItem.setEnabled(true);
+    			addMenuItem.setIcon(R.drawable.ic_menu_add);
+    			addMenuItem.setEnabled(true);
 			}
 		}
 		
 		if (cF != null){
 			if (cF.isVisible()){
 				createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
     			
     			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
-    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			uploadMenuItem.setEnabled(false);
-    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
 			}
 		}
 		
 		if (rbF != null){
 			if (rbF.isVisible()){
 				createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
     			
     			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
-    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			uploadMenuItem.setEnabled(false);
-    			moreOptionsMenuItem.setIcon(R.drawable.ic_action_content_new);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
 			}
 		}
 		
 		if (swmF != null){
 			if (swmF.isVisible()){
-				createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+				createFolderMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
     			
-    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			uploadMenuItem.setEnabled(false);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
     		}
@@ -1147,12 +1229,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		if (maF != null){
 			if (maF.isVisible()){
-				createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+				createFolderMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(false);
+    			sortByMenuItem.setVisible(false);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
     			
-    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			uploadMenuItem.setEnabled(false);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
 			}
@@ -1160,12 +1249,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		if (tF != null){
 			if (tF.isVisible()){
-				createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+				createFolderMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(false);
+    			sortByMenuItem.setVisible(false);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
     			
-    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			uploadMenuItem.setEnabled(false);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
 			}
@@ -1173,12 +1269,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		if (oF != null){
 			if (oF.isVisible()){
-				createFolderMenuItem.setVisible(true);
-    			uploadMenuItem.setVisible(true);
-    			moreOptionsMenuItem.setVisible(true);
+				createFolderMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(false);
+    			sortByMenuItem.setVisible(false);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
     			
-    			uploadMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			uploadMenuItem.setEnabled(false);
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
 			}
@@ -1235,13 +1338,75 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	}
 	        	return true;
 	        }
-	        case R.id.action_more_options:{
-	        	showMoreOptionsMenu();
+	        case R.id.action_add:{
+	        	uploadDialog = new UploadHereDialog();
+				uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+	        	return true;     	
+	        }
+	        case R.id.action_rubbish_bin:{
+	        	drawerItem = DrawerItem.RUBBISH_BIN;
+				selectDrawerItem(drawerItem);
+				return true;
+	        }
+	        case R.id.action_menu_refresh:{
+	        	switch(drawerItem){
+		        	case CLOUD_DRIVE:{
+		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
+			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
+			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+		        		break;
+		        	}
+		        	case CONTACTS:{
+		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
+			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
+			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		break;
+		        	}
+		        	case RUBBISH_BIN:{
+		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
+			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+			    		intent.putExtra("PARENT_HANDLE", parentHandleRubbish);
+			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		break;
+		        	}
+		        	case SHARED_WITH_ME:{
+		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
+			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+			    		intent.putExtra("PARENT_HANDLE", parentHandleSharedWithMe);
+			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		break;
+		        	}
+	        	}
 	        	return true;
 	        }
-	        case R.id.action_upload:{
-				uploadDialog = new UploadHereDialog();
-				uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+	        case R.id.action_menu_sort_by:{
+	        	switch(drawerItem){
+		        	case CONTACTS:{
+		        		Toast.makeText(managerActivity, "Sort by (in contacts) not yet implemented (it's implemented on CLOUD_DRIVE)", Toast.LENGTH_LONG).show();
+			    		break;
+		        	}
+		        	default:{
+		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
+			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
+			    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
+			    		break;
+		        	}
+	        	}
+	        	return true;
+	        }
+	        case R.id.action_menu_help:{
+	        	Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+	    		return true;
+	    	}
+	        case R.id.action_menu_upgrade_account:{
+	        	Intent intent = new Intent(managerActivity, UpgradeActivity.class);
+				startActivity(intent);
+				return true;
+	        }
+	        case R.id.action_menu_logout:{
+	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi);
 	        	return true;
 	        }
             default:{
@@ -1253,8 +1418,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
+		if (position >= 3){
+			position++;
+		}
 		drawerItem = DrawerItem.values()[position];
-		selectDrawerItem(DrawerItem.values()[position]);
+		selectDrawerItem(drawerItem);
 	}
 
 	@Override
@@ -1280,11 +1448,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						if (isListCloudDrive){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
 						else{
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							customListGrid.setImageResource(R.drawable.ic_menu_listview);
 						}
 					}
 				}
@@ -1305,11 +1473,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						if (isListContacts){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
 						else{
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							customListGrid.setImageResource(R.drawable.ic_menu_listview);
 						}
 					}
 				}
@@ -1331,11 +1499,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						if (isListRubbishBin){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
 						else{
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							customListGrid.setImageResource(R.drawable.ic_menu_listview);
 						}
 					}
 				}
@@ -1357,11 +1525,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						if (isListSharedWithMe){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
 						else{
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							customListGrid.setImageResource(R.drawable.ic_menu_listview);
 						}
 					}
 				}
@@ -1382,11 +1550,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						
 						if (isListOffline){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
 						else{
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-							customListGrid.setImageResource(R.drawable.ic_menu_action_list);
+							customListGrid.setImageResource(R.drawable.ic_menu_listview);
 						}
 					}
 				}
@@ -1414,225 +1582,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 	}
 	
-	private void showMoreOptionsMenu(){
-
-		switch(drawerItem){
-			case CLOUD_DRIVE:{
-				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setItems(options, new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				    	switch(which){
-					    	case 0:{
-					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-					    		break;
-					    	}
-					    	case 1:{
-					    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-					    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-					    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-					    		break;
-					    	}
-					    	case 2:{
-					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
-					    	}
-					    	case 3:{
-					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-								startActivity(intent);
-								break;
-					    	}			    	
-					    	case 4:{
-					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-					    		break;
-					    	}
-				    	}
-				    }
-				});
-				builder.show();
-				break;
-			}
-			case CONTACTS:{
-				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setItems(options, new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				    	switch(which){
-					    	case 0:{
-					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-					    		break;
-					    	}
-					    	case 1:{
-					    		Toast.makeText(managerActivity, "Sort by (in contacts) not yet implemented (it's implemented on CLOUD_DRIVE)", Toast.LENGTH_LONG).show();
-					    		break;
-					    	}
-					    	case 2:{
-					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
-					    	}
-					    	case 3:{
-					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-								startActivity(intent);
-								break;
-					    	}			    	
-					    	case 4:{
-					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-					    		break;
-					    	}
-				    	}
-				    }
-				});
-				builder.show();
-				break;
-			}
-			case RUBBISH_BIN:{
-				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setItems(options, new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				    	switch(which){
-					    	case 0:{
-					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleRubbish);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-					    		break;
-					    	}
-					    	case 1:{
-					    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-					    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-					    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-					    		break;
-					    	}
-					    	case 2:{
-					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
-					    	}
-					    	case 3:{
-					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-								startActivity(intent);
-					    		break;
-					    	}			    	
-					    	case 4:{
-					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-					    		break;
-					    	}
-				    	}
-				    }
-				});
-				builder.show();
-				break;
-			}
-			case SHARED_WITH_ME:{
-				CharSequence options[] = new CharSequence[] {"Refresh", "Sort by...", "Help", "Upgrade Account", "Logout"};
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setItems(options, new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				    	switch(which){
-					    	case 0:{
-					    		Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
-					    		intent.putExtra("PARENT_HANDLE", parentHandleSharedWithMe);
-					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-					    		break;
-					    	}
-					    	case 1:{
-					    		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
-					    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
-					    		startActivityForResult(intent, REQUEST_CODE_SORT_BY);
-					    		break;
-					    	}
-					    	case 2:{
-					    		Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
-					    	}
-					    	case 3:{
-					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-								startActivity(intent);
-								break;
-					    	}			    	
-					    	case 4:{
-					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-					    		break;
-					    	}
-				    	}
-				    }
-				});
-				builder.show();
-				break;
-			}			
-			case ACCOUNT:{
-				CharSequence options[] = new CharSequence[] {"Help", "Upgrade Account", "Logout"};
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setItems(options, new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				    	switch(which){
-					    	case 0:{
-					    		Toast.makeText(managerActivity, "Help not yet implemented (logout is implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
-					    	}
-					    	case 1:{
-					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-								startActivity(intent);
-								break;
-					    	}			    	
-					    	case 2:{
-					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-					    		break;
-					    	}
-				    	}
-				    }
-				});
-				builder.show();
-				break;
-			}
-			case SAVED_FOR_OFFLINE:{
-				CharSequence options[] = new CharSequence[] {"Help", "Upgrade Account", "Logout"};
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setItems(options, new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				    	switch(which){
-					    	case 0:{
-					    		Toast.makeText(managerActivity, "Help not yet implemented (logout is implemented)", Toast.LENGTH_SHORT).show();
-					    		break;
-					    	}
-					    	case 1:{
-					    		Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-								startActivity(intent);
-								break;
-					    	}			    	
-					    	case 2:{
-					    		logout(managerActivity, (MegaApplication)getApplication(), megaApi);
-					    		break;
-					    	}
-				    	}
-				    }
-				});
-				builder.show();
-				break;
-			}
-		}
-	}
-	
-	/*
+	 /*
 	 * Logout user
 	 */
 	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi) {

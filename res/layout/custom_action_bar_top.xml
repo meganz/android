@@ -20,7 +20,7 @@
    
     
       <ImageButton android:id="@+id/menu_action_bar_search"
-        		android:src="@drawable/ic_menu_action_search"
+        		android:src="@drawable/ic_menu_search"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
                  android:layout_gravity="center"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content" >
         
 	    <ImageButton android:id="@+id/menu_action_bar_grid"
-	        		android:src="@drawable/ic_menu_action_grid"
+	        		android:src="@drawable/ic_menu_gridview"
 	                 android:layout_width="wrap_content"
 	                 android:layout_height="wrap_content"
 	                 android:layout_gravity="center"
