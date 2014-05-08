@@ -1,22 +1,17 @@
 package com.mega.android;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.opengl.Visibility;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,24 +29,20 @@ import android.widget.Toast;
 public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener{
 	
 	Context context;
-	List<ItemFileBrowser> rowItems;
+	TransferList transfers;
 	int positionClicked;
-	ArrayList<Integer> imageIds;
-	ArrayList<String> names;
+	ActionBar aB;
 
+	MegaApiAndroid megaApi;
 
-	public MegaTransfersAdapter(Context _context, List<ItemFileBrowser> _items) {
+	public MegaTransfersAdapter(Context _context, TransferList _transfers, ActionBar aB) {
 		this.context = _context;
-		this.rowItems = _items;
+		this.transfers = _transfers;
 		this.positionClicked = -1;
-		this.imageIds = new ArrayList<Integer>();
-		this.names = new ArrayList<String>();
+		this.aB = aB;
 		
-		Iterator<ItemFileBrowser> it = rowItems.iterator();
-		while (it.hasNext()){
-			ItemFileBrowser item = it.next();
-			imageIds.add(item.getImageId());
-			names.add(item.getName());
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
 	
@@ -120,11 +111,12 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		}
 
 		holder.currentPosition = position;
-
-		ItemFileBrowser rowItem = (ItemFileBrowser) getItem(position);
 		
-		holder.imageView.setImageResource(rowItem.getImageId());
-		holder.textViewFileName.setText(rowItem.getName());
+		MegaTransfer transfer = (MegaTransfer) getItem(position);
+		MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+		
+		holder.imageView.setImageResource(R.drawable.mime_3d);
+		holder.textViewFileName.setText(node.getName());
 
 		if (position == 0 || position == 1){
 			holder.textViewCompleted.setText("Completed");
@@ -197,17 +189,17 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 
 	@Override
     public int getCount() {
-        return rowItems.size();
+        return transfers.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return rowItems.get(position);
+        return transfers.get(position);
     }
  
     @Override
     public long getItemId(int position) {
-        return rowItems.indexOf(getItem(position));
+        return position;
     }    
     
     public int getPositionClicked (){
