@@ -133,9 +133,11 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			String name = extras.getString("name");
 			handle = extras.getLong("handle", -1);
 			node = megaApi.getNodeByHandle(handle);
-			if (node != null){
-				name = node.getName();
+			if (node == null){
+				finish();
 			}
+			
+			name = node.getName();
 					
 			setContentView(R.layout.activity_file_properties);
 			iconView = (ImageView) findViewById(R.id.file_properties_icon);
