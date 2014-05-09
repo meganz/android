@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
+import com.mega.components.EditTextCursorWatcher;
 import com.mega.components.MySwitch;
 import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
@@ -632,23 +633,16 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	
 	public void showRenameDialog(){
 		
-		final EditText input = new EditText(this);
+		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setText(node.getName());
-		input.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				input.performLongClick();
-			}
-		});
 
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
 		input.setImeActionLabel(getString(R.string.context_rename),
 				KeyEvent.KEYCODE_ENTER);
-
+		
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(final View v, boolean hasFocus) {

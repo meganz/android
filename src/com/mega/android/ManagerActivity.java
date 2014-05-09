@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
+import com.mega.components.EditTextCursorWatcher;
 import com.mega.sdk.AccountDetails;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -2466,7 +2467,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void showRenameDialog(final MegaNode document, String text){
 		
-		final EditText input = new EditText(this);
+		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
