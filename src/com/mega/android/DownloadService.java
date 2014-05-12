@@ -154,12 +154,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isForeground = false;
 		log("Stopping foreground!");
 		log("stopping service! success: " + successCount + " total: " + totalCount);
-		if (successCount == 0) {
-			log("stopping service!2");
-			showCompleteFailNotification();
-		} else {
-			log("stopping service!");
-			showCompleteSuccessNotification();
+		
+		if (!isOffline){
+			if (successCount == 0) {
+				log("stopping service!2");
+				showCompleteFailNotification();
+			} else {
+				log("stopping service!");
+				showCompleteSuccessNotification();
+			}
 		}
 		log("stopping service!");
 		stopSelf();
