@@ -268,7 +268,7 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart");
+		log("onRequestStart" + request.getRequestString());
 	}
 
 	@Override
@@ -279,9 +279,14 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 			log("ERROR CODE: " + e.getErrorCode() + "_ ERROR MESSAGE: " + e.getErrorString());
 			String message = e.getErrorString();
 			if (e.getErrorCode() == MegaError.API_EEXIST) {
-				message = getString(R.string.error_email_registered);
+				Intent intent = new Intent(this, LoginActivity.class);
+				intent.setAction(LoginActivity.ACTION_CREATE_ACCOUNT_EXISTS);
+				startActivity(intent);
+				finish();
+				return;
 			}
 			Util.showErrorAlertDialog(message, false, CreateAccountActivity.this);
+			
 			
 			createAccountLayout.setVisibility(View.VISIBLE);
 			createAccountLoginLayout.setVisibility(View.VISIBLE);
@@ -299,7 +304,7 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				dialog.dismiss();
-				Intent intent = new Intent(CreateAccountActivity.this, LoginActivity.class);
+				Intent intent = new Intent(CreateAccountActivity.this, TourActivity.class);
 				startActivity(intent);
 				finish();
 			}
