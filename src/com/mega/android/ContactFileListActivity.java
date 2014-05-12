@@ -548,6 +548,9 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 			}
 			else{
 				parentHandle = parentHandleStack.pop();
+				listView.setVisibility(View.VISIBLE);
+				emptyImage.setVisibility(View.GONE);
+				emptyText.setVisibility(View.GONE);
 				if (parentHandle == -1){
 					contactNodes = megaApi.getInShares(contact);
 					aB.setTitle(getString(R.string.contact_file_list_activity));
