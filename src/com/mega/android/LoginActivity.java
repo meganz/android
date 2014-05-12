@@ -46,6 +46,7 @@ import android.widget.Toast;
 public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
 	
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
+	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 	
@@ -214,6 +215,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		Intent intentReceived = getIntent();
 		if (intentReceived != null && ACTION_CONFIRM.equals(intentReceived.getAction())) {
 			handleConfirmationIntent(intentReceived);
+			return;
+		}
+		
+		if (intentReceived.getAction().equals(ACTION_CREATE_ACCOUNT_EXISTS)){
+			String message = getString(R.string.error_email_registered);
+			Util.showErrorAlertDialog(message, false, LoginActivity.this);
 			return;
 		}
 		
