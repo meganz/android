@@ -145,9 +145,13 @@
 	
     <string name="context_share_image">Share image using</string>
     <string name="context_get_link">Share link</string>
+    <string name="context_get_link_menu">Get link</string>
     <string name="context_rename">Rename</string>
     <string name="context_renaming">Renaming</string>
+    <string name="context_download">Download</string>
+    <string name="context_move">Move</string>
     <string name="context_moving">Moving document</string>
+    <string name="context_copy">Copy</string>
     <string name="context_copying">Copying document</string>
     <string name="context_creating_link">Creating link</string>
     <string name="context_moving_to_trash">Moving to trash</string>
@@ -159,6 +163,8 @@
     <string name="context_adding_contact">Adding contact</string>
     <string name="context_download_to">Save to</string>
     <string name="context_clear_rubbish">Clear Rubbish Bin</string>
+    <string name="context_send_link">Send link</string>
+    <string name="context_remove">Remove</string>
   
     <string name="menu_new_folder">New folder</string>
     <string name="menu_add_contact">Add contact</string>
