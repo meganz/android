@@ -26,10 +26,13 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface  {
 	
@@ -38,6 +41,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	private ArrayList<Long> imageHandles;
 	private SparseArray<ViewHolderFullImage> visibleImgs = new SparseArray<ViewHolderFullImage>();
 	private boolean aBshown = true;
+	private boolean menuVisible = false;
 	
 	private ArrayList<Long> pendingPreviews = new ArrayList<Long>();
 	private ArrayList<Long> pendingFullImages = new ArrayList<Long>();
@@ -365,32 +369,44 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			    
 			    RelativeLayout bottomLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_bottom);
 			    RelativeLayout topLayout = (RelativeLayout) activity.findViewById(R.id.image_viewer_layout_top);
-				if (aBshown){
-					TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-					animBottom.setDuration(1000);
-					animBottom.setFillAfter( true );
-					bottomLayout.setAnimation(animBottom);
-					
-					TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
-					animTop.setDuration(1000);
-					animTop.setFillAfter( true );
-					topLayout.setAnimation(animTop);
-					
-					aBshown = false;
-				}
-				else{					
-					TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
-					animBottom.setDuration(1000);
-					animBottom.setFillAfter( true );
-					bottomLayout.setAnimation(animBottom);
-					
-					TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
-					animTop.setDuration(1000);
-					animTop.setFillAfter( true );
-					topLayout.setAnimation(animTop);
-					
-					aBshown = true;
-				}
+			    ListView overflowMenuList = (ListView) activity.findViewById(R.id.image_viewer_overflow_menu_list);
+			    
+			    if (menuVisible){
+//			    	AlphaAnimation a = new AlphaAnimation(0.2f, 1.0f);
+//			    	a.setDuration(1000);
+//			    	overflowMenuList.startAnimation(a);
+			    	overflowMenuList.setVisibility(View.GONE);
+			    	
+			    	menuVisible = false;
+			    }
+			    else{
+					if (aBshown){
+						TranslateAnimation animBottom = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+						animBottom.setDuration(1000);
+						animBottom.setFillAfter( true );
+						bottomLayout.setAnimation(animBottom);
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
+						animTop.setDuration(1000);
+						animTop.setFillAfter( true );
+						topLayout.setAnimation(animTop);
+						
+						aBshown = false;
+					}
+					else{					
+						TranslateAnimation animBottom = new TranslateAnimation(0, 0, Util.px2dp(48, outMetrics), 0);
+						animBottom.setDuration(1000);
+						animBottom.setFillAfter( true );
+						bottomLayout.setAnimation(animBottom);
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
+						animTop.setDuration(1000);
+						animTop.setFillAfter( true );
+						topLayout.setAnimation(animTop);
+						
+						aBshown = true;
+					}
+			    }
 				
 				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
 				activityLayout.invalidate();
@@ -407,6 +423,15 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	public void setaBshown(boolean aBshown) {
 		this.aBshown = aBshown;
 	}
+	
+	public boolean isMenuVisible() {
+		return menuVisible;
+	}
+
+	public void setMenuVisible(boolean menuVisible) {
+		this.menuVisible = menuVisible;
+	}
+	
 	private static void log(String log) {
 		Util.log("MegaFullScreenImageAdapter", log);
 	}
