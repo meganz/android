@@ -143,7 +143,8 @@
     <string name="download_touch_to_cancel">Touch to cancel download</string>
     <string name="error_file_size_greater_than_4gb">Most devices can\'t download files greater than 4GB. Your download will probably fail.</string>
 	
-    <string name="context_get_link">Share Link</string>
+    <string name="context_share_image">Share image using</string>
+    <string name="context_get_link">Share link</string>
     <string name="context_rename">Rename</string>
     <string name="context_renaming">Renaming</string>
     <string name="context_moving">Moving document</string>
@@ -210,6 +211,8 @@
     <string name="error_user_blocked">Owner of this file is blocked</string>
     
     <string name="file_properties_get_link">The link has been copied to the clipboard</string>
+    
+    <string name="full_image_viewer_not_preview">The preview has not been downloaded yet. Please wait</string>
     
     
 </resources>
