@@ -734,8 +734,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		case CLOUD_DRIVE:{
 				if (fbF == null){
 					fbF = new FileBrowserFragment();
-					fbF.setParentHandle(megaApi.getRootNode().getHandle());
-					parentHandleBrowser = megaApi.getRootNode().getHandle();
+					if (parentHandleBrowser == -1){
+						fbF.setParentHandle(megaApi.getRootNode().getHandle());
+						parentHandleBrowser = megaApi.getRootNode().getHandle();
+					}
+					else{
+						fbF.setParentHandle(parentHandleBrowser);
+					}
 					fbF.setIsList(isListCloudDrive);
 					fbF.setOrder(orderGetChildren);
 					NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
