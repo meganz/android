@@ -213,16 +213,19 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		((TableRow.LayoutParams)loginSwitch.getLayoutParams()).setMargins(Util.px2dp((1*scaleH), outMetrics), Util.px2dp((8*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0);
 		
 		Intent intentReceived = getIntent();
-		if (intentReceived != null && ACTION_CONFIRM.equals(intentReceived.getAction())) {
-			handleConfirmationIntent(intentReceived);
-			return;
+		if (intentReceived != null){
+			if (ACTION_CONFIRM.equals(intentReceived.getAction())) {
+				handleConfirmationIntent(intentReceived);
+				return;
+			}
+			else if (ACTION_CREATE_ACCOUNT_EXISTS.equals(intentReceived.getAction())){
+				String message = getString(R.string.error_email_registered);
+				Util.showErrorAlertDialog(message, false, LoginActivity.this);
+				return;
+			}
 		}
 		
-		if (intentReceived.getAction().equals(ACTION_CREATE_ACCOUNT_EXISTS)){
-			String message = getString(R.string.error_email_registered);
-			Util.showErrorAlertDialog(message, false, LoginActivity.this);
-			return;
-		}
+		
 		
 		credentials = Preferences.getCredentials(this);
 		if (credentials != null){
