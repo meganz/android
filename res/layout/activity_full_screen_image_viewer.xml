@@ -34,7 +34,28 @@
             android:src="@drawable/ic_action_navigation_accept_white"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"/>
+            android:layout_marginLeft="5dp"
+            style="@style/dialogActionButton"/>
+        
+        <ImageView 
+            android:id="@+id/full_image_viewer_overflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_core_overflow"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            style="@style/dialogActionButton"/>
+        
+        <ImageView 
+            android:id="@+id/full_image_viewer_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_social_share"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/full_image_viewer_overflow"
+            android:layout_marginRight="5dp"
+            style="@style/dialogActionButton"/>
     
     </RelativeLayout>
     
