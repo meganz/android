@@ -111,7 +111,9 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (thumb != null){
 				thumb = Util.rotateBitmap(thumb, orientation);
-				long handle = Long.parseLong(currentFile.getParentFile().getName());
+				String [] s = currentFile.getName().split("_");
+				long handle = Long.parseLong(s[0]);
+//				long handle = Long.parseLong(currentFile.getParentFile().getName());
 				ThumbnailUtils.setThumbnailCache(handle, thumb);
 				return thumb;
 			}
