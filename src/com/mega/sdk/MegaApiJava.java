@@ -307,22 +307,22 @@ public class MegaApiJava
 		megaApi.remove(node);
 	}
 
-	public void share(MegaNode node, User user, String level, MegaRequestListenerInterface listener)
+	public void share(MegaNode node, MegaUser user, int level, MegaRequestListenerInterface listener)
 	{
 		megaApi.share(node, user, level, createDelegateRequestListener(listener));
 	}
 
-	public void share(MegaNode node, User user, String level)
+	public void share(MegaNode node, MegaUser user, int level)
 	{
 		megaApi.share(node, user, level);
 	}
 
-	public void share(MegaNode node, String email, String level, MegaRequestListenerInterface listener)
+	public void share(MegaNode node, String email, int level, MegaRequestListenerInterface listener)
 	{
 		megaApi.share(node, email, level, createDelegateRequestListener(listener));
 	}
 
-	public void share(MegaNode node, String email, String level)
+	public void share(MegaNode node, String email, int level)
 	{
 		megaApi.share(node, email, level);
 	}
@@ -560,6 +560,36 @@ public class MegaApiJava
 		return megaApi.getTransfers();
 	}
 	
+	public int getNumPendingDownloads()
+	{
+		return megaApi.getNumPendingDownloads();
+	}
+	
+	public int getNumPendingUploads()
+	{
+		return megaApi.getNumPendingUploads();
+	}
+	
+	public int getTotalDownloads()
+	{
+		return megaApi.getTotalDownloads();
+	}
+	
+	public int getTotalUploads()
+	{
+		return megaApi.getTotalUploads();
+	}
+	
+	public void resetTotalDownloads()
+	{
+		megaApi.resetTotalDownloads();
+	}
+	
+	public void resetTotalUploads()
+	{
+		megaApi.resetTotalUploads();
+	}
+	
 	/****************************************************************************************************/
 	//FILESYSTEM METHODS
 	/****************************************************************************************************/
@@ -618,12 +648,12 @@ public class MegaApiJava
 		return megaApi.getInShares();
 	}
 	
-	public String getAccess(MegaNode node)
+	public int getAccess(MegaNode node)
 	{
 		return megaApi.getAccess(node);
 	}
 
-	public MegaError checkAccess(MegaNode node, String level)
+	public MegaError checkAccess(MegaNode node, int level)
 	{
 		return megaApi.checkAccess(node, level);
 	}
