@@ -74,6 +74,7 @@
 %ignore ArrayWrapper::ArrayWrapper;
 %ignore NodeList::NodeList;
 %ignore UserList::UserList;
+%ignore ShareList::ShareList;
 %ignore TransferList::TransferList;
 
 //%ignore BalanceList::BalanceList;
@@ -88,6 +89,7 @@
 %ignore MegaNode::MegaNode;
 %ignore MegaNode::fromNode;
 %ignore MegaUser::fromUser;
+%ignore MegaShare::fromShare;
 
 //Don't wrap internal setters
 //(This objects should be modified internally only)
@@ -102,12 +104,6 @@
 %ignore MegaApi::removeSync;
 %ignore MegaApi::getNumActiveSyncs;
 %ignore MegaApi::stopSyncs;
-%ignore MegaApi::getNumPendingUploads;
-%ignore MegaApi::getNumPendingDownloads;
-%ignore MegaApi::getTotalUploads;
-%ignore MegaApi::getTotalDownloads;
-%ignore MegaApi::resetTotalDownloads;
-%ignore MegaApi::resetTotalUploads;
 %ignore MegaApi::getLocalPath;
 %ignore MegaApi::updateStatics;
 %ignore MegaApi::update;
@@ -117,6 +113,8 @@
 %ignore MegaApi::setExcludedNames;
 %ignore MegaApi::checkTransfer;
 %ignore MegaApi::isRegularTransfer;
+%ignore MegaApi::moveToLocalDebris;
+%ignore MegaApi::is_syncable;
 
 //Ignore still unsupported features
 %ignore MegaApi::setProxySettings;
@@ -187,6 +185,7 @@ typedef long long uint64_t;
 typedef uint32_t dstime;
 typedef long long int64_t;
 typedef int64_t m_off_t;
+typedef int64_t m_time_t;
 
 //Include all new classes
 %include "megaapi.h"

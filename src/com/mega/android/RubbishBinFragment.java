@@ -7,6 +7,7 @@ import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.NodeList;
 
 import android.app.Activity;
@@ -150,12 +151,12 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			boolean showTrash = false;
 			
 			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "full").getErrorCode() == MegaError.API_OK)) {
+			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
 			}
 			
 			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), "owner").getErrorCode() == MegaError.API_OK)) {
+			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				showLink = true;
 			}
 			
