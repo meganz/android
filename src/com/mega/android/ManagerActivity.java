@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +71,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewConfiguration;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
@@ -231,6 +233,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
+		
+		getOverflowMenu();
 		
 		megaApi.addGlobalListener(this);
 		
@@ -3150,6 +3154,25 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public void setParentHandleSharedWithMe(long parentHandleSharedWithMe){
 		this.parentHandleSharedWithMe = parentHandleSharedWithMe;
+	}
+	
+	private void getOverflowMenu() {
+
+	     try {
+	        ViewConfiguration config = ViewConfiguration.get(this);
+	        Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+	        if(menuKeyField != null) {
+	            menuKeyField.setAccessible(true);
+	            menuKeyField.setBoolean(config, false);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	@Override
+	public boolean onKeyUp(int keyCode, KeyEvent event) {		
+		return super.onKeyUp(keyCode, event);
 	}
 
 	public static void log(String message) {
