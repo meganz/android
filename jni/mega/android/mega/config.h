@@ -54,7 +54,7 @@
 #define HAVE_SELECT 1
 
 /* Define to 1 if you have the `sendfile' function. */
-#define HAVE_SENDFILE 1
+//#define HAVE_SENDFILE 1
 
 /* Define to 1 if you have the <sqlite3.h> header file. */
 #define HAVE_SQLITE3_H 1
