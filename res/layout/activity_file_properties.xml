@@ -122,7 +122,33 @@
          
      </RelativeLayout>
      
+     <RelativeLayout
+         android:id="@+id/file_properties_shared_folder"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:background="@color/file_properties_available_layout"
+         android:orientation="horizontal"
+         android:layout_below="@id/file_properties_image">
+         
+         <TextView
+             android:id="@+id/file_properties_shared_folder_shared_with_text"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="Shared with:" 
+             android:textStyle="bold"
+             android:textColor="@color/file_properties_info_menu"
+             />
+         
+         <ListView
+	        android:id="@+id/file_properties_shared_folder_shared_with_list"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent" >
+	    </ListView>
+         
+     </RelativeLayout>
+     
      <TableLayout 
+         android:id="@+id/file_properties_info_table"
          android:layout_width="wrap_content"
        	 android:layout_height="wrap_content" 
        	 android:layout_gravity="center"

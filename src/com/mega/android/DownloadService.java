@@ -90,7 +90,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		super.onCreate();
 		log("onCreate");
 		
-		totalCount = 0;
+		app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
+		totalCount = megaApi.getTotalDownloads();
 		doneCount = 0;
 		successCount = 0;
 		totalSize = 0;
@@ -100,8 +103,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isForeground = false;
 		canceled = false;
 
-		app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
+		
 		
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -139,8 +141,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return START_NOT_STICKY;
 		}
 		
-		totalCount++;
-		totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
+		totalCount = megaApi.getTotalDownloads();
 		
 		onHandleIntent(intent, 0);
 		
@@ -154,6 +155,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isForeground = false;
 		log("Stopping foreground!");
 		log("stopping service! success: " + successCount + " total: " + totalCount);
+		megaApi.resetTotalDownloads();
+		totalCount = megaApi.getTotalDownloads();
 		
 		if (!isOffline){
 			if (successCount == 0) {
@@ -170,6 +173,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	
 	protected void onHandleIntent(final Intent intent, final int tryCount) {
 		log("onHandleIntent");
+		
 		updateProgressNotification(downloadedSize);
 		currentTryCount = tryCount;
 		
@@ -334,7 +338,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		int progressPercent = (int) Math.round((double) progress / totalSize
 				* 100);
 		log(progressPercent + " " + progress + " " + totalSize);
-		int left = totalCount - doneCount;
+		int left = totalCount - doneCount;;
 		int current = totalCount - left + 1;
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		
@@ -452,7 +456,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Download start");		
+		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
+		totalCount = megaApi.getTotalDownloads();
+		totalSize += transfer.getTotalBytes();
+//		totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
 	}
 
 	@Override
@@ -575,6 +582,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			DownloadService.this.cancel();
 			return;
 		}
+		
+		totalCount = megaApi.getTotalDownloads();
 		
 		final long bytes = transfer.getTransferredBytes();
 		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
