@@ -637,7 +637,7 @@ public class MegaApiJava
 	{
 		return megaApi.getContact(email);
 	}
-
+	
 	public NodeList getInShares(MegaUser user)
 	{
 		return megaApi.getInShares(user);
@@ -646,6 +646,11 @@ public class MegaApiJava
 	public NodeList getInShares()
 	{
 		return megaApi.getInShares();
+	}
+	
+	public ShareList getOutShares(MegaNode node)
+	{
+		return megaApi.getOutShares(node);		
 	}
 	
 	public int getAccess(MegaNode node)
