@@ -127,6 +127,7 @@
 	<string name="file_properties_shared_folder_read_write">Read &amp; write</string>
 	<string name="file_properties_shared_folder_read_only">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with">Shared with: </string>
+	<string name="file_properties_shared_folder_permissions">Permissions</string>
 	
 	<string name="contact_properties_activity">Contact</string>
 	<string name="contact_properties_content">Content:</string>

@@ -18,8 +18,11 @@ import com.mega.sdk.ShareList;
 import com.mega.sdk.UserList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -58,6 +61,12 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	MegaNode node;
 	
 	MegaApiAndroid megaApi;
+	
+	boolean removeShare = false;
+	
+	AlertDialog permissionsDialog;
+	
+	final MegaSharedFolderAdapter megaSharedFolderAdapter;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -122,6 +131,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		this.node = node;
 		this.shareList = _shareList;
 		this.positionClicked = -1;
+		this.megaSharedFolderAdapter = this;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -292,9 +302,15 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_shared);
 		}
 		
-		holder.optionPermissions.setTag(holder);
-		holder.optionPermissions.setOnClickListener(this);
-
+		if (share.getUser() != null){
+			holder.optionPermissions.setVisibility(View.VISIBLE);
+			holder.optionPermissions.setTag(holder);
+			holder.optionPermissions.setOnClickListener(this);
+		}
+		else{
+			holder.optionPermissions.setVisibility(View.GONE);			
+		}
+		
 		holder.optionRemoveShare.setTag(holder);
 		holder.optionRemoveShare.setOnClickListener(this);
 		
@@ -328,7 +344,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	public void onClick(View v) {
 		ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
 		int currentPosition = holder.currentPosition;
-		MegaShare s = (MegaShare) getItem(currentPosition);
+		final MegaShare s = (MegaShare) getItem(currentPosition);
 		MegaUser c = null;
 		if (s.getUser() != null){
 			c = megaApi.getContact(s.getUser());
@@ -336,16 +352,82 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				
 		switch (v.getId()){
 			case R.id.shared_folder_permissions_option:{
-				Intent i = new Intent(context, ContactPropertiesActivity.class);
-				i.putExtra("name", c.getEmail());
-				context.startActivity(i);							
+
+//				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+//				View customView = ((Activity)context).getLayoutInflater().inflate(R.layout.alert_dialog, null);
+//				TextView titleView = (TextView)customView.findViewById(R.id.dialog_title);
+//				titleView.setText(context.getString(R.string.file_properties_shared_folder_permissions));
+//				TextView messageView = (TextView)customView.findViewById(R.id.message);
+//				messageView.setVisibility(View.GONE);
+//				dialogBuilder.setView(customView);
+//				dialogBuilder.setInverseBackgroundForced(true);
+//				final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
+//				dialogBuilder.setSingleChoiceItems(items, s.getAccess(), new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int item) {
+//						removeShare = false;
+//						switch(item) {
+//	                        case 0:{
+//	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READ, megaSharedFolderAdapter);
+//	                        	break;
+//	                        }
+//	                        case 1:{
+//	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READWRITE, megaSharedFolderAdapter);
+//                                break;
+//	                        }
+//	                        case 2:{
+//	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_FULL, megaSharedFolderAdapter);
+//                                break;
+//	                        }
+//	                    }
+//					}
+//				});
+//				permissionsDialog = dialogBuilder.create();
+//				permissionsDialog.show();
+//				
+//				positionClicked = -1;
+//				notifyDataSetChanged();
+//				break;
+				
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+				dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, s.getAccess(), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						removeShare = false;
+						switch(item) {
+	                        case 0:{
+	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READ, megaSharedFolderAdapter);
+	                        	break;
+	                        }
+	                        case 1:{
+	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READWRITE, megaSharedFolderAdapter);
+                                break;
+	                        }
+	                        case 2:{
+	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_FULL, megaSharedFolderAdapter);
+                                break;
+	                        }
+	                    }
+					}
+				});
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+				Resources resources = permissionsDialog.getContext().getResources();
+				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+		        alertTitle.setTextColor(resources.getColor(R.color.mega));
+				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+				
+				
 				positionClicked = -1;
 				notifyDataSetChanged();
 				break;
 			}
 			case R.id.shared_folder_remove_share_option:{
 				if (c != null){
-					Toast.makeText(context, "megaApi.share(" + node.getName() + ", "+  s.getUser() + ", " + MegaShare.ACCESS_UNKNOWN + ", this);", Toast.LENGTH_LONG).show();
+					removeShare = true;
 					megaApi.share(node, s.getUser(), MegaShare.ACCESS_UNKNOWN, this);
 				}
 				else{
@@ -393,13 +475,37 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
-		if (e.getErrorCode() == MegaError.API_OK){
-			Toast.makeText(context, "Share correctly removed", Toast.LENGTH_LONG).show();
-			ShareList sl = megaApi.getOutShares(node);
-			setShareList(sl);
+		if (request.getType() == MegaRequest.TYPE_EXPORT){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(context, "The node is now private", Toast.LENGTH_LONG).show();
+			}
+			else{
+				Util.showErrorAlertDialog(e, (Activity)context);
+			}
 		}
-		else{
-			Toast.makeText(context, "Share not removed. E: " + e.getErrorCode() + "_" + e.getErrorString(), Toast.LENGTH_LONG).show();
+		else if (request.getType() == MegaRequest.TYPE_SHARE){
+			if (removeShare){
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(context, "Share correctly removed", Toast.LENGTH_LONG).show();
+					ShareList sl = megaApi.getOutShares(node);
+					setShareList(sl);
+				}
+				else{
+					Util.showErrorAlertDialog(e, (Activity)context);
+				}
+				removeShare = false;
+			}
+			else{
+				permissionsDialog.dismiss();
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(context, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
+					ShareList sl = megaApi.getOutShares(node);
+					setShareList(sl);
+				}
+				else{
+					Util.showErrorAlertDialog(e, (Activity)context);
+				}
+			}
 		}
 	}
 
