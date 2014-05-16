@@ -438,13 +438,16 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestStart: " + request.getRequestString());
+		log("Node: " + request.getNodeHandle() + "_" + request.getName());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
+		
+		log("onRequestFinish: " + request.getRequestString());
+		log("Node: " + request.getNodeHandle() + "_" + request.getName());
 
 		long handle = request.getNodeHandle();
 		MegaNode node = api.getNodeByHandle(handle);
@@ -477,13 +480,17 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				}
 			}
 		}
+		else{
+			log("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
+		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestTemporaryError: " + request.getRequestString());
+		log("Node: " + request.getNodeHandle() + "_" + request.getName());
+		log("ERROR: " + e.getErrorCode() + "_" + e.getErrorString());
 	}
 
 	@Override

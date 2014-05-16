@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.ShareList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -217,7 +218,18 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		if (node.isFolder()){
 			holder.textViewFileSize.setText(getInfoFolder(node));
-			holder.imageView.setImageResource(R.drawable.mime_folder);
+			ShareList sl = megaApi.getOutShares(node);
+			if (sl != null){
+				if (sl.size() > 0){
+					holder.imageView.setImageResource(R.drawable.mime_folder_shared);		
+				}
+				else{
+					holder.imageView.setImageResource(R.drawable.mime_folder);
+				}
+			}
+			else{
+				holder.imageView.setImageResource(R.drawable.mime_folder);				
+			}
 		}
 		else{
 			long nodeSize = node.getSize();
