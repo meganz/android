@@ -426,6 +426,16 @@ public class MegaApiJava
 	{
 		megaApi.exportNode(node);
 	}
+	
+	public void disableExport(MegaNode node, MegaRequestListenerInterface listener)
+	{
+		megaApi.disableExport(node, createDelegateRequestListener(listener));
+	}
+	
+	public void disableExport(MegaNode node)
+	{
+		megaApi.disableExport(node);
+	}
 
 	public void fetchNodes(MegaRequestListenerInterface listener)
 	{

@@ -1563,7 +1563,17 @@ void MegaApi::exportNode(MegaNode *node, MegaRequestListener *listener)
 {
 	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_EXPORT, listener);
     if(node) request->setNodeHandle(node->getHandle());
+    request->setAccess(1);
 	requestQueue.push(request);
+    waiter->notify();
+}
+
+void MegaApi::disableExport(MegaNode *node, MegaRequestListener *listener)
+{
+    MegaRequest *request = new MegaRequest(MegaRequest::TYPE_EXPORT, listener);
+    if(node) request->setNodeHandle(node->getHandle());
+    request->setAccess(0);
+    requestQueue.push(request);
     waiter->notify();
 }
 
@@ -1736,7 +1746,7 @@ void MegaApi::startDownload(handle nodehandle, const char* localPath, int connec
         string path(localPath);
         if((path.size()<2) || path.compare(0, 2, "\\\\"))
             path.insert(0, "\\\\?\\");
-        target = path.data();
+        localPath = path.data();
 #endif
 
         int c = localPath[strlen(localPath)-1];
@@ -3916,9 +3926,11 @@ Node* MegaApi::getChildNode(Node *parent, const char* name)
 	}
 
 	Node *result = NULL;
+    string nname = name;
+    fsAccess->normalize(&nname);
 	for (node_list::iterator it = parent->children.begin(); it != parent->children.end(); it++)
 	{
-		if (!strcmp(name,(*it)->displayname()))
+        if (!strcmp(nname.c_str(),(*it)->displayname()))
 		{
 			result = *it;
 			break;
@@ -4397,7 +4409,9 @@ void MegaApi::sendPendingRequests()
 
 			// generate fresh attribute object with the folder name
 			AttrMap attrs;
-			attrs.map['n'] = name;
+            string sname = name;
+            fsAccess->normalize(&sname);
+            attrs.map['n'] = sname;
 
 			// JSON-encode object and encrypt attribute string
 			attrs.getjson(&attrstring);
@@ -4451,7 +4465,10 @@ void MegaApi::sendPendingRequests()
 			if(!node || !newName) { e = API_EARGS; break; }
 
 			if (!client->checkaccess(node,FULL)) { e = API_EACCESS; break; }
-			node->attrs.map['n'] = string(newName);
+
+            string sname = newName;
+            fsAccess->normalize(&sname);
+            node->attrs.map['n'] = sname;
 			e = client->setattr(node);
 			break;
 		}
@@ -4471,10 +4488,12 @@ void MegaApi::sendPendingRequests()
 			int access = request->getAccess();
 			if(!node || !email) { e = API_EARGS; break; }
 
-            accesslevel_t a = ACCESS_UNKNOWN;
+            accesslevel_t a;
 			switch(access)
 			{
 				case MegaShare::ACCESS_UNKNOWN:
+                    a = ACCESS_UNKNOWN;
+                    break;
 				case MegaShare::ACCESS_READ:
 					a = RDONLY;
 					break;
@@ -4487,10 +4506,12 @@ void MegaApi::sendPendingRequests()
 				case MegaShare::ACCESS_OWNER:
 					a = OWNER;
 					break;
+                default:
+                    e = API_EARGS;
 			}
 
-			if(a == ACCESS_UNKNOWN) { e = API_EARGS; break; }
-			client->setshare(node, email, a);
+            if(e == API_OK)
+                client->setshare(node, email, a);
 			break;
 		}
 		case MegaRequest::TYPE_FOLDER_ACCESS:
@@ -4542,7 +4563,7 @@ void MegaApi::sendPendingRequests()
 			Node* node = client->nodebyhandle(request->getNodeHandle());
 			if(!node) { e = API_EARGS; break; }
 
-			e = client->exportnode(node, 0);
+            e = client->exportnode(node, !request->getAccess());
 			break;
 		}
 		case MegaRequest::TYPE_FETCH_NODES:

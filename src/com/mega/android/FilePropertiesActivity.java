@@ -11,6 +11,7 @@ import java.util.Map;
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.components.MySwitch;
+import com.mega.components.NestedListView;
 import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -18,7 +19,9 @@ import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.ShareList;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -46,6 +49,7 @@ import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -54,10 +58,12 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.TableLayout;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,6 +83,14 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	TextView sizeTitleTextView;
 	TextView addedTextView;
 	TextView modifiedTextView;
+	
+	TableLayout infoTable;
+	
+	RelativeLayout sharedWith;
+	TextView sharedWithText;
+	NestedListView sharedWithList;
+	
+	RelativeLayout nameLayout;
 	
 	MegaNode node;
 	long handle;
@@ -103,6 +117,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	
 	boolean shareIt = true;
 	
+	MegaSharedFolderAdapter adapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +149,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			String name = extras.getString("name");
 			handle = extras.getLong("handle", -1);
 			node = megaApi.getNodeByHandle(handle);
-			if (node == null){
+			if (node == null){  
 				finish();
 			}
 			
@@ -144,9 +159,13 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			iconView = (ImageView) findViewById(R.id.file_properties_icon);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
 			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
-			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
-			imageView.getLayoutParams().height = Util.px2dp((270*scaleH), outMetrics);
+			imageView.getLayoutParams().width = Util.px2dp((300*scaleW), outMetrics);
+			imageView.getLayoutParams().height = Util.px2dp((300*scaleH), outMetrics);
 			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((9*scaleH), outMetrics));
+			
+			nameLayout = (RelativeLayout) findViewById(R.id.file_properties_name_layout);
+//			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((-30*scaleH), outMetrics));
+			
 			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitchOnline = (MySwitch) findViewById(R.id.file_properties_switch_online);
@@ -170,11 +189,23 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
 			iconView.setImageResource(imageId);
 			((RelativeLayout.LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
+			
+			sharedWith = (RelativeLayout) findViewById(R.id.file_properties_shared_folder);
+//			((RelativeLayout.LayoutParams)sharedWith.getLayoutParams()).setMargins(0, Util.px2dp((-40*scaleH), outMetrics), 0, 0);
+			sharedWithText = (TextView) findViewById(R.id.file_properties_shared_folder_shared_with_text);
+			((RelativeLayout.LayoutParams)sharedWithText.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, Util.px2dp((15*scaleH), outMetrics));
+			sharedWithList = (NestedListView) findViewById(R.id.file_properties_shared_folder_shared_with_list);
+			
+			infoTable = (TableLayout) findViewById(R.id.file_properties_info_table);
 
 
 			File destination = null;
 			File offlineFile = null;
 			if (node.isFile()){
+				
+				availableOfflineLayout.setVisibility(View.VISIBLE);
+				sharedWith.setVisibility(View.GONE);
+				((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_available_offline);
 				
 				sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
 				
@@ -218,11 +249,28 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 			}
 			else{
+				availableOfflineLayout.setVisibility(View.GONE);
+				
+				ShareList sl = megaApi.getOutShares(node);
+				if (sl != null){
+					if (sl.size() > 0){
+						sharedWith.setVisibility(View.VISIBLE);
+						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_shared_folder);
+						imageId = R.drawable.mime_folder_shared;
+						adapter = new MegaSharedFolderAdapter(this, node, sl);
+						sharedWithList.setAdapter(adapter);
+						adapter.setShareList(sl);
+					}
+					else{
+						sharedWith.setVisibility(View.GONE);
+						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
+					}
+				}
+				imageView.setImageResource(imageId);
+				iconView.setImageResource(imageId);
 				sizeTitleTextView.setText(getString(R.string.file_properties_info_size_folder));
 				
 				sizeTextView.setText(getInfoFolder(node));
-				
-				availableOfflineLayout.setVisibility(View.INVISIBLE);
 			}
 			
 			if (node.getCreationTime() != 0){
@@ -958,13 +1006,13 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			}
 			
 			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				if(node != null){
+				MegaNode n = megaApi.getNodeByHandle(hash);
+				if(n != null){
 					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+					if (n.getType() == MegaNode.TYPE_FOLDER) {
+						getDlList(dlFiles, n, new File(parentPath, new String(n.getName())));
 					} else {
-						dlFiles.put(node, parentPath);
+						dlFiles.put(n, parentPath);
 					}
 					
 					for (MegaNode document : dlFiles.keySet()) {

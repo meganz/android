@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FilePropertiesFragment" >
+    tools:context=".FilePropertiesActivity" >
     
     <RelativeLayout 
 	    android:layout_width="match_parent"
@@ -12,33 +12,40 @@
 	    android:id="@+id/file_properties_layout">
 
         
-        <ImageView
-            android:id="@+id/file_properties_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="30dp"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/file_properties_name_layout">
+			
+	        <ImageView
+	            android:id="@+id/file_properties_icon"
+	            android:layout_width="wrap_content"
+	            android:layout_height="30dp"
+	            android:layout_marginTop="15dp"
+	            android:layout_marginLeft="30dp"/>
+	        
+	        <TextView
+		        android:id="@+id/file_properties_name"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:paddingTop="5dp"
+		        android:layout_toRightOf="@id/file_properties_icon"
+		        android:layout_alignBottom="@id/file_properties_icon" />
+        </RelativeLayout>
     
 	     <com.mega.components.RoundedImageView 
 	         android:id="@+id/file_properties_image"
 	         android:layout_width="wrap_content"
-	         android:layout_height="270dp"
+	         android:layout_height="200dp"
 	         android:layout_centerHorizontal="true"
-	         android:layout_below="@id/file_properties_icon"
+	         android:layout_below="@id/file_properties_name_layout"
 	         android:paddingLeft="30dp"
 	         android:paddingRight="30dp"
 	         rounded:corner_radius="10dp" 
 	         rounded:border_width="2dp"
-	         rounded:border_color="@color/border_file_properties" />
+	         rounded:border_color="@color/border_file_properties"/>
 	     
-	     <TextView
-	        android:id="@+id/file_properties_name"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:paddingTop="5dp"
-	        android:layout_toRightOf="@id/file_properties_icon"
-	        android:layout_alignBottom="@id/file_properties_icon"
-	        android:layout_alignRight="@id/file_properties_image"/>
+	     
      
      <RelativeLayout
          android:id="@+id/file_properties_available_offline"
@@ -126,7 +133,6 @@
          android:id="@+id/file_properties_shared_folder"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
-         android:background="@color/file_properties_available_layout"
          android:orientation="horizontal"
          android:layout_below="@id/file_properties_image">
          
@@ -134,16 +140,33 @@
              android:id="@+id/file_properties_shared_folder_shared_with_text"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
-             android:text="Shared with:" 
+             android:text="@string/file_properties_shared_folder_shared_with" 
              android:textStyle="bold"
              android:textColor="@color/file_properties_info_menu"
              />
          
-         <ListView
+         <View
+             android:id="@+id/file_properties_shared_with_delimiter"
+		     android:layout_width="match_parent"
+		     android:layout_height="1dp"
+		     android:background="#d6d6d6"
+		     android:layout_below="@id/file_properties_shared_folder_shared_with_text"
+		     />
+         
+         <com.mega.components.NestedListView
+             android:id="@+id/file_properties_shared_folder_shared_with_list"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_below="@id/file_properties_shared_with_delimiter" />
+             
+         <!--
+        <ListView
 	        android:id="@+id/file_properties_shared_folder_shared_with_list"
 	        android:layout_width="match_parent"
-	        android:layout_height="match_parent" >
+	        android:layout_height="match_parent"
+	        android:layout_below="@id/file_properties_shared_folder_shared_with_text" >
 	    </ListView>
+	   -->
          
      </RelativeLayout>
      

@@ -7,6 +7,7 @@ import java.util.List;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.ShareList;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -453,7 +454,18 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileName1.setText(node1.getName());
 			if (node1.isFolder()){
 				holder.textViewFileSize1.setText(getInfoFolder(node1));
-				holder.imageView1.setImageResource(R.drawable.mime_folder);
+				ShareList sl = megaApi.getOutShares(node1);
+				if (sl != null){
+					if (sl.size() > 0){
+						holder.imageView1.setImageResource(R.drawable.mime_folder_shared);		
+					}
+					else{
+						holder.imageView1.setImageResource(R.drawable.mime_folder);
+					}
+				}
+				else{
+					holder.imageView1.setImageResource(R.drawable.mime_folder);				
+				}
 			}
 			else{
 				long node1Size = node1.getSize();
@@ -514,7 +526,18 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				holder.textViewFileName2.setText(node2.getName());
 				if (node2.isFolder()){
 					holder.textViewFileSize2.setText(getInfoFolder(node2));
-					holder.imageView2.setImageResource(R.drawable.mime_folder);
+					ShareList sl = megaApi.getOutShares(node2);
+					if (sl != null){
+						if (sl.size() > 0){
+							holder.imageView2.setImageResource(R.drawable.mime_folder_shared);		
+						}
+						else{
+							holder.imageView2.setImageResource(R.drawable.mime_folder);
+						}
+					}
+					else{
+						holder.imageView2.setImageResource(R.drawable.mime_folder);				
+					}
 				}
 				else{
 					long node2Size = node2.getSize();

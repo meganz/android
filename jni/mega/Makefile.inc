@@ -47,6 +47,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/posix/net.cpp  \
     sdk/src/posix/fs.cpp  \
     sdk/src/posix/waiter.cpp \
+    sdk/third_party/utf8proc/utf8proc.cpp \
     linux/megaapiwait.cpp \
     android/megaapiandroidhttpio.cpp \
     sdk/src/gfx.cpp \
