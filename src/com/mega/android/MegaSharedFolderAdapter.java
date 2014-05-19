@@ -19,6 +19,7 @@ import com.mega.sdk.UserList;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,6 +51,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +61,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	int positionClicked;
 	ShareList shareList;
 	MegaNode node;
+	ListView listViewActivity;
 	
 	MegaApiAndroid megaApi;
 	
@@ -67,6 +70,8 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	AlertDialog permissionsDialog;
 	
 	final MegaSharedFolderAdapter megaSharedFolderAdapter;
+	
+	ProgressDialog statusDialog;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -126,18 +131,31 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		
 	}
 	
-	public MegaSharedFolderAdapter(Context _context, MegaNode node, ShareList _shareList) {
+	public MegaSharedFolderAdapter(Context _context, MegaNode node, ShareList _shareList, ListView _lv) {
 		this.context = _context;
 		this.node = node;
 		this.shareList = _shareList;
 		this.positionClicked = -1;
 		this.megaSharedFolderAdapter = this;
+		this.listViewActivity = _lv;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
 	
+	public void setContext(Context context){
+		this.context = context;
+	}
+	
+	public void setNode(MegaNode node){
+		this.node = node;
+	}
+	
+	public void setListViewActivity(ListView lv){
+		this.listViewActivity = lv;
+	}
+		
 	/*private view holder class*/
     private class ViewHolderShareList {
     	RoundedImageView imageView;
@@ -285,6 +303,11 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
 				ListView list = (ListView) parent;
 				list.smoothScrollToPosition(_position);
+				
+				holder.optionPermissions.getLayoutParams().width = Util.px2dp((120*scaleW), outMetrics);
+				((TableRow.LayoutParams) holder.optionPermissions.getLayoutParams()).setMargins(Util.px2dp((29*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				holder.optionRemoveShare.getLayoutParams().width = Util.px2dp((140*scaleW), outMetrics);
+				((TableRow.LayoutParams) holder.optionRemoveShare.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), 0, 0);
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);
@@ -351,49 +374,23 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		}
 				
 		switch (v.getId()){
-			case R.id.shared_folder_permissions_option:{
-
-//				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-//				View customView = ((Activity)context).getLayoutInflater().inflate(R.layout.alert_dialog, null);
-//				TextView titleView = (TextView)customView.findViewById(R.id.dialog_title);
-//				titleView.setText(context.getString(R.string.file_properties_shared_folder_permissions));
-//				TextView messageView = (TextView)customView.findViewById(R.id.message);
-//				messageView.setVisibility(View.GONE);
-//				dialogBuilder.setView(customView);
-//				dialogBuilder.setInverseBackgroundForced(true);
-//				final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
-//				dialogBuilder.setSingleChoiceItems(items, s.getAccess(), new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int item) {
-//						removeShare = false;
-//						switch(item) {
-//	                        case 0:{
-//	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READ, megaSharedFolderAdapter);
-//	                        	break;
-//	                        }
-//	                        case 1:{
-//	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READWRITE, megaSharedFolderAdapter);
-//                                break;
-//	                        }
-//	                        case 2:{
-//	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_FULL, megaSharedFolderAdapter);
-//                                break;
-//	                        }
-//	                    }
-//					}
-//				});
-//				permissionsDialog = dialogBuilder.create();
-//				permissionsDialog.show();
-//				
-//				positionClicked = -1;
-//				notifyDataSetChanged();
-//				break;
-				
+			case R.id.shared_folder_permissions_option:{				
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 				dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, s.getAccess(), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
 						removeShare = false;
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(context);
+							temp.setMessage(((Activity)context).getString(R.string.context_sharing_folder));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
 						switch(item) {
 	                        case 0:{
 	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READ, megaSharedFolderAdapter);
@@ -426,6 +423,16 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				break;
 			}
 			case R.id.shared_folder_remove_share_option:{
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(context);
+					temp.setMessage(((Activity)context).getString(R.string.context_sharing_folder)); 
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
 				if (c != null){
 					removeShare = true;
 					megaApi.share(node, s.getUser(), MegaShare.ACCESS_UNKNOWN, this);
@@ -475,6 +482,11 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
+		try { 
+			statusDialog.dismiss();
+		} 
+		catch (Exception ex) {}
+		
 		if (request.getType() == MegaRequest.TYPE_EXPORT){
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(context, "The node is now private", Toast.LENGTH_LONG).show();
@@ -488,6 +500,10 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(context, "Share correctly removed", Toast.LENGTH_LONG).show();
 					ShareList sl = megaApi.getOutShares(node);
+//					Toast.makeText(context, sl.size() + "*", Toast.LENGTH_SHORT).show();
+//					for (int i=0;i<sl.size();i++){
+//						Toast.makeText(context, "Nombre: " + sl.get(i).getUser() + "_Level: " + sl.get(i).getAccess(), Toast.LENGTH_SHORT).show();
+//					}
 					setShareList(sl);
 				}
 				else{
@@ -500,6 +516,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(context, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
 					ShareList sl = megaApi.getOutShares(node);
+					Toast.makeText(context, sl.size() + "_", Toast.LENGTH_LONG).show();
 					setShareList(sl);
 				}
 				else{
@@ -512,7 +529,6 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestTemporaryError: " + request.getRequestString());
 	}
 }
