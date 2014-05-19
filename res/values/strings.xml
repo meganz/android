@@ -128,6 +128,7 @@
 	<string name="file_properties_shared_folder_read_only">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions">Permissions</string>
+	<string name="file_properties_shared_folder_select_contact">Share with</string>
 	
 	<string name="contact_properties_activity">Contact</string>
 	<string name="contact_properties_content">Content:</string>
@@ -171,6 +172,8 @@
     <string name="context_clear_rubbish">Clear Rubbish Bin</string>
     <string name="context_send_link">Send link</string>
     <string name="context_remove">Remove</string>
+    <string name="context_share_folder">Share folder</string>
+    <string name="context_sharing_folder">Sharing</string>
   
     <string name="menu_new_folder">New folder</string>
     <string name="menu_add_contact">Add contact</string>

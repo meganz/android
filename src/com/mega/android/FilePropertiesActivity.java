@@ -16,6 +16,7 @@ import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
@@ -68,7 +69,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener{
+public class FilePropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
 	
 	ImageView iconView;
 	TextView nameView;
@@ -114,10 +115,13 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	
 	MenuItem downloadMenuItem; 
+	MenuItem shareFolderMenuItem;
 	
 	boolean shareIt = true;
 	
 	MegaSharedFolderAdapter adapter;
+	
+	ShareFolderContactsDialog shareFolderContactsDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +131,9 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			MegaApplication app = (MegaApplication)getApplication();
 			megaApi = app.getMegaApi();
 		}
+		
+		megaApi.addGlobalListener(this);
+		
 		filePropertiesActivity = this;
 		handler = new Handler();
 		
@@ -257,7 +264,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 						sharedWith.setVisibility(View.VISIBLE);
 						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_shared_folder);
 						imageId = R.drawable.mime_folder_shared;
-						adapter = new MegaSharedFolderAdapter(this, node, sl);
+						adapter = new MegaSharedFolderAdapter(this, node, sl, sharedWithList);
 						sharedWithList.setAdapter(adapter);
 						adapter.setShareList(sl);
 					}
@@ -536,6 +543,12 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 					}
 		    	}
 				return true;
+		    }
+		    case R.id.action_file_properties_share_folder:{
+		    	shareFolderContactsDialog = new ShareFolderContactsDialog();
+		    	shareFolderContactsDialog.setNode(node);
+		    	shareFolderContactsDialog.show(getSupportFragmentManager(), "fragment_share_folder_contacts");
+		    	break;
 		    }
 		    case R.id.action_file_properties_get_link:{
 		    	shareIt = false;
@@ -817,6 +830,14 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	    inflater.inflate(R.menu.activity_file_properties, menu);
 	   
 	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
+	    shareFolderMenuItem = menu.findItem(R.id.action_file_properties_share_folder);
+	    
+	    if (node.isFolder()){
+	    	shareFolderMenuItem.setVisible(true);
+	    }
+	    else{
+	    	shareFolderMenuItem.setVisible(false);
+	    }
 	    
 	    if (availableOfflineBoolean){
 	    	downloadMenuItem.setIcon(R.drawable.ic_action_collections_collection_dark);
@@ -848,6 +869,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				String link = request.getLink();
+				ShareList sl = megaApi.getOutShares(node);
 				if (filePropertiesActivity != null){
 					if (shareIt){
 						Intent intent = new Intent(Intent.ACTION_SEND);
@@ -1169,6 +1191,57 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 		
 		return info;
 	}
+	
+	@Override
+	public void onUsersUpdate(MegaApiJava api) {
+		log("onUsersUpdate");		
+	}
+
+	@Override
+	public void onNodesUpdate(MegaApiJava api) {
+		log("onNodesUpdate");
+		
+		if (node.isFolder()){
+			int imageId = R.drawable.mime_folder;
+			ShareList sl = megaApi.getOutShares(node);
+			if (sl != null){
+				if (sl.size() > 0){
+					sharedWith.setVisibility(View.VISIBLE);
+					((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_shared_folder);
+					imageId = R.drawable.mime_folder_shared;
+					if (adapter != null){
+						adapter.setNode(node);
+						adapter.setContext(this);
+						adapter.setShareList(sl);
+						adapter.setListViewActivity(sharedWithList);
+					}
+					else{
+						adapter = new MegaSharedFolderAdapter(this, node, sl, sharedWithList);
+					}
+					sharedWithList.setAdapter(adapter);
+					adapter.setShareList(sl);
+				}
+				else{
+					sharedWith.setVisibility(View.GONE);
+					((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
+				}
+			}
+			imageView.setImageResource(imageId);
+			iconView.setImageResource(imageId);
+		}
+	}
+
+	@Override
+	public void onReloadNeeded(MegaApiJava api) {
+		log("onReloadNeeded");
+	}
+	
+	@Override
+	protected void onDestroy(){
+    	super.onDestroy();
+    	
+    	megaApi.removeGlobalListener(this);
+    }
 
 	public static void log(String message) {
 		Util.log("FilePropertiesActivity", message);

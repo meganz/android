@@ -7,7 +7,15 @@
 	    android:showAsAction="always"
 	    android:title="@string/context_download"
 	    android:icon="@drawable/ic_menu_download_dark"
-	    MEGA:showAsAction="ifRoom" />
+	    MEGA:showAsAction="always" />
+	
+	<item
+	    android:id="@+id/action_file_properties_share_folder"
+	    android:orderInCategory="100"
+	    android:showAsAction="always"
+	    android:title="@string/context_share_folder"
+	    android:icon="@drawable/ic_share_folder"
+	    MEGA:showAsAction="always" />
 	
 	<item
 	    android:id="@+id/action_file_properties_get_link"
