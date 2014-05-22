@@ -1,6 +1,7 @@
 package com.mega.android;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -15,6 +16,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
@@ -71,9 +73,37 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 	
 	ProgressDialog statusDialog;
 	
+	private List<ShareInfo> filePreparedInfos;
+	
+	/*
+	 * Background task to process files for uploading
+	 */
+	private class FilePrepareTask extends AsyncTask<Intent, Void, List<ShareInfo>> {
+		Context context;
+		
+		FilePrepareTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected List<ShareInfo> doInBackground(Intent... params) {
+			return ShareInfo.processIntent(params[0], context);
+		}
+
+		@Override
+		protected void onPostExecute(List<ShareInfo> info) {
+			filePreparedInfos = info;
+			onIntentProcessed();
+		}
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (savedInstanceState != null){
+			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
+		}
 		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
@@ -126,9 +156,43 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 		else if (mode == Mode.COPY){
 			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
 		}
+		else if (mode == Mode.UPLOAD){
+			uploadButton.setText(getString(R.string.action_upload));
+		}
 		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle bundle) {
+		bundle.putBoolean("folderSelected", folderSelected);
+		super.onSaveInstanceState(bundle);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (getIntent() != null){
+			if (mode == Mode.UPLOAD) {
+				if (folderSelected){
+					if (filePreparedInfos == null){
+						FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+						filePrepareTask.execute(getIntent());
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(this);
+							temp.setMessage(getString(R.string.upload_prepare));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+					}
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -140,6 +204,45 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 					return;
 				}
 			}
+		}
+	}
+	
+	public void onIntentProcessed() {
+		List<ShareInfo> infos = filePreparedInfos;
+		
+		if (statusDialog != null) {
+			try { 
+				statusDialog.dismiss(); 
+			} 
+			catch(Exception ex){}
+		}
+		
+		log("intent processed!");
+		if (folderSelected) {
+			if (infos == null) {
+				Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
+						true, this);
+				return;
+			}
+			else {
+				long parentHandle = fe.getParentHandle();
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+				if(parentNode == null){
+					parentNode = megaApi.getRootNode();
+				}
+				Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
+						Toast.LENGTH_SHORT).show();
+				for (ShareInfo info : infos) {
+					Intent intent = new Intent(this, UploadService.class);
+					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+					startService(intent);
+				}
+				filePreparedInfos = null;
+				finish();
+			}	
 		}
 	}
 
@@ -179,6 +282,25 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 					log("finish!");
 					finish();
 				}
+				else if (mode == Mode.UPLOAD){
+					if (filePreparedInfos == null){
+						FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+						filePrepareTask.execute(getIntent());
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(this);
+							temp.setMessage(getString(R.string.upload_prepare));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+					}
+					else{
+						onIntentProcessed();
+					}
+				}
 				break;
 			}
 			case R.id.file_explorer_new_folder:{
@@ -188,7 +310,7 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 		}
 	}
 	
-public void showNewFolderDialog(String editText){
+	public void showNewFolderDialog(String editText){
 		
 		String text;
 		if (editText == null || editText.equals("")){
@@ -247,7 +369,7 @@ public void showNewFolderDialog(String editText){
 		newFolderDialog.show();
 	}
 
-private void createFolder(String title) {
+	private void createFolder(String title) {
 	
 	if (!Util.isOnline(this)){
 		Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
