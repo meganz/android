@@ -242,6 +242,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					lastEmail = credentials.getEmail();
 					gPublicKey = credentials.getPublicKey();
 					gPrivateKey = credentials.getPrivateKey();
+					loggingInText.setVisibility(View.VISIBLE);
 					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
 					return;
 				}
@@ -267,6 +268,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						lastEmail = credentials.getEmail();
 						gPublicKey = credentials.getPublicKey();
 						gPrivateKey = credentials.getPrivateKey();
+						loggingInText.setVisibility(View.VISIBLE);
 						megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
 						return;
 					}
@@ -294,6 +296,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					lastEmail = credentials.getEmail();
 					gPublicKey = credentials.getPublicKey();
 					gPrivateKey = credentials.getPrivateKey();
+					loggingInText.setVisibility(View.VISIBLE);
 					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
 					return;
 				}
@@ -517,6 +520,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 			else{
 
+				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				
 				Preferences.saveCredentials(loginActivity, credentials);
