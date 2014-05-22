@@ -116,17 +116,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.nodes = nodes;
 		positionClicked = -1;	
 		notifyDataSetChanged();
-//		listFragment.clearFocus();
-//		if (listFragment != null){
-//			listFragment.post(new Runnable() {
-//                @Override
-//                public void run() {                	
-//                    listFragment.setSelection(0);
-//                }
-//            });
-//			listFragment.setSelection(0);
-//		}
-//		list.smoothScrollToPosition(0);
 	}
 
 	@Override
