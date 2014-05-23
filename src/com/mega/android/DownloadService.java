@@ -80,6 +80,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	File currentDir;
 	
 	private int notificationId = 2;
+	private int notificationIdFinal = 4;
 	private NotificationCompat.Builder mBuilderCompat;
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
@@ -117,7 +118,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
 			mBuilder = new Notification.Builder(DownloadService.this);	
 		}
-		mBuilderCompat = new NotificationCompat.Builder(DownloadService.this);
+		mBuilderCompat = new NotificationCompat.Builder(getApplicationContext());
 		
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 	}
@@ -151,8 +152,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	
 	private void onQueueComplete() {
 		log("onQueueComplete");
-		stopForeground(true);
-		isForeground = false;
 		log("Stopping foreground!");
 		log("stopping service! success: " + successCount + " total: " + totalCount);
 		megaApi.resetTotalDownloads();
@@ -167,7 +166,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				showCompleteSuccessNotification();
 			}
 		}
-		log("stopping service!");
+		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
+		isForeground = false;
+		stopForeground(true);
 		stopSelf();
 	}
 	
@@ -276,12 +277,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setContentIntent(PendingIntent.getActivity(DownloadService.this, 0, intent, 0))
-				.setAutoCancel(true).setContentTitle(title)
+				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+				.setAutoCancel(false).setContentTitle(title)
 				.setContentText(message)
 				.setOngoing(false);
 
-		mNotificationManager.notify(notificationId, mBuilderCompat.build());
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
 	/*
@@ -302,7 +303,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		Intent intent = null;
 		if(successCount != 1)
 		{
-			intent = new Intent(DownloadService.this, ManagerActivity.class);
+			if (getApplicationContext() == null){
+				log("ES NULL");
+			}
+			else{
+				log("NO ES NULL");	
+			}			
+			intent = new Intent(getApplicationContext(), ManagerActivity.class);
 		}
 		else
 		{
@@ -321,12 +328,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setContentIntent(PendingIntent.getActivity(DownloadService.this, 0, intent, 0))
-				.setAutoCancel(true).setTicker(notificationTitle)
+				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+				.setAutoCancel(false).setTicker(notificationTitle)
 				.setContentTitle(notificationTitle).setContentText(size)
 				.setOngoing(false);
 
-		mNotificationManager.notify(notificationId, mBuilderCompat.build());
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
 	/*
@@ -405,9 +412,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 */
 	private void cancel() {
 		canceled = true;
-
-		stopForeground(true);
 		isForeground = false;
+		stopForeground(true);
+		
 	
 		stopSelf();
 	}
