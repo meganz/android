@@ -3,13 +3,13 @@ package com.mega.android;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -26,18 +26,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener{
+public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
-	TransferList transfers;
+	SparseArray<TransfersHolder> transfersListArray;
 	int positionClicked;
 	ActionBar aB;
 
 	MegaApiAndroid megaApi;
-
-	public MegaTransfersAdapter(Context _context, TransferList _transfers, ActionBar aB) {
+	
+	public MegaTransfersAdapter(Context _context, SparseArray<TransfersHolder> _transfers, ActionBar aB) {
 		this.context = _context;
-		this.transfers = _transfers;
+		this.transfersListArray = _transfers;
 		this.positionClicked = -1;
 		this.aB = aB;
 		
@@ -45,10 +45,10 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
-	
+		
 	/*private view holder class*/
     private class ViewHolder {
-        ImageView imageView;
+		ImageView imageView;
         TextView textViewFileName;
         ImageView imageViewCompleted;
         TextView textViewCompleted;
@@ -64,6 +64,11 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
         ImageButton optionUndo;
         ImageButton optionDeletePermanently;
         int currentPosition;
+    }
+    
+    public void setTransfers(SparseArray<TransfersHolder> transfers){
+    	this.transfersListArray = transfers;
+    	notifyDataSetChanged();
     }
 
 	@Override
@@ -103,7 +108,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.optionDeletePermanently.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.transfers_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
-			
+
 			convertView.setTag(holder);
 		}
 		else{
@@ -112,11 +117,11 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 
 		holder.currentPosition = position;
 		
-		MegaTransfer transfer = (MegaTransfer) getItem(position);
-		MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+		TransfersHolder transfer = (TransfersHolder) getItem(position);
+		String fileName = transfer.getName(); 
 		
 		holder.imageView.setImageResource(R.drawable.mime_3d);
-		holder.textViewFileName.setText(node.getName());
+		holder.textViewFileName.setText(fileName);
 
 		if (position == 0 || position == 1){
 			holder.textViewCompleted.setText("Completed");
@@ -189,12 +194,12 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 
 	@Override
     public int getCount() {
-        return transfers.size();
+        return transfersListArray.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return transfers.get(position);
+        return transfersListArray.get(position);
     }
  
     @Override
@@ -247,5 +252,9 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				break;
 			}
 		}
+	}
+
+	private static void log(String log) {
+		Util.log("MegaTransfersAdapter", log);
 	}
 }

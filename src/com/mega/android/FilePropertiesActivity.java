@@ -455,36 +455,15 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 			
 			try{
 				File offlineFile = new File(destination, node.getHandle() + "_" + node.getName());
-				delete(offlineFile);
+				Util.deleteFolderAndSubfolders(this, offlineFile);
 			}
-			catch(Exception e){};
-			
-			MediaScannerConnection.scanFile(this,
-					new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR}, null,
-			        new MediaScannerConnection.OnScanCompletedListener() {
-			      		public void onScanCompleted(String path, Uri uri) {
-			      			log("Scanned: " + path);
-			      		}
-			 		}
-			);			
+			catch(Exception e){};	
 		}
 		else if (node.isFolder()){
 			Toast.makeText(this, "Folder remove (not yet implemented)", Toast.LENGTH_LONG).show();
 		}
 		
 		
-	}
-	
-	void delete(File f) throws IOException {
-		if (f.isDirectory()) {
-			for (File c : f.listFiles()){
-				delete(c);
-			}
-		}
-		
-		if (!f.delete()){
-			throw new FileNotFoundException("Failed to delete file: " + f);
-		}
 	}
 	
 	@Override

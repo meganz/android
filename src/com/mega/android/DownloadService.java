@@ -139,6 +139,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
 			log("Cancel intent");
 			cancel();
+			megaApi.resetTotalDownloads();
 			return START_NOT_STICKY;
 		}
 		

@@ -22,6 +22,7 @@ import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.TransferList;
 import com.mega.sdk.UserList;
 
 import android.app.Activity;
@@ -63,6 +64,7 @@ import android.text.format.Formatter;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
+import android.util.SparseArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -90,7 +92,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface {
+public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
@@ -209,9 +211,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	ActionBar aB;
 	
 	String urlLink = "";
+		
+	SparseArray<TransfersHolder> transfersListArray = null;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
+    	
+    	log("onCreate()");
+    	
 		super.onCreate(savedInstanceState);
 		managerActivity = this;
 		if (aB == null){
@@ -237,6 +244,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		getOverflowMenu();
 		
 		megaApi.addGlobalListener(this);
+//		megaApi.addTransferListener(this);
 		
 		handler = new Handler();
 		
@@ -592,7 +600,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     protected void onDestroy(){
     	super.onDestroy();
     	
+    	log("onDestroy()");
+    	
     	megaApi.removeGlobalListener(this);
+//    	megaApi.removeTransferListener(this);
     }
     
     @Override
@@ -1611,7 +1622,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		
 		try {
-			Util.deleteFolderAndSubfolders(offlineDirectory);
+			Util.deleteFolderAndSubfolders(context, offlineDirectory);
 		} catch (IOException e) {}
 
 		Preferences.clearCredentials(context);
@@ -2612,47 +2623,6 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	@Override
-	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-		log("Download started");
-	}
-
-	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
-		log("Download finished");
-		if (e.getErrorCode() != MegaError.API_OK){
-			
-		}
-		else{
-			log("Dowload OK (" + transfer.getPath() + ")");
-			String finalPath = null;
-			try{
-				finalPath = destination.getCanonicalPath();
-			}
-			catch(Exception ex){
-				finalPath = destination.getAbsolutePath();
-			}
-			
-			Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(destination), MimeType.typeForName(api.getNodeByHandle(transfer.getNodeHandle()).getName()).getType());
-			if (isIntentAvailable(this, intent)){
-				startActivity(intent);
-			}
-		}
-		
-	}
-
-	@Override
-	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log(transfer.getFileName() + "(" + (int)((transfer.getTransferredBytes()*100)/transfer.getTotalBytes()) + "%): " + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
-	}
-
-	@Override
-	public void onTransferTemporaryError(MegaApiJava api,
-			MegaTransfer transfer, MegaError e) {
-	}
-	
-	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		
 		if (intent == null) {
@@ -3175,6 +3145,88 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		return super.onKeyUp(keyCode, event);
 	}
 
+	@Override
+	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+//		if (tF == null){
+//			tF = new TransfersFragment();
+//		}
+//		
+//		if (transfersListArray == null){
+//			TransferList tL = megaApi.getTransfers();
+//			transfersListArray = new SparseArray<TransfersHolder>();
+//			
+//			for (int i = 0; i< tL.size(); i++){
+//				MegaTransfer t = tL.get(i);
+//				TransfersHolder th = new TransfersHolder();
+//				
+//				th.setName(new String(t.getFileName()));
+//				
+//				transfersListArray.put(t.getTag(), th);
+//			}
+//		}
+//		else{
+//			TransfersHolder th = new TransfersHolder();
+//			
+//			th.setName(new String(transfer.getFileName()));
+//			
+//			transfersListArray.put(transfer.getTag(), th);
+//		}
+//		
+//		tF.setTransfers(transfersListArray);
+		
+		log("onTransferStart: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+
+	}
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+			MegaError e) {
+//		if (tF == null){
+//			tF = new TransfersFragment();
+//		}
+//		
+//		if (transfersListArray == null){
+//			TransferList tL = megaApi.getTransfers();
+//			transfersListArray = new SparseArray<TransfersHolder>();
+//			
+//			for (int i = 0; i< tL.size(); i++){
+//				MegaTransfer t = tL.get(i);
+//				TransfersHolder th = new TransfersHolder();
+//				
+//				th.setName(new String(t.getFileName()));
+//				
+//				transfersListArray.put(t.getTag(), th);
+//			}
+//		}
+//		else{
+//			transfersListArray.remove(transfer.getTag());
+//		}
+//		
+//		tF.setTransfers(transfersListArray);
+		
+		log("onTransferFinish: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+	}
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		log("onTransferUpdate: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+//		if (tF != null){
+//			if (tF.isVisible()){
+//				TransferList tl = megaApi.getTransfers();
+//				tF.setTransfers(tl);
+//			}
+//		}
+	}
+
+	@Override
+	public void onTransferTemporaryError(MegaApiJava api,
+			MegaTransfer transfer, MegaError e) {
+//		if (tF == null){
+//			tF = new TransfersFragment();
+//		}
+		log("onTransferTemporaryError: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+	}
+	
 	public static void log(String message) {
 		Util.log("ManagerActivity", message);
 	}
