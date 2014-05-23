@@ -167,9 +167,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			if (Environment.getExternalStorageDirectory() != null){
 				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 			}
-//			if (context.getExternalFilesDir(null) != null){
-//				offlineDirectory = context.getExternalFilesDir(null);
-//			}
 			else{
 				offlineDirectory = context.getFilesDir();
 			}
@@ -179,19 +176,18 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
 				File[] fList = offlineDirectory.listFiles();
 				for (File f : fList){
-					paths.add(f.getAbsolutePath());
-					
-	//				if (f.isDirectory()){
-	//					File[] document = f.listFiles();
-	//					if (document.length == 0){
-	//						try {
-	//							Util.deleteFolderAndSubfolders(f);
-	//						} catch (Exception e) {}
-	//					}
-	//					else{
-	//						paths.add(document[0].getAbsolutePath());
-	//					}
-	//				}
+					String [] s = f.getName().split("_");
+					if (s.length > 0){
+						long handle = -1;
+						try{
+							handle = Long.parseLong(s[0]);
+						}
+						catch(Exception e){ }
+						
+						if (handle != -1){
+							paths.add(f.getAbsolutePath());		
+						}						
+					}					
 				}
 			}
 			else{
@@ -229,9 +225,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			if (Environment.getExternalStorageDirectory() != null){
 				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
 			}
-//			if (context.getExternalFilesDir(null) != null){
-//				offlineDirectory = context.getExternalFilesDir(null);
-//			}
 			else{
 				offlineDirectory = context.getFilesDir();
 			}
@@ -239,11 +232,18 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
 				File[] fList = offlineDirectory.listFiles();
 				for (File f : fList){
-					paths.add(f.getAbsolutePath());
-	//				if (f.isDirectory()){
-	//					File[] document = f.listFiles();
-	//					paths.add(document[0].getAbsolutePath());
-	//				}
+					String [] s = f.getName().split("_");
+					if (s.length > 0){
+						long handle = -1;
+						try{
+							handle = Long.parseLong(s[0]);
+						}
+						catch(Exception e){ }
+						
+						if (handle != -1){
+							paths.add(f.getAbsolutePath());		
+						}						
+					}					
 				}
 			}
 			else{
@@ -560,14 +560,20 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			offlineDirectory = context.getFilesDir();
 		}
 		if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
-		
 			File[] fList = offlineDirectory.listFiles();
 			for (File f : fList){
-				paths.add(f.getAbsolutePath());
-	//			if (f.isDirectory()){
-	//				File[] document = f.listFiles();
-	//				paths.add(document[0].getAbsolutePath());
-	//			}
+				String [] s = f.getName().split("_");
+				if (s.length > 0){
+					long handle = -1;
+					try{
+						handle = Long.parseLong(s[0]);
+					}
+					catch(Exception e){ }
+					
+					if (handle != -1){
+						paths.add(f.getAbsolutePath());		
+					}						
+				}					
 			}
 		}
 		else{

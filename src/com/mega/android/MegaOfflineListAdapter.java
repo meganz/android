@@ -1,15 +1,8 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -40,7 +33,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -188,9 +180,6 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			holder.optionOpen = (ImageView) convertView.findViewById(R.id.offline_list_option_open);
 			holder.optionOpen.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionOpen.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-//			holder.optionProperties = (ImageView) convertView.findViewById(R.id.offline_list_option_properties);
-//			holder.optionProperties.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
-//			((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 			holder.optionDelete = (ImageView) convertView.findViewById(R.id.offline_list_option_delete);
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
@@ -229,16 +218,21 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		holder.currentPath = currentPath;
 		
 		long fileSize = currentFile.length();
-		holder.textViewFileName.setText(currentFile.getName());
 		holder.textViewFileSize.setText(Util.getSizeString(fileSize));
 		holder.imageView.setImageResource(MimeType.typeForName(currentFile.getName()).getIconResourceId());
 		
 		if (MimeType.typeForName(currentFile.getName()).isImage()){
 			Bitmap thumb = null;
-//			long handle = Long.parseLong(currentFile.getParentFile().getName());
 			String [] s = currentFile.getName().split("_");
 			if (s.length > 0){
 				long handle = Long.parseLong(s[0]);
+				
+				String fileName = "";
+				for (int i=1;i<s.length-1;i++){
+					fileName += s[i] + "_";
+				}
+				fileName += s[s.length-1];
+				holder.textViewFileName.setText(fileName);
 				
 				thumb = ThumbnailUtils.getThumbnailFromCache(handle);
 				if (thumb != null){
@@ -269,8 +263,6 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				
 				holder.optionOpen.getLayoutParams().width = Util.px2dp((165*scaleW), outMetrics);
 				((TableRow.LayoutParams) holder.optionOpen.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-//				holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-//				((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 				holder.optionDelete.getLayoutParams().width = Util.px2dp((165*scaleW), outMetrics);
 				((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 			}

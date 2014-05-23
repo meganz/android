@@ -3,28 +3,18 @@ package com.mega.android;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -36,14 +26,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -279,19 +267,29 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			
 			if (MimeType.typeForName(currentFile1.getName()).isImage()){
 				Bitmap thumb1 = null;
-				long handle = Long.parseLong(currentFile1.getParentFile().getName());
-				
-				thumb1 = ThumbnailUtils.getThumbnailFromCache(handle);
-				if (thumb1 != null){
-					holder.imageView1.setImageBitmap(thumb1);
-				}
-				else{
-					try{
-						new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
+				String [] s = currentFile1.getName().split("_");
+				if (s.length > 0){
+					long handle = Long.parseLong(s[0]);
+					
+					String fileName = "";
+					for (int i=1;i<s.length-1;i++){
+						fileName += s[i] + "_";
 					}
-					catch(Exception e){
-						//Too many AsyncTasks
-					}		
+					fileName += s[s.length-1];
+					holder.textViewFileName1.setText(fileName);
+					
+					thumb1 = ThumbnailUtils.getThumbnailFromCache(handle);
+					if (thumb1 != null){
+						holder.imageView1.setImageBitmap(thumb1);
+					}
+					else{
+						try{
+							new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
+						}
+						catch(Exception e){
+							//Too many AsyncTasks
+						}
+					}
 				}
 			}
 			
@@ -309,20 +307,30 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				
 				if (MimeType.typeForName(currentFile2.getName()).isImage()){
 					
-					Bitmap thumb2 = null;
-					long handle = Long.parseLong(currentFile2.getParentFile().getName());
-					
-					thumb2 = ThumbnailUtils.getThumbnailFromCache(handle);
-					if (thumb2 != null){
-						holder.imageView2.setImageBitmap(thumb2);
-					}
-					else{
-						try{
-							new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile2.getAbsolutePath());
+					Bitmap thumb = null;
+					String [] s = currentFile2.getName().split("_");
+					if (s.length > 0){
+						long handle = Long.parseLong(s[0]);
+						
+						String fileName = "";
+						for (int i=1;i<s.length-1;i++){
+							fileName += s[i] + "_";
 						}
-						catch(Exception e){
-							//Too many AsyncTasks
-						}			
+						fileName += s[s.length-1];
+						holder.textViewFileName2.setText(fileName);
+						
+						thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+						if (thumb != null){
+							holder.imageView2.setImageBitmap(thumb);
+						}
+						else{
+							try{
+								new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile2.getAbsolutePath());
+							}
+							catch(Exception e){
+								//Too many AsyncTasks
+							}
+						}
 					}
 				}
 				
@@ -446,40 +454,61 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 		
 		switch (v.getId()){
 			case R.id.offline_grid_thumbnail1:{
-				File currentFile = new File((String)getItem(currentPosition));
-				positionClicked = -1;
-				notifyDataSetChanged();
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-					context.startActivity(viewIntent);
+				String currentPath = paths.get(currentPosition);
+				File currentFile = new File (currentPath);
+				
+				if (MimeType.typeForName(currentFile.getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", currentPosition);
+					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+					intent.putExtra("parentNodeHandle", -1L);
+					context.startActivity(intent);
 				}
 				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, intentShare)){
-						context.startActivity(intentShare);
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+						context.startActivity(viewIntent);
+					}
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+							context.startActivity(intentShare);
+						}
 					}
 				}
+				positionClicked = -1;
+				notifyDataSetChanged();
 				break;
 			}
 			case R.id.offline_grid_thumbnail2:{
+				String currentPath = paths.get(currentPosition+1);
+				File currentFile = new File (currentPath);
 				
-				File currentFile = new File((String)getItem(currentPosition+1));
-				positionClicked = -1;
-				notifyDataSetChanged();
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-					context.startActivity(viewIntent);
+				if (MimeType.typeForName(currentFile.getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", currentPosition+1);
+					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+					intent.putExtra("parentNodeHandle", -1L);
+					context.startActivity(intent);
 				}
 				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, intentShare)){
-						context.startActivity(intentShare);
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+						context.startActivity(viewIntent);
+					}
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+							context.startActivity(intentShare);
+						}
 					}
 				}
+				positionClicked = -1;
+				notifyDataSetChanged();
 				break;
 			}
 			case R.id.offline_grid_option_open1:{
