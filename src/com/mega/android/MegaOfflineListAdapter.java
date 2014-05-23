@@ -376,7 +376,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				
 				try{
-					Util.deleteFolderAndSubfolders(currentFile.getParentFile());
+					Util.deleteFolderAndSubfolders(context, currentFile.getParentFile());
 				}
 				catch(Exception e){};
 				

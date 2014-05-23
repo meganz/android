@@ -31,6 +31,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -539,15 +540,25 @@ public class Util {
 		context.startActivity(intent);
 	}
 	
-	public static void deleteFolderAndSubfolders(File f) throws IOException {
+	public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
 		if (f.isDirectory()) {
 			for (File c : f.listFiles()){
-				deleteFolderAndSubfolders(c);
+				deleteFolderAndSubfolders(context, c);
 			}
 		}
 		
 		if (!f.delete()){
 			throw new FileNotFoundException("Failed to delete file: " + f);
+		}
+		else{
+			MediaScannerConnection.scanFile(context,
+					new String[] { f.getAbsolutePath() }, null,
+			        new MediaScannerConnection.OnScanCompletedListener() {
+			      		public void onScanCompleted(String path, Uri uri) {
+			      			log("Scanned: " + path);
+			      		}
+			 		}
+			);
 		}
 	}
 	

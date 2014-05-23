@@ -559,7 +559,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				
 				try{
-					Util.deleteFolderAndSubfolders(currentFile.getParentFile());
+					Util.deleteFolderAndSubfolders(context, currentFile.getParentFile());
 				}
 				catch(Exception e){};
 				
@@ -572,7 +572,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				
 				try{
-					Util.deleteFolderAndSubfolders(currentFile.getParentFile());
+					Util.deleteFolderAndSubfolders(context, currentFile.getParentFile());
 				}
 				catch(Exception e){};
 				

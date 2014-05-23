@@ -69,7 +69,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					for (int i=0;i<documents.size();i++){
 						File f = new File(documents.get(i));
 						try{
-							Util.deleteFolderAndSubfolders(f.getParentFile());
+							Util.deleteFolderAndSubfolders(context, f.getParentFile());
 						}
 						catch(Exception e){};
 					}
