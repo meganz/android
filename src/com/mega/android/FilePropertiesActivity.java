@@ -390,7 +390,7 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 //				destination = new File (getExternalFilesDir(null), node.getHandle()+"");
 //			}
 			else{
-				destination = new File(getFilesDir(), node.getHandle()+"");
+				destination = getFilesDir();
 			}
 			
 			if (destination.exists() && destination.isDirectory()){
@@ -414,11 +414,13 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 				getDlList(dlFiles, node, new File(destination, new String(node.getName())));
 			} else {
 				dlFiles.put(node, destination.getAbsolutePath());
+//				dlFiles.put(node, destination.getAbsolutePath() + "/" + node.getHandle() + "_" + node.getName());
 			}
 			
 			for (MegaNode document : dlFiles.keySet()) {
 				
 				String path = dlFiles.get(document);
+//				Toast.makeText(this, "PATH: " + path, Toast.LENGTH_LONG).show();
 				
 				if(availableFreeSpace <document.getSize()){
 					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);

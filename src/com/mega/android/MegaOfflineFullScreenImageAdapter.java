@@ -70,7 +70,8 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		    preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (preview != null){
 				preview = Util.rotateBitmap(preview, orientation);
-				long handle = Long.parseLong(currentFile.getParentFile().getName());
+				String [] s = currentFile.getName().split("_");
+				long handle = Long.parseLong(s[0]);
 				PreviewUtils.setPreviewCache(handle, preview);
 				return preview;
 			}
@@ -139,7 +140,8 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		Bitmap preview = null;
 		Bitmap thumb = null;
 
-		long handle = Long.parseLong(currentFile.getParentFile().getName());
+		String [] s = currentFile.getName().split("_");
+		long handle = Long.parseLong(s[0]);
 		
 		preview = PreviewUtils.getPreviewFromCache(handle);
 		if (preview != null){

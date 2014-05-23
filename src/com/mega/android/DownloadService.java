@@ -196,7 +196,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		
 		currentDir = getDir(document, intent);
-		currentFile = new File(currentDir, document.getName());
+		if (currentDir.isDirectory()){
+			currentFile = new File(currentDir, document.getName());
+		}
+		else{
+			currentFile = currentDir;
+		}
 		log("dir: " + currentDir.getAbsolutePath() + " file: " + document.getName() + "  Size: " + document.getSize());
 		if(!checkCurrentFile(document)){
 			return;
@@ -209,7 +214,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			lock.acquire();
 		}
 		
-		megaApi.startDownload(document, currentDir.getAbsolutePath() + "/", this);
+		if (currentDir.isDirectory()){
+			log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+			megaApi.startDownload(document, currentDir.getAbsolutePath() + "/", this);
+		}
+//		else{
+//			log("To download(file): " + currentDir.getAbsolutePath());
+//			megaApi.startDownload(document, currentDir.getAbsolutePath(), this);
+//		}
 	}
 	
 	private File getDir(MegaNode document, Intent intent) {
@@ -261,7 +273,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if (doneCount == totalCount){
 			onQueueComplete();
-		}		
+		}
 	}
 	
 	/*
@@ -467,6 +479,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
 		totalCount = megaApi.getTotalDownloads();
 		totalSize += transfer.getTotalBytes();
+		updateProgressNotification(downloadedSize);
 //		totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
 	}
 
@@ -549,25 +562,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					 		}
 					);
 				}
-				
-//				if (Environment.getExternalStorageDirectory() != null){
-//					MediaScannerConnection.scanFile(this,
-//							new String[] { Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR}, null,
-//					        new MediaScannerConnection.OnScanCompletedListener() {
-//					      		public void onScanCompleted(String path, Uri uri) {
-//					      			log("Scanned: " + path);
-//					      		}
-//					 		}
-//					);
-//				}
-	
-				
-				
+							
 				onDownloadComplete(true);
 			}
 			else 
 			{
-				log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode());
+				log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
 				lastError = error.getErrorCode();
 				File file = new File(transfer.getPath());
 				file.delete();
@@ -602,7 +602,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		log("Download Temporary Error");
+		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
 		
 	}
 
