@@ -277,7 +277,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
         
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
-			Intent intent = new Intent(managerActivity,LoginActivity.class);
+			if (getIntent() != null){
+				if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+					Intent intent = new Intent(managerActivity, LoginActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					intent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+					intent.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(intent);
+					finish();	
+					return;
+				}
+			}
+			Intent intent = new Intent(managerActivity, LoginActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -631,7 +642,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		if (intent.getAction() != null){
     			log("getAction != null");
     			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
-    				handleOpenLinkIntent(intent);
+    				Toast.makeText(this, "ACTION_OPEN_MEGA_LINK: "  + intent.getDataString(), Toast.LENGTH_LONG).show();
+//    				handleOpenLinkIntent(intent);
 					intent.setAction(null);
 					setIntent(null);
     			}
