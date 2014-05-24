@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Credentials;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -91,6 +92,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     private boolean backWhileLogin;
     private boolean loginClicked = false;
     private long parentHandle = -1;
+    
+    String action = null;
+    String url = null;
 	
 	/*
 	 * Task to process email and password
@@ -225,8 +229,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		
-		
-		
 		credentials = Preferences.getCredentials(this);
 		if (credentials != null){
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
@@ -247,9 +249,18 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					return;
 				}
 				else{
+					if (intentReceived.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+						action = ManagerActivity.ACTION_OPEN_MEGA_LINK;
+						url = intentReceived.getDataString();
+					}
+					
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){
 						Intent intent = new Intent(this, ManagerActivity.class);
+						if (action != null){
+							intent.setAction(action);
+							intent.setData(Uri.parse(url));
+						}
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
@@ -278,6 +289,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode != null){
 					Intent intent = new Intent(this, ManagerActivity.class);
+					if (action != null){
+						intent.setAction(action);
+						intent.setData(Uri.parse(url));
+					}
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					}
@@ -555,6 +570,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					}
 					else{
 						Intent intent = new Intent(loginActivity,ManagerActivity.class);
+						if (action != null){
+							intent.setAction(action);
+							intent.setData(Uri.parse(url));
+						}
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						startActivity(intent);
 						finish();
