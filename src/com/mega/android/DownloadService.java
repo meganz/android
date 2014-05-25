@@ -179,7 +179,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		updateProgressNotification(downloadedSize);
 		currentTryCount = tryCount;
 		
-		long hash = intent.getLongExtra(EXTRA_HASH, 0);
+		long hash = intent.getLongExtra(EXTRA_HASH, -1);
 		String url = intent.getStringExtra(EXTRA_URL);
 		MegaNode document = megaApi.getNodeByHandle(hash);
 		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
@@ -191,6 +191,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if(url != null){
 			log("Public node");
+			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
 			megaApi.getPublicNode(url, this);
 			return;
 		}
@@ -608,34 +609,48 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-//		log("onRequestStart: " + request.getName());
+		log("onRequestStart: " + request.getName());
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-//		log("Public node received");
-//		if (e.getErrorCode() != MegaError.API_OK) {
-//			log("Public node error");
-//			lastError = e.getErrorCode();
-//			return;
-//		}
-//		else {
-//			MegaNode node = request.getPublicNode().copy();
+		log("Public node received");
+		if (e.getErrorCode() != MegaError.API_OK) {
+			log("Public node error");
+			lastError = e.getErrorCode();
+			return;
+		}
+		else {
+			MegaNode node = request.getPublicNode();
+			
+			if (currentDir.isDirectory()){
+				currentFile = new File(currentDir, node.getName());
+				log("node.getName(): " + node.getName());
+				
+			}
+			else{
+				currentFile = currentDir;
+				log("CURREN");
+			}
 //			currentFile = getFile(node, currentIntent);
 //			if(!checkCurrentFile(node)) return;
 //			
-//			log("Public node download launched");
-//			if(!wl.isHeld()) wl.acquire();
-//			if(!lock.isHeld()) lock.acquire();
+			log("Public node download launched");
+			if(!wl.isHeld()) wl.acquire();
+			if(!lock.isHeld()) lock.acquire();
+			if (currentDir.isDirectory()){
+				log("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
+				megaApi.startPublicDownload(node, currentDir.getAbsolutePath() + "/", this);
+			}
 //			megaApi.startPublicDownload(node, currentFile.getAbsolutePath(), this);
-//		}
+		}
 	}
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-//		log("onRequestTemporaryError: " + request.getName());
+		log("onRequestTemporaryError: " + request.getName());
 	}
 	
 	public static void log(String log){

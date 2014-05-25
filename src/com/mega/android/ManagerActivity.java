@@ -213,6 +213,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	String urlLink = "";
 		
 	SparseArray<TransfersHolder> transfersListArray = null;
+	
+	ImportDialog importDialog;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -642,8 +644,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     		if (intent.getAction() != null){
     			log("getAction != null");
     			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
-    				Toast.makeText(this, "ACTION_OPEN_MEGA_LINK: "  + intent.getDataString(), Toast.LENGTH_LONG).show();
-//    				handleOpenLinkIntent(intent);
+    				if (importDialog != null){
+    					try{
+    						statusDialog.dismiss();
+    						importDialog.dismiss();
+    					}
+    					catch(Exception e){	}
+    				}
+    				if (mDrawerLayout != null){
+    					mDrawerLayout.closeDrawer(Gravity.LEFT);
+    				}
+    				handleOpenLinkIntent(intent);
 					intent.setAction(null);
 					setIntent(null);
     			}
@@ -2073,7 +2084,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				parentHandleBrowser = megaApi.getRootNode().getHandle();
 			}
 			
-			ImportDialog importDialog = new ImportDialog();
+			importDialog = new ImportDialog();
 			importDialog.setMegaApi(megaApi);
 			importDialog.setInfo(n, parentNode.getHandle(), urlLink);
 			try { 
@@ -2765,78 +2776,97 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			catch(Exception ex){}
 			
 			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
+			log("URL: " + url);
 			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
 			
-			if(hashes.length == 1){
-				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
-					if(localPath != null){	
-						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
-						}
-						catch(Exception e) {}
-						
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-						if (isIntentAvailable(this, viewIntent))
-							startActivity(viewIntent);
-						else{
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, intentShare))
-								startActivity(intentShare);
-							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-						}								
-						return;
-					}
-				}
-			}
-			
-			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				if(node != null){
-					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
-						dlFiles.put(node, parentPath);
-					}
-					
-					for (MegaNode document : dlFiles.keySet()) {
-						
-						String path = dlFiles.get(document);
-						
-						if(availableFreeSpace < document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-							continue;
-						}
-						
-						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
-						startService(service);
-					}
-				}
-				else if(url != null) {
+
+			if (hashes == null){
+				if(url != null) {
 					if(availableFreeSpace < size) {
 						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-						continue;
+						return;
 					}
 					
 					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, hash);
 					service.putExtra(DownloadService.EXTRA_URL, url);
 					service.putExtra(DownloadService.EXTRA_SIZE, size);
 					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
 					startService(service);
 				}
-				else {
-					log("node not found");
+			}
+			else{
+				if(hashes.length == 1){
+					MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+					if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+						log("ISFILE");
+						String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+						if(localPath != null){	
+							try { 
+								Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
+							}
+							catch(Exception e) {}
+							
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							if (isIntentAvailable(this, viewIntent))
+								startActivity(viewIntent);
+							else{
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+								if (isIntentAvailable(this, intentShare))
+									startActivity(intentShare);
+								String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+							}								
+							return;
+						}
+					}
+				}
+				
+				for (long hash : hashes) {
+					MegaNode node = megaApi.getNodeByHandle(hash);
+					if(node != null){
+						Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+						if (node.getType() == MegaNode.TYPE_FOLDER) {
+							getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+						} else {
+							dlFiles.put(node, parentPath);
+						}
+						
+						for (MegaNode document : dlFiles.keySet()) {
+							
+							String path = dlFiles.get(document);
+							
+							if(availableFreeSpace < document.getSize()){
+								Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+								continue;
+							}
+							
+							Intent service = new Intent(this, DownloadService.class);
+							service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+							service.putExtra(DownloadService.EXTRA_URL, url);
+							service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+							service.putExtra(DownloadService.EXTRA_PATH, path);
+							startService(service);
+						}
+					}
+					else if(url != null) {
+						if(availableFreeSpace < size) {
+							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+							continue;
+						}
+						
+						Intent service = new Intent(this, DownloadService.class);
+						service.putExtra(DownloadService.EXTRA_HASH, hash);
+						service.putExtra(DownloadService.EXTRA_URL, url);
+						service.putExtra(DownloadService.EXTRA_SIZE, size);
+						service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+						startService(service);
+					}
+					else {
+						log("node not found");
+					}
 				}
 			}
 			Util.showToast(this, R.string.download_began);

@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ImportDialog extends DialogFragment implements MegaRequestListenerInterface {
 	
@@ -36,6 +37,8 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 	MegaApiAndroid megaApi;
 	
 	private ProgressDialog progress;	
+	
+	Activity context = null;
 
 	public ImportDialog() {
 		
@@ -68,19 +71,18 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		
 		innerView = getInnerView();
-		final Activity context = getActivity();
+		context = getActivity();
 		
 		AlertDialog.Builder builder = Util.getCustomAlertBuilder(getActivity(), getString(R.string.menu_download_from_link), null, innerView);
-		
-		progress = new ProgressDialog(context);
-		progress.setMessage(getString(R.string.general_importing));
-		progress.show();
 		
 		builder.setNegativeButton(getString(R.string.general_import), new OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				importFile(context);
+				progress = new ProgressDialog(context);
+				progress.setMessage(getString(R.string.general_importing));
+				progress.show();
+				importFile();
 			}
 		});
 		
@@ -88,9 +90,9 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				try { 
-					progress.dismiss(); 
-				} catch(Exception ex) {};
+//				try { 
+//					progress.dismiss(); 
+//				} catch(Exception ex) {};
 				
 				Activity activity = getActivity();
 				long[] hashes = new long[1];
@@ -98,7 +100,7 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
 				intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 				intent.setClass(activity, FileStorageActivity.class);
-				intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
+//				intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
 				intent.putExtra(FileStorageActivity.EXTRA_URL, url);
 				intent.putExtra(FileStorageActivity.EXTRA_SIZE, document.getSize());
 				activity.startActivityForResult(intent, ManagerActivity.REQUEST_CODE_SELECT_LOCAL_FOLDER);
@@ -113,7 +115,7 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 	/*
 	 * Import file
 	 */
-	private void importFile(final Activity context) {
+	private void importFile() {
 		if(megaApi == null){
 			return;
 		}
@@ -161,7 +163,7 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 			try{
 				progress.dismiss(); 
 			} catch(Exception ex){};
-		    Activity context = 	getActivity();
+			context = getActivity();
 		    if(context == null){
 		    	return;
 		    }
