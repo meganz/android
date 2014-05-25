@@ -229,5 +229,6 @@
     
     <string name="full_image_viewer_not_preview">The preview has not been downloaded yet. Please wait</string>
     
+    <string name="import_correct">Imported correctly</string>
     
 </resources>
