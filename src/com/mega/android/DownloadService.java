@@ -292,7 +292,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
 				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(false).setContentTitle(title)
+				.setAutoCancel(true).setContentTitle(title)
 				.setContentText(message)
 				.setOngoing(false);
 
@@ -343,7 +343,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
 				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(false).setTicker(notificationTitle)
+				.setAutoCancel(true).setTicker(notificationTitle)
 				.setContentTitle(notificationTitle).setContentText(size)
 				.setOngoing(false);
 

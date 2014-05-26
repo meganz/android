@@ -3,11 +3,14 @@ package com.mega.android;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
+import android.text.TextUtils.TruncateAt;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.TypedValue;
@@ -29,15 +32,28 @@ import android.widget.Toast;
 public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
-	SparseArray<TransfersHolder> transfersListArray;
+//	SparseArray<TransfersHolder> transfersListArray;
+	TransferList tL = null;
 	int positionClicked;
 	ActionBar aB;
 
 	MegaApiAndroid megaApi;
 	
-	public MegaTransfersAdapter(Context _context, SparseArray<TransfersHolder> _transfers, ActionBar aB) {
+//	public MegaTransfersAdapter(Context _context, SparseArray<TransfersHolder> _transfers, ActionBar aB) {
+//		this.context = _context;
+//		this.transfersListArray = _transfers;
+//		this.positionClicked = -1;
+//		this.aB = aB;
+//		
+//		if (megaApi == null){
+//			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+//		}
+//	}
+	
+	
+	public MegaTransfersAdapter(Context _context, TransferList _transfers, ActionBar aB) {
 		this.context = _context;
-		this.transfersListArray = _transfers;
+		this.tL = _transfers;
 		this.positionClicked = -1;
 		this.aB = aB;
 		
@@ -45,17 +61,16 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
+	
 		
 	/*private view holder class*/
-    private class ViewHolder {
+    public class ViewHolderTransfer {
 		ImageView imageView;
         TextView textViewFileName;
         ImageView imageViewCompleted;
         TextView textViewCompleted;
         ImageView imageViewOneDot;
         TextView textViewRate;
-//        ImageView imageViewBarStructure;
-//        ImageView imageViewBarFill;
         ProgressBar transferProgressBar;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
@@ -64,10 +79,16 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
         ImageButton optionUndo;
         ImageButton optionDeletePermanently;
         int currentPosition;
+        long document;
     }
     
-    public void setTransfers(SparseArray<TransfersHolder> transfers){
-    	this.transfersListArray = transfers;
+//    public void setTransfers(SparseArray<TransfersHolder> transfers){
+//    	this.transfersListArray = transfers;
+//    	notifyDataSetChanged();
+//    }
+    
+    public void setTransfers(TransferList transfers){
+    	this.tL = transfers;
     	notifyDataSetChanged();
     }
 
@@ -76,7 +97,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	
 		final int _position = position;
 		
-		ViewHolder holder = null;
+		ViewHolderTransfer holder = null;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -89,10 +110,14 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_transfers_list, parent, false);
-			holder = new ViewHolder();
+			holder = new ViewHolderTransfer();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.transfers_list_item_layout);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.transfers_list_thumbnail);
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.transfers_list_filename);
+			holder.textViewFileName.setSingleLine(true);
+			holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
+			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
 			holder.imageViewCompleted = (ImageView) convertView.findViewById(R.id.transfers_list_completed_image);
 			holder.textViewCompleted = (TextView) convertView.findViewById(R.id.transfers_list_completed_text);
 			holder.imageViewOneDot = (ImageView) convertView.findViewById(R.id.transfers_list_one_dot);
@@ -112,47 +137,92 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			convertView.setTag(holder);
 		}
 		else{
-			holder = (ViewHolder) convertView.getTag();
+			holder = (ViewHolderTransfer) convertView.getTag();
 		}
 
 		holder.currentPosition = position;
 		
-		TransfersHolder transfer = (TransfersHolder) getItem(position);
-		String fileName = transfer.getName(); 
+//		TransfersHolder transfer = (TransfersHolder) getItem(position);
+//		String fileName = transfer.getName();
 		
-		holder.imageView.setImageResource(R.drawable.mime_3d);
+		
+//		if (position == 0 || position == 1){
+//			holder.textViewCompleted.setText("Completed");
+//			holder.imageViewCompleted.setImageResource(R.drawable.transferok);
+//			holder.imageViewOneDot.setVisibility(View.GONE);
+//			holder.textViewRate.setVisibility(View.GONE);	
+////			holder.imageViewBarStructure.setVisibility(View.GONE);
+////			holder.imageViewBarFill.setVisibility(View.GONE);
+//			holder.transferProgressBar.setVisibility(View.GONE);
+//		}
+//		else if (position == 6 || position == 7){
+//			holder.textViewCompleted.setText("Queued");
+//			holder.imageViewCompleted.setImageResource(R.drawable.transferqueued);
+//			holder.imageViewOneDot.setVisibility(View.GONE);
+//			holder.textViewRate.setVisibility(View.GONE);
+////			holder.imageViewBarStructure.setVisibility(View.GONE);
+////			holder.imageViewBarFill.setVisibility(View.GONE);
+//			holder.transferProgressBar.setVisibility(View.GONE);
+//		}
+//		else{
+		
+		MegaTransfer transfer = (MegaTransfer) getItem(position);
+		String fileName = transfer.getFileName();
 		holder.textViewFileName.setText(fileName);
 
-		if (position == 0 || position == 1){
-			holder.textViewCompleted.setText("Completed");
-			holder.imageViewCompleted.setImageResource(R.drawable.transferok);
-			holder.imageViewOneDot.setVisibility(View.GONE);
-			holder.textViewRate.setVisibility(View.GONE);	
-//			holder.imageViewBarStructure.setVisibility(View.GONE);
-//			holder.imageViewBarFill.setVisibility(View.GONE);
-			holder.transferProgressBar.setVisibility(View.GONE);
+//		holder.imageView.setImageResource(R.drawable.mime_3d);
+		
+		MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+		holder.document = transfer.getNodeHandle();
+		
+		holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+		
+		Bitmap thumb = null;
+		if (node.hasThumbnail()){
+			thumb = ThumbnailUtils.getThumbnailFromCache(node);
+			if (thumb != null){
+				holder.imageView.setImageBitmap(thumb);
+			}
+			else{
+				thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+				if (thumb != null){
+					holder.imageView.setImageBitmap(thumb);
+				}
+				else{ 
+					try{
+						thumb = ThumbnailUtils.getThumbnailFromMegaTransfer(node, context, holder, megaApi, this);
+					}
+					catch(Exception e){} //Too many AsyncTasks
+					
+					if (thumb != null){
+						holder.imageView.setImageBitmap(thumb);
+					}
+				}
+			}
 		}
-		else if (position == 6 || position == 7){
+			
+		long speed = transfer.getSpeed();
+		if (speed == 0){
+			holder.imageViewOneDot.setVisibility(View.GONE);
+			holder.textViewCompleted.setVisibility(View.VISIBLE);
+			holder.imageViewCompleted.setVisibility(View.VISIBLE);
 			holder.textViewCompleted.setText("Queued");
 			holder.imageViewCompleted.setImageResource(R.drawable.transferqueued);
-			holder.imageViewOneDot.setVisibility(View.GONE);
-			holder.textViewRate.setVisibility(View.GONE);
-//			holder.imageViewBarStructure.setVisibility(View.GONE);
-//			holder.imageViewBarFill.setVisibility(View.GONE);
 			holder.transferProgressBar.setVisibility(View.GONE);
+			holder.textViewRate.setVisibility(View.GONE);
 		}
 		else{
 			holder.imageViewOneDot.setVisibility(View.VISIBLE);
-			holder.textViewRate.setVisibility(View.VISIBLE);
-//			holder.imageViewBarStructure.setVisibility(View.VISIBLE);
-//			holder.imageViewBarFill.setVisibility(View.VISIBLE);
+			holder.textViewCompleted.setVisibility(View.GONE);
+			holder.imageViewCompleted.setVisibility(View.GONE);
 			holder.transferProgressBar.setVisibility(View.VISIBLE);
-			holder.textViewRate.setText("600 KB/s");
-//			holder.imageViewBarStructure.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
-//			holder.imageViewBarFill.getLayoutParams().width = Util.px2dp((170*scaleW), outMetrics);
+			holder.textViewRate.setVisibility(View.VISIBLE);
+			holder.textViewRate.setText(Util.getSpeedString(transfer.getSpeed()));
 			holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
-			holder.transferProgressBar.setProgress(65);
+			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
+			holder.transferProgressBar.setProgress((int)progressValue);
 		}
+//		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
 //		holder.imageButtonThreeDots.setOnClickListener(this);
@@ -192,16 +262,26 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		return convertView;
 	}
 
+//	@Override
+//    public int getCount() {
+//        return transfersListArray.size();
+//    }
+// 
+//    @Override
+//    public Object getItem(int position) {
+//        return transfersListArray.get(position);
+//    }
+ 
 	@Override
-    public int getCount() {
-        return transfersListArray.size();
-    }
- 
-    @Override
-    public Object getItem(int position) {
-        return transfersListArray.get(position);
-    }
- 
+  public int getCount() {
+      return tL.size();
+  }
+
+  @Override
+  public Object getItem(int position) {
+      return tL.get(position);
+  }
+	
     @Override
     public long getItemId(int position) {
         return position;
@@ -218,7 +298,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	@Override
 	public void onClick(View v) {
 
-		ViewHolder holder = (ViewHolder) v.getTag();
+		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
 		int currentPosition = holder.currentPosition;
 		
 		switch(v.getId()){

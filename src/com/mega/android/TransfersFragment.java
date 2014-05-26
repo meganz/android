@@ -32,7 +32,9 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	
 	MegaApiAndroid megaApi;
 	
-	SparseArray<TransfersHolder> transfersListArray = null;
+//	SparseArray<TransfersHolder> transfersListArray = null;
+	
+	TransferList tL = null;
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -66,26 +68,29 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 		
-		if (transfersListArray == null){
-			TransferList tL = megaApi.getTransfers();
-			transfersListArray = new SparseArray<TransfersHolder>();
-			
-			for (int i = 0; i< tL.size(); i++){
-				MegaTransfer t = tL.get(i);
-				TransfersHolder th = new TransfersHolder();
-				
-				th.setName(new String(t.getFileName()));
-				
-				transfersListArray.put(t.getTag(), th);
-			}
-		}
-		Toast.makeText(context, "tL.size()=" + transfersListArray.size(), Toast.LENGTH_LONG).show();
+		
+//		if (transfersListArray == null){
+//			tL = megaApi.getTransfers();
+//			transfersListArray = new SparseArray<TransfersHolder>();
+//			
+//			for (int i = 0; i< tL.size(); i++){
+//				MegaTransfer t = tL.get(i);
+//				TransfersHolder th = new TransfersHolder();
+//				
+//				th.setName(new String(t.getFileName()));
+//				
+//				transfersListArray.put(t.getTag(), th);
+//			}
+//		}
+		tL = megaApi.getTransfers();
+		Toast.makeText(context, "tL.size()=" + tL.size(), Toast.LENGTH_LONG).show();
 		
 		listView = (ListView) v.findViewById(R.id.transfers_list_view);
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
+//		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
+		adapter = new MegaTransfersAdapter(context, tL, aB);
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
 		
@@ -130,10 +135,17 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		}
 	}
 	
-	public void setTransfers(SparseArray<TransfersHolder> tl){
-		transfersListArray = tl;
+//	public void setTransfers(SparseArray<TransfersHolder> tl){
+//		transfersListArray = tl;
+//		if (adapter != null){
+//			adapter.setTransfers(transfersListArray);
+//		}
+//	}
+	
+	public void setTransfers(TransferList _transfers){
+		this.tL = _transfers;
 		if (adapter != null){
-			adapter.setTransfers(transfersListArray);
+			adapter.setTransfers(tL);
 		}
 	}
 
