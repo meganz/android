@@ -231,4 +231,7 @@
     
     <string name="import_correct">Imported correctly</string>
     
+    <string name="transfers_empty">No active transfers</string>
+    <string name="transfers_pause">All transfers are paused</string>
+    
 </resources>

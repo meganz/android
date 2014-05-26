@@ -138,8 +138,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
 			log("Cancel intent");
-			cancel();
+			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
 			megaApi.resetTotalDownloads();
+//			cancel();
 			return START_NOT_STICKY;
 		}
 		
@@ -428,8 +429,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
-		
-	
 		stopSelf();
 	}
 	
@@ -615,35 +614,50 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("Public node received");
-		if (e.getErrorCode() != MegaError.API_OK) {
-			log("Public node error");
-			lastError = e.getErrorCode();
-			return;
+		
+		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+			log("cancel_transfers received");
+			if (e.getErrorCode() == MegaError.API_OK){
+				megaApi.pauseTransfers(false, this);
+			}
 		}
-		else {
-			MegaNode node = request.getPublicNode();
-			
-			if (currentDir.isDirectory()){
-				currentFile = new File(currentDir, node.getName());
-				log("node.getName(): " + node.getName());
+		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+			log("pause_transfer false received");
+			if (e.getErrorCode() == MegaError.API_OK){
+				cancel();
+			}
+		}
+		else{
+			log("Public node received");
+			if (e.getErrorCode() != MegaError.API_OK) {
+				log("Public node error");
+				lastError = e.getErrorCode();
+				return;
+			}
+			else {
+				MegaNode node = request.getPublicNode().copy();
 				
+				if (currentDir.isDirectory()){
+					currentFile = new File(currentDir, node.getName());
+					log("node.getName(): " + node.getName());
+					
+				}
+				else{
+					currentFile = currentDir;
+					log("CURREN");
+				}
+	//			currentFile = getFile(node, currentIntent);
+	//			if(!checkCurrentFile(node)) return;
+	//			
+				log("Public node download launched");
+				if(!wl.isHeld()) wl.acquire();
+				if(!lock.isHeld()) lock.acquire();
+				if (currentDir.isDirectory()){
+					log("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
+					megaApi.startPublicDownload(node, currentDir.getAbsolutePath() + "/", this);
+				}
+	//			megaApi.startPublicDownload(node, currentFile.getAbsolutePath(), this);
 			}
-			else{
-				currentFile = currentDir;
-				log("CURREN");
-			}
-//			currentFile = getFile(node, currentIntent);
-//			if(!checkCurrentFile(node)) return;
-//			
-			log("Public node download launched");
-			if(!wl.isHeld()) wl.acquire();
-			if(!lock.isHeld()) lock.acquire();
-			if (currentDir.isDirectory()){
-				log("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
-				megaApi.startPublicDownload(node, currentDir.getAbsolutePath() + "/", this);
-			}
-//			megaApi.startPublicDownload(node, currentFile.getAbsolutePath(), this);
 		}
 	}
 
