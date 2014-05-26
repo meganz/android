@@ -82,7 +82,7 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 				progress = new ProgressDialog(context);
 				progress.setMessage(getString(R.string.general_importing));
 				progress.show();
-				importFile();
+				importFile(); 
 			}
 		});
 		

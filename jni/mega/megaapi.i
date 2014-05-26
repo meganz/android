@@ -165,7 +165,6 @@ class Share {};
 %newobject MegaRequest::copy;
 %newobject MegaNode::copy;
 %newobject MegaNode::getBase64Handle;
-%newobject MegaRequest::getPublicNode;
 
 %newobject MegaApi::getChildren;
 %newobject MegaApi::getContacts;

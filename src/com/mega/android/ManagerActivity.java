@@ -215,6 +215,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	SparseArray<TransfersHolder> transfersListArray = null;
 	
 	ImportDialog importDialog;
+	
+	boolean downloadPlay = true;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -652,7 +654,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     					catch(Exception e){	}
     				}
     				if (mDrawerLayout != null){
-    					mDrawerLayout.closeDrawer(Gravity.LEFT);
+    					mDrawerLayout.closeDrawer(Gravity.LEFT); 
     				}
     				handleOpenLinkIntent(intent);
 					intent.setAction(null);
@@ -668,7 +670,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						tempIntent.setAction(UploadService.ACTION_CANCEL);
 						title = getString(R.string.upload_uploading);
 						text = getString(R.string.upload_cancel_uploading);
-					}
+					} 
 					else{
 						tempIntent = new Intent(this, DownloadService.class);
 						tempIntent.setAction(DownloadService.ACTION_CANCEL);
@@ -682,7 +684,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					builder.setPositiveButton(getString(R.string.general_yes),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
-									startService(cancelIntent);
+									if (tF != null){
+										if (tF.isVisible()){
+											tF.setNoActiveTransfers();
+											downloadPlay = true;
+										}
+									}	
+									startService(cancelIntent);						
 								}
 							});
 					builder.setNegativeButton(getString(R.string.general_no), null);
@@ -1007,29 +1015,60 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			if (tF == null){
     				tF = new TransfersFragment();
     			}
+    			tF.setTransfers(megaApi.getTransfers());
+    			tF.setPause(!downloadPlay);
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, tF).commit();
     			customListGrid.setVisibility(View.GONE);
     			customSearch.setVisibility(View.GONE);
 
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
-
+    			
     			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(false);
+    				createFolderMenuItem.setVisible(true);
     				rubbishBinMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(true);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
+	    			if (downloadPlay){
+	    				addMenuItem.setIcon(R.drawable.ic_menu_pause);
+	    			}
+	    			else{
+	    				addMenuItem.setIcon(R.drawable.ic_menu_play);
+	    			}
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			rubbishBinMenuItem.setEnabled(false);
-	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
-	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
-	    		}
+	    			
+	    			if (megaApi.getTransfers().size() == 0){
+	    				createFolderMenuItem.setVisible(false);
+	    				rubbishBinMenuItem.setVisible(false);
+	    				addMenuItem.setVisible(false);
+	    				downloadPlay = true;
+	    			}
+    			}
+
+//    			if (createFolderMenuItem != null){
+//    				createFolderMenuItem.setVisible(false);
+//    				rubbishBinMenuItem.setVisible(false);
+//	    			addMenuItem.setVisible(false);
+//	    			refreshMenuItem.setVisible(false);
+//	    			sortByMenuItem.setVisible(false);
+//	    			helpMenuItem.setVisible(true);
+//	    			upgradeAccountMenuItem.setVisible(true);
+//	    			logoutMenuItem.setVisible(true);
+//	    			
+//	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//	    			rubbishBinMenuItem.setEnabled(false);
+//	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//	    			addMenuItem.setEnabled(false);
+//	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//	    			createFolderMenuItem.setEnabled(false);
+//	    		}
     			
     			break;
     		}
@@ -1293,21 +1332,32 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 		if (tF != null){
 			if (tF.isVisible()){
-				createFolderMenuItem.setVisible(false);
+				createFolderMenuItem.setVisible(true);
 				rubbishBinMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			refreshMenuItem.setVisible(false);
-    			sortByMenuItem.setVisible(false);
+    			addMenuItem.setVisible(true);
+    			refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
+    			if (downloadPlay){
+    				addMenuItem.setIcon(R.drawable.ic_menu_pause);
+    			}
+    			else{
+    				addMenuItem.setIcon(R.drawable.ic_menu_play);
+    			}
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			rubbishBinMenuItem.setEnabled(false);
-    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
+    			
+    			if (megaApi.getTransfers().size() == 0){
+    				createFolderMenuItem.setVisible(false);
+    				rubbishBinMenuItem.setVisible(false);
+    				addMenuItem.setVisible(false);
+    				downloadPlay = true;
+    			}
 			}
 		}
 		
@@ -1383,8 +1433,19 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	return true;
 	        }
 	        case R.id.action_add:{
-	        	uploadDialog = new UploadHereDialog();
-				uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+	        	if (drawerItem == DrawerItem.TRANSFERS){	    			
+	    			if (downloadPlay){
+	    				downloadPlay = false;
+	    			}
+	    			else{
+	    				downloadPlay = true;
+	    			}
+	    			megaApi.pauseTransfers(!downloadPlay, this);
+	        	}
+	        	else{
+		        	uploadDialog = new UploadHereDialog();
+					uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+	        	}
 	        	return true;     	
 	        }
 	        case R.id.action_rubbish_bin:{
@@ -1692,6 +1753,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 		else if (request.getType() == MegaRequest.TYPE_MKDIR){
 			log("create folder start");
+		}
+		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+			log("pause transfers start");
 		}
 	}
 
@@ -2057,9 +2121,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			try { 
 				statusDialog.dismiss();	
 			} 
-			catch (Exception ex) {}
+			catch (Exception ex) {} 
 			
-			MegaNode n = request.getPublicNode();
+			MegaNode n = request.getPublicNode().copy();
 			
 			if (e.getErrorCode() != MegaError.API_OK) {
 				Util.showErrorAlertDialog(e, ManagerActivity.this);
@@ -2092,6 +2156,22 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			} catch(Exception ex) {
 				Toast.makeText(this, "Error al mostrar el dialog: " + ex.getMessage(), Toast.LENGTH_LONG).show();
 			};
+		}
+		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+			if (e.getErrorCode() == MegaError.API_OK) {
+				if (tF != null){
+					if (tF.isVisible()){
+						if (!downloadPlay){
+							addMenuItem.setIcon(R.drawable.ic_menu_play);
+							tF.setPause(true);
+						}
+						else{
+							addMenuItem.setIcon(R.drawable.ic_menu_pause);
+							tF.setPause(false);
+						}		
+					}
+				}				
+			}
 		}
 	}
 
@@ -3168,6 +3248,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		this.parentHandleSharedWithMe = parentHandleSharedWithMe;
 	}
 	
+	public void setPauseIconVisible(boolean visible){
+		addMenuItem.setVisible(visible);
+	}
+	
 	private void getOverflowMenu() {
 
 	     try {
@@ -3181,7 +3265,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        e.printStackTrace();
 	    }
 	}
-
+	
+	public void setDownloadPlay(boolean downloadPlay){
+		this.downloadPlay = downloadPlay;
+	}
+	
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {		
 		return super.onKeyUp(keyCode, event);

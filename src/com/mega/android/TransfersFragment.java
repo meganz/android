@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import org.apache.http.util.VersionInfo;
+
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -20,7 +22,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class TransfersFragment extends Fragment implements OnClickListener, OnItemClickListener{
@@ -31,6 +35,13 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	MegaTransfersAdapter adapter;
 	
 	MegaApiAndroid megaApi;
+	
+	ImageView emptyImage;
+	TextView emptyText;
+	ImageView pauseImage;
+	TextView pauseText;
+	
+	boolean pause = false;
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
 	
@@ -55,7 +66,7 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+			Bundle savedInstanceState) {  
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -93,6 +104,45 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		adapter = new MegaTransfersAdapter(context, tL, aB);
 		adapter.setPositionClicked(-1);
 		listView.setAdapter(adapter);
+		
+		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
+		pauseImage = (ImageView) v.findViewById(R.id.transfers_pause_image);
+		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
+		pauseText = (TextView) v.findViewById(R.id.transfers_pause_text);
+		
+		emptyImage.setImageResource(R.drawable.no_active_transfers);
+		pauseImage.setImageResource(R.drawable.paused_transfers);
+		emptyText.setText(getString(R.string.transfers_empty));
+		pauseText.setText(getString(R.string.transfers_pause));
+		
+		pauseImage.setVisibility(View.GONE);
+		pauseText.setVisibility(View.GONE);
+		
+		if (pause){
+			emptyImage.setVisibility(View.GONE);
+			emptyText.setVisibility(View.GONE);
+			listView.setVisibility(View.GONE);
+			
+			pauseImage.setVisibility(View.VISIBLE);
+			pauseText.setVisibility(View.VISIBLE);
+		}
+		else{
+			if (tL.size() == 0){
+				emptyImage.setVisibility(View.VISIBLE);
+				emptyText.setVisibility(View.VISIBLE);
+				listView.setVisibility(View.GONE);
+				((ManagerActivity)context).setPauseIconVisible(false);
+			}
+			else{
+				emptyImage.setVisibility(View.GONE);
+				emptyText.setVisibility(View.GONE);
+				listView.setVisibility(View.VISIBLE);
+				((ManagerActivity)context).setPauseIconVisible(true);
+			}
+			
+			pauseImage.setVisibility(View.GONE);
+			pauseText.setVisibility(View.GONE);
+		}
 		
 		return v;
 	}
@@ -144,8 +194,87 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	
 	public void setTransfers(TransferList _transfers){
 		this.tL = _transfers;
+		
 		if (adapter != null){
 			adapter.setTransfers(tL);
+		}
+		
+		if (emptyImage != null){
+			if (pause){
+				emptyImage.setVisibility(View.GONE);
+				emptyText.setVisibility(View.GONE);
+				listView.setVisibility(View.GONE);
+				
+				pauseImage.setVisibility(View.VISIBLE);
+				pauseText.setVisibility(View.VISIBLE);
+			}
+			else{
+				if (tL.size() == 0){
+					emptyImage.setVisibility(View.VISIBLE);
+					emptyText.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.GONE);
+					((ManagerActivity)context).setPauseIconVisible(false);
+				}
+				else{
+					emptyImage.setVisibility(View.GONE);
+					emptyText.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
+					((ManagerActivity)context).setPauseIconVisible(true);
+				}	
+				
+				pauseImage.setVisibility(View.GONE);
+				pauseText.setVisibility(View.GONE);
+			}
+		}
+	}
+	
+	public void setPause(boolean pause){
+		this.pause = pause;
+		
+		if (adapter != null){
+			tL = megaApi.getTransfers();
+			adapter.setTransfers(tL);
+		}
+		
+		if (emptyImage != null){ //This means that the view has been already created
+			if (pause){
+				emptyImage.setVisibility(View.GONE);
+				emptyText.setVisibility(View.GONE);
+				listView.setVisibility(View.GONE);
+				
+				pauseImage.setVisibility(View.VISIBLE);
+				pauseText.setVisibility(View.VISIBLE);
+			}
+			else{
+				if (tL.size() == 0){
+					emptyImage.setVisibility(View.VISIBLE);
+					emptyText.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.GONE);
+					((ManagerActivity)context).setPauseIconVisible(false);
+				}
+				else{
+					emptyImage.setVisibility(View.GONE);
+					emptyText.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
+					((ManagerActivity)context).setPauseIconVisible(true);
+				}
+				
+				pauseImage.setVisibility(View.GONE);
+				pauseText.setVisibility(View.GONE);
+			}
+		}
+	} 
+	
+	
+	public void setNoActiveTransfers(){
+		this.pause = false;
+		if (emptyImage != null){
+			emptyImage.setVisibility(View.VISIBLE);
+			emptyText.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+			pauseImage.setVisibility(View.GONE);
+			pauseText.setVisibility(View.GONE);
+			((ManagerActivity)context).setPauseIconVisible(false);
 		}
 	}
 

@@ -139,7 +139,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		else{
 			holder = (ViewHolderTransfer) convertView.getTag();
 		}
-
+		
 		holder.currentPosition = position;
 		
 //		TransfersHolder transfer = (TransfersHolder) getItem(position);
@@ -165,6 +165,8 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 //			holder.transferProgressBar.setVisibility(View.GONE);
 //		}
 //		else{
+		
+		holder.imageButtonThreeDots.setVisibility(View.GONE);
 		
 		MegaTransfer transfer = (MegaTransfer) getItem(position);
 		String fileName = transfer.getFileName();
