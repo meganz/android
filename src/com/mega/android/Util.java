@@ -562,6 +562,35 @@ public class Util {
 		}
 	}
 	
+	public static String getSpeedString (long speed){
+		String speedString = "";
+		double speedDouble = 0;
+		DecimalFormat df = new DecimalFormat("#.##");
+		
+		if (speed > 1024){
+			if (speed > 1024*1024){
+				if (speed > 1024*1024*1024){
+					speedDouble = speed / (1024.0*1024.0*1024.0);
+					speedString = df.format(speedDouble) + " GB/s";
+				}
+				else{
+					speedDouble = speed / (1024.0*1024.0);
+					speedString = df.format(speedDouble) + " MB/s";
+				}
+			}
+			else{
+				speedDouble = speed / 1024.0;
+				speedString = df.format(speedDouble) + " KB/s";	
+			}
+		}
+		else{
+			speedDouble = speed;
+			speedString = df.format(speedDouble) + " B/s";
+		}
+		
+		return speedString;
+	}
+	
 	private static void log(String message) {
 		log("Util", message);
 	}
