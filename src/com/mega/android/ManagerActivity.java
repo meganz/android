@@ -2173,6 +2173,18 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				}				
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (tF != null){
+					if (tF.isVisible()){
+						Intent cancelOneIntent = new Intent(this, DownloadService.class);
+						cancelOneIntent.setAction(DownloadService.ACTION_CANCEL_ONE_DOWNLOAD);				
+						startService(cancelOneIntent);
+						tF.setTransfers(megaApi.getTransfers());
+					}
+				}
+			}
+		}
 	}
 
 	@Override

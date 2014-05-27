@@ -1,7 +1,12 @@
 package com.mega.android;
 
+import com.mega.sdk.MegaApi;
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.TransferList;
 
@@ -26,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,8 +82,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
         RelativeLayout itemLayout;
         ImageView arrowSelection;
         RelativeLayout optionsLayout;
-        ImageButton optionUndo;
-        ImageButton optionDeletePermanently;
+        ImageButton optionRemove;
         int currentPosition;
         long document;
     }
@@ -122,15 +127,14 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.textViewCompleted = (TextView) convertView.findViewById(R.id.transfers_list_completed_text);
 			holder.imageViewOneDot = (ImageView) convertView.findViewById(R.id.transfers_list_one_dot);
 			holder.textViewRate = (TextView) convertView.findViewById(R.id.transfers_list_transfer_rate);
-//			holder.imageViewBarStructure = (ImageView) convertView.findViewById(R.id.transfers_list_bar_structure);
-//			holder.imageViewBarFill = (ImageView) convertView.findViewById(R.id.transfers_list_bar_fill);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_bar); 
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.transfers_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.transfers_list_options);
-			holder.optionUndo = (ImageButton) convertView.findViewById(R.id.transfers_list_option_undo);
-			holder.optionUndo.setPadding(Util.px2dp((87*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionDeletePermanently = (ImageButton) convertView.findViewById(R.id.transfers_list_option_delete_permanently);
-			holder.optionDeletePermanently.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+			holder.optionRemove = (ImageButton) convertView.findViewById(R.id.transfers_list_option_remove);
+			holder.optionRemove.getLayoutParams().width = Util.px2dp((50*scaleW), outMetrics);
+			((TableRow.LayoutParams) holder.optionRemove.getLayoutParams()).setMargins(Util.px2dp((100*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+			holder.optionRemove.setPadding(0, Util.px2dp((8*scaleH), outMetrics), 0, 0);
+//			holder.optionRemove.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.transfers_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 
@@ -166,7 +170,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 //		}
 //		else{
 		
-		holder.imageButtonThreeDots.setVisibility(View.GONE);
+		holder.imageButtonThreeDots.setOnClickListener(this);
 		
 		MegaTransfer transfer = (MegaTransfer) getItem(position);
 		String fileName = transfer.getFileName();
@@ -255,11 +259,8 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
 		
-		holder.optionUndo.setTag(holder);
-		holder.optionUndo.setOnClickListener(this);
-		
-		holder.optionDeletePermanently.setTag(holder);
-		holder.optionDeletePermanently.setOnClickListener(this);
+		holder.optionRemove.setTag(holder);
+		holder.optionRemove.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -296,6 +297,23 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
+    
+    public void threeDotsClick(int position){
+    	if (positionClicked == -1){
+			positionClicked = position;
+			notifyDataSetChanged();
+		}
+		else{
+			if (positionClicked == position){
+				positionClicked = -1;
+				notifyDataSetChanged();
+			}
+			else{
+				positionClicked = position;
+				notifyDataSetChanged();
+			}
+		}
+    }
 
 	@Override
 	public void onClick(View v) {
@@ -321,14 +339,9 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				}
 				break;
 			}
-			case R.id.transfers_list_option_undo:{
-				Toast.makeText(context, "Undo_position"+currentPosition, Toast.LENGTH_SHORT).show();
-				positionClicked = -1;
-				notifyDataSetChanged();
-				break;
-			}
-			case R.id.transfers_list_option_delete_permanently:{
-				Toast.makeText(context, "Delete permanently_position"+currentPosition, Toast.LENGTH_SHORT).show();
+			case R.id.transfers_list_option_remove:{
+				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
+				megaApi.cancelTransfer(t, (ManagerActivity)context);
 				positionClicked = -1;
 				notifyDataSetChanged();
 				break;

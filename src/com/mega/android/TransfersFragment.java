@@ -94,7 +94,6 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 //			}
 //		}
 		tL = megaApi.getTransfers();
-		Toast.makeText(context, "tL.size()=" + tL.size(), Toast.LENGTH_LONG).show();
 		
 		listView = (ListView) v.findViewById(R.id.transfers_list_view);
 		listView.setOnItemClickListener(this);
@@ -165,6 +164,10 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
+		
+		if (adapter != null){
+			adapter.threeDotsClick(position);
+		}
 		
 //		Intent i = new Intent(context, FullScreenImageViewer.class);
 //		i.putExtra("position", position);
