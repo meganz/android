@@ -17,6 +17,7 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
+import com.mega.sdk.TransferList;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -50,6 +51,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	// Action to stop download
 	public static String ACTION_CANCEL = "CANCEL_DOWNLOAD";
+	public static String ACTION_CANCEL_ONE_DOWNLOAD = "CANCEL_ONE_DOWNLOAD";
 	public static String EXTRA_SIZE = "DOCUMENT_SIZE";
 	public static String EXTRA_HASH = "DOCUMENT_HASH";
 	public static String EXTRA_URL = "DOCUMENT_URL";
@@ -94,7 +96,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
-		totalCount = megaApi.getTotalDownloads();
+		totalCount = 0;
 		doneCount = 0;
 		successCount = 0;
 		totalSize = 0;
@@ -136,16 +138,28 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return START_NOT_STICKY;
 		}
 		
-		if (intent.getAction() != null && intent.getAction().equals(ACTION_CANCEL)){
-			log("Cancel intent");
-			megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
-			megaApi.resetTotalDownloads();
-//			cancel();
-			return START_NOT_STICKY;
+		if (intent.getAction() != null){
+			if (intent.getAction().equals(ACTION_CANCEL)){
+				log("Cancel intent");
+				megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+				return START_NOT_STICKY;
+			}
+			else if (intent.getAction().equals(ACTION_CANCEL_ONE_DOWNLOAD)){
+				log("Cancel one download intent");
+				totalCount--;
+				if (totalCount == 0){
+					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
+				}
+				totalSize = downloadedSize;
+				TransferList tL = megaApi.getTransfers();
+				for (int i=0;i<tL.size();i++){
+					totalSize += tL.get(i).getTotalBytes();
+				}
+				updateProgressNotification(downloadedSize);
+				return START_NOT_STICKY;
+			}
 		}
-		
-		totalCount = megaApi.getTotalDownloads();
-		
+				
 		onHandleIntent(intent, 0);
 		
 		updateProgressNotification(downloadedSize);
@@ -157,7 +171,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("Stopping foreground!");
 		log("stopping service! success: " + successCount + " total: " + totalCount);
 		megaApi.resetTotalDownloads();
-		totalCount = megaApi.getTotalDownloads();
 		
 		if (!isOffline){
 			if (successCount == 0) {
@@ -360,7 +373,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		int progressPercent = (int) Math.round((double) progress / totalSize
 				* 100);
 		log(progressPercent + " " + progress + " " + totalSize);
-		int left = totalCount - doneCount;;
+		int left = totalCount - doneCount;
 		int current = totalCount - left + 1;
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		
@@ -477,7 +490,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
-		totalCount = megaApi.getTotalDownloads();
+		totalCount++;
 		totalSize += transfer.getTotalBytes();
 		updateProgressNotification(downloadedSize);
 //		totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
@@ -590,9 +603,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			DownloadService.this.cancel();
 			return;
 		}
-		
-		totalCount = megaApi.getTotalDownloads();
-		
+				
 		final long bytes = transfer.getTransferredBytes();
 		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
     	updateProgressNotification(downloadedSize + bytes);
@@ -619,6 +630,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			log("cancel_transfers received");
 			if (e.getErrorCode() == MegaError.API_OK){
 				megaApi.pauseTransfers(false, this);
+				megaApi.resetTotalDownloads();
+				totalCount = 0;
+				totalSize = 0;
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){

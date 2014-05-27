@@ -122,25 +122,14 @@
             android:layout_height="wrap_content">
             
             <TableRow>
-	            <ImageButton
-		            android:id="@+id/transfers_list_option_undo"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/rubbisbin_list_option_undo"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
 	        
 		        <ImageButton
-		            android:id="@+id/transfers_list_option_delete_permanently"
+		            android:id="@+id/transfers_list_option_remove"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/rubbisbin_list_option_delete"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
+		            android:src="@drawable/contact_list_option_remove"
 		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
+		            android:layout_gravity="center_horizontal"/>
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>
