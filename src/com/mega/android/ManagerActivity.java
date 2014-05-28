@@ -282,14 +282,16 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			if (getIntent() != null){
-				if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
-					Intent intent = new Intent(managerActivity, LoginActivity.class);
-					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-					intent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
-					intent.setData(Uri.parse(getIntent().getDataString()));
-					startActivity(intent);
-					finish();	
-					return;
+				if (getIntent().getAction() != null){
+					if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+						Intent intent = new Intent(managerActivity, LoginActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+						intent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(intent);
+						finish();	
+						return;
+					}
 				}
 			}
 			Intent intent = new Intent(managerActivity, LoginActivity.class);
@@ -2784,6 +2786,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				if (file.isDirectory()){
 					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
+					log("EXTRA_FILE_PATH_dir:" + file.getAbsolutePath());
 				}
 				else{
 					ShareInfo info = ShareInfo.infoFromFile(file);
@@ -2793,11 +2796,14 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+					log("EXTRA_FILE_PATH_file:" + info.getFileAbsolutePath());
 				}
 				
+				log("EXTRA_FOLDER_PATH:" + folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				startService(uploadServiceIntent);				
+				
 				i++;
 			}
 			
