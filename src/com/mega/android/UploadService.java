@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -24,8 +25,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -38,7 +41,7 @@ import android.widget.RemoteViews;
 /*
  * Service to Upload files
  */
-public class UploadService extends Service {
+public class UploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
 	
@@ -49,10 +52,10 @@ public class UploadService extends Service {
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	
 	
-	private LinkedList<Intent> intentQueue;
-	static public boolean isProcessingIntent = false;
 	private int totalCount = 0;
 	private int successCount = 0;
+	private int doneCount = 0;
+	
 	private long totalSize = 0;
 	private long uploadedSize = 0;
 	private int lastError = 0;
@@ -78,17 +81,41 @@ public class UploadService extends Service {
 	MegaTransferListenerInterface megaTransferListener;
 	
 	UploadFolderTask uploadFolderTask;
-	UploadFileTask uploadFileTask;
 	
 	private int notificationId = 1;
+	private int notificationIdFinal = 5;
+	
+	private class IntentData{
+		long parentHandle;
+		File file;
+		
+		IntentData (File file, long parentHandle){
+			this.file = file;
+			this.parentHandle = parentHandle;
+		}
+		
+		public void setParentHandle(long parentHandle){
+			this.parentHandle = parentHandle;
+		}
+		
+		public long getParentHandle(){
+			return parentHandle;
+		}
+		
+		public void setFile (File file){
+			this.file = file;
+		}
+		
+		public File getFile(){
+			return file;
+		}
+	}
 	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		log("onCreate");
-		intentQueue = new LinkedList<Intent>();
-		isProcessingIntent = false;
 		totalCount = 0;
 		successCount = 0;
 		totalSize = 0;
@@ -136,80 +163,20 @@ public class UploadService extends Service {
 			return START_NOT_STICKY;
 		}
 		
-		if ((intent.getAction() != null) && intent.getAction().equals(ACTION_CANCEL)) {
-			cancel();
-			return START_NOT_STICKY;
+		if ((intent.getAction() != null)){
+			if (intent.getAction().equals(ACTION_CANCEL)) {
+				log("Cancel intent");
+				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				return START_NOT_STICKY;
+			}
 		}
-		
-		
-		//This thread reads the content of the intent (in case it is a directory, reads every file a
-		new Thread() {
-			Intent intent;
-			Thread setIntent(Intent intent)
-			{
-				this.intent = intent;
-				return this;
-			}
+	
+		onHandleIntent(intent);
 			
-			public void run(){
-				File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
-				try {
-					file = file.getCanonicalFile();
-				} 
-				catch (Exception e) {}
-				
-				synchronized(syncObject){
-					if (file.isDirectory()) {
-						addFolder(intent.getLongExtra(EXTRA_PARENT_HASH, 0), intent.getStringExtra(EXTRA_FOLDERPATH), file);
-					} else {
-						intentQueue.add(intent);
-						totalCount++;
-						totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
-					}
-				}
-				
-				guiHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						if (isProcessingIntent) {
-							return;
-						}
-						isProcessingIntent = true;
-						processQueue();
-					}
-				});
-				updateProgressNotification(uploadedSize);
-			}
-		}.setIntent(intent).start();
-		
 		return START_REDELIVER_INTENT;
 	}
 	
-	/*
-	 * Start next item uploading if necessary
-	 */
-	private void processQueue() {
-		guiHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				log("processQueue");
-				Intent intent = null;
-				try{
-					intent = intentQueue.pollFirst();
-				}
-				catch (Exception e){
-				}
-				
-				if (intent == null) {
-					onQueueComplete();
-				} else {
-					onHandleIntent(intent, 0);
-				}
-			}
-		});
-	}
-	
-	protected void onHandleIntent(final Intent intent, final int tryCount) {
+	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
 		updateProgressNotification(uploadedSize);
@@ -223,78 +190,32 @@ public class UploadService extends Service {
 			parent = file.getParentFile();
 		}
 		
+		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
+		
 		if (file.isDirectory()) {
-			uploadFolderTask = new UploadFolderTask(intent, file, parent, tryCount);
+			uploadFolderTask = new UploadFolderTask(file, parentHandle, this);
 			uploadFolderTask.start();
-		} else {
-			uploadFileTask = new UploadFileTask(intent, file, parent, tryCount);
-			uploadFileTask.start();
+		} 
+		else {			
+			megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 		}
 	}
 	
-	private void addFolder(long parentHandle, String basePath, File folder) {
-		try {
-			folder = folder.getCanonicalFile();
-		} 
-		catch (Exception e) {}
-		
-		if (!folder.canRead()) {
-			log("folder cant read!");
-			return;
-		}
-		ArrayList<File> folders = new ArrayList<File>();
-		
-		addIntent(parentHandle, basePath, folder);
-
-		File[] folderFiles = folder.listFiles();
-		if(folderFiles == null){
-			return;
-		}
-		for (File file : folderFiles) {
-			if (!file.canRead()) {
-				continue;
-			}
-			if (file.isDirectory()) {
-				folders.add(file);
-			} else {
-				addIntent(parentHandle, basePath, file);
-			}
-		}
-		folderFiles = null;
-		for(int i=0; i<folders.size(); i++){
-			addFolder(parentHandle, basePath, folders.get(i));
-		}
-	}
 	
-	private void addIntent(long parentHandle, String basePath, File file){
-		try {
-			file = file.getCanonicalFile();
-		} 
-		catch (IOException e) {}
+	/*
+	 * Handle download file complete
+	 */
+	private void onUploadComplete(boolean success) {
+		log("onDownloadComplete");
 		
-		log("AddIntent: " + basePath + "   File: " + file.getAbsolutePath());
-
-		Intent serviceIntent = new Intent(this, UploadService.class);
-		if (file.isDirectory()) {
-			serviceIntent.putExtra(UploadService.EXTRA_FILEPATH,file.getAbsolutePath());
-			serviceIntent.putExtra(UploadService.EXTRA_NAME,file.getName());
-		} else {
-			ShareInfo info = ShareInfo.infoFromFile(file);
-			if (info == null) {
-				log("NULL INFO");
-				return;
-			}
-			serviceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-			serviceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-			serviceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+		if (success){
+			successCount++;
 		}
+		doneCount++;
 		
-		serviceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, basePath);
-		serviceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentHandle);
-		
-		intentQueue.add(serviceIntent);
-		totalCount++;
-		totalSize += serviceIntent.getLongExtra(EXTRA_SIZE, 0);
+		if (doneCount == totalCount){
+			onQueueComplete();
+		}
 	}
 	
 	/*
@@ -302,19 +223,9 @@ public class UploadService extends Service {
 	 */
 	private void cancel() {
 		canceled = true;
-		guiHandler.removeCallbacksAndMessages(null);
-		guiHandler.post(new Runnable()
-		{
-			public void run()
-			{	
-				log("cancel!");
-				intentQueue = new LinkedList<Intent>();
-				stopForeground(true);
-				isForeground = false;
-				isProcessingIntent = false;
-				stopSelf();
-			}
-		});
+		isForeground = false;
+		stopForeground(true);
+		stopSelf();
 	}
 	
 	@Override
@@ -326,20 +237,37 @@ public class UploadService extends Service {
 	 * No more intents in the queue
 	 */
 	private void onQueueComplete() {
+		
 		log("onQueueComplete");
-		stopForeground(true);
-		isForeground = false;
 		log("Stopping foreground!");
-		log("stopping service!1");
+		log("stopping service! success: " + successCount + " total: " + totalCount);
+		megaApi.resetTotalUploads();
+		
+		if((lock != null) && (lock.isHeld()))
+			try{ lock.release(); } catch(Exception ex) {}
+		if((wl != null) && (wl.isHeld()))
+			try{ wl.release(); } catch(Exception ex) {}
+		
+		
+		//Sleep so the SDK keeps alive
+		//TODO: Must create a method to know if the SDK is waiting for any operation
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		if (successCount == 0) {
 			log("stopping service!2");
 			showCompleteFailNotification();
 		} else {
-			log("stopping service!3");
+			log("stopping service!");
 			showCompleteSuccessNotification();
 		}
-		log("stopping service!");
-		isProcessingIntent = false;
+				
+		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
+		isForeground = false;
+		stopForeground(true);
 		stopSelf();
 	}
 	
@@ -347,365 +275,185 @@ public class UploadService extends Service {
 	 * Show complete error notification
 	 */
 	private void showCompleteFailNotification() {
-		guiHandler.post(new Runnable()
-		{
-			public void run()
-			{	
-				log("showCompleteFailNotification");
-				String title = getString(R.string.upload_failed);
-				String message = getString(R.string.error_server_connection_problem);
-				if(lastError != 0) message = MegaError.getErrorString(lastError);
-				
-				Intent intent = new Intent(UploadService.this, ManagerActivity.class);
-				
-				mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify_upload)
-					.setContentIntent(PendingIntent.getActivity(UploadService.this, 0, intent, 0))
-					.setAutoCancel(true).setContentTitle(title)
-					.setContentText(message)
-					.setOngoing(false);
+		
+		
+		log("showCompleteFailNotification");
+		String title = getString(R.string.upload_failed);
+		String message = getString(R.string.error_server_connection_problem);
+		if(lastError != 0) message = MegaError.getErrorString(lastError);
 
-				mNotificationManager.notify(notificationId, mBuilderCompat.build());
-			}
-		});
+		Intent intent = new Intent(UploadService.this, ManagerActivity.class);
+		
+		mBuilderCompat
+				.setSmallIcon(R.drawable.ic_stat_notify_download)
+				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+				.setAutoCancel(true).setContentTitle(title)
+				.setContentText(message)
+				.setOngoing(false);
+
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
 	/*
 	 * Show complete success notification
 	 */
 	private void showCompleteSuccessNotification() {
-		guiHandler.post(new Runnable()
-		{
-			public void run()
-			{	
-				log("showCompleteSuccessNotification");
-				String notificationTitle, size;
 		
-				notificationTitle = successCount
-						+ " "
-						+ getResources().getQuantityString(R.plurals.general_num_files,
-								successCount) + " " + getString(R.string.upload_uploaded);
-				size = getString(R.string.general_total_size) + " "
-						+ Formatter.formatFileSize(UploadService.this, totalSize);
+		log("showCompleteSuccessNotification");
+		String notificationTitle, size;
+
+		notificationTitle = successCount
+				+ " "
+				+ getResources().getQuantityString(R.plurals.general_num_files,
+						successCount) + " " + getString(R.string.upload_uploaded);
+		size = getString(R.string.general_total_size) + " "
+				+ Formatter.formatFileSize(UploadService.this, totalSize);
+
+		Intent intent = new Intent(UploadService.this, ManagerActivity.class);
 		
-				Intent intent = new Intent(UploadService.this, ManagerActivity.class);
-				
-				mBuilderCompat
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
-						.setContentIntent(PendingIntent.getActivity(UploadService.this, 0, intent, 0))
-						.setAutoCancel(true).setTicker(notificationTitle)
-						.setContentTitle(notificationTitle).setContentText(size)
-						.setOngoing(false);
-		
-				mNotificationManager.notify(notificationId, mBuilderCompat.build());
-			}
-		});
+		mBuilderCompat
+		.setSmallIcon(R.drawable.ic_stat_notify_upload)
+		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+		.setAutoCancel(true).setTicker(notificationTitle)
+		.setContentTitle(notificationTitle).setContentText(size)
+		.setOngoing(false);
+
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
 	/*
 	 * Upload folder
 	 */
-	private class UploadFolderTask extends Thread
-	{
-		Intent intent;
+	private class UploadFolderTask extends Thread implements MegaRequestListenerInterface{
+		
 		File folder;
-		File parent;
-		int tryCount;
+		long parentHandle;
+		ArrayList<IntentData> intents;
+		ArrayList<String> foldersPath = new ArrayList<String>();
+		boolean firstFolder = false;
+		long firstFolderHandle = -1;
+		UploadService uploadService;
 		
-		UploadFolderTask(Intent intent, File folder, File parent, int tryCount)	{
-			this.intent = intent;
+		UploadFolderTask(File folder, long parentHandle, UploadService uploadService){
 			this.folder = folder;
-			this.parent = parent;
-			this.tryCount = tryCount;
-		}
-		
-		@Override
-		public void run() {
-			final long parentHash = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
-			final long uploadParentHash = getUploadParentHash(parentHash, folder, parent);
-			final File relParent = getRelativeParent(parent, folder);
-			if (uploadParentHash == 0) {
-				processQueue();
-				return;
-			}
-
-			log(folder.getAbsolutePath());
-
-			MegaNode document = megaApi.getNodeByHandle(uploadParentHash);
-			if(document != null){
-				NodeList nodeList = megaApi.getChildren(document);
-				for(int i=0; i<nodeList.size(); i++) {
-					MegaNode node = nodeList.get(i);
-					if((folder.getName().equals(node.getName())) && (node.getType() == MegaNode.TYPE_FOLDER)){
-						log("putting hash " + getFolderKey(parentHash, new File(relParent, folder.getName())));
-						createdFolders.put(getFolderKey(parentHash, new File(relParent, folder.getName())), node.getHandle());
-						successCount++;						
-						processQueue();
-						return;
-					}
-				}
-			}
-			
-			if(document == null) {
-				lastError = MegaError.API_EACCESS;
-				processQueue();
-				return;
-			}
-			
-			megaRequestListener = new MegaRequestListenerInterface() {
-				
-				@Override
-				public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-						MegaError e) {			
-				}
-				
-				@Override
-				public void onRequestStart(MegaApiJava api, MegaRequest request) {			
-				}
-				
-				@Override
-				public void onRequestFinish(MegaApiJava api, MegaRequest request,
-						MegaError e) {
-					if (canceled) {
-						guiHandler.removeCallbacksAndMessages(null);
-						guiHandler.post(new Runnable() {
-							public void run() {
-								UploadService.this.cancel();
-							}});
-						return;
-					}
-					
-					if (e.getErrorCode() != MegaError.API_OK) {
-						log("onFailure " + tryCount);
-						if (tryCount > 2) {
-							processQueue();
-						} else {
-							lastError = e.getErrorCode();
-							handleIntentDelayed(intent, tryCount + 1);
-						}
-					} else {
-						log("putting hash " + getFolderKey(parentHash, new File(relParent, folder.getName())));
-						createdFolders.put(getFolderKey(parentHash, new File(relParent, folder.getName())), 
-								request.getNodeHandle());
-						successCount++;
-						processQueue();
-					}
-					
-				}
-			};
-			
-			log("NEW FOLDER: " + folder.getName() + "  Parent: " + document.getName());
-			
-			megaApi.createFolder(folder.getName(), document, megaRequestListener);
-			
-			return;
-		}
-	}
-	
-	/*
-	 * Process upload intent from the queue
-	 */
-	protected void handleIntentDelayed(final Intent intent, final int tryCount) {
-		if (canceled) {
-			return;
-		}
-		guiHandler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				if (canceled) {
-					return;
-				}
-				onHandleIntent(intent, tryCount);
-			}
-		}, tryCount * 3 * 1000);
-	}
-	
-	/*
-	 * Upload file
-	 */
-	class UploadFileTask extends Thread
-	{
-		Intent intent;
-		File file;
-		File parent;
-		int tryCount;
-		
-		UploadFileTask(final Intent intent, final File file, final File parent, final int tryCount){
-			this.intent = intent;
-			this.file = file;
-			this.parent = parent;
-			this.tryCount = tryCount;
+			this.parentHandle = parentHandle;
+			this.intents = new ArrayList<UploadService.IntentData>();
+			this.uploadService = uploadService;
 		}
 
 		@Override
 		public void run(){
-			final ShareInfo info = new ShareInfo();
-			info.size = intent.getLongExtra(EXTRA_SIZE, 0);
-			info.title = intent.getStringExtra(EXTRA_NAME);
-
-			final long parentHash = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
-			long uploadParentHash = getUploadParentHash(parentHash, file, parent);
-			if (uploadParentHash == 0) {
-				Util.deleteIfLocal(UploadService.this, file);
-				processQueue();
-				log(parentHash + " " + file.getAbsolutePath() + " "
-						+ parent.getAbsolutePath());
-				log("file upload prent hash = null");
-				return;
-			}
-			
-			MegaNode document = megaApi.getNodeByHandle(uploadParentHash);
-			if(document != null) {
-				document = document.copy();
-				NodeList nodeList = megaApi.getChildren(document);
-				for(int i=0; i<nodeList.size(); i++) {
-					MegaNode node = nodeList.get(i);
-					if(info.getTitle() == null){
-						info.title = file.getName();
-					}
-					if(node == null){
-						continue;
-					}
-					
-					if((info.getTitle().equals(node.getName())) && (node.getType() == MegaNode.TYPE_FILE) && (node.getSize() == file.length())) {
-						successCount++;
-						uploadedSize += info.size;
-						processQueue();
-						return;
-					}
+			foldersPath.add(folder.getAbsolutePath());
+			createFoldersPathArray(folder);
+			createFolder(foldersPath.get(0));
+		}
+		
+		private void createFoldersPathArray(File currentFolder){
+			if (currentFolder.isDirectory()){
+				File[] files = currentFolder.listFiles();
+				for (int i=0;i<files.length;i++){
+					File f = files[i];
+					if (f.isDirectory()){
+						foldersPath.add(f.getAbsolutePath());
+						createFoldersPathArray(f);
+					}					
 				}
-			}
-			if(document == null) {
-				lastError = MegaError.API_EACCESS;
-				processQueue();
-				return;
-			}			
-			
-			megaTransferListener = new MegaTransferListenerInterface() {
-				
-				@Override
-				public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-					if (canceled) {
-						if((lock != null) && (lock.isHeld()))
-							try{ lock.release(); } catch(Exception ex) {}
-						if((wl != null) && (wl.isHeld()))
-							try{ wl.release(); } catch(Exception ex) {}
-						
-						megaApi.cancelTransfer(transfer);
-						guiHandler.removeCallbacksAndMessages(null);
-						guiHandler.post(new Runnable() {
-							public void run() {
-								UploadService.this.cancel();
-							}});
-						Util.deleteIfLocal(UploadService.this, file);
-						return;
-					}
-					
-					long bytes = transfer.getTransferredBytes();
-					updateProgressNotification(uploadedSize + bytes);					
-				}
-				
-				@Override
-				public void onTransferTemporaryError(MegaApiJava api,
-						MegaTransfer transfer, MegaError e) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-						MegaError e) {
-					if((lock != null) && (lock.isHeld()))
-						try{ lock.release(); } catch(Exception ex) {}
-					if((wl != null) && (wl.isHeld()))
-						try{ wl.release(); } catch(Exception ex) {}
-					
-					if (canceled) {
-						guiHandler.removeCallbacksAndMessages(null);
-						UploadService.this.cancel();
-						
-						if (e.getErrorCode() == MegaError.API_OK){
-							successCount++;
-							uploadedSize += info.size;
-							MegaNode n =  megaApi.getNodeByHandle(transfer.getNodeHandle());
-							if (n != null){
-								return;
-							}
-						}
-						Util.deleteIfLocal(UploadService.this, file);
-						return;
-					}
-
-					if (e.getErrorCode() == MegaError.API_OK){
-						successCount++;
-						uploadedSize += info.size;
-					} 
-					else {
-						log("Transfer failed: " + e.getErrorString() + " (" +  e.getErrorCode() + ")");
-						if (onFileUploadFailure(intent, e, tryCount)) {
-							return;
+			}	
+		}
+		
+		private void createFolder(String path){
+			if (foldersPath.size() > 0){
+				if (path.compareTo(folder.getAbsolutePath()) == 0){
+					NodeList nL = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
+					boolean folderExists = false;
+					for (int i=0;i<nL.size();i++){
+						if ((folder.getName().compareTo(nL.get(i).getName()) == 0) && (nL.get(i).isFolder())){
+							folderExists = true;
 						}
 					}
-					processQueue();
-					
+					if (!folderExists){
+						megaApi.createFolder(new File(path).getName(), megaApi.getNodeByHandle(parentHandle), this);
+					}
+					else{
+						foldersPath.remove(0);
+						if (!foldersPath.isEmpty()){
+							createFolder(foldersPath.get(0));
+						}
+					}
 				}
-			};
+				else{
+					long uploadParentHandle = getUploadParentHandle(path);
+					megaApi.createFolder(new File(path).getName(), megaApi.getNodeByHandle(uploadParentHandle), this);
+				}
+			}
+			else{
+				
+			}
+		}
+		
+		private long getUploadParentHandle(String path){
+			String relativePath = path.replaceFirst(folder.getAbsolutePath(), "");
+			String [] parts = relativePath.split("/");
+			log("RELATIVE PATH: " + relativePath);			
+			long tempHandle = firstFolderHandle;
+			if (parts.length > 1){
+				for (int i=1;i<parts.length;i++){
+					NodeList nL = megaApi.getChildren(megaApi.getNodeByHandle(tempHandle));
+					boolean folderExists = false;
+					int j = 0;
+					while (!folderExists && (j < nL.size()) ){
+						MegaNode n = nL.get(j).copy();
+						if ( (n.getName().compareTo(parts[i]) == 0) && (n.isFolder()) ){
+							tempHandle = n.getHandle();
+							folderExists = true;
+						}
+						j++;
+					}
+				}
+				return tempHandle;
+			}
+			return tempHandle;
+		}
 
-			if(!wl.isHeld()) wl.acquire();
-			if(!lock.isHeld()) lock.acquire();
-			
-			log("UPLOAD FILE: " + file.getAbsolutePath() + " PARENT: " + document.getName() + 
-					"  NAME: " + info.getTitle());
-			megaApi.startUpload(file.getAbsolutePath(), document, info.getTitle(), megaTransferListener);
-			return;
-		}	
-	};
-	
-	private boolean onFileUploadFailure(Intent intent, MegaError error,
-			int tryCount) {
-		log("onFailure " + tryCount);
-		if (tryCount > 2) {
-			return false;
-		} else {
-			lastError = error.getErrorCode();
-			handleIntentDelayed(intent, tryCount + 1);
-			return true;
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			log("onRequestStart: " + request.getType());
 		}
-	}
-	
-	/*
-	 * Get key for folder
-	 */
-	private String getFolderKey(Long parentHash, File relativeParent) {
-		return "" + parentHash + relativeParent.getAbsolutePath();
-	}
-	
-	/*
-	 * Get relative path from parent to file
-	 */
-	private File getRelativeParent(File parent, File file) {
-		return new File(file.getAbsolutePath().replaceFirst(
-				Pattern.quote(parent.getAbsolutePath()), "")).getParentFile();
-	}
-	
-	private long getUploadParentHash(Long parentHash, File file, File parent) {
-		File relParent = getRelativeParent(parent, file);
-		if ((relParent == null) || (relParent.getParentFile() == null)) {
-			return parentHash;
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,
+				MegaError e) {
+			if (request.getType() == MegaRequest.TYPE_MKDIR){
+				log("onRequestFinish: " + request.getType() + "_" + foldersPath.get(0));
+				if (e.getErrorCode() == MegaError.API_OK){
+					MegaNode n = megaApi.getNodeByHandle(request.getNodeHandle()).copy();
+					if (!firstFolder){
+						firstFolder = true;				
+						firstFolderHandle = n.getHandle();
+					}
+						
+					File currentFolder = new File(foldersPath.get(0));
+					File[] files = currentFolder.listFiles();
+					for (int i=0;i<files.length;i++){
+						File f = files[i];
+						if (f.isFile()){
+							megaApi.startUpload(f.getAbsolutePath(), n, uploadService);
+						}
+					}
+					
+					foldersPath.remove(0);
+					if (!foldersPath.isEmpty()){
+						createFolder(foldersPath.get(0));
+					}
+				}
+			}
 		}
-		String folderKey = getFolderKey(parentHash, relParent);
-		log("folder key is " + folderKey);
-		if (createdFolders.containsKey(folderKey)) {
-			return createdFolders.get(folderKey);
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,
+				MegaRequest request, MegaError e) {
+			log("onRequestTemporaryError: " + request.getType());
 		}
-		log("folder key not found");
-		return 0;
 	}
 	
 	@SuppressLint("NewApi")
@@ -716,7 +464,7 @@ public class UploadService extends Service {
 				int progressPercent = (int) Math.round((double) progress / totalSize
 						* 100);
 				log(progressPercent + " " + progress + " " + totalSize);
-				int left = intentQueue.size() + 1;
+				int left = totalCount - doneCount;
 				int current = totalCount - left + 1;
 				int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 
@@ -774,7 +522,101 @@ public class UploadService extends Service {
 	}
 	
 	public static void log(String log) {
-		Util.log("UploadService", log);
+		Util.log("UploadService2", log);
+	}
+
+	@Override
+	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
+		totalCount++;
+		totalSize += transfer.getTotalBytes();
+	}
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+			MegaError e) {
+		log("Upload finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
+		log("transfer.getPath:" + transfer.getPath());
+		if (canceled) {
+			log("Upload cancelled: " + transfer.getFileName());
+			
+			if((lock != null) && (lock.isHeld()))
+				try{ lock.release(); } catch(Exception ex) {}
+			if((wl != null) && (wl.isHeld()))
+				try{ wl.release(); } catch(Exception ex) {}
+				
+			UploadService.this.cancel();
+		}		
+		else{
+			if (e.getErrorCode() == MegaError.API_OK) {
+				log("Upload OK: " + transfer.getFileName());
+				uploadedSize += transfer.getTransferredBytes();
+				log("UPLOADEDFILE: " + transfer.getPath());
+				onUploadComplete(true);
+			}
+			else{
+				log("Upload Error: " + transfer.getFileName() + "_" + e.getErrorCode() + "___" + e.getErrorString());
+				lastError = e.getErrorCode();
+				onUploadComplete(false);
+			}
+		}
+	}
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		if (canceled) {
+			log("Transfer cancel: " + transfer.getFileName());
+
+			if((lock != null) && (lock.isHeld()))
+				try{ lock.release(); } catch(Exception ex) {}
+			if((wl != null) && (wl.isHeld()))
+				try{ wl.release(); } catch(Exception ex) {}
+			
+			megaApi.cancelTransfer(transfer);
+			UploadService.this.cancel();
+			return;
+		}
+				
+		final long bytes = transfer.getTransferredBytes();
+		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
+    	updateProgressNotification(uploadedSize + bytes);
+	}
+
+	@Override
+	public void onTransferTemporaryError(MegaApiJava api,
+			MegaTransfer transfer, MegaError e) {
+		log(transfer.getPath() + "\nDownload Temporary Error: " + e.getErrorString() + "__" + e.getErrorCode());
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		log("onRequestStart: " + request.getName());
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
+			log("cancel_transfers received");
+			if (e.getErrorCode() == MegaError.API_OK){
+				megaApi.pauseTransfers(false, this);
+				megaApi.resetTotalUploads();
+				totalCount = 0;
+				totalSize = 0;
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+			log("pause_transfer false received");
+			if (e.getErrorCode() == MegaError.API_OK){
+				cancel();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestTemporaryError: " + request.getName());
 	}
 
 }

@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils.TruncateAt;
+import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.TypedValue;
@@ -223,7 +224,8 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.imageViewCompleted.setVisibility(View.GONE);
 			holder.transferProgressBar.setVisibility(View.VISIBLE);
 			holder.textViewRate.setVisibility(View.VISIBLE);
-			holder.textViewRate.setText(Util.getSpeedString(transfer.getSpeed()));
+//			holder.textViewRate.setText(Util.getSpeedString(transfer.getSpeed()));
+			holder.textViewRate.setText(Formatter.formatFileSize(context, transfer.getSpeed()) + "/s");
 			holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
 			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
 			holder.transferProgressBar.setProgress((int)progressValue);

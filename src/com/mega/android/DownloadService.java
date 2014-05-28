@@ -77,7 +77,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	WifiLock lock;
 	WakeLock wl;
 	
-	int currentTryCount;
 	File currentFile;
 	File currentDir;
 	
@@ -160,9 +159,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		}
 				
-		onHandleIntent(intent, 0);
-		
-		updateProgressNotification(downloadedSize);
+		onHandleIntent(intent);
 		return START_NOT_STICKY;
 	}
 	
@@ -171,6 +168,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("Stopping foreground!");
 		log("stopping service! success: " + successCount + " total: " + totalCount);
 		megaApi.resetTotalDownloads();
+		
+		if((lock != null) && (lock.isHeld()))
+			try{ lock.release(); } catch(Exception ex) {}
+		if((wl != null) && (wl.isHeld()))
+			try{ wl.release(); } catch(Exception ex) {}
 		
 		if (!isOffline){
 			if (successCount == 0) {
@@ -187,11 +189,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopSelf();
 	}
 	
-	protected void onHandleIntent(final Intent intent, final int tryCount) {
+	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 		
 		updateProgressNotification(downloadedSize);
-		currentTryCount = tryCount;
 		
 		long hash = intent.getLongExtra(EXTRA_HASH, -1);
 		String url = intent.getStringExtra(EXTRA_URL);
@@ -492,18 +493,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
 		totalCount++;
 		totalSize += transfer.getTotalBytes();
-		updateProgressNotification(downloadedSize);
+//		updateProgressNotification(downloadedSize);
 //		totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
 	}
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError error) {
-		if((lock != null) && (lock.isHeld()))
-			try{ lock.release(); } catch(Exception ex) {}
-		if((wl != null) && (wl.isHeld()))
-			try{ wl.release(); } catch(Exception ex) {}
-		
 		log("Download finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if (canceled) {
