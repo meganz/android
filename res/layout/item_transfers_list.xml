@@ -13,6 +13,14 @@
         android:layout_marginBottom="10dp" 
         android:scaleType="fitCenter" />
     
+    <ImageView
+        android:id="@+id/transfers_list_small_icon"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/ic_download_transfers"
+        android:layout_alignRight="@id/transfers_list_thumbnail"
+        android:layout_alignTop="@id/transfers_list_thumbnail" />
+    
     <TextView
         android:id="@+id/transfers_list_filename"
         android:layout_width="wrap_content"

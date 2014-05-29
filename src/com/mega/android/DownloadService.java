@@ -619,8 +619,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		
 		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			log("cancel_transfers received");

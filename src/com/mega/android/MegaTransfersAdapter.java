@@ -12,6 +12,7 @@ import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
@@ -36,7 +37,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener {
+public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener, MegaRequestListenerInterface {
 	
 	Context context;
 //	SparseArray<TransfersHolder> transfersListArray;
@@ -73,6 +74,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	/*private view holder class*/
     public class ViewHolderTransfer {
 		ImageView imageView;
+		ImageView iconDownloadUploadView;
         TextView textViewFileName;
         ImageView imageViewCompleted;
         TextView textViewCompleted;
@@ -119,6 +121,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder = new ViewHolderTransfer();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.transfers_list_item_layout);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.transfers_list_thumbnail);
+			holder.iconDownloadUploadView = (ImageView) convertView.findViewById(R.id.transfers_list_small_icon);
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.transfers_list_filename);
 			holder.textViewFileName.setSingleLine(true);
 			holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
@@ -147,65 +150,47 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		
 		holder.currentPosition = position;
 		
-//		TransfersHolder transfer = (TransfersHolder) getItem(position);
-//		String fileName = transfer.getName();
-		
-		
-//		if (position == 0 || position == 1){
-//			holder.textViewCompleted.setText("Completed");
-//			holder.imageViewCompleted.setImageResource(R.drawable.transferok);
-//			holder.imageViewOneDot.setVisibility(View.GONE);
-//			holder.textViewRate.setVisibility(View.GONE);	
-////			holder.imageViewBarStructure.setVisibility(View.GONE);
-////			holder.imageViewBarFill.setVisibility(View.GONE);
-//			holder.transferProgressBar.setVisibility(View.GONE);
-//		}
-//		else if (position == 6 || position == 7){
-//			holder.textViewCompleted.setText("Queued");
-//			holder.imageViewCompleted.setImageResource(R.drawable.transferqueued);
-//			holder.imageViewOneDot.setVisibility(View.GONE);
-//			holder.textViewRate.setVisibility(View.GONE);
-////			holder.imageViewBarStructure.setVisibility(View.GONE);
-////			holder.imageViewBarFill.setVisibility(View.GONE);
-//			holder.transferProgressBar.setVisibility(View.GONE);
-//		}
-//		else{
-		
 		holder.imageButtonThreeDots.setOnClickListener(this);
 		
 		MegaTransfer transfer = (MegaTransfer) getItem(position);
 		String fileName = transfer.getFileName();
 		holder.textViewFileName.setText(fileName);
-
-//		holder.imageView.setImageResource(R.drawable.mime_3d);
 		
-		MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
-		holder.document = transfer.getNodeHandle();
+		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
 		
-		holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
-		
-		Bitmap thumb = null;
-		if (node.hasThumbnail()){
-			thumb = ThumbnailUtils.getThumbnailFromCache(node);
-			if (thumb != null){
-				holder.imageView.setImageBitmap(thumb);
-			}
-			else{
-				thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers);
+			MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+			holder.document = transfer.getNodeHandle();
+			
+			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+			
+			Bitmap thumb = null;
+			if (node.hasThumbnail()){
+				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null){
 					holder.imageView.setImageBitmap(thumb);
 				}
-				else{ 
-					try{
-						thumb = ThumbnailUtils.getThumbnailFromMegaTransfer(node, context, holder, megaApi, this);
-					}
-					catch(Exception e){} //Too many AsyncTasks
-					
+				else{
+					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
+					else{ 
+						try{
+							thumb = ThumbnailUtils.getThumbnailFromMegaTransfer(node, context, holder, megaApi, this);
+						}
+						catch(Exception e){} //Too many AsyncTasks
+						
+						if (thumb != null){
+							holder.imageView.setImageBitmap(thumb);
+						}
+					}
 				}
 			}
+		}
+		else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD){
+			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
+			holder.imageView.setImageResource(MimeType.typeForName(transfer.getFileName()).getIconResourceId());
 		}
 			
 		long speed = transfer.getSpeed();
@@ -343,7 +328,12 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			}
 			case R.id.transfers_list_option_remove:{
 				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
-				megaApi.cancelTransfer(t, (ManagerActivity)context);
+				if (t.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					megaApi.cancelTransfer(t, (ManagerActivity)context);
+				}
+				else if (t.getType() == MegaTransfer.TYPE_UPLOAD){
+					megaApi.cancelTransfer(t, this);
+				}
 				positionClicked = -1;
 				notifyDataSetChanged();
 				break;
@@ -351,6 +341,27 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		}
 	}
 
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		log("onRequestStart: " + request.getType());
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestFinish: " + request.getType());
+		Intent cancelOneIntent = new Intent(context, UploadService.class);
+		cancelOneIntent.setAction(UploadService.ACTION_CANCEL_ONE_UPLOAD);				
+		context.startService(cancelOneIntent);
+		((ManagerActivity)context).setTransfers(megaApi.getTransfers());
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestTemporaryError: " + request.getType());		
+	}
+	
 	private static void log(String log) {
 		Util.log("MegaTransfersAdapter", log);
 	}

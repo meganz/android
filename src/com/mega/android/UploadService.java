@@ -17,6 +17,7 @@ import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.TransferList;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -44,7 +45,7 @@ import android.widget.RemoteViews;
 public class UploadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	public static String ACTION_CANCEL = "CANCEL_UPLOAD";
-	
+	public static String ACTION_CANCEL_ONE_UPLOAD = "CANCEL_ONE_UPLOAD";
 	public static String EXTRA_FILEPATH = "MEGA_FILE_PATH";
 	public static String EXTRA_FOLDERPATH = "MEGA_FOLDER_PATH";
 	public static String EXTRA_NAME = "MEGA_FILE_NAME";
@@ -167,6 +168,20 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			if (intent.getAction().equals(ACTION_CANCEL)) {
 				log("Cancel intent");
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				return START_NOT_STICKY;
+			}
+			else if (intent.getAction().equals(ACTION_CANCEL_ONE_UPLOAD)){
+				log("Cancel one upload intent");
+				totalCount--;
+				if (totalCount == 0){
+					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+				}
+				totalSize = uploadedSize;
+				TransferList tL = megaApi.getTransfers();
+				for (int i=0;i<tL.size();i++){
+					totalSize += tL.get(i).getTotalBytes();
+				}
+				updateProgressNotification(uploadedSize);
 				return START_NOT_STICKY;
 			}
 		}
