@@ -217,6 +217,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	ImportDialog importDialog;
 	
 	boolean downloadPlay = true;
+	
+	boolean pauseIconVisible = false;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -508,6 +510,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					}
 					case 7:{
 						drawerItem = DrawerItem.TRANSFERS;
+						downloadPlay = savedInstanceState.getBoolean("downloadPlay", true);
+						pauseIconVisible = savedInstanceState.getBoolean("pauseIconVisible", false);
 						break;
 					}
 					case 8:{
@@ -597,6 +601,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	if (tF != null){
 	    	if (tF.isVisible()){
 	    		visibleFragment = 7;
+	    		outState.putBoolean("pauseIconVisible", pauseIconVisible);
+	    		outState.putBoolean("downloadPlay", downloadPlay);
 	    	}
     	}
     	
@@ -3267,7 +3273,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	}
 	
 	public void setPauseIconVisible(boolean visible){
-		addMenuItem.setVisible(visible);
+		pauseIconVisible = visible;
+		if (addMenuItem != null){
+			addMenuItem.setVisible(visible);
+		}
 	}
 	
 	private void getOverflowMenu() {

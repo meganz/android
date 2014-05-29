@@ -55,6 +55,9 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 		}
 		aB.setTitle(getString(R.string.section_account));
 		
+		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		
 		super.onCreateView(inflater, group, savedInstanceState);
 		View view = inflater.inflate(R.layout.activity_my_account, null);
 		megaApi = ((MegaApplication)getActivity().getApplication()).getMegaApi();

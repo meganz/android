@@ -77,6 +77,9 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		}
 		aB.setTitle(getString(R.string.section_transfers));
 
+		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 		
 		

@@ -59,6 +59,9 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		}
 		aB.setTitle(getString(R.string.section_contacts));
 		
+		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
 		for (int i=0;i<contacts.size();i++){
