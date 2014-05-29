@@ -20,6 +20,7 @@ import android.text.TextUtils.TruncateAt;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -46,6 +48,10 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	ActionBar aB;
 
 	MegaApiAndroid megaApi;
+	
+	boolean multipleSelect;
+	
+	ListView listFragment;
 	
 //	public MegaTransfersAdapter(Context _context, SparseArray<TransfersHolder> _transfers, ActionBar aB) {
 //		this.context = _context;
@@ -73,6 +79,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		
 	/*private view holder class*/
     public class ViewHolderTransfer {
+    	CheckBox checkbox;
 		ImageView imageView;
 		ImageView iconDownloadUploadView;
         TextView textViewFileName;
@@ -103,6 +110,8 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	
+		listFragment = (ListView) parent;
+		
 		final int _position = position;
 		
 		ViewHolderTransfer holder = null;
@@ -121,6 +130,8 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder = new ViewHolderTransfer();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.transfers_list_item_layout);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.transfers_list_thumbnail);
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.transfers_list_checkbox);
+			holder.checkbox.setClickable(false);
 			holder.iconDownloadUploadView = (ImageView) convertView.findViewById(R.id.transfers_list_small_icon);
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.transfers_list_filename);
 			holder.textViewFileName.setSingleLine(true);
@@ -155,6 +166,24 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		MegaTransfer transfer = (MegaTransfer) getItem(position);
 		String fileName = transfer.getFileName();
 		holder.textViewFileName.setText(fileName);
+		
+		if (!multipleSelect){
+			holder.checkbox.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+		}
+		else{
+			holder.checkbox.setVisibility(View.VISIBLE);
+			holder.arrowSelection.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			
+			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				holder.checkbox.setChecked(true);
+			}
+			else{
+				holder.checkbox.setChecked(false);
+			}
+		}
 		
 		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
 		
@@ -209,16 +238,13 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.imageViewCompleted.setVisibility(View.GONE);
 			holder.transferProgressBar.setVisibility(View.VISIBLE);
 			holder.textViewRate.setVisibility(View.VISIBLE);
-//			holder.textViewRate.setText(Util.getSpeedString(transfer.getSpeed()));
 			holder.textViewRate.setText(Formatter.formatFileSize(context, transfer.getSpeed()) + "/s");
 			holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
 			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
 			holder.transferProgressBar.setProgress((int)progressValue);
 		}
-//		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
-//		holder.imageButtonThreeDots.setOnClickListener(this);
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
@@ -227,8 +253,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
-				ListView list = (ListView) parent;
-				list.smoothScrollToPosition(_position);
+				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);
@@ -251,26 +276,16 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		
 		return convertView;
 	}
-
-//	@Override
-//    public int getCount() {
-//        return transfersListArray.size();
-//    }
-// 
-//    @Override
-//    public Object getItem(int position) {
-//        return transfersListArray.get(position);
-//    }
  
 	@Override
-  public int getCount() {
-      return tL.size();
-  }
-
-  @Override
-  public Object getItem(int position) {
-      return tL.get(position);
-  }
+	public int getCount() {
+		return tL.size();
+	}
+	
+	@Override
+	public Object getItem(int position) {
+		return tL.get(position);
+	}
 	
     @Override
     public long getItemId(int position) {
@@ -338,6 +353,29 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				notifyDataSetChanged();
 				break;
 			}
+		}
+	}
+	
+	/*
+	 * Get transfer at specified position
+	 */
+	public MegaTransfer getTransferAt(int position) {
+		try {
+			if(tL != null){
+				return tL.get(position);
+			}
+		} catch (IndexOutOfBoundsException e) {}
+		return null;
+	}
+	
+	public boolean isMultipleSelect() {
+		return multipleSelect;
+	}
+	
+	public void setMultipleSelect(boolean multipleSelect) {
+		if(this.multipleSelect != multipleSelect){
+			this.multipleSelect = multipleSelect;
+			notifyDataSetChanged();
 		}
 	}
 

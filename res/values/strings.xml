@@ -55,6 +55,16 @@
         <item quantity="other">folders</item>
     </plurals>
     
+    <plurals name="general_num_downloads">
+        <item quantity="one">download</item>
+        <item quantity="other">downloads</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one">upload</item>
+        <item quantity="other">uploads</item>
+    </plurals>
+    
     
     <string name="login_activity">Login</string>
     <string name="login_text">Login</string>

@@ -4,6 +4,14 @@
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/transfers_list_item_layout" >
     
+    <CheckBox
+        android:id="@+id/transfers_list_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:checked="false"
+        android:focusable="false"
+        android:layout_centerVertical="true" />
+    
     <ImageView
         android:id="@+id/transfers_list_thumbnail"
         android:layout_width="40dp"
@@ -11,7 +19,8 @@
         android:layout_marginLeft="5dp"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp" 
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:layout_toRightOf="@id/transfers_list_checkbox"  />
     
     <ImageView
         android:id="@+id/transfers_list_small_icon"

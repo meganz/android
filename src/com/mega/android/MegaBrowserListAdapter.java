@@ -59,7 +59,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         RelativeLayout itemLayout;
         ImageView arrowSelection;
         RelativeLayout optionsLayout;
-//        ImageButton optionOpen;
         ImageView optionDownload;
         ImageView optionProperties;
         ImageView optionRename;

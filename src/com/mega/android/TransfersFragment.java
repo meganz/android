@@ -1,33 +1,45 @@
 package com.mega.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.http.util.VersionInfo;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.util.SparseArray;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class TransfersFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class TransfersFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	Context context;
 	ActionBar aB;
@@ -43,9 +55,76 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	
 	boolean pause = false;
 	
+	TransfersFragment transfersFragment = this;
+	
 //	SparseArray<TransfersHolder> transfersListArray = null;
 	
 	TransferList tL = null;
+	
+	private ActionMode actionMode;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			List<MegaTransfer> transfers = getSelectedTransfers();
+			
+			switch(item.getItemId()){
+				case R.id.cab_menu_trash:{
+					for (int i=0;i<transfers.size();i++){
+						MegaTransfer t = transfers.get(i);
+						if (t.getType() == MegaTransfer.TYPE_DOWNLOAD){
+							megaApi.cancelTransfer(t, (ManagerActivity)context);
+						}
+						else if (t.getType() == MegaTransfer.TYPE_UPLOAD){
+							megaApi.cancelTransfer(t, adapter);
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					break;
+				}
+				
+				
+				
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.transfers_action, menu);
+			megaApi.pauseTransfers(true);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			adapter.setMultipleSelect(false);
+			listView.setOnItemLongClickListener(transfersFragment);
+			clearSelections();
+			megaApi.pauseTransfers(pause);
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			List<MegaTransfer> selected = getSelectedTransfers();
+
+			boolean showRemove = false;
+			
+			if (selected.size() > 0) {
+				showRemove = true;
+			}
+			
+			menu.findItem(R.id.cab_menu_trash).setVisible(showRemove);
+			
+			return false;
+		}
+		
+	}
+	
+	
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -100,11 +179,15 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		
 		listView = (ListView) v.findViewById(R.id.transfers_list_view);
 		listView.setOnItemClickListener(this);
+		listView.setOnItemLongClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
 //		adapter = new MegaTransfersAdapter(context, transfersListArray, aB);
 		adapter = new MegaTransfersAdapter(context, tL, aB);
 		adapter.setPositionClicked(-1);
+		
+		adapter.setMultipleSelect(false);
+		
 		listView.setAdapter(adapter);
 		
 		emptyImage = (ImageView) v.findViewById(R.id.transfers_empty_image);
@@ -168,16 +251,117 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
 		
-		if (adapter != null){
-			adapter.threeDotsClick(position);
+		if (adapter.isMultipleSelect()){
+			SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				listView.setItemChecked(position, true);
+			}
+			else{
+				listView.setItemChecked(position, false);
+			}				
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
 		}
-		
-//		Intent i = new Intent(context, FullScreenImageViewer.class);
-//		i.putExtra("position", position);
-//		i.putExtra("imageIds", imageIds);
-//		i.putExtra("names", namesArray);
-//		startActivity(i);
+		else{
+			if (adapter != null){
+				adapter.threeDotsClick(position);
+			}	
+		}		
     }
+	
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		if (adapter.getPositionClicked() == -1){
+			clearSelections();
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+			listView.setItemChecked(position, true);
+			adapter.setMultipleSelect(true);
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
+		return true;
+	}
+	
+	/*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				listView.setItemChecked(checkedPosition, false);
+			}
+		}
+		updateActionModeTitle();
+	}
+	
+	private void updateActionModeTitle() {
+		if (actionMode == null || getActivity() == null) {
+			return;
+		}
+		List<MegaTransfer> transfers = getSelectedTransfers();
+		int downloads = 0;
+		int uploads = 0;
+		for (MegaTransfer transfer : transfers) {
+			if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+				downloads++;
+			} else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD) {
+				uploads++;
+			}
+		}
+		Resources res = getActivity().getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, downloads,
+				res.getQuantityString(R.plurals.general_num_downloads, downloads));
+		String foldersStr = String.format(format, uploads,
+				res.getQuantityString(R.plurals.general_num_uploads, uploads));
+		String title;
+		if (downloads == 0 && uploads == 0) {
+			title = "";
+		} else if (downloads == 0) {
+			title = foldersStr;
+		} else if (uploads == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
+	
+	/*
+	 * Get list of all selected documents
+	 */
+	private List<MegaTransfer> getSelectedTransfers() {
+		ArrayList<MegaTransfer> transfers = new ArrayList<MegaTransfer>();
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				MegaTransfer transfer = adapter.getTransferAt(checkedItems.keyAt(i));
+				if (transfer != null){
+					transfers.add(transfer);
+				}
+			}
+		}
+		return transfers;
+	}
+	
+	/*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		adapter.setMultipleSelect(false);
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
 	
 	public int onBackPressed(){
 		
