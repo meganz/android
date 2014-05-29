@@ -3279,6 +3279,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		}
 	}
 	
+	public void setTransfers(TransferList transfersList){
+		if (tF != null){
+			tF.setTransfers(transfersList);
+		}
+	}
+	
 	private void getOverflowMenu() {
 
 	     try {
