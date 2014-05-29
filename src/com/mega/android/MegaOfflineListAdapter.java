@@ -116,7 +116,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		@Override
 		protected void onPostExecute(Bitmap thumb){
 			if (thumb != null){
-				if (holder.currentPath.equals(currentPath)){
+				if (holder.currentPath.compareTo(currentPath) == 0){
 					holder.imageView.setImageBitmap(thumb);
 					Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
 					holder.imageView.startAnimation(fadeInAnimation);

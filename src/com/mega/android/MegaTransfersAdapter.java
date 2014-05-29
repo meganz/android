@@ -1,5 +1,9 @@
 package com.mega.android;
 
+import java.io.File;
+import java.io.IOException;
+
+import com.mega.android.MegaOfflineListAdapter.ViewHolderOfflineList;
 import com.mega.sdk.MegaApi;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -14,7 +18,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.ExifInterface;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils.TruncateAt;
 import android.text.format.Formatter;
@@ -28,6 +35,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
@@ -65,6 +74,58 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 //	}
 	
 	
+	private class TransferThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
+		
+		ViewHolderTransfer holder;
+    	String currentPath;
+    	
+    	public TransferThumbnailAsyncTask(ViewHolderTransfer holder) {
+			this.holder = holder;
+		}
+    	
+    	@Override
+		protected Bitmap doInBackground(String... params) {
+    		currentPath = params[0];
+			File currentFile = new File(currentPath);
+			
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inJustDecodeBounds = true;
+			Bitmap thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			
+			ExifInterface exif;
+			int orientation = ExifInterface.ORIENTATION_NORMAL;
+			try {
+				exif = new ExifInterface(currentFile.getAbsolutePath());
+				orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+			} catch (IOException e) {}  
+			
+			// Calculate inSampleSize
+		    options.inSampleSize = Util.calculateInSampleSize(options, 120, 120);
+		    
+		    // Decode bitmap with inSampleSize set
+		    options.inJustDecodeBounds = false;
+		    
+		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
+			if (thumb != null){
+				thumb = Util.rotateBitmap(thumb, orientation);
+				ThumbnailUtils.setThumbnailCache(holder.currentPath, thumb);
+				return thumb;
+			}
+			
+			return null;
+    	}
+    	
+    	@Override
+		protected void onPostExecute(Bitmap thumb){
+    		if (holder.currentPath.compareTo(currentPath) == 0){
+				holder.imageView.setImageBitmap(thumb);
+				Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+				holder.imageView.startAnimation(fadeInAnimation);
+			}
+    	}
+	}
+	
+	
 	public MegaTransfersAdapter(Context _context, TransferList _transfers, ActionBar aB) {
 		this.context = _context;
 		this.tL = _transfers;
@@ -95,6 +156,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
         ImageButton optionRemove;
         int currentPosition;
         long document;
+        String currentPath;
     }
     
 //    public void setTransfers(SparseArray<TransfersHolder> transfers){
@@ -220,6 +282,23 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD){
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
 			holder.imageView.setImageResource(MimeType.typeForName(transfer.getFileName()).getIconResourceId());
+			holder.currentPath = transfer.getPath();
+			
+			if (MimeType.typeForName(transfer.getFileName()).isImage()){
+				Bitmap thumb = null;
+				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentPath);
+				if (thumb != null){
+					holder.imageView.setImageBitmap(thumb);
+				}
+				else{
+					try{
+						new TransferThumbnailAsyncTask(holder).execute(transfer.getPath());
+					}
+					catch(Exception e){
+						//Too many AsyncTasks
+					}
+				}
+			}
 		}
 			
 		long speed = transfer.getSpeed();

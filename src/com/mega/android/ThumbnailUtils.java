@@ -33,6 +33,7 @@ public class ThumbnailUtils {
 	public static File thumbDir;
 	private static int THUMBNAIL_SIZE = 120;
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
+	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
 	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
 	
 	static HashMap<Long, ThumbnailDownloadListenerList> listenersList = new HashMap<Long, ThumbnailDownloadListenerList>();
@@ -374,8 +375,16 @@ public class ThumbnailUtils {
 		return thumbnailCache.get(handle);
 	}
 	
+	public static Bitmap getThumbnailFromCache(String path){
+		return thumbnailCachePath.get(path);
+	}
+	
 	public static void setThumbnailCache(long handle, Bitmap bitmap){
 		thumbnailCache.put(handle, bitmap);
+	}
+	
+	public static void setThumbnailCache(String path, Bitmap bitmap){
+		thumbnailCachePath.put(path, bitmap);
 	}
 	
 	public static Bitmap getThumbnailFromFolder(MegaNode node, Context context){
