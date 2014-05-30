@@ -22,6 +22,7 @@ DEALINGS IN THE SOFTWARE.
 
 #ifndef WIN32
 #define _LARGEFILE64_SOURCE
+#include <signal.h>
 #endif
 
 #define _GNU_SOURCE 1
@@ -38,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #define CLIENT_USER_AGENT "MEGA Android/2.0 BETA"
 #else
 #define CLIENT_KEY "FhMgXbqb"
-#define CLIENT_USER_AGENT "MEGAsync/1.0.19"
+#define CLIENT_USER_AGENT "MEGAsync/1.0.21"
 #endif
 
 #ifdef __APPLE__
@@ -1145,7 +1146,14 @@ TreeProcessor::~TreeProcessor() {}
 //Entry point for the blocking thread
 void *MegaApi::threadEntryPoint(void *param)
 {
-	MegaApi *api = (MegaApi *)param;
+#ifndef WIN32
+    struct sigaction noaction;
+    memset(&noaction, 0, sizeof(noaction));
+    noaction.sa_handler = SIG_IGN;
+    ::sigaction(SIGPIPE, &noaction, 0);
+#endif
+
+    MegaApi *api = (MegaApi *)param;
 	api->loop();
 	return 0;
 }
@@ -1410,17 +1418,20 @@ void MegaApi::loop()
 {
     while(true)
 	{
-        client->wait();
-        MUTEX_LOCK(sdkMutex);
-		sendPendingTransfers();
-		sendPendingRequests();
-        if(threadExit)
+        int r = client->wait();
+        if(r & Waiter::NEEDEXEC)
         {
+            MUTEX_LOCK(sdkMutex);
+            sendPendingTransfers();
+            sendPendingRequests();
+            if(threadExit)
+            {
+                MUTEX_UNLOCK(sdkMutex);
+                break;
+            }
+            client->exec();
             MUTEX_UNLOCK(sdkMutex);
-            break;
         }
-		client->exec();
-        MUTEX_UNLOCK(sdkMutex);
 	}
 
     delete client->dbaccess; //Warning, it's deleted in MegaClient's destructor
@@ -4860,7 +4871,7 @@ void MegaApi::sendPendingRequests()
             while(it != client->syncs.end())
             {
                 Sync *sync = (*it);
-                if(sync->localroot.node->nodehandle == nodehandle)
+                if(!sync->localroot.node || sync->localroot.node->nodehandle == nodehandle)
                 {
                     LOG("DELETING SYNC IN MEGAAPI");
                     string path;
@@ -4926,10 +4937,10 @@ void MegaApi::updateStatics()
             uploadCount++;
         it++;
     }
-    MUTEX_UNLOCK(sdkMutex);
 
     pendingDownloads = downloadCount;
     pendingUploads = uploadCount;
+    MUTEX_UNLOCK(sdkMutex);
 }
 
 void MegaApi::update()

@@ -64,11 +64,13 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	LinearLayout loginCreateAccount;
 	View loginDelimiter;
 	ProgressBar loginProgressBar;
+	ProgressBar loginFetchNodesProgressBar;
 	TextView generatingKeysText;
 	TextView queryingSignupLinkText;
 	TextView confirmingAccountText;
 	TextView loggingInText;
 	TextView fetchingNodesText;
+	TextView prepareNodesText;
 	
 	int heightGrey = 0;
 	float scaleH, scaleW;
@@ -146,11 +148,13 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
 		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
+		loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
 		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
 		queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
 		confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
 		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
+		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		
 		loginTitle.setText(R.string.login_activity);
 		loginTitle.setTextSize(28*scaleH);
@@ -162,6 +166,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		generatingKeysText.setVisibility(View.GONE);
 		loggingInText.setVisibility(View.GONE);
 		fetchingNodesText.setVisibility(View.GONE);
+		prepareNodesText.setVisibility(View.GONE);
+		loginProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
 		confirmingAccountText.setVisibility(View.GONE);
 		
@@ -241,10 +247,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
 					generatingKeysText.setVisibility(View.VISIBLE);
+					loginProgressBar.setVisibility(View.VISIBLE);
+					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					lastEmail = credentials.getEmail();
 					gPublicKey = credentials.getPublicKey();
 					gPrivateKey = credentials.getPrivateKey();
 					loggingInText.setVisibility(View.VISIBLE);
+					fetchingNodesText.setVisibility(View.GONE);
+					prepareNodesText.setVisibility(View.GONE);
 					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
 					return;
 				}
@@ -276,10 +286,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						confirmingAccountText.setVisibility(View.GONE);
 						loginLoggingIn.setVisibility(View.VISIBLE);
 						generatingKeysText.setVisibility(View.VISIBLE);
+						loginProgressBar.setVisibility(View.VISIBLE);
+						loginFetchNodesProgressBar.setVisibility(View.GONE);
 						lastEmail = credentials.getEmail();
 						gPublicKey = credentials.getPublicKey();
 						gPrivateKey = credentials.getPrivateKey();
 						loggingInText.setVisibility(View.VISIBLE);
+						fetchingNodesText.setVisibility(View.GONE);
+						prepareNodesText.setVisibility(View.GONE);
 						megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
 						return;
 					}
@@ -308,10 +322,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
 					generatingKeysText.setVisibility(View.VISIBLE);
+					loginProgressBar.setVisibility(View.VISIBLE);
+					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					lastEmail = credentials.getEmail();
 					gPublicKey = credentials.getPublicKey();
 					gPrivateKey = credentials.getPrivateKey();
 					loggingInText.setVisibility(View.VISIBLE);
+					fetchingNodesText.setVisibility(View.GONE);
+					prepareNodesText.setVisibility(View.GONE);
 					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
 					return;
 				}
@@ -380,6 +398,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			generatingKeysText.setVisibility(View.GONE);
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
+			prepareNodesText.setVisibility(View.GONE);
 			
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
 			return;
@@ -390,6 +409,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		loginCreateAccount.setVisibility(View.GONE);
 		loginLoggingIn.setVisibility(View.VISIBLE);
 		generatingKeysText.setVisibility(View.VISIBLE);
+		loginProgressBar.setVisibility(View.VISIBLE);
+		loginFetchNodesProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
 		confirmingAccountText.setVisibility(View.GONE);
 		
@@ -421,9 +442,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			loginCreateAccount.setVisibility(View.GONE);
 			loginLoggingIn.setVisibility(View.VISIBLE);
 			generatingKeysText.setVisibility(View.VISIBLE);
+			loginProgressBar.setVisibility(View.VISIBLE);
+			loginFetchNodesProgressBar.setVisibility(View.GONE);
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.VISIBLE);
 			fetchingNodesText.setVisibility(View.GONE);
+			prepareNodesText.setVisibility(View.GONE);
 			
 			log("fastConfirm");
 			megaApi.fastConfirmAccount(confirmLink, privateKey, this);
@@ -442,12 +466,15 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			generatingKeysText.setVisibility(View.GONE);
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
+			prepareNodesText.setVisibility(View.GONE);
 			
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
 		}
 		
 		loggingInText.setVisibility(View.VISIBLE);
+		fetchingNodesText.setVisibility(View.GONE);
+		prepareNodesText.setVisibility(View.GONE);
 		
 		credentials = new UserCredentials(lastEmail,privateKey, publicKey);
 		
@@ -504,6 +531,25 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	{
 		log("onRequestStart: " + request.getRequestString());
 	}
+	
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		log("onRequestUpdate: " + request.getRequestString());
+		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			loginProgressBar.setVisibility(View.GONE);
+			loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
+			loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+			if (request.getTotalBytes() > 0){
+				double progressValue = 100.0 * request.getTransferredBytes() / request.getTotalBytes();
+				if ((progressValue > 99) || (progressValue < 0)){
+					progressValue = 100;
+					prepareNodesText.setVisibility(View.VISIBLE);
+				}
+				log("progressValue = " + (int)progressValue);
+				loginFetchNodesProgressBar.setProgress((int)progressValue);				
+			}
+		}
+	}	
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
@@ -530,13 +576,17 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
 				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 			}
 			else{
 
+				loginProgressBar.setVisibility(View.VISIBLE);
+				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
+				prepareNodesText.setVisibility(View.GONE);
 				
 				Preferences.saveCredentials(loginActivity, credentials);
 
@@ -554,6 +604,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				generatingKeysText.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				
@@ -591,6 +642,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			queryingSignupLinkText.setVisibility(View.GONE);
 			confirmingAccountText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
+			prepareNodesText.setVisibility(View.GONE);
 			
 			if(error.getErrorCode() == MegaError.API_OK){
 				s = request.getEmail();
@@ -616,6 +668,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
 				
 				if (error.getErrorCode() == MegaError.API_ENOENT){
 					Util.showErrorAlertDialog(getString(R.string.error_incorrect_email_or_password), false, LoginActivity.this);
@@ -685,6 +738,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		queryingSignupLinkText.setVisibility(View.VISIBLE);
 		confirmingAccountText.setVisibility(View.GONE);
 		fetchingNodesText.setVisibility(View.GONE);
+		prepareNodesText.setVisibility(View.GONE);
+		loginProgressBar.setVisibility(View.VISIBLE);
 		log("querySignupLink");
 		megaApi.querySignupLink(link, this);
 	}
@@ -692,5 +747,5 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	
 	public static void log(String message) {
 		Util.log("LoginActivity", message);
-	}	
+	}
 }

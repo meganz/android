@@ -89,6 +89,7 @@
     <string name="login_confirm_account">Confirm account</string>
     <string name="login_querying_signup_link">Checking validation link</string>
     <string name="login_confirming_account">Activating account</string>
+    <string name="login_preparing_filelist">Preparing file list</string>
     
     
     <string name="create_account_activity">Create account</string>

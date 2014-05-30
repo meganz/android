@@ -110,6 +110,12 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				MegaRequest request, MegaError e) {
 			log("onRequestTemporaryError");
 		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	}
 	

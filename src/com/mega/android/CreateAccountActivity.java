@@ -327,4 +327,10 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	public static void log(String log) {
 		Util.log("CreateAccountActivity", log);
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

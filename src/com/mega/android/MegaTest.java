@@ -48,6 +48,12 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 			{
 				Log.d(TAG, "onRequestTemporaryError");
 			}
+
+			@Override
+			public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 	}
 	
@@ -77,5 +83,11 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e)
 	{
 		Log.d(TAG, "onRequestTemporaryError");
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
 	}
 }

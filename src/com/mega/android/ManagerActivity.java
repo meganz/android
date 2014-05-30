@@ -3393,4 +3393,10 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public static void log(String message) {
 		Util.log("ManagerActivity", message);
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

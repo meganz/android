@@ -263,4 +263,10 @@ public class ChangePasswordActivity extends ActionBarActivity implements OnClick
 	public static void log(String message) {
 		Util.log("ChangePasswordActivity", message);
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

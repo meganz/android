@@ -222,6 +222,12 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 					MegaRequest request, MegaError e) {
 				log("onRequestTemporaryError");
 			}
+
+			@Override
+			public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+				// TODO Auto-generated method stub
+				
+			}
 			
 		}
 		
@@ -340,5 +346,11 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestTemporaryError: " + request.getRequestString());
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
 	}
 }

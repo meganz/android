@@ -449,4 +449,10 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 		
 	}
 
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

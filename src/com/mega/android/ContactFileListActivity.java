@@ -988,4 +988,10 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }
