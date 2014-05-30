@@ -97,6 +97,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     
     String action = null;
     String url = null;
+    
+    boolean firstRequestUpdate = true;
 	
 	/*
 	 * Task to process email and password
@@ -530,13 +532,22 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	public void onRequestStart(MegaApiJava api, MegaRequest request)
 	{
 		log("onRequestStart: " + request.getRequestString());
+		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+//			loginProgressBar.setVisibility(View.GONE);
+			loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
+			loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+			loginFetchNodesProgressBar.setProgress(0);
+		}
 	}
 	
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		log("onRequestUpdate: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-			loginProgressBar.setVisibility(View.GONE);
+			if (firstRequestUpdate){
+				loginProgressBar.setVisibility(View.GONE);
+				firstRequestUpdate = false;
+			}
 			loginFetchNodesProgressBar.setVisibility(View.VISIBLE);
 			loginFetchNodesProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
 			if (request.getTotalBytes() > 0){
@@ -544,6 +555,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				if ((progressValue > 99) || (progressValue < 0)){
 					progressValue = 100;
 					prepareNodesText.setVisibility(View.VISIBLE);
+					loginProgressBar.setVisibility(View.VISIBLE);
 				}
 				log("progressValue = " + (int)progressValue);
 				loginFetchNodesProgressBar.setProgress((int)progressValue);				
