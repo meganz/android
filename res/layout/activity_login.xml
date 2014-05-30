@@ -185,14 +185,29 @@
 		        android:text="@string/download_updating_filelist"
 		        android:layout_marginTop="5dp" />
 		    
+		    <TextView
+		        android:id="@+id/login_prepare_nodes_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="@string/login_preparing_filelist"
+		        android:layout_marginTop="5dp" />
+		    
+		    <ProgressBar
+			    android:id="@+id/login_fetching_nodes_bar"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				style="@style/MEGAProgressBarLogin"  
+				android:layout_gravity="center"
+		        android:layout_marginTop="10dp" />
+		    
 		    <ProgressBar
 		        android:id="@+id/login_progress_bar"
 		        style="?android:attr/progressBarStyleLargeInverse"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_gravity="center"
-		        android:layout_marginTop="30dp" />
-	    
+		        android:layout_marginTop="10dp" />
+		
 	</LinearLayout>
 	
 	</LinearLayout>

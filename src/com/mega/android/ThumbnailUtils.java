@@ -99,6 +99,12 @@ public class ThumbnailUtils {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	static class ThumbnailDownloadListenerGrid implements MegaRequestListenerInterface{
@@ -171,6 +177,12 @@ public class ThumbnailUtils {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	static class ThumbnailDownloadListenerExplorer implements MegaRequestListenerInterface{
@@ -227,6 +239,12 @@ public class ThumbnailUtils {
 
 		@Override
 		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 			// TODO Auto-generated method stub
 			
 		}
@@ -289,6 +307,12 @@ public class ThumbnailUtils {
 			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	static class ThumbnailDownloadListenerTransfer implements MegaRequestListenerInterface{
@@ -345,6 +369,12 @@ public class ThumbnailUtils {
 
 		@Override
 		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 			// TODO Auto-generated method stub
 			
 		}

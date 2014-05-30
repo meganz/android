@@ -469,6 +469,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				MegaRequest request, MegaError e) {
 			log("onRequestTemporaryError: " + request.getType());
 		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	@SuppressLint("NewApi")
@@ -632,6 +638,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestTemporaryError: " + request.getName());
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

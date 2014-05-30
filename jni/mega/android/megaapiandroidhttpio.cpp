@@ -10,56 +10,59 @@ void MegaApiCurlHttpIO::setProxy(MegaProxySettings *proxySettings)
 void MegaApiCurlHttpIO::post(HttpReq* req, const char* data, unsigned len)
 {
 	if (debug)
-	{
-		cout << "POST target URL: " << req->posturl << endl;
+	    {
+	        cout << "POST target URL: " << req->posturl << endl;
 
-		if (req->binary)
-		{
-			cout << "[sending " << req->out->size() << " bytes of raw data]" << endl;
-		}
-		else
-		{
-			cout << "Sending: " << *req->out << endl;
-		}
-	}
+	        if (req->binary)
+	        {
+	            cout << "[sending " << req->out->size() << " bytes of raw data]" << endl;
+	        }
+	        else
+	        {
+	            cout << "Sending: " << *req->out << endl;
+	        }
+	    }
 
-	CURL* curl;
+	    CURL* curl;
 
-	req->in.clear();
+	    req->in.clear();
 
-	if (( curl = curl_easy_init()))
-	{
-		curl_easy_setopt(curl, CURLOPT_URL,           req->posturl.c_str());
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDS,    data ? data : req->out->data());
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data ? len : req->out->size());
-		curl_easy_setopt(curl, CURLOPT_USERAGENT,     useragent->c_str());
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER,    req->type == REQ_JSON ? contenttypejson : contenttypebinary);
-		curl_easy_setopt(curl, CURLOPT_SHARE,         curlsh);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA,     (void*)req);
-		curl_easy_setopt(curl, CURLOPT_PRIVATE,       (void*)req);
+	    if ((curl = curl_easy_init()))
+	    {
+	        curl_easy_setopt(curl, CURLOPT_URL, req->posturl.c_str());
+	        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data ? data : req->out->data());
+	        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data ? len : req->out->size());
+	        curl_easy_setopt(curl, CURLOPT_USERAGENT, useragent->c_str());
+	        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, req->type == REQ_JSON ? contenttypejson : contenttypebinary);
+	        curl_easy_setopt(curl, CURLOPT_ENCODING, "");
+	        curl_easy_setopt(curl, CURLOPT_SHARE, curlsh);
+	        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+	        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)req);
+	        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, check_header);
+	        curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*)req);
+	        curl_easy_setopt(curl, CURLOPT_PRIVATE, (void*)req);
 
-		//Verify SSL cert and host.
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+	        //Verify SSL cert and host.
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
 
-		//Don't trust the default cacert bundle
-		curl_easy_setopt(curl,CURLOPT_CAINFO, NULL);
-		curl_easy_setopt(curl,CURLOPT_CAPATH, NULL);
+			//Don't trust the default cacert bundle
+			curl_easy_setopt(curl,CURLOPT_CAINFO, NULL);
+			curl_easy_setopt(curl,CURLOPT_CAPATH, NULL);
 
-		//Callback to load the the root certificate of the MEGA server.
-		curl_easy_setopt(curl,CURLOPT_SSL_CTX_FUNCTION, MegaApiCurlHttpIO::sslctx_function);
+			//Callback to load the the root certificate of the MEGA server.
+			curl_easy_setopt(curl,CURLOPT_SSL_CTX_FUNCTION, MegaApiCurlHttpIO::sslctx_function);
 
-		curl_multi_add_handle(curlm, curl);
+	        curl_multi_add_handle(curlm, curl);
 
-		req->status = REQ_INFLIGHT;
+	        req->status = REQ_INFLIGHT;
 
-		req->httpiohandle = (void*)curl;
-	}
-	else
-	{
-		req->status = REQ_FAILURE;
-	}
+	        req->httpiohandle = (void*)curl;
+	    }
+	    else
+	    {
+	        req->status = REQ_FAILURE;
+	    }
 }
 
 MegaProxySettings *MegaApiCurlHttpIO::getAutoProxySettings()

@@ -1060,4 +1060,10 @@ public void moveToTrash(){
 		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 		return list.size() > 0;
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

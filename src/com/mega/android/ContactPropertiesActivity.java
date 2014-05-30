@@ -255,4 +255,10 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 		Util.log("ContactPropertiesActivity", log);
 	}
 
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

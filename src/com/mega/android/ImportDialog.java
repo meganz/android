@@ -182,4 +182,10 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 	public static void log(String message) {
 		Util.log("ImportDialog", message);
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

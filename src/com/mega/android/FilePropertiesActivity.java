@@ -1227,4 +1227,10 @@ public class FilePropertiesActivity extends ActionBarActivity implements OnClick
 	public static void log(String message) {
 		Util.log("FilePropertiesActivity", message);
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }

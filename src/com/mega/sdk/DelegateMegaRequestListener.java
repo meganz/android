@@ -35,6 +35,26 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 			});
 		}
 	}
+	
+	@Override
+	public void onRequestUpdate(MegaApi api, MegaRequest request) 
+	{
+		if(listener != null)
+		{
+			final MegaRequest megaRequest;
+			if(megaApi.isRunCallbackThreaded())
+				megaRequest = request.copy();
+			else
+				megaRequest = request;
+			megaApi.runCallback(new Runnable()
+			{
+			    public void run() 
+			    {
+					listener.onRequestUpdate(megaApi, megaRequest);
+			    }
+			});
+		}
+	}
 
 	@Override
 	public void onRequestFinish(MegaApi api, MegaRequest request, MegaError e) 

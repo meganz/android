@@ -679,4 +679,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static void log(String log){
 		Util.log("DownloadService", log);
 	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
 }
