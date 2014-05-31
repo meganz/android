@@ -155,7 +155,8 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 			}
 		}
 
-		UserCredentials credentials = Preferences.getCredentials(activity);
+		DatabaseHandler dbH = new DatabaseHandler(context); 
+		UserCredentials credentials = dbH.getCredentials();
 		if(credentials != null)
 			emailView.setText(credentials.getEmail());
 

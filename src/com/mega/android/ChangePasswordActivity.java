@@ -132,7 +132,8 @@ public class ChangePasswordActivity extends ActionBarActivity implements OnClick
 		progress.setMessage(getString(R.string.my_account_changing_password));
 		progress.show();
 		
-		final UserCredentials oldCredentials = Preferences.getCredentials(ChangePasswordActivity.this);
+		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		final UserCredentials oldCredentials = dbH.getCredentials();
 		
 		String currentEmail = oldCredentials.getEmail();
 		
@@ -146,8 +147,8 @@ public class ChangePasswordActivity extends ActionBarActivity implements OnClick
 			log("no new password repeat");
 			return false;
 		}
-		
-		UserCredentials cred = Preferences.getCredentials(this);
+		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+		UserCredentials cred = dbH.getCredentials();
 		String privateKey = megaApi.getBase64PwKey(oldPassword);
 		String publicKey = megaApi.getStringHash(privateKey, cred.getEmail());
 		
@@ -237,7 +238,9 @@ public class ChangePasswordActivity extends ActionBarActivity implements OnClick
 		
 		if (request.getType() == MegaRequest.TYPE_CHANGE_PW){
 			//Now update the credentials
-			Preferences.saveCredentials(ChangePasswordActivity.this, newCredentials);
+			DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+			dbH.clearCredentials();
+			dbH.saveCredentials(newCredentials);
 			
 			try{ 
 				progress.dismiss();
