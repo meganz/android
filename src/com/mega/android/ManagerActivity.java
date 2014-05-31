@@ -242,11 +242,20 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
-		if (Preferences.getCredentials(this) == null){
+		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+		if (dbH.getCredentials() == null){
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
 		
+		Preferences prefs = dbH.getPreferences();
+		if (prefs == null){
+			firstTime = true;
+		}
+		else{
+			firstTime = prefs.isFirstTime();	
+		}
+				
 		getOverflowMenu();
 		
 		megaApi.addGlobalListener(this);
@@ -642,7 +651,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	
     	log("onResume");
     	
-    	if(Preferences.getCredentials(this) == null){	
+    	DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+    	if(dbH.getCredentials() == null){	
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
@@ -821,7 +831,9 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				mDrawerLayout.closeDrawer(Gravity.LEFT);
     			}
     			else{
-    				firstTime = false;
+    				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+    				Preferences prefs = new Preferences(false);
+    				dbH.setPreferences(prefs);
     			}
     			
     			customListGrid.setVisibility(View.VISIBLE);
@@ -1717,7 +1729,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			Util.deleteFolderAndSubfolders(context, offlineDirectory);
 		} catch (IOException e) {}
 
-		Preferences.clearCredentials(context);
+		DatabaseHandler dbH = new DatabaseHandler(context); 
+		dbH.clearCredentials();
 		megaApi.logout();
 		drawerItem = null;
 		

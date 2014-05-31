@@ -61,6 +61,7 @@ public class Util {
 	public static float dpHeightAbs = 592;
 	
 	public static double percScreenLogin = 0.596283784; //The dimension of the grey zone (Login and Tour)
+	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
 	public static boolean DEBUG = true;

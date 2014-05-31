@@ -55,6 +55,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	EditText et_user;
 	EditText et_password;
 	Button bRegister;
+	TextView registerText;
 	Button bLogin;
 	ImageView loginThreeDots;
 	MySwitch loginSwitch;
@@ -99,6 +100,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     String url = null;
     
     boolean firstRequestUpdate = true;
+    boolean firstTime = true;
 	
 	/*
 	 * Task to process email and password
@@ -140,9 +142,27 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
 	    
-	    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
 	    
-	    setContentView(R.layout.activity_login);
+	    
+	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+	    
+	    Preferences prefs = dbH.getPreferences();
+		if (prefs == null){
+		    setContentView(R.layout.activity_login);
+		    bRegister = (Button) findViewById(R.id.button_create_account_login);
+		    bRegister.setOnClickListener(this);
+		    ((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+		    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
+		    firstTime = true;
+		}
+		else{
+			setContentView(R.layout.activity_login_returning);
+			registerText = (TextView) findViewById(R.id.login_text_create_account);
+			registerText.setOnClickListener(this);
+			heightGrey = (int) (Util.percScreenLoginReturning * outMetrics.heightPixels);
+			firstTime = false;
+		}
+		
 		
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
@@ -187,15 +207,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		});
 		
-		bRegister = (Button) findViewById(R.id.button_create_account_login);
+		
 		bLogin = (Button) findViewById(R.id.button_login_login);
-		bRegister.setOnClickListener(this);		
+		
 		bLogin.setOnClickListener(this);
 		
 		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((40*scaleH), outMetrics));
 		
 		((LinearLayout.LayoutParams)bLogin.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-		((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
 		
 		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
 		
@@ -237,7 +256,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		
-		credentials = Preferences.getCredentials(this);
+		credentials = dbH.getCredentials();
 		if (credentials != null){
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
@@ -342,11 +361,17 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-		int diffHeight = heightGrey - loginCreateAccount.getTop();
+		if (firstTime){
+			int diffHeight = heightGrey - loginCreateAccount.getTop();
 		
-		int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
-		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
-		
+			int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
+			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
+		}
+		else{
+			int diffHeight = heightGrey - loginCreateAccount.getTop();
+			int paddingBottom = Util.px2dp((10*scaleH), outMetrics) + diffHeight;
+			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
+		}
 //		Toast.makeText(this, "onWindow: HEIGHT: " + loginCreateAccount.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();
 //		int marginBottom = 37; //related to a 533dp height
 //		float dpHeight = outMetrics.heightPixels / density;
@@ -363,6 +388,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				onLoginClick(v);
 				break;
 			case R.id.button_create_account_login:
+			case R.id.login_text_create_account:
 				onRegisterClick(v);
 				break;
 		}
@@ -600,7 +626,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
 				
-				Preferences.saveCredentials(loginActivity, credentials);
+				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+				dbH.clearCredentials();
+				dbH.saveCredentials(credentials);
 
 				megaApi.fetchNodes(loginActivity);
 			}
