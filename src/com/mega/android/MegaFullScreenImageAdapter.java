@@ -482,6 +482,13 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		}
 		else{
 			log("ERROR FINISH: " + e.getErrorCode() + "_" + e.getErrorString());
+			try{
+				new PreviewDownloadAsyncTask().execute(handle);
+			}
+			catch(Exception ex){
+				//Too many AsyncTasks
+				log("Too many AsyncTasks");
+			}
 		}
 	}
 
