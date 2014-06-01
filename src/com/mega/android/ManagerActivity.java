@@ -253,7 +253,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			firstTime = true;
 		}
 		else{
-			firstTime = prefs.isFirstTime();	
+			if (prefs.getFirstTime() == null){
+				firstTime = true;
+			}
+			else{
+				firstTime = Boolean.parseBoolean(prefs.getFirstTime());
+			}
 		}
 				
 		getOverflowMenu();
@@ -832,8 +837,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			}
     			else{
     				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-    				Preferences prefs = new Preferences(false);
-    				dbH.setPreferences(prefs);
+    				dbH.setFirstTime(false);
     			}
     			
     			customListGrid.setVisibility(View.VISIBLE);

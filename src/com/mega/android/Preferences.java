@@ -2,18 +2,28 @@ package com.mega.android;
 
 public class Preferences{
 	
-	boolean firstTime = false;
+	String firstTime = "";
+	String wifi = "";
 	
-	Preferences(boolean firstTime){
+	Preferences(String firstTime, String wifi){
 		this.firstTime = firstTime;
+		this.wifi = wifi;
 	}
 	
-	public boolean isFirstTime (){
+	public String getFirstTime (){
 		return firstTime;
 	}
 	
-	public void setFirstTime(boolean firstTime){
+	public void setFirstTime(String firstTime){
 		this.firstTime = firstTime;
+	}
+	
+	public String getWifi (){
+		return wifi;
+	}
+	
+	public void setWifi(String wifi){
+		this.wifi = wifi;
 	}
 }
 
