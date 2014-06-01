@@ -101,6 +101,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     
     boolean firstRequestUpdate = true;
     boolean firstTime = true;
+    boolean cameraSync = true;
 	
 	/*
 	 * Task to process email and password
@@ -258,6 +259,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 		credentials = dbH.getCredentials();
 		if (credentials != null){
+			cameraSync = false;
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
 					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
@@ -660,12 +662,18 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						finish();
 					}
 					else{
-						Intent intent = new Intent(loginActivity,ManagerActivity.class);
-						if (action != null){
-							intent.setAction(action);
-							intent.setData(Uri.parse(url));
+						Intent intent = null;
+						if (cameraSync){
+							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 						}
-						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						else{
+							intent = new Intent(loginActivity,ManagerActivity.class);
+							if (action != null){
+								intent.setAction(action);
+								intent.setData(Uri.parse(url));
+							}
+							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						}
 						startActivity(intent);
 						finish();
 					}

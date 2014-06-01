@@ -245,4 +245,10 @@
     <string name="transfers_empty">No active transfers</string>
     <string name="transfers_pause">All transfers are paused</string>
     
+    <string name="cam_sync_initial_activity">Camera Sync</string>
+    <string name="cam_sync_wifi">Sync over Wi-Fi only</string>
+    <string name="cam_sync_data">Sync over Wi-Fi or data plan</string>
+    <string name="cam_sync_ok">OK</string>
+    <string name="cam_sync_skip">Skip</string>
+    
 </resources>

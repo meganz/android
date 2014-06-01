@@ -78,7 +78,11 @@
         <item name="android:layout_height">wrap_content</item>
         
       <item name="android:button">@drawable/btn_check_holo_light</item>
-  </style>
+   </style>
+  
+    <style name="radio_MEGA" parent="android:Widget.CompoundButton.RadioButton">        
+      <item name="android:button">@drawable/btn_radio_holo_light</item>
+   </style>
   
     <style name="ProgressBarTheme.mega" parent="android:Widget.ProgressBar.Horizontal">
       <item name="android:progressDrawable">@drawable/progress_horizontal_holo_light</item>

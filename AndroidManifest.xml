@@ -37,6 +37,15 @@
         </activity>
         
         <activity
+            android:name="InitialCamSyncActivity"
+            android:label="@string/cam_sync_initial_activity"
+            android:launchMode="singleTop" 
+            android:theme="@style/login_activity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden" >
+        </activity>
+        
+        <activity
             android:name="LoginActivity"
             android:theme="@style/login_activity"
             android:label="@string/login_activity" 

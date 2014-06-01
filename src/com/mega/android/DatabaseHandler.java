@@ -21,6 +21,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PUBLIC_KEY= "publickey";
     private static final String KEY_PRIVATE_KEY = "privatekey";
     private static final String KEY_FIRST_LOGIN = "firstlogin";
+    private static final String KEY_WIFI = "wifi";
     
 
 	public DatabaseHandler(Context context) {
@@ -35,7 +36,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_CREDENTIALS_TABLE);
         
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FIRST_LOGIN + " BOOLEAN" + ")";
+        		+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FIRST_LOGIN + " BOOLEAN, "
+        		+ KEY_WIFI + " BOOLEAN" + ")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
 	}
 
@@ -111,7 +113,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void setPreferences (Preferences prefs){
 		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
-        values.put(KEY_FIRST_LOGIN, encrypt(prefs.isFirstTime() + ""));
+        values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
+        values.put(KEY_WIFI, encrypt(prefs.getWifi()));
         db.insert(TABLE_PREFERENCES, null, values);
         db.close();
 	}
@@ -125,10 +128,44 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			int id = Integer.parseInt(cursor.getString(0));
 			String firstTime = decrypt(cursor.getString(1));
-			prefs = new Preferences(Boolean.parseBoolean(firstTime));
+			String wifi = decrypt(cursor.getString(2));
+			prefs = new Preferences(firstTime, wifi);
 		}
 		
 		return prefs;
+	}
+	
+	public void setFirstTime (boolean firstTime){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_FIRST_LOGIN + "= '" + encrypt(firstTime + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_FIRST_LOGIN, encrypt(firstTime + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setCamSyncWifi (boolean wifi){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_WIFI + "= '" + encrypt(wifi + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_WIFI, encrypt(wifi + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
 	}
 	
 	public void clearCredentials(){
