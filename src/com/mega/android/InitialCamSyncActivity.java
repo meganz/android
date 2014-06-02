@@ -125,23 +125,31 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	@Override
 	public void onClick(View v) {
 
+		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+
 		Intent intent = new Intent(this,ManagerActivity.class);
 		switch(v.getId()){
-		case R.id.cam_sync_button_ok:
-			DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-			if (camSyncData.isChecked()){
-				dbH.setCamSyncWifi(false);
+			case R.id.cam_sync_button_ok:{
+				dbH.setCamSyncEnabled(true);
+				if (camSyncData.isChecked()){
+					dbH.setCamSyncWifi(false);
+				}
+				else{
+					dbH.setCamSyncWifi(true);
+				}
+				
+				startService(new Intent(this, CameraSyncService.class));
+	
+				startActivity(intent);
+				finish();
+				break;
 			}
-			else{
-				dbH.setCamSyncWifi(true);
+			case R.id.cam_sync_button_skip:{
+				dbH.setCamSyncEnabled(false);
+				startActivity(intent);
+				finish();
+				break;
 			}
-			startActivity(intent);
-			finish();
-			break;
-		case R.id.cam_sync_button_skip:
-			startActivity(intent);
-			finish();
-			break;
 		}
 	}
 
