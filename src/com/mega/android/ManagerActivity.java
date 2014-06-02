@@ -238,7 +238,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
-	    
+	     
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
@@ -838,6 +838,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			else{
     				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
     				dbH.setFirstTime(false);
+    				firstTime = false;
     			}
     			
     			customListGrid.setVisibility(View.VISIBLE);
