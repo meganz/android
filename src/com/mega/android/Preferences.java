@@ -4,10 +4,14 @@ public class Preferences{
 	
 	String firstTime = "";
 	String wifi = "";
+	String camSyncEnabled = "";
+	String camSyncHandle = "";
 	
-	Preferences(String firstTime, String wifi){
+	Preferences(String firstTime, String wifi, String camSyncEnabled, String camSyncHandle){
 		this.firstTime = firstTime;
 		this.wifi = wifi;
+		this.camSyncEnabled = camSyncEnabled;
+		this.camSyncHandle = camSyncHandle;
 	}
 	
 	public String getFirstTime (){
@@ -16,6 +20,22 @@ public class Preferences{
 	
 	public void setFirstTime(String firstTime){
 		this.firstTime = firstTime;
+	}
+	
+	public String getCamSyncEnabled(){
+		return camSyncEnabled;
+	}
+	
+	public void setCamSyncEnabled(String camSyncEnabled){
+		this.camSyncEnabled = camSyncEnabled;
+	}
+	
+	public String getCamSyncHandle(){
+		return camSyncHandle;
+	}
+	
+	public void setCamSyncHandle(String camSyncHandle){
+		this.camSyncHandle = camSyncHandle;
 	}
 	
 	public String getWifi (){

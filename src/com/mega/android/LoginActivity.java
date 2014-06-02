@@ -297,6 +297,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
+						
+						startService(new Intent(this, CameraSyncService.class));
+						
 						this.startActivity(intent);
 						this.finish();
 						return;
@@ -333,6 +336,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					}
+					
+					startService(new Intent(this, CameraSyncService.class));
+					
 					this.startActivity(intent);
 					this.finish();
 					return;
@@ -667,6 +673,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 						}
 						else{
+							startService(new Intent(this, CameraSyncService.class));
+
 							intent = new Intent(loginActivity,ManagerActivity.class);
 							if (action != null){
 								intent.setAction(action);
@@ -674,6 +682,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 							}
 							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						}
+						
 						startActivity(intent);
 						finish();
 					}
