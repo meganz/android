@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -43,6 +44,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	long photosyncHandle = -1;
 	
+	static public boolean running = false;
+	private boolean canceled;
+	
+	private Handler handler;
+	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -65,7 +71,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		
-		dbH = new DatabaseHandler(getApplicationContext()); 
+		dbH = new DatabaseHandler(getApplicationContext());
+		
+		handler = new Handler();
+		canceled = false;
 	}
 	
 	@Override
@@ -86,18 +95,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				break;
 			}
 			case CREATE_PHOTO_SYNC_FOLDER:{
-				break;
+				return START_NOT_STICKY;
 			}
 			default:{
 				return result;
 			}
 		}
 
-		return START_NOT_STICKY;
-		
+		return START_NOT_STICKY;		
 	}
 	
 	private int shouldRun(){
+		
+		if (megaApi.getRootNode() == null){
+			cancel();
+			retryLater();
+			return START_REDELIVER_INTENT;
+		}
 		
 		credentials = dbH.getCredentials();
 		if (credentials == null){
@@ -127,6 +141,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					return START_NOT_STICKY;
 				}
 				else{
+					//On Wifi or wifi and data plan?
+					boolean isWifi = Util.isOnWifi(this);
+					if (prefs.getWifi() == null || Boolean.parseBoolean(prefs.getWifi())){
+						if (!isWifi){
+							log("no wifi...");
+							cancel();
+							retryLater();
+							return START_REDELIVER_INTENT;
+						}
+					}
+					
+					//The "PhotoSync" folder exists?
 					if (prefs.getCamSyncHandle() == null){
 						photosyncHandle = -1;
 					}
@@ -167,12 +193,34 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 	}
 	
+	private void cancel() {
+		if(running){
+			canceled = true;
+		}
+	}
+	
+	private void retryLater()
+	{
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				onStartCommand(null, 0, 0);
+			}
+		}, 30 * 60 * 1000);
+	}
+	
 	private void folderExists(){
 		
 	}
 	
 	private void finish(){
 		log("finish CameraSyncService");
+		
+		if(running){
+			cancel();
+		}
+		
+		running = false;
 		
 		stopSelf();
 	}

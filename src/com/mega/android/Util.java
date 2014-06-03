@@ -307,6 +307,20 @@ public class Util {
 		return decrypted;
 	}
 	
+	/*
+	 * Check is device on WiFi
+	 */
+	public static boolean isOnWifi(Context context) {
+		ConnectivityManager connectivityManager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo networkInfo = null;
+		if (connectivityManager != null) {
+			networkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		}
+		return networkInfo == null ? false : networkInfo.isConnected();
+	}
+	
 	static public boolean isOnline(Context context) {
 	    if(context == null) return true;
 		
