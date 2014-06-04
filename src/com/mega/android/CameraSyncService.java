@@ -1,26 +1,40 @@
 package com.mega.android;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.NodeList;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Environment;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
+import android.text.format.Formatter;
+import android.widget.RemoteViews;
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface{
 
@@ -48,6 +62,31 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private boolean canceled;
 	
 	private Handler handler;
+	
+	private CameraObserver cameraObserver;
+	
+	Thread task;
+	
+	private int totalUploaded;
+	private long totalSizeToUpload;
+	private int totalToUpload;
+	private long totalSizeUploaded;
+	private ConcurrentLinkedQueue<File> filesToUpload = new ConcurrentLinkedQueue<File>();
+	
+	Object transferFinished = new Object();
+	
+	private MegaTransferListenerInterface listener;
+	
+	private boolean isForeground;
+	
+	private int notificationId = 3;
+	private int notificationIdFinal = 6;
+	
+	private static long lastRun = 0;
+	
+	String localPath = "";
+	
+	Intent intentCreate = null;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -80,9 +119,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		
-		try { app = (MegaApplication)getApplication(); }
-		catch(Exception ex) 
-		{ 
+		log("onStartCommand");
+		try { 
+			app = (MegaApplication)getApplication(); 
+		}
+		catch(Exception ex) {
 			finish();
 			return START_NOT_STICKY;
 		}
@@ -91,18 +132,27 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		int result = shouldRun();
 		switch(result){
 			case SYNC_OK:{
-				folderExists();
+				folderExists(intent);
 				break;
 			}
 			case CREATE_PHOTO_SYNC_FOLDER:{
-				return START_NOT_STICKY;
+				intentCreate = intent;
+				return START_REDELIVER_INTENT;
 			}
 			default:{
 				return result;
 			}
 		}
 
-		return START_NOT_STICKY;		
+		return START_REDELIVER_INTENT;		
+	}
+	
+	private void reset() {
+		log("---====  RESET  ====---");
+		totalUploaded = 0;
+		totalSizeToUpload = 0;
+		totalToUpload = 0;
+		totalSizeUploaded = 0;
 	}
 	
 	private int shouldRun(){
@@ -141,6 +191,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					return START_NOT_STICKY;
 				}
 				else{
+					localPath = prefs.getCamSyncLocalPath();
+					if ((localPath == null) || ("".compareTo(localPath) == 0) ){
+						log("Not defined, so not enabled");
+						finish();
+						return START_NOT_STICKY;
+					}
 					//On Wifi or wifi and data plan?
 					boolean isWifi = Util.isOnWifi(this);
 					if (prefs.getWifi() == null || Boolean.parseBoolean(prefs.getWifi())){
@@ -199,8 +255,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 	}
 	
-	private void retryLater()
-	{
+	private void retryLater(){
+		log("retryLater");
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -209,9 +265,398 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}, 30 * 60 * 1000);
 	}
 	
-	private void folderExists(){
+	private void folderExists (Intent intent){
 		
+		if (cameraObserver == null){
+			cameraObserver = new CameraObserver();
+			cameraObserver.startWatching();
+			log("observer started");
+		}
+		
+		if(!running){
+			running = true;
+			startUpload();
+		}
+		else{
+			
+			if (intent == null){
+				retryLater();
+				return;
+			}
+			
+			String newFilePath = intent.getStringExtra("newFilePath");
+			if (newFilePath == null){
+				retryLater();
+				return;
+			}
+			
+			File file = new File (newFilePath);
+			
+			if (megaApi.getRootNode() != null){
+				MegaNode targetNode = megaApi.getNodeByHandle(photosyncHandle);
+				if (targetNode == null){
+					return;
+				}
+				
+				MegaNode nodeExists = megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + file.getName());
+				if (nodeExists == null){
+					totalToUpload++;
+					totalSizeToUpload += file.length();
+					filesToUpload.add(file);
+				}
+				
+			}
+		}		
 	}
+	
+	private void startUpload() {
+		log("startUpload");
+
+		task = new Thread()
+		{
+			@Override
+			public void run()
+			{
+				uploadFiles();
+				onUploadFinish();
+			}
+		};
+		task.start();		
+	}
+	
+	private void onUploadFinish() {
+		handler.removeCallbacksAndMessages(null);
+		handler.post(new Runnable() 
+		{
+			public void run()
+			{		
+				log("totalUploaded " + totalUploaded);
+		
+				if (isForeground) {
+					isForeground = false;
+					stopForeground(true);
+				}
+		
+				if (totalUploaded > 0) {
+					showCompleteSuccessNotification();
+					totalUploaded = 0;
+				}
+		
+				if (canceled) {
+					finish();
+				}
+				canceled = false;
+				reset();
+				task = null;
+				filesToUpload.clear();
+				running = false;
+			}
+		});
+	}
+	
+	@SuppressLint("DefaultLocale")
+	private void showCompleteSuccessNotification() {
+		log("showCompleteSuccessNotification");
+
+		String message = String.format(
+				"%d %s %s (%s)",
+				totalUploaded,
+				getResources().getQuantityString(R.plurals.general_num_files,
+						totalUploaded), getString(R.string.upload_uploaded),
+				Formatter.formatFileSize(CameraSyncService.this, totalSizeUploaded));
+		String title = getString(R.string.settings_camera_notif_complete);
+		Intent intent = new Intent(CameraSyncService.this, ManagerActivity.class);
+		intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, photosyncHandle);
+
+		mBuilderCompat
+			.setSmallIcon(R.drawable.ic_stat_camera_sync)
+			.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
+			.setAutoCancel(true).setTicker(title).setContentTitle(title)
+			.setContentText(message)
+			.setOngoing(false);
+	
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+	}
+	
+	private void uploadFiles() {
+		if (canceled) {
+			log("upload canceled");
+			return;
+		}
+		
+		List<String> cameraFiles = new ArrayList<String>();
+		cameraFiles.addAll(getCameraPhotosAll());
+//		cameraFiles.addAll(getCameraVideosAll());
+		
+		reset();
+		
+		if(megaApi.getRootNode() == null){
+			return;
+		}
+		
+		MegaNode targetNode = megaApi.getNodeByHandle(photosyncHandle);
+		if(targetNode == null){
+			showSyncError(R.string.settings_camera_notif_error_no_folder);
+			finish();
+			return;
+		}
+		
+		for (String filePath : cameraFiles) {
+			File file = new File(filePath);
+			if(!file.exists()) continue;
+		
+			
+			MegaNode nodeExists = megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + file.getName());
+			if (nodeExists == null){
+				totalSizeToUpload += file.length();
+				filesToUpload.add(file);
+			}
+		}
+		
+		totalToUpload = filesToUpload.size();
+		if(totalToUpload == 0) return;
+		
+		while(filesToUpload.size() != 0)		
+		{
+			if(canceled) return;
+
+			int result = shouldRun();
+			if(result != 0) return;
+			
+			uploadFile(filesToUpload.poll(), targetNode);
+			synchronized(transferFinished)
+			{
+				try {
+					transferFinished.wait();
+				} catch (InterruptedException e) {}
+			}
+		}
+	}
+	
+	private void uploadFile(final File file, MegaNode target) {
+
+		updateProgressNotification(totalSizeUploaded);
+		
+		ShareInfo info = ShareInfo.infoFromFile(file);
+		if (info == null) {
+			synchronized(transferFinished)
+			{ transferFinished.notify(); }
+			return;
+		}
+		
+		listener = new MegaTransferListenerInterface() {
+
+			@Override
+			public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+				log("onTransferStart: " + transfer.getFileName());
+			}
+
+			@Override
+			public void onTransferFinish(MegaApiJava api,
+					MegaTransfer transfer, MegaError e) {
+				if((lock != null) && (lock.isHeld()))
+					try{ lock.release(); } catch(Exception ex) {}
+				if((wl != null) && (wl.isHeld()))
+					try{ wl.release(); } catch(Exception ex) {}
+				
+				if (canceled) {
+					handler.removeCallbacksAndMessages(null);
+					if (e.getErrorCode() == MegaError.API_OK) 
+					{
+						totalSizeToUpload -= file.length();
+						totalSizeUploaded += file.length();
+						totalUploaded++;
+						totalToUpload--;
+					}
+					synchronized(transferFinished)
+					{ transferFinished.notify(); }
+					return;
+				}
+				
+				
+				if (e.getErrorCode() == MegaError.API_OK) {
+					totalSizeToUpload -= file.length();
+					totalSizeUploaded += file.length();
+					totalUploaded++;
+					totalToUpload--;
+					log("PROGRESS " + totalUploaded + " - " + totalToUpload);
+					
+					updateProgressNotification(totalSizeUploaded);
+				}
+				synchronized(transferFinished)
+				{ transferFinished.notify(); }
+			}
+
+			@Override
+			public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+				if (canceled) {
+					if((lock != null) && (lock.isHeld()))
+						try{ lock.release(); } catch(Exception ex) {}
+					if((wl != null) && (wl.isHeld()))
+						try{ wl.release(); } catch(Exception ex) {}
+					
+					megaApi.cancelTransfer(transfer);
+					synchronized(transferFinished)
+					{ transferFinished.notify(); }
+					return;
+				}
+				
+				final long position = transfer.getTransferredBytes();
+				updateProgressNotification(totalSizeUploaded + position);
+				return;
+			}
+
+			@Override
+			public void onTransferTemporaryError(MegaApiJava api,
+					MegaTransfer transfer, MegaError e) {
+				log("onTransferTemporaryError: " + transfer.getFileName());				
+			}
+		};
+		
+
+		wl.acquire();
+		lock.acquire();
+		megaApi.startUpload(file.getAbsolutePath(), target, listener);
+	}
+	
+	@SuppressLint("NewApi")
+	private void updateProgressNotification(final long progress) {
+		handler.post(new Runnable() 
+		{
+			public void run()
+			{
+				long totalSize = totalSizeToUpload + totalSizeUploaded;
+				int progressPercent = (int) Math.round((double) progress / totalSize
+						* 100);
+				int totalCount = totalToUpload + totalUploaded;
+				int current = Math.min(totalCount - totalToUpload + 1, totalCount);
+				int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+
+				String message = current + " ";
+				if (totalCount == 1) {
+					message += getResources().getQuantityString(
+							R.plurals.general_num_files, 1);
+				} else {
+					message += "of "
+							+ totalCount
+							+ " "
+							+ getResources().getQuantityString(
+									R.plurals.general_num_files, totalCount);
+				}
+		
+				Intent intent = new Intent(CameraSyncService.this, ManagerActivity.class);
+		
+				String info = Util.getProgressSize(CameraSyncService.this, progress, totalSize);
+				
+				
+				Notification notification = null;
+
+				if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+				{
+					mBuilder
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
+					.setOngoing(true)
+					.setContentInfo(info)
+					.setContentTitle(getString(R.string.settings_camera_notif_title))
+					.setContentText(message)
+					.setOnlyAlertOnce(true);
+					notification = mBuilder.getNotification();
+//					notification = mBuilder.build();
+					
+				}
+				else
+				{
+					notification = new Notification(R.drawable.ic_stat_camera_sync, null, 1);
+					notification.flags |= Notification.FLAG_ONGOING_EVENT;
+					notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+					notification.contentIntent = PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0);
+					notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_camera_sync);
+					notification.contentView.setTextViewText(R.id.status_text, message);
+					notification.contentView.setTextViewText(R.id.progress_text, info);
+					notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+				}
+		
+				if (!isForeground) {
+					log("starting foreground!");
+					startForeground(notificationId, notification);
+					isForeground = true;
+				} else {
+					mNotificationManager.notify(notificationId, notification);
+				}
+			}}
+		);
+	}
+	
+	private List<String> getCameraPhotosAll() {
+		List<String> photos = new ArrayList<String>();
+		for (File folder : getCameraFolders()) {
+			photos.addAll(getCameraPhotos(folder));
+		}
+		return photos;
+	}
+
+	private List<String> getCameraVideosAll() {
+		List<String> photos = new ArrayList<String>();
+		for (File folder : getCameraFolders()) {
+			photos.addAll(getCameraVideos(folder));
+		}
+		return photos;
+	}
+	
+	private List<File> getCameraFolders() {
+		File dcimFolder = new File(localPath);
+//		File dcimFolder = new File(CameraSettings.getSource(this));
+		try {dcimFolder = dcimFolder.getCanonicalFile();} catch (IOException e) {}
+		List<File> folders = new ArrayList<File>();
+		if (dcimFolder.isDirectory() && dcimFolder.canRead()) {
+			folders.add(dcimFolder);
+			File[] subfolders = dcimFolder.listFiles();
+			if (subfolders != null){
+				for (File folder : dcimFolder.listFiles()) {
+					try {folder = folder.getCanonicalFile();} catch (IOException e) {}
+					if (folder.isDirectory() && !folder.getName().startsWith(".")) {
+						folders.add(folder);
+					}
+				}
+			}
+		}
+		return folders;
+	}
+	
+	private List<String> getCameraPhotos(File folder) {
+		ArrayList<String> result = new ArrayList<String>();
+		try {folder = folder.getCanonicalFile();} catch (IOException e) {}
+		File[] files = folder.listFiles();
+		if(files==null) return result;
+		for(int i=0; i<files.length; i++)
+		{
+			File file = files[i];
+			if(MimeType.typeForName(file.getName()).isImage())
+			{
+				result.add(file.getAbsolutePath());
+			}
+		}
+		return result;
+	}
+	
+	private List<String> getCameraVideos(File folder) {
+		ArrayList<String> result = new ArrayList<String>();
+		try {folder = folder.getCanonicalFile();} catch (IOException e) {}
+		File[] files = folder.listFiles();
+		if(files==null) return result;
+		for(int i=0; i<files.length; i++)
+		{
+			File file = files[i];
+			if(MimeType.typeForName(file.getName()).isVideo())
+			{
+				result.add(file.getAbsolutePath());
+			}
+		}
+		return result;
+	}
+	
 	
 	private void finish(){
 		log("finish CameraSyncService");
@@ -220,14 +665,52 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			cancel();
 		}
 		
-		running = false;
+		if (cameraObserver != null) {
+			cameraObserver.stopWatching();
+			log("observer stopped");
+		}
+		cameraObserver = null;
+		log("observer deleted");
 		
+		handler.removeCallbacksAndMessages(null);
+		running = false;
 		stopSelf();
+	}
+	
+	public void onDestroy(){
+		log("onDestroy");
+		super.onDestroy();
 	}
 	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
+	}
+	
+	private void showSyncError(final int errResId) {
+		handler.post(new Runnable() 
+		{
+			public void run()
+			{
+				log("show sync error");
+				Intent intent = new Intent(CameraSyncService.this, ManagerActivity.class);
+						
+				mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+					.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
+					.setContentTitle(getString(R.string.settings_camera_notif_error))
+					.setContentText(getString(errResId))
+					.setOngoing(false);
+		
+				if (!isForeground) {
+					log("starting foreground!");
+					startForeground(notificationId, mBuilderCompat.build());
+					isForeground = true;
+				} else {
+					mNotificationManager.notify(notificationId, mBuilderCompat.build());
+				}
+			}}
+		);
 	}
 	
 	public static void log(String log){
@@ -251,7 +734,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		if (e.getErrorCode() == MegaError.API_OK){
 			log("Folder created");
-			folderExists();
+			folderExists(intentCreate);
 		}
 		else{
 			log("Folder not created so stop service");
@@ -264,5 +747,120 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			MegaError e) {
 		log("onRequestTemporaryError: " + request.getRequestString());
 	}
+	
+	private class CameraObserver {
 
+		private ArrayList<FileObserver> observers = new ArrayList<FileObserver>();
+		
+		class CameraLauncher implements Runnable {
+			String path;
+			public void setNewFile(String path)
+			{
+				this.path = path;
+			}
+			
+			@Override
+			public void run() {
+				log("observer run");
+				Intent intent = new Intent(CameraSyncService.this,
+						CameraSyncService.class);
+				intent.putExtra("newFilePath", path);
+				startService(intent);
+			}
+		};
+
+		CameraLauncher launcher = new CameraLauncher();
+		class CameraFileObserver extends FileObserver
+		{
+			String folder;
+			CameraObserver observer;
+			public CameraFileObserver(String path, int mask, CameraObserver observer) {
+				super(path, mask);
+				folder = path;
+				this.observer = observer;
+			}
+			@Override
+			public void onEvent(int event, String path) {
+				observer.onEvent(event, new File(folder, path).getAbsolutePath());				
+			}
+		}
+		
+		
+		public CameraObserver() {
+			String path = localPath;
+			File folder = new File(path);
+			String[] files = folder.list();
+			if(folder.isDirectory())
+			{
+				observers.add(new FileObserver(folder.getAbsolutePath(),
+								FileObserver.CREATE | FileObserver.MOVED_TO)
+				{
+					@Override
+					public void onEvent(int event, String path) 
+					{
+						CameraObserver.this.onEvent(event, path);
+					}
+				});
+			}
+			
+			if(files != null)
+			{
+				for(int i=0; i<files.length; i++)
+				{
+					File file = new File(files[i]);
+					File correctFile = new File(folder, file.getName());
+					log("observer file: " + correctFile.getAbsolutePath());
+					if(correctFile.isDirectory())
+					{
+						log("observer directory: " + correctFile.getAbsolutePath());
+						observers.add(new CameraFileObserver(correctFile.getAbsolutePath(),
+										FileObserver.CREATE | FileObserver.MOVED_TO, this));
+					}
+				}
+			}
+		}
+
+		public void startWatching() {
+			for(int i=0; i<observers.size(); i++)
+				observers.get(i).startWatching();			
+		}
+
+		public void stopWatching() {
+			log("stopWatching");
+			for(int i=0; i<observers.size(); i++)
+				observers.get(i).stopWatching();
+		}
+
+		public void onEvent(int event, String path) {
+			log("observer onEvent path: " + path);
+			if (path == null || path.endsWith(".tmp")) {
+				return;
+			}
+			
+			launcher.setNewFile(path);
+			handler.removeCallbacks(launcher);
+			handler.postDelayed(launcher, 2 * 1000);
+			log("runnable posted");
+		}
+	}
+	
+	public static void runIfNecessary(final Context context) {
+		long time = System.currentTimeMillis();
+		if (time - lastRun > 5  * 1000) {
+			log("should start");
+			lastRun = time;
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					if (context != null) {
+						context.startService(new Intent(context,
+								CameraSyncService.class));
+					}
+				}
+			}, 2000);
+
+		} else {
+			log("no need");
+		}
+	}
 }

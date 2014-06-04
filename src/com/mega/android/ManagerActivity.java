@@ -125,6 +125,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	
+	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
+	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
@@ -317,7 +319,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 			return;
 		}
 		else{
-			
+					
 			UserList contacts = megaApi.getContacts();
 			for (int i=0; i < contacts.size(); i++){
 				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
@@ -640,6 +642,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	log("onDestroy()");
     	
     	megaApi.removeGlobalListener(this);
+    	
+    	startService(new Intent(getApplicationContext(), CameraSyncService.class));
 //    	megaApi.removeTransferListener(this);
     }
     
@@ -666,6 +670,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	
     	if (intent != null) {
     		log("intent != null");
+    		// Open folder from the intent
+			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
+				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
+				intent.removeExtra(EXTRA_OPEN_FOLDER);
+				setIntent(null);
+			}
+    					
     		if (intent.getAction() != null){
     			log("getAction != null");
     			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
@@ -3233,6 +3244,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
+		log("onNodesUpdate");
 		try { 
 			statusDialog.dismiss();	
 		} 

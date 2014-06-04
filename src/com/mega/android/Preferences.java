@@ -6,12 +6,14 @@ public class Preferences{
 	String wifi = "";
 	String camSyncEnabled = "";
 	String camSyncHandle = "";
+	String camSyncLocalPath = "";
 	
-	Preferences(String firstTime, String wifi, String camSyncEnabled, String camSyncHandle){
+	Preferences(String firstTime, String wifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath){
 		this.firstTime = firstTime;
 		this.wifi = wifi;
 		this.camSyncEnabled = camSyncEnabled;
 		this.camSyncHandle = camSyncHandle;
+		this.camSyncLocalPath = camSyncLocalPath;
 	}
 	
 	public String getFirstTime (){
@@ -36,6 +38,14 @@ public class Preferences{
 	
 	public void setCamSyncHandle(String camSyncHandle){
 		this.camSyncHandle = camSyncHandle;
+	}
+	
+	public String getCamSyncLocalPath(){
+		return camSyncLocalPath;
+	}
+	
+	public void setCamSyncLocalPath(String camSyncLocalPath){
+		this.camSyncLocalPath = camSyncLocalPath;
 	}
 	
 	public String getWifi (){
