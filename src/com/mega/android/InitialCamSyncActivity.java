@@ -141,7 +141,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 					dbH.setCamSyncWifi(true);
 				}
 				
-				startService(new Intent(getApplicationContext(), CameraSyncService.class));
+//				startService(new Intent(getApplicationContext(), CameraSyncService.class));
 	
 				startActivity(intent);
 				finish();
