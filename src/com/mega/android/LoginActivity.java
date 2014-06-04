@@ -298,7 +298,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
 						
-						startService(new Intent(this, CameraSyncService.class));
+						startService(new Intent(getApplicationContext(), CameraSyncService.class));
 						
 						this.startActivity(intent);
 						this.finish();
@@ -337,7 +337,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					}
 					
-					startService(new Intent(this, CameraSyncService.class));
+					startService(new Intent(getApplicationContext(), CameraSyncService.class));
 					
 					this.startActivity(intent);
 					this.finish();
@@ -673,7 +673,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 						}
 						else{
-							startService(new Intent(this, CameraSyncService.class));
+							startService(new Intent(getApplicationContext(), CameraSyncService.class));
 
 							intent = new Intent(loginActivity,ManagerActivity.class);
 							if (action != null){

@@ -24,6 +24,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_ENABLED = "camsyncenabled";
     private static final String KEY_CAM_SYNC_HANDLE = "camsynchandle";
     private static final String KEY_WIFI = "wifi";
+    private static final String KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath";
     
 
 	public DatabaseHandler(Context context) {
@@ -40,7 +41,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FIRST_LOGIN + " BOOLEAN, "
         		+ KEY_CAM_SYNC_ENABLED + " BOOLEAN, " + KEY_CAM_SYNC_HANDLE + " TEXT, "
-        		+ KEY_WIFI + " BOOLEAN" + ")";
+        		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, " + KEY_WIFI + " BOOLEAN" + ")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
 	}
 
@@ -119,6 +120,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
         values.put(KEY_WIFI, encrypt(prefs.getWifi()));
         values.put(KEY_CAM_SYNC_ENABLED, prefs.getCamSyncEnabled());
+        values.put(KEY_CAM_SYNC_HANDLE, prefs.getCamSyncHandle());
+        values.put(KEY_CAM_SYNC_LOCAL_PATH, prefs.getCamSyncLocalPath());
         db.insert(TABLE_PREFERENCES, null, values);
         db.close();
 	}
@@ -134,8 +137,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String firstTime = decrypt(cursor.getString(1));
 			String camSyncEnabled = decrypt(cursor.getString(2));
 			String camSyncHandle = decrypt(cursor.getString(3));
-			String wifi = decrypt(cursor.getString(4));
-			prefs = new Preferences(firstTime, wifi, camSyncEnabled, camSyncHandle);
+			String camSyncLocalPath = decrypt(cursor.getString(4));
+			String wifi = decrypt(cursor.getString(5));
+			prefs = new Preferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath);
 		}
 		
 		return prefs;
@@ -204,6 +208,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 	        values.put(KEY_CAM_SYNC_HANDLE, encrypt(handle + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setCamSyncLocalPath (String localPath){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_LOCAL_PATH + "= '" + encrypt(localPath + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(localPath + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
         db.close();

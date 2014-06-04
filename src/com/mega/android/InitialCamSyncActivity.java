@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -131,6 +132,8 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 		switch(v.getId()){
 			case R.id.cam_sync_button_ok:{
 				dbH.setCamSyncEnabled(true);
+				String localPath = Environment.getExternalStorageDirectory() + "/DCIM/Camera/";
+				dbH.setCamSyncLocalPath(localPath);
 				if (camSyncData.isChecked()){
 					dbH.setCamSyncWifi(false);
 				}
@@ -138,7 +141,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 					dbH.setCamSyncWifi(true);
 				}
 				
-				startService(new Intent(this, CameraSyncService.class));
+				startService(new Intent(getApplicationContext(), CameraSyncService.class));
 	
 				startActivity(intent);
 				finish();
