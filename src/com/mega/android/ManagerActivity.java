@@ -1728,7 +1728,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	 */
 	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi) {
 //		context.stopService(new Intent(context, BackgroundService.class));
-//		context.stopService(new Intent(context, CameraSyncService.class));
+		context.stopService(new Intent(context, CameraSyncService.class));
 		
 		File offlineDirectory = null;
 		if (Environment.getExternalStorageDirectory() != null){

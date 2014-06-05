@@ -21,8 +21,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
@@ -42,6 +44,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	public final static int SYNC_OK = 0;
 	public final static int CREATE_PHOTO_SYNC_FOLDER = 1;
+	
+	public final static String EXTRA_NEW_FILE_PATH = "newFilePath";
 	
 	WifiLock lock;
 	WakeLock wl;
@@ -118,51 +122,26 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		
 		log("onStartCommand");
-		try { 
-			app = (MegaApplication)getApplication(); 
+		
+		if(intent == null){
+			return START_NOT_STICKY;
 		}
-		catch(Exception ex) {
+		
+		try{
+			app = (MegaApplication) getApplication();
+		}
+		catch(Exception ex){
 			finish();
 			return START_NOT_STICKY;
 		}
 		megaApi = app.getMegaApi();
 		
-		int result = shouldRun();
-		switch(result){
-			case SYNC_OK:{
-				folderExists(intent);
-				break;
-			}
-			case CREATE_PHOTO_SYNC_FOLDER:{
-				intentCreate = intent;
-				return START_REDELIVER_INTENT;
-			}
-			default:{
-				return result;
-			}
+		if (megaApi == null){
+			finish();
+			return START_NOT_STICKY;
 		}
 
-		return START_REDELIVER_INTENT;		
-	}
-	
-	private void reset() {
-		log("---====  RESET  ====---");
-		totalUploaded = 0;
-		totalSizeToUpload = 0;
-		totalToUpload = 0;
-		totalSizeUploaded = 0;
-	}
-	
-	private int shouldRun(){
-		
-		if (megaApi.getRootNode() == null){
-			cancel();
-			retryLater();
-			return START_REDELIVER_INTENT;
-		}
-		
 		credentials = dbH.getCredentials();
 		if (credentials == null){
 			log("There are not user credentials");
@@ -170,8 +149,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
-		//Aqui deberian ir accesos a la base de datos para saber:
-		// - la carpeta local a sincronizar
+		String lastEmail = credentials.getEmail();
+		String gPublicKey = credentials.getPublicKey();
+		String gPrivateKey = credentials.getPrivateKey();
+		
+		if (megaApi.getRootNode() == null){
+			log("RootNode = null");
+			megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+//			cancel();
+//			retryLater();
+			return START_NOT_STICKY;
+		}
+		
 		Preferences prefs = dbH.getPreferences();
 		if (prefs == null){
 			log("Not defined, so not enabled");
@@ -197,7 +186,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						finish();
 						return START_NOT_STICKY;
 					}
-					//On Wifi or wifi and data plan?
+					
 					boolean isWifi = Util.isOnWifi(this);
 					if (prefs.getWifi() == null || Boolean.parseBoolean(prefs.getWifi())){
 						if (!isWifi){
@@ -222,11 +211,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 								photosyncHandle = -1;
 							}
 						}
-					}
+					}					
 				}
 			}
 		}
-				
+		
 		if (photosyncHandle == -1){
 			NodeList nl = megaApi.getChildren(megaApi.getRootNode());
 			for (int i=0;i<nl.size();i++){
@@ -238,15 +227,68 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			
 			
 			if (photosyncHandle == -1){
+				log("must create the folder");
 				megaApi.createFolder(PHOTO_SYNC, megaApi.getRootNode(), this);
-				return CREATE_PHOTO_SYNC_FOLDER;
+				cancel();
+				retryLater();
+				return START_NOT_STICKY;
 			}
-		}		
+		}
 		
+		log("TODO OK");
 		log ("photosynchandle = " + photosyncHandle);
 		
-		return SYNC_OK;
+		if (cameraObserver == null){
+			cameraObserver = new CameraObserver();
+			cameraObserver.startWatching();
+			log("observer started");
+		}
 		
+		onHandleIntent(intent);
+		
+				
+		
+//		log("onStartCommand");
+//		try { 
+//			app = (MegaApplication)getApplication(); 
+//		}
+//		catch(Exception ex) {
+//			finish();
+//			return START_NOT_STICKY;
+//		}
+//		megaApi = app.getMegaApi();
+//		
+//		int result = shouldRun();
+//		switch(result){
+//			case SYNC_OK:{
+//				folderExists(intent);
+//				break;
+//			}
+//			case CREATE_PHOTO_SYNC_FOLDER:{
+//				intentCreate = intent;
+//				return START_REDELIVER_INTENT;
+//			}
+//			default:{
+//				return result;
+//			}
+//		}
+
+		return START_REDELIVER_INTENT;		
+	}
+	
+	public void onHandleIntent(Intent intent){
+		String newFilePath = intent.getStringExtra(EXTRA_NEW_FILE_PATH);
+		if (newFilePath != null){
+			
+		}
+	}
+	
+	private void reset() {
+		log("---====  RESET  ====---");
+		totalUploaded = 0;
+		totalSizeToUpload = 0;
+		totalToUpload = 0;
+		totalSizeUploaded = 0;
 	}
 	
 	private void cancel() {
@@ -262,7 +304,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			public void run() {
 				onStartCommand(null, 0, 0);
 			}
-		}, 30 * 60 * 1000);
+		}, 15 * 1000);
 	}
 	
 	private void folderExists (Intent intent){
@@ -284,7 +326,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				return;
 			}
 			
-			String newFilePath = intent.getStringExtra("newFilePath");
+			String newFilePath = intent.getStringExtra(EXTRA_NEW_FILE_PATH);
 			if (newFilePath == null){
 				retryLater();
 				return;
@@ -420,8 +462,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		{
 			if(canceled) return;
 
-			int result = shouldRun();
-			if(result != 0) return;
+//			int result = shouldRun();
+//			if(result != 0) return;
 			
 			uploadFile(filesToUpload.poll(), targetNode);
 			synchronized(transferFinished)
@@ -732,13 +774,36 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
-		if (e.getErrorCode() == MegaError.API_OK){
-			log("Folder created");
-			folderExists(intentCreate);
+		if (request.getType() == MegaRequest.TYPE_FAST_LOGIN){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Fast login OK");
+				
+				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+				dbH.clearCredentials();
+				dbH.saveCredentials(credentials);
+				
+				megaApi.fetchNodes(this);
+			}
+			else{
+				cancel();
+				retryLater();
+			}
 		}
-		else{
-			log("Folder not created so stop service");
-			finish();
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			if (e.getErrorCode() == MegaError.API_OK){
+				cancel();
+				retryLater();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_MKDIR){		
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Folder created");
+				folderExists(intentCreate);
+			}
+			else{
+				log("Folder not created so stop service");
+				finish();
+			}
 		}
 	}
 
@@ -764,7 +829,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("observer run");
 				Intent intent = new Intent(CameraSyncService.this,
 						CameraSyncService.class);
-				intent.putExtra("newFilePath", path);
+				intent.putExtra(EXTRA_NEW_FILE_PATH, path);
 				startService(intent);
 			}
 		};
@@ -803,13 +868,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				});
 			}
 			
+			
 			if(files != null)
 			{
 				for(int i=0; i<files.length; i++)
 				{
 					File file = new File(files[i]);
 					File correctFile = new File(folder, file.getName());
-					log("observer file: " + correctFile.getAbsolutePath());
+//					log("observer file: " + correctFile.getAbsolutePath());
 					if(correctFile.isDirectory())
 					{
 						log("observer directory: " + correctFile.getAbsolutePath());
