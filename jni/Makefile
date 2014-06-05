@@ -123,6 +123,7 @@ clean: clean_mega
 	rm -rf $(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)
 	rm -rf $(OPENSSL)/$(OPENSSL)
 	rm -rf ../obj/local/armeabi/
+	rm -rf ../obj/local/x86
 
 veryclean: clean
 	rm -rf $(CRYPTOPP)/$(CRYPTOPP_SOURCE_FILE) $(CRYPTOPP_VERIFIED_SOURCES)
