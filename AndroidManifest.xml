@@ -201,6 +201,34 @@
 	            <data android:mimeType="image/*" />
 	        </intent-filter>
     	</receiver>
+    	
+        <receiver
+	        android:name="com.mega.android.receivers.NetEventReceiver"
+	        android:enabled="true" >
+	        <intent-filter>
+	           <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+	        </intent-filter>
+    	</receiver>
+    	
+        <receiver
+	        android:name="com.mega.android.receivers.ChargeEventReceiver"
+	        android:enabled="true" >
+	        <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+    	</receiver>
+    	
+        <receiver
+	        android:name="com.mega.android.receivers.BootEventReceiver"
+	        android:enabled="true" >
+	      	<intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+    	</receiver>
+        
     </application>
 
 </manifest>
