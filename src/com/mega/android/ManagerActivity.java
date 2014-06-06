@@ -123,6 +123,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
+	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
@@ -694,8 +695,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 					intent.setAction(null);
 					setIntent(null);
     			}
-    			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
-    				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD");
+    			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+    				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
 					String title = null;
 					String text = null;
@@ -705,11 +706,17 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 						title = getString(R.string.upload_uploading);
 						text = getString(R.string.upload_cancel_uploading);
 					} 
-					else{
+					else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
 						tempIntent = new Intent(this, DownloadService.class);
 						tempIntent.setAction(DownloadService.ACTION_CANCEL);
 						title = getString(R.string.download_downloading);
 						text = getString(R.string.download_cancel_downloading);
+					}
+					else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+						tempIntent = new Intent(this, CameraSyncService.class);
+						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+						title = getString(R.string.cam_sync_syncing);
+						text = getString(R.string.cam_sync_cancel_sync);
 					}
 					
 					final Intent cancelIntent = tempIntent;

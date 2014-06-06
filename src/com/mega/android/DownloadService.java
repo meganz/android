@@ -503,6 +503,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("Download finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if (canceled) {
+			if((lock != null) && (lock.isHeld()))
+				try{ lock.release(); } catch(Exception ex) {}
+			if((wl != null) && (wl.isHeld()))
+				try{ wl.release(); } catch(Exception ex) {}
+			
 			log("Download cancelled: " + transfer.getFileName());
 			File file = new File(transfer.getPath());
 			file.delete();

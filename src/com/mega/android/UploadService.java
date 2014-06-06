@@ -211,7 +211,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			uploadFolderTask = new UploadFolderTask(file, parentHandle, this);
 			uploadFolderTask.start();
 		} 
-		else {			
+		else {
+			if(!wl.isHeld()){ 
+				wl.acquire();
+			}
+			if(!lock.isHeld()){
+				lock.acquire();
+			}
 			megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
 		}
 	}
