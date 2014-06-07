@@ -75,6 +75,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private long totalSizeUploaded;
 	private int successCount;
 	private ConcurrentLinkedQueue<File> filesToUpload = new ConcurrentLinkedQueue<File>();
+	private ConcurrentLinkedQueue<File> filesUploaded = new ConcurrentLinkedQueue<File>();
 	
 	Object transferFinished = new Object();
 	
@@ -98,6 +99,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	public void onCreate(){
 		super.onCreate();
 		log("onCreate CamSync");
+		reset();
 		
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -286,9 +288,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	public void onHandleIntent(Intent intent){
 		
-		if (filesToUpload.size() == 0){
-			reset();
-		}
+//		if (filesToUpload.size() == 0){
+//			reset();
+//		}
 		
 		String newFilePath = null;
 		if (intent != null){
@@ -351,10 +353,20 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 					}
 					
+					it = filesUploaded.iterator();
+					boolean fileAlreadyUploaded = false;
+					while (it.hasNext()){
+						File f = it.next();
+						if (f.getAbsolutePath().compareTo(file.getAbsolutePath()) == 0){
+							fileAlreadyUploaded = true;
+							break;
+						}
+					}
+					
 					//If the file is ready to upload already
-					if (!fileAlreadyToUpload){
-						totalToUpload++;
-						totalSizeToUpload += file.length();
+					if (!fileAlreadyToUpload && !fileAlreadyUploaded){
+//						totalToUpload++;
+//						totalSizeToUpload += file.length();
 						filesToUpload.add(file);	
 						
 					}
@@ -367,6 +379,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		while (filesToUpload.size() > 0){
 			File f = filesToUpload.poll();
+			filesUploaded.add(f);
 			log("Ficheros subidos: " + f.getAbsolutePath());
 			if(!wl.isHeld()){ 
 				wl.acquire();
@@ -374,6 +387,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			if(!lock.isHeld()){
 				lock.acquire();
 			}
+			totalToUpload++;
+			totalSizeToUpload += f.length();
+			log("startUpload called");
 			megaApi.startUpload(f.getAbsolutePath(), megaApi.getNodeByHandle(photosyncHandle), this);
 		}
 		
@@ -1150,5 +1166,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		stopForeground(true);
 		stopSelf();
 				
+	}
+	
+	@Override
+	public void onTaskRemoved (Intent rootIntent){
+		log("onTaskRemoved -> retryLater");
+		retryLater();
 	}
 }
