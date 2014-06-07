@@ -2561,7 +2561,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	
 	private void clearRubbishBin(){
 		if (rbF != null){
-			NodeList rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode());
+			NodeList rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 			
 			ProgressDialog temp = null;
 			try{

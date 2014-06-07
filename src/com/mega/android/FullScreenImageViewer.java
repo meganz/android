@@ -106,6 +106,8 @@ public class FullScreenImageViewer extends Activity implements OnPageChangeListe
 	
 	private AlertDialog renameDialog;
 	
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -131,6 +133,7 @@ public class FullScreenImageViewer extends Activity implements OnPageChangeListe
 		
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
+		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
 		
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
@@ -227,7 +230,7 @@ public class FullScreenImageViewer extends Activity implements OnPageChangeListe
 				parentNode = megaApi.getNodeByHandle(parentNodeHandle);
 			}
 			
-			NodeList nodes = megaApi.getChildren(parentNode);
+			NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
@@ -1038,7 +1041,7 @@ public void moveToTrash(){
 			return;
 		
 		folder.mkdir();
-		NodeList nodeList = megaApi.getChildren(parent);
+		NodeList nodeList = megaApi.getChildren(parent, orderGetChildren);
 		for(int i=0; i<nodeList.size(); i++){
 			MegaNode document = nodeList.get(i);
 			if (document.getType() == MegaNode.TYPE_FOLDER) {
