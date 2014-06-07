@@ -393,6 +393,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						else{
 							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 						}
+						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 					}
 					else{
@@ -681,6 +682,16 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
+		if (isList){
+			if (adapterList != null){
+				adapterList.setOrder(orderGetChildren);
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.setOrder(orderGetChildren);
+			}
+		}
 	}
 	
 	private static void log(String log) {

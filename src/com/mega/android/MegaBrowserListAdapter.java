@@ -3,6 +3,7 @@ package com.mega.android;
 import java.util.ArrayList;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.ShareList;
@@ -48,6 +49,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	boolean multipleSelect;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
+	
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	/*public static view holder class*/
     public class ViewHolderBrowserList {
@@ -599,6 +602,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();
 		}
+	}
+	
+	public void setOrder(int orderGetChildren){
+		this.orderGetChildren = orderGetChildren;
 	}
 	
 	private static void log(String log) {

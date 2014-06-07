@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.ShareList;
@@ -58,6 +59,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	ActionBar aB;
 	
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
+	
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	public MegaBrowserGridAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
@@ -927,6 +930,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 							else{
 								intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
 							}
+							intent.putExtra("orderGetChildren", orderGetChildren);
 						}
 						else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 							intent.putExtra("adapterType", ManagerActivity.RUBBISH_BIN_ADAPTER);
@@ -936,6 +940,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 							else{
 								intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
 							}
+							intent.putExtra("orderGetChildren", orderGetChildren);
 						}
 						else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
 							intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
@@ -1230,6 +1235,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
 			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 		}
+	}
+	
+	public void setOrder(int orderGetChildren){
+		this.orderGetChildren = orderGetChildren;
 	}
 	
 	private static void log(String log) {
