@@ -1122,6 +1122,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_grid_option_properties1:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				MegaNode n = (MegaNode) getItem(currentPosition);
+				i.putExtra("handle", n.getHandle());
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.mime_folder);
 				}
@@ -1137,6 +1138,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_grid_option_properties2:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
+				i.putExtra("handle", n.getHandle());
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.mime_folder);
 				}
