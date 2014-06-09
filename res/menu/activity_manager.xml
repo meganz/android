@@ -76,6 +76,14 @@
 	    MEGA:showAsAction="never" />
 	
 	<item
+	    android:id="@+id/action_menu_settings"
+	    android:orderInCategory="130"
+	    android:showAsAction="never"
+	    android:title="@string/action_settings"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+	<item
 	    android:id="@+id/action_menu_logout"
 	    android:orderInCategory="135"
 	    android:showAsAction="never"

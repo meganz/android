@@ -148,6 +148,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
 	private MenuItem upgradeAccountMenuItem;
+	private MenuItem settingsMenuItem;
 	private MenuItem logoutMenuItem;
 	
 	private static DrawerItem drawerItem;
@@ -871,6 +872,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
@@ -910,6 +912,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
@@ -959,6 +962,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1009,6 +1013,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1041,6 +1046,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1074,6 +1080,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			if (downloadPlay){
@@ -1146,6 +1153,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1274,6 +1282,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 		sortByMenuItem = menu.findItem(R.id.action_menu_sort_by);
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
+		settingsMenuItem = menu.findItem(R.id.action_menu_settings);
 		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		
 		if (fbF != null){
@@ -1285,6 +1294,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);   			
     			
     			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
@@ -1304,6 +1314,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
     			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
@@ -1323,6 +1334,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
     			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
@@ -1342,6 +1354,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1362,6 +1375,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(false);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1382,6 +1396,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
     			if (downloadPlay){
@@ -1413,6 +1428,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			sortByMenuItem.setVisible(false);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1552,6 +1568,11 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 	        	Intent intent = new Intent(managerActivity, UpgradeActivity.class);
 				startActivity(intent);
 				return true;
+	        }
+	        case R.id.action_menu_settings:{
+	        	Intent intent = new Intent(this, PreferencesActivity.class);
+				startActivity(intent);
+	        	return true;
 	        }
 	        case R.id.action_menu_logout:{
 	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi);
