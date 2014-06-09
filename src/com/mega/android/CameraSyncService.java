@@ -40,6 +40,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 	public static String PHOTO_SYNC = "PhotoSync";
 	public static String ACTION_CANCEL = "CANCEL_SYNC";
+	public static String ACTION_STOP = "STOP_SYNC";
 	public final static int SYNC_OK = 0;
 	public final static int CREATE_PHOTO_SYNC_FOLDER = 1;
 	
@@ -134,6 +135,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 					dbH.setCamSyncEnabled(false);
 					return START_NOT_STICKY;
+				}
+				else if (intent.getAction().equals(ACTION_STOP)){
+					if (megaApi != null){
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						dbH.setCamSyncEnabled(false);
+						return START_NOT_STICKY;
+					}
+					else{
+						cancel();
+						return START_NOT_STICKY;
+					}
 				}
 			}
 		}
@@ -282,7 +294,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //				return result;
 //			}
 //		}
-
+		
 		return START_REDELIVER_INTENT;		
 	}
 	
@@ -774,6 +786,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	public void onDestroy(){
 		log("onDestroy");
+		running = false;
+		retryLater();
 		super.onDestroy();
 	}
 	
@@ -834,25 +848,25 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 				dbH.clearCredentials();
 				dbH.saveCredentials(credentials);
-				
+
 				megaApi.fetchNodes(this);
 			}
 			else{
-				cancel();
 				retryLater();
+				cancel();				
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
-				cancel();
 				retryLater();
+				finish();				
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MKDIR){		
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Folder created");
-				cancel();
 				retryLater();
+				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
