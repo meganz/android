@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+     <PreferenceCategory 
+        android:key="settings_pin_lock"
+        android:title="@string/settings_pin_lock">
+        
+         <Preference
+	        android:key="settings_pin_lock_enable"
+	        android:title="@string/settings_pin_lock_on" />
+		
+		<Preference
+	        android:key="settings_pin_lock_code"
+	        android:title="@string/settings_pin_lock_code" />
+    </PreferenceCategory>
+    
+    <PreferenceCategory 
+        android:key="settings_camera_upload"
+        android:title="@string/settings_camera_upload">
+        
+		<Preference
+	        android:key="settings_camera_upload_on"
+	        android:title="@string/settings_camera_upload_on" />
+		
+		<Preference
+	        android:key="settings_camera_upload_how_to_upload"
+	        android:title="@string/settings_camera_upload_how_to_upload" />
+		
+		<Preference
+	        android:key="settings_camera_upload_what_to_upload"
+	        android:title="@string/settings_camera_upload_what_to_upload" />
+		
+		<Preference
+	        android:key="settings_camera_upload_folder"
+	        android:title="@string/settings_camera_upload_folder" />
+	</PreferenceCategory>
+	
+    <PreferenceCategory 
+        android:key="settings_storage"
+        android:title="@string/settings_storage">
+		
+        <CheckBoxPreference
+            android:key="settings_storage_ask_me_always"
+        	android:title="@string/settings_storage_ask_me_always" />
+        
+		<Preference
+	        android:key="settings_storage_download_location"
+	        android:title="@string/settings_storage_download_location" />
+	</PreferenceCategory>
+</PreferenceScreen>

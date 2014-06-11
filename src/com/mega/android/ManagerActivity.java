@@ -1570,8 +1570,12 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
-	        	Intent intent = new Intent(this, PreferencesActivity.class);
-				startActivity(intent);
+//				if (Build.VERSION.SDK_INT<Build.VERSION_CODES.HONEYCOMB) {
+				    startActivity(new Intent(this, SettingsActivity.class));
+//				}
+//				else {
+//					startActivity(new Intent(this, SettingsActivityHC.class));
+//				}
 	        	return true;
 	        }
 	        case R.id.action_menu_logout:{

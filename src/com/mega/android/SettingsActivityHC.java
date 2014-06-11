@@ -1,14 +1,19 @@
 package com.mega.android;
 
+
+import java.util.List;
+
 import com.mega.sdk.MegaApiAndroid;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 
-public class PreferencesActivity extends PreferenceActivity {
-
+@SuppressLint("NewApi")
+public class SettingsActivityHC extends Activity {
+	
 	private MegaApiAndroid megaApi;
-	static PreferencesActivity preferencesActivity;
+	static SettingsActivityHC preferencesActivity;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,6 +32,6 @@ public class PreferencesActivity extends PreferenceActivity {
 		
 		Preferences prefs = dbH.getPreferences();
 		
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
 	}
-	
 }
