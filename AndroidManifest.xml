@@ -177,7 +177,12 @@
         </activity>
         
         <activity
-            android:name="PreferencesActivity"
+            android:name="SettingsActivity"
+            android:label="@string/action_settings" >
+        </activity>
+        
+        <activity
+            android:name="SettingsActivityHC"
             android:label="@string/action_settings" >
         </activity>
         
