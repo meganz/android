@@ -93,6 +93,9 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	
 	private List<ShareInfo> filePreparedInfos;
 	
+	DatabaseHandler dbH = null;
+	Preferences prefs = null;
+	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -682,16 +685,45 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	}
 	
 	public void onFileClick(ArrayList<Long> handleList){
+		
+		long size = 0;
 		long[] hashes = new long[handleList.size()];
 		for (int i=0;i<handleList.size();i++){
 			hashes[i] = handleList.get(i);
+			size += megaApi.getNodeByHandle(hashes[i]).getSize();
 		}
 		
-		Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-		intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-		intent.setClass(this, FileStorageActivity.class);
-		intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+		if (dbH == null){
+			dbH = new DatabaseHandler(getApplicationContext());
+		}
+		
+		boolean askMe = true;
+		String downloadLocationDefaultPath = "";
+		prefs = dbH.getPreferences();		
+		if (prefs != null){
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							askMe = false;
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}		
+			
+		if (askMe){
+			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+			intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
+			intent.setClass(this, FileStorageActivity.class);
+			intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
+			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+		}
+		else{
+			downloadTo(downloadLocationDefaultPath, null, size, hashes);
+		}
 	}
 	
 	public void showCopy(ArrayList<Long> handleList){
@@ -768,88 +800,13 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			double availableFreeSpace = Double.MAX_VALUE;
-			try{
-				StatFs stat = new StatFs(parentPath);
-				availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
-			}
-			catch(Exception ex){}
-			
 			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
+			log("URL: " + url + "___SIZE: " + size);
+
 			
-			if(hashes.length == 1){
-				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
-				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
-					if(localPath != null){	
-						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
-						}
-						catch(Exception e) {}
-						
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-						if (isIntentAvailable(this, viewIntent))
-							startActivity(viewIntent);
-						else{
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, intentShare))
-								startActivity(intentShare);
-							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-						}								
-						return;
-					}
-				}
-			}
-			
-			for (long hash : hashes) {
-				MegaNode node = megaApi.getNodeByHandle(hash);
-				if(node != null){
-					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
-						dlFiles.put(node, parentPath);
-					}
-					
-					for (MegaNode document : dlFiles.keySet()) {
-						
-						String path = dlFiles.get(document);
-						
-						if(availableFreeSpace <document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-							continue;
-						}
-						
-						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
-						startService(service);
-					}
-				}
-				else if(url != null) {
-					if(availableFreeSpace < size) {
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-						continue;
-					}
-					
-					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, hash);
-					service.putExtra(DownloadService.EXTRA_URL, url);
-					service.putExtra(DownloadService.EXTRA_SIZE, size);
-					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-					startService(service);
-				}
-				else {
-					log("node not found");
-				}
-			}
+			downloadTo (parentPath, url, size, hashes);
 			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
@@ -993,5 +950,104 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+		double availableFreeSpace = Double.MAX_VALUE;
+		try{
+			StatFs stat = new StatFs(parentPath);
+			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+		}
+		catch(Exception ex){}
+		
+		
+		if (hashes == null){
+			if(url != null) {
+				if(availableFreeSpace < size) {
+					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+					return;
+				}
+				
+				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_URL, url);
+				service.putExtra(DownloadService.EXTRA_SIZE, size);
+				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+				startService(service);
+			}
+		}
+		else{
+			if(hashes.length == 1){
+				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
+				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+					log("ISFILE");
+					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					if(localPath != null){	
+						try { 
+							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
+						}
+						catch(Exception e) {}
+						
+						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+						if (isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else{
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							if (isIntentAvailable(this, intentShare))
+								startActivity(intentShare);
+							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+						}								
+						return;
+					}
+				}
+			}
+			
+			for (long hash : hashes) {
+				MegaNode node = megaApi.getNodeByHandle(hash);
+				if(node != null){
+					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+					if (node.getType() == MegaNode.TYPE_FOLDER) {
+						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+					} else {
+						dlFiles.put(node, parentPath);
+					}
+					
+					for (MegaNode document : dlFiles.keySet()) {
+						
+						String path = dlFiles.get(document);
+						
+						if(availableFreeSpace < document.getSize()){
+							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							continue;
+						}
+						
+						Intent service = new Intent(this, DownloadService.class);
+						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+						service.putExtra(DownloadService.EXTRA_URL, url);
+						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+						service.putExtra(DownloadService.EXTRA_PATH, path);
+						startService(service);
+					}
+				}
+				else if(url != null) {
+					if(availableFreeSpace < size) {
+						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+						continue;
+					}
+					
+					Intent service = new Intent(this, DownloadService.class);
+					service.putExtra(DownloadService.EXTRA_HASH, hash);
+					service.putExtra(DownloadService.EXTRA_URL, url);
+					service.putExtra(DownloadService.EXTRA_SIZE, size);
+					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+					startService(service);
+				}
+				else {
+					log("node not found");
+				}
+			}
+		}
 	}
 }
