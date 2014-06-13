@@ -294,6 +294,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ASK_ME_ALWAYS) == 0){
+			askMe = storageAskMeAlways.isChecked();
+			dbH.setStorageAskAlways(askMe);
 			if (storageAskMeAlways.isChecked()){
 				downloadLocation.setEnabled(false);
 			}
@@ -316,7 +318,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK && intent != null) {
 			String path = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			Toast.makeText(this, "Download to: " + path, Toast.LENGTH_LONG).show();
+			dbH.setStorageDownloadLocation(path);
 			downloadLocation.setSummary(path);
 		}
 		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == RESULT_OK && intent != null){

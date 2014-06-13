@@ -39,6 +39,9 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 	private ProgressDialog progress;	
 	
 	Activity context = null;
+	
+	DatabaseHandler dbH = null;
+	Preferences prefs = null;
 
 	public ImportDialog() {
 		
@@ -90,20 +93,42 @@ public class ImportDialog extends DialogFragment implements MegaRequestListenerI
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-//				try { 
-//					progress.dismiss(); 
-//				} catch(Exception ex) {};
-				
 				Activity activity = getActivity();
 				long[] hashes = new long[1];
 				hashes[0]=document.getHandle();
-				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.setClass(activity, FileStorageActivity.class);
-//				intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
-				intent.putExtra(FileStorageActivity.EXTRA_URL, url);
-				intent.putExtra(FileStorageActivity.EXTRA_SIZE, document.getSize());
-				activity.startActivityForResult(intent, ManagerActivity.REQUEST_CODE_SELECT_LOCAL_FOLDER);
+				long size = document.getSize();
+				
+				if (dbH == null){
+					dbH = new DatabaseHandler(activity);
+				}
+				
+				boolean askMe = true;
+				String downloadLocationDefaultPath = "";
+				prefs = dbH.getPreferences();		
+				if (prefs != null){
+					if (prefs.getStorageAskAlways() != null){
+						if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+							if (prefs.getStorageDownloadLocation() != null){
+								if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+									askMe = false;
+									downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+								}
+							}
+						}
+					}
+				}
+				
+				if (askMe){
+					Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+					intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+					intent.setClass(activity, FileStorageActivity.class);
+					intent.putExtra(FileStorageActivity.EXTRA_URL, url);
+					intent.putExtra(FileStorageActivity.EXTRA_SIZE, document.getSize());
+					activity.startActivityForResult(intent, ManagerActivity.REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+				}
+				else{
+					((ManagerActivity)activity).downloadTo(downloadLocationDefaultPath, url, size, hashes);
+				}
 			}
 		});
 		
