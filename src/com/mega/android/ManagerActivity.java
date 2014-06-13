@@ -862,6 +862,7 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     				dbH.setFirstTime(false);
     				dbH.setStorageAskAlways(true);
     				dbH.setPinLockEnabled(false);
+    				dbH.setPinLockCode("");
     				firstTime = false;
     			}
     			

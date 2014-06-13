@@ -5,13 +5,13 @@ import com.mega.sdk.MegaApiAndroid;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
-import android.widget.Toast;
 
 public class SettingsActivity extends PreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
 
@@ -47,7 +47,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	
 	
 	Preference pinLockEnable;
-	Preference pinLockCode;
+	EditTextPreference pinLockCode;
 	Preference downloadLocation;
 	Preference cameraUploadOn;
 	ListPreference cameraUploadHow;
@@ -67,6 +67,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	String camSyncLocalPath = "";
 	String fileUpload = "";
 	String downloadLocationPath = "";
+	String ast = "";
+	String pinLockCodeTxt = "";
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -95,7 +97,9 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		pinLockEnable = findPreference(KEY_PIN_LOCK_ENABLE);
 		pinLockEnable.setOnPreferenceClickListener(this);
 		
-		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
+		pinLockCode = (EditTextPreference) findPreference(KEY_PIN_LOCK_CODE);
+		pinLockCode.setOnPreferenceChangeListener(this);
+		pinLockCode.setOnPreferenceClickListener(this);
 		
 		downloadLocation = findPreference(KEY_STORAGE_DOWNLOAD_LOCATION);
 		downloadLocation.setOnPreferenceClickListener(this);
@@ -120,6 +124,8 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			dbH.setFirstTime(false);
 			dbH.setCamSyncEnabled(false);
 			dbH.setPinLockEnabled(false);
+			dbH.setPinLockCode("");
+			pinLockCode.setText("");
 			cameraUpload = false;
 			pinLock = false;
 			askMe = true;
@@ -173,10 +179,18 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			
 			if (prefs.getPinLockEnabled() == null){
 				dbH.setPinLockEnabled(false);
+				dbH.setPinLockCode("");
+				pinLockCode.setText("");
 				pinLock = false;
 			}
 			else{
 				pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
+				pinLockCodeTxt = prefs.getPinLockCode();
+				if (pinLockCodeTxt == null){
+					pinLockCodeTxt = "";
+					dbH.setPinLockCode(pinLockCodeTxt);
+					pinLockCode.setText(pinLockCodeTxt);
+				}
 			}
 			
 			if (prefs.getStorageAskAlways() == null){
@@ -218,6 +232,16 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		
 		if (pinLock){
 			pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
+			ast = "";
+			if (pinLockCodeTxt.compareTo("") == 0){
+				ast = getString(R.string.settings_pin_lock_code_not_set);
+			}
+			else{
+				for (int i=0;i<pinLockCodeTxt.length();i++){
+					ast = ast + "*";
+				}
+			}
+			pinLockCode.setSummary(ast);
 			pinLockCategory.addPreference(pinLockCode);
 		}
 		else{
@@ -239,6 +263,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
+		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
 			Intent intent = new Intent(SettingsActivity.this, FileStorageActivity.class);
 			intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
@@ -285,10 +310,30 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
 			pinLock = !pinLock;
 			if (pinLock){
+				pinLockCodeTxt = prefs.getPinLockCode();
+				if (pinLockCodeTxt == null){
+					pinLockCodeTxt = "";
+					dbH.setPinLockCode(pinLockCodeTxt);
+					pinLockCode.setText(pinLockCodeTxt);
+				}
 				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
+				ast = "";
+				if (pinLockCodeTxt.compareTo("") == 0){
+					ast = getString(R.string.settings_pin_lock_code_not_set);
+				}
+				else{
+					for (int i=0;i<pinLockCodeTxt.length();i++){
+						ast = ast + "*";
+					}
+				}
+				pinLockCode.setSummary(ast);
 				pinLockCategory.addPreference(pinLockCode);
+				dbH.setPinLockEnabled(true);
 			}
 			else{
+				dbH.setPinLockEnabled(false);
+				dbH.setPinLockCode("");
+				pinLockCode.setText("");
 				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_on));
 				pinLockCategory.removePreference(pinLockCode);
 			}
@@ -316,6 +361,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		prefs = dbH.getPreferences();
 		if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == RESULT_OK && intent != null) {
 			String path = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			dbH.setStorageDownloadLocation(path);
@@ -341,6 +387,7 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 
 	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
+		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_HOW_TO) == 0){
 			switch (Integer.parseInt((String)newValue)){
 				case CAMERA_UPLOAD_WIFI:{
@@ -388,7 +435,26 @@ public class SettingsActivity extends PreferenceActivity implements OnPreference
 			startService(photosVideosIntent);
 			
 			startService(new Intent(getApplicationContext(), CameraSyncService.class));
-		}		
+		}
+		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
+			pinLockCodeTxt = (String) newValue;
+			dbH.setPinLockCode(pinLockCodeTxt);
+			pinLockCode.setText(pinLockCodeTxt);
+			
+			ast = "";
+			if (pinLockCodeTxt.compareTo("") == 0){
+				ast = getString(R.string.settings_pin_lock_code_not_set);
+			}
+			else{
+				for (int i=0;i<pinLockCodeTxt.length();i++){
+					ast = ast + "*";
+				}
+			}
+			pinLockCode.setSummary(ast);
+			
+			pinLockCode.setSummary(ast);
+			log("Object: " + newValue);
+		}
 		
 		return true;
 	}
