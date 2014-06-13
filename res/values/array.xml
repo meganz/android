@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string-array name="settings_camera_upload_how_to_values">
+		<item>1001</item>
+		<item>1002</item>
+	</string-array>
+	
+	<string-array name="settings_camera_upload_file_upload_values">
+		<item>1001</item>
+		<item>1002</item>
+		<item>1003</item>
+	</string-array>
+</resources>

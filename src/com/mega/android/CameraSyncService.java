@@ -41,6 +41,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	public static String PHOTO_SYNC = "PhotoSync";
 	public static String ACTION_CANCEL = "CANCEL_SYNC";
 	public static String ACTION_STOP = "STOP_SYNC";
+	public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER ="PHOTOS_VIDEOS_NEW_FOLDER";
 	public final static int SYNC_OK = 0;
 	public final static int CREATE_PHOTO_SYNC_FOLDER = 1;
 	
@@ -95,6 +96,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	private int lastError = 0;
 	
+	Preferences prefs;
+	
+	boolean newFileList = false;
+	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -122,19 +127,35 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		handler = new Handler();
 		canceled = false;
+		newFileList = false;
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
 		
+		try{
+			app = (MegaApplication) getApplication();
+		}
+		catch(Exception ex){
+			finish();
+			return START_NOT_STICKY;
+		}
+		megaApi = app.getMegaApi();
+		
 		if (intent != null){
 			if (intent.getAction() != null){
 				if (intent.getAction().equals(ACTION_CANCEL)){
 					log("Cancel intent");
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-					dbH.setCamSyncEnabled(false);
-					return START_NOT_STICKY;
+					if (megaApi != null){
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						dbH.setCamSyncEnabled(false);
+						return START_NOT_STICKY;
+					}
+					else{
+						cancel();
+						return START_NOT_STICKY;
+					}
 				}
 				else if (intent.getAction().equals(ACTION_STOP)){
 					if (megaApi != null){
@@ -147,17 +168,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						return START_NOT_STICKY;
 					}
 				}
+				else if (intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER)){
+					log("List photos and videos");
+					if (megaApi != null){
+						newFileList = true;
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						return START_NOT_STICKY;
+					}
+					else{
+						cancel();
+						return START_NOT_STICKY;
+					}
+				}
 			}
 		}
 		
-		try{
-			app = (MegaApplication) getApplication();
-		}
-		catch(Exception ex){
-			finish();
+		if (newFileList){
 			return START_NOT_STICKY;
 		}
-		megaApi = app.getMegaApi();
 		
 		if (megaApi == null){
 			finish();
@@ -183,14 +211,19 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
-		Preferences prefs = dbH.getPreferences();
+		prefs = dbH.getPreferences();
 		if (prefs == null){
+			dbH.setFirstTime(false);
+			dbH.setStorageAskAlways(true);
+			dbH.setCamSyncEnabled(false);
+			dbH.setPinLockEnabled(false);
 			log("Not defined, so not enabled");
 			finish();
 			return START_NOT_STICKY;
 		}
 		else{
 			if (prefs.getCamSyncEnabled() == null){
+				dbH.setCamSyncEnabled(false);
 				log("Not defined, so not enabled");
 				finish();
 				return START_NOT_STICKY;
@@ -210,7 +243,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 					
 					boolean isWifi = Util.isOnWifi(this);
-					if (prefs.getWifi() == null || Boolean.parseBoolean(prefs.getWifi())){
+					if (prefs.getCamSyncWifi() == null || Boolean.parseBoolean(prefs.getCamSyncWifi())){
 						if (!isWifi){
 							log("no wifi...");
 							cancel();
@@ -336,7 +369,27 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		else{
 			log("newFilePath == null");
 			List<String> cameraFiles = new ArrayList<String>();
-			cameraFiles.addAll(getCameraPhotosAll());
+			if (prefs.getCamSyncFileUpload() == null){
+				dbH.setCamSyncFileUpload(Preferences.ONLY_PHOTOS);
+				cameraFiles.addAll(getCameraPhotosAll());
+			}
+			else{
+				switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
+					case Preferences.ONLY_PHOTOS:{
+						cameraFiles.addAll(getCameraPhotosAll());
+						break;
+					}
+					case Preferences.ONLY_VIDEOS:{
+						cameraFiles.addAll(getCameraVideosAll());
+						break;
+					}
+					case Preferences.PHOTOS_AND_VIDEOS:{
+						cameraFiles.addAll(getCameraPhotosAll());
+						cameraFiles.addAll(getCameraVideosAll());
+						break;
+					}
+				}
+			}
 			
 			MegaNode targetNode = megaApi.getNodeByHandle(photosyncHandle);
 			if(targetNode == null){
@@ -377,8 +430,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					
 					//If the file is ready to upload already
 					if (!fileAlreadyToUpload && !fileAlreadyUploaded){
-//						totalToUpload++;
-//						totalSizeToUpload += file.length();
 						filesToUpload.add(file);	
 						
 					}
@@ -406,14 +457,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		log ("filestoupload.size() = " + filesToUpload.size());
-		
-//		Iterator<File> it = filesToUpload.iterator();
-//		while (it.hasNext()){
-//			File f = it.next();
-//			log("Ficheros a subir: " + f.getAbsolutePath());
-//			
-//			
-//		}
+
 	}
 	
 	private void reset() {
@@ -423,6 +467,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		totalToUpload = 0;
 		totalSizeUploaded = 0;
 		successCount = 0;
+		filesToUpload.clear();
+		filesUploaded.clear();
 	}
 	
 	private void cancel() {
@@ -441,95 +487,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 		}, 15 * 1000);
 	}
-	
-//	private void folderExists (Intent intent){
-//		
-//		if (cameraObserver == null){
-//			cameraObserver = new CameraObserver();
-//			cameraObserver.startWatching();
-//			log("observer started");
-//		}
-//		
-//		if(!running){
-//			running = true;
-//			startUpload();
-//		}
-//		else{
-//			
-//			if (intent == null){
-//				retryLater();
-//				return;
-//			}
-//			
-//			String newFilePath = intent.getStringExtra(EXTRA_NEW_FILE_PATH);
-//			if (newFilePath == null){
-//				retryLater();
-//				return;
-//			}
-//			
-//			File file = new File (newFilePath);
-//			
-//			if (megaApi.getRootNode() != null){
-//				MegaNode targetNode = megaApi.getNodeByHandle(photosyncHandle);
-//				if (targetNode == null){
-//					return;
-//				}
-//				
-//				MegaNode nodeExists = megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + file.getName());
-//				if (nodeExists == null){
-//					totalToUpload++;
-//					totalSizeToUpload += file.length();
-//					filesToUpload.add(file);
-//				}
-//				
-//			}
-//		}		
-//	}
-	
-//	private void startUpload() {
-//		log("startUpload");
-//
-//		task = new Thread()
-//		{
-//			@Override
-//			public void run()
-//			{
-//				uploadFiles();
-//				onUploadFinish();
-//			}
-//		};
-//		task.start();		
-//	}
-	
-//	private void onUploadFinish() {
-//		handler.removeCallbacksAndMessages(null);
-//		handler.post(new Runnable() 
-//		{
-//			public void run()
-//			{		
-//				log("totalUploaded " + totalUploaded);
-//		
-//				if (isForeground) {
-//					isForeground = false;
-//					stopForeground(true);
-//				}
-//		
-//				if (totalUploaded > 0) {
-//					showCompleteSuccessNotification();
-//					totalUploaded = 0;
-//				}
-//		
-//				if (canceled) {
-//					finish();
-//				}
-//				canceled = false;
-//				reset();
-//				task = null;
-//				filesToUpload.clear();
-//				running = false;
-//			}
-//		});
-//	}
 	
 	@SuppressLint("DefaultLocale")
 	private void showCompleteSuccessNotification() {
@@ -554,147 +511,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
-	
-//	private void uploadFiles() {
-//		if (canceled) {
-//			log("upload canceled");
-//			return;
-//		}
-//		
-//		List<String> cameraFiles = new ArrayList<String>();
-//		cameraFiles.addAll(getCameraPhotosAll());
-////		cameraFiles.addAll(getCameraVideosAll());
-//		
-//		reset();
-//		
-//		if(megaApi.getRootNode() == null){
-//			return;
-//		}
-//		
-//		MegaNode targetNode = megaApi.getNodeByHandle(photosyncHandle);
-//		if(targetNode == null){
-//			showSyncError(R.string.settings_camera_notif_error_no_folder);
-//			finish();
-//			return;
-//		}
-//		
-//		for (String filePath : cameraFiles) {
-//			File file = new File(filePath);
-//			if(!file.exists()) continue;
-//		
-//			
-//			MegaNode nodeExists = megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + file.getName());
-//			if (nodeExists == null){
-//				totalSizeToUpload += file.length();
-//				filesToUpload.add(file);
-//			}
-//		}
-//		
-//		totalToUpload = filesToUpload.size();
-//		if(totalToUpload == 0) return;
-//		
-//		while(filesToUpload.size() != 0)		
-//		{
-//			if(canceled) return;
-//
-////			int result = shouldRun();
-////			if(result != 0) return;
-//			
-//			uploadFile(filesToUpload.poll(), targetNode);
-//			synchronized(transferFinished)
-//			{
-//				try {
-//					transferFinished.wait();
-//				} catch (InterruptedException e) {}
-//			}
-//		}
-//	}
-	
-//	private void uploadFile(final File file, MegaNode target) {
-//
-//		updateProgressNotification(totalSizeUploaded);
-//		
-//		ShareInfo info = ShareInfo.infoFromFile(file);
-//		if (info == null) {
-//			synchronized(transferFinished)
-//			{ transferFinished.notify(); }
-//			return;
-//		}
-//		
-//		listener = new MegaTransferListenerInterface() {
-//
-//			@Override
-//			public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-//				log("onTransferStart: " + transfer.getFileName());
-//			}
-//
-//			@Override
-//			public void onTransferFinish(MegaApiJava api,
-//					MegaTransfer transfer, MegaError e) {
-//				if((lock != null) && (lock.isHeld()))
-//					try{ lock.release(); } catch(Exception ex) {}
-//				if((wl != null) && (wl.isHeld()))
-//					try{ wl.release(); } catch(Exception ex) {}
-//				
-//				if (canceled) {
-//					handler.removeCallbacksAndMessages(null);
-//					if (e.getErrorCode() == MegaError.API_OK) 
-//					{
-//						totalSizeToUpload -= file.length();
-//						totalSizeUploaded += file.length();
-//						totalUploaded++;
-//						totalToUpload--;
-//					}
-//					synchronized(transferFinished)
-//					{ transferFinished.notify(); }
-//					return;
-//				}
-//				
-//				
-//				if (e.getErrorCode() == MegaError.API_OK) {
-//					totalSizeToUpload -= file.length();
-//					totalSizeUploaded += file.length();
-//					totalUploaded++;
-//					totalToUpload--;
-//					log("PROGRESS " + totalUploaded + " - " + totalToUpload);
-//					
-//					updateProgressNotification(totalSizeUploaded);
-//				}
-//				synchronized(transferFinished)
-//				{ transferFinished.notify(); }
-//			}
-//
-//			@Override
-//			public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//				if (canceled) {
-//					if((lock != null) && (lock.isHeld()))
-//						try{ lock.release(); } catch(Exception ex) {}
-//					if((wl != null) && (wl.isHeld()))
-//						try{ wl.release(); } catch(Exception ex) {}
-//					
-//					megaApi.cancelTransfer(transfer);
-//					synchronized(transferFinished)
-//					{ transferFinished.notify(); }
-//					return;
-//				}
-//				
-//				final long position = transfer.getTransferredBytes();
-//				updateProgressNotification(totalSizeUploaded + position);
-//				return;
-//			}
-//
-//			@Override
-//			public void onTransferTemporaryError(MegaApiJava api,
-//					MegaTransfer transfer, MegaError e) {
-//				log("onTransferTemporaryError: " + transfer.getFileName());				
-//			}
-//		};
-//		
-//
-//		wl.acquire();
-//		lock.acquire();
-//		megaApi.startUpload(file.getAbsolutePath(), target, listener);
-//	}
 	
 	private List<String> getCameraPhotosAll() {
 		List<String> photos = new ArrayList<String>();
@@ -880,7 +696,19 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			log("pause_transfer false received");
 			if (e.getErrorCode() == MegaError.API_OK){
-				cancel();
+				if (newFileList){
+					newFileList = false;
+					log("pauseNewFileList");
+//					retryLater();
+					mNotificationManager.cancel(notificationId);
+					mNotificationManager.cancel(notificationIdFinal);
+					isForeground = false;
+					stopForeground(true);
+					stopSelf();
+				}
+				else{
+					cancel();
+				}
 			}
 		}
 	}

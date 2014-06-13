@@ -21,13 +21,17 @@
 	        android:key="settings_camera_upload_on"
 	        android:title="@string/settings_camera_upload_on" />
 		
-		<Preference
+		<ListPreference
 	        android:key="settings_camera_upload_how_to_upload"
-	        android:title="@string/settings_camera_upload_how_to_upload" />
+	        android:title="@string/settings_camera_upload_how_to_upload"
+	        android:entries="@array/settings_camera_upload_how_to_entries"
+	        android:entryValues="@array/settings_camera_upload_how_to_values" />
 		
-		<Preference
+		<ListPreference
 	        android:key="settings_camera_upload_what_to_upload"
-	        android:title="@string/settings_camera_upload_what_to_upload" />
+	        android:title="@string/settings_camera_upload_what_to_upload" 
+	        android:entries="@array/settings_camera_upload_file_upload_entries"
+	        android:entryValues="@array/settings_camera_upload_file_upload_values" />
 		
 		<Preference
 	        android:key="settings_camera_upload_folder"
