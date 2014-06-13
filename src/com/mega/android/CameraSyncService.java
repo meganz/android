@@ -217,6 +217,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			dbH.setStorageAskAlways(true);
 			dbH.setCamSyncEnabled(false);
 			dbH.setPinLockEnabled(false);
+			dbH.setPinLockCode("");
 			log("Not defined, so not enabled");
 			finish();
 			return START_NOT_STICKY;

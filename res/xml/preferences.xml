@@ -8,9 +8,11 @@
 	        android:key="settings_pin_lock_enable"
 	        android:title="@string/settings_pin_lock_on" />
 		
-		<Preference
+		<EditTextPreference
 	        android:key="settings_pin_lock_code"
-	        android:title="@string/settings_pin_lock_code" />
+	        android:title="@string/settings_pin_lock_code"
+	        android:password="true"
+	        android:inputType="numberPassword" />
     </PreferenceCategory>
     
     <PreferenceCategory 

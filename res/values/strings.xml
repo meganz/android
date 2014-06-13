@@ -290,4 +290,5 @@
     <string name="settings_pin_lock_on">Enable PIN Lock</string>
     <string name="settings_pin_lock_off">Disable PIN Lock</string>
     <string name="settings_pin_lock_code">PIN Code</string> 
+    <string name="settings_pin_lock_code_not_set">Not set</string>
 </resources>
