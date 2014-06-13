@@ -3,17 +3,31 @@ package com.mega.android;
 public class Preferences{
 	
 	String firstTime = "";
-	String wifi = "";
+	String camSyncWifi = "";
 	String camSyncEnabled = "";
 	String camSyncHandle = "";
 	String camSyncLocalPath = "";
+	String camSyncFileUpload = "";
+	String pinLockEnabled = "";
+	String pinLockCode = "";
+	String storageAskAlways = "";
+	String storageDownloadLocation = "";
 	
-	Preferences(String firstTime, String wifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath){
+	public final static int ONLY_PHOTOS = 1001;
+	public final static int ONLY_VIDEOS = 1002;
+	public final static int PHOTOS_AND_VIDEOS = 1003;
+	
+	Preferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String pinLockEnabled, String pinLockCode, String storageAskAlways, String storageDownloadLocation){
 		this.firstTime = firstTime;
-		this.wifi = wifi;
+		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
 		this.camSyncHandle = camSyncHandle;
 		this.camSyncLocalPath = camSyncLocalPath;
+		this.camSyncFileUpload = camSyncFileUpload;
+		this.pinLockEnabled = pinLockEnabled;
+		this.pinLockCode = pinLockCode;
+		this.storageAskAlways = storageAskAlways;
+		this.storageDownloadLocation = storageDownloadLocation;
 	}
 	
 	public String getFirstTime (){
@@ -48,12 +62,52 @@ public class Preferences{
 		this.camSyncLocalPath = camSyncLocalPath;
 	}
 	
-	public String getWifi (){
-		return wifi;
+	public String getCamSyncWifi (){
+		return camSyncWifi;
 	}
 	
-	public void setWifi(String wifi){
-		this.wifi = wifi;
+	public void setCamSyncWifi(String camSyncWifi){
+		this.camSyncWifi = camSyncWifi;
+	}
+	
+	public String getCamSyncFileUpload(){
+		return camSyncFileUpload;
+	}
+	
+	public void setCamSyncFileUpload(String camSyncFileUpload){
+		this.camSyncFileUpload = camSyncFileUpload;
+	}
+	
+	public String getPinLockEnabled(){
+		return pinLockEnabled;
+	}
+	
+	public void setPinLockEnabled(String pinLockEnabled){
+		this.pinLockEnabled = pinLockEnabled;
+	}
+	
+	public String getPinLockCode(){
+		return pinLockCode;
+	}
+	
+	public void setPinLockCode(String pinLockCode){
+		this.pinLockCode = pinLockCode;
+	}
+	
+	public String getStorageAskAlways(){
+		return storageAskAlways;
+	}
+	
+	public void setStorageAskAlways(String storageAskAlways){
+		this.storageAskAlways = storageAskAlways;
+	}
+	
+	public String getStorageDownloadLocation(){
+		return storageDownloadLocation;
+	}
+	
+	public void setStorageDownloadLocation(String storageDownloadLocation){
+		this.storageDownloadLocation = storageDownloadLocation;
 	}
 }
 

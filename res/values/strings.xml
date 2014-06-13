@@ -185,6 +185,7 @@
     <string name="context_remove">Remove</string>
     <string name="context_share_folder">Share folder</string>
     <string name="context_sharing_folder">Sharing</string>
+    <string name="context_camera_folder">Camera folder: </string>
   
     <string name="menu_new_folder">New folder</string>
     <string name="menu_add_contact">Add contact</string>
@@ -262,15 +263,31 @@
     <string name="settings_pin_lock">PIN Lock</string>
     
     <string name="settings_storage_download_location">Default download location</string>
-    <string name="settings_storage_ask_me_always">Ask location always</string>
+    <string name="settings_storage_ask_me_always">Ask download location always</string>
     
     <string name="settings_camera_upload_on">Turn on Photo Sync</string>
     <string name="settings_camera_upload_off">Turn off Photo Sync</string>
     <string name="settings_camera_upload_how_to_upload">How to upload</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries">
+        <item>Sync over Wi-Fi or data plan</item>
+        <item>Sync over Wi-Fi only</item>
+    </string-array>
+    
     <string name="settings_camera_upload_what_to_upload">File Upload</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries">
+        <item>Photos only</item>
+        <item>Videos only</item>
+        <item>Photos and videos</item>
+    </string-array>
+    
     <string name="settings_camera_upload_folder">Camera folder</string>
+    <string name="settings_camera_upload_only_photos">Photos only</string>
+    <string name="settings_camera_upload_only_videos">Videos only</string>
+    <string name="settings_camera_upload_photos_and_videos">Photos and videos</string>
     
     <string name="settings_pin_lock_on">Enable PIN Lock</string>
     <string name="settings_pin_lock_off">Disable PIN Lock</string>
-    <string name="settings_pin_lock_code">PIN Code</string>    
+    <string name="settings_pin_lock_code">PIN Code</string> 
 </resources>

@@ -12,7 +12,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 1; 
+	private static final int DATABASE_VERSION = 4; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -23,8 +23,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_FIRST_LOGIN = "firstlogin";
     private static final String KEY_CAM_SYNC_ENABLED = "camsyncenabled";
     private static final String KEY_CAM_SYNC_HANDLE = "camsynchandle";
-    private static final String KEY_WIFI = "wifi";
+    private static final String KEY_CAM_SYNC_WIFI = "wifi";
     private static final String KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath";
+    private static final String KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload";
+    private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
+    private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
+    private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
+    private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
     
 
 	public DatabaseHandler(Context context) {
@@ -41,7 +46,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY," + KEY_FIRST_LOGIN + " BOOLEAN, "
         		+ KEY_CAM_SYNC_ENABLED + " BOOLEAN, " + KEY_CAM_SYNC_HANDLE + " TEXT, "
-        		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, " + KEY_WIFI + " BOOLEAN" + ")";
+        		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, " + KEY_CAM_SYNC_WIFI + " BOOLEAN, " 
+        		+ KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, " + KEY_PIN_LOCK_ENABLED + " TEXT, " + 
+        		KEY_PIN_LOCK_CODE + " TEXT, " + KEY_STORAGE_ASK_ALWAYS + " TEXT, " +
+        		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT" + ")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
 	}
 
@@ -118,10 +126,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
-        values.put(KEY_WIFI, encrypt(prefs.getWifi()));
+        values.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
         values.put(KEY_CAM_SYNC_ENABLED, prefs.getCamSyncEnabled());
         values.put(KEY_CAM_SYNC_HANDLE, prefs.getCamSyncHandle());
         values.put(KEY_CAM_SYNC_LOCAL_PATH, prefs.getCamSyncLocalPath());
+        values.put(KEY_CAM_SYNC_FILE_UPLOAD, prefs.getCamSyncFileUpload());
+        values.put(KEY_PIN_LOCK_ENABLED, prefs.getPinLockEnabled());
+        values.put(KEY_PIN_LOCK_CODE, prefs.getPinLockCode());
+        values.put(KEY_STORAGE_ASK_ALWAYS, prefs.getStorageAskAlways());
+        values.put(KEY_STORAGE_DOWNLOAD_LOCATION, prefs.getStorageDownloadLocation());
         db.insert(TABLE_PREFERENCES, null, values);
         db.close();
 	}
@@ -139,7 +152,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String camSyncHandle = decrypt(cursor.getString(3));
 			String camSyncLocalPath = decrypt(cursor.getString(4));
 			String wifi = decrypt(cursor.getString(5));
-			prefs = new Preferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath);
+			String fileUpload = decrypt(cursor.getString(6));
+			String pinLockEnabled = decrypt(cursor.getString(7));
+			String pinLockCode = decrypt(cursor.getString(8));
+			String askAlways = decrypt(cursor.getString(9));
+			String downloadLocation = decrypt(cursor.getString(10));
+			prefs = new Preferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
 		}
 		
 		return prefs;
@@ -168,12 +186,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
-			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_WIFI + "= '" + encrypt(wifi + "") + "' WHERE " + KEY_ID + " = '1'";
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_WIFI + "= '" + encrypt(wifi + "") + "' WHERE " + KEY_ID + " = '1'";
 			db.execSQL(UPDATE_PREFERENCES_TABLE);
 			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
 		}
 		else{
-	        values.put(KEY_WIFI, encrypt(wifi + ""));
+	        values.put(KEY_CAM_SYNC_WIFI, encrypt(wifi + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
         db.close();
@@ -225,6 +243,91 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 	        values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(localPath + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setCamSyncFileUpload (int fileUpload){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_FILE_UPLOAD + "= '" + encrypt(fileUpload + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(fileUpload + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setPinLockEnabled (boolean pinLockEnabled){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_ENABLED + "= '" + encrypt(pinLockEnabled + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_PIN_LOCK_ENABLED, encrypt(pinLockEnabled + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setPinLockCode (String pinLockCode){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PIN_LOCK_CODE + "= '" + encrypt(pinLockCode + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_PIN_LOCK_CODE, encrypt(pinLockCode + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setStorageAskAlways (boolean storageAskAlways){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ASK_ALWAYS + "= '" + encrypt(storageAskAlways + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(storageAskAlways + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+        db.close();
+	}
+	
+	public void setStorageDownloadLocation (String storageDownloadLocation){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_DOWNLOAD_LOCATION + "= '" + encrypt(storageDownloadLocation + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(storageDownloadLocation + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
         db.close();

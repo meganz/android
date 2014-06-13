@@ -857,6 +857,8 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     			else{
     				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
     				dbH.setFirstTime(false);
+    				dbH.setStorageAskAlways(true);
+    				dbH.setPinLockEnabled(false);
     				firstTime = false;
     			}
     			
