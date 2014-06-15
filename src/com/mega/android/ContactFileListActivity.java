@@ -51,7 +51,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ContactFileListActivity extends ActionBarActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener, OnClickListener, MegaGlobalListenerInterface {
+public class ContactFileListActivity extends PinActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
@@ -466,7 +466,7 @@ public class ContactFileListActivity extends ActionBarActivity implements MegaRe
 		log("onRequestTemporaryError");
 	}
 	
-	private static void log(String log) {
+	public static void log(String log) {
 		Util.log("ContactFileListActivity", log);
 	}
 

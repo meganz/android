@@ -34,7 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class FileExplorerActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface{
+public class FileExplorerActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface{
 	
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -100,6 +100,12 @@ public class FileExplorerActivity extends ActionBarActivity implements OnClickLi
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+		if (dbH.getCredentials() == null){
+			ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi);
+			return;
+		}
 		
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);

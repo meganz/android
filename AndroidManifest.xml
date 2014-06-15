@@ -186,6 +186,11 @@
             android:label="@string/action_settings" >
         </activity>
         
+        <activity
+            android:name="PinLockActivity"
+            android:label="@string/settings_pin_lock" >
+        </activity>
+        
         <service
             android:name="CameraSyncService"
             android:exported="false" >

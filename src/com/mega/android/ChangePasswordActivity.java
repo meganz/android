@@ -21,7 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class ChangePasswordActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface{
+public class ChangePasswordActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface{
 	
 	private class HashTask extends AsyncTask<String, Void, String[]> {
 

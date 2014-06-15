@@ -159,6 +159,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String downloadLocation = decrypt(cursor.getString(10));
 			prefs = new Preferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
 		}
+		cursor.close();
+        db.close();
 		
 		return prefs;
 	}
@@ -177,6 +179,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_FIRST_LOGIN, encrypt(firstTime + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -194,6 +197,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_CAM_SYNC_WIFI, encrypt(wifi + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -211,6 +215,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_CAM_SYNC_ENABLED, encrypt(enabled + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -228,6 +233,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_CAM_SYNC_HANDLE, encrypt(handle + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -245,6 +251,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(localPath + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -262,6 +269,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(fileUpload + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -279,6 +287,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_PIN_LOCK_ENABLED, encrypt(pinLockEnabled + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -296,6 +305,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_PIN_LOCK_CODE, encrypt(pinLockCode + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -313,6 +323,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(storageAskAlways + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	
@@ -330,6 +341,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(storageDownloadLocation + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
+		cursor.close();
         db.close();
 	}
 	

@@ -92,7 +92,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-public class ManagerActivity extends ActionBarActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
+public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
@@ -657,6 +657,13 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
     	super.onNewIntent(intent);
     	setIntent(intent);    	
 	}
+    
+    @Override
+	protected void onPause() {
+    	managerActivity = null;
+    	log("onPause");
+    	super.onPause();
+    }
     
     @Override
 	protected void onResume() {
@@ -1789,17 +1796,29 @@ public class ManagerActivity extends ActionBarActivity implements OnItemClickLis
 
 		DatabaseHandler dbH = new DatabaseHandler(context); 
 		dbH.clearCredentials();
+		dbH.setPinLockEnabled(false);
+		dbH.setPinLockCode("");
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
 		megaApi.logout();
 		drawerItem = null;
 		
-		if(managerActivity != null)
-		{
+		if(managerActivity != null)	{
 			Intent intent = new Intent(managerActivity, TourActivity.class);
 	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			managerActivity.startActivity(intent);
 			managerActivity.finish();
 			managerActivity = null;
+		}
+		else{
+			Intent intent = new Intent (context, TourActivity.class);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			context.startActivity(intent);
+			((Activity)context).finish();
+			context = null;
 		}
 	}	
 	

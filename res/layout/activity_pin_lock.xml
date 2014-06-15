@@ -1,0 +1,58 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    tools:context=".PinLockActivity" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:orientation="vertical"
+            android:paddingBottom="40dp"
+            android:paddingTop="40dp" >
+
+            <EditText
+                android:id="@+id/pin_lock_pin_code"
+                style="@style/InputField"
+                android:hint="@string/settings_pin_lock_code"
+                android:imeOptions="actionDone"
+                android:inputType="numberPassword" >
+            </EditText>
+
+            <Button
+                style="@style/button_MEGA"
+                android:id="@+id/pin_lock_enter_pin"
+                android:layout_gravity="center"
+                android:text="@string/pin_lock_enter" >
+            </Button>
+			
+        </LinearLayout>
+        
+        <include layout="@layout/delimiter" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="30dp"
+            android:gravity="center_horizontal"
+            >
+            
+            <Button
+                android:id="@+id/pin_lock_logout"
+                style="@style/button_MEGA"
+                android:layout_gravity="center"
+                android:text="@string/action_logout" >
+            </Button>
+            
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
