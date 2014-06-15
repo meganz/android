@@ -56,7 +56,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FullScreenImageViewer extends Activity implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
+public class FullScreenImageViewer extends PinActivity implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
 	
 	private Display display;
 	private DisplayMetrics outMetrics;

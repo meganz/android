@@ -7,7 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.MenuItem;
 import android.view.View;
 
-public class UpgradeActivity extends ActionBarActivity{
+public class UpgradeActivity extends PinActivity{
 
 	private ActionBar aB;
 	

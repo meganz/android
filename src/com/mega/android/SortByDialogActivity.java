@@ -11,7 +11,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-public class SortByDialogActivity extends Activity implements OnClickListener {
+public class SortByDialogActivity extends PinActivity implements OnClickListener {
 
 	public static String ACTION_SORT_BY = "ACTION_SORT_BY";
 	

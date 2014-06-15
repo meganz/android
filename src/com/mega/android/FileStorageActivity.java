@@ -34,7 +34,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FileStorageActivity extends ActionBarActivity implements OnClickListener, OnItemClickListener, OnItemCheckClickListener {
+public class FileStorageActivity extends PinActivity implements OnClickListener, OnItemClickListener, OnItemCheckClickListener {
 	
 	public static String EXTRA_URL = "fileurl";
 	public static String EXTRA_SIZE = "filesize";
@@ -524,7 +524,7 @@ public class FileStorageActivity extends ActionBarActivity implements OnClickLis
 		setFiles(path);
 	}
 	
-	private void log(String message) {
+	public static void log(String message) {
 		Util.log("FileStorageActivity", message);
 	}
 

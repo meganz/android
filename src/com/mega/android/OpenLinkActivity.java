@@ -11,7 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
 
-public class OpenLinkActivity extends Activity {
+public class OpenLinkActivity extends PinActivity {
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -88,7 +88,7 @@ public class OpenLinkActivity extends Activity {
 		finish();
 	}
 	
-	private void log(String message) {
+	public static void log(String message) {
 		Util.log("OpenLinkActivity", message);
 	}
 }

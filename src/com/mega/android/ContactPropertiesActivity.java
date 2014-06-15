@@ -31,7 +31,7 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ContactPropertiesActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface {
+public class ContactPropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface {
 	
 	TextView nameView;
 	TextView contentTextView;
@@ -251,7 +251,7 @@ public class ContactPropertiesActivity extends ActionBarActivity implements OnCl
 		log("onRequestTemporaryError");
 	}
 	
-	private static void log(String log) {
+	public static void log(String log) {
 		Util.log("ContactPropertiesActivity", log);
 	}
 
