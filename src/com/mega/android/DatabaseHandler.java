@@ -55,9 +55,28 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		UserCredentials userCredentials = null;
+		
+		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
+		Cursor cursor = db.rawQuery(selectQuery, null);		
+		if (cursor.moveToFirst()) {
+			int id = Integer.parseInt(cursor.getString(0));
+			String email = decrypt(cursor.getString(1));
+			String publicKey = decrypt(cursor.getString(2));
+			String privateKey = decrypt(cursor.getString(3));
+			userCredentials = new UserCredentials(email, privateKey, publicKey);
+		}
+		cursor.close();
+        
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES); 
         onCreate(db);
+        
+        ContentValues values = new ContentValues();
+        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
+        values.put(KEY_PUBLIC_KEY, encrypt(userCredentials.getPublicKey()));
+        values.put(KEY_PRIVATE_KEY, encrypt(userCredentials.getPrivateKey()));        
+        db.insert(TABLE_CREDENTIALS, null, values);
 	} 
 	
 	public static String encrypt(String original) {
