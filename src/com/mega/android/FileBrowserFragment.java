@@ -382,6 +382,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 					}
+					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo()){
+						streaming();
+					}
 					else{
 						adapterList.setPositionClicked(-1);
 						adapterList.notifyDataSetChanged();
@@ -393,6 +396,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			}
 		}
     }
+	
+	public void streaming(){
+		Toast.makeText(context, "PITIRRI STREAMING", Toast.LENGTH_SHORT).show();
+	}
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
