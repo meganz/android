@@ -161,6 +161,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			node = megaApi.getNodeByHandle(handle);
 			if (node == null){  
 				finish();
+				return;
 			}
 			
 			name = node.getName();
