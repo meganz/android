@@ -197,6 +197,16 @@ public class MegaApiJava
 		megaApi.fastLogin(email, stringHash, base64pwkey);
 	}
 	
+	public void fastLogin(String session, MegaRequestListenerInterface listener)
+	{
+		megaApi.fastLogin(session, createDelegateRequestListener(listener));
+	}
+
+	public void fastLogin(String session)
+	{
+		megaApi.fastLogin(session);
+	}
+	
 	public void createAccount(String email, String password, String name, MegaRequestListenerInterface listener)
 	{
 		megaApi.createAccount(email, password, name, createDelegateRequestListener(listener));
