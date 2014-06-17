@@ -3,7 +3,7 @@
     package="com.mega.android"
     android:installLocation="internalOnly"
     android:versionCode="26"
-    android:versionName="0.25" >
+    android:versionName="@string/app_version" >
 
     <uses-sdk
         android:minSdkVersion="9"
