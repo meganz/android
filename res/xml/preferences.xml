@@ -52,4 +52,14 @@
 	        android:key="settings_storage_download_location"
 	        android:title="@string/settings_storage_download_location" />
 	</PreferenceCategory>
+	
+    <PreferenceCategory 
+        android:key="settings_about"
+        android:title="@string/settings_about">
+		
+        <Preference
+            android:key="settings_about_app_version"
+        	android:title="@string/settings_about_app_version"
+        	android:summary="@string/app_version" />
+	</PreferenceCategory>
 </PreferenceScreen>
