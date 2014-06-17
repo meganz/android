@@ -178,6 +178,7 @@ class Share {};
 %newobject MegaApi::search;
 %newobject MegaApi::ebcEncryptKey;
 %newobject MegaApi::getMyEmail;
+%newobject MegaApi::dumpSession;
 
 typedef long long time_t;
 typedef long long uint64_t;
