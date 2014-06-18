@@ -254,7 +254,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
-		
+				
 		prefs = dbH.getPreferences();
 		if (prefs == null){
 			firstTime = true;
@@ -324,7 +324,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			return;
 		}
 		else{
-					
+			log("rootNode != null");		
 			UserList contacts = megaApi.getContacts();
 			for (int i=0; i < contacts.size(); i++){
 				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
@@ -649,7 +649,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	megaApi.removeGlobalListener(this);
     	
 //    	startService(new Intent(getApplicationContext(), CameraSyncService.class));
-//    	megaApi.removeTransferListener(this);
+//    	megaApi.removeTransferListener(this); 
     }
     
     @Override
@@ -1773,10 +1773,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 */
 	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi) {
 //		context.stopService(new Intent(context, BackgroundService.class));
-		Intent stopIntent = null;
-		stopIntent = new Intent(context, CameraSyncService.class);
-		stopIntent.setAction(CameraSyncService.ACTION_STOP);
-		context.startService(stopIntent);
+		log("logout");
 //		context.stopService(new Intent(context, CameraSyncService.class));
 		
 		File offlineDirectory = null;
@@ -1796,8 +1793,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 		DatabaseHandler dbH = new DatabaseHandler(context); 
 		dbH.clearCredentials();
-		dbH.setPinLockEnabled(false);
-		dbH.setPinLockCode("");
+		if (dbH.getPreferences() != null){
+			dbH.setFirstTime(false);
+			dbH.setPinLockEnabled(false);
+			dbH.setPinLockCode("");
+			dbH.setCamSyncEnabled(false);
+			Intent stopIntent = null;
+			stopIntent = new Intent(context, CameraSyncService.class);
+			stopIntent.setAction(CameraSyncService.ACTION_STOP);
+			context.startService(stopIntent);
+		}
+		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}

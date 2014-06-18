@@ -12,14 +12,13 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 4; 
+	private static final int DATABASE_VERSION = 5; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
-    private static final String KEY_PUBLIC_KEY= "publickey";
-    private static final String KEY_PRIVATE_KEY = "privatekey";
+    private static final String KEY_SESSION= "session";
     private static final String KEY_FIRST_LOGIN = "firstlogin";
     private static final String KEY_CAM_SYNC_ENABLED = "camsyncenabled";
     private static final String KEY_CAM_SYNC_HANDLE = "camsynchandle";
@@ -40,7 +39,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EMAIL + " TEXT, " 
-                + KEY_PUBLIC_KEY + " TEXT, " + KEY_PRIVATE_KEY + " TEXT" + ")";        
+                + KEY_SESSION + " TEXT" + ")";        
         db.execSQL(CREATE_CREDENTIALS_TABLE);
         
         String CREATE_PREFERENCES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_PREFERENCES + "("
@@ -55,42 +54,41 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		UserCredentials userCredentials = null;
-		
-		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
-		Cursor cursor = db.rawQuery(selectQuery, null);		
-		if (cursor.moveToFirst()) {
-			int id = Integer.parseInt(cursor.getString(0));
-			String email = decrypt(cursor.getString(1));
-			String publicKey = decrypt(cursor.getString(2));
-			String privateKey = decrypt(cursor.getString(3));
-			userCredentials = new UserCredentials(email, privateKey, publicKey);
-		}
-		cursor.close();
+//		UserCredentials userCredentials = null;
+//		
+//		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
+//		Cursor cursor = db.rawQuery(selectQuery, null);		
+//		if (cursor.moveToFirst()) {
+//			int id = Integer.parseInt(cursor.getString(0));
+//			String email = decrypt(cursor.getString(1));
+//			String session = decrypt(cursor.getString(2));
+//			userCredentials = new UserCredentials(email, session);
+//		}
+//		cursor.close();
         
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES); 
         onCreate(db);
         
-        ContentValues values = new ContentValues();
-        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
-        values.put(KEY_PUBLIC_KEY, encrypt(userCredentials.getPublicKey()));
-        values.put(KEY_PRIVATE_KEY, encrypt(userCredentials.getPrivateKey()));        
-        db.insert(TABLE_CREDENTIALS, null, values);
+//        ContentValues values = new ContentValues();
+//        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
+//        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
+//        db.insert(TABLE_CREDENTIALS, null, values);
 	} 
 	
 	public static String encrypt(String original) {
-		if (original == null) {
-			return null;
-		}
-		try {
-			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
-			return Base64.encodeToString(encrypted, Base64.DEFAULT);
-		} catch (Exception e) {
-			log("ee");
-			e.printStackTrace();
-			return null;
-		}
+//		if (original == null) {
+//			return null;
+//		}
+//		try {
+//			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
+//			return Base64.encodeToString(encrypted, Base64.DEFAULT);
+//		} catch (Exception e) {
+//			log("ee");
+//			e.printStackTrace();
+//			return null;
+//		}
+		return original;
 	}
 	
 	private static byte[] getAesKey() {
@@ -102,24 +100,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
-        values.put(KEY_PUBLIC_KEY, encrypt(userCredentials.getPublicKey()));
-        values.put(KEY_PRIVATE_KEY, encrypt(userCredentials.getPrivateKey()));        
+        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
         db.insert(TABLE_CREDENTIALS, null, values);
         db.close(); 
     }
 	
 	public static String decrypt(String encodedString) {
-		if (encodedString == null) {
-			return null;
-		}
-		try {
-			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
-			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
-			return new String(original);
-		} catch (Exception e) {
-			log("de");
-			return null;
-		}
+//		if (encodedString == null) {
+//			return null;
+//		}
+//		try {
+//			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
+//			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
+//			return new String(original);
+//		} catch (Exception e) {
+//			log("de");
+//			return null;
+//		}
+		return encodedString;
 	}
 	
 	public UserCredentials getCredentials(){
@@ -131,9 +129,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()) {
 			int id = Integer.parseInt(cursor.getString(0));
 			String email = decrypt(cursor.getString(1));
-			String publicKey = decrypt(cursor.getString(2));
-			String privateKey = decrypt(cursor.getString(3));
-			userCredentials = new UserCredentials(email, privateKey, publicKey);
+			String session = decrypt(cursor.getString(2));
+			userCredentials = new UserCredentials(email, session);
 		}
 		cursor.close();
         db.close();

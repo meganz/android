@@ -85,6 +85,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	private String lastPassword;
 	private String gPublicKey;
 	private String gPrivateKey;
+	private String gSession;
 	
 	private String confirmLink;
 	
@@ -142,8 +143,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
-	    
-	    
 	    
 	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 	    
@@ -263,6 +262,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
 					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
+					
+					lastEmail = credentials.getEmail();
+					gSession = credentials.getSession();
+					
 					loginLogin.setVisibility(View.GONE);
 					loginDelimiter.setVisibility(View.GONE);
 					loginCreateAccount.setVisibility(View.GONE);
@@ -272,13 +275,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					generatingKeysText.setVisibility(View.VISIBLE);
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
-					lastEmail = credentials.getEmail();
-					gPublicKey = credentials.getPublicKey();
-					gPrivateKey = credentials.getPrivateKey();
 					loggingInText.setVisibility(View.VISIBLE);
 					fetchingNodesText.setVisibility(View.GONE);
 					prepareNodesText.setVisibility(View.GONE);
-					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+					megaApi.fastLogin(gSession, this);
 					return;
 				}
 				else{
@@ -305,6 +305,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						return;
 					}
 					else{
+						lastEmail = credentials.getEmail();
+						gSession = credentials.getSession();
+						
 						loginLogin.setVisibility(View.GONE);
 						loginDelimiter.setVisibility(View.GONE);
 						loginCreateAccount.setVisibility(View.GONE);
@@ -314,20 +317,20 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						generatingKeysText.setVisibility(View.VISIBLE);
 						loginProgressBar.setVisibility(View.VISIBLE);
 						loginFetchNodesProgressBar.setVisibility(View.GONE);
-						lastEmail = credentials.getEmail();
-						gPublicKey = credentials.getPublicKey();
-						gPrivateKey = credentials.getPrivateKey();
 						loggingInText.setVisibility(View.VISIBLE);
 						fetchingNodesText.setVisibility(View.GONE);
 						prepareNodesText.setVisibility(View.GONE);
-						megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+						megaApi.fastLogin(gSession, this);
 						return;
 					}
 				}
 			}
 			else{
+				log("Pitirri");
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode != null){
+					
+					log("rootNode != null");
 					Intent intent = new Intent(this, ManagerActivity.class);
 					if (action != null){
 						intent.setAction(action);
@@ -337,13 +340,25 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					}
 					
-					startService(new Intent(getApplicationContext(), CameraSyncService.class));
+					prefs = dbH.getPreferences();
+					if (prefs.getCamSyncEnabled() != null){
+						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+							log("Enciendo el servicio de la camara");
+							startService(new Intent(getApplicationContext(), CameraSyncService.class));
+						}
+					}
 					
 					this.startActivity(intent);
 					this.finish();
 					return;
 				}
 				else{
+					log("rootNode == null");
+					
+					lastEmail = credentials.getEmail();
+					gSession = credentials.getSession();
+					
+					log("session: " + gSession);
 					loginLogin.setVisibility(View.GONE);
 					loginDelimiter.setVisibility(View.GONE);
 					loginCreateAccount.setVisibility(View.GONE);
@@ -353,13 +368,10 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					generatingKeysText.setVisibility(View.VISIBLE);
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
-					lastEmail = credentials.getEmail();
-					gPublicKey = credentials.getPublicKey();
-					gPrivateKey = credentials.getPrivateKey();
 					loggingInText.setVisibility(View.VISIBLE);
 					fetchingNodesText.setVisibility(View.GONE);
 					prepareNodesText.setVisibility(View.GONE);
-					megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+					megaApi.fastLogin(gSession, this);
 					return;
 				}
 			}
@@ -512,8 +524,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 		fetchingNodesText.setVisibility(View.GONE);
 		prepareNodesText.setVisibility(View.GONE);
 		
-		credentials = new UserCredentials(lastEmail,privateKey, publicKey);
-		
+		log("fastLogin con publicKey y privateKey");
 		megaApi.fastLogin(lastEmail, publicKey, privateKey, this);
 	}
 	
@@ -625,6 +636,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				prepareNodesText.setVisibility(View.GONE);
 				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+				
+				ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi);
 			}
 			else{
 
@@ -634,9 +647,17 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
 				
+				gSession = megaApi.dumpSession();
+				credentials = new UserCredentials(lastEmail, gSession);
+				
 				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 				dbH.clearCredentials();
 				dbH.saveCredentials(credentials);
+				
+				log("Logged in: " + gSession);
+				
+//				String session = megaApi.dumpSession();
+//				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
 
 				megaApi.fetchNodes(loginActivity);
 			}
@@ -669,11 +690,13 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					}
 					else{
 						Intent intent = null;
-						if (cameraSync){
+						if (firstTime){
 							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 						}
 						else{
-							startService(new Intent(getApplicationContext(), CameraSyncService.class));
+							if (cameraSync){
+								startService(new Intent(getApplicationContext(), CameraSyncService.class));
+							}
 
 							intent = new Intent(loginActivity,ManagerActivity.class);
 							if (action != null){
