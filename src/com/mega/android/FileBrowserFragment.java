@@ -382,9 +382,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 					}
-					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo()){
-						streaming();
-					}
+//					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo()){
+//						streaming();
+//					}
 					else{
 						adapterList.setPositionClicked(-1);
 						adapterList.notifyDataSetChanged();

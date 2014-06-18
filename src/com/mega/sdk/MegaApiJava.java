@@ -186,6 +186,10 @@ public class MegaApiJava
 	{
 		megaApi.login(email, password);
 	}
+	
+	public String dumpSession() {
+		return megaApi.dumpSession();
+	}
 
 	public void fastLogin(String email, String stringHash, String base64pwkey, MegaRequestListenerInterface listener)
 	{

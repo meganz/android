@@ -2,25 +2,31 @@ package com.mega.android;
 
 public class UserCredentials {
 	private String email;
-	private String publicKey;
-	private String privateKey;
+	private String session;
 	
-	public UserCredentials(String email, String privateKey, String publicKey) {
+	public UserCredentials(String email){
 		this.email = email;
-		this.privateKey = privateKey;
-		this.publicKey = publicKey;
+	}
+	
+	public UserCredentials(String email, String session) {
+		this.email = email;
+		this.session = session;
 	}
 	
 	public String getEmail() {
 		return email;
 	}
 	
-	public String getPrivateKey() {
-		return privateKey;
+	public void setEmail(String email){
+		this.email = email;
 	}
 	
-	public String getPublicKey() {
-		return publicKey;
+	public String getSession() {
+		return session;
+	}
+	
+	public void setSession(String session){
+		this.session = session;
 	}
 }
 
