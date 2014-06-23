@@ -1,6 +1,8 @@
 package com.mega.android;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -524,6 +526,33 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 						intent.putExtra("parentNodeHandle", megaApi.getParentNode(contactNodes.get(position)).getHandle());
 					}
 					startActivity(intent);
+				}
+				else if (MimeType.typeForName(contactNodes.get(position).getName()).isVideo()){
+					MegaNode file = contactNodes.get(position);
+					Intent service = new Intent(this, MegaStreamingService.class);
+			  		startService(service);
+			  		String fileName = file.getName();
+					try {
+						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+					} 
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+			  		String mimeType = "video/x-msvideo";
+			  		System.out.println("FILENAME: " + fileName);
+			  		
+			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			  		try
+			  		{
+			  			startActivity(mediaIntent);
+			  		}
+			  		catch(Exception e)
+			  		{
+			  			Toast.makeText(this, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+			  		}						
 				}
 				else{
 					adapter.setPositionClicked(-1);

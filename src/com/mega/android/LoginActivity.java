@@ -46,7 +46,7 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.EditText;
 import android.widget.Toast;
-
+ 
 public class LoginActivity extends AccountAuthenticatorActivity implements OnClickListener, MegaRequestListenerInterface{
 	
 	public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
