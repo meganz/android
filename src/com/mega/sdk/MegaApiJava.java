@@ -610,6 +610,11 @@ public class MegaApiJava
 		megaApi.resetTotalUploads();
 	}
 	
+	public void startStreaming(MegaNode node, long startOffset, long size, MegaTransferListenerInterface listener)
+	{
+		megaApi.startStreaming(node, startOffset, size, createDelegateTransferListener(listener));
+	}
+	
 	/****************************************************************************************************/
 	//FILESYSTEM METHODS
 	/****************************************************************************************************/
@@ -621,6 +626,11 @@ public class MegaApiJava
 	public NodeList getChildren(MegaNode parent)
 	{
 		return megaApi.getChildren(parent);
+	}
+	
+	public MegaNode getChildNode(MegaNode parent, String name)
+	{
+		return megaApi.getChildNode(parent, name);
 	}
 
 	public MegaNode getParentNode(MegaNode node)
@@ -702,12 +712,6 @@ public class MegaApiJava
 	{
 		return megaApi.getRubbishNode();
 	}
-
-	public MegaNode getMailNode()
-	{
-		return megaApi.getMailNode();
-	}
-
 	  
 	/****************************************************************************************************/
 	//INTERNAL METHODS

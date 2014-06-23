@@ -36,6 +36,8 @@
 //Generate inheritable wrappers for listener objects
 %feature("director") MegaRequestListener;
 %feature("director") MegaTransferListener;
+%apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
+
 %feature("director") MegaGlobalListener;
 %feature("director") MegaListener;
 %feature("director") GfxProcessor;
@@ -167,6 +169,7 @@ class Share {};
 %newobject MegaNode::getBase64Handle;
 
 %newobject MegaApi::getChildren;
+%newobject MegaApi::getChildNode;
 %newobject MegaApi::getContacts;
 %newobject MegaApi::getTransfers;
 %newobject MegaApi::getContact;

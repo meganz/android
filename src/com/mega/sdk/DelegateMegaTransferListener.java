@@ -112,4 +112,19 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 			});
 		}
 	}
+	
+	public boolean onTransferData(MegaApi api, MegaTransfer transfer, byte[] buffer)
+	{
+		if(listener != null)
+		{
+			final MegaTransfer megaTransfer;
+			if(megaApi.isRunCallbackThreaded())
+				megaTransfer = transfer.copy();
+			else
+				megaTransfer = transfer;
+			
+			return listener.onTransferData(megaApi, megaTransfer, buffer);
+		}	  
+		return false;
+	}
 }

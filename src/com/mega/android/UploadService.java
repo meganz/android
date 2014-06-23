@@ -652,4 +652,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		
 	}
 
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
+	{
+		return true;
+	}
 }
