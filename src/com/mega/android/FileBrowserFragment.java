@@ -212,6 +212,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
+		if (megaApi.getRootNode() == null){
+			return null;
+		}
+		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
 			((ManagerActivity)context).setParentHandleBrowser(parentHandle);

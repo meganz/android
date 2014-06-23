@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
@@ -953,6 +956,33 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
+					else if (MimeType.typeForName(n.getName()).isVideo()){
+						MegaNode file = n;
+						Intent service = new Intent(context, MegaStreamingService.class);
+				  		context.startService(service);
+				  		String fileName = file.getName();
+						try {
+							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+						} 
+						catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+						
+				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+				  		String mimeType = "video/x-msvideo";
+				  		System.out.println("FILENAME: " + fileName);
+				  		
+				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+				  		try
+				  		{
+				  			context.startActivity(mediaIntent);
+				  		}
+				  		catch(Exception e)
+				  		{
+				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+				  		}						
+					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();
 						handleList.add(n.getHandle());
@@ -1056,6 +1086,33 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 							}
 						}
 						context.startActivity(intent);
+					}
+					else if (MimeType.typeForName(n.getName()).isVideo()){
+						MegaNode file = n;
+						Intent service = new Intent(context, MegaStreamingService.class);
+				  		context.startService(service);
+				  		String fileName = file.getName();
+						try {
+							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+						} 
+						catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+						
+				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+				  		String mimeType = "video/x-msvideo";
+				  		System.out.println("FILENAME: " + fileName);
+				  		
+				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+				  		try
+				  		{
+				  			context.startActivity(mediaIntent);
+				  		}
+				  		catch(Exception e)
+				  		{
+				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+				  		}						
 					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();

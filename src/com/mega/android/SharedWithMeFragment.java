@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -395,6 +398,33 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						}
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
+					}
+					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo()){
+						MegaNode file = nodes.get(position);
+						Intent service = new Intent(context, MegaStreamingService.class);
+				  		context.startService(service);
+				  		String fileName = file.getName();
+						try {
+							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+						} 
+						catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+						
+				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+				  		String mimeType = "video/x-msvideo";
+				  		System.out.println("FILENAME: " + fileName);
+				  		
+				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+				  		try
+				  		{
+				  			startActivity(mediaIntent);
+				  		}
+				  		catch(Exception e)
+				  		{
+				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+				  		}						
 					}
 					else{
 						adapterList.setPositionClicked(-1);
