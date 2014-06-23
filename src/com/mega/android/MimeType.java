@@ -132,7 +132,7 @@ public class MimeType {
 	 * Check is MimeType of image type
 	 */
 	public boolean isVideo() {
-		return type.startsWith("video/");
+		return type.startsWith("video/") || extension.equals("mkv");
 	}
 
 	/*

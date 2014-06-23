@@ -1016,4 +1016,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		log("onTaskRemoved -> retryLater");
 		retryLater();
 	}
+
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
+	{
+		return true;
+	}
 }

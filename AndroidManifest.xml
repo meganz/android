@@ -206,6 +206,11 @@
             android:exported="false" >
         </service>
         
+        <service
+            android:name="MegaStreamingService"
+            android:exported="false" >
+        </service>
+        
         <receiver
 	        android:name="com.mega.android.receivers.CameraEventReceiver"
 	        android:enabled="true" >

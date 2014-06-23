@@ -690,4 +690,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
+	{
+		return true;
+	}
 }

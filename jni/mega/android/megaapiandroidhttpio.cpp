@@ -10,59 +10,55 @@ void MegaApiCurlHttpIO::setProxy(MegaProxySettings *proxySettings)
 void MegaApiCurlHttpIO::post(HttpReq* req, const char* data, unsigned len)
 {
 	if (debug)
-	    {
-	        cout << "POST target URL: " << req->posturl << endl;
+	{
+		cout << "POST target URL: " << req->posturl << endl;
 
-	        if (req->binary)
-	        {
-	            cout << "[sending " << req->out->size() << " bytes of raw data]" << endl;
-	        }
-	        else
-	        {
-	            cout << "Sending: " << *req->out << endl;
-	        }
-	    }
+		if (req->binary)
+		{
+			cout << "[sending " << req->out->size() << " bytes of raw data]" << endl;
+		}
+		else
+		{
+			cout << "Sending: " << *req->out << endl;
+		}
+	}
 
-	    CURL* curl;
+	CURL* curl;
 
-	    req->in.clear();
+	req->in.clear();
 
-	    if ((curl = curl_easy_init()))
-	    {
-	        curl_easy_setopt(curl, CURLOPT_URL, req->posturl.c_str());
-	        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data ? data : req->out->data());
-	        curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data ? len : req->out->size());
-	        curl_easy_setopt(curl, CURLOPT_USERAGENT, useragent->c_str());
-	        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, req->type == REQ_JSON ? contenttypejson : contenttypebinary);
-	        curl_easy_setopt(curl, CURLOPT_ENCODING, "");
-	        curl_easy_setopt(curl, CURLOPT_SHARE, curlsh);
-	        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-	        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)req);
-	        curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, check_header);
-	        curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*)req);
-	        curl_easy_setopt(curl, CURLOPT_PRIVATE, (void*)req);
+	if ((curl = curl_easy_init()))
+	{
+		curl_easy_setopt(curl, CURLOPT_URL, req->posturl.c_str());
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data ? data : req->out->data());
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data ? len : req->out->size());
+		curl_easy_setopt(curl, CURLOPT_USERAGENT, useragent->c_str());
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, req->type == REQ_JSON ? contenttypejson : contenttypebinary);
+		curl_easy_setopt(curl, CURLOPT_ENCODING, "");
+		curl_easy_setopt(curl, CURLOPT_SHARE, curlsh);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*)req);
+		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, check_header);
+		curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void*)req);
+		curl_easy_setopt(curl, CURLOPT_PRIVATE, (void*)req);
+		curl_easy_setopt(curl, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_function);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
 
-	        //Verify SSL cert and host.
-			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
-			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+		//Don't trust the default cacert bundle
+		curl_easy_setopt(curl,CURLOPT_CAINFO, NULL);
+		curl_easy_setopt(curl,CURLOPT_CAPATH, NULL);
 
-			//Don't trust the default cacert bundle
-			curl_easy_setopt(curl,CURLOPT_CAINFO, NULL);
-			curl_easy_setopt(curl,CURLOPT_CAPATH, NULL);
+		curl_multi_add_handle(curlm, curl);
 
-			//Callback to load the the root certificate of the MEGA server.
-			curl_easy_setopt(curl,CURLOPT_SSL_CTX_FUNCTION, MegaApiCurlHttpIO::sslctx_function);
+		req->status = REQ_INFLIGHT;
 
-	        curl_multi_add_handle(curlm, curl);
-
-	        req->status = REQ_INFLIGHT;
-
-	        req->httpiohandle = (void*)curl;
-	    }
-	    else
-	    {
-	        req->status = REQ_FAILURE;
-	    }
+		req->httpiohandle = (void*)curl;
+	}
+	else
+	{
+		req->status = REQ_FAILURE;
+	}
 }
 
 MegaProxySettings *MegaApiCurlHttpIO::getAutoProxySettings()
@@ -141,70 +137,5 @@ int MegaApiCurlHttpIO::ssl_verify_callback(X509_STORE_CTX *ctx, void *arg)
 	EVP_PKEY_free(evp);
 	return ok;
 }
-
-CURLcode MegaApiCurlHttpIO::sslctx_function(CURL * curl, void * sslctx, void * parm)
-{
-	X509_STORE * store;
-	X509 * cert=NULL;
-	BIO * bio;
-
-	//CA in the root of the MEGA certificate.
-	const char *MEGApemRoot =
-			"UTN DATACorp SGC Root CA\n"
-			"========================\n"
-			"-----BEGIN CERTIFICATE-----\n"
-			"MIIEXjCCA0agAwIBAgIQRL4Mi1AAIbQR0ypoBqmtaTANBgkqhkiG9w0BAQUFADCBkzELMAkGA1UE\n"
-			"BhMCVVMxCzAJBgNVBAgTAlVUMRcwFQYDVQQHEw5TYWx0IExha2UgQ2l0eTEeMBwGA1UEChMVVGhl\n"
-			"IFVTRVJUUlVTVCBOZXR3b3JrMSEwHwYDVQQLExhodHRwOi8vd3d3LnVzZXJ0cnVzdC5jb20xGzAZ\n"
-			"BgNVBAMTElVUTiAtIERBVEFDb3JwIFNHQzAeFw05OTA2MjQxODU3MjFaFw0xOTA2MjQxOTA2MzBa\n"
-			"MIGTMQswCQYDVQQGEwJVUzELMAkGA1UECBMCVVQxFzAVBgNVBAcTDlNhbHQgTGFrZSBDaXR5MR4w\n"
-			"HAYDVQQKExVUaGUgVVNFUlRSVVNUIE5ldHdvcmsxITAfBgNVBAsTGGh0dHA6Ly93d3cudXNlcnRy\n"
-			"dXN0LmNvbTEbMBkGA1UEAxMSVVROIC0gREFUQUNvcnAgU0dDMIIBIjANBgkqhkiG9w0BAQEFAAOC\n"
-			"AQ8AMIIBCgKCAQEA3+5YEKIrblXEjr8uRgnn4AgPLit6E5Qbvfa2gI5lBZMAHryv4g+OGQ0SR+ys\n"
-			"raP6LnD43m77VkIVni5c7yPeIbkFdicZD0/Ww5y0vpQZY/KmEQrrU0icvvIpOxboGqBMpsn0GFlo\n"
-			"wHDyUwDAXlCCpVZvNvlK4ESGoE1O1kduSUrLZ9emxAW5jh70/P/N5zbgnAVssjMiFdC04MwXwLLA\n"
-			"9P4yPykqlXvY8qdOD1R8oQ2AswkDwf9c3V6aPryuvEeKaq5xyh+xKrhfQgUL7EYw0XILyulWbfXv\n"
-			"33i+Ybqypa4ETLyorGkVl73v67SMvzX41MPRKA5cOp9wGDMgd8SirwIDAQABo4GrMIGoMAsGA1Ud\n"
-			"DwQEAwIBxjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBRTMtGzz3/64PGgXYVOktKeRR20TzA9\n"
-			"BgNVHR8ENjA0MDKgMKAuhixodHRwOi8vY3JsLnVzZXJ0cnVzdC5jb20vVVROLURBVEFDb3JwU0dD\n"
-			"LmNybDAqBgNVHSUEIzAhBggrBgEFBQcDAQYKKwYBBAGCNwoDAwYJYIZIAYb4QgQBMA0GCSqGSIb3\n"
-			"DQEBBQUAA4IBAQAnNZcAiosovcYzMB4p/OL31ZjUQLtgyr+rFywJNn9Q+kHcrpY6CiM+iVnJowft\n"
-			"Gzet/Hy+UUla3joKVAgWRcKZsYfNjGjgaQPpxE6YsjuMFrMOoAyYUJuTqXAJyCyjj98C5OBxOvG0\n"
-			"I3KgqgHf35g+FFCgMSa9KOlaMCZ1+XtgHI3zzVAmbQQnmt/VDUVHKWss5nbZqSl9Mt3JNjy9rjXx\n"
-			"EZ4du5A/EkdOjtd+D2JzHVImOBwYSf0wdJrE5SIv2MCN7ZF6TACPcn9d2t0bi0Vr591pl6jFVkwP\n"
-			"DPafepE39peC4N1xaf92P2BNPM/3mfnGV/TJVTl4uix5yaaIK/QI\n"
-			"-----END CERTIFICATE-----\n";
-
-	SSL_CTX *ctx = (SSL_CTX *)sslctx;
-
-	/* get a BIO */
-	bio=BIO_new_mem_buf((char *)MEGApemRoot, -1);
-
-	/* use it to read the PEM formatted certificate from memory into an X509
-	 * structure that SSL can use*/
-	PEM_read_bio_X509(bio, &cert, 0, NULL);
-	(void)BIO_set_close(bio, BIO_NOCLOSE);
-	BIO_free(bio);
-
-	if(cert == NULL) return CURLE_SSL_CACERT_BADFILE;
-
-	/* get a pointer to the X509 certificate store (which may be empty!) */
-	store=SSL_CTX_get_cert_store(ctx);
-	if (store == NULL) { X509_free(cert); return CURLE_SSL_CACERT_BADFILE; }
-
-	/* add the certificate to this store */
-	X509_STORE_add_cert(store, cert);
-	X509_free(cert);
-
-	/* set max depth for the certificate chain */
-	SSL_CTX_set_verify_depth(ctx, 3);
-
-	/* set a custom callback to check the certificate */
-	SSL_CTX_set_cert_verify_callback(ctx, MegaApiCurlHttpIO::ssl_verify_callback, NULL);
-
-	/* all set to go */
-	return CURLE_OK ;
-}
-
 
 }

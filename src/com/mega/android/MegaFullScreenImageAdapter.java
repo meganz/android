@@ -587,4 +587,10 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
+	{
+		return true;
+	}
 }
