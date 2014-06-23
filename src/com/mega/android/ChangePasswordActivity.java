@@ -23,25 +23,7 @@ import android.widget.Toast;
 
 public class ChangePasswordActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface{
 	
-	private class HashTask extends AsyncTask<String, Void, String[]> {
-
-		@Override
-		protected String[] doInBackground(String... args) {
-			String privateKey = megaApi.getBase64PwKey(args[1]);
-			String publicKey = megaApi.getStringHash(privateKey, args[0]);
-			String email = args[0];
-			String newPassword = args[1];
-			String oldPassword = args[2];
-			return new String[]{new String(email), new String(newPassword), new String(oldPassword), new String(privateKey), new String(publicKey)};
-		}
-
-		
-		@Override
-		protected void onPostExecute(String[] key) {
-			changePassword(key[0], key[1], key[2], key[3], key[4]);
-		}
-
-	}
+	ChangePasswordActivity changePasswordActivity = this;
 
 	private ProgressDialog progress;
 	
@@ -120,11 +102,16 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 		String newPassword1 = newPassword1View.getText().toString();
 		String newPassword2 = newPassword2View.getText().toString();
 		
-		if (!checkPassword(oldPassword, newPassword1, newPassword2)){
+		if (!newPassword1.equals(newPassword2)){
+			log("no new password repeat");
 			Util.showErrorAlertDialog(getString(R.string.my_account_change_password_error),
 					false, this);
 			return;
 		}
+		
+//		if (!checkPassword(oldPassword, newPassword1, newPassword2)){
+//
+//		}
 		
 		final String newPassword = newPassword1;
 
@@ -137,28 +124,31 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 		
 		String currentEmail = oldCredentials.getEmail();
 		
-		new HashTask().execute(currentEmail, newPassword, oldPassword);
+//		new HashTask().execute(currentEmail, newPassword, oldPassword);
+		changePassword(currentEmail, newPassword, oldPassword);
 	}
 	
-	private boolean checkPassword (String oldPassword, String newPassword1, String newPassword2){
-		log(newPassword1);
-		log(newPassword2);
-		if (!newPassword1.equals(newPassword2)){
-			log("no new password repeat");
-			return false;
-		}
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
-		UserCredentials cred = dbH.getCredentials();
-		String privateKey = megaApi.getBase64PwKey(oldPassword);
-		String publicKey = megaApi.getStringHash(privateKey, cred.getEmail());
-		
-		if (!privateKey.equals(cred.getPrivateKey()) || !publicKey.equals(cred.getPublicKey())){
-			log("no old password");
-			return false;
-		}
-			
-		return true;
-	}
+//	private boolean checkPassword (String oldPassword, String newPassword1, String newPassword2){
+//		log(newPassword1);
+//		log(newPassword2);
+//		if (!newPassword1.equals(newPassword2)){
+//			log("no new password repeat");
+//			return false;
+//		}
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//		UserCredentials cred = dbH.getCredentials();
+//		String email = cred.getEmail();
+//		new CheckTask();
+//		String privateKey = megaApi.getBase64PwKey(oldPassword);
+//		String publicKey = megaApi.getStringHash(privateKey, cred.getEmail());
+//		
+//		if (!privateKey.equals(cred.getPrivateKey()) || !publicKey.equals(cred.getPublicKey())){
+//			log("no old password");
+//			return false;
+//		}
+//			
+//		return true;
+//	}
 	
 	/*
 	 * Validate old password and new passwords 
@@ -220,8 +210,8 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 		return null;
 	}
 	
-	private void changePassword (String email, String newPassword, String oldPassword, String privateKey, String publicKey){
-		newCredentials = new UserCredentials(email, privateKey, publicKey);
+	private void changePassword (String email, String newPassword, String oldPassword){
+		newCredentials = new UserCredentials(email);
 		
 		megaApi.changePassword(oldPassword, newPassword, this);
 	}
@@ -237,19 +227,27 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 		log("onRequestFinish");
 		
 		if (request.getType() == MegaRequest.TYPE_CHANGE_PW){
-			//Now update the credentials
-			DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
-			dbH.clearCredentials();
-			dbH.saveCredentials(newCredentials);
-			
-			try{ 
-				progress.dismiss();
-			} catch(Exception ex) {};
-			
-			if (e.getErrorCode() != MegaError.API_OK) {
-				Util.showErrorAlertDialog(e, ChangePasswordActivity.this);
+			if (e.getErrorCode() != MegaError.API_OK){
+				log("e.getErrorCode = " + e.getErrorCode() + "__ e.getErrorString = " + e.getErrorString());
+				
+				try{ 
+					progress.dismiss();
+				} catch(Exception ex) {};
+				
+				Util.showErrorAlertDialog(getString(R.string.my_account_change_password_error), false, changePasswordActivity);
+				
 			}
 			else{
+				//Now update the credentials
+				newCredentials.setSession(megaApi.dumpSession());
+				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+				dbH.clearCredentials();
+				dbH.saveCredentials(newCredentials);
+				
+				try{ 
+					progress.dismiss();
+				} catch(Exception ex) {};
+				
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 				finish();
 				Toast.makeText(ChangePasswordActivity.this, R.string.my_account_change_password_OK, Toast.LENGTH_LONG).show();

@@ -21,6 +21,11 @@
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.CAMERA" />
     
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    
     <application
         android:name="MegaApplication"
         android:allowBackup="false"
@@ -210,10 +215,19 @@
             android:name="MegaStreamingService"
             android:exported="false" >
         </service>
+
+        <service android:name="com.mega.android.authenticator.MegaAuthenticatorService" android:exported="false" >
+		    <intent-filter>
+		        <action android:name="android.accounts.AccountAuthenticator" />
+		    </intent-filter>
+		    <meta-data android:name="android.accounts.AccountAuthenticator"
+		               android:resource="@xml/authenticator" />
+		</service>
         
         <receiver
 	        android:name="com.mega.android.receivers.CameraEventReceiver"
-	        android:enabled="true" >
+	        android:enabled="true"
+	        android:exported="false" >
 	        <intent-filter>
 	            <action android:name="com.android.camera.NEW_PICTURE" />
 	            <action android:name="android.hardware.action.NEW_PICTURE" />
@@ -224,7 +238,8 @@
     	
         <receiver
 	        android:name="com.mega.android.receivers.NetEventReceiver"
-	        android:enabled="true" >
+	        android:enabled="true"
+	        android:exported="false" >
 	        <intent-filter>
 	           <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
 	        </intent-filter>
@@ -232,7 +247,8 @@
     	
         <receiver
 	        android:name="com.mega.android.receivers.ChargeEventReceiver"
-	        android:enabled="true" >
+	        android:enabled="true"
+	        android:exported="false" >
 	        <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
@@ -243,7 +259,8 @@
     	
         <receiver
 	        android:name="com.mega.android.receivers.BootEventReceiver"
-	        android:enabled="true" >
+	        android:enabled="true"
+	        android:exported="false" >
 	      	<intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

@@ -200,12 +200,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		String lastEmail = credentials.getEmail();
-		String gPublicKey = credentials.getPublicKey();
-		String gPrivateKey = credentials.getPrivateKey();
+		String gSession = credentials.getSession();
 		
 		if (megaApi.getRootNode() == null){
 			log("RootNode = null");
-			megaApi.fastLogin(lastEmail, gPublicKey, gPrivateKey, this);
+			megaApi.fastLogin(gSession, this);
 //			cancel();
 //			retryLater();
 			return START_NOT_STICKY;
@@ -666,6 +665,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				dbH.clearCredentials();
 				dbH.saveCredentials(credentials);
 
+				log("Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes(this);
 			}
 			else{
