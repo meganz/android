@@ -12,6 +12,9 @@ import com.mega.sdk.MegaRequestListener;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.NodeList;
 
+import android.accounts.Account;
+import android.accounts.AccountAuthenticatorActivity;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -44,8 +47,15 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
+public class LoginActivity extends AccountAuthenticatorActivity implements OnClickListener, MegaRequestListenerInterface{
 	
+	public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
+    public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
+    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
+    public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
+    
+    public final static String AUTH_TOKEN_TYPE_INSTANTIATE = "MEGA User";
+    
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
@@ -103,6 +113,9 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
     boolean firstRequestUpdate = true;
     boolean firstTime = true;
     boolean cameraSync = true;
+    
+    AccountManager accountManager;
+    String authTokenType;
 	
 	/*
 	 * Task to process email and password
@@ -127,6 +140,8 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		accountManager = AccountManager.get(this);
 		
 		loginClicked = false;
 		
@@ -637,7 +652,18 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 				
-				ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi);
+				DatabaseHandler dbH = new DatabaseHandler(this); 
+				dbH.clearCredentials();
+				if (dbH.getPreferences() != null){
+					dbH.setFirstTime(false);
+					dbH.setPinLockEnabled(false);
+					dbH.setPinLockCode("");
+					dbH.setCamSyncEnabled(false);
+					Intent stopIntent = null;
+					stopIntent = new Intent(this, CameraSyncService.class);
+					stopIntent.setAction(CameraSyncService.ACTION_STOP);
+					startService(stopIntent);
+				}
 			}
 			else{
 
@@ -659,6 +685,20 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 //				String session = megaApi.dumpSession();
 //				Toast.makeText(this, "Session = " + session, Toast.LENGTH_LONG).show();
 
+				//TODO
+				//Aqui va el addAccount (email, session)
+				String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+				if (accountType != null){
+					authTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
+					if (authTokenType == null){
+						authTokenType = LoginActivity.AUTH_TOKEN_TYPE_INSTANTIATE;
+					}
+					Account account = new Account(lastEmail, accountType);
+					accountManager.addAccountExplicitly(account, gSession, null);
+					log("AUTTHO: _" + authTokenType + "_");
+					accountManager.setAuthToken(account, authTokenType, gSession);
+				}
+				
 				megaApi.fetchNodes(loginActivity);
 			}
 		}
