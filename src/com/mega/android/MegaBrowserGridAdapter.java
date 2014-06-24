@@ -956,7 +956,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeType.typeForName(n.getName()).isVideo()){
+					else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -969,7 +969,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = "video/x-msvideo";
+				  		String mimeType = MimeType.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -1087,7 +1087,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeType.typeForName(n.getName()).isVideo()){
+					else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio()){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -1100,7 +1100,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = "video/x-msvideo";
+				  		String mimeType = MimeType.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);

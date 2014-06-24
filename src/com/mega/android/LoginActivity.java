@@ -341,7 +341,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 				}
 			}
 			else{
-				log("Pitirri");
 				MegaNode rootNode = megaApi.getRootNode();
 				if (rootNode != null){
 					

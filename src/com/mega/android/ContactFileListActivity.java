@@ -527,7 +527,7 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 					}
 					startActivity(intent);
 				}
-				else if (MimeType.typeForName(contactNodes.get(position).getName()).isVideo()){
+				else if (MimeType.typeForName(contactNodes.get(position).getName()).isVideo() || MimeType.typeForName(contactNodes.get(position).getName()).isAudio()){
 					MegaNode file = contactNodes.get(position);
 					Intent service = new Intent(this, MegaStreamingService.class);
 			  		startService(service);
@@ -540,7 +540,7 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 					}
 					
 			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = "video/x-msvideo";
+			  		String mimeType = MimeType.typeForName(file.getName()).getType();
 			  		System.out.println("FILENAME: " + fileName);
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
