@@ -129,10 +129,17 @@ public class MimeType {
 	}
 	
 	/*
-	 * Check is MimeType of image type
+	 * Check is MimeType of video type
 	 */
 	public boolean isVideo() {
 		return type.startsWith("video/") || extension.equals("mkv");
+	}
+	
+	/*
+	 * Check is MimeType of audio type
+	 */
+	public boolean isAudio() {
+		return type.startsWith("audio/");
 	}
 
 	/*

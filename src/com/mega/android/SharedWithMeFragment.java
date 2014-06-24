@@ -399,7 +399,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 					}
-					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo()){
+					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio()){
 						MegaNode file = nodes.get(position);
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -412,7 +412,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = "video/x-msvideo";
+				  		String mimeType = MimeType.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
