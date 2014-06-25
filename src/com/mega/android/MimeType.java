@@ -92,10 +92,13 @@ public class MimeType {
 		String detectedType = MimeTypeMap.getSingleton()
 				.getMimeTypeFromExtension(extension);
 		if (detectedType == null) {
-			detectedType = "application/octet-stream";
+			if(extension.equals("mkv"))
+				detectedType = "video/x-matroska";
+			else
+				detectedType = "application/octet-stream";
 		}
 		if (extension == null) {
-			extension = "unknown";
+			extension = "";
 		}
 		return new MimeType(detectedType, extension);
 	}
