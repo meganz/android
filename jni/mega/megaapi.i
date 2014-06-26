@@ -36,6 +36,10 @@
 //Generate inheritable wrappers for listener objects
 %feature("director") MegaRequestListener;
 %feature("director") MegaTransferListener;
+
+%typemap(directorargout) (char *STRING, size_t LENGTH)
+%{ jenv->DeleteLocalRef($input); %}
+
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
 
 %feature("director") MegaGlobalListener;
