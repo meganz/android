@@ -1045,10 +1045,7 @@ protected:
 
     DECLARE_MUTEX(sdkMutex);
 
-	MegaRequest *loginRequest;
 	MegaTransfer *currentTransfer;
-	int updatingSID;
-	long long updateSIDtime;
 	int threadExit;
     mega::dstime pausetime;
 	void loop();
