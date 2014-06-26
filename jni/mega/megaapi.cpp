@@ -1183,9 +1183,6 @@ MegaApi::MegaApi(const char *basePath)
 
     INIT_RECURSIVE_MUTEX(sdkMutex);
 	maxRetries = 5;
-	loginRequest = NULL;
-	updatingSID = 0;
-	updateSIDtime = -10000000;
 	currentTransfer = NULL;
     pausetime = 0;
     pendingUploads = 0;
@@ -1475,14 +1472,16 @@ void MegaApi::loop()
         }
 	}
 
+#ifdef WIN32
     delete client->dbaccess; //Warning, it's deleted in MegaClient's destructor
     delete client->sctable;  //Warning, it's deleted in MegaClient's destructor
+#else
+    delete client;
+    delete httpio;
+    delete waiter;
+    delete fsAccess;
+#endif
 
-    //delete client;
-    //delete httpio;
-    //delete waiter;
-    //delete fsAccess;
-    //if(loginRequest) delete loginRequest;
     MUTEX_DELETE(sdkMutex);
 }
 
@@ -3036,41 +3035,6 @@ void MegaApi::login_result(error result)
 	if((request->getType() != MegaRequest::TYPE_LOGIN) && (request->getType() != MegaRequest::TYPE_FAST_LOGIN))
 		cout << "INCORRECT REQUEST OBJECT (7) " << request->getRequestString() << endl;
 
-	/* Support to renew an expired SID. Deactivated. It needs SDK changes.
-		if(loginRequest) delete loginRequest;
-		updateSIDtime = curl->ds;
-		if(result == API_OK)
-		{
-			loginRequest = new MegaRequest(*request);
-			if(updatingSID)
-			{
-			updatingSID = 0;
-			cout << "SID updated OK!" << endl;
-			//This is an internal request.
-			//Deleting request without calling listeners.
-			requestMap.erase(client->restag);
-			//delete request; Alredy deleted. It's loginRequest
-			curl->notify(); //Wake up pending request
-			return;
-			}
-		}
-		else
-		{
-			loginRequest = NULL;
-			if(updatingSID)
-			{
-			updatingSID = 0;
-			cout << "SID update FAILED!" << endl;
-			//This is an internal request.
-			//Deleting request without calling listeners.
-			requestMap.erase(client->restag);
-			//delete request; Alredy deleted. It's loginRequest
-			curl->notify(); //Wake up pending request
-			return;
-			}
-		}
-	 */
-
 	fireOnRequestFinish(this, request, megaError);
 }
 
@@ -3634,37 +3598,6 @@ void MegaApi::fireOnRequestStart(MegaApi* api, MegaRequest *request)
 
 void MegaApi::fireOnRequestFinish(MegaApi* api, MegaRequest *request, MegaError e)
 {
-	/*  Renew an expired SID. Deactivated. It needs SDK changes
-	//If expired Session ID
-	if((e.getErrorCode()==MegaError::API_ESID) && (loginRequest) &&
-		(request->getType() != MegaRequest::TYPE_LOGIN) && (request->getType() != MegaRequest::TYPE_FAST_LOGIN))
-	{
-		//If not already updating SID and no unrecoverable error
-		if((!updatingSID) && (curl->ds - updateSIDtime) > 1000)
-		{
-		//Updating SID...
-		cout << "Updating SID..." << endl;
-		client->setsid(NULL);
-		updatingSID = 1;
-		requestQueue.push_front(loginRequest);
-		}
-
-		//If no unrecoverable error
-		if((curl->ds - updateSIDtime) > 1000)
-		{
-		//Clean request
-		requestMap.erase(client->restag);
-
-		//Repeat request after updating SID
-		requestQueue.push(request);
-
-		//Notify cURL
-		curl->notify();
-		return;
-		}
-	}
-	 */
-
 	MegaError *megaError = new MegaError(e);
 
 	for(set<MegaRequestListener *>::iterator it = requestListeners.begin(); it != requestListeners.end() ; it++)
@@ -4476,8 +4409,6 @@ void MegaApi::sendPendingRequests()
 			byte pwkey[SymmCipher::KEYLENGTH];
 			if((e = client->pw_key(password,pwkey))) break;
 			client->login(login, pwkey);
-
-			if(updatingSID) return;
 			break;
 		}
 		case MegaRequest::TYPE_MKDIR:
@@ -4702,9 +4633,6 @@ void MegaApi::sendPendingRequests()
 		}
 		case MegaRequest::TYPE_LOGOUT:
 		{
-			if(loginRequest) delete loginRequest;
-			loginRequest = NULL;
-
             requestMap.erase(nextTag);
             while(!requestMap.empty())
             {
@@ -4746,14 +4674,6 @@ void MegaApi::sendPendingRequests()
                 Base64::atob(sessionKey, (byte *)session, sizeof session);
                 client->login(session, sizeof session);
             }
-
-            /*byte strhash[SymmCipher::KEYLENGTH];
-			Base64::atob(stringHash, (byte *)strhash, sizeof strhash);
-
-            client->key.setkey((byte*)pwkey);
-			client->reqs[client->r].add(new CommandLogin(client,email,*(uint64_t*)strhash));
-
-            if(updatingSID) return;*/
 			break;
 		}
 		case MegaRequest::TYPE_GET_ATTR_FILE:
