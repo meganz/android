@@ -20,11 +20,35 @@ public class MegaApplication extends Application
 {
 	final String TAG = "MegaApplication";
 	MegaApiAndroid megaApi;
+	MegaApiAndroid megaApiFolder;
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 //		new MegaTest(getMegaApi()).start();
+	}
+	
+	public MegaApiAndroid getMegaApiFolder(){
+		if (megaApiFolder == null){
+			PackageManager m = getPackageManager();
+			String s = getPackageName();
+			PackageInfo p;
+			String path = null;
+			try
+			{
+				p = m.getPackageInfo(s, 0);
+				path = p.applicationInfo.dataDir + "/";
+			}
+			catch (NameNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+			
+			Log.d(TAG, "Database path: " + path);
+			megaApiFolder = new MegaApiAndroid(path);
+		}
+		
+		return megaApiFolder;
 	}
 	
 	public MegaApiAndroid getMegaApi()

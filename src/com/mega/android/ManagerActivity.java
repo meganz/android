@@ -125,6 +125,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
+	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
 	
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	
@@ -133,6 +134,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int RUBBISH_BIN_ADAPTER = 2002;
 	final public static int SHARED_WITH_ME_ADAPTER = 2003;
 	final public static int OFFLINE_ADAPTER = 2004;
+	final public static int FOLDER_LINK_ADAPTER = 2005;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -310,6 +312,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						Intent intent = new Intent(managerActivity, LoginActivity.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+						intent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(intent);
+						finish();	
+						return;
+					}
+					else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
+						Intent intent = new Intent(managerActivity, LoginActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();	
@@ -705,6 +716,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				handleOpenLinkIntent(intent);
 					intent.setAction(null);
 					setIntent(null);
+    			}
+    			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
+    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
+    				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    				intentFolderLink.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(intentFolderLink);
+					finish();
+    				Toast.makeText(this, "FOLDER LINK!!!!", Toast.LENGTH_LONG).show();
     			}
     			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
@@ -1899,8 +1919,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
 		        
 		        bottomControlBar.setVisibility(View.VISIBLE);
-		        
-		        int usedPerc = (int)((100 * usedStorage) / totalStorage);
+		        int usedPerc = 0;
+		        if (totalStorage != 0){
+		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
+		        }
 		        if (usedPerc < 90){
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

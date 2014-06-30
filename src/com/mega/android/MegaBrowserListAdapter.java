@@ -31,6 +31,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -92,6 +93,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
 				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+				break;
+			}
+			case ManagerActivity.FOLDER_LINK_ADAPTER:{
+				megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
 				break;
 			}
 			default:{
@@ -341,6 +346,18 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionDelete.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 				}
+				else if (type == ManagerActivity.FOLDER_LINK_ADAPTER){
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.GONE);
+					holder.optionCopy.setVisibility(View.GONE);
+					holder.optionMove.setVisibility(View.GONE);
+					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRename.setVisibility(View.GONE);
+					holder.optionDelete.setVisibility(View.GONE);
+					
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((335*scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				}
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);
@@ -461,6 +478,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ContactFileListActivity)context).onFileClick(handleList);
 				}
+				else if (type == ManagerActivity.FOLDER_LINK_ADAPTER){
+					((FolderLinkActivity)context).onFileClick(handleList);
+				}
 				else{
 					((ManagerActivity) context).onFileClick(handleList);
 				}
@@ -570,27 +590,30 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
 		switch(type){
-		case ManagerActivity.FILE_BROWSER_ADAPTER:{
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			break;
+			case ManagerActivity.FILE_BROWSER_ADAPTER:{
+				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				break;
+			}
+			case ManagerActivity.CONTACT_FILE_ADAPTER:{
+				((ContactFileListActivity)context).setParentHandle(parentHandle);
+				break;
+			}
+			case ManagerActivity.RUBBISH_BIN_ADAPTER:{
+				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+				break;
+			}
+			case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
+				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+				break;
+			}
+			case ManagerActivity.FOLDER_LINK_ADAPTER:{
+				break;
+			}
+			default:{
+				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				break;
+			}
 		}
-		case ManagerActivity.CONTACT_FILE_ADAPTER:{
-			((ContactFileListActivity)context).setParentHandle(parentHandle);
-			break;
-		}
-		case ManagerActivity.RUBBISH_BIN_ADAPTER:{
-			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-			break;
-		}
-		case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-			break;
-		}
-		default:{
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			break;
-		}
-	}
 	}
 	
 	public boolean isMultipleSelect() {

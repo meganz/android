@@ -301,6 +301,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 						action = ManagerActivity.ACTION_OPEN_MEGA_LINK;
 						url = intentReceived.getDataString();
 					}
+					else if(intentReceived.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
+						action = ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK;
+						url = intentReceived.getDataString();
+					}
 					
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){

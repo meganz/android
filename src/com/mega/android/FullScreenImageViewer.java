@@ -111,12 +111,13 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 	DatabaseHandler dbH = null;
 	Preferences prefs = null;
 	
+	boolean isFolderLink = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		fullScreenImageViewer = this;
-		MegaApplication app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
+		
 		
 		handler = new Handler();
 		fullScreenImageViewer = this;
@@ -137,6 +138,15 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
 		orderGetChildren = intent.getIntExtra("orderGetChildren", MegaApiJava.ORDER_DEFAULT_ASC);
+		isFolderLink = intent.getBooleanExtra("isFolderLink", false);
+		
+		MegaApplication app = (MegaApplication)getApplication();
+		if (isFolderLink){
+			megaApi = app.getMegaApiFolder();
+		}
+		else{
+			megaApi = app.getMegaApi();
+		}
 		
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
@@ -222,6 +232,10 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 						parentNode = megaApi.getInboxNode();
 						break;
 					}
+					case ManagerActivity.FOLDER_LINK_ADAPTER:{
+						parentNode = megaApi.getRootNode();
+						break;
+					}
 					default:{
 						parentNode = megaApi.getRootNode();
 						break;
@@ -259,8 +273,13 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			actionBarIcon.setOnClickListener(this);
 			
 			overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
-			overflowIcon.setVisibility(View.VISIBLE);
-			overflowIcon.setOnClickListener(this);
+			if (!isFolderLink){
+				overflowIcon.setVisibility(View.VISIBLE);
+				overflowIcon.setOnClickListener(this);
+			}
+			else{
+				overflowIcon.setVisibility(View.INVISIBLE);
+			}
 			
 			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
 			shareIcon.setVisibility(View.VISIBLE);
@@ -1046,6 +1065,7 @@ public void moveToTrash(){
 				service.putExtra(DownloadService.EXTRA_URL, url);
 				service.putExtra(DownloadService.EXTRA_SIZE, size);
 				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+				service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
 				startService(service);
 			}
 		}
@@ -1102,6 +1122,7 @@ public void moveToTrash(){
 						service.putExtra(DownloadService.EXTRA_URL, url);
 						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
 						service.putExtra(DownloadService.EXTRA_PATH, path);
+						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
 						startService(service);
 					}
 				}
@@ -1116,6 +1137,7 @@ public void moveToTrash(){
 					service.putExtra(DownloadService.EXTRA_URL, url);
 					service.putExtra(DownloadService.EXTRA_SIZE, size);
 					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
 					startService(service);
 				}
 				else {
