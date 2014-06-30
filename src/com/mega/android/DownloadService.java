@@ -56,6 +56,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_HASH = "DOCUMENT_HASH";
 	public static String EXTRA_URL = "DOCUMENT_URL";
 	public static String EXTRA_PATH = "SAVE_PATH";
+	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_OFFLINE = "IS_OFFLINE";
 	
 	private int totalCount = 0;
@@ -70,6 +71,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean canceled;
 	
 	private boolean isOffline = false;
+	private boolean isFolderLink = false;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -196,8 +198,18 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		long hash = intent.getLongExtra(EXTRA_HASH, -1);
 		String url = intent.getStringExtra(EXTRA_URL);
-		MegaNode document = megaApi.getNodeByHandle(hash);
 		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
+		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
+		if (isFolderLink){
+			log("hola!!!!!!!!!!!");
+			megaApi = app.getMegaApiFolder();
+		}
+		else{
+			log("adios!!!!!!!!!!!");
+			megaApi = app.getMegaApi();
+		}
+		
+		MegaNode document = megaApi.getNodeByHandle(hash);
 		
 		if((document == null) && (url == null)){
 			log("Node not found");

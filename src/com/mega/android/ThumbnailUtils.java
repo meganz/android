@@ -25,6 +25,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 /*
  * Service to create thumbnails

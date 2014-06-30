@@ -161,6 +161,11 @@
         </activity>
         
         <activity
+            android:name="FolderLinkActivity"
+            android:label="@string/app_name" >
+        </activity>
+        
+        <activity
             android:name="SortByDialogActivity"
             android:label="@string/general_sort_by"
             android:theme="@android:style/Theme.Dialog">

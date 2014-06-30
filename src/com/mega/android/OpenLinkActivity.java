@@ -25,6 +25,7 @@ public class OpenLinkActivity extends PinActivity {
 		
 		Intent intent = getIntent();
 		String url = intent.getDataString();
+		
 		try {
 			url = URLDecoder.decode(url, "UTF-8");
 		} 
@@ -72,12 +73,12 @@ public class OpenLinkActivity extends PinActivity {
 		// Folder Download link
 		if (url != null && url.matches("^https://mega.co.nz/#F!.+$")) {
 			log("folder link url");
-			Intent errorIntent = new Intent(this, ManagerActivity.class);
-			errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(errorIntent);
-			finish();			
-			Toast toast = Toast.makeText(getApplicationContext(), "Folder link (not implemented yet)", Toast.LENGTH_LONG);
-			toast.show();
+			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
+			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openFolderIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+			openFolderIntent.setData(Uri.parse(url));
+			startActivity(openFolderIntent);
+			finish();
 			return;
 		}
 		
