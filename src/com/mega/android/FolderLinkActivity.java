@@ -15,19 +15,26 @@ import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.NodeList;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -60,6 +67,70 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	Preferences prefs = null;
 	
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	
+	private ActionMode actionMode;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			List<MegaNode> documents = getSelectedDocuments();
+			
+			switch(item.getItemId()){
+				case R.id.cab_menu_download:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					onFileClick(handleList);
+					break;
+				}
+			}
+			
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_browser_action, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			adapterList.setMultipleSelect(false);
+			listView.setOnItemLongClickListener(folderLinkActivity);
+			clearSelections();
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			List<MegaNode> selected = getSelectedDocuments();
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
+			
+			if (selected.size() > 0) {
+				showDownload = true;
+			}
+			
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			
+			return false;
+		}
+		
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -395,24 +466,111 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	}
 
 	@Override
-	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
-			long arg3) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		if (adapterList.getPositionClicked() == -1){
+			clearSelections();
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+			listView.setItemChecked(position, true);
+			adapterList.setMultipleSelect(true);
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
+		return true;
+	}
+	
+	/*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		adapterList.setMultipleSelect(false);
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
+	
+	/*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				listView.setItemChecked(checkedPosition, false);
+			}
+		}
+		updateActionModeTitle();
+	}
+	
+	private void updateActionModeTitle() {
+		if (actionMode == null) {
+			return;
+		}
+		List<MegaNode> documents = getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
+		Resources res = getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = "";
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
+	
+	/*
+	 * Get list of all selected documents
+	 */
+	private List<MegaNode> getSelectedDocuments() {
+		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
+				if (document != null){
+					documents.add(document);
+				}
+			}
+		}
+		return documents;
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if (adapterList.isMultipleSelect()){
-//			SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//			if (checkedItems.get(position, false) == true){
-//				listView.setItemChecked(position, true);
-//			}
-//			else{
-//				listView.setItemChecked(position, false);
-//			}				
-//			updateActionModeTitle();
-//			adapterList.notifyDataSetChanged();
+			SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				listView.setItemChecked(position, true);
+			}
+			else{
+				listView.setItemChecked(position, false);
+			}				
+			updateActionModeTitle();
+			adapterList.notifyDataSetChanged();
 		}
 		else{
 			if (nodes.get(position).isFolder()){
