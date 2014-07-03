@@ -240,6 +240,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			aB = getSupportActionBar();
 		}
 
+		MegaApplication app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -248,8 +251,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
 	     
-		MegaApplication app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
 		
 		dbH = new DatabaseHandler(getApplicationContext()); 
 		if (dbH.getCredentials() == null){
@@ -271,9 +272,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 				
 		getOverflowMenu();
-		
-		megaApi.addGlobalListener(this);
-//		megaApi.addTransferListener(this);
 		
 		handler = new Handler();
 		
@@ -336,6 +334,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else{
 			log("rootNode != null");		
+			megaApi.addGlobalListener(this);
+//			megaApi.addTransferListener(this);
 			UserList contacts = megaApi.getContacts();
 			for (int i=0; i < contacts.size(); i++){
 				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
@@ -657,10 +657,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	log("onDestroy()");
     	
-    	megaApi.removeGlobalListener(this);
+    	if (megaApi.getRootNode() != null){
+    		megaApi.removeGlobalListener(this);
     	
-//    	startService(new Intent(getApplicationContext(), CameraSyncService.class));
-//    	megaApi.removeTransferListener(this); 
+//    		startService(new Intent(getApplicationContext(), CameraSyncService.class));
+//    		megaApi.removeTransferListener(this);
+    	} 
     }
     
     @Override
