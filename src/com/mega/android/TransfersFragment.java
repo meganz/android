@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -124,13 +125,15 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		
 	}
 	
-	
+	private Handler handler;
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		handler = new Handler();
 		
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
@@ -229,7 +232,23 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 			pauseText.setVisibility(View.GONE);
 		}
 		
+		refreshTransfers();
+		
 		return v;
+	}
+	
+	private void refreshTransfers(){
+		log("refreshTransfers()");
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				tL = megaApi.getTransfers();
+				setTransfers(tL);
+				if (tL.size() > 0){
+					refreshTransfers();
+				}
+			}
+		}, 1 * 1000);
 	}
 	
 	@Override
