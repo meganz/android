@@ -228,6 +228,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	DatabaseHandler dbH = null;
 	Preferences prefs = null;
+	
+	TransferList tL;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -3365,9 +3367,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-//		if (tF == null){
-//			tF = new TransfersFragment();
-//		}
+		if (tF == null){
+			tF = new TransfersFragment();
+		}
+				
+		tL = megaApi.getTransfers();
+		tF.setTransfers(tL);
 //		
 //		if (transfersListArray == null){
 //			TransferList tL = megaApi.getTransfers();
@@ -3399,9 +3404,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
-//		if (tF == null){
-//			tF = new TransfersFragment();
-//		}
+		if (tF == null){
+			tF = new TransfersFragment();
+		}
+		
+		tL = megaApi.getTransfers();
+		tF.setTransfers(tL);
+		
 //		
 //		if (transfersListArray == null){
 //			TransferList tL = megaApi.getTransfers();
@@ -3428,6 +3437,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferUpdate: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+		
+		if (tF == null){
+			tF = new TransfersFragment();
+		}
+		
+		tL = megaApi.getTransfers();
+		tF.setTransfers(tL);
+		
 //		if (tF != null){
 //			if (tF.isVisible()){
 //				TransferList tl = megaApi.getTransfers();
@@ -3439,9 +3456,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-//		if (tF == null){
-//			tF = new TransfersFragment();
-//		}
+		if (tF == null){
+			tF = new TransfersFragment();
+		}
+		
+		tL = megaApi.getTransfers();
+		tF.setTransfers(tL);
+		
 		log("onTransferTemporaryError: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
 	}
 	
