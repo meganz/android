@@ -230,9 +230,9 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 			
 			pauseImage.setVisibility(View.GONE);
 			pauseText.setVisibility(View.GONE);
-		}
-		
-		refreshTransfers();
+		}    
+		 
+//		refreshTransfers();
 		
 		return v;
 	}

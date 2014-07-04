@@ -69,7 +69,7 @@ public class MegaApiJava
 	
 	public void addTransferListener(MegaTransferListenerInterface listener)
 	{
-		megaApi.addTransferListener(createDelegateTransferListener(listener));
+		megaApi.addTransferListener(createDelegateTransferListener(listener, false));
 	}
 
 	public void addGlobalListener(MegaGlobalListenerInterface listener)
@@ -730,7 +730,14 @@ public class MegaApiJava
 	
 	private MegaTransferListener createDelegateTransferListener(MegaTransferListenerInterface listener)
 	{
-		DelegateMegaTransferListener delegateListener = new DelegateMegaTransferListener(this, listener);
+		DelegateMegaTransferListener delegateListener = new DelegateMegaTransferListener(this, listener, true);
+		activeTransferListeners.add(delegateListener);
+		return delegateListener;
+	}
+	
+	private MegaTransferListener createDelegateTransferListener(MegaTransferListenerInterface listener, boolean singleListener)
+	{
+		DelegateMegaTransferListener delegateListener = new DelegateMegaTransferListener(this, listener, singleListener);
 		activeTransferListeners.add(delegateListener);
 		return delegateListener;
 	}
