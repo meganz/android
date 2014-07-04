@@ -566,14 +566,21 @@ public class Util {
 			throw new FileNotFoundException("Failed to delete file: " + f);
 		}
 		else{
-			MediaScannerConnection.scanFile(context,
-					new String[] { f.getAbsolutePath() }, null,
-			        new MediaScannerConnection.OnScanCompletedListener() {
-			      		public void onScanCompleted(String path, Uri uri) {
-			      			log("Scanned: " + path);
-			      		}
-			 		}
-			);
+			
+			Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+			File fileToDelete = new File(f.getAbsolutePath());
+		    Uri contentUri = Uri.fromFile(fileToDelete);
+		    mediaScanIntent.setData(contentUri);
+		    context.sendBroadcast(mediaScanIntent);
+		    
+//			MediaScannerConnection.scanFile(context,
+//					new String[] { f.getAbsolutePath() }, null,
+//			        new MediaScannerConnection.OnScanCompletedListener() {
+//			      		public void onScanCompleted(String path, Uri uri) {
+//			      			log("Scanned: " + path);
+//			      		}
+//			 		}
+//			);
 		}
 	}
 	

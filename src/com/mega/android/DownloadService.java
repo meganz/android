@@ -566,27 +566,40 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						resultFile.renameTo(d);
 					}
 					
-					MediaScannerConnection.scanFile(this,
-							new String[] { newFileName }, null,
-					        new MediaScannerConnection.OnScanCompletedListener() {
-					      		public void onScanCompleted(String path, Uri uri) {
-					      			log("Scanned Offline: " + path);
-					      		}
-					 		}
-					);
+//					MediaScannerConnection.scanFile(this,
+//							new String[] { newFileName }, null,
+//					        new MediaScannerConnection.OnScanCompletedListener() {
+//					      		public void onScanCompleted(String path, Uri uri) {
+//					      			log("Scanned Offline: " + path);
+//					      		}
+//					 		}
+//					);
+					
+					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+					File f = new File(newFileName);
+				    Uri contentUri = Uri.fromFile(f);
+				    mediaScanIntent.setData(contentUri);
+				    this.sendBroadcast(mediaScanIntent);
+				    
 					log("isoffline");
 					
 				}
 				else{
 					log("not offline");
-					MediaScannerConnection.scanFile(this,
-							new String[] { filePath }, null,
-					        new MediaScannerConnection.OnScanCompletedListener() {
-					      		public void onScanCompleted(String path, Uri uri) {
-					      			log("Scanned: " + path);
-					      		}
-					 		}
-					);
+//					MediaScannerConnection.scanFile(this,
+//							new String[] { filePath }, null,
+//					        new MediaScannerConnection.OnScanCompletedListener() {
+//					      		public void onScanCompleted(String path, Uri uri) {
+//					      			log("Scanned: " + path);
+//					      		}
+//					 		}
+//					);
+					
+					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+					File f = new File(filePath);
+				    Uri contentUri = Uri.fromFile(f);
+				    mediaScanIntent.setData(contentUri);
+				    this.sendBroadcast(mediaScanIntent);
 				}
 							
 				onDownloadComplete(true);
