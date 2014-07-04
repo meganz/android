@@ -335,7 +335,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		else{
 			log("rootNode != null");		
 			megaApi.addGlobalListener(this);
-//			megaApi.addTransferListener(this);
+			megaApi.addTransferListener(this);
 			UserList contacts = megaApi.getContacts();
 			for (int i=0; i < contacts.size(); i++){
 				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
@@ -661,7 +661,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		megaApi.removeGlobalListener(this);
     	
 //    		startService(new Intent(getApplicationContext(), CameraSyncService.class));
-//    		megaApi.removeTransferListener(this);
+    		megaApi.removeTransferListener(this);
     	} 
     }
     

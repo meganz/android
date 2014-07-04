@@ -4,11 +4,13 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 {
 	MegaApiJava megaApi;
 	MegaTransferListenerInterface listener;
+	boolean singleListener;
 	
-	DelegateMegaTransferListener(MegaApiJava megaApi, MegaTransferListenerInterface listener)
+	DelegateMegaTransferListener(MegaApiJava megaApi, MegaTransferListenerInterface listener, boolean singleListener)
 	{
 		this.megaApi = megaApi;
 		this.listener = listener;
+		this.singleListener = singleListener;
 	}
 
 	MegaTransferListenerInterface getUserListener()
@@ -62,7 +64,9 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 			    }
 			});
 		}
-		megaApi.privateFreeTransferListener(this);
+		if (singleListener){
+			megaApi.privateFreeTransferListener(this);
+		}
 	}
 	
 	@Override
