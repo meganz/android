@@ -3397,7 +3397,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //		
 //		tF.setTransfers(transfersListArray);
 		
-		log("onTransferStart: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 
 	}
 
@@ -3431,12 +3431,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //		
 //		tF.setTransfers(transfersListArray);
 		
-		log("onTransferFinish: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferUpdate: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
 		
 		if (tF == null){
 			tF = new TransfersFragment();
@@ -3463,7 +3463,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		tL = megaApi.getTransfers();
 		tF.setTransfers(tL);
 		
-		log("onTransferTemporaryError: " + megaApi.getNodeByHandle(transfer.getNodeHandle()).getName() + " - " + transfer.getTag());
+		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 	
 	public static void log(String message) {
