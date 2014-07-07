@@ -95,7 +95,7 @@ import android.widget.Toast;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -108,6 +108,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case IMAGE_VIEWER: return context.getString(R.string.section_image_viewer);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
 				case ACCOUNT: return context.getString(R.string.section_account);
+				case SEARCH: return context.getString(R.string.search_files_and_folders);
 			}
 			return null;
 		}
@@ -177,6 +178,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	long parentHandleBrowser;
 	long parentHandleRubbish;
 	long parentHandleSharedWithMe;
+	long parentHandleSearch;
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
@@ -189,6 +191,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private TransfersFragment tF; 
     private MyAccountFragment maF;
     private OfflineFragment oF;
+    private SearchFragment sF;
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
@@ -230,6 +233,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	Preferences prefs = null;
 	
 	TransferList tL;
+	
+	String searchQuery = null;
+	NodeList searchNodes;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -503,6 +509,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			parentHandleBrowser = -1;
 			parentHandleRubbish = -1;
 			parentHandleSharedWithMe = -1;
+			parentHandleSearch = -1;
 			orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 			if (savedInstanceState != null){
 				firstTime = false;
@@ -511,6 +518,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser");
 				parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish");
 				parentHandleSharedWithMe = savedInstanceState.getLong("parentHandleSharedWithMe");
+				parentHandleSearch = savedInstanceState.getLong("parentHandleSearch");
 				switch (visibleFragment){
 					case 1:{
 						drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -562,6 +570,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						drawerItem = DrawerItem.ACCOUNT;
 						break;
 					}
+					case 11:{
+						drawerItem = DrawerItem.SEARCH;
+						searchQuery = savedInstanceState.getString("searchQuery");
+						break;
+					}
 				}
 			}
 			
@@ -583,7 +596,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	long pHBrowser = -1;
     	long pHRubbish = -1;
-    	long phSharedWithMe = -1;
+    	long pHSharedWithMe = -1;
+    	long pHSearch = -1;
     	int visibleFragment = -1;
     	int order = this.orderGetChildren;
     	if (fbF != null){
@@ -621,7 +635,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	}
     	
     	if (swmF != null){
-    		phSharedWithMe = swmF.getParentHandle();
+    		pHSharedWithMe = swmF.getParentHandle();
     		if (swmF.isVisible()){
     			if (isListSharedWithMe){
     				visibleFragment = 8;
@@ -646,11 +660,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
     	
+    	if (sF != null){
+    		if (sF.isVisible()){
+    			pHSearch = sF.getParentHandle();
+    			visibleFragment = 11;
+    			outState.putString("searchQuery", searchQuery);
+    		}
+    	}
+    	
     	outState.putInt("orderGetChildren", order);
     	outState.putInt("visibleFragment", visibleFragment);
     	outState.putLong("parentHandleBrowser", pHBrowser);
     	outState.putLong("parentHandleRubbish", pHRubbish);
-    	outState.putLong("parentHandleSharedWithMe", phSharedWithMe);
+    	outState.putLong("parentHandleSharedWithMe", pHSharedWithMe);
+    	outState.putLong("parentHandleSearch", pHSearch);
     }
     
     @Override
@@ -669,8 +692,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     @Override
 	protected void onNewIntent(Intent intent){
+    	
+    	if ((intent != null) && Intent.ACTION_SEARCH.equals(intent.getAction())){
+    		searchQuery = intent.getStringExtra(SearchManager.QUERY);
+    		parentHandleSearch = -1;
+    		
+    		selectDrawerItem(DrawerItem.SEARCH);
+    		
+    		if (searchMenuItem != null) {
+    			MenuItemCompat.collapseActionView(searchMenuItem);
+			}
+    		return;
+    	}
+    	
     	super.onNewIntent(intent);
-    	setIntent(intent);    	
+    	setIntent(intent); 
+    	return;
 	}
     
     @Override
@@ -1203,8 +1240,46 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			break;
     		}
-		default:
-			break;
+    		case SEARCH:{
+    			if (sF == null){
+        			sF = new SearchFragment();
+        		}
+    			
+    			//TODO CHANGE THIS TO MEGAAPI.SEARCH
+    			searchNodes = megaApi.getChildren(megaApi.getRootNode());
+    			
+    			sF.setSearchNodes(searchNodes);
+    			sF.setNodes(searchNodes);
+    			sF.setSearchQuery(searchQuery);
+    			sF.setParentHandle(parentHandleSearch);
+    			
+    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, sF, "sF").commit();
+    			customListGrid.setVisibility(View.GONE);
+    			customSearch.setVisibility(View.GONE);
+    			
+
+    			if (createFolderMenuItem != null){
+        			createFolderMenuItem.setVisible(false);
+        			rubbishBinMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			refreshMenuItem.setVisible(false);
+        			sortByMenuItem.setVisible(false);
+        			helpMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(true);
+        			settingsMenuItem.setVisible(true);
+        			logoutMenuItem.setVisible(true);
+        			
+        			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+        			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
+        			rubbishBinMenuItem.setEnabled(true);
+        			addMenuItem.setIcon(R.drawable.ic_menu_add);
+        			addMenuItem.setEnabled(true);
+    			}
+    			break;
+    		}
+			default:{
+				break;
+			}
     	}
     }
 	
@@ -1277,7 +1352,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (oF != null){
 			if (oF.isVisible()){
 				if (oF.onBackPressed() == 0){
-					drawerItem = drawerItem.CLOUD_DRIVE;
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					return;
+				}
+			}
+		}
+		
+		if (sF != null){
+			if (sF.isVisible()){
+				if (sF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
 					return;
 				}
@@ -1474,6 +1559,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
+			}
+		}
+		
+		if (sF != null){
+			if (sF.isVisible()){
+				if (createFolderMenuItem != null){
+	    			createFolderMenuItem.setVisible(false);
+	    			rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
+	    			
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+				}
 			}
 		}
 	    	    
@@ -3327,6 +3435,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void setParentHandleSharedWithMe(long parentHandleSharedWithMe){
 		this.parentHandleSharedWithMe = parentHandleSharedWithMe;
+	}
+	
+	public void setParentHandleSearch(long parentHandleSearch){
+		this.parentHandleSearch = parentHandleSearch;
 	}
 	
 	public void setPauseIconVisible(boolean visible){
