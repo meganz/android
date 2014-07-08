@@ -1154,6 +1154,9 @@ MegaListener::~MegaListener() {}
 int TreeProcessor::processNode(Node*){ return 0; /* Stops the processing */ }
 TreeProcessor::~TreeProcessor() {}
 
+bool MegaTreeProcessor::processMegaNode(MegaNode*){ return false; /* Stops the processing */ }
+MegaTreeProcessor::~MegaTreeProcessor() {}
+
 //Entry point for the blocking thread
 void *MegaApi::threadEntryPoint(void *param)
 {
@@ -2254,6 +2257,51 @@ int MegaApi::getAccess(MegaNode* megaNode)
 	}
 }
 
+bool MegaApi::processMegaTree(MegaNode* n, MegaTreeProcessor* processor, bool recursive)
+{
+	if(!n) return true;
+	if(!processor) return false;
+
+    MUTEX_LOCK(sdkMutex);
+	Node *node = client->nodebyhandle(n->getHandle());
+	if(!node)
+	{
+        MUTEX_UNLOCK(sdkMutex);
+		return true;
+	}
+
+	if (node->type != FILENODE)
+	{
+		for (node_list::iterator it = node->children.begin(); it != node->children.end(); )
+		{
+			MegaNode *megaNode = MegaNode::fromNode(*it++);
+			if(recursive)
+			{
+				if(!processMegaTree(megaNode,processor))
+				{
+					delete megaNode;
+                    MUTEX_UNLOCK(sdkMutex);
+					return 0;
+				}
+			}
+			else
+			{
+				if(!processor->processMegaNode(megaNode))
+				{
+					delete megaNode;
+                    MUTEX_UNLOCK(sdkMutex);
+					return 0;
+				}
+			}
+			delete megaNode;
+		}
+	}
+	bool result = processor->processMegaNode(n);
+
+    MUTEX_UNLOCK(sdkMutex);
+	return result;
+}
+
 bool MegaApi::processTree(Node* node, TreeProcessor* processor, bool recursive)
 {
 	if(!node) return 1;
@@ -2295,16 +2343,15 @@ bool MegaApi::processTree(Node* node, TreeProcessor* processor, bool recursive)
 	return result;
 }
 
-NodeList* MegaApi::search(Node* node, const char* searchString, bool recursive)
+NodeList* MegaApi::search(MegaNode* n, const char* searchString, bool recursive)
 {
-    if(!node || !searchString) return new NodeList();
-
-    MUTEX_LOCK(sdkMutex);
-	node = client->nodebyhandle(node->nodehandle);
+	if(!n || !searchString) return new NodeList();
+	MUTEX_LOCK(sdkMutex);
+	Node *node = client->nodebyhandle(n->getHandle());
 	if(!node)
 	{
-        MUTEX_UNLOCK(sdkMutex);
-        return new NodeList();
+		MUTEX_UNLOCK(sdkMutex);
+		return new NodeList();
 	}
 
 	SearchTreeProcessor searchProcessor(searchString);
@@ -2314,7 +2361,6 @@ NodeList* MegaApi::search(Node* node, const char* searchString, bool recursive)
 	NodeList *nodeList;
     if(vNodes.size()) nodeList = new NodeList(vNodes.data(), vNodes.size());
     else nodeList = new NodeList();
-
     MUTEX_UNLOCK(sdkMutex);
 
     return nodeList;

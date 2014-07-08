@@ -638,6 +638,13 @@ class TreeProcessor
 	virtual ~TreeProcessor();
 };
 
+class MegaTreeProcessor
+{
+	public:
+	virtual bool processMegaNode(MegaNode* node);
+	virtual ~MegaTreeProcessor();
+};
+
 class SearchTreeProcessor : public TreeProcessor
 {
     public:
@@ -986,6 +993,9 @@ public:
     MegaNode *getRootNode();
     MegaNode* getInboxNode();
     MegaNode *getRubbishNode();
+	NodeList* search(MegaNode* node, const char* searchString, bool recursive = 1);
+	bool processMegaTree(MegaNode* node, MegaTreeProcessor* processor, bool recursive = 1);
+
 	//StringList *getRootNodeNames();
 	//StringList *getRootNodePaths();
 
@@ -1179,7 +1189,6 @@ protected:
 	//Pending
 	mega::Node* getChildNodeInternal(mega::Node *parent, const char* name);
 	bool processTree(mega::Node* node, TreeProcessor* processor, bool recursive = 1);
-	NodeList* search(mega::Node* node, const char* searchString, bool recursive = 1);
 	void getAccountDetails(int storage, int transfer, int pro, int transactions, int purchases, int sessions, MegaRequestListener *listener = NULL);
     void getNodeAttribute(MegaNode* node, int type, char *dstFilePath, MegaRequestListener *listener = NULL);
     void setNodeAttribute(MegaNode* node, int type, char *srcFilePath, MegaRequestListener *listener = NULL);

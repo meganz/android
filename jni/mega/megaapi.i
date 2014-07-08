@@ -44,6 +44,7 @@
 
 %feature("director") MegaGlobalListener;
 %feature("director") MegaListener;
+%feature("director") MegaTreeProcessor;
 %feature("director") GfxProcessor;
 
 //%feature("director") TreeProcessor;
