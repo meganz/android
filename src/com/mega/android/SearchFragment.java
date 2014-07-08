@@ -46,13 +46,12 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserListAdapter adapterList;
-	MegaBrowserGridAdapter adapterGrid;
 	SearchFragment searchFragment = this;
 	
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
-	boolean isList = true;
+	int levels = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	NodeList nodes;
@@ -219,16 +218,22 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		}
 		
 		if (parentHandle == -1){
-			//TODO CHANGE THIS TO MEGAAPI.SEARCH
-			nodes = megaApi.getChildren(megaApi.getRootNode());
-			searchNodes = megaApi.getChildren(megaApi.getRootNode());
+			nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
+			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 			
 			aB.setTitle(getString(R.string.search_files_and_folders));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 		else{
-			Toast.makeText(context, "DISTINTO", Toast.LENGTH_LONG).show();
+			MegaNode n = megaApi.getNodeByHandle(parentHandle);
+			
+			aB.setTitle(n.getName());
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+
+			((ManagerActivity)context).setParentHandleSearch(parentHandle);
+			nodes = megaApi.getChildren(n, orderGetChildren);
 		}
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -243,7 +248,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
 		if (adapterList == null){
-			adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
+			adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SEARCH_ADAPTER);
 		}
 		else{
 			adapterList.setParentHandle(parentHandle);
@@ -258,100 +263,6 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		setNodes(nodes);
 		
 		return v;
-		
-		
-//		if (parentHandle == -1){
-//			parentHandle = megaApi.getRootNode().getHandle();
-//			((ManagerActivity)context).setParentHandleSearch(parentHandle);
-//			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-//			aB.setTitle(getString(R.string.search_files_and_folders));	
-//			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			((ManagerActivity)context).supportInvalidateOptionsMenu();
-//		}
-//		else{
-//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//			nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//			
-//			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));	
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			}
-//			else{
-//				aB.setTitle(parentNode.getName());					
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//			}
-//			((ManagerActivity)context).supportInvalidateOptionsMenu();
-//		}	
-//		
-//		if (isList){
-//			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-//	        
-//	        listView = (ListView) v.findViewById(R.id.file_list_view_browser);
-//			listView.setOnItemClickListener(this);
-//			listView.setOnItemLongClickListener(this);
-//			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//			listView.setItemsCanFocus(false);
-//			
-//			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-//			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-//			
-//			if (adapterList == null){
-//				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
-//			}
-//			else{
-//				adapterList.setParentHandle(parentHandle);
-//				adapterList.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-//			
-//			adapterList.setPositionClicked(-1);
-//			adapterList.setMultipleSelect(false);
-//
-//			listView.setAdapter(adapterList);
-//			
-//			setNodes(nodes);
-//			
-//			return v;
-//		}
-//		else{
-//			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
-//			
-//			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
-//			listView.setOnItemClickListener(null);
-//			listView.setItemsCanFocus(false);
-//	        
-//	        emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-//			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-//	        
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
-//			}
-//			else{
-//				adapterGrid.setParentHandle(parentHandle);
-//				adapterGrid.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-//			
-//			adapterGrid.setPositionClicked(-1);
-//			
-//			listView.setAdapter(adapterGrid);
-//			
-//			setNodes(nodes);
-//			
-//			return v;
-//		}		
 	}
 		
 	@Override
@@ -373,104 +284,106 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
 		
-		if (isList){
-			if (adapterList.isMultipleSelect()){
-				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-				if (checkedItems.get(position, false) == true){
-					listView.setItemChecked(position, true);
-				}
-				else{
-					listView.setItemChecked(position, false);
-				}				
-				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
+		if (adapterList.isMultipleSelect()){
+			SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				listView.setItemChecked(position, true);
 			}
 			else{
-				if (nodes.get(position).isFolder()){
-					MegaNode n = nodes.get(position);
-					
-					aB.setTitle(n.getName());
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = nodes.get(position).getHandle();
-					((ManagerActivity)context).setParentHandleSearch(parentHandle);
-					adapterList.setParentHandle(parentHandle);
-					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-					adapterList.setNodes(nodes);
-					listView.setSelection(0);
-					
-					//If folder has no files
-					if (adapterList.getCount() == 0){
-						listView.setVisibility(View.GONE);
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextView.setText(R.string.file_browser_empty_folder);
-						}
-					}
-					else{
-						listView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
+				listView.setItemChecked(position, false);
+			}				
+			updateActionModeTitle();
+			adapterList.notifyDataSetChanged();
+		}
+		else{
+			if (nodes.get(position).isFolder()){
+				MegaNode n = nodes.get(position);
+				
+				aB.setTitle(n.getName());
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				parentHandle = nodes.get(position).getHandle();
+				((ManagerActivity)context).setParentHandleSearch(parentHandle);
+				adapterList.setParentHandle(parentHandle);
+				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
+				adapterList.setNodes(nodes);
+				listView.setSelection(0);
+				
+				levels++;
+				
+				//If folder has no files
+				if (adapterList.getCount() == 0){
+					listView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					} else {
+						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+						emptyTextView.setText(R.string.file_browser_empty_folder);
 					}
 				}
 				else{
-					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
-						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-						}
-						intent.putExtra("orderGetChildren", orderGetChildren);
-						startActivity(intent);
-					}
-					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
-						MegaNode file = nodes.get(position);
-						Intent service = new Intent(context, MegaStreamingService.class);
-				  		context.startService(service);
-				  		String fileName = file.getName();
-						try {
-							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-						} 
-						catch (UnsupportedEncodingException e) {
-							e.printStackTrace();
-						}
-						
-				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeType.typeForName(file.getName()).getType();
-				  		System.out.println("FILENAME: " + fileName);
-				  		
-				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		try
-				  		{
-				  			startActivity(mediaIntent);
-				  		}
-				  		catch(Exception e)
-				  		{
-				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-				  		}						
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}
+			}
+			else{
+				if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", position);
+					intent.putExtra("searchQuery", searchQuery);
+					intent.putExtra("adapterType", ManagerActivity.SEARCH_ADAPTER);
+					if (parentHandle == -1){
+						intent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
-						adapterList.setPositionClicked(-1);
-						adapterList.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						((ManagerActivity) context).onFileClick(handleList);
+						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
+					intent.putExtra("orderGetChildren", orderGetChildren);
+					startActivity(intent);
+				}
+				else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
+					MegaNode file = nodes.get(position);
+					Intent service = new Intent(context, MegaStreamingService.class);
+			  		context.startService(service);
+			  		String fileName = file.getName();
+					try {
+						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+					} 
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+			  		String mimeType = MimeType.typeForName(file.getName()).getType();
+			  		System.out.println("FILENAME: " + fileName);
+			  		
+			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			  		try
+			  		{
+			  			startActivity(mediaIntent);
+			  		}
+			  		catch(Exception e)
+			  		{
+			  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+			  		}						
+				}
+				else{
+					adapterList.setPositionClicked(-1);
+					adapterList.notifyDataSetChanged();
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(nodes.get(position).getHandle());
+					((ManagerActivity) context).onFileClick(handleList);
 				}
 			}
 		}
-    }
+	}
+
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -577,136 +490,73 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 			return 1;
 		}
 		else{
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-			if (parentNode != null){
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-					aB.setTitle(getString(R.string.section_cloud_drive));	
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			if (levels > 0){
+				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+				if (parentNode != null){
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+						aB.setTitle(getString(R.string.section_cloud_drive));	
+						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					}
+					else{
+						aB.setTitle(parentNode.getName());					
+						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					}
+					
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+					
+					parentHandle = parentNode.getHandle();
+					((ManagerActivity)context).setParentHandleSearch(parentHandle);
+					nodes = megaApi.getChildren(parentNode, orderGetChildren);
+					adapterList.setNodes(nodes);
+					listView.setSelection(0);
+					adapterList.setParentHandle(parentHandle);
+					levels--;
+					return 2;
 				}
 				else{
-					aB.setTitle(parentNode.getName());					
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					return 0;
 				}
-				
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
-				
-				parentHandle = parentNode.getHandle();
+			}
+			else if (levels == -1){
+				return 0;
+			}
+			else{
+				parentHandle = -1;
 				((ManagerActivity)context).setParentHandleSearch(parentHandle);
-				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 				adapterList.setNodes(nodes);
 				listView.setSelection(0);
 				adapterList.setParentHandle(parentHandle);
-				return 2;
-			}
-			else{
-				return 0;
+				levels--;
+				aB.setTitle(getString(R.string.search_files_and_folders));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				return 3;
 			}
 		}
-		
-//		if (isList){
-//			parentHandle = adapterList.getParentHandle();
-//			((ManagerActivity)context).setParentHandleSearch(parentHandle);
-//			
-//			if (adapterList.getPositionClicked() != -1){
-//				adapterList.setPositionClicked(-1);
-//				adapterList.notifyDataSetChanged();
-//				return 1;
-//			}
-//			else{
-//				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-//				if (parentNode != null){
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//						aB.setTitle(getString(R.string.section_cloud_drive));	
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//					}
-//					else{
-//						aB.setTitle(parentNode.getName());					
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					}
-//					
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = parentNode.getHandle();
-//					((ManagerActivity)context).setParentHandleSearch(parentHandle);
-//					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//					adapterList.setNodes(nodes);
-//					listView.setSelection(0);
-//					adapterList.setParentHandle(parentHandle);
-//					return 2;
-//				}
-//				else{
-//					return 0;
-//				}
-//			}
-//		}
-//		else{
-//			parentHandle = adapterGrid.getParentHandle();
-//			((ManagerActivity)context).setParentHandleSearch(parentHandle);
-//			
-//			if (adapterGrid.getPositionClicked() != -1){
-//				adapterGrid.setPositionClicked(-1);
-//				adapterGrid.notifyDataSetChanged();
-//				return 1;
-//			}
-//			else{
-//				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-//				if (parentNode != null){
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//						aB.setTitle(getString(R.string.section_cloud_drive));	
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//					}
-//					else{
-//						aB.setTitle(parentNode.getName());					
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					}
-//					
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = parentNode.getHandle();
-//					((ManagerActivity)context).setParentHandleSearch(parentHandle);
-//					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//					adapterGrid.setNodes(nodes);
-//					listView.setSelection(0);
-//					adapterGrid.setParentHandle(parentHandle);
-//					return 2;
-//				}
-//				else{
-//					return 0;
-//				}
-//			}
-//		}
 	}
 	
 	public long getParentHandle(){
-		if (isList){
-			return adapterList.getParentHandle();
-		}
-		else{
-			return adapterGrid.getParentHandle();
-		}
+		return adapterList.getParentHandle();
+
 	}
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-		if (isList){
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(parentHandle);
-			}
+		if (adapterList != null){
+			adapterList.setParentHandle(parentHandle);
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(parentHandle);
-			}
-		}
+	}
+	
+	public int getLevels(){
+		return levels;
+	}
+	
+	public void setLevels(int levels){
+		this.levels = levels;
 	}
 	
 	public ListView getListView(){
@@ -744,100 +594,25 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 				emptyTextView.setVisibility(View.GONE);
 			}			
 		}
-		
-		
-		
-//		if (isList){
-//			if (adapterList != null){
-//				adapterList.setNodes(nodes);
-//				if (adapterList.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyTextView.setVisibility(View.VISIBLE);
-//					if (megaApi.getRootNode().getHandle()==parentHandle) {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-//						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-//					} else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextView.setText(R.string.file_browser_empty_folder);
-//					}
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//				}			
-//			}	
-//		}
-//		else{
-//			if (adapterGrid != null){
-//				adapterGrid.setNodes(nodes);
-//				if (adapterGrid.getCount() == 0){
-//					listView.setVisibility(View.GONE);
-//					emptyImageView.setVisibility(View.VISIBLE);
-//					emptyTextView.setVisibility(View.VISIBLE);
-//					if (megaApi.getRootNode().getHandle()==parentHandle) {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-//						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-//					} else {
-//						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//						emptyTextView.setText(R.string.file_browser_empty_folder);
-//					}
-//				}
-//				else{
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//				}			
-//			}
-//		}
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		if (isList){
-			if (adapterList != null){
-				adapterList.setPositionClicked(positionClicked);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setPositionClicked(positionClicked);
-			}	
-		}		
+		if (adapterList != null){
+			adapterList.setPositionClicked(positionClicked);
+		}	
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
-			if (adapterList != null){
-				adapterList.notifyDataSetChanged();
-			}
+		if (adapterList != null){
+			adapterList.notifyDataSetChanged();
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.notifyDataSetChanged();
-			}
-		}
-	}
-	
-	public void setIsList(boolean isList){
-		this.isList = isList;
-	}
-	
-	public boolean getIsList(){
-		return isList;
 	}
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setOrder(orderGetChildren);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setOrder(orderGetChildren);
-			}
+		
+		if (adapterList != null){
+			adapterList.setOrder(orderGetChildren);
 		}
 	}
 	

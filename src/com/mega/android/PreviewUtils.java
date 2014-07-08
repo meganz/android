@@ -90,7 +90,7 @@ public class PreviewUtils {
 		BitmapFactory.Options bOpts = new BitmapFactory.Options();
 		bOpts.inPurgeable = true;
 		bOpts.inInputShareable = true;
-		log("TAM_IMAGEN_PREVIA " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
+		log("PREVIEW_SIZE " + bmpFile.getAbsolutePath() + "____ " + bmpFile.length());
 		Bitmap bmp = BitmapFactory.decodeFile(bmpFile.getAbsolutePath(), bOpts);
 		return bmp;
 	}

@@ -99,6 +99,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
 				break;
 			}
+			case ManagerActivity.SEARCH_ADAPTER:{
+				((ManagerActivity)context).setParentHandleSearch(parentHandle);
+				break;
+			}
 			default:{
 				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 				break;
@@ -515,7 +519,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_list_option_public_link:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
+				if ((type == ManagerActivity.FILE_BROWSER_ADAPTER) || (type == ManagerActivity.SEARCH_ADAPTER)){
 					((ManagerActivity) context).getPublicLinkAndShareIt(n);
 				}
 				break;
@@ -607,6 +611,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 			case ManagerActivity.FOLDER_LINK_ADAPTER:{
+				break;
+			}
+			case ManagerActivity.SEARCH_ADAPTER:{
+				((ManagerActivity)context).setParentHandleSearch(parentHandle);
 				break;
 			}
 			default:{

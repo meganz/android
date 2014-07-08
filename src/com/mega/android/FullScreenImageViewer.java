@@ -215,6 +215,82 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
 		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		}
+		else if(adapterType == ManagerActivity.SEARCH_ADAPTER){
+			NodeList nodes = null;
+			if (parentNodeHandle == -1){
+				String query = intent.getStringExtra("searchQuery");
+				nodes = megaApi.search(megaApi.getRootNode(), query, true);
+			}
+			else{
+				parentNode =  megaApi.getNodeByHandle(parentNodeHandle);
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			}
+			
+			int imageNumber = 0;
+			for (int i=0;i<nodes.size();i++){
+				MegaNode n = nodes.get(i);
+				if (MimeType.typeForName(n.getName()).isImage()){
+					imageHandles.add(n.getHandle());
+					if (i == positionG){
+						positionG = imageNumber; 
+					}
+					imageNumber++;
+				}
+			}
+			
+			adapterMega = new MegaFullScreenImageAdapter(fullScreenImageViewer,imageHandles, megaApi);
+			
+			viewPager.setAdapter(adapterMega);
+			
+			viewPager.setCurrentItem(positionG);
+	
+			viewPager.setOnPageChangeListener(this);
+			
+			actionBarIcon = (ImageView) findViewById(R.id.full_image_viewer_icon);
+			actionBarIcon.setOnClickListener(this);
+			
+			overflowIcon = (ImageView) findViewById(R.id.full_image_viewer_overflow);
+			if (!isFolderLink){
+				overflowIcon.setVisibility(View.VISIBLE);
+				overflowIcon.setOnClickListener(this);
+			}
+			else{
+				overflowIcon.setVisibility(View.INVISIBLE);
+			}
+			
+			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
+			shareIcon.setVisibility(View.VISIBLE);
+			shareIcon.setOnClickListener(this);
+			
+			downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
+			downloadIcon.setVisibility(View.VISIBLE);
+			downloadIcon.setOnClickListener(this);
+			
+			String menuOptions[] = new String[6];
+			menuOptions[0] = getString(R.string.context_get_link_menu);
+			menuOptions[1] = getString(R.string.context_rename);
+			menuOptions[2] = getString(R.string.context_move);
+			menuOptions[3] = getString(R.string.context_copy);
+			menuOptions[4] = getString(R.string.context_send_link);
+			menuOptions[5] = getString(R.string.context_remove);
+			
+			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
+			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
+			overflowMenuList.setAdapter(arrayAdapter);
+			overflowMenuList.setOnItemClickListener(this);
+			if (overflowVisible){
+				overflowMenuList.setVisibility(View.VISIBLE);	
+			}
+			else{
+				overflowMenuList.setVisibility(View.GONE);
+			}
+			
+			bottomLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_bottom);
+		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
+		    
+		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
+		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		}
 		else{
 
 			if (parentNodeHandle == -1){
@@ -240,7 +316,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 						parentNode = megaApi.getRootNode();
 						break;
 					}
-				}
+				} 
 				
 			}
 			else{
