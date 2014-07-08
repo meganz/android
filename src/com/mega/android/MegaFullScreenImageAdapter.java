@@ -105,7 +105,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			else if(param == 2){
 				MegaNode node = megaApi.getNodeByHandle(handle);
 				File previewFile = new File(PreviewUtils.getPreviewFolder(activity), node.getBase64Handle()+".jpg");
-				log("INICIA LA DESCARGA DE " + node.getHandle());
+				log("GET PREVIEW OF HANDLE: " + node.getHandle());
 				pendingPreviews.add(node.getHandle());
 				megaApi.getPreview(node,  previewFile.getAbsolutePath(), megaFullScreenImageAdapter);				
 			}
@@ -346,7 +346,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		visibleImgs.remove(position);
         ((ViewPager) container).removeView((RelativeLayout) object);
         System.gc();
-        log ("DESTROY POSITION " + position + " SIZE SPARSE: " + visibleImgs.size());
+        log ("DESTROY POSITION " + position + " visibleImgs.size(): " + visibleImgs.size());
  
     }
 	
@@ -439,7 +439,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
 		log("onRequestStart: " + request.getRequestString());
-		log("Node: " + request.getNodeHandle() + "_" + request.getName());
+		log("onRequestStart: Node: " + request.getNodeHandle());
 	}
 
 	@Override
@@ -447,7 +447,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			MegaError e) {
 		
 		log("onRequestFinish: " + request.getRequestString());
-		log("Node: " + request.getNodeHandle() + "_" + request.getName());
+		log("onRequestFinish: Node: " + request.getNodeHandle() + "_" + request.getName());
 
 		long handle = request.getNodeHandle();
 		MegaNode node = api.getNodeByHandle(handle);
@@ -460,7 +460,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			
 			if (preview.exists()) {
 				if (preview.length() > 0) {
-					log("DESCARGADO EL HANDLE: " + handle + " SPARSE SIZE: " + visibleImgs.size());
+					log("GET PREVIEW FINISHED. HANDLE: " + handle + " visibleImgs.size(): " + visibleImgs.size());
 					int position = 0;
 					boolean holderIsVisible = false;
 					for(int i = 0; i < visibleImgs.size(); i++) {

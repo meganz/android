@@ -136,6 +136,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int SHARED_WITH_ME_ADAPTER = 2003;
 	final public static int OFFLINE_ADAPTER = 2004;
 	final public static int FOLDER_LINK_ADAPTER = 2005;
+	final public static int SEARCH_ADAPTER = 2006;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -236,6 +237,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	String searchQuery = null;
 	NodeList searchNodes;
+	int levelsSearch = -1;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -426,7 +428,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        
 	        List<String> items = new ArrayList<String>();
 			for (DrawerItem item : DrawerItem.values()) {
-				if (!item.equals(DrawerItem.RUBBISH_BIN)){
+				if (!item.equals(DrawerItem.RUBBISH_BIN) && (!item.equals(DrawerItem.SEARCH))){
 					items.add(item.getTitle(this));
 				}
 			}
@@ -573,6 +575,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					case 11:{
 						drawerItem = DrawerItem.SEARCH;
 						searchQuery = savedInstanceState.getString("searchQuery");
+						levelsSearch = savedInstanceState.getInt("levels");
 						break;
 					}
 				}
@@ -665,6 +668,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			pHSearch = sF.getParentHandle();
     			visibleFragment = 11;
     			outState.putString("searchQuery", searchQuery);
+    			outState.putInt("levels", sF.getLevels());
     		}
     	}
     	
@@ -1245,13 +1249,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			sF = new SearchFragment();
         		}
     			
-    			//TODO CHANGE THIS TO MEGAAPI.SEARCH
-    			searchNodes = megaApi.getChildren(megaApi.getRootNode());
+    			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
     			
     			sF.setSearchNodes(searchNodes);
     			sF.setNodes(searchNodes);
     			sF.setSearchQuery(searchQuery);
     			sF.setParentHandle(parentHandleSearch);
+    			sF.setLevels(levelsSearch);
+    			Toast.makeText(this, "LEVELS: " + levelsSearch, Toast.LENGTH_LONG).show();
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, sF, "sF").commit();
     			customListGrid.setVisibility(View.GONE);
