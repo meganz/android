@@ -24,7 +24,8 @@ public class MegaApiJava
 	static Set<DelegateMegaTransferListener> activeTransferListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaTransferListener>());
 	static Set<DelegateMegaGlobalListener> activeGlobalListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaGlobalListener>());
 	static Set<DelegateMegaListener> activeMegaListeners = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaListener>());
-
+	static Set<DelegateMegaTreeProcessor> activeMegaTreeProcessors = Collections.synchronizedSet(new LinkedHashSet<DelegateMegaTreeProcessor>());
+	
 	//Order options for getChildren
 	public final static int ORDER_NONE = MegaApi.ORDER_NONE;
 	public final static int ORDER_DEFAULT_ASC = MegaApi.ORDER_DEFAULT_ASC;
@@ -716,7 +717,21 @@ public class MegaApiJava
 	{
 		return megaApi.getRubbishNode();
 	}
-	  
+	
+	public NodeList search(MegaNode parent, String searchString, boolean recursive)
+	{
+		return megaApi.search(parent, searchString, recursive);
+	}
+	
+	public boolean processMegaTree(MegaNode parent, MegaTreeProcessorInterface processor, boolean recursive)
+	{
+		DelegateMegaTreeProcessor delegateListener = new DelegateMegaTreeProcessor(this, processor);
+		activeMegaTreeProcessors.add(delegateListener);
+		boolean result = megaApi.processMegaTree(parent, delegateListener, recursive);
+		activeMegaTreeProcessors.remove(delegateListener);
+		return result;
+	}
+	
 	/****************************************************************************************************/
 	//INTERNAL METHODS
 	/****************************************************************************************************/
