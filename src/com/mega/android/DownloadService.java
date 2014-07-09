@@ -201,11 +201,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
 		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
 		if (isFolderLink){
-			log("hola!!!!!!!!!!!");
 			megaApi = app.getMegaApiFolder();
 		}
 		else{
-			log("adios!!!!!!!!!!!");
 			megaApi = app.getMegaApi();
 		}
 		
@@ -354,6 +352,19 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else
 		{
+			if (MimeType.typeForName(currentFile.getName()).isDocument()){
+				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+				viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				if (isIntentAvailable(this, viewIntent))
+					startActivity(viewIntent);
+				else{
+					Intent intentShare = new Intent(Intent.ACTION_SEND);
+					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+					intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					startActivity(intentShare);
+				}
+			}
 			log("Current File: " + currentFile.getAbsolutePath());
 			intent = new Intent(Intent.ACTION_VIEW);
 			intent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName())

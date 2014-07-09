@@ -107,6 +107,12 @@ public class MimeType {
 		return type;
 	}
 	
+	public boolean isDocument(){
+		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith("text/plain");
+		
+		return r;
+	}
+	
 	/*
 	 * Check is MimeType of image type
 	 */

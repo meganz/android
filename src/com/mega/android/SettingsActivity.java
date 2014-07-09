@@ -253,9 +253,11 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 
 		if (storageAskMeAlways.isChecked()){
 			downloadLocation.setEnabled(false);
+			downloadLocation.setSummary("");
 		}
 		else{
 			downloadLocation.setEnabled(true);
+			downloadLocation.setSummary(downloadLocationPath);
 		}
 		
 //		cameraUploadHow.setEnabled(false);
