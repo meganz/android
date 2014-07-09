@@ -238,6 +238,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	String searchQuery = null;
 	NodeList searchNodes;
 	int levelsSearch = -1;
+	
+	private boolean isOpenLink = false;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -260,6 +262,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
+	    
+//	    Intent intentNuevo = getIntent();
+//	    
+//	    if (intentNuevo != null){
+//	    	if (intentNuevo.getAction() != null){
+//	    		if (intentNuevo.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+//	    	    	Toast.makeText(this, "intentNuevo DISTINTO DE NULL", Toast.LENGTH_LONG).show();		
+//	    	    	isOpenLink = true;
+//	    	    	return;
+//	    		}
+//	    	}
+//	    }
 	     
 		
 		dbH = new DatabaseHandler(getApplicationContext()); 
@@ -728,14 +742,35 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	log("onResume");
     	
+    	Intent intent = getIntent();
+    	
+//    	if (intent != null){
+//    		if (intent.getAction() != null){
+//    			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
+//    				if (importDialog != null){
+//    					try{
+//    						statusDialog.dismiss();
+//    						importDialog.dismiss();
+//    					}
+//    					catch(Exception e){	}
+//    				}
+//    				if (mDrawerLayout != null){
+//    					mDrawerLayout.closeDrawer(Gravity.LEFT); 
+//    				}
+//    				handleOpenLinkIntent(intent);
+//					intent.setAction(null);
+//					setIntent(null);
+//					return;
+//    			}
+//    		}
+//    	}
+    	
     	DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
     	if(dbH.getCredentials() == null){	
 			logout(this, (MegaApplication)getApplication(), megaApi);
 			return;
 		}
-    	
-    	Intent intent = getIntent();
-    	
+    	   	
     	if (intent != null) {
     		log("intent != null");
     		// Open folder from the intent
@@ -932,7 +967,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			else{
     				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
     				dbH.setFirstTime(false);
-    				dbH.setStorageAskAlways(true);
+    				dbH.setStorageAskAlways(false);
+    				File defaultDownloadLocation = null;
+    				if (Environment.getExternalStorageDirectory() != null){
+    					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+    				}
+    				else{
+    					defaultDownloadLocation = getFilesDir();
+    				}
+    				
+    				defaultDownloadLocation.mkdirs();
+    				
+    				dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
     				dbH.setPinLockEnabled(false);
     				dbH.setPinLockCode("");
     				firstTime = false;
@@ -1379,7 +1425,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
 		super.onPostCreate(savedInstanceState);
-		mDrawerToggle.syncState();
+		if (!isOpenLink){
+			mDrawerToggle.syncState();
+		}
 	}
 
 	
@@ -2361,44 +2409,49 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
 			
+			
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {} 
-			
-			MegaNode n = request.getPublicNode().copy();
-			
-			if (e.getErrorCode() != MegaError.API_OK) {
-				Util.showErrorAlertDialog(e, ManagerActivity.this);
-				return;
-			}
-			
-			if (n == null){
-				Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, ManagerActivity.this);
-				return;
-			}
-			
-			MegaNode parentNode = null;
-			if (fbF != null){
-				if (fbF.isVisible()){
-					parentHandleBrowser = fbF.getParentHandle();
-					parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+			if (e.getErrorCode() == MegaError.API_OK) {
+				MegaNode n = request.getPublicNode().copy();
+				
+				if (e.getErrorCode() != MegaError.API_OK) {
+					Util.showErrorAlertDialog(e, ManagerActivity.this);
+					return;
 				}
+				
+				if (n == null){
+					Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, ManagerActivity.this);
+					return;
+				}
+				
+				MegaNode parentNode = null;
+				if (fbF != null){
+					if (fbF.isVisible()){
+						parentHandleBrowser = fbF.getParentHandle();
+						parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+					}
+				}
+				
+				if (parentNode == null){
+					parentNode = megaApi.getRootNode();
+					parentHandleBrowser = megaApi.getRootNode().getHandle();
+				}
+				
+				importDialog = new ImportDialog();
+				importDialog.setMegaApi(megaApi);
+				importDialog.setInfo(n, parentNode.getHandle(), urlLink);
+				try { 
+					importDialog.show(getSupportFragmentManager(), "fragment_import"); 
+				} catch(Exception ex) {
+					Toast.makeText(this, "Error al mostrar el dialog: " + ex.getMessage(), Toast.LENGTH_LONG).show();
+				};
 			}
-			
-			if (parentNode == null){
-				parentNode = megaApi.getRootNode();
-				parentHandleBrowser = megaApi.getRootNode().getHandle();
+			else{
+				Toast.makeText(this, "Error (" + e.getErrorCode() + "): "+ e.getErrorString(), Toast.LENGTH_LONG).show();
 			}
-			
-			importDialog = new ImportDialog();
-			importDialog.setMegaApi(megaApi);
-			importDialog.setInfo(n, parentNode.getHandle(), urlLink);
-			try { 
-				importDialog.show(getSupportFragmentManager(), "fragment_import"); 
-			} catch(Exception ex) {
-				Toast.makeText(this, "Error al mostrar el dialog: " + ex.getMessage(), Toast.LENGTH_LONG).show();
-			};
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			if (e.getErrorCode() == MegaError.API_OK) {
