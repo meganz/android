@@ -3187,72 +3187,71 @@ void MegaApi::openfilelink_result(handle ph, const byte* key, m_off_t size, stri
 	if((request->getType() != MegaRequest::TYPE_IMPORT_LINK) && (request->getType() != MegaRequest::TYPE_GET_PUBLIC_NODE))
 		cout << "INCORRECT REQUEST OBJECT (12)";
 
-	if (!client->loggedin())
+	if (!client->loggedin() || (request->getType() == MegaRequest::TYPE_IMPORT_LINK))
 	{
         LOG("Need to be logged in to import file links.");
 		fireOnRequestFinish(this, request, MegaError(MegaError::API_EACCESS));
+		return;
+	}
+
+	if(request->getType() == MegaRequest::TYPE_IMPORT_LINK)
+	{
+		NewNode* newnode = new NewNode[1];
+
+		// set up new node as folder node
+		newnode->source = NEW_PUBLIC;
+		newnode->type = FILENODE;
+		newnode->nodehandle = ph;
+		newnode->clienttimestamp = tm;
+		newnode->parenthandle = UNDEF;
+		newnode->nodekey.assign((char*)key,FILENODEKEYLENGTH);
+		newnode->attrstring = *a;
+
+		// add node
+		requestMap.erase(client->restag);
+		requestMap[client->nextreqtag()]=request;
+		client->putnodes(request->getParentHandle(),newnode,1);
 	}
 	else
 	{
-		if(request->getType() == MegaRequest::TYPE_IMPORT_LINK)
+		string attrstring;
+		string fileName;
+		string keystring;
+
+		attrstring.resize(a->length()*4/3+4);
+		attrstring.resize(Base64::btoa((const byte *)a->data(),a->length(), (char *)attrstring.data()));
+
+		if(key)
 		{
-			NewNode* newnode = new NewNode[1];
+			SymmCipher nodeKey;
+			keystring.assign((char*)key,FILENODEKEYLENGTH);
+			nodeKey.setkey(key, FILENODE);
 
-			// set up new node as folder node
-			newnode->source = NEW_PUBLIC;
-			newnode->type = FILENODE;
-			newnode->nodehandle = ph;
-			newnode->clienttimestamp = tm;
-			newnode->parenthandle = UNDEF;
-			newnode->nodekey.assign((char*)key,FILENODEKEYLENGTH);
-			newnode->attrstring = *a;
+			byte *buf = Node::decryptattr(&nodeKey,attrstring.c_str(),attrstring.size());
+			if(buf)
+			{
+				JSON json;
+				nameid name;
+				string* t;
+				AttrMap attrs;
 
-			// add node
-			requestMap.erase(client->restag);
-			requestMap[client->nextreqtag()]=request;
-			client->putnodes(request->getParentHandle(),newnode,1);
+				json.begin((char*)buf+5);
+				while ((name = json.getnameid()) != EOO && json.storeobject((t = &attrs.map[name]))) JSON::unescape(t);
+				delete[] buf;
+
+				attr_map::iterator it;
+				it = attrs.map.find('n');
+				if (it == attrs.map.end()) fileName = "CRYPTO_ERROR";
+				else if (!it->second.size()) fileName = "BLANK";
+				else fileName = it->second.c_str();
+			}
+			else fileName = "CRYPTO_ERROR";
 		}
-		else
-		{
-            string attrstring;
-            string fileName;
-            string keystring;
+		else fileName = "NO_KEY";
 
-            attrstring.resize(a->length()*4/3+4);
-            attrstring.resize(Base64::btoa((const byte *)a->data(),a->length(), (char *)attrstring.data()));
-
-            if(key)
-            {
-                SymmCipher nodeKey;
-                keystring.assign((char*)key,FILENODEKEYLENGTH);
-                nodeKey.setkey(key, FILENODE);
-
-                byte *buf = Node::decryptattr(&nodeKey,attrstring.c_str(),attrstring.size());
-                if(buf)
-                {
-                    JSON json;
-                    nameid name;
-                    string* t;
-                    AttrMap attrs;
-
-                    json.begin((char*)buf+5);
-                    while ((name = json.getnameid()) != EOO && json.storeobject((t = &attrs.map[name]))) JSON::unescape(t);
-                    delete[] buf;
-
-                    attr_map::iterator it;
-                    it = attrs.map.find('n');
-                    if (it == attrs.map.end()) fileName = "CRYPTO_ERROR";
-                    else if (!it->second.size()) fileName = "BLANK";
-                    else fileName = it->second.c_str();
-                }
-                else fileName = "CRYPTO_ERROR";
-            }
-            else fileName = "NO_KEY";
-
-            request->setPublicNode(new MegaNode(fileName.c_str(), FILENODE, size, ts, tm, ph, &keystring, a));
-			fireOnRequestFinish(this, request, MegaError(MegaError::API_OK));
-		}
-    }
+		request->setPublicNode(new MegaNode(fileName.c_str(), FILENODE, size, ts, tm, ph, &keystring, a));
+		fireOnRequestFinish(this, request, MegaError(MegaError::API_OK));
+	}
 }
 
 // reload needed
