@@ -3187,7 +3187,7 @@ void MegaApi::openfilelink_result(handle ph, const byte* key, m_off_t size, stri
 	if((request->getType() != MegaRequest::TYPE_IMPORT_LINK) && (request->getType() != MegaRequest::TYPE_GET_PUBLIC_NODE))
 		cout << "INCORRECT REQUEST OBJECT (12)";
 
-	if (!client->loggedin() || (request->getType() == MegaRequest::TYPE_IMPORT_LINK))
+	if (!client->loggedin() && (request->getType() == MegaRequest::TYPE_IMPORT_LINK))
 	{
         LOG("Need to be logged in to import file links.");
 		fireOnRequestFinish(this, request, MegaError(MegaError::API_EACCESS));
