@@ -167,6 +167,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		if ((intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_CANCEL)) {
 				log("Cancel intent");
+				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 				return START_NOT_STICKY;
 			}
@@ -494,15 +495,22 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				int left = totalCount - doneCount;
 				int current = totalCount - left + 1;
 				int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+				
+				String message = "";
+				if (totalCount == 0){
+					message = getString(R.string.download_preparing_files);
+				}
+				else{
 
-				String message = getString(R.string.upload_uploading) + " " + current + " ";
-				if (totalCount == 1) {
-					message += getResources().getQuantityString(R.plurals.general_num_files, 1);
-				} else {
-					message += getString(R.string.general_x_of_x) + " " + totalCount;
-							
-					if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB){
-						message += " " + getResources().getQuantityString(R.plurals.general_num_files, totalCount);
+					message = getString(R.string.upload_uploading) + " " + current + " ";
+					if (totalCount == 1) {
+						message += getResources().getQuantityString(R.plurals.general_num_files, 1);
+					} else {
+						message += getString(R.string.general_x_of_x) + " " + totalCount;
+								
+						if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB){
+							message += " " + getResources().getQuantityString(R.plurals.general_num_files, totalCount);
+						}
 					}
 				}
 				
