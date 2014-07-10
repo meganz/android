@@ -99,6 +99,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	Preferences prefs;
 	
 	boolean newFileList = false;
+	boolean stopped = false;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -158,6 +159,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 				else if (intent.getAction().equals(ACTION_STOP)){
+					stopped = true;
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 						dbH.setCamSyncEnabled(false);
@@ -603,7 +605,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	public void onDestroy(){
 		log("onDestroy");
 		running = false;
-		retryLater();
+		if (!stopped){
+			retryLater();
+		}
 		super.onDestroy();
 	}
 	

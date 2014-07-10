@@ -156,6 +156,7 @@
 	<string name="download_failed">Download failed</string>
 	<string name="download_downloaded">downloaded</string>
 	<string name="download_downloading">Downloading</string>
+	<string name="download_preparing_files">Preparing files</string>
     <string name="already_downloaded">Already downloaded</string>
     <string name="download_began">Download has started</string>
     <string name="download_cancel_downloading">Do you want to cancel the download?</string>
