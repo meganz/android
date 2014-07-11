@@ -121,12 +121,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	public static int REQUEST_CODE_REFRESH = 1005;
 	public static int REQUEST_CODE_SORT_BY = 1006;
+	public static int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
+	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
 	
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	
@@ -224,8 +226,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 	SparseArray<TransfersHolder> transfersListArray = null;
 	
-	ImportDialog importDialog;
-	
 	boolean downloadPlay = true;
 	
 	boolean pauseIconVisible = false;
@@ -239,9 +239,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	NodeList searchNodes;
 	int levelsSearch = -1;
 	
-	private boolean isOpenLink = false;
+	private boolean openLink = false;
 
-    @Override
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
     	
     	log("onCreate()");
@@ -263,23 +263,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
 	    
-//	    Intent intentNuevo = getIntent();
-//	    
-//	    if (intentNuevo != null){
-//	    	if (intentNuevo.getAction() != null){
-//	    		if (intentNuevo.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
-//	    	    	Toast.makeText(this, "intentNuevo DISTINTO DE NULL", Toast.LENGTH_LONG).show();		
-//	    	    	isOpenLink = true;
-//	    	    	return;
-//	    		}
-//	    	}
-//	    }
-	     
-		
-		dbH = new DatabaseHandler(getApplicationContext()); 
+	    dbH = new DatabaseHandler(getApplicationContext()); 
 		if (dbH.getCredentials() == null){
-			logout(this, (MegaApplication)getApplication(), megaApi);
-			return;
+			Intent newIntent = getIntent();
+		    
+		    if (newIntent != null){
+		    	if (newIntent.getAction() != null){
+		    		if (newIntent.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK) || newIntent.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
+		    			openLink = true;
+		    		}
+		    		else if (newIntent.getAction().equals(ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+		    			Intent cancelTourIntent = new Intent(this, TourActivity.class);
+		    			cancelTourIntent.setAction(newIntent.getAction());
+		    			startActivity(cancelTourIntent);
+		    			finish();
+		    			return;		    			
+		    		}
+		    	}
+		    }
+		    
+		    if (!openLink){
+		    	logout(this, (MegaApplication)getApplication(), megaApi);
+		    }
+		    
+	    	return;
 		}
 				
 		prefs = dbH.getPreferences();
@@ -330,10 +337,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (rootNode == null){
 			if (getIntent() != null){
 				if (getIntent().getAction() != null){
-					if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+					if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivity.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						intent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+						intent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+						intent.setData(Uri.parse(getIntent().getDataString()));
+						startActivity(intent);
+						finish();	
+						return;
+					}
+					else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+						Intent intent = new Intent(managerActivity, FileLinkActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();	
@@ -346,6 +362,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						intent.setData(Uri.parse(getIntent().getDataString()));
 						startActivity(intent);
 						finish();	
+						return;
+					}
+					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+						Intent intent = new Intent(managerActivity, LoginActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						intent.setAction(getIntent().getAction());
+						startActivity(intent);
+						finish();
 						return;
 					}
 				}
@@ -742,33 +766,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	log("onResume");
     	
-    	Intent intent = getIntent();
-    	
-//    	if (intent != null){
-//    		if (intent.getAction() != null){
-//    			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
-//    				if (importDialog != null){
-//    					try{
-//    						statusDialog.dismiss();
-//    						importDialog.dismiss();
-//    					}
-//    					catch(Exception e){	}
-//    				}
-//    				if (mDrawerLayout != null){
-//    					mDrawerLayout.closeDrawer(Gravity.LEFT); 
-//    				}
-//    				handleOpenLinkIntent(intent);
-//					intent.setAction(null);
-//					setIntent(null);
-//					return;
-//    			}
-//    		}
-//    	}
+    	Intent intent = getIntent(); 
     	
     	DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
     	if(dbH.getCredentials() == null){	
-			logout(this, (MegaApplication)getApplication(), megaApi);
-			return;
+    		if (!openLink){
+    			logout(this, (MegaApplication)getApplication(), megaApi);
+    			return;
+    		}			
 		}
     	   	
     	if (intent != null) {
@@ -782,21 +787,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					
     		if (intent.getAction() != null){
     			log("getAction != null");
-    			if (intent.getAction().equals(ACTION_OPEN_MEGA_LINK)){
-    				if (importDialog != null){
-    					try{
-    						statusDialog.dismiss();
-    						importDialog.dismiss();
-    					}
-    					catch(Exception e){	}
-    				}
-    				if (mDrawerLayout != null){
-    					mDrawerLayout.closeDrawer(Gravity.LEFT); 
-    				}
-    				handleOpenLinkIntent(intent);
-					intent.setAction(null);
-					setIntent(null);
-    			}
+    			if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
+					Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
+					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					loginIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+					loginIntent.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(loginIntent);
+					finish();	
+					return;
+				}
+				else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivity.class);
+					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					fileLinkIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(fileLinkIntent);
+					finish();	
+					return;
+				}
     			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
     				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -804,7 +812,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
 					startActivity(intentFolderLink);
 					finish();
-    				Toast.makeText(this, "FOLDER LINK!!!!", Toast.LENGTH_LONG).show();
     			}
     			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
@@ -1425,7 +1432,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
 		super.onPostCreate(savedInstanceState);
-		if (!isOpenLink){
+		if (!openLink){
 			mDrawerToggle.syncState();
 		}
 	}
@@ -1983,6 +1990,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			dbH.setPinLockEnabled(false);
 			dbH.setPinLockCode("");
 			dbH.setCamSyncEnabled(false);
+			dbH.setStorageAskAlways(true);
 			Intent stopIntent = null;
 			stopIntent = new Intent(context, CameraSyncService.class);
 			stopIntent.setAction(CameraSyncService.ACTION_STOP);
@@ -2295,7 +2303,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
 			}
-		}
+		} 
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			try { 
 				statusDialog.dismiss();	
@@ -2406,52 +2414,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			log("add contact");
-		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PUBLIC_NODE){
-			
-			
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {} 
-			if (e.getErrorCode() == MegaError.API_OK) {
-				MegaNode n = request.getPublicNode().copy();
-				
-				if (e.getErrorCode() != MegaError.API_OK) {
-					Util.showErrorAlertDialog(e, ManagerActivity.this);
-					return;
-				}
-				
-				if (n == null){
-					Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, ManagerActivity.this);
-					return;
-				}
-				
-				MegaNode parentNode = null;
-				if (fbF != null){
-					if (fbF.isVisible()){
-						parentHandleBrowser = fbF.getParentHandle();
-						parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-					}
-				}
-				
-				if (parentNode == null){
-					parentNode = megaApi.getRootNode();
-					parentHandleBrowser = megaApi.getRootNode().getHandle();
-				}
-				
-				importDialog = new ImportDialog();
-				importDialog.setMegaApi(megaApi);
-				importDialog.setInfo(n, parentNode.getHandle(), urlLink);
-				try { 
-					importDialog.show(getSupportFragmentManager(), "fragment_import"); 
-				} catch(Exception ex) {
-					Toast.makeText(this, "Error al mostrar el dialog: " + ex.getMessage(), Toast.LENGTH_LONG).show();
-				};
-			}
-			else{
-				Toast.makeText(this, "Error (" + e.getErrorCode() + "): "+ e.getErrorString(), Toast.LENGTH_LONG).show();
-			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			if (e.getErrorCode() == MegaError.API_OK) {

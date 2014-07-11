@@ -297,13 +297,16 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					return;
 				}
 				else{
-					if (intentReceived.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+					if(intentReceived.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
+						action = ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK;
+						url = intentReceived.getDataString();
+					}
+					else if(intentReceived.getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
 						action = ManagerActivity.ACTION_OPEN_MEGA_LINK;
 						url = intentReceived.getDataString();
 					}
-					else if(intentReceived.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
-						action = ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK;
-						url = intentReceived.getDataString();
+					else if (intentReceived.getAction().equals(ManagerActivity.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(ManagerActivity.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(ManagerActivity.ACTION_CANCEL_CAM_SYNC)){
+						action = intentReceived.getAction();
 					}
 					
 					MegaNode rootNode = megaApi.getRootNode();
@@ -311,7 +314,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 						Intent intent = new Intent(this, ManagerActivity.class);
 						if (action != null){
 							intent.setAction(action);
-							intent.setData(Uri.parse(url));
+							if (url != null){
+								intent.setData(Uri.parse(url));
+							}
 						}
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -352,7 +357,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					Intent intent = new Intent(this, ManagerActivity.class);
 					if (action != null){
 						intent.setAction(action);
-						intent.setData(Uri.parse(url));
+						if (url != null){
+							intent.setData(Uri.parse(url));
+						}
 					}
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 						intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -744,7 +751,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 							intent = new Intent(loginActivity,ManagerActivity.class);
 							if (action != null){
 								intent.setAction(action);
-								intent.setData(Uri.parse(url));
+								if (url != null){
+									intent.setData(Uri.parse(url));
+								}
 							}
 							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						}

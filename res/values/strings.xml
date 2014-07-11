@@ -10,6 +10,7 @@
     <string name="general_no">No</string>
     <string name="general_move_to">Move</string>
     <string name="general_copy_to">Copy</string>
+    <string name="general_import_to">Import</string>
     <string name="general_create">Create</string>
     <string name="general_upload">File Upload</string>
     <string name="general_download">Download</string>

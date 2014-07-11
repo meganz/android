@@ -4,6 +4,8 @@ import com.mega.components.LoopViewPager;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Build;
@@ -84,7 +86,116 @@ public class TourActivity extends Activity implements OnClickListener {
 //	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
 	    
 	    tourLoginCreate = (LinearLayout) findViewById(R.id.tour_login_create);
+	    
+	    Intent intent = getIntent();
+	    
+	    if (intent != null){
+	    	if (intent.getAction() != null){
+	    		if (intent.getAction().equals(ManagerActivity.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ManagerActivity.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ManagerActivity.ACTION_CANCEL_CAM_SYNC)){
+	    			log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+	    			Intent tempIntent = null;
+	    			String title = null;
+	    			String text = null;
+	    			if(intent.getAction().equals(ManagerActivity.ACTION_CANCEL_UPLOAD)){
+	    				tempIntent = new Intent(this, UploadService.class);
+	    				tempIntent.setAction(UploadService.ACTION_CANCEL);
+	    				title = getString(R.string.upload_uploading);
+	    				text = getString(R.string.upload_cancel_uploading);
+	    			} 
+	    			else if (intent.getAction().equals(ManagerActivity.ACTION_CANCEL_DOWNLOAD)){
+	    				tempIntent = new Intent(this, DownloadService.class);
+	    				tempIntent.setAction(DownloadService.ACTION_CANCEL);
+	    				title = getString(R.string.download_downloading);
+	    				text = getString(R.string.download_cancel_downloading);
+	    			}
+	    			else if (intent.getAction().equals(ManagerActivity.ACTION_CANCEL_CAM_SYNC)){
+	    				tempIntent = new Intent(this, CameraSyncService.class);
+	    				tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+	    				title = getString(R.string.cam_sync_syncing);
+	    				text = getString(R.string.cam_sync_cancel_sync);
+	    			}
+	    			
+	    			final Intent cancelIntent = tempIntent;
+	    			AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+	    					title, text, null);
+	    			builder.setPositiveButton(getString(R.string.general_yes),
+	    					new DialogInterface.OnClickListener() {
+	    						public void onClick(DialogInterface dialog, int whichButton) {
+	    							startService(cancelIntent);						
+	    						}
+	    					});
+	    			builder.setNegativeButton(getString(R.string.general_no), null);
+	    			final AlertDialog dialog = builder.create();
+	    			try {
+	    				dialog.show(); 
+	    			}
+	    			catch(Exception ex)	{ 
+	    				startService(cancelIntent); 
+	    			}
+	    			intent.setAction(null);
+	    			setIntent(null);
+	    		}
+	    	}
+	    }	    
 	}	
+	
+	@Override
+	protected void onResume() {
+		
+		super.onResume();
+		
+		Intent intent = getIntent();
+	    
+	    if (intent != null){
+	    	if (intent.getAction() != null){
+	    		if (intent.getAction().equals(ManagerActivity.ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ManagerActivity.ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ManagerActivity.ACTION_CANCEL_CAM_SYNC)){
+	    			log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+	    			Intent tempIntent = null;
+	    			String title = null;
+	    			String text = null;
+	    			if(intent.getAction().equals(ManagerActivity.ACTION_CANCEL_UPLOAD)){
+	    				tempIntent = new Intent(this, UploadService.class);
+	    				tempIntent.setAction(UploadService.ACTION_CANCEL);
+	    				title = getString(R.string.upload_uploading);
+	    				text = getString(R.string.upload_cancel_uploading);
+	    			} 
+	    			else if (intent.getAction().equals(ManagerActivity.ACTION_CANCEL_DOWNLOAD)){
+	    				tempIntent = new Intent(this, DownloadService.class);
+	    				tempIntent.setAction(DownloadService.ACTION_CANCEL);
+	    				title = getString(R.string.download_downloading);
+	    				text = getString(R.string.download_cancel_downloading);
+	    			}
+	    			else if (intent.getAction().equals(ManagerActivity.ACTION_CANCEL_CAM_SYNC)){
+	    				tempIntent = new Intent(this, CameraSyncService.class);
+	    				tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+	    				title = getString(R.string.cam_sync_syncing);
+	    				text = getString(R.string.cam_sync_cancel_sync);
+	    			}
+	    			
+	    			final Intent cancelIntent = tempIntent;
+	    			AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+	    					title, text, null);
+	    			builder.setPositiveButton(getString(R.string.general_yes),
+	    					new DialogInterface.OnClickListener() {
+	    						public void onClick(DialogInterface dialog, int whichButton) {
+	    							startService(cancelIntent);						
+	    						}
+	    					});
+	    			builder.setNegativeButton(getString(R.string.general_no), null);
+	    			final AlertDialog dialog = builder.create();
+	    			try {
+	    				dialog.show(); 
+	    			}
+	    			catch(Exception ex)	{ 
+	    				startService(cancelIntent); 
+	    			}
+	    		}
+	    		intent.setAction(null);
+	    	}
+	    }
+	    
+	    setIntent(null);
+	}
 	
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {

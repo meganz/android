@@ -32,7 +32,7 @@ public class MegaStreamingService extends Service implements Runnable {
 	public void run() 
 	{
 		try {
-			proxyServer = new MegaProxyServer(4443, application.getMegaApi(), application, guiHandler);
+			proxyServer = new MegaProxyServer(4443, application.getMegaApi(), application.getMegaApiFolder(), application, guiHandler);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return;
