@@ -41,11 +41,12 @@ public class OpenLinkActivity extends PinActivity {
 		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
 			log("open link url");
 			
-			Intent openIntent = new Intent(this, ManagerActivity.class);
-			openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			openIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
-			openIntent.setData(Uri.parse(url));
-			startActivity(openIntent);
+//			Intent openIntent = new Intent(this, ManagerActivity.class);
+			Intent openFileIntent = new Intent(this, FileLinkActivity.class);
+			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+			openFileIntent.setData(Uri.parse(url));
+			startActivity(openFileIntent);
 			finish();
 //			
 //			Intent errorIntent = new Intent(this, ManagerActivity.class);

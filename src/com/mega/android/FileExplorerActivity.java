@@ -40,6 +40,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
+	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
 	
 	/*
 	 * Select modes:
@@ -48,7 +49,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	 * CAMERA - pick folder for camera sync destination
 	 */
 	private enum Mode {
-		UPLOAD, MOVE, COPY, CAMERA;
+		UPLOAD, MOVE, COPY, CAMERA, IMPORT;
 	}
 	
 	private Button uploadButton;
@@ -144,6 +145,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				}
 				fe.setDisableNodes(list);
 			}
+			else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
+				mode = Mode.IMPORT;
+			}
 		}
 		
 		uploadButton = (Button) findViewById(R.id.file_explorer_button);
@@ -164,6 +168,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		}
 		else if (mode == Mode.UPLOAD){
 			uploadButton.setText(getString(R.string.action_upload));
+		}
+		else if (mode == Mode.IMPORT){
+			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
 		}
 		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
@@ -306,6 +313,19 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					else{
 						onIntentProcessed();
 					}
+				}
+				else if (mode == Mode.IMPORT){
+					long parentHandle = fe.getParentHandle();
+					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+					if(parentNode == null){
+						parentNode = megaApi.getRootNode();
+					}
+					
+					Intent intent = new Intent();
+					intent.putExtra("IMPORT_TO", parentNode.getHandle());
+					setResult(RESULT_OK, intent);
+					log("finish!");
+					finish();
 				}
 				break;
 			}

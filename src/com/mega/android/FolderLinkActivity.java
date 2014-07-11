@@ -164,48 +164,17 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		listView.setOnItemLongClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
-		
-		
-//		if(megaApiFolder.getRootNode() == null){
-		
-			Intent intent = getIntent();
-	    	
-	    	if (intent != null) {
-	    		if (intent.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
-	    			if (parentHandle == -1){
-	    				url = intent.getDataString();
-	    				megaApiFolder.folderAccess(url, this);
-	    			}
-	    		}
-	    	}
-//		}
-//		else{
-//			if (parentHandle == -1){
-//				parentHandle = megaApiFolder.getRootNode().getHandle();
-////				setParentHandleBrowser(parentHandle);
-//				nodes = megaApiFolder.getChildren(megaApiFolder.getRootNode(), orderGetChildren);
-//				aB.setTitle(megaApiFolder.getRootNode().getName());	
-//				supportInvalidateOptionsMenu();
-//			}
-//			else{
-//				MegaNode parentNode = megaApiFolder.getNodeByHandle(parentHandle);
-//				nodes = megaApiFolder.getChildren(parentNode, orderGetChildren);
-//				aB.setTitle(parentNode.getName());
-//			}
-//			
-//			if (adapterList == null){
-//				adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
-//			}
-//			else{
-//				adapterList.setParentHandle(parentHandle);
-//				adapterList.setNodes(nodes);
-//			}
-//			
-//			adapterList.setPositionClicked(-1);
-//			adapterList.setMultipleSelect(false);
-//			
-//			listView.setAdapter(adapterList);
-//		}
+
+		Intent intent = getIntent();
+    	
+    	if (intent != null) {
+    		if (intent.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
+    			if (parentHandle == -1){
+    				url = intent.getDataString();
+    				megaApiFolder.folderAccess(url, this);
+    			}
+    		}
+    	}
     }
 	
 	@Override
@@ -621,33 +590,33 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 					intent.putExtra("isFolderLink", true);
 					startActivity(intent);
 				}
-//				else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
-//					MegaNode file = nodes.get(position);
-//					Intent service = new Intent(this, MegaStreamingService.class);
-//			  		startService(service);
-//			  		String fileName = file.getName();
-//					try {
-//						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-//					} 
-//					catch (UnsupportedEncodingException e) {
-//						e.printStackTrace();
-//					}
-//					
-//			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-//			  		String mimeType = MimeType.typeForName(file.getName()).getType();
-//			  		System.out.println("FILENAME: " + fileName);
-//			  		
-//			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-//			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-//			  		try
-//			  		{
-//			  			startActivity(mediaIntent);
-//			  		}
-//			  		catch(Exception e)
-//			  		{
-//			  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-//			  		}						
-//				}
+				else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
+					MegaNode file = nodes.get(position);
+					Intent service = new Intent(this, MegaStreamingService.class);
+			  		startService(service);
+			  		String fileName = file.getName();
+					try {
+						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+					} 
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+			  		String mimeType = MimeType.typeForName(file.getName()).getType();
+			  		System.out.println("FILENAME: " + fileName);
+			  		
+			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			  		try
+			  		{
+			  			startActivity(mediaIntent);
+			  		}
+			  		catch(Exception e)
+			  		{
+			  			Toast.makeText(this, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+			  		}						
+				}
 				else{
 					adapterList.setPositionClicked(-1);
 					adapterList.notifyDataSetChanged();

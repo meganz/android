@@ -103,19 +103,23 @@ public class MegaProxyServer
 
 	Handler guiHandler;
 	MegaApplication app;
-	MegaApiAndroid api;
+	MegaApiAndroid megaApi;
+	MegaApiAndroid megaApiFolder;
 	ServerSocket myServerSocket;
 	Thread myThread;
+	
+	boolean folderLink = false;
 	
 	/**
 	 * Starts a HTTP server to given port.<p>
 	 * Throws an IOException if the socket is already in use
 	 */
-	public MegaProxyServer( int port, MegaApiAndroid api, MegaApplication app, Handler handler) throws IOException
+	public MegaProxyServer( int port, MegaApiAndroid api, MegaApiAndroid apiFolder, MegaApplication app, Handler handler) throws IOException
 	{
 		this.guiHandler = handler;
 		this.app = app;
-		this.api = api;
+		this.megaApi = api;
+		this.megaApiFolder = apiFolder;
 		myServerSocket = new ServerSocket( port );
 		myThread = new Thread( new Runnable()
 			{
@@ -510,8 +514,15 @@ public class MegaProxyServer
 					{
 						System.out.println("Input pipe closed. Opening a new one");
 						streamingBuffer.resetErrorBit();
-						api.startStreaming(response.node, response.startFrom + writtenBytes, 
-								totalBytes - writtenBytes, new MegaStreamReader(streamingBuffer));
+						if (folderLink){
+							megaApiFolder.startStreaming(response.node, response.startFrom + writtenBytes, 
+									totalBytes - writtenBytes, new MegaStreamReader(streamingBuffer));	
+						}
+						else{
+							megaApi.startStreaming(response.node, response.startFrom + writtenBytes, 
+									totalBytes - writtenBytes, new MegaStreamReader(streamingBuffer));	
+						}
+						
 						continue;
 					}
 					
@@ -599,12 +610,20 @@ public class MegaProxyServer
     	}
  
 		
-		MegaNode node = api.getNodeByHandle(MegaApi.base64ToHandle(handler));
-		if(node == null)
-		{
-			showText("File not found");
-			return new Response( HTTP_NOTFOUND,
-    				"Error 404, file not found." );
+		MegaNode node = megaApi.getNodeByHandle(MegaApi.base64ToHandle(handler));
+		if(node == null){
+			node = megaApiFolder.getNodeByHandle(MegaApi.base64ToHandle(handler));
+			if (node == null){
+				showText("File not found");
+				return new Response( HTTP_NOTFOUND,
+	    				"Error 404, file not found." );
+			}
+			else{
+				folderLink = true;
+			}
+		}
+		else{
+			folderLink = false;
 		}
 				
 		try { fileName = URLDecoder.decode(fileName, "UTF-8"); } 
@@ -619,7 +638,13 @@ public class MegaProxyServer
 				return new Response( HTTP_NOTFOUND, "Error 404, file not found." );
 
 			String baseName = fileName.substring(0, extensionIndex+1);
-			node = api.getChildNode(api.getParentNode(node), fileName);
+			if (folderLink){
+				node = megaApiFolder.getChildNode(megaApiFolder.getParentNode(node), fileName);
+			}
+			else{
+				node = megaApi.getChildNode(megaApi.getParentNode(node), fileName);
+			}
+			
 			if((node == null) || !node.getName().startsWith(baseName))
 				return new Response( HTTP_NOTFOUND, "Error 404, file not found." );
 			showText("SUBTITLE found!");
