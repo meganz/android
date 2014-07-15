@@ -532,7 +532,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			public void run() {
 				onStartCommand(null, 0, 0);
 			}
-		}, 15 * 1000);
+		}, 5 * 60 * 1000);
 	}
 	
 	@SuppressLint("DefaultLocale")

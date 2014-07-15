@@ -4,11 +4,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Handler;
 
 import com.mega.android.CameraSyncService;
 import com.mega.android.Util;
 
 public class ChargeEventReceiver extends BroadcastReceiver {
+	
+	Handler handler = new Handler();
 	
 	public ChargeEventReceiver() {}
 
@@ -20,7 +23,16 @@ public class ChargeEventReceiver extends BroadcastReceiver {
 //	    log("CameraEventReceiver_New Photo is Saved as : -" + image_path);
 	    
 		log("ChargeEventReceiver");
-	    context.startService(new Intent(context, CameraSyncService.class));
+		final Context c = context;
+		
+		handler.postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				log("Now I start the service");
+				c.startService(new Intent(c, CameraSyncService.class));		
+			}
+		}, 5 * 60 * 1000);
 	}
 	
 	public static void log(String message) {
