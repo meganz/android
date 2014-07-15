@@ -9,6 +9,7 @@ import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -44,6 +45,9 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		}
 		
 		if (parentHandle == -1){
+			if (megaApi.getRootNode() == null){
+				return;
+			}			
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
 		}

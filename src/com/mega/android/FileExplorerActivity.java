@@ -11,6 +11,7 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.NodeList;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -116,6 +117,18 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
+		Intent intent = getIntent();
+		if (megaApi.getRootNode() == null){
+			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
+			Intent loginIntent = new Intent(this, LoginActivity.class);
+			loginIntent.setAction(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD);
+			loginIntent.putExtras(intent.getExtras());
+			loginIntent.setData(intent.getData());
+			startActivity(loginIntent);
+			finish();
+			return;
+		}
+		
 		handler = new Handler();
 		
 		setContentView(R.layout.activity_file_explorer);
@@ -123,7 +136,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		fe = (FileExplorerFragment) getSupportFragmentManager().findFragmentById(R.id.file_explorer_fragment);
 		
 		mode = Mode.UPLOAD;
-		Intent intent = getIntent();
+		
 		if ((intent != null) && (intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
 				mode = Mode.MOVE;
