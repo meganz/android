@@ -178,6 +178,15 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
     }
 	
 	@Override
+	protected void onDestroy() {
+
+		if (megaApiFolder != null){
+			megaApiFolder.logout();
+		}
+		super.onDestroy();
+	}
+
+	@Override
 	protected void onPause() {
     	folderLinkActivity = null;
     	log("onPause");

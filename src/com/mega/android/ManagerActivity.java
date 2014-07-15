@@ -129,6 +129,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_OPEN_MEGA_LINK = "OPEN_MEGA_LINK";
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
 	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
+	public static String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
 	
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	

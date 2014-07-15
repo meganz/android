@@ -117,6 +117,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
     String authTokenType;
     
     Handler handler = new Handler();
+    
+    Bundle extras = null;
+    Uri uriData = null;
 	
 	/*
 	 * Task to process email and password
@@ -308,11 +311,22 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					else if (intentReceived.getAction().equals(ManagerActivity.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(ManagerActivity.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(ManagerActivity.ACTION_CANCEL_CAM_SYNC)){
 						action = intentReceived.getAction();
 					}
+					else if (intentReceived.getAction().equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
+						action = ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD;
+						uriData = intentReceived.getData();
+						extras = intentReceived.getExtras();
+						url = null;
+					}
 					
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){
 						Intent intent = new Intent(this, ManagerActivity.class);
 						if (action != null){
+							if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
+								intent = new Intent(this, FileExplorerActivity.class);
+								intent.putExtras(extras);
+								intent.setData(uriData);
+							}
 							intent.setAction(action);
 							if (url != null){
 								intent.setData(Uri.parse(url));
@@ -363,6 +377,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					log("rootNode != null");
 					Intent intent = new Intent(this, ManagerActivity.class);
 					if (action != null){
+						if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
+							intent = new Intent(this, FileExplorerActivity.class);
+							intent.putExtras(extras);
+							intent.setData(uriData);
+						}
 						intent.setAction(action);
 						if (url != null){
 							intent.setData(Uri.parse(url));
@@ -777,6 +796,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 
 							intent = new Intent(loginActivity,ManagerActivity.class);
 							if (action != null){
+								if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
+									intent = new Intent(this, FileExplorerActivity.class);
+									intent.putExtras(extras);
+									intent.setData(uriData);
+								}
 								intent.setAction(action);
 								if (url != null){
 									intent.setData(Uri.parse(url));
