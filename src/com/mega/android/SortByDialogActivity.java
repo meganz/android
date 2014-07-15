@@ -11,7 +11,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-public class SortByDialogActivity extends PinActivity implements OnClickListener {
+public class SortByDialogActivity extends Activity implements OnClickListener {
 
 	public static String ACTION_SORT_BY = "ACTION_SORT_BY";
 	
@@ -101,6 +101,18 @@ public class SortByDialogActivity extends PinActivity implements OnClickListener
 		intent.putExtra("ORDER_GET_CHILDREN", orderGetChildren);
 		setResult(RESULT_OK, intent);
 		finish();
+	}
+	
+	@Override
+	protected void onPause() {
+		PinUtil.pause(this);
+		super.onPause();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		PinUtil.resume(this);
 	}
 	
 }
