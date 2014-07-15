@@ -112,10 +112,11 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
     
     boolean firstRequestUpdate = true;
     boolean firstTime = true;
-    boolean cameraSync = true;
     
     AccountManager accountManager;
     String authTokenType;
+    
+    Handler handler = new Handler();
 	
 	/*
 	 * Task to process email and password
@@ -273,7 +274,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 		
 		credentials = dbH.getCredentials();
 		if (credentials != null){
-			cameraSync = false;
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
 					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
@@ -321,8 +321,15 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 							intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 						}
-						
-						startService(new Intent(getApplicationContext(), CameraSyncService.class));
+					    
+					    handler.postDelayed(new Runnable() {
+							
+							@Override
+							public void run() {
+								log("Now I start the service");
+								startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+							}
+						}, 5 * 60 * 1000);
 						
 						this.startActivity(intent);
 						this.finish();
@@ -369,7 +376,14 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					if (prefs.getCamSyncEnabled() != null){
 						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 							log("Enciendo el servicio de la camara");
-							startService(new Intent(getApplicationContext(), CameraSyncService.class));
+							handler.postDelayed(new Runnable() {
+								
+								@Override
+								public void run() {
+									log("Now I start the service");
+									startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+								}
+							}, 5 * 60 * 1000);
 						}
 					}
 					
@@ -744,8 +758,21 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 						}
 						else{
-							if (cameraSync){
-								startService(new Intent(getApplicationContext(), CameraSyncService.class));
+							DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+							Preferences prefs = dbH.getPreferences();
+							prefs = dbH.getPreferences();
+							if (prefs.getCamSyncEnabled() != null){
+								if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+									log("Enciendo el servicio de la camara");
+									handler.postDelayed(new Runnable() {
+										
+										@Override
+										public void run() {
+											log("Now I start the service");
+											startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+										}
+									}, 5 * 60 * 1000);
+								}
 							}
 
 							intent = new Intent(loginActivity,ManagerActivity.class);

@@ -2,8 +2,10 @@ package com.mega.android;
 
 import com.mega.sdk.MegaApiAndroid;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -17,6 +19,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 
 	private MegaApiAndroid megaApi;
 	static SettingsActivity preferencesActivity;
+	
+	Handler handler = new Handler();
 	
 	private static int REQUEST_DOWNLOAD_FOLDER = 1000;
 	private static int REQUEST_CAMERA_FOLDER = 2000;
@@ -285,7 +289,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				
 				dbH.setCamSyncEnabled(true);
 				
-				startService(new Intent(getApplicationContext(), CameraSyncService.class));
+				handler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						log("Now I start the service");
+						startService(new Intent(preferencesActivity, CameraSyncService.class));		
+					}
+				}, 30 * 1000);
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
 				cameraUploadHow.setSummary(wifi);
@@ -379,7 +390,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 			startService(photosVideosIntent);
 			
-			startService(new Intent(getApplicationContext(), CameraSyncService.class));
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					log("Now I start the service");
+					startService(new Intent(preferencesActivity, CameraSyncService.class));		
+				}
+			}, 30 * 1000);
 		}
 	}
 	
@@ -406,7 +424,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				}
 			}
 			cameraUploadHow.setSummary(wifi);
-			startService(new Intent(getApplicationContext(), CameraSyncService.class));
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					log("Now I start the service");
+					startService(new Intent(preferencesActivity, CameraSyncService.class));		
+				}
+			}, 30 * 1000);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_WHAT_TO) == 0){
 			switch(Integer.parseInt((String)newValue)){
@@ -436,7 +461,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
 			startService(photosVideosIntent);
 			
-			startService(new Intent(getApplicationContext(), CameraSyncService.class));
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					log("Now I start the service");
+					startService(new Intent(preferencesActivity, CameraSyncService.class));		
+				}
+			}, 30 * 1000);
 		}
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			pinLockCodeTxt = (String) newValue;

@@ -238,8 +238,7 @@
         
         <receiver
 	        android:name="com.mega.android.receivers.CameraEventReceiver"
-	        android:enabled="true"
-	        android:exported="false" >
+	        android:enabled="true" >
 	        <intent-filter>
 	            <action android:name="com.android.camera.NEW_PICTURE" />
 	            <action android:name="android.hardware.action.NEW_PICTURE" />
@@ -250,8 +249,7 @@
     	
         <receiver
 	        android:name="com.mega.android.receivers.NetEventReceiver"
-	        android:enabled="true"
-	        android:exported="false" >
+	        android:enabled="true">
 	        <intent-filter>
 	           <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
 	        </intent-filter>
@@ -259,8 +257,7 @@
     	
         <receiver
 	        android:name="com.mega.android.receivers.ChargeEventReceiver"
-	        android:enabled="true"
-	        android:exported="false" >
+	        android:enabled="true">
 	        <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
             </intent-filter>
@@ -271,8 +268,7 @@
     	
         <receiver
 	        android:name="com.mega.android.receivers.BootEventReceiver"
-	        android:enabled="true"
-	        android:exported="false" >
+	        android:enabled="true">
 	      	<intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

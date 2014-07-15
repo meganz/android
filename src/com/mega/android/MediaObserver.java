@@ -15,11 +15,14 @@ public class MediaObserver extends ContentObserver {
 	@Override
 	public void onChange(boolean selfChange) {
 		
+		log("MEDIAOBSERVER");
 		if (service != null){
 			service.retryLater();
 		}
 	}
 	
-	
+	public static void log(String message) {
+		Util.log("MediaObserver", message);
+	}
 
 }
