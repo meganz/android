@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mega.android"
     android:installLocation="internalOnly"
-    android:versionCode="28"
+    android:versionCode="29"
     android:versionName="@string/app_version" >
 
     <uses-sdk
