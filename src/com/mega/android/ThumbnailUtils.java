@@ -93,6 +93,9 @@ public class ThumbnailUtils {
 					}
 				}
 			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			}
 		}
 
 		@Override
@@ -171,6 +174,9 @@ public class ThumbnailUtils {
 					}
 				}
 			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			}
 		}
 
 		@Override
@@ -235,6 +241,9 @@ public class ThumbnailUtils {
 						}
 					}
 				}
+			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 
@@ -301,6 +310,9 @@ public class ThumbnailUtils {
 					}
 				}
 			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			}
 		}
 
 		@Override
@@ -365,6 +377,9 @@ public class ThumbnailUtils {
 						}
 					}
 				}
+			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 			}
 		}
 

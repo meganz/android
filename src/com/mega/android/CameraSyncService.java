@@ -40,6 +40,7 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
+import android.text.format.Time;
 import android.widget.RemoteViews;
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface{
@@ -461,6 +462,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				
 				//If the file is ready to upload already
 				if (!fileAlreadyToUpload && !fileAlreadyUploaded){
+					log("MEDIA.FILEPATH: " + media.filePath);
 					filesToUpload.add(media);	
 					
 				}
@@ -502,7 +504,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private boolean checkFile(Media media){
 		
 		if (media.filePath.startsWith(localPath)){
-			return true;
+			Time t = new Time(Time.getCurrentTimezone());
+			t.setToNow();
+			long timeSpent = t.toMillis(true) - media.timestamp;
+			if (timeSpent > ((5 * 60 * 1000)-1)){
+				return true;
+			}
 		}
 		return false;
 	}
