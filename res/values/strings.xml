@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">MEGA_COM</string>
-    <string name="app_version">0.28</string>
+    <string name="app_version">0.29</string>
     
     <string name="general_total_size">Total size</string>
     <string name="general_x_of_x"> of </string>
