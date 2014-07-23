@@ -43,12 +43,20 @@ OPENSSL_VERIFIED_SOURCES=$(OPENSSL)/$(OPENSSL_SOURCE_FILE)_verified
 OPENSSL_CONFIGURED=openssl/openssl/lib/libcrypto.a
 OPENSSL_PREFIX=$(JNI_PATH)/$(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)
 
+SODIUM=sodium
+SODIUM_VERSION=0.6.0
+SODIUM_SOURCE_FILE=libsodium-$(SODIUM_VERSION).tar.gz
+SODIUM_SOURCE_FOLDER=libsodium-$(SODIUM_VERSION)
+SODIUM_DOWNLOAD_URL=https://download.libsodium.org/libsodium/releases/$(SODIUM_SOURCE_FILE)
+SODIUM_VERIFIED_SOURCES=$(SODIUM)/$(SODIUM_SOURCE_FILE)_verified
+SODIUM_BUILT=$(SODIUM)/$(SODIUM_SOURCE_FILE)_built
+
 MEGA=mega
 MEGA_JAVA_OUTPUT_PATH=$(JNI_PATH)/../src
 MEGA_CONFIGURED=java_wrap.cxx
 MEGA_WRAPPER=megaapi.i
 
-all: $(CRYPTOPP) $(CURL) $(MEGA)
+all: $(SODIUM) $(CRYPTOPP) $(CURL) $(MEGA)
 	$(NDK_BUILD)
 
 $(OPENSSL): $(OPENSSL_CONFIGURED)
@@ -56,11 +64,6 @@ $(OPENSSL): $(OPENSSL_CONFIGURED)
 $(OPENSSL_CONFIGURED): $(OPENSSL_VERIFIED_SOURCES)
 	cd $(OPENSSL)/; tar --overwrite -xf $(OPENSSL_SOURCE_FILE)
 	ln -sf $(OPENSSL_SOURCE_FOLDER) $(OPENSSL)/$(OPENSSL)
-	cd openssl/openssl/crypto/bn/asm;  perl armv4-mont.pl >> armv4-mont.S
-	cd openssl/openssl/crypto/aes/asm; perl aes-armv4.pl >> aes-armv4.S
-	cd openssl/openssl/crypto/sha/asm; perl sha1-armv4-large.pl >> sha1-armv4-large.S
-	cd openssl/openssl/crypto/sha/asm; perl sha256-armv4.pl >> sha256-armv4.S
-	cd openssl/openssl/crypto/sha/asm; perl sha512-armv4.pl >> sha512-armv4.S
 	ln -sf $(LIBDIR) $(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)/lib
 	-$(NDK_BUILD) -k ssl crypto
 
@@ -111,9 +114,26 @@ $(CRYPTOPP_VERIFIED_SOURCES):
 	cd $(CRYPTOPP); sha1sum -c $(CRYPTOPP_SOURCE_FILE).sha1
 	touch $(CRYPTOPP_VERIFIED_SOURCES)
 
+$(SODIUM): $(SODIUM_BUILT)
+
+$(SODIUM_BUILT): $(SODIUM_VERIFIED_SOURCES)
+	cd $(SODIUM)/; tar --overwrite -xf $(SODIUM_SOURCE_FILE)
+	ln -sf $(SODIUM_SOURCE_FOLDER) $(SODIUM)/$(SODIUM)
+	cd $(SODIUM)/$(SODIUM) && ./autogen.sh
+	cd $(SODIUM)/$(SODIUM) && export ANDROID_NDK_HOME=$(NDK_ROOT) && dist-build/android-x86.sh
+	cd $(SODIUM)/$(SODIUM) && export ANDROID_NDK_HOME=$(NDK_ROOT) && dist-build/android-arm.sh
+	ln -sf libsodium-android-arm $(SODIUM)/$(SODIUM)/libsodium-android-armeabi
+	ln -sf libsodium-android-arm $(SODIUM)/$(SODIUM)/libsodium-android-armeabi-v7
+	touch $(SODIUM_BUILT)
+
+$(SODIUM_VERIFIED_SOURCES):
+	wget -O $(SODIUM)/$(SODIUM_SOURCE_FILE) $(SODIUM_DOWNLOAD_URL)
+	cd $(SODIUM); sha1sum -c $(SODIUM_SOURCE_FILE).sha1
+	touch $(SODIUM_VERIFIED_SOURCES)
+
 clean_mega:
 	-make -C $(MEGA) -f MakefileBindings clean JAVA_BASE_OUTPUT_PATH=$(MEGA_JAVA_OUTPUT_PATH)
-	
+
 clean: clean_mega
 	rm -rf $(CRYPTOPP_SOURCE_FOLDER)
 	rm -rf $(CURL)/$(CURL_SOURCE_FOLDER)
@@ -122,6 +142,9 @@ clean: clean_mega
 	rm -rf $(CURL)/ares
 	rm -rf $(OPENSSL)/$(OPENSSL_SOURCE_FOLDER)
 	rm -rf $(OPENSSL)/$(OPENSSL)
+	rm -rf $(SODIUM)/$(SODIUM_SOURCE_FOLDER)
+	rm -rf $(SODIUM)/$(SODIUM)
+	rm -rf $(SODIUM_BUILT)
 	rm -rf ../obj/local/armeabi/
 	rm -rf ../obj/local/x86
 
@@ -130,3 +153,5 @@ veryclean: clean
 	rm -rf $(CURL)/$(CURL_SOURCE_FILE) $(CURL_VERIFIED_SOURCES)
 	rm -rf $(CURL)/$(ARES_SOURCE_FILE) $(ARES_VERIFIED_SOURCES)
 	rm -rf $(OPENSSL)/$(OPENSSL_SOURCE_FILE) $(OPENSSL_VERIFIED_SOURCES)
+	rm -rf $(SODIUM)/$(SODIUM_SOURCE_FILE) $(SODIUM_VERIFIED_SOURCES)
+

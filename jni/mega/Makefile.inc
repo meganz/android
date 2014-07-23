@@ -42,6 +42,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/utils.cpp \
     sdk/src/waiterbase.cpp  \
     sdk/src/crypto/cryptopp.cpp  \
+    sdk/src/crypto/sodium.cpp  \
     sdk/src/db/sqlite.cpp  \
     MegaProxySettings.cpp \
     sdk/src/posix/net.cpp  \
