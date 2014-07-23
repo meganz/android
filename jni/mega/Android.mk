@@ -2,8 +2,6 @@ LOCAL_PATH := $(call my-dir)
 
 local_c_includes := \
         $(LOCAL_PATH) \
-        $(LOCAL_PATH)/../curl/curl/include \
-        $(LOCAL_PATH)/../cryptopp \
         $(LOCAL_PATH)/.. \
         $(LOCAL_PATH)/sdk/include \
         $(LOCAL_PATH)/sdk/include/mega/posix \
