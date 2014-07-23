@@ -147,6 +147,8 @@
 /* Define to use libcrypto++ */
 #define USE_CRYPTOPP 1
 
+#define USE_SODIUM 1
+
 /* Define to use Berkeley DB */
 #define USE_DB 0
 
