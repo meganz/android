@@ -73,22 +73,11 @@ bool GfxProcAndroid::resizebitmap(int rw, int rh, string* jpegout)
     transform(w, h, rw, rh, px, py);
     if (!w || !h) return false;
 
-    jpegout->clear();
-    char *resultPath = processor->resizeBitmap(w, h, px, py, rw, rh);
-    if(!resultPath) return false;
+    int size = processor->getBitmapDataSize(w, h, px, py, rw, rh);
+    jpegout->resize(size);
+    if(!size) return false;
 
-    PosixFileAccess *f = new PosixFileAccess();
-    string filePath(resultPath);
-    if(!f->fopen(&filePath, true, false))
-    {
-    	delete f;
-    	return false;
-    }
-
-    jpegout->resize(f->size);
-	bool result = f->sysread((byte *)jpegout->data(), jpegout->size(), 0);
-	delete f;
-    return result;
+    return processor->getBitmapData((char *)jpegout->data(), jpegout->size());
 }
 
 void GfxProcAndroid::freebitmap()

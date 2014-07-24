@@ -108,7 +108,8 @@ public:
 	virtual bool readBitmap(const char* path) { return false; }
 	virtual int getWidth() { return 0; }
 	virtual int getHeight() { return 0; }
-	virtual char *resizeBitmap(int w, int h, int px, int py, int rw, int rh) { return NULL; }
+	virtual int getBitmapDataSize(int w, int h, int px, int py, int rw, int rh) { return 0; }
+	virtual bool getBitmapData(char *bitmapData, size_t size) { return false; }
 	virtual void freeBitmap() {}
 	virtual ~GfxProcessor() {};
 };
