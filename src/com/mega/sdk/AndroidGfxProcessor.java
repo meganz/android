@@ -1,5 +1,6 @@
 package com.mega.sdk;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,17 +17,12 @@ public class AndroidGfxProcessor extends GfxProcessor
 {
 	Rect size;
 	int orientation;
-	String basePath;
 	String srcPath;
-	String dstPath;
-	File dstFile;
 	Bitmap bitmap;
+	byte[] bitmapData;
 	
-	protected AndroidGfxProcessor(String basePath) 
+	protected AndroidGfxProcessor() 
 	{
-		this.basePath = basePath;
-		dstFile = new File(basePath, "tmp.jpg");
-		dstPath = dstFile.getAbsolutePath();
 	}
 	
 	public static Rect getImageDimensions(String path, int orientation)
@@ -179,22 +175,6 @@ public class AndroidGfxProcessor extends GfxProcessor
 		return bitmap;
 	}
 	
-	public String resizeBitmap(int w, int h, int px, int py, int rw, int rh) 
-	{
-		if(bitmap == null)
-		    bitmap = getBitmap(srcPath, size, orientation, w, h);
-		else 
-			bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
-		
-		bitmap = extractRect(bitmap, px, py, rw, rh);
-		if(bitmap == null)
-			return null;
-		
-		if(saveBitmap(bitmap, dstFile))
-			return dstPath;
-		return null;
-	}
-	
 	public static boolean saveBitmap(Bitmap bitmap, File file)
 	{
 		if(bitmap == null)
@@ -212,10 +192,46 @@ public class AndroidGfxProcessor extends GfxProcessor
 		} catch (Exception e) {}
 		return false;
 	}
+	
+	public int getBitmapDataSize(int w, int h, int px, int py, int rw, int rh) 
+	{
+		if(bitmap == null)
+		    bitmap = getBitmap(srcPath, size, orientation, w, h);
+		else 
+			bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+		
+		bitmap = extractRect(bitmap, px, py, rw, rh);
+		if(bitmap == null)
+			return 0;
+		
+		try
+		{
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			if(!bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream))
+				return 0;			
+			
+			bitmapData = stream.toByteArray();
+			return bitmapData.length;
+		} catch (Exception e) {}
+		return 0;
+	}
+
+	public boolean getBitmapData(byte[] buffer) 
+	{
+		try
+		{
+			System.arraycopy(bitmapData, 0, buffer, 0, bitmapData.length);
+			return true;
+		}
+		catch(Exception e)
+		{}
+		return false;
+  	}
 
 	public void freeBitmap() 
 	{
 		bitmap = null;
+		bitmapData = null;
 		size = null;
 		srcPath = null;
 		orientation = 0;

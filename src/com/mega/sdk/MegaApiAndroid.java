@@ -9,7 +9,7 @@ public class MegaApiAndroid extends MegaApiJava
 	
 	public MegaApiAndroid(String path)
 	{
-		super(path, new AndroidGfxProcessor(path));
+		super(path, new AndroidGfxProcessor());
 	}
 
 	@Override

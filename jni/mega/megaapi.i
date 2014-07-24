@@ -37,17 +37,26 @@
 %feature("director") MegaRequestListener;
 %feature("director") MegaTransferListener;
 
-%typemap(directorargout) (char *STRING, size_t LENGTH)
-%{ jenv->DeleteLocalRef($input); %}
-
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
+%typemap(directorargout) (char *buffer, size_t size)
+%{ jenv->DeleteLocalRef($input); %}
 
 %feature("director") MegaGlobalListener;
 %feature("director") MegaListener;
 %feature("director") MegaTreeProcessor;
 %feature("director") GfxProcessor;
 
-//%feature("director") TreeProcessor;
+%apply (char *STRING, size_t LENGTH) {(char *bitmapData, size_t size)};
+%typemap(directorin, descriptor="[B") (char *bitmapData, size_t size)
+%{ 
+	jbyteArray jb = (jenv)->NewByteArray($2);
+	$input = jb;
+%}
+%typemap(directorargout) (char *bitmapData, size_t size)
+%{ 
+	jenv->GetByteArrayRegion($input, 0, $2, (jbyte *)$1);
+	jenv->DeleteLocalRef($input);
+%}
 
 //Ignore internal classes
 %ignore mega::MegaApiCurlHttpIO;
