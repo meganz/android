@@ -184,6 +184,9 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 				Util.showErrorAlertDialogFinish(e, getActivity());
 				return;
 			}
+			else{
+				log("ACCOUNT OK");
+			}
 		}
 		
 		AccountDetails accountInfo = request.getAccountDetails();

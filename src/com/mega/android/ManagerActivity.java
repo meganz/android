@@ -95,7 +95,7 @@ import android.widget.Toast;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, IMAGE_VIEWER, TRANSFERS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, PHOTO_SYNC, TRANSFERS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -105,7 +105,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case SHARED_WITH_ME: return context.getString(R.string.section_shared_with_me);
 				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
 				case CONTACTS: return context.getString(R.string.section_contacts);
-				case IMAGE_VIEWER: return context.getString(R.string.section_image_viewer);
+				case PHOTO_SYNC: return context.getString(R.string.section_image_viewer);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
 				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.search_files_and_folders);
@@ -140,6 +140,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int OFFLINE_ADAPTER = 2004;
 	final public static int FOLDER_LINK_ADAPTER = 2005;
 	final public static int SEARCH_ADAPTER = 2006;
+	final public static int PHOTO_SYNC_ADAPTER = 2007;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -188,6 +189,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListRubbishBin = true;
 	private boolean isListSharedWithMe = true;
 	private boolean isListOffline = true;
+	private boolean isListPhotoSync = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
@@ -196,6 +198,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private MyAccountFragment maF;
     private OfflineFragment oF;
     private SearchFragment sF;
+    private PhotoSyncFragment psF;
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
@@ -284,7 +287,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    }
 		    
 		    if (!openLink){
-		    	logout(this, (MegaApplication)getApplication(), megaApi);
+		    	logout(this, (MegaApplication)getApplication(), megaApi, false);
 		    }
 		    
 	    	return;
@@ -772,7 +775,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
     	if(dbH.getCredentials() == null){	
     		if (!openLink){
-    			logout(this, (MegaApplication)getApplication(), megaApi);
+    			logout(this, (MegaApplication)getApplication(), megaApi, false);
     			return;
     		}			
 		}
@@ -1310,7 +1313,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			sF.setSearchQuery(searchQuery);
     			sF.setParentHandle(parentHandleSearch);
     			sF.setLevels(levelsSearch);
-    			Toast.makeText(this, "LEVELS: " + levelsSearch, Toast.LENGTH_LONG).show();
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, sF, "sF").commit();
     			customListGrid.setVisibility(View.GONE);
@@ -1335,6 +1337,59 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			addMenuItem.setEnabled(true);
     			}
     			break;
+    		}
+    		case PHOTO_SYNC:{
+   			
+    			if (psF == null){
+    				psF = new PhotoSyncFragment();
+//    				psF.setParentHandle(parentHandle); //TODO El handle de la carpeta PHOTOSYNC (Si no existe ¿crearla?)
+//    				parentHandlePhotoSync = parentHandle de la carpeta photosync;
+//					psF.setIsList(isListCloudDrive); 
+//					psF.setOrder(orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
+//					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandlePhotoSync), orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
+//					psF.setNodes(nodes);
+				}
+				else{
+//					psF.setIsList(isListCloudDrive);
+//					psF.setParentHandle(parentHandleCarpetaPhotosync);
+//					fbF.setOrder(orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
+//					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandlePhotoSync), orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
+//					fbF.setNodes(nodes);
+				}
+				
+				
+				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, psF, "psF").commit();
+				if (isListPhotoSync){					
+					customListGrid.setImageResource(R.drawable.ic_menu_gridview);
+				}
+				else{
+    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
+    			}
+    			    			
+   				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			customListGrid.setVisibility(View.VISIBLE);
+    			customSearch.setVisibility(View.VISIBLE);
+    			
+
+    			if (createFolderMenuItem != null){
+	    			createFolderMenuItem.setVisible(true);
+	    			rubbishBinMenuItem.setVisible(true);
+	    			addMenuItem.setVisible(true);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(true);
+	    			settingsMenuItem.setVisible(true);
+	    			logoutMenuItem.setVisible(true);
+	    			
+	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
+	    			rubbishBinMenuItem.setEnabled(true);
+	    			addMenuItem.setIcon(R.drawable.ic_menu_add);
+	    			addMenuItem.setEnabled(true);
+    			}
+      			break;
     		}
 			default:{
 				break;
@@ -1421,6 +1476,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (sF != null){
 			if (sF.isVisible()){
 				if (sF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					return;
+				}
+			}
+		}
+		
+		if (psF != null){
+			if (psF.isVisible()){
+				if (psF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
 					return;
@@ -1665,16 +1730,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    		if (fbF != null){
 		    			if (fbF.isVisible()){
 		    				fbF.onBackPressed();
+		    				return true;
 		    			}
 		    		}
 		    		if (rbF != null){
 		    			if (rbF.isVisible()){
 		    				rbF.onBackPressed();
+		    				return true;
 		    			}
 		    		}
 		    		if (swmF != null){
 		    			if (swmF.isVisible()){
 		    				swmF.onBackPressed();
+		    		    	return true;
+		    			}
+		    		}
+		    		if (sF != null){
+		    			if (sF.isVisible()){
+		    				sF.onBackPressed();
+		    				return true;
 		    			}
 		    		}
 				}
@@ -1785,7 +1859,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	return true;
 	        }
 	        case R.id.action_menu_logout:{
-	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi);
+	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi, false);
 	        	return true;
 	        }
             default:{
@@ -1964,7 +2038,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 /*
 	 * Logout user
 	 */
-	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi) {
+	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi, boolean confirmAccount) {
 //		context.stopService(new Intent(context, BackgroundService.class));
 		log("logout");
 //		context.stopService(new Intent(context, CameraSyncService.class));
@@ -2004,21 +2078,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		megaApi.logout();
 		drawerItem = null;
 		
-		if(managerActivity != null)	{
-			Intent intent = new Intent(managerActivity, TourActivity.class);
-	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-			managerActivity.startActivity(intent);
-			managerActivity.finish();
-			managerActivity = null;
+		if (!confirmAccount){		
+			if(managerActivity != null)	{
+				Intent intent = new Intent(managerActivity, TourActivity.class);
+		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				managerActivity.startActivity(intent);
+				managerActivity.finish();
+				managerActivity = null;
+			}
+			else{
+				Intent intent = new Intent (context, TourActivity.class);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				context.startActivity(intent);
+				((Activity)context).finish();
+				context = null;
+			}
 		}
 		else{
-			Intent intent = new Intent (context, TourActivity.class);
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-			context.startActivity(intent);
-			((Activity)context).finish();
-			context = null;
+			if (managerActivity != null){
+				managerActivity.finish();
+			}
+			else{
+				((Activity)context).finish();
+			}
 		}
 	}	
 	
@@ -3437,6 +3521,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
 				swmF.setNodes(nodes);
 				swmF.getListView().invalidateViews();
+			}
+		}
+		if (psF != null){
+			if (psF.isVisible()){
+				long photoSyncHandle = psF.getPhotoSyncHandle();
+				MegaNode nps = megaApi.getNodeByHandle(photoSyncHandle);
+				if (nps != null){
+					NodeList nodes = megaApi.getChildren(nps, orderGetChildren);
+					psF.setNodes(nodes);
+					psF.getListView().invalidateViews();
+				}
 			}
 		}
 	}

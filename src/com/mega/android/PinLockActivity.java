@@ -59,7 +59,7 @@ public class PinLockActivity extends ActionBarActivity implements OnClickListene
 				break;
 			}
 			case R.id.pin_lock_logout:{
-				ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi);
+				ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi, false);
 				break;
 			}
 		}
