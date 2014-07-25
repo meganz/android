@@ -103,6 +103,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity)context).setParentHandleSearch(parentHandle);
 				break;
 			}
+			case ManagerActivity.PHOTO_SYNC_ADAPTER:{
+				break;
+			}
 			default:{
 				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 				break;
@@ -615,6 +618,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			case ManagerActivity.SEARCH_ADAPTER:{
 				((ManagerActivity)context).setParentHandleSearch(parentHandle);
+				break;
+			}
+			case ManagerActivity.PHOTO_SYNC_ADAPTER:{
 				break;
 			}
 			default:{

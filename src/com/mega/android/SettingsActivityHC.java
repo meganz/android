@@ -26,7 +26,7 @@ public class SettingsActivityHC extends Activity {
 		
 		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 		if (dbH.getCredentials() == null){
-			ManagerActivity.logout(this, app, megaApi);
+			ManagerActivity.logout(this, app, megaApi, false);
 			return;
 		}	
 		
