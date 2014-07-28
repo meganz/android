@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -25,6 +26,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.text.format.DateUtils;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,7 +50,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	MegaBrowserListAdapter adapterList;
+	MegaPhotoSyncListAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
 	PhotoSyncFragment fileBrowserFragment = this;
 	
@@ -59,11 +61,18 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	NodeList nodes;
+	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<PhotoSyncFragment.PhotoSyncHolder>();
 	
 	private ActionMode actionMode;
 	
 	ProgressDialog statusDialog;
 	long photosyncHandle = -1;
+	
+	public class PhotoSyncHolder{
+		boolean isNode;
+		long handle;
+		String monthYear;
+	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -303,12 +312,30 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle));
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+			PhotoSyncHolder psh = new PhotoSyncHolder();
+			psh.isNode = false;
+			psh.monthYear = "July 2014";
+			nodesArray.add(psh);
+			psh = new PhotoSyncHolder();
+			psh.isNode = true;
+			psh.handle = nodes.get(0).getHandle();
+			nodesArray.add(psh);
+			
+			for (int i=0;i<nodes.size();i++){
+				try {
+					log("NODE: " + nodes.get(i).getName() + "___" + DateUtils.getRelativeTimeSpanString(nodes.get(i).getModificationTime() * 1000));
+				}
+				catch(Exception ex)	{}
+				
+			}
+			
+			
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, photosyncHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.PHOTO_SYNC_ADAPTER);
+				adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB);
 			}
 			else{
-				adapterList.setNodes(nodes);
+				adapterList.setNodes(nodesArray);
 			}
 			
 			adapterList.setPositionClicked(-1);
@@ -316,8 +343,6 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 
 			listView.setAdapter(adapterList);
 		}
-		
-		
 		
 		return v;
 		
@@ -612,15 +637,16 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	 */
 	private List<MegaNode> getSelectedDocuments() {
 		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
-		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-		for (int i = 0; i < checkedItems.size(); i++) {
-			if (checkedItems.valueAt(i) == true) {
-				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
-				if (document != null){
-					documents.add(document);
-				}
-			}
-		}
+//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+//		for (int i = 0; i < checkedItems.size(); i++) {
+//			if (checkedItems.valueAt(i) == true) {
+//				
+//				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
+//				if (document != null){
+//					documents.add(document);
+//				}
+//			}
+//		}
 		return documents;
 	}
 	
@@ -720,26 +746,13 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	
 	public long getPhotoSyncHandle(){
 		if (isList){
-			return adapterList.getParentHandle();
+			return adapterList.getPhotoSyncHandle();
 		}
 		else{
 			return adapterGrid.getParentHandle();
 		}
 	}
 	
-	public void setPhotosyncHandle(long photosyncHandle){
-		this.photosyncHandle = photosyncHandle;
-		if (isList){
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(photosyncHandle);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(photosyncHandle);
-			}
-		}
-	}
 	
 	public ListView getListView(){
 		return listView;
@@ -749,7 +762,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		this.nodes = nodes;
 		if (isList){
 			if (adapterList != null){
-				adapterList.setNodes(nodes);
+				adapterList.setNodes(nodesArray);
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
