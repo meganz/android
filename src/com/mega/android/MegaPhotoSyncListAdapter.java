@@ -1,7 +1,9 @@
 package com.mega.android;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import com.mega.android.PhotoSyncFragment.PhotoSyncHolder;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
@@ -33,15 +35,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
+public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	MegaApiAndroid megaApi;
 
 	int positionClicked;
-	NodeList nodes;
+	ArrayList<PhotoSyncHolder> nodesArray;
 	
-	long parentHandle = -1;
+	long photosyncHandle = -1;
 	
 	ListView listFragment;
 	ImageView emptyImageViewFragment;
@@ -54,7 +56,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	/*public static view holder class*/
-    public class ViewHolderBrowserList {
+    public class ViewHolderPhotoSyncList {
     	CheckBox checkbox;
         ImageView imageView;
         TextView textViewFileName;
@@ -74,41 +76,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
         long document;
     }
 	
-	public MegaBrowserListAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int type) {
+	public MegaPhotoSyncListAdapter(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.context = _context;
-		this.nodes = _nodes;
-		this.parentHandle = _parentHandle;
-		switch(type){
-			case ManagerActivity.FILE_BROWSER_ADAPTER:{
-				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-				break;
-			}
-			case ManagerActivity.CONTACT_FILE_ADAPTER:{
-				((ContactFileListActivity)context).setParentHandle(parentHandle);
-				break;
-			}
-			case ManagerActivity.RUBBISH_BIN_ADAPTER:{
-				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-				break;
-			}
-			case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
-				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-				break;
-			}
-			case ManagerActivity.FOLDER_LINK_ADAPTER:{
-				megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApiFolder();
-				break;
-			}
-			case ManagerActivity.SEARCH_ADAPTER:{
-				((ManagerActivity)context).setParentHandleSearch(parentHandle);
-				break;
-			}
-			default:{
-				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-				break;
-			}
-		}
-
+		this.nodesArray = _nodesArray;
+		this.photosyncHandle = _photosyncHandle;
+		
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
 		this.emptyTextViewFragment = emptyTextView;
@@ -116,15 +88,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		this.positionClicked = -1;
 		
-		this.type = type;
-		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
 	
-	public void setNodes(NodeList nodes){
-		this.nodes = nodes;
+	public void setNodes(ArrayList<PhotoSyncHolder> nodesArray){
+		this.nodesArray = nodesArray;
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
@@ -136,7 +106,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		final int _position = position;
 		
-		ViewHolderBrowserList holder = null;
+		ViewHolderPhotoSyncList holder = null;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -149,7 +119,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_file_list, parent, false);
-			holder = new ViewHolderBrowserList();
+			holder = new ViewHolderPhotoSyncList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
 			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
 			holder.checkbox.setClickable(false);
@@ -187,7 +157,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			convertView.setTag(holder);
 		}
 		else{
-			holder = (ViewHolderBrowserList) convertView.getTag();
+			holder = (ViewHolderPhotoSyncList) convertView.getTag();
 		}
 		
 		if (!multipleSelect){
@@ -210,77 +180,159 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		holder.currentPosition = position;
 		
-		MegaNode node = (MegaNode) getItem(position);
-		holder.document = node.getHandle();
-		Bitmap thumb = null;
-		
-		holder.textViewFileName.setText(node.getName());
-		
-		if (node.isFolder()){
-			holder.textViewFileSize.setText(getInfoFolder(node));
-			ShareList sl = megaApi.getOutShares(node);
-			if (sl != null){
-				if (sl.size() > 0){
-					holder.imageView.setImageResource(R.drawable.mime_folder_shared);		
-				}
-				else{
-					holder.imageView.setImageResource(R.drawable.mime_folder);
-				}
+		PhotoSyncHolder psh = (PhotoSyncHolder) getItem(position);
+		if (psh.isNode){
+			MegaNode node = megaApi.getNodeByHandle(psh.handle);
+			holder.document = node.getHandle();
+			Bitmap thumb = null;
+			
+			holder.textViewFileName.setText(node.getName());
+			
+			if (node.isFolder()){
+//				holder.textViewFileSize.setText(getInfoFolder(node));
+//				ShareList sl = megaApi.getOutShares(node);
+//				if (sl != null){
+//					if (sl.size() > 0){
+//						holder.imageView.setImageResource(R.drawable.mime_folder_shared);		
+//					}
+//					else{
+//						holder.imageView.setImageResource(R.drawable.mime_folder);
+//					}
+//				}
+//				else{
+//					holder.imageView.setImageResource(R.drawable.mime_folder);				
+//				}
 			}
 			else{
-				holder.imageView.setImageResource(R.drawable.mime_folder);				
-			}
-		}
-		else{
-			long nodeSize = node.getSize();
-			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
-			
-			if (node.hasThumbnail()){
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null){
-					holder.imageView.setImageBitmap(thumb);
-				}
-				else{
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+				long nodeSize = node.getSize();
+				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+				holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+				
+				if (node.hasThumbnail()){
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
-						try{
-							thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
-						}
-						catch(Exception e){} //Too many AsyncTasks
-						
+					else{
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}
+						else{ 
+							try{
+								thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
+							}
+							catch(Exception e){} //Too many AsyncTasks
+							
+							if (thumb != null){
+								holder.imageView.setImageBitmap(thumb);
+							}
+						}
 					}
 				}
-			}
-			else{
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null){
-					holder.imageView.setImageBitmap(thumb);
-				}
 				else{
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
-						try{
-							ThumbnailUtils.createThumbnailList(context, node, holder, megaApi, this);
+					else{
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						if (thumb != null){
+							holder.imageView.setImageBitmap(thumb);
 						}
-						catch(Exception e){} //Too many AsyncTasks
-					}
-				}			
+						else{ 
+							try{
+								ThumbnailUtils.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
+							}
+							catch(Exception e){} //Too many AsyncTasks
+						}
+					}			
+				}
 			}
 		}
+		else{
+			holder.textViewFileName.setText(psh.monthYear);
+		}
 		
+		
+		
+		
+		
+		
+		
+		
+		
+//		MegaNode node = (MegaNode) getItem(position);
+//		holder.document = node.getHandle();
+//		Bitmap thumb = null;
+//		
+//		holder.textViewFileName.setText(node.getName());
+//		
+//		if (node.isFolder()){
+//			holder.textViewFileSize.setText(getInfoFolder(node));
+//			ShareList sl = megaApi.getOutShares(node);
+//			if (sl != null){
+//				if (sl.size() > 0){
+//					holder.imageView.setImageResource(R.drawable.mime_folder_shared);		
+//				}
+//				else{
+//					holder.imageView.setImageResource(R.drawable.mime_folder);
+//				}
+//			}
+//			else{
+//				holder.imageView.setImageResource(R.drawable.mime_folder);				
+//			}
+//		}
+//		else{
+//			long nodeSize = node.getSize();
+//			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+//			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+//			
+//			if (node.hasThumbnail()){
+//				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+//				if (thumb != null){
+//					holder.imageView.setImageBitmap(thumb);
+//				}
+//				else{
+//					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+//					if (thumb != null){
+//						holder.imageView.setImageBitmap(thumb);
+//					}
+//					else{ 
+//						try{
+//							thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+//						}
+//						catch(Exception e){} //Too many AsyncTasks
+//						
+//						if (thumb != null){
+//							holder.imageView.setImageBitmap(thumb);
+//						}
+//					}
+//				}
+//			}
+//			else{
+//				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+//				if (thumb != null){
+//					holder.imageView.setImageBitmap(thumb);
+//				}
+//				else{
+//					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+//					if (thumb != null){
+//						holder.imageView.setImageBitmap(thumb);
+//					}
+//					else{ 
+//						try{
+//							ThumbnailUtils.createThumbnailList(context, node, holder, megaApi, this);
+//						}
+//						catch(Exception e){} //Too many AsyncTasks
+//					}
+//				}			
+//			}
+//		}
+//		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
-		
+//		
 		if (positionClicked != -1){
 			if (positionClicked == position){
 				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -289,79 +341,79 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
 				listFragment.smoothScrollToPosition(_position);
-				
-				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
-					holder.optionDownload.setVisibility(View.VISIBLE);
-					holder.optionProperties.setVisibility(View.VISIBLE);
-					holder.optionCopy.setVisibility(View.VISIBLE);
-					holder.optionMove.setVisibility(View.GONE);
-					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.GONE);
-					holder.optionDelete.setVisibility(View.GONE);
-					
-					holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				}
-				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
-					holder.optionDownload.setVisibility(View.VISIBLE);
-					holder.optionProperties.setVisibility(View.VISIBLE);
-					holder.optionCopy.setVisibility(View.VISIBLE);
-					holder.optionMove.setVisibility(View.VISIBLE);
-					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.VISIBLE);
-					holder.optionDelete.setVisibility(View.VISIBLE);
-					
-					holder.optionDownload.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionProperties.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionCopy.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionMove.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionRename.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionDelete.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				}
-				else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-					holder.optionDownload.setVisibility(View.VISIBLE);
-					holder.optionProperties.setVisibility(View.VISIBLE);
-					holder.optionCopy.setVisibility(View.VISIBLE);
-					holder.optionMove.setVisibility(View.GONE);
-					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.VISIBLE);
-					holder.optionDelete.setVisibility(View.VISIBLE);
-					
-					holder.optionDownload.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionProperties.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionCopy.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionMove.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionRename.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionDelete.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				}
-				else if (type == ManagerActivity.FOLDER_LINK_ADAPTER){
-					holder.optionDownload.setVisibility(View.VISIBLE);
-					holder.optionProperties.setVisibility(View.GONE);
-					holder.optionCopy.setVisibility(View.GONE);
-					holder.optionMove.setVisibility(View.GONE);
-					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.GONE);
-					holder.optionDelete.setVisibility(View.GONE);
-					
-					holder.optionDownload.getLayoutParams().width = Util.px2dp((335*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				}
+//				
+//				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
+//					holder.optionDownload.setVisibility(View.VISIBLE);
+//					holder.optionProperties.setVisibility(View.VISIBLE);
+//					holder.optionCopy.setVisibility(View.VISIBLE);
+//					holder.optionMove.setVisibility(View.GONE);
+//					holder.optionPublicLink.setVisibility(View.GONE);
+//					holder.optionRename.setVisibility(View.GONE);
+//					holder.optionDelete.setVisibility(View.GONE);
+//					
+//					holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//				}
+//				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+//					holder.optionDownload.setVisibility(View.VISIBLE);
+//					holder.optionProperties.setVisibility(View.VISIBLE);
+//					holder.optionCopy.setVisibility(View.VISIBLE);
+//					holder.optionMove.setVisibility(View.VISIBLE);
+//					holder.optionPublicLink.setVisibility(View.GONE);
+//					holder.optionRename.setVisibility(View.VISIBLE);
+//					holder.optionDelete.setVisibility(View.VISIBLE);
+//					
+//					holder.optionDownload.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionProperties.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionCopy.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionMove.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionRename.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionDelete.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//				}
+//				else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+//					holder.optionDownload.setVisibility(View.VISIBLE);
+//					holder.optionProperties.setVisibility(View.VISIBLE);
+//					holder.optionCopy.setVisibility(View.VISIBLE);
+//					holder.optionMove.setVisibility(View.GONE);
+//					holder.optionPublicLink.setVisibility(View.GONE);
+//					holder.optionRename.setVisibility(View.VISIBLE);
+//					holder.optionDelete.setVisibility(View.VISIBLE);
+//					
+//					holder.optionDownload.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionProperties.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionCopy.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionMove.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionRename.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//					holder.optionDelete.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//				}
+//				else if (type == ManagerActivity.FOLDER_LINK_ADAPTER){
+//					holder.optionDownload.setVisibility(View.VISIBLE);
+//					holder.optionProperties.setVisibility(View.GONE);
+//					holder.optionCopy.setVisibility(View.GONE);
+//					holder.optionMove.setVisibility(View.GONE);
+//					holder.optionPublicLink.setVisibility(View.GONE);
+//					holder.optionRename.setVisibility(View.GONE);
+//					holder.optionDelete.setVisibility(View.GONE);
+//					
+//					holder.optionDownload.getLayoutParams().width = Util.px2dp((335*scaleW), outMetrics);
+//					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+//				}
 			}
 			else{
 				holder.arrowSelection.setVisibility(View.GONE);
@@ -378,27 +430,27 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
-		
-		holder.optionDownload.setTag(holder);
-		holder.optionDownload.setOnClickListener(this);
-		
-		holder.optionProperties.setTag(holder);
-		holder.optionProperties.setOnClickListener(this);
-		
-		holder.optionRename.setTag(holder);
-		holder.optionRename.setOnClickListener(this);
-		
-		holder.optionCopy.setTag(holder);
-		holder.optionCopy.setOnClickListener(this);
-		
-		holder.optionMove.setTag(holder);
-		holder.optionMove.setOnClickListener(this);
-		
-		holder.optionDelete.setTag(holder);
-		holder.optionDelete.setOnClickListener(this);
-		
-		holder.optionPublicLink.setTag(holder);
-		holder.optionPublicLink.setOnClickListener(this);
+//		
+//		holder.optionDownload.setTag(holder);
+//		holder.optionDownload.setOnClickListener(this);
+//		
+//		holder.optionProperties.setTag(holder);
+//		holder.optionProperties.setOnClickListener(this);
+//		
+//		holder.optionRename.setTag(holder);
+//		holder.optionRename.setOnClickListener(this);
+//		
+//		holder.optionCopy.setTag(holder);
+//		holder.optionCopy.setOnClickListener(this);
+//		
+//		holder.optionMove.setTag(holder);
+//		holder.optionMove.setOnClickListener(this);
+//		
+//		holder.optionDelete.setTag(holder);
+//		holder.optionDelete.setOnClickListener(this);
+//		
+//		holder.optionPublicLink.setTag(holder);
+//		holder.optionPublicLink.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -446,12 +498,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
     public int getCount() {
-        return nodes.size();
+        return nodesArray.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return nodes.get(position);
+        return nodesArray.get(position);
     }
  
     @Override
@@ -469,7 +521,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public void onClick(View v) {
-		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
+		ViewHolderPhotoSyncList holder = (ViewHolderPhotoSyncList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		MegaNode n = (MegaNode) getItem(currentPosition);
 		
@@ -578,52 +630,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	/*
 	 * Get document at specified position
 	 */
-	public MegaNode getDocumentAt(int position) {
+	public PhotoSyncHolder getDocumentAt(int position) {
 		try {
-			if(nodes != null){
-				return nodes.get(position);
+			if(nodesArray != null){
+				return nodesArray.get(position);
 			}
 		} catch (IndexOutOfBoundsException e) {}
 		return null;
 	}
 		
-	public long getParentHandle(){
-		return parentHandle;
-	}
-	
-	public void setParentHandle(long parentHandle){
-		this.parentHandle = parentHandle;
-		switch(type){
-			case ManagerActivity.FILE_BROWSER_ADAPTER:{
-				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-				break;
-			}
-			case ManagerActivity.CONTACT_FILE_ADAPTER:{
-				((ContactFileListActivity)context).setParentHandle(parentHandle);
-				break;
-			}
-			case ManagerActivity.RUBBISH_BIN_ADAPTER:{
-				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-				break;
-			}
-			case ManagerActivity.SHARED_WITH_ME_ADAPTER:{
-				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-				break;
-			}
-			case ManagerActivity.FOLDER_LINK_ADAPTER:{
-				break;
-			}
-			case ManagerActivity.SEARCH_ADAPTER:{
-				((ManagerActivity)context).setParentHandleSearch(parentHandle);
-				break;
-			}
-			default:{
-				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-				break;
-			}
-		}
-	}
-	
 	public boolean isMultipleSelect() {
 		return multipleSelect;
 	}
@@ -637,6 +652,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
+	}
+	
+	public long getPhotoSyncHandle(){
+		return photosyncHandle;
 	}
 	
 	private static void log(String log) {
