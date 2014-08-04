@@ -31,6 +31,7 @@
     <color name="contact_properties_info_menu">#404040</color>
     <color name="contact_properties_info_data">#999999</color>
     <color name="contact_list_second_row">#848484</color>
+    <color name="photo_sync_month_layout">#333333</color>
     
     
     <color name="white">#FFFFFF</color>
