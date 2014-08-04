@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -313,22 +314,40 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-			PhotoSyncHolder psh = new PhotoSyncHolder();
-			psh.isNode = false;
-			psh.monthYear = "July 2014";
-			nodesArray.add(psh);
-			psh = new PhotoSyncHolder();
-			psh.isNode = true;
-			psh.handle = nodes.get(0).getHandle();
-			nodesArray.add(psh);
-			
+			int month = 0;
+			int year = 0;
 			for (int i=0;i<nodes.size();i++){
-				try {
-					log("NODE: " + nodes.get(i).getName() + "___" + DateUtils.getRelativeTimeSpanString(nodes.get(i).getModificationTime() * 1000));
+				PhotoSyncHolder psh = new PhotoSyncHolder();
+				Date d = new Date(nodes.get(i).getModificationTime()*1000);
+				if ((month == d.getMonth()) && (year == d.getYear())){
+					psh.isNode = true;
+					psh.handle = nodes.get(i).getHandle();
+					nodesArray.add(psh);
 				}
-				catch(Exception ex)	{}
-				
+				else{
+					month = d.getMonth();
+					year = d.getYear();
+					psh.isNode = false;
+					psh.monthYear = getImageDateString(month, year);
+					nodesArray.add(psh);
+					psh = new PhotoSyncHolder();
+					psh.isNode = true;
+					psh.handle = nodes.get(i).getHandle();
+					nodesArray.add(psh);
+					log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
+				}
 			}
+			
+			
+			
+//			for (int i=0;i<nodes.size();i++){
+//				try {
+//					log("NODE: " + nodes.get(i).getName() + "___" + DateUtils.getRelativeTimeSpanString(nodes.get(i).getModificationTime() * 1000));
+//				}
+//				catch(Exception ex)	{}
+//				
+//			}
+			
 			
 			
 			if (adapterList == null){
@@ -445,6 +464,63 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 //			
 //			return v;
 //		}		
+	}
+	
+	public String getImageDateString(int month, int year){
+		String ret = "";
+		year = year + 1900;
+	
+		switch(month){
+			case 0:{
+				ret = context.getString(R.string.january) + " " + year;
+				break;
+			}
+			case 1:{
+				ret = context.getString(R.string.february) + " " + year;
+				break;
+			}
+			case 2:{
+				ret = context.getString(R.string.march) + " " + year;
+				break;
+			}
+			case 3:{
+				ret = context.getString(R.string.april) + " " + year;
+				break;
+			}
+			case 4:{
+				ret = context.getString(R.string.may) + " " + year;
+				break;
+			}
+			case 5:{
+				ret = context.getString(R.string.june) + " " + year;
+				break;
+			}
+			case 6:{
+				ret = context.getString(R.string.july) + " " + year;
+				break;
+			}
+			case 7:{
+				ret = context.getString(R.string.august) + " " + year;
+				break;
+			}
+			case 8:{
+				ret = context.getString(R.string.september) + " " + year;
+				break;
+			}
+			case 9:{
+				ret = context.getString(R.string.october) + " " + year;
+				break;
+			}
+			case 10:{
+				ret = context.getString(R.string.november) + " " + year;
+				break;
+			}
+			case 11:{
+				ret = context.getString(R.string.december) + " " + year;
+				break;
+			}
+		}
+		return ret;
 	}
 		
 	@Override
@@ -746,7 +822,12 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	
 	public long getPhotoSyncHandle(){
 		if (isList){
-			return adapterList.getPhotoSyncHandle();
+			if (adapterList != null){
+				return adapterList.getPhotoSyncHandle();
+			}
+			else{
+				return -1;
+			}
 		}
 		else{
 			return adapterGrid.getParentHandle();

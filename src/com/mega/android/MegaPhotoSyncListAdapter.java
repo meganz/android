@@ -72,6 +72,8 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
         ImageView optionMove;
         ImageView optionPublicLink;
         ImageView optionDelete;
+        RelativeLayout monthLayout;
+        TextView monthTextView;
         int currentPosition;
         long document;
     }
@@ -118,40 +120,42 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
-			convertView = inflater.inflate(R.layout.item_file_list, parent, false);
+			convertView = inflater.inflate(R.layout.item_photo_sync_list, parent, false);
 			holder = new ViewHolderPhotoSyncList();
-			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
-			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
+			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_list_item_layout);
+			holder.monthLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_list_month_layout);
+			holder.monthTextView = (TextView) convertView.findViewById(R.id.photo_sync_list_month_name);
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.photo_sync_list_checkbox);
 			holder.checkbox.setClickable(false);
-			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
-			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);
+			holder.imageView = (ImageView) convertView.findViewById(R.id.photo_sync_list_thumbnail);
+			holder.textViewFileName = (TextView) convertView.findViewById(R.id.photo_sync_list_filename);
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
-			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
-			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
-			holder.optionDownload = (ImageView) convertView.findViewById(R.id.file_list_option_download);
+			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.photo_sync_list_filesize);
+			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.photo_sync_list_three_dots);
+			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_list_options);
+			holder.optionDownload = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_download);
 			holder.optionDownload.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionProperties = (ImageView) convertView.findViewById(R.id.file_list_option_properties);
+			holder.optionProperties = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_properties);
 			holder.optionProperties.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
+			holder.optionRename = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_rename);
 			holder.optionRename.getLayoutParams().width = Util.px2dp((30*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionCopy = (ImageView) convertView.findViewById(R.id.file_list_option_copy);
+			holder.optionCopy = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_copy);
 			holder.optionCopy.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionMove = (ImageView) convertView.findViewById(R.id.file_list_option_move);
+			holder.optionMove = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_move);
 			holder.optionMove.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionPublicLink = (ImageView) convertView.findViewById(R.id.file_list_option_public_link);
+			holder.optionPublicLink = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_public_link);
 			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionDelete = (ImageView) convertView.findViewById(R.id.file_list_option_delete);
+			holder.optionDelete = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_delete);
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
+			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.photo_sync_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 			
 			convertView.setTag(holder);
@@ -187,6 +191,8 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			Bitmap thumb = null;
 			
 			holder.textViewFileName.setText(node.getName());
+			holder.monthLayout.setVisibility(View.GONE);
+			holder.itemLayout.setVisibility(View.VISIBLE);
 			
 			if (node.isFolder()){
 //				holder.textViewFileSize.setText(getInfoFolder(node));
@@ -251,8 +257,12 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			}
 		}
 		else{
-			holder.textViewFileName.setText(psh.monthYear);
+			holder.monthTextView.setText(psh.monthYear);
+			holder.itemLayout.setVisibility(View.GONE);
+			holder.monthLayout.setVisibility(View.VISIBLE);
+			
 		}
+		
 		
 		
 		
@@ -526,7 +536,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		MegaNode n = (MegaNode) getItem(currentPosition);
 		
 		switch (v.getId()){
-			case R.id.file_list_option_download:{
+			case R.id.photo_sync_list_option_download:{
 				positionClicked = -1;
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
@@ -542,7 +552,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 				break;
 			}
-			case R.id.file_list_option_properties:{
+			case R.id.photo_sync_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				i.putExtra("handle", n.getHandle());
 			
@@ -558,7 +568,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				notifyDataSetChanged();
 				break;
 			}
-			case R.id.file_list_option_delete:{
+			case R.id.photo_sync_list_option_delete:{
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(n.getHandle());
 				setPositionClicked(-1);
@@ -568,7 +578,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 				break;
 			}
-			case R.id.file_list_option_public_link:{
+			case R.id.photo_sync_list_option_public_link:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				if ((type == ManagerActivity.FILE_BROWSER_ADAPTER) || (type == ManagerActivity.SEARCH_ADAPTER)){
@@ -576,7 +586,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 				break;
 			}
-			case R.id.file_list_option_rename:{
+			case R.id.photo_sync_list_option_rename:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
@@ -584,7 +594,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 				break;
 			}
-			case R.id.file_list_option_move:{
+			case R.id.photo_sync_list_option_move:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
@@ -594,7 +604,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 				break;
 			}
-			case R.id.file_list_option_copy:{
+			case R.id.photo_sync_list_option_copy:{
 				positionClicked = -1;
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
@@ -607,7 +617,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 				break;
 			}
-			case R.id.file_list_three_dots:{
+			case R.id.photo_sync_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
 					notifyDataSetChanged();
