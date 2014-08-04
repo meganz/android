@@ -440,27 +440,27 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
 		}
-//		
-//		holder.optionDownload.setTag(holder);
-//		holder.optionDownload.setOnClickListener(this);
-//		
-//		holder.optionProperties.setTag(holder);
-//		holder.optionProperties.setOnClickListener(this);
-//		
-//		holder.optionRename.setTag(holder);
-//		holder.optionRename.setOnClickListener(this);
-//		
-//		holder.optionCopy.setTag(holder);
-//		holder.optionCopy.setOnClickListener(this);
-//		
-//		holder.optionMove.setTag(holder);
-//		holder.optionMove.setOnClickListener(this);
-//		
-//		holder.optionDelete.setTag(holder);
-//		holder.optionDelete.setOnClickListener(this);
-//		
-//		holder.optionPublicLink.setTag(holder);
-//		holder.optionPublicLink.setOnClickListener(this);
+		
+		holder.optionDownload.setTag(holder);
+		holder.optionDownload.setOnClickListener(this);
+		
+		holder.optionProperties.setTag(holder);
+		holder.optionProperties.setOnClickListener(this);
+		
+		holder.optionRename.setTag(holder);
+		holder.optionRename.setOnClickListener(this);
+		
+		holder.optionCopy.setTag(holder);
+		holder.optionCopy.setOnClickListener(this);
+		
+		holder.optionMove.setTag(holder);
+		holder.optionMove.setOnClickListener(this);
+		
+		holder.optionDelete.setTag(holder);
+		holder.optionDelete.setOnClickListener(this);
+		
+		holder.optionPublicLink.setTag(holder);
+		holder.optionPublicLink.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -533,7 +533,17 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 	public void onClick(View v) {
 		ViewHolderPhotoSyncList holder = (ViewHolderPhotoSyncList) v.getTag();
 		int currentPosition = holder.currentPosition;
-		MegaNode n = (MegaNode) getItem(currentPosition);
+		PhotoSyncHolder psH = (PhotoSyncHolder) getItem(currentPosition);
+		
+		if (megaApi == null){
+			return;
+		}
+		
+		MegaNode n = megaApi.getNodeByHandle(psH.handle);
+		
+		if (n == null){
+			return;
+		}
 		
 		switch (v.getId()){
 			case R.id.photo_sync_list_option_download:{
