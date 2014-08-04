@@ -3527,8 +3527,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (psF.isVisible()){
 				long photoSyncHandle = psF.getPhotoSyncHandle();
 				MegaNode nps = megaApi.getNodeByHandle(photoSyncHandle);
+				log("photoSyncHandle: " + photoSyncHandle);
 				if (nps != null){
-					NodeList nodes = megaApi.getChildren(nps, orderGetChildren);
+					log("nps != null");
+					NodeList nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_DEFAULT_ASC);
 					psF.setNodes(nodes);
 					psF.getListView().invalidateViews();
 				}

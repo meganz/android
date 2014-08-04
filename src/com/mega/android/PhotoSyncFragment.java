@@ -336,19 +336,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 					nodesArray.add(psh);
 					log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
 				}
-			}
-			
-			
-			
-//			for (int i=0;i<nodes.size();i++){
-//				try {
-//					log("NODE: " + nodes.get(i).getName() + "___" + DateUtils.getRelativeTimeSpanString(nodes.get(i).getModificationTime() * 1000));
-//				}
-//				catch(Exception ex)	{}
-//				
-//			}
-			
-			
+			}			
 			
 			if (adapterList == null){
 				adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB);
@@ -841,6 +829,30 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	
 	public void setNodes(NodeList nodes){
 		this.nodes = nodes;
+		this.nodesArray.clear();
+		int month = 0;
+		int year = 0;
+		for (int i=0;i<nodes.size();i++){
+			PhotoSyncHolder psh = new PhotoSyncHolder();
+			Date d = new Date(nodes.get(i).getModificationTime()*1000);
+			if ((month == d.getMonth()) && (year == d.getYear())){
+				psh.isNode = true;
+				psh.handle = nodes.get(i).getHandle();
+				nodesArray.add(psh);
+			}
+			else{
+				month = d.getMonth();
+				year = d.getYear();
+				psh.isNode = false;
+				psh.monthYear = getImageDateString(month, year);
+				nodesArray.add(psh);
+				psh = new PhotoSyncHolder();
+				psh.isNode = true;
+				psh.handle = nodes.get(i).getHandle();
+				nodesArray.add(psh);
+				log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
+			}
+		}
 		if (isList){
 			if (adapterList != null){
 				adapterList.setNodes(nodesArray);
