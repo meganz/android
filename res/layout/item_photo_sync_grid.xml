@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/file_grid_item_complete_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/grid_background">
+    
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/photo_sync_grid_item_layout"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:descendantFocusability="blocksDescendants" >
+        
+        <ImageButton
+	        android:id="@+id/photo_sync_grid_thumbnail1"
+	        android:layout_width="110dp"
+	        android:layout_height="110dp"
+	        android:scaleType="fitCenter"
+	        android:background="@null" 
+	        android:layout_marginRight="5dp"
+	        android:layout_marginLeft="5dp"
+	        android:layout_alignParentLeft="true"/>
+        
+        <ImageButton
+	        android:id="@+id/photo_sync_grid_thumbnail2"
+	        android:layout_width="110dp"
+	        android:layout_height="110dp"
+	        android:scaleType="fitCenter"
+	        android:background="@null" 
+	        android:layout_marginRight="5dp"
+	        android:layout_marginLeft="5dp"
+	        android:layout_centerHorizontal="true"/>
+        
+        <ImageButton
+	        android:id="@+id/photo_sync_grid_thumbnail3"
+	        android:layout_width="110dp"
+	        android:layout_height="110dp"
+	        android:scaleType="fitCenter"
+	        android:background="@null"
+	        android:layout_marginRight="5dp"
+	        android:layout_marginLeft="5dp"
+	        android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+    
+    <RelativeLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:descendantFocusability="blocksDescendants"
+	    android:id="@+id/photo_sync_grid_month_layout" 
+	    android:background="@color/photo_sync_month_layout"
+	    android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp" >
+	    
+    	<TextView
+	        android:id="@+id/photo_sync_grid_month_name"
+	        android:layout_width="225dp"
+	        android:layout_height="30dp"
+	        android:layout_marginLeft="10dp"
+	        android:layout_marginTop="4dp"
+	        android:layout_marginBottom="4dp"
+	        android:singleLine="false" 
+	        android:textColor="@color/white"
+	        android:textSize="18sp"/>
+    
+	</RelativeLayout>	
+        
+</RelativeLayout>

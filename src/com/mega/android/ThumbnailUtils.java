@@ -8,6 +8,7 @@ import com.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import com.mega.android.MegaExplorerAdapter.ViewHolderExplorer;
 import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
+import com.mega.android.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import com.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
 import com.mega.android.MegaTransfersAdapter.ViewHolderTransfer;
 import com.mega.sdk.MegaApiAndroid;
@@ -44,6 +45,7 @@ public class ThumbnailUtils {
 	static HashMap<Long, ThumbnailDownloadListenerFull> listenersFull = new HashMap<Long, ThumbnailDownloadListenerFull>();
 	static HashMap<Long, ThumbnailDownloadListenerTransfer> listenersTransfer = new HashMap<Long, ThumbnailDownloadListenerTransfer>();
 	static HashMap<Long, ThumbnailDownloadListenerPhotoSyncList> listenersPhotoSyncList = new HashMap<Long, ThumbnailDownloadListenerPhotoSyncList>();
+	static HashMap<Long, ThumbnailDownloadListenerPhotoSyncGrid> listenersPhotoSyncGrid = new HashMap<Long, ThumbnailDownloadListenerPhotoSyncGrid>();
 
 	
 	static class ThumbnailDownloadListenerPhotoSyncList implements MegaRequestListenerInterface{
@@ -90,6 +92,96 @@ public class ThumbnailUtils {
 									holder.imageView.startAnimation(fadeInAnimation);
 									adapter.notifyDataSetChanged();
 									log("Thumbnail update");
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
+	static class ThumbnailDownloadListenerPhotoSyncGrid implements MegaRequestListenerInterface{
+		Context context;
+		ViewHolderPhotoSyncGrid holder;
+		MegaPhotoSyncGridAdapter adapter;
+		int numView;
+		
+		ThumbnailDownloadListenerPhotoSyncGrid(Context context, ViewHolderPhotoSyncGrid holder, MegaPhotoSyncGridAdapter adapter, int numView){
+			this.context = context;
+			this.holder = holder;
+			this.adapter = adapter;
+			this.numView = numView;
+		}
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
+			
+			log("Downloading thumbnail finished");
+			final long handle = request.getNodeHandle();
+			MegaNode node = api.getNodeByHandle(handle);
+			
+			pendingThumbnails.remove(handle);
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Downloading thumbnail OK: " + handle);
+				thumbnailCache.remove(handle);
+				
+				if (holder != null){
+					File thumbDir = getThumbFolder(context);
+					File thumb = new File(thumbDir, node.getBase64Handle()+".jpg");
+					if (thumb.exists()) {
+						if (thumb.length() > 0) {
+							final Bitmap bitmap = getBitmapForCache(thumb, context);
+							if (bitmap != null) {
+								thumbnailCache.put(handle, bitmap);
+								if (numView == 1){
+									if ((holder.document1 == handle)){
+										holder.imageView1.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										holder.imageView1.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
+								}
+								else if (numView == 2){
+									if ((holder.document2 == handle)){
+										holder.imageView2.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										holder.imageView2.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
+								}
+								else if (numView == 3){
+									if ((holder.document3 == handle)){
+										holder.imageView3.setImageBitmap(bitmap);
+										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+										holder.imageView3.startAnimation(fadeInAnimation);
+										adapter.notifyDataSetChanged();
+										log("Thumbnail update");
+									}
 								}
 							}
 						}
@@ -623,6 +715,25 @@ public class ThumbnailUtils {
 		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerGrid listener = new ThumbnailDownloadListenerGrid(context, viewHolder, adapter, numView);
 		listenersGrid.put(document.getHandle(), listener);
+		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
+		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
+		
+		return thumbnailCache.get(document.getHandle());
+	}
+	
+	public static Bitmap getThumbnailFromMegaPhotoSyncGrid(MegaNode document, Context context, ViewHolderPhotoSyncGrid viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapter adapter, int numView){
+		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+			log("the thumbnail is already downloaded or added to the list");
+			return thumbnailCache.get(document.getHandle());
+		}
+		
+		if (!Util.isOnline(context)){
+			return thumbnailCache.get(document.getHandle());
+		}
+		
+		pendingThumbnails.add(document.getHandle());
+		ThumbnailDownloadListenerPhotoSyncGrid listener = new ThumbnailDownloadListenerPhotoSyncGrid(context, viewHolder, adapter, numView);
+		listenersPhotoSyncGrid.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
 		megaApi.getThumbnail(document,  thumbFile.getAbsolutePath(), listener);
 		

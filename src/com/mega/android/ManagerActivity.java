@@ -1342,19 +1342,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
    			
     			if (psF == null){
     				psF = new PhotoSyncFragment();
-//    				psF.setParentHandle(parentHandle); //TODO El handle de la carpeta PHOTOSYNC (Si no existe ¿crearla?)
-//    				parentHandlePhotoSync = parentHandle de la carpeta photosync;
-//					psF.setIsList(isListCloudDrive); 
-//					psF.setOrder(orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
-//					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandlePhotoSync), orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
-//					psF.setNodes(nodes);
+    				psF.setIsList(isListPhotoSync);
 				}
 				else{
-//					psF.setIsList(isListCloudDrive);
-//					psF.setParentHandle(parentHandleCarpetaPhotosync);
-//					fbF.setOrder(orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
-//					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandlePhotoSync), orderGetChildren); //TODO ORDENAR POR FECHA DE MODIFICACION
-//					fbF.setNodes(nodes);
+					psF.setIsList(isListPhotoSync);
 				}
 				
 				
@@ -1371,23 +1362,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			customListGrid.setVisibility(View.VISIBLE);
     			customSearch.setVisibility(View.VISIBLE);
     			
-
     			if (createFolderMenuItem != null){
-	    			createFolderMenuItem.setVisible(true);
-	    			rubbishBinMenuItem.setVisible(true);
-	    			addMenuItem.setVisible(true);
-	    			refreshMenuItem.setVisible(true);
-	    			sortByMenuItem.setVisible(true);
+	    			createFolderMenuItem.setVisible(false);
+	    			rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
-	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
-	    			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
-	    			rubbishBinMenuItem.setEnabled(true);
-	    			addMenuItem.setIcon(R.drawable.ic_menu_add);
-	    			addMenuItem.setEnabled(true);
+	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			rubbishBinMenuItem.setEnabled(false);
+	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
     			}
       			break;
     		}
@@ -1710,6 +1701,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}
+		
+		if (psF != null){
+			if (psF.isVisible()){
+				createFolderMenuItem.setVisible(false);
+				rubbishBinMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(false);
+    			sortByMenuItem.setVisible(false);
+    			helpMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
+    			logoutMenuItem.setVisible(true);
+    			
+    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			rubbishBinMenuItem.setEnabled(false);
+    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			addMenuItem.setEnabled(false);
+    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+    			createFolderMenuItem.setEnabled(false);
+			}
+		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
 	}
@@ -2002,6 +2014,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						fragTransaction.commit();
 						
 						if (isListOffline){
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
+						}
+						else{
+							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+							customListGrid.setImageResource(R.drawable.ic_menu_listview);
+						}
+					}
+				}
+				
+				if (psF != null){
+					if (psF.isVisible()){
+						Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
+						FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.detach(currentFragment);
+						fragTransaction.commit();
+						
+						isListPhotoSync = !isListPhotoSync;
+						psF.setIsList(isListPhotoSync);
+						
+						fragTransaction = getSupportFragmentManager().beginTransaction();
+						fragTransaction.attach(currentFragment);
+						fragTransaction.commit();
+						
+						if (isListPhotoSync){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
@@ -3530,7 +3567,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				log("photoSyncHandle: " + photoSyncHandle);
 				if (nps != null){
 					log("nps != null");
-					NodeList nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_DEFAULT_ASC);
+					NodeList nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 					psF.setNodes(nodes);
 					psF.getListView().invalidateViews();
 				}

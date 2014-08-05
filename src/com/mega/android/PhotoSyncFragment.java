@@ -52,17 +52,18 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaPhotoSyncListAdapter adapterList;
-	MegaBrowserGridAdapter adapterGrid;
+	MegaPhotoSyncGridAdapter adapterGrid;
 	PhotoSyncFragment fileBrowserFragment = this;
 	
 	MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
 	boolean isList = true;
-	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	NodeList nodes;
 	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<PhotoSyncFragment.PhotoSyncHolder>();
+	ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<PhotoSyncFragment.PhotoSyncGridHolder>();
 	
 	private ActionMode actionMode;
 	
@@ -73,6 +74,14 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		boolean isNode;
 		long handle;
 		String monthYear;
+	}
+	
+	public class PhotoSyncGridHolder{
+		boolean isNode;
+		String monthYear;
+		long handle1;
+		long handle2;
+		long handle3;
 	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -236,222 +245,281 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		
-		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-		
-		listView = (ListView) v.findViewById(R.id.file_list_view_browser);
-		listView.setOnItemClickListener(this);
-		listView.setOnItemLongClickListener(this);
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-		listView.setItemsCanFocus(false);
-		
-		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-		
-		emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-		emptyTextView.setText(R.string.file_browser_empty_folder);
-		
-		emptyImageView.setVisibility(View.VISIBLE);
-		emptyTextView.setVisibility(View.VISIBLE);
-		listView.setVisibility(View.GONE);
-		
 		DatabaseHandler dbH = new DatabaseHandler(context);
 		Preferences prefs = dbH.getPreferences();
 		
-		
-		if (prefs == null){
-			photosyncHandle = -1;
-		}
-		else{
-			//The "PhotoSync" folder exists?
-			if (prefs.getCamSyncHandle() == null){
+		if (isList){
+			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+			
+			listView = (ListView) v.findViewById(R.id.file_list_view_browser);
+			listView.setOnItemClickListener(this);
+	//		listView.setOnItemLongClickListener(this);
+			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			listView.setItemsCanFocus(false);
+			
+			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+			
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
+			
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+			
+			if (prefs == null){
 				photosyncHandle = -1;
 			}
 			else{
-				photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-				if (megaApi.getNodeByHandle(photosyncHandle) == null){
+				//The "PhotoSync" folder exists?
+				if (prefs.getCamSyncHandle() == null){
 					photosyncHandle = -1;
 				}
 				else{
-					if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+					photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+					if (megaApi.getNodeByHandle(photosyncHandle) == null){
 						photosyncHandle = -1;
 					}
-				}
-			}
-		}
-		
-		if (photosyncHandle == -1){
-			NodeList nl = megaApi.getChildren(megaApi.getRootNode());
-			for (int i=0;i<nl.size();i++){
-				if ((CameraSyncService.PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-					photosyncHandle = nl.get(i).getHandle();
-					dbH.setCamSyncHandle(photosyncHandle);
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					break;
+					else{
+						if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+							photosyncHandle = -1;
+						}
+					}
 				}
 			}
 			
 			if (photosyncHandle == -1){
-				log("must create the folder");
-				statusDialog = null;
-				try {
-					statusDialog = new ProgressDialog(context);
-					statusDialog.setMessage(getString(R.string.context_creating_folder));
-					statusDialog.show();
+				NodeList nl = megaApi.getChildren(megaApi.getRootNode());
+				for (int i=0;i<nl.size();i++){
+					if ((CameraSyncService.PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+						photosyncHandle = nl.get(i).getHandle();
+						dbH.setCamSyncHandle(photosyncHandle);
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+						break;
+					}
 				}
-				catch(Exception e){}
 				
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				listView.setVisibility(View.GONE);
-				
-				megaApi.createFolder(CameraSyncService.PHOTO_SYNC, megaApi.getRootNode(), this);
-			}
-		}
-		else{
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-			int month = 0;
-			int year = 0;
-			for (int i=0;i<nodes.size();i++){
-				PhotoSyncHolder psh = new PhotoSyncHolder();
-				Date d = new Date(nodes.get(i).getModificationTime()*1000);
-				if ((month == d.getMonth()) && (year == d.getYear())){
-					psh.isNode = true;
-					psh.handle = nodes.get(i).getHandle();
-					nodesArray.add(psh);
+				if (photosyncHandle == -1){
+					log("must create the folder");
+					statusDialog = null;
+					try {
+						statusDialog = new ProgressDialog(context);
+						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog.show();
+					}
+					catch(Exception e){}
+					
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					listView.setVisibility(View.GONE);
+					
+					megaApi.createFolder(CameraSyncService.PHOTO_SYNC, megaApi.getRootNode(), this);
 				}
-				else{
-					month = d.getMonth();
-					year = d.getYear();
-					psh.isNode = false;
-					psh.monthYear = getImageDateString(month, year);
-					nodesArray.add(psh);
-					psh = new PhotoSyncHolder();
-					psh.isNode = true;
-					psh.handle = nodes.get(i).getHandle();
-					nodesArray.add(psh);
-					log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
-				}
-			}			
-			
-			if (adapterList == null){
-				adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB);
 			}
 			else{
-				adapterList.setNodes(nodesArray);
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				int month = 0;
+				int year = 0;
+				for (int i=0;i<nodes.size();i++){
+					if (nodes.get(i).isFolder()){
+						continue;
+					}
+					PhotoSyncHolder psh = new PhotoSyncHolder();
+					Date d = new Date(nodes.get(i).getModificationTime()*1000);
+					if ((month == d.getMonth()) && (year == d.getYear())){
+						psh.isNode = true;
+						psh.handle = nodes.get(i).getHandle();
+						nodesArray.add(psh);
+					}
+					else{
+						month = d.getMonth();
+						year = d.getYear();
+						psh.isNode = false;
+						psh.monthYear = getImageDateString(month, year);
+						nodesArray.add(psh);
+						psh = new PhotoSyncHolder();
+						psh.isNode = true;
+						psh.handle = nodes.get(i).getHandle();
+						nodesArray.add(psh);
+						log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
+					}
+				}			
+				
+				if (adapterList == null){
+					adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes);
+				}
+				else{
+					adapterList.setNodes(nodesArray, nodes);
+				}
+				
+				adapterList.setPositionClicked(-1);
+				adapterList.setMultipleSelect(false);
+	
+				listView.setAdapter(adapterList);
 			}
 			
-			adapterList.setPositionClicked(-1);
-			adapterList.setMultipleSelect(false);
-
-			listView.setAdapter(adapterList);
+			return v;
 		}
-		
-		return v;
-		
-		
-		
-		
-		
-		
-		
-		
-//		if (parentHandle == -1){
-//			parentHandle = megaApi.getRootNode().getHandle();
-//			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-//			aB.setTitle(getString(R.string.section_cloud_drive));	
-//			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			((ManagerActivity)context).supportInvalidateOptionsMenu();
-//		}
-//		else{
-//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//			nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//			
-//			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));	
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			}
-//			else{
-//				aB.setTitle(parentNode.getName());					
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//			}
-//			((ManagerActivity)context).supportInvalidateOptionsMenu();
-//		}	
-//		
-//		if (isList){
-//			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
-//	        
-//	        listView = (ListView) v.findViewById(R.id.file_list_view_browser);
-//			listView.setOnItemClickListener(this);
-//			listView.setOnItemLongClickListener(this);
-//			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-//			listView.setItemsCanFocus(false);
-//			
-//			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-//			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-//			
-//			if (adapterList == null){
-//				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
-//			}
-//			else{
-//				adapterList.setParentHandle(parentHandle);
-//				adapterList.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-//			
-//			adapterList.setPositionClicked(-1);
-//			adapterList.setMultipleSelect(false);
-//
-//			listView.setAdapter(adapterList);
-//			
-//			setNodes(nodes);
-//			
-//			return v;
-//		}
-//		else{
-//			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
-//			
-//			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
-//			listView.setOnItemClickListener(null);
-//			listView.setItemsCanFocus(false);
-//	        
-//	        emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-//			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-//	        
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
-//			}
-//			else{
-//				adapterGrid.setParentHandle(parentHandle);
-//				adapterGrid.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_cloud_drive));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-//			
-//			adapterGrid.setPositionClicked(-1);
-//			
-//			listView.setAdapter(adapterGrid);
-//			
-//			setNodes(nodes);
-//			
-//			return v;
-//		}		
+		else{
+			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
+			
+			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
+			
+			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
+			
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
+			
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			listView.setVisibility(View.GONE);
+			
+			if (prefs == null){
+				photosyncHandle = -1;
+			}
+			else{
+				//The "PhotoSync" folder exists?
+				if (prefs.getCamSyncHandle() == null){
+					photosyncHandle = -1;
+				}
+				else{
+					photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+					if (megaApi.getNodeByHandle(photosyncHandle) == null){
+						photosyncHandle = -1;
+					}
+					else{
+						if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+							photosyncHandle = -1;
+						}
+					}
+				}
+			}
+			
+			if (photosyncHandle == -1){
+				NodeList nl = megaApi.getChildren(megaApi.getRootNode());
+				for (int i=0;i<nl.size();i++){
+					if ((CameraSyncService.PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+						photosyncHandle = nl.get(i).getHandle();
+						dbH.setCamSyncHandle(photosyncHandle);
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+						break;
+					}
+				}
+				
+				if (photosyncHandle == -1){
+					log("must create the folder");
+					statusDialog = null;
+					try {
+						statusDialog = new ProgressDialog(context);
+						statusDialog.setMessage(getString(R.string.context_creating_folder));
+						statusDialog.show();
+					}
+					catch(Exception e){}
+					
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					listView.setVisibility(View.GONE);
+					
+					megaApi.createFolder(CameraSyncService.PHOTO_SYNC, megaApi.getRootNode(), this);
+				}
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				int month = 0;
+				int year = 0;
+				for (int i=0;i<nodes.size();i++){
+					if (nodes.get(i).isFolder()){
+						continue;
+					}
+					PhotoSyncGridHolder psGH = new PhotoSyncGridHolder();
+					psGH.handle1 = -1;
+					psGH.handle2 = -1;
+					psGH.handle3 = -1;
+					Date d = new Date(nodes.get(i).getModificationTime()*1000);
+					if ((month == d.getMonth()) && (year == d.getYear())){
+						psGH.isNode = true;
+						psGH.handle1 = nodes.get(i).getHandle();
+						log("HANDLE1: " + psGH.handle1 + "__" + nodes.get(i).getName());
+					}
+					else{
+						month = d.getMonth();
+						year = d.getYear();
+						psGH.isNode = false;
+						psGH.monthYear = getImageDateString(month, year);
+						nodesArrayGrid.add(psGH);
+						log("METO EL MES (1): " + month + "__" + year);
+						i--;
+						continue;
+					}
+
+					i++;
+					if (i < nodes.size()){
+						d = new Date(nodes.get(i).getModificationTime()*1000);
+						if ((month == d.getMonth()) && (year == d.getYear())){
+							psGH.handle2 = nodes.get(i).getHandle();
+							log("HANDLE1: " + psGH.handle1 + " HANDLE2: " + psGH.handle2 + "__" + nodes.get(i).getName());
+						}
+						else{
+							nodesArrayGrid.add(psGH);
+							psGH = new PhotoSyncGridHolder();
+							month = d.getMonth();
+							year = d.getYear();
+							psGH.isNode = false;
+							psGH.monthYear = getImageDateString(month, year);
+							nodesArrayGrid.add(psGH);
+							log("METO EL MES (2): " + month + "__" + year);
+							i--;
+							continue;
+						}
+						
+						i++;
+						if (i < nodes.size()){
+							d = new Date(nodes.get(i).getModificationTime()*1000);
+							if ((month == d.getMonth()) && (year == d.getYear())){
+								psGH.handle3 = nodes.get(i).getHandle();
+								log("HANDLE1: " + psGH.handle1 + " HANDLE2: " + psGH.handle2 + " HANDLE3: " + psGH.handle3 + "__" + nodes.get(i).getName());
+								nodesArrayGrid.add(psGH);
+							}
+							else{
+								nodesArrayGrid.add(psGH);
+								psGH = new PhotoSyncGridHolder();
+								month = d.getMonth();
+								year = d.getYear();
+								psGH.isNode = false;
+								psGH.monthYear = getImageDateString(month, year);
+								nodesArrayGrid.add(psGH);
+								log("METO EL MES (3): " + month + "__" + year);
+								i--;
+								continue;
+							}
+						}
+					}
+				}			
+				
+				if (adapterGrid == null){
+					adapterGrid = new MegaPhotoSyncGridAdapter(context, nodesArrayGrid, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes);
+				}
+				else{
+					adapterGrid.setNodes(nodesArrayGrid, nodes);
+				}
+				
+				adapterGrid.setPositionClicked(-1);	
+				listView.setAdapter(adapterGrid);
+			}
+			
+			return v;
+		}
 	}
 	
 	public String getImageDateString(int month, int year){
@@ -543,86 +611,60 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 				adapterList.notifyDataSetChanged();
 			}
 			else{
-				if (nodes.get(position).isFolder()){
-//					MegaNode n = nodes.get(position);
-//					
-//					aB.setTitle(n.getName());
-//					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = nodes.get(position).getHandle();
-//					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//					adapterList.setParentHandle(parentHandle);
-//					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-//					adapterList.setNodes(nodes);
-//					listView.setSelection(0);
-//					
-//					//If folder has no files
-//					if (adapterList.getCount() == 0){
-//						listView.setVisibility(View.GONE);
-//						emptyImageView.setVisibility(View.VISIBLE);
-//						emptyTextView.setVisibility(View.VISIBLE);
-//						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-//							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-//							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-//						} else {
-//							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-//							emptyTextView.setText(R.string.file_browser_empty_folder);
-//						}
-//					}
-//					else{
-//						listView.setVisibility(View.VISIBLE);
-//						emptyImageView.setVisibility(View.GONE);
-//						emptyTextView.setVisibility(View.GONE);
-//					}
-				}
-				else{
-					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
-						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-						}
-						intent.putExtra("orderGetChildren", orderGetChildren);
-						startActivity(intent);
-					}
-					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
-						MegaNode file = nodes.get(position);
-						Intent service = new Intent(context, MegaStreamingService.class);
-				  		context.startService(service);
-				  		String fileName = file.getName();
-						try {
-							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-						} 
-						catch (UnsupportedEncodingException e) {
-							e.printStackTrace();
-						}
+				PhotoSyncHolder psH = nodesArray.get(position);
+				if (psH.isNode){
+					MegaNode n = megaApi.getNodeByHandle(psH.handle);
+					if (n.isFolder()){
 						
-				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeType.typeForName(file.getName()).getType();
-				  		System.out.println("FILENAME: " + fileName);
-				  		
-				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		try
-				  		{
-				  			startActivity(mediaIntent);
-				  		}
-				  		catch(Exception e)
-				  		{
-				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-				  		}						
 					}
 					else{
-						adapterList.setPositionClicked(-1);
-						adapterList.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						((ManagerActivity) context).onFileClick(handleList);
+						if (MimeType.typeForName(n.getName()).isImage()){
+							int positionInNodes = 0;
+							for (int i=0;i<nodes.size();i++){
+								if(nodes.get(i).getHandle() == n.getHandle()){
+									positionInNodes = i;
+								}
+							}
+							Intent intent = new Intent(context, FullScreenImageViewer.class);
+							intent.putExtra("position", positionInNodes);
+							intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
+							intent.putExtra("parentNodeHandle", photosyncHandle);
+							intent.putExtra("orderGetChildren", orderGetChildren);
+							startActivity(intent);
+						}
+						else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+							Intent service = new Intent(context, MegaStreamingService.class);
+					  		context.startService(service);
+					  		String fileName = n.getName();
+							try {
+								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+							} 
+							catch (UnsupportedEncodingException e) {
+								e.printStackTrace();
+							}
+							
+					  		String url = "http://127.0.0.1:4443/" + n.getBase64Handle() + "/" + fileName;
+					  		String mimeType = MimeType.typeForName(n.getName()).getType();
+					  		System.out.println("FILENAME: " + fileName);
+					  		
+					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					  		try
+					  		{
+					  			startActivity(mediaIntent);
+					  		}
+					  		catch(Exception e)
+					  		{
+					  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+					  		}
+						}
+						else{
+							adapterList.setPositionClicked(-1);
+							adapterList.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(n.getHandle());
+							((ManagerActivity) context).onFileClick(handleList);
+						}
 					}
 				}
 			}
@@ -726,6 +768,16 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	
 	public int onBackPressed(){
 		
+		if (isList){
+			if (adapterList != null){
+				if (adapterList.getPositionClicked() != -1){
+					adapterList.setPositionClicked(-1);
+					adapterList.notifyDataSetChanged();
+					return 1;
+				}
+			}
+		}
+		
 		return 0;
 
 //		if (isList){
@@ -818,7 +870,12 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 			}
 		}
 		else{
-			return adapterGrid.getParentHandle();
+			if (adapterGrid != null){
+				return adapterGrid.getPhotoSyncHandle();
+			}
+			else{
+				return -1;
+			}
 		}
 	}
 	
@@ -833,6 +890,9 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		int month = 0;
 		int year = 0;
 		for (int i=0;i<nodes.size();i++){
+			if (nodes.get(i).isFolder()){
+				continue;
+			}
 			PhotoSyncHolder psh = new PhotoSyncHolder();
 			Date d = new Date(nodes.get(i).getModificationTime()*1000);
 			if ((month == d.getMonth()) && (year == d.getYear())){
@@ -855,7 +915,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		}
 		if (isList){
 			if (adapterList != null){
-				adapterList.setNodes(nodesArray);
+				adapterList.setNodes(nodesArray, nodes);
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
@@ -872,7 +932,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		}
 		else{
 			if (adapterGrid != null){
-				adapterGrid.setNodes(nodes);
+				adapterGrid.setNodes(nodesArrayGrid, nodes);
 				if (adapterGrid.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
