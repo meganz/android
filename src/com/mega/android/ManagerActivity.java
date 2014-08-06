@@ -620,6 +620,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						levelsSearch = savedInstanceState.getInt("levels");
 						break;
 					}
+					case 12:{
+						drawerItem = DrawerItem.PHOTO_SYNC;
+						isListPhotoSync = true;
+						break;
+					}
+					case 13:{
+						drawerItem = DrawerItem.PHOTO_SYNC;
+						isListPhotoSync = false;
+						break;
+					}
+					
 				}
 			}
 			
@@ -711,6 +722,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			visibleFragment = 11;
     			outState.putString("searchQuery", searchQuery);
     			outState.putInt("levels", sF.getLevels());
+    		}
+    	}
+    	
+    	if (psF != null){
+    		if (psF.isVisible()){
+    			if (isListPhotoSync){
+    				visibleFragment = 12;
+    			}
+    			else{
+    				visibleFragment = 13;
+    			}
+    			
     		}
     	}
     	
