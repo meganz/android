@@ -94,7 +94,12 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 		
 		getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		TextView titleView = (TextView) view.findViewById(R.id.dialog_title);
-		titleView.setText(R.string.file_properties_shared_folder_select_contact);
+		if (node.isFolder()){
+			titleView.setText(R.string.file_properties_shared_folder_select_contact);
+		}
+		else{
+			titleView.setText(R.string.file_properties_send_file_select_contact);
+		}
 		
 		return view;		
 	}
@@ -104,48 +109,53 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 		this.setShowsDialog(false);
 		final MegaUser contact = visibleContacts.get(position);
 		
-		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-		dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
-		final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
-		dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int item) {
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(context);
-					temp.setMessage(getString(R.string.context_sharing_folder));
-					temp.show();
+		if (node.isFolder()){
+			AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+			dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
+			final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
+			dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int item) {
+					ProgressDialog temp = null;
+					try{
+						temp = new ProgressDialog(context);
+						temp.setMessage(getString(R.string.context_sharing_folder));
+						temp.show();
+					}
+					catch(Exception e){
+						return;
+					}
+					statusDialog = temp;
+					permissionsDialog.dismiss();
+					
+					switch(item) {
+	                    case 0:{
+	                    	megaApi.share(node, contact.getEmail(), MegaShare.ACCESS_READ, shareFolderContactsDialog);
+	                    	break;
+	                    }
+	                    case 1:{
+	                    	megaApi.share(node, contact.getEmail(), MegaShare.ACCESS_READWRITE, shareFolderContactsDialog);
+	                        break;
+	                    }
+	                    case 2:{
+	                    	megaApi.share(node, contact.getEmail(), MegaShare.ACCESS_FULL, shareFolderContactsDialog);
+	                        break;
+	                    }
+	                }
 				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
-				permissionsDialog.dismiss();
-				
-				switch(item) {
-                    case 0:{
-                    	megaApi.share(node, contact.getEmail(), MegaShare.ACCESS_READ, shareFolderContactsDialog);
-                    	break;
-                    }
-                    case 1:{
-                    	megaApi.share(node, contact.getEmail(), MegaShare.ACCESS_READWRITE, shareFolderContactsDialog);
-                        break;
-                    }
-                    case 2:{
-                    	megaApi.share(node, contact.getEmail(), MegaShare.ACCESS_FULL, shareFolderContactsDialog);
-                        break;
-                    }
-                }
-			}
-		});
-		permissionsDialog = dialogBuilder.create();
-		permissionsDialog.show();
-		Resources resources = permissionsDialog.getContext().getResources();
-		int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-		TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-        alertTitle.setTextColor(resources.getColor(R.color.mega));
-		int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-		View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-		titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+			});
+			permissionsDialog = dialogBuilder.create();
+			permissionsDialog.show();
+			Resources resources = permissionsDialog.getContext().getResources();
+			int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+			TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+	        alertTitle.setTextColor(resources.getColor(R.color.mega));
+			int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+			View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+			titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+		}
+		else{
+			Toast.makeText(context, "Enviar archivo a: " + contact.getEmail(), Toast.LENGTH_LONG).show();
+		}
 	}
 	
 	@Override
