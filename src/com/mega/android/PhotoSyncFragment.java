@@ -316,52 +316,53 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 					listView.setVisibility(View.GONE);
 					
 					megaApi.createFolder(CameraSyncService.PHOTO_SYNC, megaApi.getRootNode(), this);
+					
+					return v;
 				}
 			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-				int month = 0;
-				int year = 0;
-				for (int i=0;i<nodes.size();i++){
-					if (nodes.get(i).isFolder()){
-						continue;
-					}
-					PhotoSyncHolder psh = new PhotoSyncHolder();
-					Date d = new Date(nodes.get(i).getModificationTime()*1000);
-					if ((month == d.getMonth()) && (year == d.getYear())){
-						psh.isNode = true;
-						psh.handle = nodes.get(i).getHandle();
-						nodesArray.add(psh);
-					}
-					else{
-						month = d.getMonth();
-						year = d.getYear();
-						psh.isNode = false;
-						psh.monthYear = getImageDateString(month, year);
-						nodesArray.add(psh);
-						psh = new PhotoSyncHolder();
-						psh.isNode = true;
-						psh.handle = nodes.get(i).getHandle();
-						nodesArray.add(psh);
-						log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
-					}
-				}			
-				
-				if (adapterList == null){
-					adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes);
+
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+			int month = 0;
+			int year = 0;
+			for (int i=0;i<nodes.size();i++){
+				if (nodes.get(i).isFolder()){
+					continue;
+				}
+				PhotoSyncHolder psh = new PhotoSyncHolder();
+				Date d = new Date(nodes.get(i).getModificationTime()*1000);
+				if ((month == d.getMonth()) && (year == d.getYear())){
+					psh.isNode = true;
+					psh.handle = nodes.get(i).getHandle();
+					nodesArray.add(psh);
 				}
 				else{
-					adapterList.setNodes(nodesArray, nodes);
+					month = d.getMonth();
+					year = d.getYear();
+					psh.isNode = false;
+					psh.monthYear = getImageDateString(month, year);
+					nodesArray.add(psh);
+					psh = new PhotoSyncHolder();
+					psh.isNode = true;
+					psh.handle = nodes.get(i).getHandle();
+					nodesArray.add(psh);
+					log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
 				}
-				
-				adapterList.setPositionClicked(-1);
-				adapterList.setMultipleSelect(false);
-	
-				listView.setAdapter(adapterList);
+			}			
+			
+			if (adapterList == null){
+				adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes);
 			}
+			else{
+				adapterList.setNodes(nodesArray, nodes);
+			}
+			
+			adapterList.setPositionClicked(-1);
+			adapterList.setMultipleSelect(false);
+
+			listView.setAdapter(adapterList);
 			
 			return v;
 		}
