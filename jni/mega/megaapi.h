@@ -913,6 +913,8 @@ public:
     void copyNode(MegaNode* node, MegaNode *newParent, MegaRequestListener *listener = NULL);
     void renameNode(MegaNode* node, const char* newName, MegaRequestListener *listener = NULL);
     void remove(MegaNode* node, MegaRequestListener *listener = NULL);
+    void sendFileToUser(MegaNode *node, MegaUser *user, MegaRequestListener *listener = NULL);
+	void sendFileToUser(MegaNode *node, const char* email, MegaRequestListener *listener = NULL);
     void share(MegaNode *node, MegaUser* user, int level, MegaRequestListener *listener = NULL);
     void share(MegaNode* node, const char* email, int level, MegaRequestListener *listener = NULL);
 	void folderAccess(const char* megaFolderLink, MegaRequestListener *listener = NULL);

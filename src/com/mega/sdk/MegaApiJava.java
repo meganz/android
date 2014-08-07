@@ -321,6 +321,26 @@ public class MegaApiJava
 	{
 		megaApi.remove(node);
 	}
+	
+	public void sendFileToUser(MegaNode node, MegaUser user, MegaRequestListenerInterface listener)
+	{
+		megaApi.sendFileToUser(node, user, createDelegateRequestListener(listener));
+	}
+
+	public void sendFileToUser(MegaNode node, MegaUser user)
+	{
+		megaApi.sendFileToUser(node, user);
+	}
+
+	public void sendFileToUser(MegaNode node, String email, MegaRequestListenerInterface listener)
+	{
+		megaApi.sendFileToUser(node, email, createDelegateRequestListener(listener));
+	}
+
+	public void sendFileToUser(MegaNode node, String email)
+	{
+		megaApi.sendFileToUser(node, email);
+	}
 
 	public void share(MegaNode node, MegaUser user, int level, MegaRequestListenerInterface listener)
 	{

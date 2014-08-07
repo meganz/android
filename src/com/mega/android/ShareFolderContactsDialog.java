@@ -69,6 +69,14 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 	}
 	
 	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		setRetainInstance(true);
+		super.onCreate(savedInstanceState);
+	}
+
+
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		if (megaApi == null){
@@ -92,7 +100,9 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 		adapter = new ContactAdapter(getActivity(), R.layout.file_list_item_file, visibleContacts);
 		listView.setAdapter(adapter);
 		
-		getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		if (getDialog() != null){
+			getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		}
 		TextView titleView = (TextView) view.findViewById(R.id.dialog_title);
 		if (node.isFolder()){
 			titleView.setText(R.string.file_properties_shared_folder_select_contact);
@@ -153,8 +163,12 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 			View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 			titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 		}
-		else{
-			Toast.makeText(context, "Enviar archivo a: " + contact.getEmail(), Toast.LENGTH_LONG).show();
+		else{ 
+			megaApi.sendFileToUser(node, contact.getEmail(), shareFolderContactsDialog);
+			try { 
+				dismiss();
+			} 
+			catch (Exception ex) {}
 		}
 	}
 	
@@ -313,6 +327,13 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 		
 	}
 	
+	@Override
+	public void onDestroyView() {
+	  if (getDialog() != null && getRetainInstance())
+	    getDialog().setOnDismissListener(null);
+	  super.onDestroyView();
+	}
+	
 	public MegaNode getNode(){
 		return node;
 	}
@@ -346,6 +367,14 @@ public class ShareFolderContactsDialog extends DialogFragment implements OnItemC
 				Toast.makeText(context, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
 				ShareList sl = megaApi.getOutShares(node);
 			}
+			else{
+				Util.showErrorAlertDialog(e, (Activity)context);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_COPY){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(context, "File sent to: " + request.getEmail(), Toast.LENGTH_LONG).show();
+			} 
 			else{
 				Util.showErrorAlertDialog(e, (Activity)context);
 			}
