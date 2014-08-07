@@ -143,6 +143,30 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 		holder.imageView2 = (ImageButton) v.findViewById(R.id.photo_sync_grid_thumbnail2);
 		holder.imageView3 = (ImageButton) v.findViewById(R.id.photo_sync_grid_thumbnail3);
 		
+		RelativeLayout.LayoutParams paramsIL = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+		paramsIL.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		paramsIL.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		paramsIL.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+		holder.itemLayout.setLayoutParams(paramsIL);
+		
+		RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
+		holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
+		paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
+		paramsIV1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		holder.imageView1.setLayoutParams(paramsIV1);
+		
+		RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
+		holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
+		paramsIV2.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
+		paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		holder.imageView2.setLayoutParams(paramsIV2);
+		
+		RelativeLayout.LayoutParams paramsIV3 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
+		holder.imageView3.setScaleType(ImageView.ScaleType.FIT_CENTER);
+		paramsIV3.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
+		paramsIV3.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+		holder.imageView3.setLayoutParams(paramsIV3);
+		
 		holder.imageView1.setTag(holder);
 		holder.imageView1.setOnClickListener(this);
 		
