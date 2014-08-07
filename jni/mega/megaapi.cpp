@@ -1533,6 +1533,20 @@ void MegaApi::remove(MegaNode *node, MegaRequestListener *listener)
     waiter->notify();
 }
 
+void MegaApi::sendFileToUser(MegaNode *node, MegaUser *user, MegaRequestListener *listener)
+{
+	return sendFileToUser(node, user ? user->getEmail() : NULL, listener);
+}
+
+void MegaApi::sendFileToUser(MegaNode *node, const char* email, MegaRequestListener *listener)
+{
+	MegaRequest *request = new MegaRequest(MegaRequest::TYPE_COPY, listener);
+    if(node) request->setNodeHandle(node->getHandle());
+    request->setEmail(email);
+	requestQueue.push(request);
+    waiter->notify();
+}
+
 void MegaApi::share(MegaNode* node, MegaUser *user, int access, MegaRequestListener *listener)
 {
     return share(node, user ? user->getEmail() : NULL, access, listener);
@@ -2905,19 +2919,22 @@ void MegaApi::fetchnodes_result(error e)
 void MegaApi::putnodes_result(error e, targettype_t t, NewNode* nn)
 {
 	MegaError megaError(e);
+
+	if(requestMap.find(client->restag) == requestMap.end()) return;
+	MegaRequest* request = requestMap.at(client->restag);
+	if(!request) return;
+
 	if (t == USER_HANDLE)
 	{
-		delete[] nn;	// free array allocated by the app
 		if (!e) cout << "Success." << endl;
-        return;
+
+		fireOnRequestFinish(this, request, megaError);
+		delete[] nn;	// free array allocated by the app
+
+		return;
 	}
 
 	if(e) cout << "Node addition failed (" << megaError.getErrorString() << ")" << endl;
-
-    if(requestMap.find(client->restag) == requestMap.end()) return;
-    MegaRequest* request = requestMap.at(client->restag);
-    if(!request) return;
-
 
 	if((request->getType() != MegaRequest::TYPE_IMPORT_LINK) && (request->getType() != MegaRequest::TYPE_MKDIR) &&
             (request->getType() != MegaRequest::TYPE_COPY) &&
@@ -4512,21 +4529,43 @@ void MegaApi::sendPendingRequests()
 		{
 			Node *node = client->nodebyhandle(request->getNodeHandle());
 			Node *target = client->nodebyhandle(request->getParentHandle());
-			if(!node || !target) { e = API_EARGS; break; }
+			const char* email = request->getEmail();
+			if(!node || (!target && !email)) { e = API_EARGS; break; }
 
-			unsigned nc;
-			TreeProcCopy tc;
-			// determine number of nodes to be copied
-			client->proctree(node,&tc);
-			tc.allocnodes();
-			nc = tc.nc;
-			// build new nodes array
-			client->proctree(node,&tc);
-			if (!nc) { e = API_EARGS; break; }
+			if (target){
+				unsigned nc;
+				TreeProcCopy tc;
+				// determine number of nodes to be copied
+				client->proctree(node,&tc);
+				tc.allocnodes();
+				nc = tc.nc;
+				// build new nodes array
+				client->proctree(node,&tc);
+				if (!nc) { e = API_EARGS; break; }
 
-			tc.nn->parenthandle = UNDEF;
+				tc.nn->parenthandle = UNDEF;
 
-			client->putnodes(target->nodehandle,tc.nn,nc);
+				client->putnodes(target->nodehandle,tc.nn,nc);
+			}
+			else{
+				TreeProcCopy tc;
+				unsigned nc;
+
+				// determine number of nodes to be copied
+				client->proctree(node, &tc);
+
+				tc.allocnodes();
+				nc = tc.nc;
+
+				// build new nodes array
+				client->proctree(node, &tc);
+				if (!nc) { e = API_EARGS; break; }
+
+				// tree root: no parent
+				tc.nn->parenthandle = UNDEF;
+
+				client->putnodes(email, tc.nn, nc);
+			}
 			break;
 		}
 		case MegaRequest::TYPE_RENAME:
