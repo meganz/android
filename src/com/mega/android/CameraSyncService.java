@@ -101,7 +101,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	private int lastError = 0;
 	
-	Preferences prefs;
+	MegaPreferences prefs;
 	
 	boolean newFileList = false;
 	boolean stopped = false;
@@ -379,23 +379,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		if (prefs.getCamSyncFileUpload() == null){
-			dbH.setCamSyncFileUpload(Preferences.ONLY_PHOTOS);
+			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 			uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 			uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 		}
 		else{
 			switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-				case Preferences.ONLY_PHOTOS:{
+				case MegaPreferences.ONLY_PHOTOS:{
 					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 					break;
 				}
-				case Preferences.ONLY_VIDEOS:{
+				case MegaPreferences.ONLY_VIDEOS:{
 					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
 					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
 					break;
 				}
-				case Preferences.PHOTOS_AND_VIDEOS:{
+				case MegaPreferences.PHOTOS_AND_VIDEOS:{
 					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);

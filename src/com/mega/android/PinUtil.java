@@ -6,7 +6,7 @@ import android.content.Intent;
 public class PinUtil {
 	
 	static DatabaseHandler dbH = null;
-	static Preferences prefs = null;
+	static MegaPreferences prefs = null;
 	
 	private static Context lastLocked = null;
 	private static long lastPause;

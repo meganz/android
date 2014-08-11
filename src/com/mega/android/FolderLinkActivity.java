@@ -64,7 +64,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
 	
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	

@@ -30,7 +30,7 @@ public class SettingsActivityHC extends Activity {
 			return;
 		}	
 		
-		Preferences prefs = dbH.getPreferences();
+		MegaPreferences prefs = dbH.getPreferences();
 		
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
 	}

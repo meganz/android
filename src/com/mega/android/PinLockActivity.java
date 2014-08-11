@@ -22,7 +22,7 @@ public class PinLockActivity extends ActionBarActivity implements OnClickListene
 	EditText pinCodeText;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

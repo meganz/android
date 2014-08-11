@@ -124,7 +124,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	ShareFolderContactsDialog shareFolderContactsDialog;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
