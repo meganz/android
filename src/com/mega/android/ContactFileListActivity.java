@@ -96,7 +96,7 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 	private List<ShareInfo> filePreparedInfos;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 

@@ -1,6 +1,6 @@
 package com.mega.android;
 
-public class Preferences{
+public class MegaPreferences{
 	
 	String firstTime = "";
 	String camSyncWifi = "";
@@ -17,7 +17,7 @@ public class Preferences{
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	
-	Preferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String pinLockEnabled, String pinLockCode, String storageAskAlways, String storageDownloadLocation){
+	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String pinLockEnabled, String pinLockCode, String storageAskAlways, String storageDownloadLocation){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
