@@ -13,7 +13,9 @@
     <color name="transfer_progress">#cccccc</color>
     <color name="navigation_drawer_mail">#858585</color>
     <color name="navigation_drawer_text">#d2d2d2</color>
+    <color name="navigation_drawer_background_disabled">#222222</color>
     <color name="navigation_drawer_background">#333333</color>
+    <color name="navigation_drawer_background_selected">#444444</color>
     <color name="navigation_drawer_divider">#555555</color>
     <color name="file_list_second_row">#848484</color>
     <color name="file_list_selected_row">#e5e5e5</color>

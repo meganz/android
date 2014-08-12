@@ -248,6 +248,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean openLink = false;
 	
 	MegaApplication app;
+	
+	NavigationDrawerAdapter nDA;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -365,40 +367,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 	        
-	        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-					R.layout.drawer_list_item, items)
-					{
-						public View getView(int position, View rowView, ViewGroup parentView) {
-							TextView view = (TextView)super.getView(position, rowView, parentView);
-							switch(position)
-							{
-							case 0:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_cloud,0,0,0);
-								break;
-							case 1:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_saved,0,0,0);
-								break;
-							case 2:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_shared,0,0,0);
-								break;
-							case 3:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_contacts,0,0,0);
-								break;
-							case 4:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_photosync,0,0,0);
-								break;
-							case 5:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_transfers,0,0,0);
-								break;
-							case 6:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_account,0,0,0);
-								break;
-							}
-							return view;
-						}
-					}
-					
-					);
+			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
+			nDA.setPositionClicked(1);
+			mDrawerList.setAdapter(nDA);
+			
 	        
 	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
 	        getSupportActionBar().setHomeButtonEnabled(true);
@@ -589,40 +561,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 	        
-	        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-					R.layout.drawer_list_item, items)
-					{
-						public View getView(int position, View rowView, ViewGroup parentView) {
-							TextView view = (TextView)super.getView(position, rowView, parentView);
-							switch(position)
-							{
-							case 0:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_cloud,0,0,0);
-								break;
-							case 1:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_saved,0,0,0);
-								break;
-							case 2:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_shared,0,0,0);
-								break;
-							case 3:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_contacts,0,0,0);
-								break;
-							case 4:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_photosync,0,0,0);
-								break;
-							case 5:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_transfers,0,0,0);
-								break;
-							case 6:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_account,0,0,0);
-								break;
-							}
-							return view;
-						}
-					}
-					
-					);
+			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
+			mDrawerList.setAdapter(nDA);
 	        
 	        mDrawerList.setOnItemClickListener(this);
 	        
@@ -1604,8 +1544,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 					}
 					
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
+					if (fbF != null){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+					}
+					else{
+						super.onBackPressed();
+					}
 					return;
 				}
 			}
@@ -1631,7 +1576,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 	}
-
 
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
@@ -2030,6 +1974,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
+		
+		if (nDA != null){
+			nDA.setPositionClicked(position);
+		}
+		
 		if (position >= 3){
 			position++;
 		}
