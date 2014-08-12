@@ -6,12 +6,13 @@ local_c_includes := \
         $(LOCAL_PATH)/sdk/include \
         $(LOCAL_PATH)/sdk/include/mega/posix \
         $(LOCAL_PATH)/sdk/third_party/utf8proc \
+        $(LOCAL_PATH)/sdk/third_party/glob \
         $(LOCAL_PATH)/android
 
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/Makefile.inc
 LOCAL_MODULE    := megasdk
-LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DUSE_PTHREAD -DUSE_ANDROID
+LOCAL_CFLAGS := -fexceptions -frtti -fvisibility=hidden -fvisibility-inlines-hidden -fdata-sections -ffunction-sections -DUSE_PTHREAD -DUSE_EXTERNAL_GFX
 LOCAL_SRC_FILES := $(CPP_SOURCES) $(C_SOURCES) $(C_WRAPPER_SOURCES)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_STATIC_LIBRARIES := curl cryptopp sodium
@@ -24,7 +25,7 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 include $(LOCAL_PATH)/Makefile.inc
 LOCAL_MODULE    := mega
-LOCAL_CFLAGS := -fexceptions -frtti -fdata-sections -ffunction-sections -DUSE_PTHREAD -DUSE_ANDROID
+LOCAL_CFLAGS := -fexceptions -frtti -fdata-sections -ffunction-sections -DUSE_PTHREAD -DUSE_EXTERNAL_GFX
 LOCAL_SRC_FILES := $(JAVA_WRAPS)
 LOCAL_C_INCLUDES += -fexceptions -frtti $(local_c_includes)
 LOCAL_LDLIBS := -lm -lz -llog
