@@ -1,5 +1,5 @@
 #define __ANDROID__
-#define USE_ANDROID
+#define USE_EXTERNAL_GFX
 
 %module(directors="1") mega
 %{
@@ -44,7 +44,7 @@
 %feature("director") MegaGlobalListener;
 %feature("director") MegaListener;
 %feature("director") MegaTreeProcessor;
-%feature("director") GfxProcessor;
+%feature("director") MegaGfxProcessor;
 
 %apply (char *STRING, size_t LENGTH) {(char *bitmapData, size_t size)};
 %typemap(directorin, descriptor="[B") (char *bitmapData, size_t size)
@@ -59,11 +59,12 @@
 %}
 
 //Ignore internal classes
-%ignore mega::MegaApiCurlHttpIO;
+%ignore mega::CurlHttpIO;
 %ignore mega::PosixFileSystemAccess;
-%ignore mega::MegaApiLinuxWaiter;
+%ignore mega::PosixWaiter;
 %ignore mega::SqliteDbAccess;
-%ignore mega::GfxProcAndroid;
+%ignore mega::GfxProcessor;
+%ignore mega::GfxProcExternal;
 %ignore threadEntryPoint;
 %ignore HttpIO;
 %ignore MegaApp;
@@ -156,14 +157,14 @@ namespace mega {
 typedef uint64_t handle;
 typedef int error;
 
-class MegaApiLinuxWaiter {};
 class PosixFileSystemAccess {};
 class SqliteDbAccess {};
 class File {};
-class MegaApiCurlHttpIO {};
-class GfxProcAndroid {};
+class CurlHttpIO {};
+class GfxProcessor {};
+class GfxProcExternal {};
 class MegaFileSystemAccess {};
-class MegaWaiter {};
+class PosixWaiter {};
 class HttpIO {};
 class MegaApp {};
 class FileAccess {};
@@ -196,6 +197,13 @@ class Share {};
 %newobject MegaApi::ebcEncryptKey;
 %newobject MegaApi::getMyEmail;
 %newobject MegaApi::dumpSession;
+%newobject MegaApi::getNodeByPath;
+%newobject MegaApi::getNodeByHandle;
+%newobject MegaApi::getRootNode;
+%newobject MegaApi::getInboxNode;
+%newobject MegaApi::getRubbishNode;
+%newobject MegaApi::getParentNode;
+%newobject MegaApi::getMyEmail;
 
 typedef long long time_t;
 typedef long long uint64_t;

@@ -13,7 +13,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.media.ExifInterface;
 
-public class AndroidGfxProcessor extends GfxProcessor
+public class AndroidGfxProcessor extends MegaGfxProcessor
 {
 	Rect size;
 	int orientation;

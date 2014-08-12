@@ -37,6 +37,7 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/sync.cpp \
     sdk/src/transfer.cpp \
     sdk/src/transferslot.cpp \
+    sdk/src/proxy.cpp \
     sdk/src/treeproc.cpp \
     sdk/src/user.cpp \
     sdk/src/utils.cpp \
@@ -44,17 +45,16 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/crypto/cryptopp.cpp  \
     sdk/src/crypto/sodium.cpp  \
     sdk/src/db/sqlite.cpp  \
-    MegaProxySettings.cpp \
     sdk/src/posix/net.cpp  \
     sdk/src/posix/fs.cpp  \
     sdk/src/posix/waiter.cpp \
     sdk/third_party/utf8proc/utf8proc.cpp \
-    linux/megaapiwait.cpp \
-    android/megaapiandroidhttpio.cpp \
+    sdk/src/posix/waiter.cpp \
+    sdk/src/posix/net.cpp \
     sdk/src/gfx.cpp \
-    android/mega/gfx/android.cpp
+    sdk/src/gfx/external.cpp
     
-C_SOURCES = sqlite3.c android/glob.c
+C_SOURCES = sqlite3.c sdk/third_party/glob/glob.c
 
 HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/account.h \
@@ -81,6 +81,7 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/sync.h \
 	    sdk/include/mega/transfer.h \
 	    sdk/include/mega/transferslot.h \
+	    sdk/include/mega/proxy.h \
 	    sdk/include/mega/treeproc.h \
 	    sdk/include/mega/types.h \
 	    sdk/include/mega/user.h \
@@ -89,14 +90,13 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/crypto/cryptopp.h  \
 	    sdk/include/mega/db/sqlite.h  \
 	    megaapi.h \
-	    MegaProxySettings.h \
 	    sdk/include/mega/posix/meganet.h  \
         sdk/include/mega/posix/megasys.h  \
         sdk/include/mega/posix/megafs.h  \
         sdk/include/mega/posix/megawaiter.h \
-        linux/megaapiwait.h  \
-        android/mega/config.h \
-        android/glob.h
+        sdk/include/mega/config-android.h \
+        sdk/third_party/glob/glob.h \
+        sdk/include/mega/gfx/external.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = megaapi.cpp

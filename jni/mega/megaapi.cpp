@@ -39,7 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #define CLIENT_USER_AGENT "MEGA Android/2.0 BETA"
 #else
 #define CLIENT_KEY "FhMgXbqb"
-#define CLIENT_USER_AGENT "MEGAsync/1.0.23"
+#define CLIENT_USER_AGENT "MEGAsync/1.0.29"
 #endif
 
 #ifdef __APPLE__
@@ -272,7 +272,7 @@ TransferList::TransferList(MegaTransfer** newlist, int size)
 	list = NULL; s = size;
 	if(!size) return;
 
-	list = new MegaTransfer*[size];
+    list = new MegaTransfer*[size];
 	for(int i=0; i<size; i++)
 		list[i] = newlist[i]->copy();
 }
@@ -584,6 +584,7 @@ MegaRequest::MegaRequest(MegaRequest &request)
 		this->accountDetails->transfer_hist_interval = temp->transfer_hist_interval;
 		this->accountDetails->transfer_reserved = temp->transfer_reserved;
 		this->accountDetails->transfer_limit = temp->transfer_limit;
+        this->accountDetails->storage = temp->storage;
 	}
 }
 
@@ -1172,8 +1173,8 @@ void *MegaApi::threadEntryPoint(void *param)
 	return 0;
 }
 
-#ifdef __ANDROID__
-MegaApi::MegaApi(const char *basePath, GfxProcessor* processor)
+#ifdef USE_EXTERNAL_GFX
+MegaApi::MegaApi(const char *basePath, MegaGfxProcessor* processor)
 #else
 MegaApi::MegaApi(const char *basePath)
 #endif
@@ -1208,7 +1209,7 @@ MegaApi::MegaApi(const char *basePath)
     dbAccess = new MegaDbAccess(&sBasePath);
     gfxAccess = new MegaGfxProc();
 
-#ifdef __ANDROID__
+#ifdef USE_EXTERNAL_GFX
     gfxAccess->setProcessor(processor);
 #endif
 
@@ -1406,9 +1407,9 @@ void MegaApi::fastConfirmAccount(const char* link, const char *base64pwkey, Mega
     waiter->notify();
 }
 
-void MegaApi::setProxySettings(MegaProxySettings *proxySettings)
+void MegaApi::setProxySettings(MegaProxy *proxySettings)
 {
-    MegaProxySettings localProxySettings;
+    Proxy localProxySettings;
     localProxySettings.setProxyType(proxySettings->getProxyType());
 
     string url = proxySettings->getProxyURL();
@@ -1432,24 +1433,22 @@ void MegaApi::setProxySettings(MegaProxySettings *proxySettings)
         localProxySettings.setCredentials(&localusername, &localpassword);
     }
 
-    httpio->setProxy(&localProxySettings);
+    httpio->setproxy(&localProxySettings);
 }
 
-MegaProxySettings *MegaApi::getAutoProxySettings()
+MegaProxy *MegaApi::getAutoProxySettings()
 {
-    MegaProxySettings *proxySettings = new MegaProxySettings;
-    MegaProxySettings *localProxySettings = httpio->getAutoProxySettings();
+    Proxy *proxySettings = new Proxy;
+    Proxy *localProxySettings = httpio->getautoproxy();
     proxySettings->setProxyType(localProxySettings->getProxyType());
-    if(localProxySettings->getProxyType() == MegaProxySettings::CUSTOM)
+    if(localProxySettings->getProxyType() == Proxy::CUSTOM)
     {
         LOG("Custom AutoProxy");
         string localProxyURL = localProxySettings->getProxyURL();
         string proxyURL;
         fsAccess->local2path(&localProxyURL, &proxyURL);
         proxySettings->setProxyURL(&proxyURL);
-        LOG(proxyURL.c_str());
     }
-    else LOG("No AutoProxy");
 
     delete localProxySettings;
     return proxySettings;
@@ -1466,25 +1465,24 @@ void MegaApi::loop()
             sendPendingTransfers();
             sendPendingRequests();
             if(threadExit)
-            {
-                MUTEX_UNLOCK(sdkMutex);
                 break;
-            }
+
             client->exec();
             MUTEX_UNLOCK(sdkMutex);
         }
 	}
 
-#ifdef WIN32
+//#ifdef USE_QT
     delete client->dbaccess; //Warning, it's deleted in MegaClient's destructor
     delete client->sctable;  //Warning, it's deleted in MegaClient's destructor
-#else
-    delete client;
-    delete httpio;
-    delete waiter;
-    delete fsAccess;
-#endif
+//#else
+//    delete client;
+//    delete httpio;
+//    delete waiter;
+//    delete fsAccess;
+//#endif
 
+    MUTEX_UNLOCK(sdkMutex);
     MUTEX_DELETE(sdkMutex);
 }
 
@@ -1931,32 +1929,6 @@ bool MegaApi::moveToLocalDebris(const char *path)
     return result;
 }
 
-bool MegaApi::isRegularTransfer(MegaTransfer *t)
-{
-    bool regular = false;
-    MUTEX_LOCK(sdkMutex);
-    if(transferMap.find(t->getTag()) == transferMap.end())
-    {
-        MUTEX_UNLOCK(sdkMutex);
-    	return false;
-    }
-
-    Transfer *transfer = t->getTransfer();
-    file_list::const_iterator iterator;
-    for (iterator = transfer->files.begin(); iterator != transfer->files.end(); iterator++)
-    {
-        File *file = *iterator;
-        if(!file->syncxfer)
-        {
-            regular = true;
-            break;
-        }
-    }
-    MUTEX_UNLOCK(sdkMutex);
-    return regular;
-}
-
-
 treestate_t MegaApi::syncPathState(string* path)
 {
 #ifdef WIN32
@@ -2375,6 +2347,7 @@ NodeList* MegaApi::search(MegaNode* n, const char* searchString, bool recursive)
 	NodeList *nodeList;
     if(vNodes.size()) nodeList = new NodeList(vNodes.data(), vNodes.size());
     else nodeList = new NodeList();
+
     MUTEX_UNLOCK(sdkMutex);
 
     return nodeList;
@@ -2448,10 +2421,10 @@ void MegaApi::transfer_added(Transfer *t)
     }
 
 	currentTransfer = NULL;
-	transferMap[t->tag]=transfer;
     transfer->setTransfer(t);
-	transfer->setTotalBytes(t->size);
-	transfer->setTag(t->tag);
+    transfer->setTotalBytes(t->size);
+    transfer->setTag(t->tag);
+	transferMap[t->tag]=transfer;
 
     if (t->type == GET) totalDownloads++;
     else totalUploads++;
@@ -2463,21 +2436,25 @@ void MegaApi::transfer_added(Transfer *t)
 void MegaApi::transfer_removed(Transfer *t)
 {
     updateStatics();
-    if (t->type == GET)
-    {
-        if(pendingDownloads > 0)
-            pendingDownloads--;
-    }
-    else
-    {
-        if(pendingUploads > 0)
-            pendingUploads --;
-    }
 
-    if(transferMap.find(t->tag) == transferMap.end()) return;
-    MegaTransfer* transfer = transferMap.at(t->tag);
-    LOG("transfer_removed");
-    fireOnTransferFinish(this, transfer, MegaError(API_EINCOMPLETE));
+    if (t->files.size() == 1)
+    {
+        if (t->type == GET)
+        {
+            if(pendingDownloads > 0)
+                pendingDownloads--;
+        }
+        else
+        {
+            if(pendingUploads > 0)
+                pendingUploads --;
+        }
+
+        if(transferMap.find(t->tag) == transferMap.end()) return;
+        MegaTransfer* transfer = transferMap.at(t->tag);
+        LOG("transfer_removed");
+        fireOnTransferFinish(this, transfer, MegaError(API_EINCOMPLETE));
+    }
 }
 
 void MegaApi::transfer_prepare(Transfer *t)
@@ -2870,6 +2847,8 @@ void MegaApi::fetchnodes_result(error e)
 		cout << "INCORRECT REQUEST OBJECT (4)";
 
     fireOnRequestFinish(this, request, megaError);
+    if(e != API_OK)
+        return;
 
 #ifdef USE_QT
     Preferences *preferences = Preferences::instance();
@@ -3063,10 +3042,16 @@ void MegaApi::notify_retry(dstime dsdelta)
 // this can occur e.g. with syntactically malformed requests (due to a bug) or due to an invalid application key
 void MegaApi::request_error(error e)
 {
-	MegaError megaError(e);
-#ifdef USE_QT
-    ((MegaApplication *)qApp)->showErrorMessage(QCoreApplication::translate("MegaError", "Error") + QString::fromAscii(": ") + megaError.QgetErrorString());
-#endif
+    if(e == API_ENOENT)
+    {
+        fetchNodes();
+        return;
+    }
+
+    MegaRequest *request = new MegaRequest(MegaRequest::TYPE_LOGOUT);
+    request->setParamType(e);
+    requestQueue.push(request);
+    waiter->notify();
 }
 
 void MegaApi::request_response_progress(m_off_t currentProgress, m_off_t totalProgress)
@@ -4096,6 +4081,8 @@ const char* MegaApi::getNodePath(MegaNode *node)
 
 MegaNode* MegaApi::getNodeByPath(const char *path, MegaNode* node)
 {
+    if(!path) return NULL;
+
     MUTEX_LOCK(sdkMutex);
     Node *cwd = NULL;
     if(node) cwd = client->nodebyhandle(node->getHandle());
@@ -4295,15 +4282,32 @@ void MegaApi::sendPendingTransfers()
 			case MegaTransfer::TYPE_UPLOAD:
 			{
                 const char* localPath = transfer->getPath();
-                LOG("Checking local path");
-				if(!localPath) { e = API_EARGS; break; }
+
+                if(!localPath) { e = API_EARGS; break; }
 				currentTransfer=transfer;
 				string tmpString = localPath;
 				string wLocalPath;
 				client->fsaccess->path2local(&tmpString, &wLocalPath);
 				MegaFilePut *f = new MegaFilePut(client, &wLocalPath, transfer->getParentHandle(), "");
-                LOG("Calling startxfer");
-				client->startxfer(PUT,f);
+
+                client->startxfer(PUT,f);
+                if(transfer->getTag() == -1)
+                {
+                    //Already existing transfer
+                    //Delete the new one and set the transfer as regular
+                    transfer_map::iterator it = client->transfers[PUT].find(f);
+                    if(it != client->transfers[PUT].end())
+                    {
+                        int previousTag = it->second->tag;
+                        if(transferMap.find(previousTag) != transferMap.end())
+                        {
+                            MegaTransfer* previousTransfer = transferMap.at(previousTag);
+                            previousTransfer->setSyncTransfer(false);
+                            delete transfer;
+                        }
+                    }
+                }
+                currentTransfer=NULL;
 				break;
 			}
 			case MegaTransfer::TYPE_DOWNLOAD:
@@ -4347,8 +4351,25 @@ void MegaApi::sendPendingTransfers()
 						path += name;
 						f = new MegaFileGet(client, publicNode, path);
 					}
+
 					transfer->setPath(path.c_str());
 					client->startxfer(GET,f);
+                    if(transfer->getTag() == -1)
+                    {
+                        //Already existing transfer
+                        //Delete the new one and set the transfer as regular
+                        transfer_map::iterator it = client->transfers[GET].find(f);
+                        if(it != client->transfers[GET].end())
+                        {
+                            int previousTag = it->second->tag;
+                            if(transferMap.find(previousTag) != transferMap.end())
+                            {
+                                MegaTransfer* previousTransfer = transferMap.at(previousTag);
+                                previousTransfer->setSyncTransfer(false);
+                                delete transfer;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -4374,6 +4395,7 @@ void MegaApi::sendPendingTransfers()
                 		//TODO: Implement streaming of public nodes
                 	}
                 }
+                currentTransfer=NULL;
 
 				break;
 			}
@@ -4716,6 +4738,7 @@ void MegaApi::sendPendingRequests()
 		}
 		case MegaRequest::TYPE_LOGOUT:
 		{
+            int errorCode = request->getParamType();
             requestMap.erase(nextTag);
             while(!requestMap.empty())
             {
@@ -4734,7 +4757,14 @@ void MegaApi::sendPendingRequests()
 
             requestMap[nextTag]=request;
 			client->restag = nextTag;
-			fireOnRequestFinish(this, request, MegaError(e));
+            pausetime = 0;
+            pendingUploads = 0;
+            pendingDownloads = 0;
+            totalUploads = 0;
+            totalDownloads = 0;
+            waiting = false;
+            waitingRequest = false;
+            fireOnRequestFinish(this, request, MegaError(errorCode));
 			break;
 		}
 		case MegaRequest::TYPE_FAST_LOGIN:
@@ -4920,6 +4950,7 @@ void MegaApi::sendPendingRequests()
             if(transferMap.find(transferTag) == transferMap.end()) { e = API_ENOENT; break; };
 
             MegaTransfer* megaTransfer = transferMap.at(transferTag);
+            megaTransfer->setSyncTransfer(true);
             Transfer *transfer = megaTransfer->getTransfer();
 
             file_list files = transfer->files;
@@ -4943,6 +4974,9 @@ void MegaApi::sendPendingRequests()
             for (transfer_map::iterator it = client->transfers[direction].begin() ; it != client->transfers[direction].end() ; )
             {
                 Transfer *transfer = it->second;
+                if(transferMap.find(transfer->tag) != transferMap.end())
+                    transferMap.at(transfer->tag)->setSyncTransfer(true);
+
                 it++;
 
                 file_list files = transfer->files;

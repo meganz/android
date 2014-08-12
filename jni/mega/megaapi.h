@@ -101,8 +101,12 @@ class MegaGfxProc : public mega::GfxProcQT {};
 
 #endif
 
-#ifdef USE_ANDROID
-class GfxProcessor
+#include "mega.h"
+using namespace std;
+
+#ifdef USE_EXTERNAL_GFX
+#include "mega/gfx/external.h"
+class MegaGfxProcessor : public mega::GfxProcessor 
 {
 public:
 	virtual bool readBitmap(const char* path) { return false; }
@@ -111,50 +115,33 @@ public:
 	virtual int getBitmapDataSize(int w, int h, int px, int py, int rw, int rh) { return 0; }
 	virtual bool getBitmapData(char *bitmapData, size_t size) { return false; }
 	virtual void freeBitmap() {}
-	virtual ~GfxProcessor() {};
+	virtual ~MegaGfxProcessor() {};
 };
 
-#include "mega/gfx/android.h"
-class MegaGfxProc : public mega::GfxProcAndroid {};
+class MegaGfxProc : public mega::GfxProcExternal {};
 #endif
-
-using namespace std;
 
 #ifdef WIN32
 
-#include "win32/megaapiwinhttpio.h"
-#include "mega/win32/megafs.h"
-#include "win32/megaapiwait.h"
-#include "mega.h"
-#include "MegaProxySettings.h"
-
-class MegaHttpIO : public mega::MegaApiWinHttpIO {};
+class MegaHttpIO : public mega::WinHttpIO {};
 class MegaFileSystemAccess : public mega::WinFileSystemAccess {};
-class MegaWaiter : public mega::MegaApiWinWaiter {};
+class MegaWaiter : public mega::WinWaiter {};
 
 #else
-
-#ifdef __ANDROID__
-#include "android/megaapiandroidhttpio.h"
-#else
-#include "linux/megaapiposixhttpio.h"
-#endif
-
-#include "mega/posix/meganet.h"
-#include "mega/posix/megafs.h"
-#include "linux/megaapiwait.h"
 
 #ifdef __APPLE__
-typedef mega::MegaApiCurlHttpIO MegaHttpIO;
+typedef mega::CurlHttpIO MegaHttpIO;
 typedef mega::PosixFileSystemAccess MegaFileSystemAccess;
-typedef mega::MegaApiLinuxWaiter MegaWaiter;
+typedef mega::PosixWaiter MegaWaiter;
 #else
-class MegaHttpIO : public mega::MegaApiCurlHttpIO {};
+class MegaHttpIO : public mega::CurlHttpIO {};
 class MegaFileSystemAccess : public mega::PosixFileSystemAccess {};
-class MegaWaiter : public mega::MegaApiLinuxWaiter {};
+class MegaWaiter : public mega::PosixWaiter {};
 #endif
 
 #endif
+
+typedef mega::Proxy MegaProxy;
 
 class MegaDbAccess : public mega::SqliteDbAccess
 {
@@ -867,8 +854,8 @@ public:
     static bool nodeComparatorAlphabeticalDESC  (mega::Node *i, mega::Node *j);
 	static bool userComparatorDefaultASC (mega::User *i, mega::User *j);
 
-	#ifdef __ANDROID__
-		MegaApi(const char *basePath = NULL, GfxProcessor* processor = NULL);
+	#ifdef USE_EXTERNAL_GFX
+		MegaApi(const char *basePath = NULL, MegaGfxProcessor* processor = NULL);
 	#else
 		MegaApi(const char *basePath = NULL);
 	#endif
@@ -903,8 +890,8 @@ public:
 	void querySignupLink(const char* link, MegaRequestListener *listener = NULL);
 	void confirmAccount(const char* link, const char *password, MegaRequestListener *listener = NULL);
 	void fastConfirmAccount(const char* link, const char *base64pwkey, MegaRequestListener *listener = NULL);
-    void setProxySettings(MegaProxySettings *proxySettings);
-    MegaProxySettings *getAutoProxySettings();
+    void setProxySettings(MegaProxy *proxySettings);
+    MegaProxy *getAutoProxySettings();
     int isLoggedIn();
 	const char* getMyEmail();
 
@@ -944,7 +931,6 @@ public:
 
     void startPublicDownload(MegaNode* node, const char* localPath, MegaTransferListener *listener = NULL);
     //	void startPublicDownload(handle nodehandle, const char * base64key, const char* localFolder, MegaTransferListener *listener = NULL);
-    bool isRegularTransfer(MegaTransfer *transfer);
     void cancelTransfer(MegaTransfer *transfer, MegaRequestListener *listener=NULL);
     void cancelTransfers(int direction, MegaRequestListener *listener=NULL);
     void pauseTransfers(bool pause, MegaRequestListener* listener=NULL);
@@ -1192,6 +1178,7 @@ protected:
 	//Pending
 	mega::Node* getChildNodeInternal(mega::Node *parent, const char* name);
 	bool processTree(mega::Node* node, TreeProcessor* processor, bool recursive = 1);
+	NodeList* search(mega::Node* node, const char* searchString, bool recursive = 1);
 	void getAccountDetails(int storage, int transfer, int pro, int transactions, int purchases, int sessions, MegaRequestListener *listener = NULL);
     void getNodeAttribute(MegaNode* node, int type, char *dstFilePath, MegaRequestListener *listener = NULL);
     void setNodeAttribute(MegaNode* node, int type, char *srcFilePath, MegaRequestListener *listener = NULL);
