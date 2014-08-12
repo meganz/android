@@ -3,13 +3,10 @@ package com.mega.android.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Handler;
-import android.widget.Toast;
 
 import com.mega.android.CameraSyncService;
 import com.mega.android.DatabaseHandler;
-import com.mega.android.MegaApplication;
 import com.mega.android.MegaAttributes;
 import com.mega.android.Util;
 
@@ -36,12 +33,12 @@ public class NetEventReceiver extends BroadcastReceiver {
 			if (attr.getOnline() != null){
 				if (Boolean.parseBoolean(attr.getOnline())){
 					if (!Util.isOnline(context)){
-						Toast.makeText(context, "REFRESCAR, porque antes era online y ahora offline", Toast.LENGTH_LONG).show();
+//						Toast.makeText(context, "REFRESCAR, porque antes era online y ahora offline", Toast.LENGTH_LONG).show();
 					}
 				}
 				else{
 					if (Util.isOnline(context)){
-						Toast.makeText(context, "REFRESCAR, porque antes era offline y ahora online", Toast.LENGTH_LONG).show();
+//						Toast.makeText(context, "REFRESCAR, porque antes era offline y ahora online", Toast.LENGTH_LONG).show();
 					}
 				}
 			}
