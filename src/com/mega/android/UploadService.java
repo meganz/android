@@ -219,7 +219,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			if(!lock.isHeld()){
 				lock.acquire();
 			}
-			megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+			String nameInMEGA = intent.getStringExtra(EXTRA_NAME);
+			if (nameInMEGA != null){
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), nameInMEGA, this);
+			}
+			else{
+				megaApi.startUpload(file.getAbsolutePath(), megaApi.getNodeByHandle(parentHandle), this);
+			}
 		}
 	}
 	
@@ -593,6 +599,19 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				log("Upload Error: " + transfer.getFileName() + "_" + e.getErrorCode() + "___" + e.getErrorString());
 				lastError = e.getErrorCode();
 				onUploadComplete(false);
+			}
+			
+			if (getApplicationContext().getExternalCacheDir() != null){
+				File localFile = new File (getApplicationContext().getExternalCacheDir(), transfer.getFileName());
+				if (localFile.exists()){
+					localFile.delete();
+				}
+			}
+			else{
+				File localFile = new File (getApplicationContext().getCacheDir(), transfer.getFileName());
+				if (localFile.exists()){
+					localFile.delete();
+				}
 			}
 		}
 	}
