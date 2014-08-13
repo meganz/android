@@ -400,6 +400,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
 	        }
 	        
+	        mDrawerLayout.setVisibility(View.GONE);
+	        
 	        //Create the actionBar Menu
 	        getSupportActionBar().setDisplayShowCustomEnabled(true);
 	        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
@@ -593,6 +595,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        else{
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
 	        }
+	        
+	        mDrawerLayout.setVisibility(View.VISIBLE);
 	        
 	        //Create the actionBar Menu
 	        getSupportActionBar().setDisplayShowCustomEnabled(true);
