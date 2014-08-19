@@ -12,10 +12,11 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 5; 
+	private static final int DATABASE_VERSION = 6; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
+    private static final String TABLE_ATTRIBUTES = "attributes";
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_SESSION= "session";
@@ -29,7 +30,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
-    
+    private static final String KEY_ATTR_ONLINE = "online";
 
 	public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -50,45 +51,50 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_PIN_LOCK_CODE + " TEXT, " + KEY_STORAGE_ASK_ALWAYS + " TEXT, " +
         		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT" + ")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
+        
+        String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT" + ")";
+        db.execSQL(CREATE_ATTRIBUTES_TABLE);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//		UserCredentials userCredentials = null;
-//		
-//		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
-//		Cursor cursor = db.rawQuery(selectQuery, null);		
-//		if (cursor.moveToFirst()) {
-//			int id = Integer.parseInt(cursor.getString(0));
-//			String email = decrypt(cursor.getString(1));
-//			String session = decrypt(cursor.getString(2));
-//			userCredentials = new UserCredentials(email, session);
-//		}
-//		cursor.close();
+		UserCredentials userCredentials = null;
+		
+		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
+		Cursor cursor = db.rawQuery(selectQuery, null);		
+		if (cursor.moveToFirst()) {
+			int id = Integer.parseInt(cursor.getString(0));
+			String email = decrypt(cursor.getString(1));
+			String session = decrypt(cursor.getString(2));
+			userCredentials = new UserCredentials(email, session);
+		}
+		cursor.close();
         
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES); 
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
         onCreate(db);
         
-//        ContentValues values = new ContentValues();
-//        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
-//        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
-//        db.insert(TABLE_CREDENTIALS, null, values);
+        ContentValues values = new ContentValues();
+        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
+        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
+        db.insert(TABLE_CREDENTIALS, null, values);
 	} 
 	
 	public static String encrypt(String original) {
-//		if (original == null) {
-//			return null;
-//		}
-//		try {
-//			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
-//			return Base64.encodeToString(encrypted, Base64.DEFAULT);
-//		} catch (Exception e) {
-//			log("ee");
-//			e.printStackTrace();
-//			return null;
-//		}
-		return original;
+		if (original == null) {
+			return null;
+		}
+		try {
+			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
+			return Base64.encodeToString(encrypted, Base64.DEFAULT);
+		} catch (Exception e) {
+			log("ee");
+			e.printStackTrace();
+			return null;
+		}
+//		return original;
 	}
 	
 	private static byte[] getAesKey() {
@@ -106,18 +112,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 	
 	public static String decrypt(String encodedString) {
-//		if (encodedString == null) {
-//			return null;
-//		}
-//		try {
-//			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
-//			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
-//			return new String(original);
-//		} catch (Exception e) {
-//			log("de");
-//			return null;
-//		}
-		return encodedString;
+		if (encodedString == null) {
+			return null;
+		}
+		try {
+			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
+			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
+			return new String(original);
+		} catch (Exception e) {
+			log("de");
+			return null;
+		}
+//		return encodedString;
 	}
 	
 	public UserCredentials getCredentials(){
@@ -138,7 +144,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return userCredentials; 
 	}
 	
-	public void setPreferences (Preferences prefs){
+	public void setPreferences (MegaPreferences prefs){
 		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
@@ -155,8 +161,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
 	}
 	
-	public Preferences getPreferences(){
-		Preferences prefs = null;
+	public MegaPreferences getPreferences(){
+		MegaPreferences prefs = null;
 		
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -173,12 +179,37 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String pinLockCode = decrypt(cursor.getString(8));
 			String askAlways = decrypt(cursor.getString(9));
 			String downloadLocation = decrypt(cursor.getString(10));
-			prefs = new Preferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
+			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
 		}
 		cursor.close();
         db.close();
 		
 		return prefs;
+	}
+	
+	public void setAttributes (MegaAttributes attr){
+		SQLiteDatabase db = this.getWritableDatabase(); 
+        ContentValues values = new ContentValues();
+        values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
+        db.insert(TABLE_ATTRIBUTES, null, values);
+        db.close();
+	}
+	
+	public MegaAttributes getAttributes(){
+		MegaAttributes attr = null;
+		
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			int id = Integer.parseInt(cursor.getString(0));
+			String online = decrypt(cursor.getString(1));
+			attr = new MegaAttributes(online);
+		}
+		cursor.close();
+		db.close();
+		
+		return attr;
 	}
 	
 	public void setFirstTime (boolean firstTime){
@@ -359,6 +390,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
         db.close();
+	}
+	
+	public void setAttrOnline (boolean online){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_ONLINE + "='" + encrypt(online + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_ATTR_ONLINE, encrypt(online + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+		db.close();
 	}
 	
 	public void clearCredentials(){

@@ -47,6 +47,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.os.UserManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -235,7 +236,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	boolean pauseIconVisible = false;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
+	MegaAttributes attr = null;
 	
 	TransferList tL;
 	
@@ -244,10 +246,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	int levelsSearch = -1;
 	
 	private boolean openLink = false;
+	
+	MegaApplication app;
+	
+	NavigationDrawerAdapter nDA;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-    	
+
+	    dbH = new DatabaseHandler(getApplicationContext()); 
+
+		if (Util.isOnline(this)){
+			dbH.setAttrOnline(true);
+		}
+		else{
+			dbH.setAttrOnline(false);
+		}
+		
     	log("onCreate()");
     	
 		super.onCreate(savedInstanceState);
@@ -256,7 +271,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			aB = getSupportActionBar();
 		}
 
-		MegaApplication app = (MegaApplication)getApplication();
+		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
 		Display display = getWindowManager().getDefaultDisplay();
@@ -267,7 +282,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
 	    
-	    dbH = new DatabaseHandler(getApplicationContext()); 
 		if (dbH.getCredentials() == null){
 			Intent newIntent = getIntent();
 		    
@@ -337,6 +351,78 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //        barFill = (ImageView) findViewById(R.id.bar_fill);
 //        barStructure = (ImageView) findViewById(R.id.bar_structure);
         
+        if (!Util.isOnline(this)){
+        	
+        	dbH.setAttrOnline(false);
+        	
+        	userName.setVisibility(View.INVISIBLE);
+        	userEmail.setVisibility(View.INVISIBLE);
+        	bottomControlBar.setVisibility(View.INVISIBLE);
+        	topControlBar.setVisibility(View.INVISIBLE);
+        	
+        	List<String> items = new ArrayList<String>();
+			for (DrawerItem item : DrawerItem.values()) {
+				if (!item.equals(DrawerItem.RUBBISH_BIN) && (!item.equals(DrawerItem.SEARCH))){
+					items.add(item.getTitle(this));
+				}
+			}
+	        
+			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
+			nDA.setPositionClicked(1);
+			mDrawerList.setAdapter(nDA);
+			
+	        
+	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
+	        getSupportActionBar().setHomeButtonEnabled(true);
+			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+	        
+	        mDrawerToggle = new ActionBarDrawerToggle(
+	                this,                  /* host Activity */
+	                mDrawerLayout,         /* DrawerLayout object */
+	                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+	                R.string.app_name,  /* "open drawer" description for accessibility */
+	                R.string.app_name  /* "close drawer" description for accessibility */
+	                ) {
+	            public void onDrawerClosed(View view) {
+	                supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
+	            }
+	
+	            public void onDrawerOpened(View drawerView) {
+	                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+	            }
+	        };
+	        mDrawerToggle.setDrawerIndicatorEnabled(true);
+	        mDrawerLayout.setDrawerListener(mDrawerToggle);
+	        if (savedInstanceState == null){
+	        	mDrawerLayout.openDrawer(Gravity.LEFT);
+	        }
+	        else{
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+	        }
+	        
+	        mDrawerLayout.setVisibility(View.GONE);
+	        
+	        //Create the actionBar Menu
+	        getSupportActionBar().setDisplayShowCustomEnabled(true);
+	        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
+	        
+	        customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
+	        customSearch.setVisibility(View.INVISIBLE);
+			
+			customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
+			customListGrid.setOnClickListener(this);
+			
+			drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+			mDrawerLayout.closeDrawer(Gravity.LEFT);
+			
+			//INITIAL FRAGMENT
+			selectDrawerItem(drawerItem);
+			
+        	return;
+        }
+        
+        dbH.setAttrOnline(true);
+        
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
 			if (getIntent() != null){
@@ -396,11 +482,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			if (contact != null){
+				userEmail.setVisibility(View.VISIBLE);
 				userEmail.setText(contact.getEmail());
 				String userNameString = contact.getEmail();
 				String [] sp = userNameString.split("@");
 				if (sp.length != 0){
 					userNameString = sp[0];
+					userName.setVisibility(View.VISIBLE);
 					userName.setText(userNameString);
 				}
 				
@@ -475,40 +563,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 	        
-	        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-					R.layout.drawer_list_item, items)
-					{
-						public View getView(int position, View rowView, ViewGroup parentView) {
-							TextView view = (TextView)super.getView(position, rowView, parentView);
-							switch(position)
-							{
-							case 0:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_cloud,0,0,0);
-								break;
-							case 1:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_saved,0,0,0);
-								break;
-							case 2:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_shared,0,0,0);
-								break;
-							case 3:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_contacts,0,0,0);
-								break;
-							case 4:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_photosync,0,0,0);
-								break;
-							case 5:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_transfers,0,0,0);
-								break;
-							case 6:
-								view.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_account,0,0,0);
-								break;
-							}
-							return view;
-						}
-					}
-					
-					);
+			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
+			mDrawerList.setAdapter(nDA);
 	        
 	        mDrawerList.setOnItemClickListener(this);
 	        
@@ -539,6 +595,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        else{
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
 	        }
+	        
+	        mDrawerLayout.setVisibility(View.VISIBLE);
 	        
 	        //Create the actionBar Menu
 	        getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -1480,8 +1538,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (oF != null){
 			if (oF.isVisible()){
 				if (oF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
+					attr = dbH.getAttributes();
+					if (attr != null){
+						if (attr.getOnline() != null){
+							if (!Boolean.parseBoolean(attr.getOnline())){
+								super.onBackPressed();
+								return;
+							}
+						}
+					}
+					
+					if (fbF != null){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+					}
+					else{
+						super.onBackPressed();
+					}
 					return;
 				}
 			}
@@ -1507,7 +1580,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 	}
-
 
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
@@ -1906,6 +1978,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
+		
+		if (nDA != null){
+			nDA.setPositionClicked(position);
+		}
+		
 		if (position >= 3){
 			position++;
 		}

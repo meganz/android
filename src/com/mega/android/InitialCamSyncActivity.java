@@ -140,7 +140,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 				else{
 					dbH.setCamSyncWifi(true);
 				}
-				dbH.setCamSyncFileUpload(Preferences.ONLY_PHOTOS);
+				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 				
 				startService(new Intent(getApplicationContext(), CameraSyncService.class));
 	

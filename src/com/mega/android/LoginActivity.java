@@ -165,7 +165,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 	    
 	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 	    
-	    Preferences prefs = dbH.getPreferences();
+	    MegaPreferences prefs = dbH.getPreferences();
 		if (prefs == null){
 		    setContentView(R.layout.activity_login);
 		    bRegister = (Button) findViewById(R.id.button_create_account_login);
@@ -778,7 +778,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 						}
 						else{
 							DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
-							Preferences prefs = dbH.getPreferences();
+							MegaPreferences prefs = dbH.getPreferences();
 							prefs = dbH.getPreferences();
 							if (prefs.getCamSyncEnabled() != null){
 								if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){

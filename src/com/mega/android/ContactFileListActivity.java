@@ -96,7 +96,9 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 	private List<ShareInfo> filePreparedInfos;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
+	
+	MenuItem uploadButton;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -339,6 +341,11 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_contact_file_list, menu);
+	    
+	    uploadButton = menu.findItem(R.id.action_contact_file_list_upload);
+	    if (parentHandleStack.isEmpty()){
+	    	uploadButton.setVisible(false);
+	    }
 	    
 //	    MenuItem nullItem = menu.findItem(R.id.action_contact_file_list_null);
 //	    nullItem.setEnabled(false);

@@ -246,7 +246,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		
 		DatabaseHandler dbH = new DatabaseHandler(context);
-		Preferences prefs = dbH.getPreferences();
+		MegaPreferences prefs = dbH.getPreferences();
 		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
