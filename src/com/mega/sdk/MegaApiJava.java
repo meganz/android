@@ -39,20 +39,20 @@ public class MegaApiJava
 	public final static int ORDER_ALPHABETICAL_ASC = MegaApi.ORDER_ALPHABETICAL_ASC;
 	public final static int ORDER_ALPHABETICAL_DESC = MegaApi.ORDER_ALPHABETICAL_DESC;
 	  
-	public MegaApiJava(String basePath)
+	public MegaApiJava(String appKey, String basePath)
 	{
-		megaApi = new MegaApi(basePath);
+		megaApi = new MegaApi(appKey, basePath);
 	}
 	
-	public MegaApiJava(String basePath, MegaGfxProcessor gfxProcessor)
+	public MegaApiJava(String appKey, String userAgent, String basePath, MegaGfxProcessor gfxProcessor)
 	{
 		this.gfxProcessor = gfxProcessor;
-		megaApi = new MegaApi(basePath, gfxProcessor);
+		megaApi = new MegaApi(appKey, gfxProcessor, basePath, userAgent);
 	}
 	
-	public MegaApiJava()
+	public MegaApiJava(String appKey)
 	{
-		megaApi = new MegaApi();
+		megaApi = new MegaApi(appKey);
 	}
 	
 	/****************************************************************************************************/
