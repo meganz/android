@@ -606,10 +606,20 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	public long getParentHandle(){
 		if (isList){
-			return adapterList.getParentHandle();
+			if (adapterList != null){
+				return adapterList.getParentHandle();
+			}
+			else{
+				return -1;
+			}
 		}
 		else{
-			return adapterGrid.getParentHandle();
+			if (adapterGrid != null){
+				return adapterGrid.getParentHandle();
+			}
+			else{
+				return -1;
+			}
 		}
 	}
 	

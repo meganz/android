@@ -66,7 +66,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	
 	DatabaseHandler dbH;
 	
-	Preferences prefs;
+	MegaPreferences prefs;
 	String wifi = "";
 	String camSyncLocalPath = "";
 	String fileUpload = "";
@@ -143,22 +143,22 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
 				camSyncLocalPath = prefs.getCamSyncLocalPath();
 				if (prefs.getCamSyncFileUpload() == null){
-					dbH.setCamSyncFileUpload(Preferences.ONLY_PHOTOS);
+					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_photos);
 				}
 				else{
 					switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-						case Preferences.ONLY_PHOTOS:{
+						case MegaPreferences.ONLY_PHOTOS:{
 							fileUpload = getString(R.string.settings_camera_upload_only_photos);
 							cameraUploadWhat.setValueIndex(0);
 							break;
 						}
-						case Preferences.ONLY_VIDEOS:{
+						case MegaPreferences.ONLY_VIDEOS:{
 							fileUpload = getString(R.string.settings_camera_upload_only_videos);
 							cameraUploadWhat.setValueIndex(1);
 							break;
 						}
-						case Preferences.PHOTOS_AND_VIDEOS:{
+						case MegaPreferences.PHOTOS_AND_VIDEOS:{
 							fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
 							cameraUploadWhat.setValueIndex(2);
 							break;
@@ -279,7 +279,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
 			cameraUpload = !cameraUpload;
 			if (cameraUpload){
-				dbH.setCamSyncFileUpload(Preferences.ONLY_PHOTOS);
+				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 				fileUpload = getString(R.string.settings_camera_upload_only_photos);
 				cameraUploadWhat.setValueIndex(0);
 				
@@ -436,19 +436,19 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_WHAT_TO) == 0){
 			switch(Integer.parseInt((String)newValue)){
 				case CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS:{
-					dbH.setCamSyncFileUpload(Preferences.ONLY_PHOTOS);
+					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_photos);
 					cameraUploadWhat.setValueIndex(0);
 					break;
 				}
 				case CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS:{
-					dbH.setCamSyncFileUpload(Preferences.ONLY_VIDEOS);
+					dbH.setCamSyncFileUpload(MegaPreferences.ONLY_VIDEOS);
 					fileUpload = getString(R.string.settings_camera_upload_only_videos);
 					cameraUploadWhat.setValueIndex(1);
 					break;
 				}
 				case CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS:{
-					dbH.setCamSyncFileUpload(Preferences.PHOTOS_AND_VIDEOS);
+					dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS);
 					fileUpload = getString(R.string.settings_camera_upload_photos_and_videos);
 					cameraUploadWhat.setValueIndex(2);
 					break;

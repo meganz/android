@@ -109,7 +109,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
 	
 	boolean isFolderLink = false;
 	

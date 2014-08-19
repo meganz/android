@@ -61,7 +61,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 	MegaNode document = null;
 	
 	DatabaseHandler dbH = null;
-	Preferences prefs = null;
+	MegaPreferences prefs = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

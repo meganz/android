@@ -3,10 +3,11 @@ package com.mega.android.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Handler;
 
 import com.mega.android.CameraSyncService;
+import com.mega.android.DatabaseHandler;
+import com.mega.android.MegaAttributes;
 import com.mega.android.Util;
 
 public class NetEventReceiver extends BroadcastReceiver {
@@ -24,6 +25,31 @@ public class NetEventReceiver extends BroadcastReceiver {
 	    
 		log("NetEventReceiver");
 		final Context c = context;
+		
+		DatabaseHandler dbH = new DatabaseHandler(context);
+		MegaAttributes attr = dbH.getAttributes();
+		
+		if (attr != null){
+			if (attr.getOnline() != null){
+				if (Boolean.parseBoolean(attr.getOnline())){
+					if (!Util.isOnline(context)){
+//						Toast.makeText(context, "REFRESCAR, porque antes era online y ahora offline", Toast.LENGTH_LONG).show();
+					}
+				}
+				else{
+					if (Util.isOnline(context)){
+//						Toast.makeText(context, "REFRESCAR, porque antes era offline y ahora online", Toast.LENGTH_LONG).show();
+					}
+				}
+			}
+		}
+		
+		if (Util.isOnline(context)){
+			dbH.setAttrOnline(true);
+		}
+		else{
+			dbH.setAttrOnline(false);
+		}
 		
 		handler.postDelayed(new Runnable() {
 			
