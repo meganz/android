@@ -19,6 +19,8 @@ import android.util.Log;
 public class MegaApplication extends Application
 {
 	final String TAG = "MegaApplication";
+	static final String APP_KEY = "U5NE3TxD";
+	static final String USER_AGENT = "MEGA Android/2.0 BETA";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	
@@ -45,7 +47,8 @@ public class MegaApplication extends Application
 			}
 			
 			Log.d(TAG, "Database path: " + path);
-			megaApiFolder = new MegaApiAndroid(path);
+			megaApiFolder = new MegaApiAndroid(MegaApplication.APP_KEY, 
+					MegaApplication.USER_AGENT, path);
 		}
 		
 		return megaApiFolder;
@@ -70,7 +73,8 @@ public class MegaApplication extends Application
 			}
 			
 			Log.d(TAG, "Database path: " + path);
-			megaApi = new MegaApiAndroid(path);
+			megaApi = new MegaApiAndroid(MegaApplication.APP_KEY, 
+					MegaApplication.USER_AGENT, path);
 		}
 		
 		return megaApi;

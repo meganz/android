@@ -10,7 +10,7 @@ import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
-import com.mega.sdk.AccountDetails;
+import com.mega.sdk.MegaAccountDetails;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -2207,10 +2207,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				AccountDetails accountInfo = request.getAccountDetails();
+				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
 				
-				long totalStorage = accountInfo.getMaxStorage();
-				long usedStorage = accountInfo.getUsedStorage();
+				long totalStorage = accountInfo.getStorageMax();
+				long usedStorage = accountInfo.getStorageUsed();
 				
 				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 				String total = "";

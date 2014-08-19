@@ -7,9 +7,9 @@ public class MegaApiAndroid extends MegaApiJava
 {
 	static Handler handler = new Handler(Looper.getMainLooper());
 	
-	public MegaApiAndroid(String path)
+	public MegaApiAndroid(String appKey, String userAgent, String path)
 	{
-		super(path, new AndroidGfxProcessor());
+		super(appKey, userAgent, path, new AndroidGfxProcessor());
 	}
 
 	@Override

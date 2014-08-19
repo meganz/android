@@ -1,7 +1,7 @@
 package com.mega.android;
 
 import com.mega.android.ManagerActivity.DrawerItem;
-import com.mega.sdk.AccountDetails;
+import com.mega.sdk.MegaAccountDetails;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -189,9 +189,9 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 			}
 		}
 		
-		AccountDetails accountInfo = request.getAccountDetails();
-		maxStorage = accountInfo.getMaxStorage();
-		usedStorage = accountInfo.getUsedStorage();
+		MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+		maxStorage = accountInfo.getStorageMax();
+		usedStorage = accountInfo.getStorageUsed();
 		proLevel = accountInfo.getProLevel();
 		
 		try { 

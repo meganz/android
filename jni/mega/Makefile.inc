@@ -90,7 +90,8 @@ HEADERS= sdk/include/mega.h \
 	    sdk/include/mega/waiter.h \
 	    sdk/include/mega/crypto/cryptopp.h  \
 	    sdk/include/mega/db/sqlite.h  \
-	    megaapi.h \
+	    sdk/include/megaapi.h \
+	    sdk/include/megaapi_impl.h \
 	    sdk/include/mega/posix/meganet.h  \
         sdk/include/mega/posix/megasys.h  \
         sdk/include/mega/posix/megafs.h  \
@@ -101,8 +102,8 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/thread/posixthread.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
-C_WRAPPER_SOURCES = megaapi.cpp
-C_WRAPPER_OBJECTS = megaapi.o
+C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp
+C_WRAPPER_OBJECTS = sdk/src/megaapi.o sdk/src/megaapi_impl.o
 
 PYTHON_WRAPS=python_wrap.cxx
 PYTHON_HEADERS=python_wrap.h 
