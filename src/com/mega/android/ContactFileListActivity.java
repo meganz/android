@@ -105,7 +105,7 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaNode> documents = getSelectedDocuments();
-			
+						
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
@@ -163,10 +163,8 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 					hideMultipleSelect();
 //					((ManagerActivity) context).moveToTrash(handleList);
 					break;
-				}
-				
-				
-				
+				}	
+								
 			}
 			return false;
 		}
@@ -972,7 +970,22 @@ public class ContactFileListActivity extends PinActivity implements MegaRequestL
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
 		NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren);
-		adapter.setNodes(nodes);
+		if (nodes.size() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImage.setVisibility(View.VISIBLE);
+			emptyText.setVisibility(View.VISIBLE);
+			emptyImage.setImageResource(R.drawable.ic_empty_folder);
+			emptyText.setText(R.string.file_browser_empty_folder);
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImage.setVisibility(View.GONE);
+			emptyText.setVisibility(View.GONE);
+		}		
+		this.contactNodes = nodes;
+		if (adapter != null){
+			adapter.setNodes(nodes);
+		}
 		listView.invalidateViews();
 	}
 
