@@ -653,6 +653,21 @@ public class MegaApiJava
 		return megaApi.getChildren(parent);
 	}
 	
+	public int getNumChildren(MegaNode parent) 
+	{
+		return megaApi.getNumChildren(parent);
+	}
+	
+	public int getNumChildFiles(MegaNode parent) 
+	{
+		return megaApi.getNumChildFiles(parent);
+	}
+
+	public int getNumChildFolders(MegaNode parent) 
+	{
+	  return megaApi.getNumChildFolders(parent);
+	}
+	
 	public MegaNode getChildNode(MegaNode parent, String name)
 	{
 		return megaApi.getChildNode(parent, name);
