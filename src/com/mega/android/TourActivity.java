@@ -11,14 +11,19 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.text.style.ParagraphStyle;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RelativeLayout.LayoutParams;
 
 public class TourActivity extends Activity implements OnClickListener {
 	
@@ -28,6 +33,8 @@ public class TourActivity extends Activity implements OnClickListener {
 	private ImageView bar;
 	private Button bRegister;
 	private Button bLogin;
+	TextView tourText1;
+	TextView tourText2;
 	private LinearLayout tourLoginCreate;
 	int heightGrey = 0;
 	
@@ -41,7 +48,9 @@ public class TourActivity extends Activity implements OnClickListener {
 		bar = (ImageView) findViewById(R.id.barTour);
 		bRegister = (Button) findViewById(R.id.button_register_tour);
 		bLogin = (Button) findViewById(R.id.button_login_tour);
-		
+		tourLoginCreate = (LinearLayout) findViewById(R.id.tour_login_create);
+		tourText1 = (TextView) findViewById(R.id.tour_text_1);
+		tourText2 = (TextView) findViewById(R.id.tour_text_2);
 		bRegister.setOnClickListener(this);
 		bLogin.setOnClickListener(this);
 		
@@ -59,6 +68,21 @@ public class TourActivity extends Activity implements OnClickListener {
 	    
 	    float dpHeight = outMetrics.heightPixels / density;
 	    float dpWidth  = outMetrics.widthPixels / density;
+	    
+	    bLogin.setPadding(0, Util.px2dp((5*scaleH), outMetrics), 0, 0);
+	    LinearLayout.LayoutParams paramsLogin = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+	    paramsLogin.setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+	    bLogin.setLayoutParams(paramsLogin);
+	    
+	    bRegister.setPadding(0, Util.px2dp((5*scaleH), outMetrics), 0, 0);
+	    LinearLayout.LayoutParams paramsRegister = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+	    paramsRegister.setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+	    bRegister.setLayoutParams(paramsRegister);
+	    
+	    tourText1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
+	    tourText2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+	    
+	    tourLoginCreate.setPadding(0, Util.px2dp((5*scaleH), outMetrics), 0, Util.px2dp((10*scaleH), outMetrics));
 	    
 	    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
 	    
@@ -84,8 +108,6 @@ public class TourActivity extends Activity implements OnClickListener {
 //	    String cadena;
 //	    cadena = "Density: " + density + "_Width: " + dpWidth + "_Height: " + dpHeight + "_heightPix" + outMetrics.heightPixels;
 //	    Toast.makeText(this, cadena, Toast.LENGTH_LONG).show();
-	    
-	    tourLoginCreate = (LinearLayout) findViewById(R.id.tour_login_create);
 	    
 	    Intent intent = getIntent();
 	    
