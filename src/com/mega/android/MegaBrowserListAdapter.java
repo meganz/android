@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.ShareList;
 
@@ -133,7 +134,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
 		listFragment = (ListView) parent;
-		
 		final int _position = position;
 		
 		ViewHolderBrowserList holder = null;
@@ -291,20 +291,85 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				listFragment.smoothScrollToPosition(_position);
 				
 				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
-					holder.optionDownload.setVisibility(View.VISIBLE);
-					holder.optionProperties.setVisibility(View.VISIBLE);
-					holder.optionCopy.setVisibility(View.VISIBLE);
-					holder.optionMove.setVisibility(View.GONE);
-					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.GONE);
-					holder.optionDelete.setVisibility(View.GONE);
 					
-					holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+					//Choose the buttons to show depending on the type of folder
+					
+					MegaNode n = (MegaNode) getItem(positionClicked);
+					MegaNode folder=null;
+					
+					if(n.isFile())
+						folder=megaApi.getParentNode(n);
+					else
+						folder=n;
+					
+					int accessLevel= megaApi.getAccess(folder);					
+						
+					switch(accessLevel){
+						case MegaShare.ACCESS_FULL:{
+							
+							holder.optionDownload.setVisibility(View.VISIBLE);
+							holder.optionProperties.setVisibility(View.VISIBLE);
+							holder.optionCopy.setVisibility(View.VISIBLE);
+							holder.optionMove.setVisibility(View.VISIBLE);
+							holder.optionPublicLink.setVisibility(View.GONE);
+							holder.optionRename.setVisibility(View.VISIBLE);
+							holder.optionDelete.setVisibility(View.VISIBLE);
+							
+							holder.optionDownload.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionProperties.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionCopy.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionMove.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionMove.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionRename.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionDelete.getLayoutParams().width = Util.px2dp((44*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							//holder.textViewPermissions.setText(context.getString(R.string.file_properties_shared_folder_full_access));
+							break;
+						}
+						case MegaShare.ACCESS_READ:{
+							log("read");
+							holder.optionDownload.setVisibility(View.VISIBLE);
+							holder.optionProperties.setVisibility(View.VISIBLE);
+							holder.optionCopy.setVisibility(View.VISIBLE);
+							holder.optionMove.setVisibility(View.GONE);
+							holder.optionPublicLink.setVisibility(View.GONE);
+							holder.optionRename.setVisibility(View.GONE);
+							holder.optionDelete.setVisibility(View.GONE);
+							
+							holder.optionDownload.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionProperties.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionCopy.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							break;
+						}
+						case MegaShare.ACCESS_READWRITE:{
+							log("readwrite");
+							holder.optionDownload.setVisibility(View.VISIBLE);
+							holder.optionProperties.setVisibility(View.VISIBLE);
+							holder.optionCopy.setVisibility(View.VISIBLE);
+							holder.optionMove.setVisibility(View.GONE);
+							holder.optionPublicLink.setVisibility(View.GONE);
+							holder.optionRename.setVisibility(View.VISIBLE);
+							holder.optionDelete.setVisibility(View.GONE);
+							
+							holder.optionDownload.getLayoutParams().width = Util.px2dp((70*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionProperties.getLayoutParams().width = Util.px2dp((70*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionCopy.getLayoutParams().width = Util.px2dp((70*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionCopy.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							holder.optionRename.getLayoutParams().width = Util.px2dp((70*scaleW), outMetrics);
+							((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+							break;	
+						}				
+																		
+					}					
 				}
 				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 					holder.optionDownload.setVisibility(View.VISIBLE);
@@ -514,6 +579,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).moveToTrash(handleList);
 				}
+				else{
+					((ContactFileListActivity) context).moveToTrash(handleList);
+				}
 				break;
 			}
 			case R.id.file_list_option_public_link:{
@@ -521,7 +589,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				if ((type == ManagerActivity.FILE_BROWSER_ADAPTER) || (type == ManagerActivity.SEARCH_ADAPTER)){
 					((ManagerActivity) context).getPublicLinkAndShareIt(n);
-				}
+				}				
 				break;
 			}
 			case R.id.file_list_option_rename:{
@@ -530,6 +598,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).showRenameDialog(n, n.getName());
 				}
+				if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
+					((ContactFileListActivity) context).showRenameDialog(n, n.getName());
+				}					
+					
 				break;
 			}
 			case R.id.file_list_option_move:{
@@ -539,6 +611,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				handleList.add(n.getHandle());
 				if (type != ManagerActivity.CONTACT_FILE_ADAPTER){
 					((ManagerActivity) context).showMove(handleList);
+				}
+				else{
+					((ContactFileListActivity) context).showMove(handleList);
 				}
 				break;
 			}
