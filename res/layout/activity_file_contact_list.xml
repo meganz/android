@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/file_contact_list"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <RelativeLayout
+        android:id="@+id/file_contact_list_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/file_list_selected_row" >
+
+        <ImageView
+            android:id="@+id/file_properties_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:paddingLeft="5dp"
+            android:paddingTop="5dp" />
+
+        <TextView
+            android:id="@+id/node_name"
+            android:layout_width="225dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@id/file_properties_icon"
+            android:paddingLeft="5dp"
+            android:paddingTop="7dp"
+            android:singleLine="false" />
+
+        <TextView
+            android:id="@+id/node_last_update"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_below="@id/node_name"
+            android:layout_toRightOf="@id/file_properties_icon"
+            android:paddingBottom="7dp"
+            android:paddingLeft="5dp"
+            android:textColor="@color/file_list_second_row"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/file_contact_list_browser_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/file_contact_list_layout" >
+
+        <ListView
+            android:id="@+id/file_contact_list_view_browser"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="multipleChoice" >
+        </ListView>
+
+        <ImageView
+            android:id="@+id/file_contact_list_empty_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <TextView
+            android:id="@+id/file_contact_list_empty_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/file_contact_list_empty_image"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/standard_margin"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+</RelativeLayout>
