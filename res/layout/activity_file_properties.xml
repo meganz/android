@@ -45,7 +45,74 @@
 	         rounded:border_width="2dp"
 	         rounded:border_color="@color/border_file_properties"/>
 	     
-	     
+	      <RelativeLayout
+         android:id="@+id/contacts_shared_with_eye"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:background="@color/contact_properties_content_layout"
+         android:orientation="horizontal"
+         android:layout_below="@id/file_properties_image">
+         
+         <TableLayout       		
+             	android:id="@+id/file_properties_content_table"
+       		    android:layout_width="fill_parent"
+       		    android:layout_height="wrap_content"
+       		    android:layout_gravity="center"
+       		    android:background="@drawable/selectable_background_mega" >
+       		    
+             <TableRow>
+                    <TextView
+		             android:id="@+id/file_properties_public_link"
+		             android:layout_width="wrap_content"
+		             android:layout_height="30dp"		             
+		             android:paddingLeft="30dp"
+		             android:paddingRight="5dp"
+		             android:paddingTop="10dp"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:textColor="@color/contact_properties_text_content" />  
+             
+			 </TableRow>
+				       	    
+             <TableRow>  
+                 
+                 <TextView
+		             android:id="@+id/file_properties_shared_folder_shared_with_text"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/file_properties_shared_folder_shared_with"
+		             android:paddingLeft="30dp"
+		             android:paddingRight="5dp"
+		             android:paddingTop="10dp"
+		             android:paddingBottom="10dp"
+		             android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:textColor="@color/contact_properties_text_content" />        
+                 
+                 <TextView
+		             android:id="@+id/shared_with_detailed"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:paddingTop="10dp"
+		             android:paddingBottom="10dp"
+					 android:layout_gravity="center_vertical|right"
+					 android:textColor="@color/contact_properties_content_detailed"
+					 android:paddingRight="100dp" />                 
+                 
+             	<ImageButton 
+             	    android:id="@+id/contact_properties_content_eye"
+             	    android:layout_width="wrap_content"
+             	    android:layout_height="wrap_content"
+             	    android:src="@drawable/contact_properties_content_eye"
+             	    android:paddingTop="15dp"
+             	    android:paddingBottom="10dp"
+             	    android:background="@null" />
+             	
+             </TableRow>
+       		    
+         </TableLayout>
+         
+     </RelativeLayout>    
      
      <RelativeLayout
          android:id="@+id/file_properties_available_offline"
@@ -53,7 +120,7 @@
          android:layout_height="wrap_content"
          android:background="@color/file_properties_available_layout"
          android:orientation="horizontal"
-         android:layout_below="@id/file_properties_image">
+         android:layout_below="@+id/contacts_shared_with_eye">
          
          <TableLayout       		
        		    android:layout_width="wrap_content"
@@ -128,47 +195,7 @@
          </TableLayout>
          
      </RelativeLayout>
-     
-     <RelativeLayout
-         android:id="@+id/file_properties_shared_folder"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:orientation="horizontal"
-         android:layout_below="@id/file_properties_image">
-         
-         <TextView
-             android:id="@+id/file_properties_shared_folder_shared_with_text"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/file_properties_shared_folder_shared_with" 
-             android:textStyle="bold"
-             android:textColor="@color/file_properties_info_menu"
-             />
-         
-         <View
-             android:id="@+id/file_properties_shared_with_delimiter"
-		     android:layout_width="match_parent"
-		     android:layout_height="1dp"
-		     android:background="#d6d6d6"
-		     android:layout_below="@id/file_properties_shared_folder_shared_with_text"
-		     />
-         
-         <com.mega.components.NestedListView
-             android:id="@+id/file_properties_shared_folder_shared_with_list"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:layout_below="@id/file_properties_shared_with_delimiter" />
-             
-         <!--
-        <ListView
-	        android:id="@+id/file_properties_shared_folder_shared_with_list"
-	        android:layout_width="match_parent"
-	        android:layout_height="match_parent"
-	        android:layout_below="@id/file_properties_shared_folder_shared_with_text" >
-	    </ListView>
-	   -->
-         
-     </RelativeLayout>
+
      
      <TableLayout 
          android:id="@+id/file_properties_info_table"
@@ -179,6 +206,28 @@
          
          <TableRow>
              <TextView
+		             android:id="@+id/file_properties_permission_label"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/file_properties_shared_folder_permissions"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="7dp" />   
+             
+             <TextView
+		             android:id="@+id/file_properties_permission_info"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:textColor="@color/file_properties_info_data"
+					 android:layout_gravity="center_vertical|left" 
+					 android:paddingLeft="4dp"
+					 android:paddingTop="7dp"/>
+         </TableRow>
+                  
+         <TableRow>
+             <TextView
 		             android:id="@+id/file_properties_info_menu_size"
 		             android:layout_width="wrap_content"
 		             android:layout_height="wrap_content"
@@ -187,7 +236,7 @@
 					 android:layout_gravity="center_vertical|left"
 					 android:textStyle="bold"
 					 android:paddingLeft="30dp"
-					 android:paddingTop="15dp" />
+					 android:paddingTop="7dp" />                        
              
              <TextView
 		             android:id="@+id/file_properties_info_data_size"
@@ -196,8 +245,8 @@
 		             android:textColor="@color/file_properties_info_data"
 					 android:layout_gravity="center_vertical|left" 
 					 android:paddingLeft="4dp"
-					 android:paddingTop="15dp"/>
-         </TableRow>
+					 android:paddingTop="7dp"/>
+         </TableRow>                    
          
          <TableRow>
              <TextView

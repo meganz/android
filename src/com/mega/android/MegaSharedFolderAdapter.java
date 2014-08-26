@@ -181,7 +181,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		log("Position: " + position + "_TOTAL: " + getCount());
+		//log("Position: " + position + "_TOTAL: " + getCount());
 	
 		final int _position = position;
 		
@@ -224,6 +224,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 
 		holder.currentPosition = position;
 		
+		//Check if the share
 		MegaShare share = (MegaShare) getItem(position);
 		if (share.getUser() == null){
 			holder.contactMail = context.getString(R.string.file_properties_shared_folder_public_link);
@@ -506,10 +507,6 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(context, "Share correctly removed", Toast.LENGTH_LONG).show();
 					ShareList sl = megaApi.getOutShares(node);
-//					Toast.makeText(context, sl.size() + "*", Toast.LENGTH_SHORT).show();
-//					for (int i=0;i<sl.size();i++){
-//						Toast.makeText(context, "Nombre: " + sl.get(i).getUser() + "_Level: " + sl.get(i).getAccess(), Toast.LENGTH_SHORT).show();
-//					}
 					setShareList(sl);
 				}
 				else{

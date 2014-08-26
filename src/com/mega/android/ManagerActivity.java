@@ -131,6 +131,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
 	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
 	public static String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
+	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	
@@ -170,8 +171,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private TextView usedSpaceText;
 	private TextView usedSpace;
 	
-//	ImageView barFill;
-//	ImageView barStructure;
 	ProgressBar usedSpaceBar;
 	
 	MegaUser contact = null;
@@ -861,8 +860,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}			
 		}
     	   	
-    	if (intent != null) {
-    		log("intent != null");
+    	if (intent != null) {    		
     		// Open folder from the intent
 			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
 				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
@@ -870,8 +868,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				setIntent(null);
 			}
     					
-    		if (intent.getAction() != null){
-    			log("getAction != null");
+    		if (intent.getAction() != null){    			
     			if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
 					Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -897,6 +894,34 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
 					startActivity(intentFolderLink);
 					finish();
+    			}
+    			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
+    				
+    				parentHandleBrowser = intent.getLongExtra("parentHandle", -1);    				
+    				intent.removeExtra("parentHandle");
+    				setParentHandleBrowser(parentHandleBrowser);
+    				
+    				if (fbF != null){
+						fbF.setParentHandle(parentHandleBrowser);
+    					fbF.setIsList(isListCloudDrive);
+    					fbF.setOrder(orderGetChildren);
+    					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    					fbF.setNodes(nodes);
+    					if (!fbF.isVisible()){
+    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
+    					}
+    				}	
+    				else{
+    					fbF = new FileBrowserFragment();
+    					fbF.setParentHandle(parentHandleBrowser);
+    					fbF.setIsList(isListCloudDrive);
+    					fbF.setOrder(orderGetChildren);
+    					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    					fbF.setNodes(nodes);
+    					if (!fbF.isVisible()){
+    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
+    					}
+    				}
     			}
     			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");

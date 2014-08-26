@@ -560,7 +560,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				i.putExtra("handle", n.getHandle());
 			
 				if (n.isFolder()){
-					i.putExtra("imageId", R.drawable.mime_folder);
+					ShareList sl = megaApi.getOutShares(n);	
+
+					if (sl != null){
+						
+						if (sl.size() > 0){
+							
+							i.putExtra("imageId", R.drawable.mime_folder_shared);
+						}
+						else{
+							i.putExtra("imageId", R.drawable.mime_folder);
+						}
+					}
+					else{						
+						i.putExtra("imageId", R.drawable.mime_folder);
+					}			
+					
 				}
 				else{
 					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	

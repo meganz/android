@@ -67,6 +67,11 @@
         <item quantity="other">uploads</item>
     </plurals>
     
+     <plurals name="general_num_users">
+        <item quantity="one">user</item>
+        <item quantity="other">users</item>
+    </plurals>
+    
     
     <string name="login_activity">Login</string>
     <string name="login_text">Login</string>
@@ -136,12 +141,13 @@
 	<string name="file_properties_info_size_folder">Content: </string>
 	<string name="file_properties_info_added">Added: </string>
 	<string name="file_properties_info_modified">Modified: </string>
+	<string name="file_properties_shared_folder_private_folder">No public link</string>
 	<string name="file_properties_shared_folder_public_link">Public link</string>
 	<string name="file_properties_shared_folder_full_access">Full access</string>
 	<string name="file_properties_shared_folder_read_write">Read &amp; write</string>
 	<string name="file_properties_shared_folder_read_only">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with">Shared with: </string>
-	<string name="file_properties_shared_folder_permissions">Permissions</string>
+	<string name="file_properties_shared_folder_permissions">Permissions:</string>
 	<string name="file_properties_shared_folder_select_contact">Share with</string>
 	<string name="file_properties_send_file_select_contact">Send to</string>
 	
@@ -151,6 +157,7 @@
 	<string name="contact_properties_info_added">Added: </string>
 	
 	<string name="contact_file_list_activity">Content</string>
+	<string name="file_contact_list_activity">Shared with</string>
 	
 	<string name="full_screen_image_viewer_label">Image Viewer</string>
 	
