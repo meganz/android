@@ -177,10 +177,13 @@ public class Util {
 	     
         try {
             Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-            bitmap.recycle();
+            if (bitmap != null && !bitmap.isRecycled()) {
+                bitmap.recycle();
+                bitmap = null; 
+            }
             return bmRotated;
         }
-        catch (OutOfMemoryError e) {
+        catch (Exception e) {
             e.printStackTrace();
             return null;
         }
