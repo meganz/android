@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    
+    <item
+	    android:id="@+id/action_file_contact_list_permissions"
+	    android:orderInCategory="100"
+	    android:showAsAction="always"
+	    android:title="Change permissions"
+	    android:icon="@drawable/permissions_button_no_text_white"
+	    MEGA:showAsAction="always" />
+	
+	<item
+	    android:id="@+id/action_file_contact_list_delete"
+	    android:orderInCategory="120"
+	    android:showAsAction="always"
+	    android:title="Delete"
+	    android:icon="@drawable/ic_menu_discard_dark"
+	    MEGA:showAsAction="always" />
+
+</menu>

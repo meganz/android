@@ -40,7 +40,6 @@
         android:icon="@drawable/ic_menu_download_link_dark"
         android:title="@string/context_get_link"
         MEGA:showAsAction="ifRoom" />
-
     
     <item
         android:id="@+id/cab_menu_trash"
@@ -48,16 +47,6 @@
         android:orderInCategory="125"
         android:showAsAction="always"
         android:title="@string/context_move_to_trash"
-        MEGA:showAsAction="ifRoom" />
-    
-    
-    
-<!--     <item
-	    android:id="@+id/action_new_folder"
-	    android:orderInCategory="100"
-	    android:showAsAction="always"
-	    android:title="Create new folder"
-	    android:icon="@drawable/ic_menu_new_folder_dark"
-	    MEGA:showAsAction="ifRoom" />
-	     -->
+        MEGA:showAsAction="ifRoom" />    
+
 </menu>

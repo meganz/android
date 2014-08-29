@@ -1153,24 +1153,42 @@ public class ContactFileListActivity extends PinActivity implements
 
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
-		NodeList nodes = megaApi.getChildren(
-				megaApi.getNodeByHandle(parentHandle), orderGetChildren);
-		if (nodes.size() == 0) {
-			listView.setVisibility(View.GONE);
-			emptyImage.setVisibility(View.VISIBLE);
-			emptyText.setVisibility(View.VISIBLE);
-			emptyImage.setImageResource(R.drawable.ic_empty_folder);
-			emptyText.setText(R.string.file_browser_empty_folder);
-		} else {
+		if (megaApi.getNodeByHandle(parentHandle) == null){
+			parentHandle = -1;
+			contactNodes = megaApi.getInShares(contact);
+			aB.setTitle(getString(R.string.contact_file_list_activity));
+			aB.setLogo(R.drawable.ic_action_navigation_accept);
+			supportInvalidateOptionsMenu();
+			adapter.setNodes(contactNodes);
+			listView.setSelection(0);
+			adapter.setParentHandle(parentHandle);
+			parentHandleStack.clear();
 			listView.setVisibility(View.VISIBLE);
 			emptyImage.setVisibility(View.GONE);
 			emptyText.setVisibility(View.GONE);
 		}
-		this.contactNodes = nodes;
-		if (adapter != null) {
-			adapter.setNodes(nodes);
+		else{		
+			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren);
+			log("----num nodes:" + nodes.size());
+			log("----parentHandle: "+megaApi.getNodeByHandle(parentHandle));
+			
+			if (nodes.size() == 0) {
+				listView.setVisibility(View.GONE);
+				emptyImage.setVisibility(View.VISIBLE);
+				emptyText.setVisibility(View.VISIBLE);
+				emptyImage.setImageResource(R.drawable.ic_empty_folder);
+				emptyText.setText(R.string.file_browser_empty_folder);
+			} else {
+				listView.setVisibility(View.VISIBLE);
+				emptyImage.setVisibility(View.GONE);
+				emptyText.setVisibility(View.GONE);
+			}
+			this.contactNodes = nodes;
+			if (adapter != null) {
+				adapter.setNodes(nodes);
+			}
+			listView.invalidateViews();
 		}
-		listView.invalidateViews();
 	}
 
 	@Override

@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+	<item
+	    android:id="@+id/action_folder_contacts_list_share_folder"
+	    android:orderInCategory="110"
+	    android:showAsAction="always"
+		android:title="@string/context_share_folder"
+	    android:icon="@drawable/ic_share_folder"
+	    MEGA:showAsAction="always" />
+</menu>

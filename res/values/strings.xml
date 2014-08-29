@@ -52,6 +52,11 @@
         <item quantity="other">files</item>
     </plurals>
     
+     <plurals name="general_num_contacts">
+        <item quantity="one">contact</item>
+        <item quantity="other">contacts</item>
+    </plurals>
+    
     <plurals name="general_num_folders">
         <item quantity="one">folder</item>
         <item quantity="other">folders</item>
