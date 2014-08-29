@@ -38,6 +38,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -47,6 +48,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -66,12 +68,15 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	MegaApiAndroid megaApi;
 	
 	boolean removeShare = false;
+	boolean multipleSelect = false;
 	
 	AlertDialog permissionsDialog;
 	
 	final MegaSharedFolderAdapter megaSharedFolderAdapter;
 	
 	ProgressDialog statusDialog;
+	
+	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -87,14 +92,17 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		
 		@Override
 		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			log("onRequestStart()");
+			log("onRequestStart() avatar");
 		}
 
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
-			log("onRequestFinish()");
+			log("onRequestFinish() avatar");
 			if (e.getErrorCode() == MegaError.API_OK){
+
+				pendingAvatars.remove(request.getEmail());
+				
 				if (holder.contactMail.compareTo(request.getEmail()) == 0){
 					File avatar = null;
 					if (context.getExternalCacheDir() != null){
@@ -118,8 +126,11 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 							}
 						}
 					}
-					adapter.notifyDataSetChanged();
 				}
+			}
+			else{
+				log("E: " + e.getErrorCode() + "_" + e.getErrorString());	
+				//TODO Si no tiene avatar, holder.imageView.setImageBitmap(IMAGEN_POR_DEFECTO);
 			}
 		}
 
@@ -164,6 +175,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		
 	/*private view holder class*/
     private class ViewHolderShareList {
+    	CheckBox checkbox;
     	RoundedImageView imageView;
 //        ImageView imageView;
         TextView textViewContactName; 
@@ -199,6 +211,8 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_shared_folder, parent, false);
 			holder = new ViewHolderShareList();
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.shared_folder_contact_checkbox);
+			holder.checkbox.setClickable(false);
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.shared_folder_item_layout);
 			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.shared_folder_contact_thumbnail);
 			((RelativeLayout.LayoutParams) holder.imageView.getLayoutParams()).setMargins(Util.px2dp((15*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics), Util.px2dp((15*scaleW), outMetrics), 0);
@@ -220,6 +234,24 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		}
 		else{
 			holder = (ViewHolderShareList) convertView.getTag();
+		}
+		
+		if (!multipleSelect){
+			holder.checkbox.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+		}
+		else{
+			holder.checkbox.setVisibility(View.VISIBLE);
+			holder.arrowSelection.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			
+			SparseBooleanArray checkedItems = listViewActivity.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true){
+				holder.checkbox.setChecked(true);
+			}
+			else{
+				holder.checkbox.setChecked(false);
+			}
 		}
 
 		holder.currentPosition = position;
@@ -289,11 +321,14 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				}
 			}	
 			else{
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-				}
-				else{
-					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				if (!pendingAvatars.contains(contact.getEmail())){
+					pendingAvatars.add(contact.getEmail());
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
+					else{
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+					}
 				}
 			}
 		}
@@ -528,7 +563,27 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			}
 		}
 	}
+	
+	public void setMultipleSelect(boolean multipleSelect) {
+		if(this.multipleSelect != multipleSelect){
+			this.multipleSelect = multipleSelect;
+			notifyDataSetChanged();
+		}
+	}
+	
+	public boolean isMultipleSelect() {
+		return multipleSelect;
+	}
 
+	public MegaShare getContactAt(int position) {
+		try {
+			if(shareList != null){
+				return shareList.get(position);
+			}
+		} catch (IndexOutOfBoundsException e) {}
+		return null;
+	}
+	
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
