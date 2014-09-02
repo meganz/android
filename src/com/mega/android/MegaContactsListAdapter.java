@@ -55,6 +55,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	
 	MegaApiAndroid megaApi;
 	
+	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
+	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
 		Context context;
@@ -77,6 +79,9 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				MegaError e) {
 			log("onRequestFinish()");
 			if (e.getErrorCode() == MegaError.API_OK){
+				
+				pendingAvatars.remove(request.getEmail());
+				
 				if (holder.contactMail.compareTo(request.getEmail()) == 0){
 					File avatar = null;
 					if (context.getExternalCacheDir() != null){
@@ -233,11 +238,14 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			}
 		}	
 		else{
-			if (context.getExternalCacheDir() != null){
-				megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
-			}
-			else{
-				megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+			if (!pendingAvatars.contains(contact.getEmail())){
+				pendingAvatars.add(contact.getEmail());
+				if (context.getExternalCacheDir() != null){
+					megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
+				else{
+					megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+				}
 			}
 		}
 		
