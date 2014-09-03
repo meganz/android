@@ -19,6 +19,14 @@
             android:orientation="horizontal" >
 
             <ImageButton
+                android:id="@+id/contacts_explorer_phone_mega_contacts"
+                style="@style/dialogActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/menu_add_contact"
+                android:src="@drawable/ic_action_hardware_phone" />
+            
+            <ImageButton
                 android:id="@+id/contacts_explorer_add_contact"
                 style="@style/dialogActionButton"
                 android:layout_width="wrap_content"
