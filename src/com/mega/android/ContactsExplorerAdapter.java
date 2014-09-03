@@ -20,7 +20,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -322,9 +321,6 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			else{
 				holder.phoneEmailTextView.setText("");
 			}
-			
-			// Loads the thumbnail image pointed to by photoUri into the QuickContactBadge in a
-            // background worker thread
 			
 			holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_contact_picture_holo_light));
 			
