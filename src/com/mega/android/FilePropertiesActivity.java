@@ -106,6 +106,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	boolean availableOfflineBoolean = false;
 	
 	private MegaApiAndroid megaApi = null;
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
 	public FilePropertiesActivity filePropertiesActivity;
 	
 	ProgressDialog statusDialog;
@@ -294,32 +296,82 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				}
 			}
 			else{ //Folder
-				availableOfflineLayout.setVisibility(View.GONE);				
+				availableOfflineLayout.setVisibility(View.VISIBLE);	
+				((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_available_offline);
+				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
+				
+				destination = null;
+				if (Environment.getExternalStorageDirectory() != null){
+					destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/");
+					log("DESTINATION: "+destination);
+				}
+				else{
+					destination = new File(getFilesDir(), node.getHandle()+"");
+					log("DESTINATION: "+destination);
+				}
 
+				if (destination.exists() && destination.isDirectory()){
+					log("DESTINATION OK");
+					log(node.getName());
+					offlineFile = new File(destination, node.getName());
+					
+					if (offlineFile.exists()){ 
+						log("Existoooo1");
+						//if(node.getSize() == offlineFile.length()){//This means that is already available offline
+							log("Existoooo2");
+							if (offlineFile.getName().equals(node.getName())){
+								log("Existoooo3");
+								availableOfflineBoolean = true;
+								availableSwitchOffline.setVisibility(View.VISIBLE);
+								availableSwitchOnline.setVisibility(View.GONE);
+							}
+						//}
+						
+					}	
+					else{
+						log("NOOOOOOOOOOOO Existoooo");
+						availableOfflineBoolean = false;
+						availableSwitchOffline.setVisibility(View.GONE);
+						availableSwitchOnline.setVisibility(View.VISIBLE);
+						//removeOffline();
+						//supportInvalidateOptionsMenu();
+					}
+				}
 				sl = megaApi.getOutShares(node);		
 
 				if (sl != null){
 
 					if (sl.size() == 0){						
 						sharedWith.setVisibility(View.GONE);
-						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
 						
-						permissionLabel.setVisibility(View.VISIBLE);
-						permissionInfo.setVisibility(View.VISIBLE);
-
-						int accessLevel= megaApi.getAccess(node);							
 						
-						switch(accessLevel){
-							case MegaShare.ACCESS_FULL:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
-							}
-							case MegaShare.ACCESS_READ:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));							
-							}						
-							case MegaShare.ACCESS_READWRITE:{								
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));	
+						
+						if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+							
+							permissionLabel.setVisibility(View.GONE);
+							permissionInfo.setVisibility(View.GONE);
+							//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
+							
+						}
+						else{	
+							permissionLabel.setVisibility(View.VISIBLE);
+							permissionInfo.setVisibility(View.VISIBLE);
+							
+							int accessLevel= megaApi.getAccess(node);							
+							
+							switch(accessLevel){
+								case MegaShare.ACCESS_FULL:{
+									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
+								}
+								case MegaShare.ACCESS_READ:{
+									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));							
+								}						
+								case MegaShare.ACCESS_READWRITE:{								
+									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));	
+								}
 							}
 						}
+						
 					}
 					else{		
 						publicLink=false;
@@ -340,14 +392,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							publicLinkTextView.setVisibility(View.VISIBLE);
 							sharedWith.setVisibility(View.VISIBLE);
 							sharedWithTextView.setText(sl.size()-1+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-							((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.contacts_shared_with_eye);
 						}
 						else{
 							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));		
 							sharedWith.setVisibility(View.VISIBLE);
 							sharedWithTextView.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-							((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.contacts_shared_with_eye);		
-
 						}
 
 						imageView.setImageResource(imageId);
@@ -356,8 +405,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 						sizeTextView.setText(getInfoFolder(node));
 					}
-
-
+					
+					
 					if (node.getCreationTime() != 0){
 						try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
 
@@ -464,16 +513,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			availableSwitchOffline.setVisibility(View.VISIBLE);
 			availableSwitchOnline.setVisibility(View.GONE);
 			availableSwitchOnline.setChecked(true);
-			if (node.isFile()){
+			//if (node.isFile()){
 				saveOffline();
-			}
+			//}
 			supportInvalidateOptionsMenu();
 		}		
 	}
 	
 	public void saveOffline (){
+		log("saveOffline");
 		
-		if (node.isFile()){
 			File destination = null;
 			if (Environment.getExternalStorageDirectory() != null){
 				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/");
@@ -503,8 +552,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			
 			Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 			if (node.getType() == MegaNode.TYPE_FOLDER) {
+				log("saveOffline:isFolder");
 				getDlList(dlFiles, node, new File(destination, new String(node.getName())));
 			} else {
+				log("saveOffline:isFile");
 				dlFiles.put(node, destination.getAbsolutePath());
 //				dlFiles.put(node, destination.getAbsolutePath() + "/" + node.getHandle() + "_" + node.getName());
 			}
@@ -529,11 +580,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				startService(service);
 			}
 		}
-		else if (node.isFolder()){
-			Toast.makeText(this, "IS FOLDER (not yet implemented)", Toast.LENGTH_LONG).show();
-		}
-	}
-	
+
 	public void removeOffline(){
 		if (node.isFile()){
 			File destination = null;
