@@ -1,6 +1,8 @@
 package com.mega.android;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,7 +35,7 @@ import android.widget.TextView;
 public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListener {
 	
 	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
-
+	
 	private class UserAvatarListenerExplorer implements MegaRequestListenerInterface{
 
 		Context context;
@@ -302,7 +307,10 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			holder.phoneEmailTextView.setVisibility(View.VISIBLE);
 			holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
 			holder.currentPosition = position;
+			holder.contactId = contact.getId();
+			holder.contactName = contact.getName();
 			holder.contactMail = contact.getEmail();
+			holder.phoneNumber = contact.getPhoneNumber();
 			
 			holder.contactNameTextView.setText(contact.getName());
 			if (contact.getEmail() != null){
@@ -313,6 +321,21 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			}
 			else{
 				holder.phoneEmailTextView.setText("");
+			}
+			
+			// Loads the thumbnail image pointed to by photoUri into the QuickContactBadge in a
+            // background worker thread
+			
+			holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_contact_picture_holo_light));
+			
+			Uri contactPhotoUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));
+			log("PHOTOURI: " + contactPhotoUri);			
+			
+			InputStream photo_stream = ContactsContract.Contacts.openContactPhotoInputStream( mContext.getContentResolver(), contactPhotoUri);
+			if (photo_stream != null){
+				BufferedInputStream buf = new BufferedInputStream(photo_stream);
+	            Bitmap photoBitmap = BitmapFactory.decodeStream(buf);
+	            holder.imageView.setImageBitmap(photoBitmap);
 			}
 			
 			return rowView;
