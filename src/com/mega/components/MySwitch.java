@@ -202,9 +202,9 @@ public class MySwitch extends CompoundButton {
         mSwitchPadding =  a.getDimensionPixelSize( R.styleable.MySwitch_switchPadding, 0);
 
         mTrackDrawable.getPadding(mTrackPaddingRect) ;
-        Log.d(TAG, "mTrackPaddingRect=" + mTrackPaddingRect);
+        //Log.d(TAG, "mTrackPaddingRect=" + mTrackPaddingRect);
         mThumbDrawable.getPadding(mThPad);
-        Log.d(TAG, "mThPad=" + mThPad);
+        //Log.d(TAG, "mThPad=" + mThPad);
         
         mMaskDrawable = a.getDrawable(R.styleable.MySwitch_backgroundMask);
         
@@ -479,7 +479,7 @@ public class MySwitch extends CompoundButton {
     	    final int thumbTop = mSwitchTop + (int) (mThumbPosition + 0.5f) - mTouchSlop;
     	    final int thumbBottom = thumbTop + mThumbHeight + mTouchSlop;// + mThPad.top + mThPad.bottom
     	    final int thumbRight = mSwitchRight + mTouchSlop;
-    	    Log.d(TAG, "returning " +  (x > thumbLeft && x < thumbRight && y > thumbTop && y < thumbBottom));
+    	    //Log.d(TAG, "returning " +  (x > thumbLeft && x < thumbRight && y > thumbTop && y < thumbBottom));
     	    return x > thumbLeft && x < thumbRight && y > thumbTop && y < thumbBottom;
     	}
     	else  {
@@ -574,7 +574,7 @@ public class MySwitch extends CompoundButton {
             }
         }
 
-        Log.d(TAG, "mThumbPosition="+mThumbPosition);
+        //Log.d(TAG, "mThumbPosition="+mThumbPosition);
         boolean flag = super.onTouchEvent(ev);
         //Log.d(TAG, "super.onTouchEvent(ev) returned="+flag);
         return flag;
@@ -805,8 +805,8 @@ public class MySwitch extends CompoundButton {
             	mThumbHeight = 15;
             }
         }
-        Log.d(TAG, "mThumbWidth="+mThumbWidth);
-        Log.d(TAG, "mThumbHeight="+mThumbHeight);
+        //Log.d(TAG, "mThumbWidth="+mThumbWidth);
+        //Log.d(TAG, "mThumbHeight="+mThumbHeight);
 
         int switchWidth;
         if (mOrientation == HORIZONTAL) {
@@ -843,7 +843,7 @@ public class MySwitch extends CompoundButton {
         int switchHeight = Math.max(mSwitchMinHeight, maxTextHeight);
             switchHeight = Math.max(trackHeight, switchHeight);
             switchHeight = Math.max(switchHeight, thumbHeight);
-        Log.d(TAG, "****" + trackHeight + "_" + mSwitchMinHeight + "_" + maxTextHeight + "_" + thumbHeight + "****");
+        //Log.d(TAG, "****" + trackHeight + "_" + mSwitchMinHeight + "_" + maxTextHeight + "_" + thumbHeight + "****");
             
 
         if (mOrientation == VERTICAL) {
@@ -896,7 +896,7 @@ public class MySwitch extends CompoundButton {
         mSwitchWidth = switchWidth;
         mSwitchHeight = switchHeight;
 
-        Log.d(TAG, "onMeasure():mSwitchWidth="+mSwitchWidth+" mSwitchHeight="+mSwitchHeight);
+        //Log.d(TAG, "onMeasure():mSwitchWidth="+mSwitchWidth+" mSwitchHeight="+mSwitchHeight);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         final int measuredHeight = getMeasuredHeight();
         final int measuredWidth = getMeasuredWidth();
@@ -912,7 +912,7 @@ public class MySwitch extends CompoundButton {
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		Log.d(TAG, "onLayout()-left=" + left + ",top="+top+",right="+right+",bottom="+bottom);
+		//Log.d(TAG, "onLayout()-left=" + left + ",top="+top+",right="+right+",bottom="+bottom);
         super.onLayout(changed, left, top, right, bottom);
         
 
@@ -949,13 +949,13 @@ public class MySwitch extends CompoundButton {
             mThumbPosition = isChecked() ? 0 : getThumbScrollRange();
         }
         
-        Log.d(TAG, "getWidth()="+getWidth()+" getHeight()="+getHeight());
-        Log.d(TAG, "getPaddingLeft()="+getPaddingLeft()+" getPaddingRight()="+getPaddingRight());
-        Log.d(TAG, "getPaddingTop()="+getPaddingTop()+" getPaddingBottom()="+getPaddingBottom());
-        
-        Log.d(TAG, "mSwitchWidth="+mSwitchWidth+" mSwitchHeight="+mSwitchHeight);
-        Log.d(TAG, "mSwitchLeft="+mSwitchLeft+" mSwitchRight="+mSwitchRight);
-        Log.d(TAG, "mSwitchTop="+mSwitchTop+" mSwitchBottom="+mSwitchBottom);
+//        Log.d(TAG, "getWidth()="+getWidth()+" getHeight()="+getHeight());
+//        Log.d(TAG, "getPaddingLeft()="+getPaddingLeft()+" getPaddingRight()="+getPaddingRight());
+//        Log.d(TAG, "getPaddingTop()="+getPaddingTop()+" getPaddingBottom()="+getPaddingBottom());
+//        
+//        Log.d(TAG, "mSwitchWidth="+mSwitchWidth+" mSwitchHeight="+mSwitchHeight);
+//        Log.d(TAG, "mSwitchLeft="+mSwitchLeft+" mSwitchRight="+mSwitchRight);
+//        Log.d(TAG, "mSwitchTop="+mSwitchTop+" mSwitchBottom="+mSwitchBottom);
         
         //now that the layout is known, prepare the drawables
         mTrackDrawable.setBounds(mSwitchLeft, mSwitchTop, mSwitchRight, mSwitchBottom);
@@ -1038,7 +1038,7 @@ public class MySwitch extends CompoundButton {
                 width = mSwitchRight - mSwitchLeft;
             }
             
-            Log.d(TAG,"pushBitmap width="+width+" height="+height);
+            //Log.d(TAG,"pushBitmap width="+width+" height="+height);
             pushBitmap = Bitmap.createBitmap(width, height,  Config.ARGB_8888);
             Canvas backingLayer = new Canvas(pushBitmap);
             mTextPaint.drawableState = getDrawableState();
@@ -1263,8 +1263,8 @@ public class MySwitch extends CompoundButton {
        	    thumbBoundT = switchInnerTop + thumbPos - mThumbExtraMovement;
        	    thumbBoundB = switchInnerTop + thumbPos - mThumbExtraMovement + mThumbHeight;
         	//Draw the Thumb
-        	Log.d(TAG, "thumbBoundT, thumbBoundB=("+thumbBoundT+","+thumbBoundB+")");
-        	Log.d(TAG, "mSwitchLeft, mSwitchRight=("+mSwitchLeft+","+mSwitchRight+")");
+//        	Log.d(TAG, "thumbBoundT, thumbBoundB=("+thumbBoundT+","+thumbBoundB+")");
+//        	Log.d(TAG, "mSwitchLeft, mSwitchRight=("+mSwitchLeft+","+mSwitchRight+")");
         	mThumbDrawable.setBounds(mSwitchLeft, thumbBoundT, mSwitchRight, thumbBoundB);
         	mThumbDrawable.draw(canvas);
 

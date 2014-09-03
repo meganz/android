@@ -1,6 +1,8 @@
 package com.mega.android;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -17,6 +19,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
     private static final String TABLE_ATTRIBUTES = "attributes";
+    private static final String TABLE_OFFLINE = "offline";
     private static final String KEY_ID = "id";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_SESSION= "session";
@@ -31,6 +34,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
     private static final String KEY_ATTR_ONLINE = "online";
+    private static final String KEY_OFF_HANDLE = "handle";
+    private static final String KEY_OFF_PATH = "path";
+    private static final String KEY_OFF_NAME = "name";
+    private static final String KEY_OFF_PARENT = "parentId";
+    private static final String KEY_OFF_TYPE = "type";
 
 	public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,6 +46,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		
+        String CREATE_OFFLINE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_OFFLINE + "("
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER"+", FOREIGN KEY (" + KEY_OFF_PARENT + ") REFERENCES "+ TABLE_OFFLINE +" ("+ KEY_ID +"))";
+        db.execSQL(CREATE_OFFLINE_TABLE);
+		
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_EMAIL + " TEXT, " 
                 + KEY_SESSION + " TEXT" + ")";        
@@ -55,6 +68,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
+        
+
 	}
 
 	@Override
@@ -149,14 +164,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
         values.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
-        values.put(KEY_CAM_SYNC_ENABLED, prefs.getCamSyncEnabled());
-        values.put(KEY_CAM_SYNC_HANDLE, prefs.getCamSyncHandle());
-        values.put(KEY_CAM_SYNC_LOCAL_PATH, prefs.getCamSyncLocalPath());
-        values.put(KEY_CAM_SYNC_FILE_UPLOAD, prefs.getCamSyncFileUpload());
-        values.put(KEY_PIN_LOCK_ENABLED, prefs.getPinLockEnabled());
-        values.put(KEY_PIN_LOCK_CODE, prefs.getPinLockCode());
-        values.put(KEY_STORAGE_ASK_ALWAYS, prefs.getStorageAskAlways());
-        values.put(KEY_STORAGE_DOWNLOAD_LOCATION, prefs.getStorageDownloadLocation());
+        values.put(KEY_CAM_SYNC_ENABLED, encrypt(prefs.getCamSyncEnabled()));
+        values.put(KEY_CAM_SYNC_HANDLE, encrypt(prefs.getCamSyncHandle()));
+        values.put(KEY_CAM_SYNC_LOCAL_PATH, encrypt(prefs.getCamSyncLocalPath()));
+        values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(prefs.getCamSyncFileUpload()));
+        values.put(KEY_PIN_LOCK_ENABLED, encrypt(prefs.getPinLockEnabled()));
+        values.put(KEY_PIN_LOCK_CODE, encrypt(prefs.getPinLockCode()));
+        values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(prefs.getStorageAskAlways()));
+        values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()));
         db.insert(TABLE_PREFERENCES, null, values);
         db.close();
 	}
@@ -210,6 +225,156 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.close();
 		
 		return attr;
+	}
+	
+	public void setOfflineFile (MegaOffline offline){
+		
+		SQLiteDatabase db = this.getWritableDatabase(); 
+        ContentValues values = new ContentValues();
+        values.put(KEY_OFF_HANDLE, offline.getHandle());
+        values.put(KEY_OFF_PATH, offline.getPath());
+        values.put(KEY_OFF_NAME, offline.getName());
+        values.put(KEY_OFF_PARENT, offline.getparentId());
+        values.put(KEY_OFF_TYPE, offline.getType());
+        db.insert(TABLE_OFFLINE, null, values);
+        db.close();
+		
+	}
+	
+	public ArrayList<MegaOffline> getOfflineFiles (){
+		
+		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
+
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE;
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			do{
+				
+				int id = Integer.parseInt(cursor.getString(0));
+				String handle = decrypt(cursor.getString(1));
+				String path = decrypt(cursor.getString(2));
+				String name = decrypt(cursor.getString(3));
+				int parent = cursor.getInt(4);
+				String type = decrypt(cursor.getString(5));			
+				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type);
+				listOffline.add(offline);
+			} while (cursor.moveToNext());
+		}
+		cursor.close();
+		db.close();
+
+		return listOffline;
+	}
+
+	public boolean exists(long handle){
+		
+				
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		if (!cursor.equals(null))
+	        return cursor.moveToFirst();
+	    
+		return false; 		 
+	}
+	
+	public MegaOffline findByHandle(long handle){
+
+		MegaOffline offline = null;
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+
+				int _id = -1;
+				int _parent = -1;
+				String _handle = null;
+				String _path = null;
+				String _name = null;
+				String _type = null;
+
+				_id = Integer.parseInt(cursor.getString(0));
+				_handle = cursor.getString(1);
+				_path = cursor.getString(2);
+				_name = cursor.getString(3);
+				_parent = cursor.getInt(4);
+				_type = cursor.getString(5);
+				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type);
+			}
+		}
+		return offline; 		 
+	}
+
+	public ArrayList<MegaOffline> getNodesSameParentOffline (String path, String name){
+		
+		int _id = -1;
+		int _parent = -1;
+		String _handle = null;
+		String _path = null;
+		String _name = null;
+		String _type = null;
+		
+		
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND" + KEY_OFF_NAME + " = '" + name + "'"  ;
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		
+		if (cursor.moveToFirst()){			
+				
+			_id = Integer.parseInt(cursor.getString(0));
+			_handle = decrypt(cursor.getString(1));
+			_path = decrypt(cursor.getString(2));
+			_name = decrypt(cursor.getString(3));
+			_parent = cursor.getInt(4);
+			_type = decrypt(cursor.getString(5));			
+		}
+		
+		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
+		
+		//Get the rest of nodes with the same parent (if there be)
+		if(_parent!=-1){
+			
+			selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PARENT + " = '" + _parent + "'";
+			
+			cursor = db.rawQuery(selectQuery, null);
+			if (cursor.moveToFirst()){
+				do{
+					
+					_id = Integer.parseInt(cursor.getString(0));
+					_handle = decrypt(cursor.getString(1));
+					_path = decrypt(cursor.getString(2));
+					_name = decrypt(cursor.getString(3));
+					_parent = cursor.getInt(4);
+					_type = decrypt(cursor.getString(5));			
+					MegaOffline offline = new MegaOffline(_handle, _path, _name, _parent, _type);
+					listOffline.add(offline);
+				} while (cursor.moveToNext());
+			}
+			cursor.close();
+			db.close();			
+		}		
+		
+		return listOffline; 		
+	}
+
+	public void deleteOfflineFile (MegaOffline mOff) {
+	    SQLiteDatabase db = this.getWritableDatabase();
+	    
+	    db.delete(TABLE_OFFLINE, KEY_OFF_HANDLE + " = ?",
+	            new String[] { String.valueOf(mOff.getHandle()) });
+	            
+	    db.close();
 	}
 	
 	public void setFirstTime (boolean firstTime){
