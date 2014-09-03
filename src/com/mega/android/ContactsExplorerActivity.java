@@ -16,14 +16,23 @@ import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
 import com.mega.sdk.UserList;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.View;
@@ -47,34 +56,22 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
 	
 	public static String EXTRA_NODE_HANDLE = "node_handle";
+	public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
 	public static String EXTRA_CONTACTS = "extra_contacts";
+	public static String EXTRA_EMAIL = "extra_email";
+	public static String EXTRA_PHONE = "extra_phone";
 	
 	MegaApiAndroid megaApi;
 	
-//	public static String EXTRA_URL = "fileurl";
-//	public static String EXTRA_SIZE = "filesize";
-//	public static String EXTRA_DOCUMENT_HASHES = "document_hash";
-//	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
-//	public static String EXTRA_PATH = "filepath";
-//	public static String EXTRA_FILES = "fileslist";
-	
-//	private File path;
-//	private File root;
-	
-//	private String buttonPrefix;
+	boolean megaContacts = true;
 	
 	private TextView windowTitle;
 	private Button button;
 	private ListView listView;
 	private ImageButton addContactButton;
+	private ImageButton megaPhoneContacts;
 	
 	long nodeHandle = -1;
-	
-//	private String url;
-//	private long size;
-//	private long[] documentHashes;
-	
-//	FileStorageAdapter adapter;
 	
 	ContactsExplorerAdapter adapter;
 	
@@ -82,6 +79,112 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
 	private AlertDialog addContactDialog;
+	
+	public class PhoneContacts{
+		long id;
+		String name;
+		String email;
+		String phoneNumber;
+		
+		public PhoneContacts(long id, String name, String email, String phoneNumber) {
+			this.id = id;
+			this.name = name;
+			this.email = email;
+			this.phoneNumber = phoneNumber;
+		}
+		
+		public long getId(){
+			return id;
+		}
+		
+		public String getName(){
+			return name;
+		}
+		
+		public String getEmail(){
+			return email;
+		}
+		
+		public String getPhoneNumber(){
+			return phoneNumber;
+		}
+	}
+	
+	private class RefreshContactsTask extends AsyncTask<String, Void, Boolean> {
+
+		ArrayList<PhoneContacts> contactList;
+		
+		@Override
+		protected Boolean doInBackground(String... args) {
+			// Fetch emails from contact list
+	        contactList = refreshPhoneContacts();
+	        
+	        if (contactList != null){
+	        	return true;
+	        }
+	        else{
+	        	return false;
+	        }
+		}
+		
+		@Override
+		protected void onPostExecute(Boolean res) {
+			// Show emails on screen
+
+			if (!megaContacts){
+				if (adapter != null){
+					adapter.setContacts(null, contactList);
+				}
+			}
+		}
+		
+	}
+	
+	@SuppressLint("InlinedApi")
+	private ArrayList<PhoneContacts> refreshPhoneContacts() {
+       ArrayList<PhoneContacts> contactList = new ArrayList<PhoneContacts>();
+         
+       try {
+ 
+            /**************************************************/
+             
+            ContentResolver cr = getBaseContext().getContentResolver();
+            
+            @SuppressLint("InlinedApi")
+            String SORT_ORDER = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ? Contacts.SORT_KEY_PRIMARY : Contacts.DISPLAY_NAME;
+            
+            Cursor c = cr.query(
+                    Data.CONTENT_URI, 
+                    null, 
+                    "(" + Data.MIMETYPE + "= ? OR " + Data.MIMETYPE + "= ?) AND " + 
+                    Data.CONTACT_ID + " IN (SELECT " + Contacts._ID + " FROM contacts WHERE " + Contacts.HAS_PHONE_NUMBER + "!=0) AND " + Contacts.IN_VISIBLE_GROUP + "=1", 
+                    new String[]{Email.CONTENT_ITEM_TYPE, Phone.CONTENT_ITEM_TYPE}, SORT_ORDER);
+            
+            while (c.moveToNext()){
+            	long id = c.getLong(c.getColumnIndex(Data.CONTACT_ID));
+                String name = c.getString(c.getColumnIndex(Data.DISPLAY_NAME));
+                String data1 = c.getString(c.getColumnIndex(Data.DATA1));
+                String mimetype = c.getString(c.getColumnIndex(Data.MIMETYPE));
+                if (mimetype.compareTo(Email.CONTENT_ITEM_TYPE) == 0){
+                	log("ID: " + id + "___ NAME: " + name + "____ EMAIL: " + data1);
+                	PhoneContacts pc = new PhoneContacts(id, name, data1, null);
+                	contactList.add(pc);
+                }
+                else if (mimetype.compareTo(Phone.CONTENT_ITEM_TYPE) == 0){
+                	PhoneContacts pc = new PhoneContacts(id, name, null, data1);
+                	contactList.add(pc);
+                	log("ID: " + id + "___ NAME: " + name + "____ PHONE: " + data1);
+                }
+            }
+            
+            c.close();
+            
+            return contactList;
+ 
+        } catch (Exception e) {}
+         
+        return null;
+    }
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,34 +208,54 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		}
 		
 		windowTitle = (TextView) findViewById(R.id.contacts_explorer_window_title);
-		windowTitle.setText(getString(R.string.section_contacts));
+		
 		listView = (ListView) findViewById(R.id.contacts_explorer_list_view);
 		button = (Button) findViewById(R.id.contacts_explorer_button);
 		button.setVisibility(View.GONE);
 		addContactButton = (ImageButton) findViewById(R.id.contacts_explorer_add_contact);
+		megaPhoneContacts = (ImageButton) findViewById(R.id.contacts_explorer_phone_mega_contacts);
+		
+		if (megaContacts){
+			windowTitle.setText(getResources().getString(R.string.context_mega_contacts));
+			megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_hardware_phone));
+			
+			contacts = megaApi.getContacts();
+			visibleContacts.clear();
+			for (int i=0;i<contacts.size();i++){
+				log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+				if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+					visibleContacts.add(contacts.get(i));
+				}
+			}
+			
+			if (adapter == null){
+				adapter = new ContactsExplorerAdapter(this, visibleContacts, null, megaContacts);
+				
+				listView.setAdapter(adapter);
+				listView.setOnItemClickListener(this);
+				listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+				listView.setItemsCanFocus(false);
+
+				adapter.setOnItemCheckClickListener(this);
+			}
+			else{
+				adapter.setContacts(visibleContacts, null);
+			}			
+		}
+		else{
+			windowTitle.setText(getResources().getString(R.string.context_phone_contacts));
+			megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_contacts_dark));
+		}
+		
 		
 		Intent intent = getIntent();
 		nodeHandle =  intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
 		
 		button.setOnClickListener(this);
 		addContactButton.setOnClickListener(this);
+		megaPhoneContacts.setOnClickListener(this);
 		
-		contacts = megaApi.getContacts();
-		visibleContacts.clear();
-		for (int i=0;i<contacts.size();i++){
-			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
-			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
-				visibleContacts.add(contacts.get(i));
-			}
-		}
 		
-		adapter = new ContactsExplorerAdapter(this, visibleContacts);
-		listView.setAdapter(adapter);
-		listView.setOnItemClickListener(this);
-		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-		listView.setItemsCanFocus(false);
-
-		adapter.setOnItemCheckClickListener(this);
 	}
 	
 	@Override
@@ -173,6 +296,66 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 			}
 			case R.id.contacts_explorer_add_contact:{
 				onAddContactClick();
+				break;
+			}
+			case R.id.contacts_explorer_phone_mega_contacts:{
+				megaContacts = !megaContacts;
+				if (megaContacts){
+					addContactButton.setVisibility(View.VISIBLE);
+					windowTitle.setText(getResources().getString(R.string.context_mega_contacts));
+					megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_hardware_phone));
+					
+					contacts = megaApi.getContacts();
+					visibleContacts.clear();
+					for (int i=0;i<contacts.size();i++){
+						log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+						if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+							visibleContacts.add(contacts.get(i));
+						}
+					}
+					
+					if (adapter == null){
+						adapter = new ContactsExplorerAdapter(this, visibleContacts, null, megaContacts);
+						
+						listView.setAdapter(adapter);
+						listView.setOnItemClickListener(this);
+						listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+						listView.setItemsCanFocus(false);
+
+						adapter.setOnItemCheckClickListener(this);
+					}
+					else{
+						adapter.setContacts(visibleContacts, null);
+						adapter.setMegaContacts(megaContacts);
+					}
+				}
+				else{
+					addContactButton.setVisibility(View.INVISIBLE);
+					windowTitle.setText(getResources().getString(R.string.context_phone_contacts));
+					megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_contacts_dark));
+					
+					if (adapter != null){
+						adapter.setMegaContacts(megaContacts);
+					}
+					
+					new RefreshContactsTask().execute("");
+					
+//					visibleContacts.clear();
+//					if (adapter == null){
+//						adapter = new ContactsExplorerAdapter(this, visibleContacts, megaContacts);
+//						
+//						listView.setAdapter(adapter);
+//						listView.setOnItemClickListener(this);
+//						listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+//						listView.setItemsCanFocus(false);
+//
+//						adapter.setOnItemCheckClickListener(this);
+//					}
+//					else{
+//						adapter.setContacts(visibleContacts);
+//						adapter.setMegaContacts(megaContacts);
+//					}
+				}
 				break;
 			}
 		}
@@ -232,21 +415,38 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 		log("on item click");
 		
-		MegaUser contact = adapter.getDocumentAt(position);
-		ArrayList<String> emails = new ArrayList<String>();
-		emails.add(contact.getEmail());
-		setResultContacts(emails);
-		listView.setItemChecked(position, false);
+		if (megaContacts){
+			MegaUser contact = (MegaUser) adapter.getDocumentAt(position);
+			ArrayList<String> emails = new ArrayList<String>();
+			emails.add(contact.getEmail());
+			setResultContacts(emails, megaContacts);
+			listView.setItemChecked(position, false);
+		}
+		else{
+			PhoneContacts contact = (PhoneContacts) adapter.getDocumentAt(position);
+			ArrayList<String> contacts = new ArrayList<String>();
+			if (contact.getEmail() != null){
+				contacts.add(ContactsExplorerActivity.EXTRA_EMAIL);
+				contacts.add(contact.getEmail());
+			}
+			else if (contact.getPhoneNumber() != null){
+				contacts.add(ContactsExplorerActivity.EXTRA_PHONE);
+				contacts.add(contact.getPhoneNumber());
+			}
+			setResultContacts(contacts, megaContacts);
+			listView.setItemChecked(position, false);
+		}
 	}
 	
 	/*
 	 * Set selected files to pass to the caller activity and finish this
 	 * activity
 	 */
-	private void setResultContacts(ArrayList<String> emails) {
+	private void setResultContacts(ArrayList<String> emails, boolean megaContacts) {
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra(EXTRA_CONTACTS, emails);
 		intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
+		intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 		setResult(RESULT_OK, intent);
 		finish();
 	}
@@ -386,12 +586,14 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 			}
 		}
 		
-		if (adapter == null){
-			adapter = new ContactsExplorerAdapter(this, visibleContacts);
-			listView.setAdapter(adapter);
-		}
-		else{
-			adapter.setContacts(visibleContacts);
+		if (megaContacts){
+			if (adapter == null){
+				adapter = new ContactsExplorerAdapter(this, visibleContacts, null, megaContacts);
+				listView.setAdapter(adapter);
+			}
+			else{
+				adapter.setContacts(visibleContacts, null);
+			}
 		}
 		
 	}

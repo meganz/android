@@ -1230,65 +1230,95 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				return;
 			}
 			
-			final ArrayList<String> emails = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);
 			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+			final boolean megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
 			
-			if (node.isFolder()){
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(filePropertiesActivity);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
+			if (megaContacts){
+				if (node.isFolder()){
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							ProgressDialog temp = null;
+							try{
+								temp = new ProgressDialog(filePropertiesActivity);
+								temp.setMessage(getString(R.string.context_sharing_folder));
+								temp.show();
+							}
+							catch(Exception e){
+								return;
+							}
+							statusDialog = temp;
+							permissionsDialog.dismiss();
+							
+							switch(item) {
+			                    case 0:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, filePropertiesActivity);
+			                    	}
+			                    	break;
+			                    }
+			                    case 1:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, filePropertiesActivity);
+			                    	}
+			                        break;
+			                    }
+			                    case 2:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, filePropertiesActivity);
+			                    	}		                    	
+			                        break;
+			                    }
+			                }
 						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-						permissionsDialog.dismiss();
-						
-						switch(item) {
-		                    case 0:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		megaApi.share(node, emails.get(i), MegaShare.ACCESS_READ, filePropertiesActivity);
-		                    	}
-		                    	break;
-		                    }
-		                    case 1:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		megaApi.share(node, emails.get(i), MegaShare.ACCESS_READWRITE, filePropertiesActivity);
-		                    	}
-		                        break;
-		                    }
-		                    case 2:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		megaApi.share(node, emails.get(i), MegaShare.ACCESS_FULL, filePropertiesActivity);
-		                    	}		                    	
-		                        break;
-		                    }
-		                }
+					});
+					permissionsDialog = dialogBuilder.create();
+					permissionsDialog.show();
+					Resources resources = permissionsDialog.getContext().getResources();
+					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+			        alertTitle.setTextColor(resources.getColor(R.color.mega));
+					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+				}
+				else{ 
+					for (int i=0;i<contactsData.size();i++){
+						megaApi.sendFileToUser(node, contactsData.get(i), filePropertiesActivity);
 					}
-				});
-				permissionsDialog = dialogBuilder.create();
-				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-			}
-			else{ 
-				for (int i=0;i<emails.size();i++){
-					megaApi.sendFileToUser(node, emails.get(i), filePropertiesActivity);
 				}
 			}
-			
+			else{
+				if (node.isFolder()){
+					for (int i=0; i < contactsData.size();i++){
+						String type = contactsData.get(i);
+						if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
+							i++;
+							Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+						}
+						else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
+							i++;
+							Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+						}
+					}
+				}
+				else{
+					for (int i=0; i < contactsData.size();i++){
+						String type = contactsData.get(i);
+						if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
+							i++;
+							Toast.makeText(this, "Sending a file: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+						}
+						else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
+							i++;
+							Toast.makeText(this, "Sending a file: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+						}
+					}
+				}
+			}
 		}
 	}
 	
