@@ -153,6 +153,7 @@
 	<string name="file_properties_shared_folder_read_only">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions">Permissions:</string>
+	<string name="file_properties_owner">My Folder </string>
 	<string name="file_properties_shared_folder_select_contact">Share with</string>
 	<string name="file_properties_send_file_select_contact">Send to</string>
 	
