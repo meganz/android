@@ -582,7 +582,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			startService(service);					
 		}
 		
-		insertDB();		
+		insertDB();
 	}
 
 	public void removeOffline(){
