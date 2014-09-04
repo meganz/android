@@ -19,10 +19,19 @@
     <TextView
         android:id="@+id/contact_explorer_name"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="25dp"
         android:layout_toRightOf="@id/contact_explorer_thumbnail"
         android:paddingLeft="5dp"
         android:paddingTop="7dp" />
+    
+    <TextView 
+        android:id="@+id/contact_explorer_phone_mail"
+        android:layout_width="fill_parent"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/contact_explorer_thumbnail"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp"
+        android:layout_below="@id/contact_explorer_name"/>
     
 </RelativeLayout>
 
