@@ -29,6 +29,9 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
     
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    
+    
     <application
         android:name="MegaApplication"
         android:allowBackup="false"

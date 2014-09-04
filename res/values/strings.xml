@@ -204,6 +204,8 @@
     <string name="context_share_folder">Share folder</string>
     <string name="context_sharing_folder">Sharing</string>
     <string name="context_camera_folder">Camera folder: </string>
+    <string name="context_mega_contacts">MEGA Contacts</string>
+    <string name="context_phone_contacts">Phone Contacts</string>
   
     <string name="menu_new_folder">New folder</string>
     <string name="menu_add_contact">Add contact</string>
