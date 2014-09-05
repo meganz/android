@@ -1082,22 +1082,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				mDrawerLayout.closeDrawer(Gravity.LEFT);
     			}
     			else{
-    				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-    				dbH.setFirstTime(false);
-    				dbH.setStorageAskAlways(false);
-    				File defaultDownloadLocation = null;
-    				if (Environment.getExternalStorageDirectory() != null){
-    					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
-    				}
-    				else{
-    					defaultDownloadLocation = getFilesDir();
-    				}
-    				
-    				defaultDownloadLocation.mkdirs();
-    				
-    				dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
-    				dbH.setPinLockEnabled(false);
-    				dbH.setPinLockCode("");
     				firstTime = false;
     			}
     			
@@ -2223,14 +2207,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		DatabaseHandler dbH = new DatabaseHandler(context); 
 		dbH.clearCredentials();
 		if (dbH.getPreferences() != null){
+			dbH.clearPreferences();
 			dbH.setFirstTime(false);
-			dbH.setPinLockEnabled(false);
-			dbH.setPinLockCode("");
-			dbH.setCamSyncEnabled(false);
-			dbH.setStorageAskAlways(true);
+//			dbH.setPinLockEnabled(false);
+//			dbH.setPinLockCode("");
+//			dbH.setCamSyncEnabled(false);
+//			dbH.setStorageAskAlways(true);
 			Intent stopIntent = null;
 			stopIntent = new Intent(context, CameraSyncService.class);
-			stopIntent.setAction(CameraSyncService.ACTION_STOP);
+			stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
 			context.startService(stopIntent);
 		}
 		

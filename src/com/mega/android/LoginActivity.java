@@ -698,13 +698,14 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 				DatabaseHandler dbH = new DatabaseHandler(this); 
 				dbH.clearCredentials();
 				if (dbH.getPreferences() != null){
+					dbH.clearPreferences();
 					dbH.setFirstTime(false);
-					dbH.setPinLockEnabled(false);
-					dbH.setPinLockCode("");
-					dbH.setCamSyncEnabled(false);
+//					dbH.setPinLockEnabled(false);
+//					dbH.setPinLockCode("");
+//					dbH.setCamSyncEnabled(false);
 					Intent stopIntent = null;
 					stopIntent = new Intent(this, CameraSyncService.class);
-					stopIntent.setAction(CameraSyncService.ACTION_STOP);
+					stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
 					startService(stopIntent);
 				}
 			}
@@ -777,6 +778,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 						}
 						else{
+							boolean initialCam = false;
 							DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 							MegaPreferences prefs = dbH.getPreferences();
 							prefs = dbH.getPreferences();
@@ -793,17 +795,24 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 									}, 5 * 60 * 1000);
 								}
 							}
+							else{
+								intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+								initialCam = true;
+								
+							}
 
-							intent = new Intent(loginActivity,ManagerActivity.class);
-							if (action != null){
-								if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
-									intent = new Intent(this, FileExplorerActivity.class);
-									intent.putExtras(extras);
-									intent.setData(uriData);
-								}
-								intent.setAction(action);
-								if (url != null){
-									intent.setData(Uri.parse(url));
+							if (!initialCam){
+								intent = new Intent(loginActivity,ManagerActivity.class);
+								if (action != null){
+									if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
+										intent = new Intent(this, FileExplorerActivity.class);
+										intent.putExtras(extras);
+										intent.setData(uriData);
+									}
+									intent.setAction(action);
+									if (url != null){
+										intent.setData(Uri.parse(url));
+									}
 								}
 							}
 							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
