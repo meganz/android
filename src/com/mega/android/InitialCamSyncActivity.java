@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.io.File;
+
 import com.mega.components.LoopViewPager;
 
 import android.annotation.SuppressLint;
@@ -131,6 +133,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 		Intent intent = new Intent(this,ManagerActivity.class);
 		switch(v.getId()){
 			case R.id.cam_sync_button_ok:{
+				setInitialPreferences();
 				dbH.setCamSyncEnabled(true);
 				String localPath = Environment.getExternalStorageDirectory() + "/DCIM/Camera/";
 				dbH.setCamSyncLocalPath(localPath);
@@ -149,6 +152,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 				break;
 			}
 			case R.id.cam_sync_button_skip:{
+				setInitialPreferences();
 				dbH.setCamSyncEnabled(false);
 				startActivity(intent);
 				finish();
@@ -161,6 +165,25 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 		Intent intent = new Intent(this, CreateAccountActivity.class);
 		startActivity(intent);
 		finish();
+	}
+	
+	public void setInitialPreferences(){
+		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		dbH.setFirstTime(false);
+		dbH.setStorageAskAlways(false);
+		File defaultDownloadLocation = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+		}
+		else{
+			defaultDownloadLocation = getFilesDir();
+		}
+		
+		defaultDownloadLocation.mkdirs();
+		
+		dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+		dbH.setPinLockEnabled(false);
+		dbH.setPinLockCode("");
 	}
 
 	public static void log(String message) {

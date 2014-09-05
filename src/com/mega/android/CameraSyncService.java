@@ -48,6 +48,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	public static String PHOTO_SYNC = "PhotoSync";
 	public static String ACTION_CANCEL = "CANCEL_SYNC";
 	public static String ACTION_STOP = "STOP_SYNC";
+	public static String ACTION_LOGOUT = "LOGOUT_SYNC";
 	public static String ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER ="PHOTOS_VIDEOS_NEW_FOLDER";
 	public final static int SYNC_OK = 0;
 	public final static int CREATE_PHOTO_SYNC_FOLDER = 1;
@@ -187,6 +188,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					log("List photos and videos");
 					if (megaApi != null){
 						newFileList = true;
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						return START_NOT_STICKY;
+					}
+					else{
+						cancel();
+						return START_NOT_STICKY;
+					}
+				}
+				else if (intent.getAction().equals(ACTION_LOGOUT)){
+					stopped = true;
+					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 						return START_NOT_STICKY;
 					}
