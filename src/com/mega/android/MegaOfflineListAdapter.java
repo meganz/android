@@ -40,7 +40,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 	int positionClicked;
 
-	ArrayList<String> paths = new ArrayList<String>();	
+	ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();	
 	
 	ListView listFragment;
 	ImageView emptyImageViewFragment;
@@ -48,6 +48,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	ActionBar aB;
 	
 	OfflineFragment fragment;
+	//ArrayList<MegaOffline> mOffList;
 	
 	boolean multipleSelect;
 	
@@ -125,10 +126,10 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		}    	
     }
 	
-	public MegaOfflineListAdapter(OfflineFragment _fragment, Context _context, ArrayList<String> _paths, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
+	public MegaOfflineListAdapter(OfflineFragment _fragment, Context _context, ArrayList<MegaOffline> _mOffList, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.fragment = _fragment;
 		this.context = _context;
-		this.paths = _paths;
+		this.mOffList = _mOffList;
 
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
@@ -138,16 +139,16 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		this.positionClicked = -1;
 	}
 	
-	public void setPaths(ArrayList<String> paths){
-		this.paths = paths;
+	public void setNodes(ArrayList<MegaOffline> mOffList){
+		this.mOffList = mOffList;
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
-		View v;
+		log("MegaOfflineListAdapter:getView");
+		View v;		
 	
 		listFragment = (ListView) parent;
 		
@@ -209,44 +210,44 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				holder.checkbox.setChecked(false);
 			}
 		}
+				
+		MegaOffline currentNode = (MegaOffline) getItem(position);
+		File currentFile = new File(currentNode.getPath(), currentNode.getName());
 		
+		holder.currentPath = currentFile.getAbsolutePath();
 		holder.currentPosition = position;
 		
-		String currentPath = (String) getItem(position);
-		File currentFile = new File(currentPath);
+//		File currentFile = new File(currentPath);
+//		
+//		holder.currentPath = currentPath;
+//		
+//		long fileSize = currentFile.length();
+//		holder.textViewFileSize.setText(Util.getSizeString(fileSize));
 		
-		holder.currentPath = currentPath;
-		
-		long fileSize = currentFile.length();
-		holder.textViewFileSize.setText(Util.getSizeString(fileSize));
-		holder.imageView.setImageResource(MimeType.typeForName(currentFile.getName()).getIconResourceId());
-		
-		if (MimeType.typeForName(currentFile.getName()).isImage()){
-			Bitmap thumb = null;
-			String [] s = currentFile.getName().split("_");
-			if (s.length > 0){
-				long handle = Long.parseLong(s[0]);
-				
-				String fileName = "";
-				for (int i=1;i<s.length-1;i++){
-					fileName += s[i] + "_";
-				}
-				fileName += s[s.length-1];
-				holder.textViewFileName.setText(fileName);
-				
-				thumb = ThumbnailUtils.getThumbnailFromCache(handle);
-				if (thumb != null){
-					holder.imageView.setImageBitmap(thumb);
-				}
-				else{
-					try{
-						new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+		holder.textViewFileName.setText(currentNode.getName());
+		holder.imageView.setImageResource(MimeType.typeForName(currentNode.getName()).getIconResourceId());
+		if (currentFile.isFile()){
+			if (MimeType.typeForName(currentNode.getName()).isImage()){
+				Bitmap thumb = null;
+								
+				if (currentFile.exists()){
+					thumb = ThumbnailUtils.getThumbnailFromCache(currentNode.getHandle());
+					if (thumb != null){
+						holder.imageView.setImageBitmap(thumb);
 					}
-					catch(Exception e){
-						//Too many AsyncTasks
+					else{
+						try{
+							new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+						}
+						catch(Exception e){
+							//Too many AsyncTasks
+						}
 					}
 				}
 			}
+		}
+		else{
+			holder.imageView.setImageResource(R.drawable.mime_folder);
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);
@@ -301,12 +302,12 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
     public int getCount() {
-        return paths.size();
+		return mOffList.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return paths.get(position);
+        return mOffList.get(position);
     }
  
     @Override
@@ -399,11 +400,11 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	 * Get path at specified position
 	 */
 	public String getPathAt(int position) {
-		try {
-			if(paths != null){
-				return paths.get(position);
-			}
-		} catch (IndexOutOfBoundsException e) {}
+//		try {
+//			if(paths != null){
+//				return paths.get(position);
+//			}
+//		} catch (IndexOutOfBoundsException e) {}
 		return null;
 	}
 	
