@@ -313,6 +313,73 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		return offline; 		 
 	}
+	
+	public ArrayList<MegaOffline> findByParentId(int parentId){
+
+		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PARENT + " = '" + parentId + "'";
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+				do{
+					int _id = -1;
+					int _parent = -1;
+					String _handle = null;
+					String _path = null;
+					String _name = null;
+					String _type = null;
+	
+					_id = Integer.parseInt(cursor.getString(0));
+					_handle = cursor.getString(1);
+					_path = cursor.getString(2);
+					_name = cursor.getString(3);
+					_parent = cursor.getInt(4);
+					_type = cursor.getString(5);
+					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type));
+				} while (cursor.moveToNext());
+			}
+		}
+		return listOffline; 		 
+	}
+	
+	
+	public ArrayList<MegaOffline> findByPath(String path){
+
+		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'";
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+				do{
+					int _id = -1;
+					int _parent = -1;
+					String _handle = null;
+					String _path = null;
+					String _name = null;
+					String _type = null;
+	
+					_id = Integer.parseInt(cursor.getString(0));
+					_handle = cursor.getString(1);
+					_path = cursor.getString(2);
+					_name = cursor.getString(3);
+					_parent = cursor.getInt(4);
+					_type = cursor.getString(5);
+					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type));
+				} while (cursor.moveToNext());
+			}
+		}
+		return listOffline; 		 
+	}
+	
+	
 
 	public ArrayList<MegaOffline> getNodesSameParentOffline (String path, String name){
 		
