@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.crypto.Cipher;
@@ -68,6 +69,8 @@ public class Util {
 	
 	public static String offlineDIR = "MEGA/MEGA Offline"; 
 	public static String downloadDIR ="MEGA/MEGA Downloads";
+	
+	public static DatabaseHandler dbH;
 	
 	/*
 	 * Create progress dialog helper
@@ -587,6 +590,7 @@ public class Util {
 //			);
 		}
 	}
+	
 	
 	public static String getSpeedString (long speed){
 		String speedString = "";

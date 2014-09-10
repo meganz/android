@@ -34,6 +34,7 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 	private ArrayList<String> paths;
 	private SparseArray<ViewHolderOfflineFullImage> visibleImgs = new SparseArray<ViewHolderOfflineFullImage>();
 	private boolean aBshown = true;
+	DatabaseHandler dbH = null;
 	
 	
 	private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
@@ -70,8 +71,7 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		    preview = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (preview != null){
 				preview = Util.rotateBitmap(preview, orientation);
-				String [] s = currentFile.getName().split("_");
-				long handle = Long.parseLong(s[0]);
+				long handle = holder.currentHandle;
 				PreviewUtils.setPreviewCache(handle, preview);
 				return preview;
 			}
@@ -95,6 +95,7 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
         ProgressBar progressBar;
         ProgressBar downloadProgressBar;
         String currentPath;
+        long currentHandle;
         int position;
     }
 	
@@ -103,6 +104,7 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		this.activity = activity;
 		this.paths = paths;
 		this.megaFullScreenImageAdapter = this;
+		dbH = new DatabaseHandler(activity);
 	}
 
 	@Override
@@ -139,9 +141,21 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
         
 		Bitmap preview = null;
 		Bitmap thumb = null;
-
-		String [] s = currentFile.getName().split("_");
-		long handle = Long.parseLong(s[0]);
+		
+		//Get the path of the file
+		
+		String pathFile = currentFile.getAbsolutePath();		
+		String[] subPath=pathFile.split(Util.offlineDIR);		
+		int index = subPath[1].lastIndexOf("/");		
+		pathFile = subPath[1].substring(0, index+1);
+		
+		//Get the handle from the db
+		MegaOffline mOff = dbH.findbyPathAndName(pathFile, currentFile.getName());
+		
+		long handle = Long.parseLong(mOff.getHandle());
+		holder.currentHandle = handle;
+		
+		log("Handle gatito" + mOff.getHandle() );
 		
 		preview = PreviewUtils.getPreviewFromCache(handle);
 		if (preview != null){

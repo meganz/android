@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.mega.sdk.MegaNode;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +15,7 @@ import android.graphics.Color;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -37,8 +40,11 @@ import android.widget.TextView;
 public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
-
+ 
 	int positionClicked;
+	public static String DB_FILE = "0";
+	public static String DB_FOLDER = "1";
+	public DatabaseHandler dbH;
 
 	ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();	
 	
@@ -67,6 +73,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
         ImageView optionDelete;
         int currentPosition;
         String currentPath;
+        String currentHandle;
     }
     
     private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
@@ -104,9 +111,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (thumb != null){
 				thumb = Util.rotateBitmap(thumb, orientation);
-				String [] s = currentFile.getName().split("_");
-				long handle = Long.parseLong(s[0]);
-//				long handle = Long.parseLong(currentFile.getParentFile().getName());
+				long handle = Long.parseLong(holder.currentHandle);
 				ThumbnailUtils.setThumbnailCache(handle, thumb);
 				return thumb;
 			}
@@ -212,17 +217,18 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		}
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
-		File currentFile = new File(currentNode.getPath(), currentNode.getName());
+		
+		File currentFile = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath()+currentNode.getName());
+		}
+		else{
+			currentFile = context.getFilesDir();
+		}
 		
 		holder.currentPath = currentFile.getAbsolutePath();
+		holder.currentHandle = currentNode.getHandle();
 		holder.currentPosition = position;
-		
-//		File currentFile = new File(currentPath);
-//		
-//		holder.currentPath = currentPath;
-//		
-//		long fileSize = currentFile.length();
-//		holder.textViewFileSize.setText(Util.getSizeString(fileSize));
 		
 		holder.textViewFileName.setText(currentNode.getName());
 		holder.imageView.setImageResource(MimeType.typeForName(currentNode.getName()).getIconResourceId());
@@ -231,7 +237,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				Bitmap thumb = null;
 								
 				if (currentFile.exists()){
-					thumb = ThumbnailUtils.getThumbnailFromCache(currentNode.getHandle());
+					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
@@ -327,7 +333,8 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	public void onClick(View v) {
 		ViewHolderOfflineList holder = (ViewHolderOfflineList) v.getTag();
 		int currentPosition = holder.currentPosition;
-		String currentPath = (String) getItem(currentPosition);
+		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
+		String currentPath = mOff.getPath()+mOff.getName(); 
 		File currentFile = new File(currentPath);
 		
 		switch (v.getId()){
@@ -368,12 +375,14 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				
-				try{
-					Util.deleteFolderAndSubfolders(context, currentFile);
+				try{					
+					deleteOffline(context, mOff);				
+					
 				}
 				catch(Exception e){};
 				
 				fragment.refreshPaths();
+				
 				break;
 			}
 			case R.id.offline_list_three_dots:{
@@ -417,6 +426,66 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();
 		}
+	}
+	
+	private int deleteOffline(Context context,MegaOffline node){
+		
+		log("deleteOffline");
+
+		dbH = new DatabaseHandler(context);
+
+		ArrayList<MegaOffline> mOffList=new ArrayList<MegaOffline>();
+		//MegaOffline mOffDelete = node;		
+		MegaOffline parentNode = null;
+
+
+		//mOffDelete = dbH.findByHandle(node.getHandle());
+		int parentId = node.getParentId();
+		
+		log("Voy a borrar:" +node.getName());
+		
+		//Remove the node in DB				
+		dbH.removeById(node.getId());
+
+		if(parentId!=-1){
+			mOffList=dbH.findByParentId(parentId);
+			
+			log("Encuentro con el mismo padre?:" +mOffList.size());
+			
+			if(mOffList.size()==0){
+				//No more node with the same parent, keep deleting				
+
+				parentNode = dbH.findById(parentId);
+				log("Nombre del padre recursivo: "+parentNode.getName());
+				if(parentNode != null){
+					log("Borro tb el padre");
+					deleteOffline(context, parentNode);						
+				}	
+			}			
+		}	
+		
+		//Remove the node physically
+		File destination = null;								
+
+		if (Environment.getExternalStorageDirectory() != null){
+			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
+		}
+		else{
+			destination = context.getFilesDir();
+		}	
+
+		try{
+			File offlineFile = new File(destination, node.getName());
+			log("Delete: " +node.getName());
+			Util.deleteFolderAndSubfolders(context, offlineFile);
+		}
+		catch(Exception e){
+			log("EXCEPTION: deleteOffline - adapter");
+		};		
+		
+		
+
+		return 1;		
 	}
 	
 	private static void log(String log) {

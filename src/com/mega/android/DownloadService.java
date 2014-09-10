@@ -563,7 +563,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				
 				String filePath = transfer.getPath();
 				
-				if (isOffline){
+				/*if (isOffline){
 					
 					String[] s = filePath.split(transfer.getFileName());
 					String newFileName = "";
@@ -613,13 +613,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 //					      		}
 //					 		}
 //					);
-					
+					*/
 					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 					File f = new File(filePath);
 				    Uri contentUri = Uri.fromFile(f);
 				    mediaScanIntent.setData(contentUri);
 				    this.sendBroadcast(mediaScanIntent);
-				}
+				/*}*/
 							
 				onDownloadComplete(true);
 			}
