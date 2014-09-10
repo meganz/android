@@ -227,20 +227,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return attr;
 	}
 	
-	public void setOfflineFile (MegaOffline offline){
+	public long setOfflineFile (MegaOffline offline){
 		
 		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
+        String nullColumnHack = null;
+        
         values.put(KEY_OFF_HANDLE, offline.getHandle());
         values.put(KEY_OFF_PATH, offline.getPath());
         values.put(KEY_OFF_NAME, offline.getName());
         values.put(KEY_OFF_PARENT, offline.getparentId());
         values.put(KEY_OFF_TYPE, offline.getType());
-        db.insert(TABLE_OFFLINE, null, values);
+        
+        long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
         db.close();
+        
+        return ret;
 		
 	}
-	
+		
 	public ArrayList<MegaOffline> getOfflineFiles (){
 		
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
@@ -314,6 +319,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return offline; 		 
 	}
 	
+	public MegaOffline findByHandle(String handle){
+
+		MegaOffline offline = null;
+		//Get the foreign key of the node 
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+
+				int _id = -1;
+				int _parent = -1;
+				String _handle = null;
+				String _path = null;
+				String _name = null;
+				String _type = null;
+
+				_id = Integer.parseInt(cursor.getString(0));
+				_handle = cursor.getString(1);
+				_path = cursor.getString(2);
+				_name = cursor.getString(3);
+				_parent = cursor.getInt(4);
+				_type = cursor.getString(5);
+				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type);
+			}
+		}
+		return offline; 		 
+	}
+	
 	public ArrayList<MegaOffline> findByParentId(int parentId){
 
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
@@ -346,6 +383,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return listOffline; 		 
 	}
 	
+	public MegaOffline findById(int id){		
+		
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_ID + " = '" + id + "'";
+		MegaOffline mOffline = null;
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+				do{
+					int _id = -1;
+					int _parent = -1;
+					String _handle = null;
+					String _path = null;
+					String _name = null;
+					String _type = null;
+	
+					_id = Integer.parseInt(cursor.getString(0));
+					_handle = cursor.getString(1);
+					_path = cursor.getString(2);
+					_name = cursor.getString(3);
+					_parent = cursor.getInt(4);
+					_type = cursor.getString(5);
+					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type);
+					
+				} while (cursor.moveToNext());
+			}
+		}
+		return mOffline; 		 
+	}
+	
+	public boolean removeById(int id){	
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		return db.delete(TABLE_OFFLINE, KEY_ID + "="+id, null) > 0;		
+		
+	}	
 	
 	public ArrayList<MegaOffline> findByPath(String path){
 
@@ -379,7 +453,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return listOffline; 		 
 	}
 	
+	public MegaOffline findbyPathAndName(String path, String name){
+		
+		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND " + KEY_OFF_NAME + " = '" + name + "'"  ;
+		
+		MegaOffline mOffline = null;
+		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);	
+
+		if (!cursor.equals(null)){
+			if (cursor.moveToFirst()){		
+				do{
+					int _id = -1;
+					int _parent = -1;
+					String _handle = null;
+					String _path = null;
+					String _name = null;
+					String _type = null;
 	
+					_id = Integer.parseInt(cursor.getString(0));
+					_handle = cursor.getString(1);
+					_path = cursor.getString(2);
+					_name = cursor.getString(3);
+					_parent = cursor.getInt(4);
+					_type = cursor.getString(5);
+					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type);
+					
+				} while (cursor.moveToNext());
+			}
+		}
+		return mOffline; 	
+		
+	}		
 
 	public ArrayList<MegaOffline> getNodesSameParentOffline (String path, String name){
 		

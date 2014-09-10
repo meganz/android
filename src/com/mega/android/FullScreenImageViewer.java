@@ -155,40 +155,29 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		
 		adapterType = intent.getIntExtra("adapterType", 0);
 		if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
 			
-			File offlineDirectory = null;
-			if (Environment.getExternalStorageDirectory() != null){
-				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-			}
-			else{
-				offlineDirectory = getFilesDir();
-			}
+			File offlineDirectory = new File(offlinePathDirectory);
+//			if (Environment.getExternalStorageDirectory() != null){
+//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
+//			}
+//			else{
+//				offlineDirectory = getFilesDir();
+//			}
 			
 			paths.clear();			
 			int imageNumber = 0;
 			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
 			for (File f : fList){
-				String [] s = f.getName().split("_");
-				if (s.length > 0){
-					long handle = -1;
-					try{
-						handle = Long.parseLong(s[0]);
+				if (MimeType.typeForName(f.getName()).isImage()){
+					paths.add(f.getAbsolutePath());
+					if (index == positionG){
+						positionG = imageNumber; 
 					}
-					catch(Exception e){ }
-					
-					if (handle != -1){
-						if (MimeType.typeForName(f.getName()).isImage()){
-							paths.add(f.getAbsolutePath());
-							if (index == positionG){
-								positionG = imageNumber; 
-							}
-							imageNumber++;
-						}
-						index++;
-					}						
+					imageNumber++;
 				}
-				
+				index++;				
 			}
 			
 			adapterOffline = new MegaOfflineFullScreenImageAdapter(fullScreenImageViewer, paths);
