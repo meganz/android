@@ -728,6 +728,26 @@ public class MegaApiJava
 		return megaApi.getAccess(node);
 	}
 
+	public String getFingerprint(String filePath) 
+	{
+	    return megaApi.getFingerprint(filePath);
+	}
+
+	public String getFingerprint(MegaNode node) 
+	{
+		return megaApi.getFingerprint(node);
+	}
+
+	public MegaNode getNodeByFingerprint(String fingerprint) 
+	{
+	    return megaApi.getNodeByFingerprint(fingerprint);
+	}
+
+	public boolean hasFingerprint(String fingerprint) 
+	{
+		return megaApi.hasFingerprint(fingerprint);
+	}
+		  
 	public MegaError checkAccess(MegaNode node, int level)
 	{
 		return megaApi.checkAccess(node, level);

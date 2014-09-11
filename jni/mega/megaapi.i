@@ -107,6 +107,9 @@
 %newobject mega::MegaApi::getRubbishNode;
 %newobject mega::MegaApi::getParentNode;
 %newobject mega::MegaApi::getMyEmail;
+%newobject mega::MegaApi::getFingerprint;
+%newobject mega::MegaApi::getNodeByFingerprint;
+%newobject mega::MegaApi::hasFingerprint;
 
 typedef long long time_t;
 typedef long long uint64_t;
