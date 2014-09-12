@@ -402,7 +402,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 									log("Now I start the service");
 									startService(new Intent(getApplicationContext(), CameraSyncService.class));		
 								}
-							}, 5 * 60 * 1000);
+							}, 30 * 1000);
 						}
 					}
 					
@@ -792,7 +792,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 											log("Now I start the service");
 											startService(new Intent(getApplicationContext(), CameraSyncService.class));		
 										}
-									}, 5 * 60 * 1000);
+									}, 30 * 1000);
 								}
 							}
 							else{

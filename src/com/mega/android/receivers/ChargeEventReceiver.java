@@ -32,7 +32,7 @@ public class ChargeEventReceiver extends BroadcastReceiver {
 				log("Now I start the service");
 				c.startService(new Intent(c, CameraSyncService.class));		
 			}
-		}, 5 * 60 * 1000);
+		}, 30 * 1000);
 	}
 	
 	public static void log(String message) {

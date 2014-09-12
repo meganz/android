@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -74,9 +76,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private Handler handler;
 	
 //	private CameraObserver cameraObserver;
-	
-	Thread task;
-	
+		
 	private int totalUploaded;
 	private long totalSizeToUpload;
 	private int totalToUpload;
@@ -115,6 +115,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		public long timestamp;
 	}
 	
+	Thread task;
+	
+	MegaNode photoSyncNode = null;
+	
+	Queue<Media> cameraFiles = new LinkedList<Media>();
+	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -145,6 +151,106 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		newFileList = false;
 	}
 	
+	private int shouldRun(){
+		credentials = dbH.getCredentials();
+		
+		if (credentials == null){
+			log("There are not user credentials");
+			finish();
+			return START_NOT_STICKY;
+		}
+		
+		String lastEmail = credentials.getEmail();
+		String gSession = credentials.getSession();
+		
+		if (megaApi.getRootNode() == null){
+			log("RootNode = null");
+			running = true;
+			megaApi.fastLogin(gSession, this);
+			return START_NOT_STICKY;
+		}
+		
+		prefs = dbH.getPreferences();
+		if (prefs == null){
+			log("Not defined, so not enabled");
+			finish();
+			return START_NOT_STICKY;
+		}
+		else{
+			if (prefs.getCamSyncEnabled() == null){
+				dbH.setCamSyncEnabled(false);
+				log("Not defined, so not enabled");
+				finish();
+				return START_NOT_STICKY;
+			}
+			else{
+				if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+					log("Not enabled");
+					finish();
+					return START_NOT_STICKY;
+				}
+				else{
+					localPath = prefs.getCamSyncLocalPath();
+					if ((localPath == null) || ("".compareTo(localPath) == 0) ){
+						log("Not defined, so not enabled");
+						finish();
+						return START_NOT_STICKY;
+					}
+					
+					boolean isWifi = Util.isOnWifi(this);
+					if (prefs.getCamSyncWifi() == null || Boolean.parseBoolean(prefs.getCamSyncWifi())){
+						if (!isWifi){
+							log("no wifi...");
+							finish();
+							return START_REDELIVER_INTENT;
+						}
+					}
+					
+					//The "PhotoSync" folder exists?
+					if (prefs.getCamSyncHandle() == null){
+						photosyncHandle = -1;
+					}
+					else{
+						photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+						if (megaApi.getNodeByHandle(photosyncHandle) == null){
+							photosyncHandle = -1;
+						}
+						else{
+							if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+								photosyncHandle = -1;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if (photosyncHandle == -1){
+			NodeList nl = megaApi.getChildren(megaApi.getRootNode());
+			for (int i=0;i<nl.size();i++){
+				if ((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					photosyncHandle = nl.get(i).getHandle();
+					dbH.setCamSyncHandle(photosyncHandle);
+				}
+			}
+			
+			
+			if (photosyncHandle == -1){
+				log("must create the folder");
+				if (!running){
+					running = true;
+					megaApi.createFolder(PHOTO_SYNC, megaApi.getRootNode(), this);
+				}
+				return START_NOT_STICKY;
+			}
+		}
+		
+		log("TODO OK");
+		log ("photosynchandle = " + photosyncHandle);
+		
+		return 0;
+	}
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		log("onStartCommand");
@@ -157,6 +263,16 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		megaApi = app.getMegaApi();
+		
+		int result = shouldRun();
+		if (result != 0){
+			return result;
+		}
+		
+		if (megaApi == null){
+			finish();
+			return START_NOT_STICKY;
+		}
 		
 		if (intent != null){
 			if (intent.getAction() != null){
@@ -214,153 +330,141 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
-		if (megaApi == null){
-			finish();
-			return START_NOT_STICKY;
-		}
-
-		credentials = dbH.getCredentials();
-		if (credentials == null){
-			log("There are not user credentials");
-			finish();
-			return START_NOT_STICKY;
-		}
-		
-		String lastEmail = credentials.getEmail();
-		String gSession = credentials.getSession();
-		
-		if (megaApi.getRootNode() == null){
-			log("RootNode = null");
-			megaApi.fastLogin(gSession, this);
-//			cancel();
-//			retryLater();
-			return START_NOT_STICKY;
-		}
-		
-		prefs = dbH.getPreferences();
-		if (prefs == null){
-			dbH.setFirstTime(false);
-			dbH.setStorageAskAlways(true);
-			dbH.setCamSyncEnabled(false);
-			dbH.setPinLockEnabled(false);
-			dbH.setPinLockCode("");
-			log("Not defined, so not enabled");
-			finish();
-			return START_NOT_STICKY;
+		if (!running){
+			running = true;
+			task = new Thread()
+			{
+				@Override
+				public void run()
+				{
+					initSync();
+				}
+			};
+			task.start();
+			log("ESTOY CORRIENDO");
+			
 		}
 		else{
-			if (prefs.getCamSyncEnabled() == null){
-				dbH.setCamSyncEnabled(false);
-				log("Not defined, so not enabled");
-				finish();
-				return START_NOT_STICKY;
-			}
-			else{
-				if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-					log("Not enabled");
-					finish();
-					return START_NOT_STICKY;
-				}
-				else{
-					localPath = prefs.getCamSyncLocalPath();
-					if ((localPath == null) || ("".compareTo(localPath) == 0) ){
-						log("Not defined, so not enabled");
-						finish();
-						return START_NOT_STICKY;
-					}
-					
-					boolean isWifi = Util.isOnWifi(this);
-					if (prefs.getCamSyncWifi() == null || Boolean.parseBoolean(prefs.getCamSyncWifi())){
-						if (!isWifi){
-							log("no wifi...");
-							cancel();
-							retryLater();
-							return START_REDELIVER_INTENT;
-						}
-					}
-					
-					//The "PhotoSync" folder exists?
-					if (prefs.getCamSyncHandle() == null){
-						photosyncHandle = -1;
-					}
-					else{
-						photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-						if (megaApi.getNodeByHandle(photosyncHandle) == null){
-							photosyncHandle = -1;
-						}
-						else{
-							if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
-								photosyncHandle = -1;
-							}
-						}
-					}					
-				}
-			}
+			log("ESTABA CORRIENDO YA ASI QUE RETRYLATER");
+			retryLater();
 		}
-		
-		if (photosyncHandle == -1){
-			NodeList nl = megaApi.getChildren(megaApi.getRootNode());
-			for (int i=0;i<nl.size();i++){
-				if ((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-					photosyncHandle = nl.get(i).getHandle();
-					dbH.setCamSyncHandle(photosyncHandle);
-				}
-			}
-			
-			
-			if (photosyncHandle == -1){
-				log("must create the folder");
-				megaApi.createFolder(PHOTO_SYNC, megaApi.getRootNode(), this);
-				cancel();
-				retryLater();
-				return START_NOT_STICKY;
-			}
-		}
-		
-		log("TODO OK");
-		log ("photosynchandle = " + photosyncHandle);
-		
-//		if (cameraObserver == null){
-//			cameraObserver = new CameraObserver();
-//			cameraObserver.startWatching();
-//			log("observer started");
-//		}
-		
-		registerObservers();
-		
-		onHandleIntent(intent);
-		
-				
-		
-//		log("onStartCommand");
-//		try { 
-//			app = (MegaApplication)getApplication(); 
-//		}
-//		catch(Exception ex) {
-//			finish();
-//			return START_NOT_STICKY;
-//		}
-//		megaApi = app.getMegaApi();
-//		
-//		int result = shouldRun();
-//		switch(result){
-//			case SYNC_OK:{
-//				folderExists(intent);
-//				break;
-//			}
-//			case CREATE_PHOTO_SYNC_FOLDER:{
-//				intentCreate = intent;
-//				return START_REDELIVER_INTENT;
-//			}
-//			default:{
-//				return result;
-//			}
-//		}
 		
 		return START_REDELIVER_INTENT;		
 	}
 	
+	void initSync(){
+		log("initSync");
+		
+		if(!wl.isHeld()){ 
+			wl.acquire();
+		}
+		if(!lock.isHeld()){
+			lock.acquire();
+		}
+		
+		registerObservers();
+		
+		String projection[] = {	MediaColumns.DATA, 
+				//MediaColumns.MIME_TYPE, 
+				//MediaColumns.DATE_MODIFIED,
+				MediaColumns.DATE_ADDED};
+		
+		String order = MediaColumns.DATE_ADDED + " ASC";
+		
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		if (prefs.getCamSyncFileUpload() == null){
+			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+			uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+		}
+		else{
+			switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
+				case MegaPreferences.ONLY_PHOTOS:{
+					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+					break;
+				}
+				case MegaPreferences.ONLY_VIDEOS:{
+					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+					break;
+				}
+				case MegaPreferences.PHOTOS_AND_VIDEOS:{
+					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
+					break;
+				}
+			}
+		}
+		
+		for(int i=0; i<uris.size(); i++){
+			
+			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, null, null, order);
+			int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+	        int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+	        while(cursor.moveToNext()){
+	        	Media media = new Media();
+		        media.filePath = cursor.getString(dataColumn);
+		        media.timestamp = cursor.getLong(timestampColumn) * 1000;
+		        
+		        if (!checkFile(media)){
+		        	continue;	
+		        }
+		        
+		        cameraFiles.add(media);
+	        }				
+		}
+		
+		photoSyncNode = megaApi.getNodeByHandle(photosyncHandle);
+		if(photoSyncNode == null){
+			showSyncError(R.string.settings_camera_notif_error_no_folder);
+			finish();
+			return;
+		}
+		
+		totalToUpload = cameraFiles.size();
+				
+		uploadNextImage();
+	}
+	
+	void uploadNextImage(){
+		totalUploaded++;
+		if (cameraFiles.size() > 0){
+			Media media = cameraFiles.poll();
+			
+			File file = new File(media.filePath);
+			if(!file.exists()){
+				uploadNextImage();
+			}
+			
+			String localFingerPrint = megaApi.getFingerprint(media.filePath);
+			
+			MegaNode nodeExists = megaApi.getNodeByFingerprint(localFingerPrint);
+			
+			if (nodeExists == null){
+				log("SUBIR EL FICHERO: " + media.filePath);
+				megaApi.startUpload(file.getAbsolutePath(), photoSyncNode, this);
+			}
+			else{
+				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());
+				if (megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + nodeExists.getName()) == null){
+					megaApi.copyNode(nodeExists, photoSyncNode, this);
+				}
+				else{
+					
+					uploadNextImage();
+				}
+			}
+		}
+		else{
+			finish();
+		}
+	}
+	
 	void registerObservers(){
+		log("registerObservers");
  		mediaObserver = new MediaObserver(handler, this);
  		ContentResolver cr = getContentResolver();
 		cr.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false,  mediaObserver);		
@@ -380,7 +484,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		log("newFilePath == null");
 		//AQUI ES DONDE REVISO QUE COSAS HAY QUE SUBIR
 		
-		List<Media> cameraFiles = new ArrayList<Media>();
+//		List<Media> cameraFiles = new ArrayList<Media>();
 		
 		String projection[] = {	MediaColumns.DATA, 
 								//MediaColumns.MIME_TYPE, 
@@ -528,7 +632,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	private void reset() {
 		log("---====  RESET  ====---");
-		totalUploaded = 0;
+		totalUploaded = -1;
 		totalSizeToUpload = 0;
 		totalToUpload = 0;
 		totalSizeUploaded = 0;
@@ -538,6 +642,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 	
 	private void cancel() {
+		if((lock != null) && (lock.isHeld()))
+			try{ lock.release(); } catch(Exception ex) {}
+		if((wl != null) && (wl.isHeld()))
+			try{ wl.release(); } catch(Exception ex) {}
+		
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
@@ -551,7 +660,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			public void run() {
 				onStartCommand(null, 0, 0);
 			}
-		}, 5 * 60 * 1000);
+		}, 30 * 1000);
 	}
 	
 	@SuppressLint("DefaultLocale")
@@ -651,19 +760,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		log("finish CameraSyncService");
 		
 		if(running){
+			handler.removeCallbacksAndMessages(null);
+			running = false;
 			cancel();
 		}
-		
-//		if (cameraObserver != null) {
-//			cameraObserver.stopWatching();
-//			log("observer stopped");
-//		}
-//		cameraObserver = null;
-//		log("observer deleted");
-		
-		handler.removeCallbacksAndMessages(null);
-		running = false;
-		stopSelf();
 	}
 	
 	public void onDestroy(){
@@ -746,7 +846,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				retryLater();
-				cancel();				
+				finish();				
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -760,6 +860,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("Folder created");
 				retryLater();
 				finish();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_COPY){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("Node copied: " + megaApi.getNodePath(megaApi.getNodeByHandle(request.getNodeHandle())));
+				uploadNextImage();
+			}
+			else{
+				log("ERROR AL COPIAR EL NODO");
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
@@ -839,7 +948,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("Image Sync OK: " + transfer.getFileName());
 				totalSizeUploaded += transfer.getTransferredBytes();
 				log("IMAGESYNCFILE: " + transfer.getPath());
-				onUploadComplete(true);
+				uploadNextImage();
 			}
 			else{
 				log("Image Sync OK: " + transfer.getFileName());
