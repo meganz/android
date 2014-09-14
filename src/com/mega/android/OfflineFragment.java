@@ -50,6 +50,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	OfflineFragment offlineFragment = this;
 	DatabaseHandler dbH = null;
 	ArrayList<MegaOffline> mOffList= null;
+	String pathNavigation = null;
 	
 	long parentHandle = -1;
 	boolean isList = true;
@@ -161,7 +162,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
 						
 			mOffList=dbH.findByPath("/");
-			log("He encontrado: "+mOffList.size());			
+			pathNavigation= "/";
 				
 			for(int i=0; i<mOffList.size();i++){
 				
@@ -174,11 +175,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				}	
 				
 				if (!offlineDirectory.exists()){
-
-					log("No Encuentro el fichero");				
-					
 					dbH.removeById(mOffList.get(i).getId());
-					log("quitado DB");
 					mOffList.remove(i);
 					
 				}			
@@ -289,15 +286,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 			else{
 				
-				MegaOffline currentNode = mOffList.get(position);		
+				MegaOffline currentNode = mOffList.get(position);
+				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";				
+				
 				File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
 				
 				if(currentFile.exists()&&currentFile.isDirectory()){
 
 					mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
-					log("He encontrado: "+mOffList.size());
-
-
+					
 					for(int i=0; i<mOffList.size();i++){
 
 						File offlineDirectory = null;
@@ -309,10 +306,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						}	
 
 						if (!offlineDirectory.exists()){
-							//Updating the DB because the file does not exist
-							
-							log("No Encuentro el fichero");				
-							
+							//Updating the DB because the file does not exist														
 							dbH.removeById(mOffList.get(i).getId());
 							log("quitado DB");
 							mOffList.remove(i);
@@ -497,11 +491,22 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				adapterList.notifyDataSetChanged();
 				return 1;
 			}
-//			else if{
+			else if(!pathNavigation.equals("/")){
 				//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
+
 				// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
-//				return 2;
-//			}
+				
+				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+				int index=pathNavigation.lastIndexOf("/");				
+				pathNavigation=pathNavigation.substring(0,index+1);
+				
+				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
+				mOffListNavigation=dbH.findByPath(pathNavigation);
+				adapterList.setNodes(mOffListNavigation);				
+				adapterList.notifyDataSetChanged();
+				
+				return 2;
+			}
 			else{
 					return 0;
 			}
@@ -622,8 +627,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	public void refreshPaths(){
 		
-		mOffList=dbH.findByPath("/");	
-		
+		mOffList=dbH.findByPath("/");			
 		
 		setNodes(mOffList);
 		listView.invalidateViews();

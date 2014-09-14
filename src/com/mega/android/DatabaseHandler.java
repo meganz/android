@@ -48,7 +48,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		
         String CREATE_OFFLINE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_OFFLINE + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER"+", FOREIGN KEY (" + KEY_OFF_PARENT + ") REFERENCES "+ TABLE_OFFLINE +" ("+ KEY_ID +"))";
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER"+", FOREIGN KEY (" + KEY_OFF_PARENT + ") REFERENCES "+ TABLE_OFFLINE +" ("+ KEY_ID +") " + " ON DELETE CASCADE " +")";
         db.execSQL(CREATE_OFFLINE_TABLE);
 		
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
@@ -68,8 +68,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
-        
 
+        db.execSQL("PRAGMA foreign_keys=ON;");     
 	}
 
 	@Override
@@ -231,19 +231,25 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
-        String nullColumnHack = null;
         
-        values.put(KEY_OFF_HANDLE, offline.getHandle());
-        values.put(KEY_OFF_PATH, offline.getPath());
-        values.put(KEY_OFF_NAME, offline.getName());
-        values.put(KEY_OFF_PARENT, offline.getparentId());
-        values.put(KEY_OFF_TYPE, offline.getType());
+        MegaOffline checkInsert = null;
+        checkInsert=this.findByHandle(offline.getHandle());
+        if(checkInsert!=null){
+        	String nullColumnHack = null;
+            
+            values.put(KEY_OFF_HANDLE, offline.getHandle());
+            values.put(KEY_OFF_PATH, offline.getPath());
+            values.put(KEY_OFF_NAME, offline.getName());
+            values.put(KEY_OFF_PARENT, offline.getparentId());
+            values.put(KEY_OFF_TYPE, offline.getType());
+            
+            long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
+            db.close();
+            
+            return ret;        	
+        }
         
-        long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
-        db.close();
-        
-        return ret;
-		
+        return -1;
 	}
 		
 	public ArrayList<MegaOffline> getOfflineFiles (){
@@ -414,10 +420,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return mOffline; 		 
 	}
 	
-	public boolean removeById(int id){	
+	public int removeById(int id){	
 
 		SQLiteDatabase db = this.getWritableDatabase();
-		return db.delete(TABLE_OFFLINE, KEY_ID + "="+id, null) > 0;		
+		return db.delete(TABLE_OFFLINE, KEY_ID + "="+id, null);		
 		
 	}	
 	
@@ -482,8 +488,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		}
-		return mOffline; 	
-		
+		return mOffline; 			
 	}		
 
 	public ArrayList<MegaOffline> getNodesSameParentOffline (String path, String name){
