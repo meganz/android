@@ -502,6 +502,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		}
 
 		destination.mkdirs();
+		
+		log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
 
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
@@ -542,8 +544,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			startService(service);					
 		}
 		
-		insertDB(nodesToDB);
-		
+		insertDB(nodesToDB);		
 		
 	}
 
@@ -570,10 +571,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 		deleteDB(node);	
 	}	
-	
-	
-	
-	
+
 	private void insertDB (ArrayList<MegaNode> nodesToDB){
 
 		MegaNode parentNode = null;	
@@ -713,10 +711,20 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 		ArrayList<MegaOffline> mOffList=new ArrayList<MegaOffline>();
 		MegaOffline mOffDelete = null;
+		ArrayList<MegaOffline> mOffChildren = new ArrayList<MegaOffline>();
 				
 		mOffDelete = dbH.findByHandle(node.getHandle());
 		int parentId = mOffDelete.getId();
-
+		
+		//Delete children
+		mOffList=dbH.findByParentId(mOffDelete.getId());
+		if(mOffList.size()>0){
+			//The node have childrens, delete
+			deleteChildenDB(mOffList);
+			
+		}
+		
+		//Delete parents is possible
 		if(parentId!=-1){
 			mOffList=dbH.findByParentId(parentId);
 			
@@ -725,10 +733,30 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				deleteDB(megaApi.getParentNode(node));
 				
 			}	
-		}
+		}		
 		
-		dbH.removeById(mOffDelete.getId());
+		dbH.removeById(mOffDelete.getId());		
+		
 	}
+	
+	
+	private void deleteChildenDB(ArrayList<MegaOffline> mOffList){
+		
+		log("deleteChildenDB");
+		MegaOffline mOffDelete=null;
+	
+		for(int i=0; i< mOffList.size(); i++){
+			
+			mOffDelete=mOffList.get(i);
+			mOffList=dbH.findByParentId(mOffDelete.getId());
+			if(mOffList.size()>0){
+				//The node have children, delete
+				deleteChildenDB(mOffList);
+				
+			}			
+			dbH.removeById(mOffDelete.getId());			
+		}		
+	}	
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -1527,7 +1555,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			s = dTree.toString();
 		}
 		else{
-			s=null;
+			s="";
 		}
 			
 		log("createStringTree: "+s);

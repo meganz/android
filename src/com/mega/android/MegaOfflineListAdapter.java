@@ -373,13 +373,9 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 //			}
 			case R.id.offline_list_option_delete:{
 				setPositionClicked(-1);
-				notifyDataSetChanged();
-				
-				try{					
-					deleteOffline(context, mOff);				
-					
-				}
-				catch(Exception e){};
+				notifyDataSetChanged();				
+									
+				deleteOffline(context, mOff);
 				
 				fragment.refreshPaths();
 				
@@ -434,25 +430,26 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 		dbH = new DatabaseHandler(context);
 
-		ArrayList<MegaOffline> mOffList=new ArrayList<MegaOffline>();
-		//MegaOffline mOffDelete = node;		
-		MegaOffline parentNode = null;
-
-
-		//mOffDelete = dbH.findByHandle(node.getHandle());
+		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
+		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
+		MegaOffline parentNode = null;	
+		
+		//Delete children
+		mOffListChildren=dbH.findByParentId(node.getId());
+		if(mOffListChildren.size()>0){
+			//The node have childrens, delete
+			log("Llamo a delete children");
+			deleteChildrenDB(mOffListChildren);			
+		}
+		
 		int parentId = node.getParentId();
-		
-		log("Voy a borrar:" +node.getName());
-		
-		//Remove the node in DB				
-		dbH.removeById(node.getId());
-
+		//Delete parents
 		if(parentId!=-1){
-			mOffList=dbH.findByParentId(parentId);
+			mOffListParent=dbH.findByParentId(parentId);
 			
-			log("Encuentro con el mismo padre?:" +mOffList.size());
+			log("Encuentro con el mismo padre?:" +mOffListParent.size());
 			
-			if(mOffList.size()==0){
+			if(mOffListParent.size()==0){
 				//No more node with the same parent, keep deleting				
 
 				parentNode = dbH.findById(parentId);
@@ -462,7 +459,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 					deleteOffline(context, parentNode);						
 				}	
 			}			
-		}	
+		}			
 		
 		//Remove the node physically
 		File destination = null;								
@@ -475,18 +472,39 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		}	
 
 		try{
-			File offlineFile = new File(destination, node.getName());
-			log("Delete: " +node.getName());
+			File offlineFile = new File(destination, node.getName());			
 			Util.deleteFolderAndSubfolders(context, offlineFile);
 		}
 		catch(Exception e){
 			log("EXCEPTION: deleteOffline - adapter");
 		};		
 		
+		dbH.removeById(node.getId());		
 		
-
 		return 1;		
 	}
+	
+	private void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
+		
+		log("deleteChildenDB: "+mOffListChildren.size());
+		MegaOffline mOffDelete=null;
+	
+		for(int i=0; i<mOffListChildren.size(); i++){	
+			
+			mOffDelete=mOffListChildren.get(i);
+			
+			log("Children "+i+ ": "+ mOffDelete.getName());
+			ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
+			if(mOffListChildren2.size()>0){
+				//The node have children, delete				
+				deleteChildrenDB(mOffListChildren2);				
+			}	
+			
+			int lines = dbH.removeById(mOffDelete.getId());		
+			log("Borradas; "+lines);
+		}		
+	}	
+	
 	
 	private static void log(String log) {
 		Util.log("MegaOfflineListAdapter", log);
