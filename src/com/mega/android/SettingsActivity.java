@@ -1,10 +1,13 @@
 package com.mega.android;
 
+import java.io.File;
+
 import com.mega.sdk.MegaApiAndroid;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -125,7 +128,20 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		cameraUploadFolder.setOnPreferenceClickListener(this);
 		
 		if (prefs == null){
-			dbH.setStorageAskAlways(true);
+			dbH.setStorageAskAlways(false);
+			
+			File defaultDownloadLocation = null;
+			if (Environment.getExternalStorageDirectory() != null){
+				defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+			}
+			else{
+				defaultDownloadLocation = getFilesDir();
+			}
+			
+			defaultDownloadLocation.mkdirs();
+			
+			dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+			
 			dbH.setFirstTime(false);
 			dbH.setCamSyncEnabled(false);
 			dbH.setPinLockEnabled(false);
@@ -199,14 +215,39 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			}
 			
 			if (prefs.getStorageAskAlways() == null){
-				dbH.setStorageAskAlways(true);
-				askMe = true;
-				downloadLocationPath = "";
+				dbH.setStorageAskAlways(false);
+				
+				File defaultDownloadLocation = null;
+				if (Environment.getExternalStorageDirectory() != null){
+					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+				}
+				else{
+					defaultDownloadLocation = getFilesDir();
+				}
+				
+				defaultDownloadLocation.mkdirs();
+				
+				dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+				
+				askMe = false;
+				downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
 			}
 			else{
 				askMe = Boolean.parseBoolean(prefs.getStorageAskAlways());
 				if (prefs.getStorageDownloadLocation() == null){
-					downloadLocationPath = "";
+					File defaultDownloadLocation = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+					}
+					else{
+						defaultDownloadLocation = getFilesDir();
+					}
+					
+					defaultDownloadLocation.mkdirs();
+					
+					dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+					
+					downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
 				}
 				else{
 					downloadLocationPath = prefs.getStorageDownloadLocation();
