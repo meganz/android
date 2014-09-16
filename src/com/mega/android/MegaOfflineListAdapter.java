@@ -376,8 +376,8 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();				
 									
 				deleteOffline(context, mOff);
-				
-				fragment.refreshPaths();
+								
+				fragment.refreshPaths(mOff);
 				
 				break;
 			}
@@ -472,13 +472,15 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		}	
 
 		try{
-			File offlineFile = new File(destination, node.getName());			
+			File offlineFile = new File(destination, node.getName());	
+			log("Delete in phone: "+node.getName());
 			Util.deleteFolderAndSubfolders(context, offlineFile);
 		}
 		catch(Exception e){
 			log("EXCEPTION: deleteOffline - adapter");
 		};		
 		
+		log("Delete in DB: "+node.getId());
 		dbH.removeById(node.getId());		
 		
 		return 1;		
