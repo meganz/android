@@ -515,7 +515,8 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		}
 		
 		if (dbH == null){
-			dbH = new DatabaseHandler(getApplicationContext());
+//			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
 		boolean askMe = true;

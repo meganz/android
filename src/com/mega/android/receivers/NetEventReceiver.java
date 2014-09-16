@@ -26,7 +26,7 @@ public class NetEventReceiver extends BroadcastReceiver {
 		log("NetEventReceiver");
 		final Context c = context;
 		
-		DatabaseHandler dbH = new DatabaseHandler(context);
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaAttributes attr = dbH.getAttributes();
 		
 		if (attr != null){

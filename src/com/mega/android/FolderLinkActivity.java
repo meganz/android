@@ -210,7 +210,8 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		}
 		
 		if (dbH == null){
-			dbH = new DatabaseHandler(getApplicationContext());
+//			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
 		boolean askMe = true;

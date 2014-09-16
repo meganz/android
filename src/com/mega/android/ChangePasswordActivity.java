@@ -119,7 +119,8 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 		progress.setMessage(getString(R.string.my_account_changing_password));
 		progress.show();
 		
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		final UserCredentials oldCredentials = dbH.getCredentials();
 		
 		String currentEmail = oldCredentials.getEmail();
@@ -240,7 +241,8 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 			else{
 				//Now update the credentials
 				newCredentials.setSession(megaApi.dumpSession());
-				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 				dbH.clearCredentials();
 				dbH.saveCredentials(newCredentials);
 				

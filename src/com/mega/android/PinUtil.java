@@ -13,7 +13,8 @@ public class PinUtil {
 
 	public static void resume(Context context) {
 		log("resume");
-		dbH = new DatabaseHandler(context);
+//		dbH = new DatabaseHandler(context);
+		dbH = DatabaseHandler.getDbHandler(context);
 		prefs = dbH.getPreferences();
 		
 		if (shouldLock(context)){

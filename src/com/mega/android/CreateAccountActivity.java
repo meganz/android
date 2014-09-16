@@ -153,7 +153,8 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	private void submitForm() {
 		log("submit form!");
 
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		dbH.clearCredentials();
 		megaApi.logout();
 		

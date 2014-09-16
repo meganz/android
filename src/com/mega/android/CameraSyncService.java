@@ -137,7 +137,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		
-		dbH = new DatabaseHandler(getApplicationContext());
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//		dbH = new DatabaseHandler(getApplicationContext());
 		
 		handler = new Handler();
 		canceled = false;
@@ -651,7 +652,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Fast login OK");
 				
-				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
 				dbH.clearCredentials();
 				dbH.saveCredentials(credentials);
 

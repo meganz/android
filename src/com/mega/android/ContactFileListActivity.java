@@ -891,7 +891,8 @@ public class ContactFileListActivity extends PinActivity implements
 		}
 
 		if (dbH == null) {
-			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//			dbH = new DatabaseHandler(getApplicationContext());
 		}
 
 		boolean askMe = true;

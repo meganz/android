@@ -112,7 +112,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 		
 		((RelativeLayout.LayoutParams) sizeTextView.getLayoutParams()).setMargins(Util.px2dp((75*scaleW), outMetrics), 0, 0, 0);
 		
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext()); 
     	if(dbH.getCredentials() == null){	
     		importButton.setVisibility(View.INVISIBLE);
     	}
@@ -294,7 +294,8 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 		long size = document.getSize();
 		
 		if (dbH == null){
-			dbH = new DatabaseHandler(this);
+//			dbH = new DatabaseHandler(this);
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
 		boolean askMe = true;

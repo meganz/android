@@ -128,7 +128,8 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	@Override
 	public void onClick(View v) {
 
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		Intent intent = new Intent(this,ManagerActivity.class);
 		switch(v.getId()){
@@ -168,7 +169,8 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	}
 	
 	public void setInitialPreferences(){
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		dbH.setFirstTime(false);
 		dbH.setStorageAskAlways(false);
 		File defaultDownloadLocation = null;

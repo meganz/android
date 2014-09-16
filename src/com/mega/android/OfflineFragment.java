@@ -135,7 +135,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 		
-		dbH = new DatabaseHandler(context);
+//		dbH = new DatabaseHandler(context);
+		dbH = DatabaseHandler.getDbHandler(context);
 		
 		mOffList = new ArrayList<MegaOffline>();		
 	}

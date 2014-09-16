@@ -162,7 +162,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		filePropertiesActivity = this;
 		handler = new Handler();
 		
-		dbH = new DatabaseHandler(getApplicationContext());
+//		dbH = new DatabaseHandler(getApplicationContext());
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
@@ -954,7 +955,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		}
 		
 		if (dbH == null){
-			dbH = new DatabaseHandler(getApplicationContext());
+//			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
 		boolean askMe = true;
