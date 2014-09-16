@@ -55,6 +55,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	long parentHandle = -1;
 	boolean isList = true;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	public static String DB_FILE = "0";
+	public static String DB_FOLDER = "1";
 	
 	//ArrayList<String> paths = null;
 	
@@ -501,10 +503,9 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				pathNavigation=pathNavigation.substring(0,index+1);
 				
 				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-				mOffListNavigation=dbH.findByPath(pathNavigation);
+				mOffListNavigation=dbH.findByPath(pathNavigation);				
 				adapterList.setNodes(mOffListNavigation);				
-				adapterList.notifyDataSetChanged();
-				
+				this.setNodes(mOffListNavigation);
 				return 2;
 			}
 			else{
@@ -631,6 +632,55 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		
 		setNodes(mOffList);
 		listView.invalidateViews();
+	}
+	
+	public void refreshPaths(MegaOffline mOff){
+		
+		int index=0;
+		MegaOffline retFindPath = null;
+		
+		//Find in the tree, the last existing node
+		String pathNavigation= mOff.getPath();
+		
+		if(mOff.getType()==DB_FILE){
+			
+			index=pathNavigation.lastIndexOf("/");				
+			pathNavigation=pathNavigation.substring(0,index+1);
+			
+		}
+		else{
+			pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+		}	
+		
+		retFindPath=findPath(pathNavigation);		
+		mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");			
+		//Bucar la lista de
+		setNodes(mOffList);
+		listView.invalidateViews();
+	}
+	
+	private MegaOffline findPath (String pathNavigation){
+		
+		MegaOffline nodeToShow = null;
+		int index=pathNavigation.lastIndexOf("/");	
+		String pathToShow = pathNavigation.substring(0, index+1);
+		log("Path: "+ pathToShow);
+		String nameToShow = pathNavigation.substring(index+1, pathNavigation.length());
+		log("Name: "+ nameToShow);
+		
+		nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
+		if(nodeToShow!=null){
+			//Show the node
+			log("NOde: "+ nodeToShow.getName());
+			
+			return nodeToShow;
+		}
+		else{
+			findPath (pathNavigation);
+		}
+		
+		return nodeToShow;
+		
 	}
 	
 	public void setPath(String path){

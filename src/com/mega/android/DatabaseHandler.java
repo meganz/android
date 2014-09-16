@@ -233,9 +233,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         
         MegaOffline checkInsert = null;
-        checkInsert=this.findByHandle(offline.getHandle());
-        if(checkInsert!=null){
-        	String nullColumnHack = null;
+        checkInsert=findByHandle(offline.getHandle());              
+        
+        if(checkInsert==null){
+        	String nullColumnHack = null;        	
             
             values.put(KEY_OFF_HANDLE, offline.getHandle());
             values.put(KEY_OFF_PATH, offline.getPath());
@@ -244,11 +245,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_TYPE, offline.getType());
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
-            db.close();
             
+			db.close();            
             return ret;        	
         }
-        
+        db.close();	
         return -1;
 	}
 		
@@ -287,9 +288,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
-		if (!cursor.equals(null))
-	        return cursor.moveToFirst();
-	    
+		if (!cursor.equals(null)){
+			cursor.close();
+			db.close();
+		
+			return cursor.moveToFirst();
+		}	        
+		
+		cursor.close();
+		db.close();
+		
 		return false; 		 
 	}
 	
@@ -320,9 +328,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_parent = cursor.getInt(4);
 				_type = cursor.getString(5);
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type);
+				cursor.close();
+				db.close();	
+				return offline;
 			}
 		}
-		return offline; 		 
+		cursor.close();
+		db.close();	
+		return null; 		 
 	}
 	
 	public MegaOffline findByHandle(String handle){
@@ -333,7 +346,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
-
 
 		if (!cursor.equals(null)){
 			if (cursor.moveToFirst()){		
@@ -352,9 +364,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_parent = cursor.getInt(4);
 				_type = cursor.getString(5);
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type);
+				cursor.close();
+				db.close();	
+				return offline;
 			}
 		}
-		return offline; 		 
+		cursor.close();
+		db.close();	
+		return null;
+		
 	}
 	
 	public ArrayList<MegaOffline> findByParentId(int parentId){
@@ -386,6 +404,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		}
+		
+		cursor.close();
+		db.close();	
 		return listOffline; 		 
 	}
 	
@@ -417,6 +438,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		}
+		
+		cursor.close();
+		db.close();	
+		
 		return mOffline; 		 
 	}
 	
@@ -456,6 +481,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		}
+		cursor.close();
+		db.close();	
 		return listOffline; 		 
 	}
 	
@@ -488,6 +515,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		}
+		cursor.close();
+		db.close();	
 		return mOffline; 			
 	}		
 

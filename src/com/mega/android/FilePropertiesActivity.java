@@ -147,6 +147,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
+		
+		int result=0;
 			
 		super.onCreate(savedInstanceState);
 		
@@ -293,9 +295,25 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				//Choose the button availableSwitch
 				
 				if(dbH.exists(node.getHandle())){
-					availableOfflineBoolean = true;
-					availableSwitchOffline.setVisibility(View.VISIBLE);
-					availableSwitchOnline.setVisibility(View.GONE);
+					
+//					NodeList childrenList=megaApi.getChildren(node);
+//					if(childrenList.size()>0){
+//						
+//						result=checkChildrenStatus(childrenList);
+//						
+//					}
+//					
+//					if(result==0){
+//						availableOfflineBoolean = false;
+//						availableSwitchOffline.setVisibility(View.GONE);
+//						availableSwitchOnline.setVisibility(View.VISIBLE);
+//					}
+//					else{
+						availableOfflineBoolean = true;
+						availableSwitchOffline.setVisibility(View.VISIBLE);
+						availableSwitchOnline.setVisibility(View.GONE);
+//					}
+					
 				}
 				else{
 					availableOfflineBoolean = false;
@@ -440,6 +458,28 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		}
 	}
 		
+	private int checkChildrenStatus(NodeList childrenList){
+		
+		if(childrenList.size()>0){
+			for(int i=0;i<childrenList.size();i++){
+				
+				if(!dbH.exists(childrenList.get(i).getHandle())){
+					return 0;
+				}
+				else{
+					int result=checkChildrenStatus(childrenList);
+					if(result==0){
+						return 0;
+					}
+					else
+						return 1;
+				}
+				
+				
+			}	
+		}				
+		return 0;
+	}
 	@Override
 	public void onClick(View v) {
 		
@@ -532,7 +572,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				continue;
 			}
 			
-			nodesToDB.add(document);
+			nodesToDB.add(document);			
 			
 			String url = null;
 			Intent service = new Intent(this, DownloadService.class);
@@ -573,7 +613,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	}	
 
 	private void insertDB (ArrayList<MegaNode> nodesToDB){
-
+		log("insertDB");
+		
 		MegaNode parentNode = null;	
 		MegaNode nodeToInsert = null;	
 
@@ -618,11 +659,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						log("inserto el nodo");
 						if(nodeToInsert.isFile()){
 							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE);
-							dbH.setOfflineFile(mOffInsert);
+							long checkInsert=dbH.setOfflineFile(mOffInsert);
+							log("Test insert A: "+checkInsert);
 						}
 						else{
 							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER);
-							dbH.setOfflineFile(mOffInsert);
+							long checkInsert=dbH.setOfflineFile(mOffInsert);
+							log("Test insert B: "+checkInsert);
 						}			
 					}
 				}					
@@ -633,11 +676,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 				if(nodeToInsert.isFile()){
 					MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE);
-					dbH.setOfflineFile(mOffInsert);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert C: "+checkInsert);
 				}
 				else{
 					MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER);
-					dbH.setOfflineFile(mOffInsert);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert D: "+checkInsert);
 				}
 
 			}
@@ -671,11 +716,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				else{			
 					if(parentNode.isFile()){
 						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE);
-						dbH.setOfflineFile(mOffInsert);
+						long checkInsert=dbH.setOfflineFile(mOffInsert);
+						log("Test insert E: "+checkInsert);
 					}
 					else{
 						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER);
-						dbH.setOfflineFile(mOffInsert);
+						long checkInsert=dbH.setOfflineFile(mOffInsert);
+						log("Test insert F: "+checkInsert);
 					}	
 				}	
 				
@@ -684,11 +731,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 				if(parentNode.isFile()){
 					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE);
-					dbH.setOfflineFile(mOffInsert);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert G: "+checkInsert);
 				}
 				else{
 					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER);
-					dbH.setOfflineFile(mOffInsert);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert H: "+checkInsert);
 				}	
 			}	
 		}
@@ -696,11 +745,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			log("---------------PARENT NODE ROOT------");
 			if(parentNode.isFile()){
 				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE);
-				dbH.setOfflineFile(mOffInsert);
+				long checkInsert=dbH.setOfflineFile(mOffInsert);
+				log("Test insert I: "+checkInsert);
 			}
 			else{
 				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER);
-				dbH.setOfflineFile(mOffInsert);
+				long checkInsert=dbH.setOfflineFile(mOffInsert);
+				log("Test insert J: "+checkInsert);
 			}						
 		}			
 		
