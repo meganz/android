@@ -14,7 +14,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 6; 
+	private static final int DATABASE_VERSION = 7; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -93,29 +93,30 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		UserCredentials userCredentials = null;
 		
-		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
-		Cursor cursor = db.rawQuery(selectQuery, null);		
-		if (cursor.moveToFirst()) {
-			int id = Integer.parseInt(cursor.getString(0));
-			String email = decrypt(cursor.getString(1));
-			String session = decrypt(cursor.getString(2));
-			userCredentials = new UserCredentials(email, session);
-		}
-		cursor.close();
+//		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
+//		Cursor cursor = db.rawQuery(selectQuery, null);		
+//		if (cursor.moveToFirst()) {
+//			int id = Integer.parseInt(cursor.getString(0));
+//			String email = decrypt(cursor.getString(1));
+//			String session = decrypt(cursor.getString(2));
+//			userCredentials = new UserCredentials(email, session);
+//		}
+//		cursor.close();
         
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES); 
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
         onCreate(db);
         
-        ContentValues values = new ContentValues();
-        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
-        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
-        db.insert(TABLE_CREDENTIALS, null, values);
+//        ContentValues values = new ContentValues();
+//        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
+//        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
+//        db.insert(TABLE_CREDENTIALS, null, values);
 	} 
 	
 	public static String encrypt(String original) {
-		if (original == null) {
+/*		if (original == null) {
 			return null;
 		}
 		try {
@@ -125,8 +126,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			log("ee");
 			e.printStackTrace();
 			return null;
-		}
-//		return original;
+		}*/
+		return original;
 	}
 	
 	private static byte[] getAesKey() {
@@ -142,7 +143,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 	
 	public static String decrypt(String encodedString) {
-		if (encodedString == null) {
+/*		if (encodedString == null) {
 			return null;
 		}
 		try {
@@ -152,8 +153,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		} catch (Exception e) {
 			log("de");
 			return null;
-		}
-//		return encodedString;
+		}*/
+		return encodedString;
 	}
 	
 	public UserCredentials getCredentials(){
