@@ -29,6 +29,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_CAM_SYNC_WIFI = "wifi";
     private static final String KEY_CAM_SYNC_LOCAL_PATH = "camsynclocalpath";
     private static final String KEY_CAM_SYNC_FILE_UPLOAD = "fileUpload";
+    private static final String KEY_CAM_SYNC_TIMESTAMP = "camSyncTimeStamp";
     private static final String KEY_PIN_LOCK_ENABLED = "pinlockenabled";
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
@@ -62,7 +63,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, " + KEY_CAM_SYNC_WIFI + " BOOLEAN, " 
         		+ KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, " + KEY_PIN_LOCK_ENABLED + " TEXT, " + 
         		KEY_PIN_LOCK_CODE + " TEXT, " + KEY_STORAGE_ASK_ALWAYS + " TEXT, " +
-        		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT" + ")";
+        		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, " + KEY_CAM_SYNC_TIMESTAMP + " TEXT" + ")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
@@ -172,6 +173,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_PIN_LOCK_CODE, encrypt(prefs.getPinLockCode()));
         values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(prefs.getStorageAskAlways()));
         values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()));
+        values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(prefs.getCamSyncTimeStamp()));
         db.insert(TABLE_PREFERENCES, null, values);
         db.close();
 	}
@@ -194,7 +196,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String pinLockCode = decrypt(cursor.getString(8));
 			String askAlways = decrypt(cursor.getString(9));
 			String downloadLocation = decrypt(cursor.getString(10));
-			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
+			String camSyncTimeStamp = decrypt(cursor.getString(11));
+			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
 		}
 		cursor.close();
         db.close();
@@ -685,6 +688,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 	        values.put(KEY_CAM_SYNC_FILE_UPLOAD, encrypt(fileUpload + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+        db.close();
+	}
+	
+	public void setCamSyncTimeStamp (long camSyncTimeStamp){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_TIMESTAMP + "= '" + encrypt(camSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(camSyncTimeStamp + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();

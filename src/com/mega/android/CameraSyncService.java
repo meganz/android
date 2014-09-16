@@ -1,12 +1,9 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -33,7 +30,6 @@ import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.FileObserver;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -87,8 +83,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	Object transferFinished = new Object();
 	
-	private MegaTransferListenerInterface listener;
-	
 	private boolean isForeground;
 	
 	private int notificationId = 3;
@@ -100,8 +94,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	Intent intentCreate = null;
 	
-	private int lastError = 0;
-	
 	MegaPreferences prefs;
 	
 	boolean newFileList = false;
@@ -111,7 +103,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	private class Media {
 		public String filePath;
-		public String mimeType;
 		public long timestamp;
 	}
 	
@@ -120,6 +111,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	MegaNode photoSyncNode = null;
 	
 	Queue<Media> cameraFiles = new LinkedList<Media>();
+	
+	long currentTimeStamp = 0;
 	
 	@SuppressLint("NewApi")
 	@Override
@@ -160,7 +153,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
-		String lastEmail = credentials.getEmail();
 		String gSession = credentials.getSession();
 		
 		if (megaApi.getRootNode() == null){
@@ -264,20 +256,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		megaApi = app.getMegaApi();
 		
-		int result = shouldRun();
-		if (result != 0){
-			return result;
-		}
-		
 		if (megaApi == null){
 			finish();
 			return START_NOT_STICKY;
 		}
 		
+		int result = shouldRun();
+		if (result != 0){
+			return result;
+		}		
+		
 		if (intent != null){
 			if (intent.getAction() != null){
 				if (intent.getAction().equals(ACTION_CANCEL)){
 					log("Cancel intent");
+					intent.setAction(null);
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 						dbH.setCamSyncEnabled(false);
@@ -289,6 +282,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 				else if (intent.getAction().equals(ACTION_STOP)){
+					log("Stop intent");
+					intent.setAction(null);
 					stopped = true;
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
@@ -301,7 +296,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 				else if (intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER)){
-					log("List photos and videos");
+					log("List photos and videos intent");
+					intent.setAction(null);
 					if (megaApi != null){
 						newFileList = true;
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
@@ -313,6 +309,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 				else if (intent.getAction().equals(ACTION_LOGOUT)){
+					log("Logout intent");
 					stopped = true;
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
@@ -332,6 +329,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		if (!running){
 			running = true;
+			canceled = false;
 			task = new Thread()
 			{
 				@Override
@@ -369,6 +367,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				//MediaColumns.DATE_MODIFIED,
 				MediaColumns.DATE_ADDED};
 		
+		String selection = null;
+		String[] selectionArgs = null;
+		
+		if (prefs != null){
+			if (prefs.getCamSyncTimeStamp() != null){
+				long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
+				selection = "(" + MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
+				log("SELECTION: " + selection);
+			}
+		}
+		
 		String order = MediaColumns.DATE_ADDED + " ASC";
 		
 		ArrayList<Uri> uris = new ArrayList<Uri>();
@@ -401,7 +410,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		for(int i=0; i<uris.size(); i++){
 			
-			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, null, null, order);
+			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
 			int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
 	        int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
 	        while(cursor.moveToNext()){
@@ -425,11 +434,20 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		totalToUpload = cameraFiles.size();
+		
+		totalSizeToUpload = 0;
+		Iterator<Media> itCF = cameraFiles.iterator();
+		while (itCF.hasNext()){
+			Media m = itCF.next();
+			File f = new File(m.filePath);
+			totalSizeToUpload = totalSizeToUpload + f.length();
+		}		
 				
 		uploadNextImage();
 	}
 	
 	void uploadNextImage(){
+		log("uploadNextImage");
 		totalUploaded++;
 		if (cameraFiles.size() > 0){
 			Media media = cameraFiles.poll();
@@ -445,20 +463,26 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			
 			if (nodeExists == null){
 				log("SUBIR EL FICHERO: " + media.filePath);
+				currentTimeStamp = media.timestamp;
 				megaApi.startUpload(file.getAbsolutePath(), photoSyncNode, this);
 			}
 			else{
 				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());
 				if (megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + nodeExists.getName()) == null){
+					currentTimeStamp = media.timestamp;
 					megaApi.copyNode(nodeExists, photoSyncNode, this);
 				}
 				else{
-					
+					currentTimeStamp = media.timestamp;
+					dbH.setCamSyncTimeStamp(currentTimeStamp);
+					File f = new File(media.filePath);
+					totalSizeUploaded += f.length();
 					uploadNextImage();
 				}
 			}
 		}
 		else{
+			onQueueComplete(true, totalUploaded);
 			finish();
 		}
 	}
@@ -474,148 +498,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		cr.registerContentObserver(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, false,  mediaObserver);
 		cr.registerContentObserver(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, false,  mediaObserver);
  	}
-	
-	public void onHandleIntent(Intent intent){
-		
-//		if (filesToUpload.size() == 0){
-//			reset();
-//		}
-		
-		log("newFilePath == null");
-		//AQUI ES DONDE REVISO QUE COSAS HAY QUE SUBIR
-		
-//		List<Media> cameraFiles = new ArrayList<Media>();
-		
-		String projection[] = {	MediaColumns.DATA, 
-								//MediaColumns.MIME_TYPE, 
-								//MediaColumns.DATE_MODIFIED,
-								MediaColumns.DATE_ADDED};
-		
-		String order = MediaColumns.DATE_ADDED + " ASC";
-		
-		ArrayList<Uri> uris = new ArrayList<Uri>();
-		if (prefs.getCamSyncFileUpload() == null){
-			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-			uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-			uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-		}
-		else{
-			switch(Integer.parseInt(prefs.getCamSyncFileUpload())){
-				case MegaPreferences.ONLY_PHOTOS:{
-					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-					break;
-				}
-				case MegaPreferences.ONLY_VIDEOS:{
-					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-					break;
-				}
-				case MegaPreferences.PHOTOS_AND_VIDEOS:{
-					uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-					uris.add(MediaStore.Video.Media.INTERNAL_CONTENT_URI);
-					break;
-				}
-			}
-		}		
-			
-		for(int i=0; i<uris.size(); i++){
-			
-			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, null, null, order);
-			int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-	        int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
-	        while(cursor.moveToNext()){
-	        	Media media = new Media();
-		        media.filePath = cursor.getString(dataColumn);
-		        media.timestamp = cursor.getLong(timestampColumn) * 1000;
-		        
-		        if (!checkFile(media)){
-		        	continue;	
-		        }
-		        
-		        cameraFiles.add(media);
-	        }				
-		}
-		
-		MegaNode targetNode = megaApi.getNodeByHandle(photosyncHandle);
-		if(targetNode == null){
-			showSyncError(R.string.settings_camera_notif_error_no_folder);
-			finish();
-			return;
-		}
-		
-		for (Media media : cameraFiles){
-			File file = new File(media.filePath);
-			if(!file.exists()){
-				continue;
-			}
-		
-			
-			MegaNode nodeExists = megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + file.getName());
-			if (nodeExists == null){
-				
-				Iterator<Media> it = filesToUpload.iterator();
-				boolean fileAlreadyToUpload = false;
-				while (it.hasNext()){
-					Media m = it.next();
-					if (m.filePath.compareTo(media.filePath) == 0){
-						fileAlreadyToUpload = true;
-						break;
-					}
-				}
-				
-				it = filesUploaded.iterator();
-				boolean fileAlreadyUploaded = false;
-				while (it.hasNext()){
-					Media m = it.next();
-					if (m.filePath.compareTo(media.filePath) == 0){
-						fileAlreadyUploaded = true;
-						break;
-					}
-				}
-				
-				//If the file is ready to upload already
-				if (!fileAlreadyToUpload && !fileAlreadyUploaded){
-					log("MEDIA.FILEPATH: " + media.filePath);
-					filesToUpload.add(media);	
-					
-				}
-			}
-		}
-		
-		
-		
-		log("TOTALSIZETOUPLOAD = " + totalSizeToUpload + "___" + totalToUpload);
-		while (filesToUpload.size() > 0){
-			Media media = filesToUpload.poll();
-			filesUploaded.add(media);
-			
-			log("Ficheros subidos: " + media.filePath);
-			
-			File f = new File(media.filePath);
-			
-			if(!wl.isHeld()){ 
-				wl.acquire();
-			}
-			if(!lock.isHeld()){
-				lock.acquire();
-			}
-			totalToUpload++;
-			totalSizeToUpload += f.length();
-			
-			log("startUpload called");
-			
-			megaApi.startUpload(f.getAbsolutePath(), megaApi.getNodeByHandle(photosyncHandle), this);
-		}
-		
-		
-		log("DIRECTORIO PARA SUBIR: " + localPath);
-		
-		log ("filestoupload.size() = " + filesToUpload.size());
-
-	}
 	
 	private boolean checkFile(Media media){
 		
@@ -649,6 +531,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		canceled = true;
 		isForeground = false;
+		running = false;
 		stopForeground(true);
 		stopSelf();
 	}
@@ -686,76 +569,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
-	
-	private List<String> getCameraPhotosAll() {
-		List<String> photos = new ArrayList<String>();
-		for (File folder : getCameraFolders()) {
-			photos.addAll(getCameraPhotos(folder));
-		}
-		return photos;
-	}
 
-	private List<String> getCameraVideosAll() {
-		List<String> photos = new ArrayList<String>();
-		for (File folder : getCameraFolders()) {
-			photos.addAll(getCameraVideos(folder));
-		}
-		return photos;
-	}
-	
-	private List<File> getCameraFolders() {
-		File dcimFolder = new File(localPath);
-//		File dcimFolder = new File(CameraSettings.getSource(this));
-		try {dcimFolder = dcimFolder.getCanonicalFile();} catch (IOException e) {}
-		List<File> folders = new ArrayList<File>();
-		if (dcimFolder.isDirectory() && dcimFolder.canRead()) {
-			folders.add(dcimFolder);
-			File[] subfolders = dcimFolder.listFiles();
-			if (subfolders != null){
-				for (File folder : dcimFolder.listFiles()) {
-					try {folder = folder.getCanonicalFile();} catch (IOException e) {}
-					if (folder.isDirectory() && !folder.getName().startsWith(".")) {
-						folders.add(folder);
-					}
-				}
-			}
-		}
-		return folders;
-	}
-	
-	private List<String> getCameraPhotos(File folder) {
-		ArrayList<String> result = new ArrayList<String>();
-		try {folder = folder.getCanonicalFile();} catch (IOException e) {}
-		File[] files = folder.listFiles();
-		if(files==null) return result;
-		for(int i=0; i<files.length; i++)
-		{
-			File file = files[i];
-			if(MimeType.typeForName(file.getName()).isImage())
-			{
-				result.add(file.getAbsolutePath());
-			}
-		}
-		return result;
-	}
-	
-	private List<String> getCameraVideos(File folder) {
-		ArrayList<String> result = new ArrayList<String>();
-		try {folder = folder.getCanonicalFile();} catch (IOException e) {}
-		File[] files = folder.listFiles();
-		if(files==null) return result;
-		for(int i=0; i<files.length; i++)
-		{
-			File file = files[i];
-			if(MimeType.typeForName(file.getName()).isVideo())
-			{
-				result.add(file.getAbsolutePath());
-			}
-		}
-		return result;
-	}
-	
-	
 	private void finish(){
 		log("finish CameraSyncService");
 		
@@ -865,10 +679,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Node copied: " + megaApi.getNodePath(megaApi.getNodeByHandle(request.getNodeHandle())));
+				dbH.setCamSyncTimeStamp(currentTimeStamp);
+				totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
 				uploadNextImage();
 			}
 			else{
 				log("ERROR AL COPIAR EL NODO");
+				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
@@ -878,6 +695,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				megaApi.resetTotalUploads();
 				reset();
 			}
+			else{
+				retryLater();
+				finish();
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
 			log("pause_transfer false received");
@@ -885,7 +706,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				if (newFileList){
 					newFileList = false;
 					log("pauseNewFileList");
-//					retryLater();
+					retryLater();
 					mNotificationManager.cancel(notificationId);
 					mNotificationManager.cancel(notificationIdFinal);
 					isForeground = false;
@@ -893,7 +714,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					stopSelf();
 				}
 				else{
-					cancel();
+					retryLater();
+					finish();
 				}
 			}
 		}
@@ -948,12 +770,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("Image Sync OK: " + transfer.getFileName());
 				totalSizeUploaded += transfer.getTransferredBytes();
 				log("IMAGESYNCFILE: " + transfer.getPath());
+				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				uploadNextImage();
 			}
 			else{
-				log("Image Sync OK: " + transfer.getFileName());
-				lastError = e.getErrorCode();
-				onUploadComplete(false);
+				log("Image Sync FAIL: " + transfer.getFileName());
+				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 			}
 		}
 	}
@@ -984,6 +806,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		log("onTransferTemporaryError: " + transfer.getFileName());
 	}
 	
+	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	private void updateProgressNotification(final long progress) {
 		log("updateProgressNotification");
@@ -1053,20 +876,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 	}
 	
-	private void onUploadComplete(boolean success) {
-		log("onCamSyncComplete");
-		
-		if (success){
-			successCount++;
-		}
-		totalUploaded++;
-		
-		if (totalUploaded == totalToUpload){
-			onQueueComplete();
-		}
-	}
-	
-	private void onQueueComplete() {
+	private void onQueueComplete(boolean success, int totalUploaded) {
 		log("onQueueComplete");
 		log("Stopping foreground!");
 		log("stopping service! success: " + successCount + " total: " + totalToUpload);
@@ -1085,18 +895,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			e.printStackTrace();
 		}
 		
-		if (successCount == 0) {
+		if (totalUploaded == 0) {
 			log("stopping service!2");
 		} else {
 			log("stopping service!");
-			showCompleteSuccessNotification();
+			if (success){
+				if (totalSizeUploaded != 0){
+					showCompleteSuccessNotification();
+				}
+			}
 		}
 				
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
 		stopForeground(true);
-		stopSelf();
-				
+		stopSelf();				
 	}
 	
 	@Override
