@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -278,7 +279,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						return START_NOT_STICKY;
 					}
 					else{
-						cancel();
+						finish();
 						return START_NOT_STICKY;
 					}
 				}
@@ -292,7 +293,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						return START_NOT_STICKY;
 					}
 					else{
-						cancel();
+						finish();
 						return START_NOT_STICKY;
 					}
 				}
@@ -305,7 +306,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						return START_NOT_STICKY;
 					}
 					else{
-						cancel();
+						finish();
 						return START_NOT_STICKY;
 					}
 				}
@@ -317,7 +318,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						return START_NOT_STICKY;
 					}
 					else{
-						cancel();
+						finish();
 						return START_NOT_STICKY;
 					}
 				}
@@ -465,7 +466,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			if (nodeExists == null){
 				log("SUBIR EL FICHERO: " + media.filePath);
 				currentTimeStamp = media.timestamp;
-				megaApi.startUpload(file.getAbsolutePath(), photoSyncNode, this);
+				Calendar cal = Calendar.getInstance();
+				cal.setTimeInMillis(media.timestamp);
+				log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
+				megaApi.startUpload(file.getAbsolutePath(), photoSyncNode, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
 			}
 			else{
 				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());
@@ -474,11 +478,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					megaApi.copyNode(nodeExists, photoSyncNode, this);
 				}
 				else{
-					currentTimeStamp = media.timestamp;
-					dbH.setCamSyncTimeStamp(currentTimeStamp);
-					File f = new File(media.filePath);
-					totalSizeUploaded += f.length();
-					uploadNextImage();
+					if (nodeExists.getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
+						currentTimeStamp = media.timestamp;
+						dbH.setCamSyncTimeStamp(currentTimeStamp);
+						File f = new File(media.filePath);
+						totalSizeUploaded += f.length();
+						uploadNextImage();	
+					}
+					else{
+						log("The file is in PhotoSync but with a different name");
+						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
+					}					
 				}
 			}
 		}
@@ -534,6 +544,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		isForeground = false;
 		running = false;
 		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
 		stopSelf();
 	}
 	
@@ -577,8 +588,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if(running){
 			handler.removeCallbacksAndMessages(null);
 			running = false;
-			cancel();
 		}
+		cancel();
 	}
 	
 	public void onDestroy(){
@@ -679,12 +690,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Node copied: " + megaApi.getNodePath(megaApi.getNodeByHandle(request.getNodeHandle())));
+				megaApi.renameNode(megaApi.getNodeByHandle(request.getNodeHandle()), Util.getPhotoSyncName(currentTimeStamp, megaApi.getNodeByHandle(request.getNodeHandle()).getName()), this);
+			}
+			else{
+				log("Error copying");
+				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
+			if (e.getErrorCode() == MegaError.API_OK){
 				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
 				uploadNextImage();
 			}
 			else{
-				log("ERROR AL COPIAR EL NODO");
+				log("Error renaming");
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 			}
 		}
@@ -710,6 +730,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					mNotificationManager.cancel(notificationId);
 					mNotificationManager.cancel(notificationIdFinal);
 					isForeground = false;
+					finish();
 					stopForeground(true);
 					stopSelf();
 				}
@@ -908,6 +929,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
+		finish();
 		stopForeground(true);
 		stopSelf();				
 	}
