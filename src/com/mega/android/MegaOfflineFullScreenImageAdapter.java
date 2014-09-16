@@ -104,7 +104,8 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		this.activity = activity;
 		this.paths = paths;
 		this.megaFullScreenImageAdapter = this;
-		dbH = new DatabaseHandler(activity);
+//		dbH = new DatabaseHandler(activity);
+		dbH = DatabaseHandler.getDbHandler(activity);
 	}
 
 	@Override

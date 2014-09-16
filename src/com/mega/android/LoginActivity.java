@@ -163,7 +163,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
 	    
-	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+	    DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 	    
 	    MegaPreferences prefs = dbH.getPreferences();
 		if (prefs == null){
@@ -695,7 +696,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 				
 				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
 				
-				DatabaseHandler dbH = new DatabaseHandler(this); 
+//				DatabaseHandler dbH = new DatabaseHandler(this);
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
@@ -720,7 +722,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 				gSession = megaApi.dumpSession();
 				credentials = new UserCredentials(lastEmail, gSession);
 				
-				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
 				dbH.saveCredentials(credentials);
 				
@@ -779,7 +782,8 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 						}
 						else{
 							boolean initialCam = false;
-							DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//							DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+							DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 							MegaPreferences prefs = dbH.getPreferences();
 							prefs = dbH.getPreferences();
 							if (prefs.getCamSyncEnabled() != null){

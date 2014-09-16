@@ -103,7 +103,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (dbH.getCredentials() == null){
 			ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi, false);
 			return;

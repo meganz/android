@@ -428,7 +428,8 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		
 		log("deleteOffline");
 
-		dbH = new DatabaseHandler(context);
+//		dbH = new DatabaseHandler(context);
+		dbH = DatabaseHandler.getDbHandler(context);
 
 		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
 		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			

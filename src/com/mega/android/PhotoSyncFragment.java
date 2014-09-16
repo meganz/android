@@ -245,7 +245,8 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		
-		DatabaseHandler dbH = new DatabaseHandler(context);
+//		DatabaseHandler dbH = new DatabaseHandler(context);
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
 		
 		if (isList){

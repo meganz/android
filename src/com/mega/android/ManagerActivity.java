@@ -253,7 +253,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-	    dbH = new DatabaseHandler(getApplicationContext()); 
+//	    dbH = new DatabaseHandler(getApplicationContext());
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
 		if (Util.isOnline(this)){
 			dbH.setAttrOnline(true);
@@ -852,7 +853,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	Intent intent = getIntent(); 
     	
-    	DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
+//    	dbH = new DatabaseHandler(getApplicationContext());
+    	dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     	if(dbH.getCredentials() == null){	
     		if (!openLink){
     			logout(this, (MegaApplication)getApplication(), megaApi, false);
@@ -2204,7 +2206,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			Util.deleteFolderAndSubfolders(context, offlineDirectory);
 		} catch (IOException e) {}
 
-		DatabaseHandler dbH = new DatabaseHandler(context); 
+//		DatabaseHandler dbH = new DatabaseHandler(context);
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.clearCredentials();
 		if (dbH.getPreferences() != null){
 			dbH.clearPreferences();
@@ -2732,7 +2735,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		if (dbH == null){
-			dbH = new DatabaseHandler(getApplicationContext());
+//			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		}
 		
 		boolean askMe = true;

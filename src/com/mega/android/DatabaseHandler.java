@@ -41,15 +41,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_OFF_PARENT = "parentId";
     private static final String KEY_OFF_TYPE = "type";
 
+    private static DatabaseHandler instance;
+    
+    private static SQLiteDatabase db;
+
+    public static synchronized DatabaseHandler getDbHandler(Context context){
+    	
+    	log("getDbHandler");
+    	
+    	if (instance == null){
+    		log("INSTANCE IS NULL");
+    		instance = new DatabaseHandler(context);
+    	}
+    	
+    	return instance;
+    }
+    
 	public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        db = this.getWritableDatabase(); 
     }
 	
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		
         String CREATE_OFFLINE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_OFFLINE + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER"+", FOREIGN KEY (" + KEY_OFF_PARENT + ") REFERENCES "+ TABLE_OFFLINE +" ("+ KEY_ID +") " + " ON DELETE CASCADE " +")";
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER)";
         db.execSQL(CREATE_OFFLINE_TABLE);
 		
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
@@ -69,8 +86,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
         		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
-
-        db.execSQL("PRAGMA foreign_keys=ON;");     
+  
 	}
 
 	@Override
@@ -119,12 +135,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void saveCredentials(UserCredentials userCredentials) {
-        SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
         values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
         db.insert(TABLE_CREDENTIALS, null, values);
-        db.close(); 
     }
 	
 	public static String decrypt(String encodedString) {
@@ -146,7 +160,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		UserCredentials userCredentials = null;
 		
 		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);		
 		if (cursor.moveToFirst()) {
 			int id = Integer.parseInt(cursor.getString(0));
@@ -155,13 +168,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			userCredentials = new UserCredentials(email, session);
 		}
 		cursor.close();
-        db.close();
         
         return userCredentials; 
 	}
 	
 	public void setPreferences (MegaPreferences prefs){
-		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_LOGIN, encrypt(prefs.getFirstTime()));
         values.put(KEY_CAM_SYNC_WIFI, encrypt(prefs.getCamSyncWifi()));
@@ -175,14 +186,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_STORAGE_DOWNLOAD_LOCATION, encrypt(prefs.getStorageDownloadLocation()));
         values.put(KEY_CAM_SYNC_TIMESTAMP, encrypt(prefs.getCamSyncTimeStamp()));
         db.insert(TABLE_PREFERENCES, null, values);
-        db.close();
 	}
 	
 	public MegaPreferences getPreferences(){
 		MegaPreferences prefs = null;
 		
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
 			int id = Integer.parseInt(cursor.getString(0));
@@ -200,24 +209,20 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, pinLockCode, askAlways, downloadLocation);
 		}
 		cursor.close();
-        db.close();
 		
 		return prefs;
 	}
 	
 	public void setAttributes (MegaAttributes attr){
-		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
         db.insert(TABLE_ATTRIBUTES, null, values);
-        db.close();
 	}
 	
 	public MegaAttributes getAttributes(){
 		MegaAttributes attr = null;
 		
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
 			int id = Integer.parseInt(cursor.getString(0));
@@ -225,14 +230,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			attr = new MegaAttributes(online);
 		}
 		cursor.close();
-		db.close();
 		
 		return attr;
 	}
 	
 	public long setOfflineFile (MegaOffline offline){
 		
-		SQLiteDatabase db = this.getWritableDatabase(); 
         ContentValues values = new ContentValues();
         
         MegaOffline checkInsert = null;
@@ -249,10 +252,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
             
-			db.close();            
             return ret;        	
         }
-        db.close();	
         return -1;
 	}
 		
@@ -261,7 +262,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE;
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
 			do{
@@ -277,29 +277,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		db.close();
 
 		return listOffline;
 	}
 
 	public boolean exists(long handle){
-		
 				
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
 		
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
 		if (!cursor.equals(null)){
-			cursor.close();
-			db.close();
 		
-			return cursor.moveToFirst();
+			boolean r = cursor.moveToFirst();
+			cursor.close();
+			
+			return r;
 		}	        
 		
 		cursor.close();
-		db.close();
 		
 		return false; 		 
 	}
@@ -310,7 +307,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
 
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 
@@ -332,12 +328,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_type = cursor.getString(5);
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type);
 				cursor.close();
-				db.close();	
 				return offline;
 			}
 		}
 		cursor.close();
-		db.close();	
 		return null; 		 
 	}
 	
@@ -347,7 +341,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_HANDLE + " = '" + handle + "'";
 
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 		if (!cursor.equals(null)){
@@ -368,12 +361,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_type = cursor.getString(5);
 				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type);
 				cursor.close();
-				db.close();	
 				return offline;
 			}
 		}
 		cursor.close();
-		db.close();	
 		return null;
 		
 	}
@@ -384,7 +375,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PARENT + " = '" + parentId + "'";
 
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 		if (!cursor.equals(null)){
@@ -409,7 +399,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		
 		cursor.close();
-		db.close();	
 		return listOffline; 		 
 	}
 	
@@ -417,7 +406,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_ID + " = '" + id + "'";
 		MegaOffline mOffline = null;
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 		if (!cursor.equals(null)){
@@ -443,14 +431,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		
 		cursor.close();
-		db.close();	
 		
 		return mOffline; 		 
 	}
 	
 	public int removeById(int id){	
 
-		SQLiteDatabase db = this.getWritableDatabase();
 		return db.delete(TABLE_OFFLINE, KEY_ID + "="+id, null);		
 		
 	}	
@@ -461,7 +447,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'";
 
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 		if (!cursor.equals(null)){
@@ -485,7 +470,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 		}
 		cursor.close();
-		db.close();	
 		return listOffline; 		 
 	}
 	
@@ -494,7 +478,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND " + KEY_OFF_NAME + " = '" + name + "'"  ;
 		
 		MegaOffline mOffline = null;
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);	
 
 		if (!cursor.equals(null)){
@@ -519,7 +502,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 		}
 		cursor.close();
-		db.close();	
 		return mOffline; 			
 	}		
 
@@ -536,7 +518,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND" + KEY_OFF_NAME + " = '" + name + "'"  ;
 		
-		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		
 		if (cursor.moveToFirst()){			
@@ -571,7 +552,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 			cursor.close();
-			db.close();			
 		}		
 		
 		return listOffline; 		
@@ -583,12 +563,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	    db.delete(TABLE_OFFLINE, KEY_OFF_HANDLE + " = ?",
 	            new String[] { String.valueOf(mOff.getHandle()) });
 	            
-	    db.close();
 	}
 	
 	public void setFirstTime (boolean firstTime){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -601,12 +579,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setCamSyncWifi (boolean wifi){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -619,12 +595,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setCamSyncEnabled (boolean enabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -637,12 +611,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setCamSyncHandle (long handle){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -655,12 +627,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setCamSyncLocalPath (String localPath){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -673,12 +643,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setCamSyncFileUpload (int fileUpload){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -691,12 +659,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setCamSyncTimeStamp (long camSyncTimeStamp){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -709,12 +675,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setPinLockEnabled (boolean pinLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -727,12 +691,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setPinLockCode (String pinLockCode){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -745,12 +707,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setStorageAskAlways (boolean storageAskAlways){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -763,12 +723,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setStorageDownloadLocation (String storageDownloadLocation){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
-		SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -781,12 +739,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
-        db.close();
 	}
 	
 	public void setAttrOnline (boolean online){
 		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
-		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()){
@@ -799,17 +755,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();
-		db.close();
 	}
 	
 	public void clearCredentials(){
-		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);   
         onCreate(db);
 	}
 	
 	public void clearPreferences(){
-		SQLiteDatabase db = this.getWritableDatabase();
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES);   
         onCreate(db);
 	}

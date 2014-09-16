@@ -105,7 +105,6 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	
 	private List<ShareInfo> filePreparedInfos;
 	
-	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 	
 	MenuItem permissionButton;

@@ -83,7 +83,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
-		dbH = new DatabaseHandler(getApplicationContext()); 
+//		dbH = new DatabaseHandler(getApplicationContext());
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (dbH.getCredentials() == null){
 			ManagerActivity.logout(this, app, megaApi, false);
 			return;

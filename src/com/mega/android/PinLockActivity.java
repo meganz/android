@@ -31,7 +31,8 @@ public class PinLockActivity extends ActionBarActivity implements OnClickListene
 		setContentView(R.layout.activity_pin_lock);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
-		dbH = new DatabaseHandler(this);
+//		dbH = new DatabaseHandler(this);
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		prefs = dbH.getPreferences();
 		
 		logoutButton = (Button) findViewById(R.id.pin_lock_logout);
