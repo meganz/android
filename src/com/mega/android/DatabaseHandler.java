@@ -116,7 +116,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	} 
 	
 	public static String encrypt(String original) {
-/*		if (original == null) {
+		if (original == null) {
 			return null;
 		}
 		try {
@@ -126,8 +126,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			log("ee");
 			e.printStackTrace();
 			return null;
-		}*/
-		return original;
+		}
+//		return original;
 	}
 	
 	private static byte[] getAesKey() {
@@ -143,7 +143,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 	
 	public static String decrypt(String encodedString) {
-/*		if (encodedString == null) {
+		if (encodedString == null) {
 			return null;
 		}
 		try {
@@ -153,8 +153,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		} catch (Exception e) {
 			log("de");
 			return null;
-		}*/
-		return encodedString;
+		}
+//		return encodedString;
 	}
 	
 	public UserCredentials getCredentials(){
