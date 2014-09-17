@@ -193,11 +193,22 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			
 			adapterList.setPositionClicked(-1);
 			adapterList.setMultipleSelect(false);
-
+			
 			listView.setAdapter(adapterList);
-			
-//			setPaths(paths);
-			
+						
+			if (adapterList.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
+		
 			return v;
 		}
 		else{
@@ -297,23 +308,29 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				if(currentFile.exists()&&currentFile.isDirectory()){
 
 					mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
-					
-					for(int i=0; i<mOffList.size();i++){
+					if (adapterList.getCount() == 0){
+						listView.setVisibility(View.GONE);
+						emptyImageView.setVisibility(View.VISIBLE);
+						emptyTextView.setVisibility(View.VISIBLE);						
+					}
+					else{
+						for(int i=0; i<mOffList.size();i++){
 
-						File offlineDirectory = null;
-						if (Environment.getExternalStorageDirectory() != null){
-							offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+							File offlineDirectory = null;
+							if (Environment.getExternalStorageDirectory() != null){
+								offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+							}
+							else{
+								offlineDirectory = context.getFilesDir();
+							}	
+
+							if (!offlineDirectory.exists()){
+								//Updating the DB because the file does not exist														
+								dbH.removeById(mOffList.get(i).getId());
+
+								mOffList.remove(i);
+							}			
 						}
-						else{
-							offlineDirectory = context.getFilesDir();
-						}	
-
-						if (!offlineDirectory.exists()){
-							//Updating the DB because the file does not exist														
-							dbH.removeById(mOffList.get(i).getId());
-							log("quitado DB");
-							mOffList.remove(i);
-						}			
 					}
 
 					if (adapterList == null){
@@ -330,7 +347,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				}else{
 					if(currentFile.exists()&&currentFile.isFile()){
 						//Open it!
-						log("is FILE");
 						if (MimeType.typeForName(currentFile.getName()).isImage()){
 							Intent intent = new Intent(context, FullScreenImageViewer.class);
 							intent.putExtra("position", position);

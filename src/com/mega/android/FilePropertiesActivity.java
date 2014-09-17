@@ -100,6 +100,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	TextView permissionLabel;
 	TextView permissionInfo;
 	ShareList sl;
+	MegaOffline mOffDelete;
 	
 	RelativeLayout nameLayout;
 	ArrayList<MegaNode> dTreeList = null;
@@ -146,11 +147,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	AlertDialog permissionsDialog;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {		
-		
-		int result=0;
-			
+	protected void onCreate(Bundle savedInstanceState) {			
+	
 		super.onCreate(savedInstanceState);
+		
+		boolean result=true;;
 		
 		if (megaApi == null){
 			MegaApplication app = (MegaApplication)getApplication();
@@ -245,7 +246,6 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 									
 			infoTable = (TableLayout) findViewById(R.id.file_properties_info_table);
 
-			File destination = null;
 			File offlineFile = null;
 			
 			availableOfflineLayout.setVisibility(View.VISIBLE);	
@@ -297,23 +297,23 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				
 				if(dbH.exists(node.getHandle())){
 					
-//					NodeList childrenList=megaApi.getChildren(node);
-//					if(childrenList.size()>0){
-//						
-//						result=checkChildrenStatus(childrenList);
-//						
-//					}
-//					
-//					if(result==0){
-//						availableOfflineBoolean = false;
-//						availableSwitchOffline.setVisibility(View.GONE);
-//						availableSwitchOnline.setVisibility(View.VISIBLE);
-//					}
-//					else{
+					NodeList childrenList=megaApi.getChildren(node);
+					if(childrenList.size()>0){
+						
+						result=checkChildrenStatus(childrenList);
+						
+					}
+					
+					if(!result){
+						availableOfflineBoolean = false;
+						availableSwitchOffline.setVisibility(View.GONE);
+						availableSwitchOnline.setVisibility(View.VISIBLE);
+					}
+					else{
 						availableOfflineBoolean = true;
 						availableSwitchOffline.setVisibility(View.VISIBLE);
 						availableSwitchOnline.setVisibility(View.GONE);
-//					}
+					}
 					
 				}
 				else{
@@ -459,27 +459,43 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		}
 	}
 		
-	private int checkChildrenStatus(NodeList childrenList){
+	private boolean checkChildrenStatus(NodeList childrenList){
+
+		boolean children = true;
+		NodeList childrenListRec;
 		
 		if(childrenList.size()>0){
 			for(int i=0;i<childrenList.size();i++){
 				
 				if(!dbH.exists(childrenList.get(i).getHandle())){
-					return 0;
+					children=false;	
+					return children;
 				}
 				else{
-					int result=checkChildrenStatus(childrenList);
-					if(result==0){
-						return 0;
+					if(childrenList.get(i).isFolder()){
+						
+						childrenListRec=megaApi.getChildren(childrenList.get(i));
+
+						if(childrenListRec.size()>0){
+							boolean result=checkChildrenStatus(childrenListRec);
+							if(!result){
+								children=false;
+								return children;
+							}								
+						}											
 					}
-					else
-						return 1;
+					else{
+
+						if(!dbH.exists(childrenList.get(i).getHandle())){
+							children=false;
+							return children;
+						}
+						
+					}
 				}
-				
-				
 			}	
-		}				
-		return 0;
+		}	
+		return children;
 	}
 	@Override
 	public void onClick(View v) {
@@ -509,8 +525,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			availableOfflineBoolean = false;
 			availableSwitchOffline.setVisibility(View.GONE);
 			availableSwitchOnline.setVisibility(View.VISIBLE);
-			availableSwitchOffline.setChecked(false);			
-			removeOffline();			
+			availableSwitchOffline.setChecked(false);	
+			mOffDelete = dbH.findByHandle(node.getHandle());
+			removeOffline(mOffDelete);			
 			supportInvalidateOptionsMenu();
 		}
 		else{	
@@ -589,29 +606,59 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 	}
 
-	public void removeOffline(){
+	public void removeOffline(MegaOffline mOffDelete){
 		
-		log("removeOffline - file");				
+		log("removeOffline - file: "+mOffDelete.getName());	
+		//mOffDelete = node;
+		MegaOffline parentNode = null;	
+		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
+		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
+				
+		if(mOffDelete.getType()==DB_FOLDER){
+			//Delete in DB
+			//Delete children
+			mOffListChildren=dbH.findByParentId(mOffDelete.getId());
+			if(mOffListChildren.size()>0){
+				//The node have childrens, delete
+				deleteChildrenDB(mOffListChildren);			
+			}
+		}
 		
+		int parentId = mOffDelete.getParentId();
+		log("Finding parents... "+parentId);
+		//Delete parents
+		if(parentId!=-1){
+			mOffListParent=dbH.findByParentId(parentId);
+						
+			if(mOffListParent.size()<1){
+				//No more node with the same parent, keep deleting				
+				parentNode = dbH.findById(parentId);
+				if(parentNode != null){
+					removeOffline(mOffDelete);						
+				}	
+			}			
+		}	
+		
+		//Remove the node physically
 		File destination = null;
-		String path = createStringTree(node);
 		if (Environment.getExternalStorageDirectory() != null){
-			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+path);
+			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffDelete.getPath());
 		}
 		else{
-			destination = new File(getFilesDir(), node.getHandle()+"");
+			destination = new File(getFilesDir(), mOffDelete.getHandle()+"");
 		}
 		
 		try{
-			File offlineFile = new File(destination, node.getName());
+			File offlineFile = new File(destination, mOffDelete.getName());
 			Util.deleteFolderAndSubfolders(this, offlineFile);
 		}
 		catch(Exception e){
 			log("EXCEPTION: removeOffline - file");
 		};	
 		
-		deleteDB(node);	
-	}	
+		dbH.removeById(mOffDelete.getId());		
+		
+	}		
 
 	private void insertDB (ArrayList<MegaNode> nodesToDB){
 		log("insertDB");
@@ -628,12 +675,12 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		for(int i=nodesToDB.size()-1; i>=0; i--){
 
 			nodeToInsert = nodesToDB.get(i);
-			log("Nodo a insertar: "+nodeToInsert.getName());
+			log("Node to insert: "+nodeToInsert.getName());
 
 			if(megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT){
 				
 				parentNode = megaApi.getParentNode(nodeToInsert);
-				log("Nodo padre: "+parentNode.getName());
+				log("ParentNode: "+parentNode.getName());
 				log("PARENT NODE nooot ROOT");
 
 				path = createStringTree(nodeToInsert);
@@ -643,7 +690,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				else{
 					path="/"+path;
 				}
-				log("PAth nodo a insertar: --- "+path);
+				log("PAth node to insert: --- "+path);
 				//Get the node parent 
 				mOffParent = dbH.findByHandle(parentNode.getHandle());
 				//If the parent is not in the DB
@@ -657,7 +704,6 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				if(mOffNode == null){			
 
 					if(mOffParent!=null){
-						log("inserto el nodo");
 						if(nodeToInsert.isFile()){
 							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE);
 							long checkInsert=dbH.setOfflineFile(mOffInsert);
@@ -758,41 +804,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 	}
 
-	private void deleteDB (MegaNode node){
-		log("deleteDB");
 		
-		ArrayList<MegaOffline> mOffList=new ArrayList<MegaOffline>();
-		MegaOffline mOffDelete = null;
-		ArrayList<MegaOffline> mOffChildren = new ArrayList<MegaOffline>();
-				
-		mOffDelete = dbH.findByHandle(node.getHandle());
-		int parentId = mOffDelete.getId();
-		
-		//Delete children
-		mOffList=dbH.findByParentId(mOffDelete.getId());
-		if(mOffList.size()>0){
-			//The node have childrens, delete
-			deleteChildenDB(mOffList);
-			
-		}
-		
-		//Delete parents is possible
-		if(parentId!=-1){
-			mOffList=dbH.findByParentId(parentId);
-			
-			if(mOffList.size()==0){
-				//No more node with the same parent, keep deleting
-				deleteDB(megaApi.getParentNode(node));
-				
-			}	
-		}		
-		
-		dbH.removeById(mOffDelete.getId());		
-		
-	}
-	
-	
-	private void deleteChildenDB(ArrayList<MegaOffline> mOffList){
+	private void deleteChildrenDB(ArrayList<MegaOffline> mOffList){
 		
 		log("deleteChildenDB");
 		MegaOffline mOffDelete=null;
@@ -800,15 +813,15 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		for(int i=0; i< mOffList.size(); i++){
 			
 			mOffDelete=mOffList.get(i);
-			mOffList=dbH.findByParentId(mOffDelete.getId());
+			ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
 			if(mOffList.size()>0){
 				//The node have children, delete
-				deleteChildenDB(mOffList);
+				deleteChildrenDB(mOffListChildren2);
 				
 			}			
 			dbH.removeById(mOffDelete.getId());			
 		}		
-	}	
+	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -844,13 +857,15 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						}
 						else{
 							availableOfflineBoolean = false;
-							removeOffline();
+							mOffDelete = dbH.findByHandle(node.getHandle());
+							removeOffline(mOffDelete);							
 							supportInvalidateOptionsMenu();
 						}
 					}
 					else{
 						availableOfflineBoolean = false;
-						removeOffline();
+						mOffDelete = dbH.findByHandle(node.getHandle());
+						removeOffline(mOffDelete);		
 						supportInvalidateOptionsMenu();
 					}
 		    		Intent intent = new Intent(Intent.ACTION_VIEW);
