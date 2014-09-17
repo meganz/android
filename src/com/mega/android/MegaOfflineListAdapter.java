@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.ShareList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -231,6 +232,40 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		holder.currentPosition = position;
 		
 		holder.textViewFileName.setText(currentNode.getName());
+		
+		int folders=0;
+		int files=0;
+		if (currentFile.isDirectory()){
+			
+			File[] fList = currentFile.listFiles();
+			for (File f : fList){
+				
+				if (f.isDirectory()){
+					folders++;						
+				}
+				else{
+					files++;
+				}
+			}
+			
+			String info = "";
+			if (folders > 0){
+				info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+				if (files > 0){
+					info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+				}
+			}
+			else {
+				info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+			}			
+					
+			holder.textViewFileSize.setText(info);			
+		}
+		else{
+			long nodeSize = currentFile.length();
+			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+		}
+		
 		holder.imageView.setImageResource(MimeType.typeForName(currentNode.getName()).getIconResourceId());
 		if (currentFile.isFile()){
 			if (MimeType.typeForName(currentNode.getName()).isImage()){
@@ -439,29 +474,30 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		mOffListChildren=dbH.findByParentId(node.getId());
 		if(mOffListChildren.size()>0){
 			//The node have childrens, delete
-			log("Llamo a delete children");
 			deleteChildrenDB(mOffListChildren);			
 		}
 		
 		int parentId = node.getParentId();
+		log("Finding parents...");
 		//Delete parents
 		if(parentId!=-1){
 			mOffListParent=dbH.findByParentId(parentId);
 			
-			log("Encuentro con el mismo padre?:" +mOffListParent.size());
+			log("Same Parent?:" +mOffListParent.size());
 			
-			if(mOffListParent.size()==0){
+			if(mOffListParent.size()<1){
 				//No more node with the same parent, keep deleting				
 
 				parentNode = dbH.findById(parentId);
-				log("Nombre del padre recursivo: "+parentNode.getName());
+				log("Recursive parent: "+parentNode.getName());
 				if(parentNode != null){
-					log("Borro tb el padre");
-					deleteOffline(context, parentNode);						
+					deleteOffline(context, parentNode);	
+						
 				}	
 			}			
-		}			
+		}	
 		
+		log("Remove the node physically");
 		//Remove the node physically
 		File destination = null;								
 
