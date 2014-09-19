@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -37,9 +38,13 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 	
 	OfflineFragment fragment;
 	Context context;
-	
-	ArrayList<String> paths = new ArrayList<String>();	
 	int positionClicked;
+
+	public static String DB_FILE = "0";
+	public static String DB_FOLDER = "1";
+	public DatabaseHandler dbH;
+	String pathNavigation = null;
+	ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();	
 		
 	ListView listFragment;
 	ImageView emptyImageViewFragment;
@@ -61,6 +66,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 		protected Bitmap doInBackground(String... params) {
 
 			currentPath = params[0];
+			String numHolder = params[1];
 			File currentFile = new File(currentPath);
 			
 			BitmapFactory.Options options = new BitmapFactory.Options();
@@ -82,8 +88,18 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 		    
 		    thumb = BitmapFactory.decodeFile(currentFile.getAbsolutePath(), options);
 			if (thumb != null){
+				long handle = -1;
 				thumb = Util.rotateBitmap(thumb, orientation);
-				long handle = Long.parseLong(currentFile.getParentFile().getName());
+				if(numHolder.equals("1")){
+					log("Entro opor el 1: "+numHolder);
+					handle = Long.parseLong(holder.currentHandle1);
+				}
+				else{
+					log("Entro opor el 2: "+numHolder);
+					handle = Long.parseLong(holder.currentHandle2);
+				}
+				
+				//long handle = Long.parseLong(currentFile.getParentFile().getName());
 				ThumbnailUtils.setThumbnailCache(handle, thumb);
 				return thumb;
 			}
@@ -111,11 +127,12 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			}
 		}    	
     }
+	
 		
-	public MegaOfflineGridAdapter(OfflineFragment _fragment, Context _context, ArrayList<String> _paths, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
+	public MegaOfflineGridAdapter(OfflineFragment _fragment, Context _context, ArrayList<MegaOffline> _mOffList, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
 		this.fragment = _fragment;
 		this.context = _context;
-		this.paths = _paths;
+		this.mOffList = _mOffList;
 
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
@@ -125,8 +142,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 		this.positionClicked = -1;
 	}
 	
-	public void setPaths(ArrayList<String> paths){
-		this.paths = paths;
+	public void setNodes(ArrayList<MegaOffline> mOffList){
+		this.mOffList = mOffList;
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
@@ -154,6 +171,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
         int currentPosition;
         String currentPath1;
         String currentPath2;
+        String currentHandle1;
+        String currentHandle2;
     }
     
     ViewHolderOfflineGrid holder = null;
@@ -161,7 +180,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
+		log("MegaOfflineGridAdapter:getView");
 		View v;
 		
 		listFragment = (ListView) parent;
@@ -255,83 +274,159 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 
 			holder.currentPosition = position;
 
-			String currentPath1 = (String) getItem(position);
-			File currentFile1 = new File(currentPath1);
+////////////////////// Node 1			
 			
-			holder.currentPath1 = currentPath1;
+			MegaOffline currentNode1 = (MegaOffline) getItem(position);
 			
-			long fileSize1 = currentFile1.length();
-			holder.textViewFileName1.setText(currentFile1.getName());
-			holder.textViewFileSize1.setText(Util.getSizeString(fileSize1));
-			holder.imageView1.setImageResource(MimeType.typeForName(currentFile1.getName()).getIconResourceId());
-			
-			if (MimeType.typeForName(currentFile1.getName()).isImage()){
-				Bitmap thumb1 = null;
-				String [] s = currentFile1.getName().split("_");
-				if (s.length > 0){
-					long handle = Long.parseLong(s[0]);
-					
-					String fileName = "";
-					for (int i=1;i<s.length-1;i++){
-						fileName += s[i] + "_";
-					}
-					fileName += s[s.length-1];
-					holder.textViewFileName1.setText(fileName);
-					
-					thumb1 = ThumbnailUtils.getThumbnailFromCache(handle);
-					if (thumb1 != null){
-						holder.imageView1.setImageBitmap(thumb1);
-					}
-					else{
-						try{
-							new OfflineThumbnailAsyncTask(holder, 0).execute(currentFile1.getAbsolutePath());
-						}
-						catch(Exception e){
-							//Too many AsyncTasks
-						}
-					}
-				}
+			File currentFile1 = null;
+			if (Environment.getExternalStorageDirectory() != null){
+				currentFile1 = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode1.getPath()+currentNode1.getName());
+			}
+			else{
+				currentFile1 = context.getFilesDir();
 			}
 			
-			String currentPath2 = "";
-			if (position < (getCount()-1)){
-				currentPath2 = (String) getItem(position+1);
-				File currentFile2 = new File(currentPath2);
+			holder.currentPath1 = currentFile1.getAbsolutePath();
+			holder.currentHandle1 = currentNode1.getHandle();
+			holder.currentPosition = position;
+			
+			holder.textViewFileName1.setText(currentNode1.getName());
+			
+			int folders=0;
+			int files=0;
+			if (currentFile1.isDirectory()){
 				
-				holder.currentPath2 = currentPath2;
-				
-				long fileSize2 = currentFile2.length();
-				holder.textViewFileName2.setText(currentFile2.getName());
-				holder.textViewFileSize2.setText(Util.getSizeString(fileSize2));
-				holder.imageView2.setImageResource(MimeType.typeForName(currentFile2.getName()).getIconResourceId());
-				
-				if (MimeType.typeForName(currentFile2.getName()).isImage()){
+				File[] fList = currentFile1.listFiles();
+				for (File f : fList){
 					
+					if (f.isDirectory()){
+						folders++;						
+					}
+					else{
+						files++;
+					}
+				}
+				
+				String info = "";
+				if (folders > 0){
+					info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+					if (files > 0){
+						info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+					}
+				}
+				else {
+					info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+				}			
+						
+				holder.textViewFileSize1.setText(info);			
+			}
+			else{
+				long nodeSize = currentFile1.length();
+				holder.textViewFileSize1.setText(Util.getSizeString(nodeSize));		
+			}
+						
+			holder.imageView1.setImageResource(MimeType.typeForName(currentNode1.getName()).getIconResourceId());
+			if (currentFile1.isFile()){
+				if (MimeType.typeForName(currentNode1.getName()).isImage()){
 					Bitmap thumb = null;
-					String [] s = currentFile2.getName().split("_");
-					if (s.length > 0){
-						long handle = Long.parseLong(s[0]);
-						
-						String fileName = "";
-						for (int i=1;i<s.length-1;i++){
-							fileName += s[i] + "_";
-						}
-						fileName += s[s.length-1];
-						holder.textViewFileName2.setText(fileName);
-						
-						thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+									
+					if (currentFile1.exists()){
+						thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode1.getHandle()));
 						if (thumb != null){
-							holder.imageView2.setImageBitmap(thumb);
+							holder.imageView1.setImageBitmap(thumb);
 						}
 						else{
 							try{
-								new OfflineThumbnailAsyncTask(holder, 1).execute(currentFile2.getAbsolutePath());
+								new OfflineThumbnailAsyncTask(holder,0).execute(new String[] { currentFile1.getAbsolutePath(),"1" });
 							}
 							catch(Exception e){
 								//Too many AsyncTasks
 							}
 						}
 					}
+				}
+			}
+			else{
+				holder.imageView1.setImageResource(R.drawable.mime_folder);
+			}	
+			
+////////////////////////////////Node 2		
+			
+			MegaOffline currentNode2 = null;
+			if (position < (getCount()-1)){
+				
+				currentNode2 = (MegaOffline) getItem(position+1);
+				
+				File currentFile2 = null;
+				if (Environment.getExternalStorageDirectory() != null){
+					currentFile2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode2.getPath()+currentNode2.getName());
+				}
+				else{
+					currentFile2 = context.getFilesDir();
+				}
+				
+				holder.currentPath2 = currentFile2.getAbsolutePath();
+				holder.currentHandle2 = currentNode2.getHandle();
+				holder.currentPosition = position;
+				
+				holder.textViewFileName2.setText(currentNode2.getName());				
+				
+				folders=0;
+				files=0;
+				if (currentFile2.isDirectory()){
+					
+					File[] fList = currentFile2.listFiles();
+					for (File f : fList){
+						
+						if (f.isDirectory()){
+							folders++;						
+						}
+						else{
+							files++;
+						}
+					}
+					
+					String info = "";
+					if (folders > 0){
+						info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+						if (files > 0){
+							info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+						}
+					}
+					else {
+						info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+					}			
+							
+					holder.textViewFileSize2.setText(info);			
+				}
+				else{
+					long nodeSize = currentFile2.length();
+					holder.textViewFileSize2.setText(Util.getSizeString(nodeSize));
+				}				
+				
+				holder.imageView2.setImageResource(MimeType.typeForName(currentNode2.getName()).getIconResourceId());
+				if (currentFile2.isFile()){
+					if (MimeType.typeForName(currentNode2.getName()).isImage()){
+						Bitmap thumb = null;
+										
+						if (currentFile2.exists()){
+							thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode2.getHandle()));
+							if (thumb != null){
+								holder.imageView2.setImageBitmap(thumb);
+							}
+							else{
+								try{
+									new OfflineThumbnailAsyncTask(holder,1).execute(new String[] { currentFile2.getAbsolutePath(),"2" });
+								}
+								catch(Exception e){
+									//Too many AsyncTasks
+								}
+							}
+						}
+					}
+				}
+				else{
+					holder.imageView2.setImageResource(R.drawable.mime_folder);
 				}
 				
 				holder.itemLayout2.setVisibility(View.VISIBLE);				
@@ -425,12 +520,12 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
     public int getCount() {
-        return paths.size();
+        return mOffList.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return paths.get(position);
+        return mOffList.get(position);
     }
  
     @Override
@@ -451,62 +546,230 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 
 		ViewHolderOfflineGrid holder = (ViewHolderOfflineGrid) v.getTag();
 		int currentPosition = holder.currentPosition;
-		
+		dbH = DatabaseHandler.getDbHandler(context);
+				
 		switch (v.getId()){
 			case R.id.offline_grid_thumbnail1:{
-				String currentPath = paths.get(currentPosition);
-				File currentFile = new File (currentPath);
 				
-				if (MimeType.typeForName(currentFile.getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", currentPosition);
-					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
-					intent.putExtra("parentNodeHandle", -1L);
-					context.startActivity(intent);
-				}
-				else{
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-						context.startActivity(viewIntent);
+				log("Nooo en la uno");
+				MegaOffline mOff = (MegaOffline) getItem(currentPosition);
+				String currentPath = mOff.getPath()+mOff.getName(); 
+				File currentFile = new File(currentPath);		
+				
+				MegaOffline currentNode = mOffList.get(currentPosition);
+				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";				
+				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+				
+				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+				
+				if(currentFile.exists()&&currentFile.isDirectory()){
+										
+					mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
+					
+					if (this.getCount() == 0){
+						log("thum1");
+						listFragment.setVisibility(View.GONE);
+						emptyImageViewFragment.setVisibility(View.VISIBLE);
+						emptyTextViewFragment.setVisibility(View.VISIBLE);						
 					}
 					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-						if (ManagerActivity.isIntentAvailable(context, intentShare)){
-							context.startActivity(intentShare);
+						for(int i=0; i<mOffList.size();i++){
+
+							File offlineDirectory = null;
+							if (Environment.getExternalStorageDirectory() != null){
+								offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+							}
+							else{
+								offlineDirectory = context.getFilesDir();
+							}	
+
+							if (!offlineDirectory.exists()){
+								//Updating the DB because the file does not exist														
+								dbH.removeById(mOffList.get(i).getId());
+
+								mOffList.remove(i);
+							}			
 						}
 					}
+
+
+					this.setNodes(mOffList);
+
+
+					this.setPositionClicked(-1);
+					//this.setMultipleSelect(false);
+					notifyDataSetChanged();
+
+				}else{
+					//if(currentFile.exists()&&currentFile.isFile()){
+						log("Open it!");
+						if (MimeType.typeForName(currentFile.getName()).isImage()){
+							Intent intent = new Intent(context, FullScreenImageViewer.class);
+							intent.putExtra("position", currentPosition);
+							intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+							intent.putExtra("parentNodeHandle", -1L);
+							intent.putExtra("offlinePathDirectory", currentFile.getParent());
+							context.startActivity(intent);
+						}
+						else{
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+							if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+								context.startActivity(viewIntent);
+							}
+							else{
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+								if (ManagerActivity.isIntentAvailable(context, intentShare)){
+									context.startActivity(intentShare);
+								}
+							}
+					//	}
+						
+					}
+					
 				}
+				
+				
+				
+				
+				
+				
+//				if (MimeType.typeForName(currentFile.getName()).isImage()){
+//					Intent intent = new Intent(context, FullScreenImageViewer.class);
+//					intent.putExtra("position", currentPosition);
+//					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+//					intent.putExtra("parentNodeHandle", -1L);
+//					context.startActivity(intent);
+//				}
+//				else{
+//					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+//					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+//						context.startActivity(viewIntent);
+//					}
+//					else{
+//						Intent intentShare = new Intent(Intent.ACTION_SEND);
+//						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+//						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+//							context.startActivity(intentShare);
+//						}
+//					}
+//				}
 				positionClicked = -1;
 				notifyDataSetChanged();
 				break;
 			}
 			case R.id.offline_grid_thumbnail2:{
-				String currentPath = paths.get(currentPosition+1);
-				File currentFile = new File (currentPath);
 				
-				if (MimeType.typeForName(currentFile.getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", currentPosition+1);
-					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
-					intent.putExtra("parentNodeHandle", -1L);
-					context.startActivity(intent);
-				}
-				else{
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-						context.startActivity(viewIntent);
+				
+				log("Entroooo");
+				MegaOffline mOff = (MegaOffline) getItem(currentPosition+1);
+				String currentPath = mOff.getPath()+mOff.getName(); 
+				File currentFile = new File(currentPath);		
+				
+				MegaOffline currentNode = mOffList.get(currentPosition);
+				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";				
+				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+				
+				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+				
+				if(currentFile.exists()&&currentNode.getType()==DB_FOLDER){
+					
+					log("Y por aqui?");
+
+					mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
+					if (this.getCount() == 0){
+						
+						listFragment.setVisibility(View.GONE);
+						emptyImageViewFragment.setVisibility(View.VISIBLE);
+						emptyTextViewFragment.setVisibility(View.VISIBLE);						
 					}
 					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-						if (ManagerActivity.isIntentAvailable(context, intentShare)){
-							context.startActivity(intentShare);
+						for(int i=0; i<mOffList.size();i++){
+
+							File offlineDirectory = null;
+							if (Environment.getExternalStorageDirectory() != null){
+								offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+							}
+							else{
+								offlineDirectory = context.getFilesDir();
+							}	
+
+							if (!offlineDirectory.exists()){
+								//Updating the DB because the file does not exist														
+								dbH.removeById(mOffList.get(i).getId());
+
+								mOffList.remove(i);
+							}			
 						}
 					}
+
+					this.setNodes(mOffList);
+
+
+					this.setPositionClicked(-1);
+					//this.setMultipleSelect(false);
+					notifyDataSetChanged();
+
+				}else{
+					//if(currentFile.exists()&&currentFile.isFile()){
+						log("Open it!");
+						if (MimeType.typeForName(currentFile.getName()).isImage()){
+							Intent intent = new Intent(context, FullScreenImageViewer.class);
+							intent.putExtra("position", currentPosition);
+							intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+							intent.putExtra("parentNodeHandle", -1L);
+							intent.putExtra("offlinePathDirectory", currentFile.getParent());
+							context.startActivity(intent);
+						}
+						else{
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+							if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+								context.startActivity(viewIntent);
+							}
+							else{
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+								if (ManagerActivity.isIntentAvailable(context, intentShare)){
+									context.startActivity(intentShare);
+								}
+							}
+						}
+						
+					//}
+					
 				}
+				
+				
+				
+				
+//				MegaOffline mOff = (MegaOffline) getItem(currentPosition+1);
+//				String currentPath = mOff.getPath()+mOff.getName(); 
+//				File currentFile = new File(currentPath);
+//				
+//				if (MimeType.typeForName(currentFile.getName()).isImage()){
+//					Intent intent = new Intent(context, FullScreenImageViewer.class);
+//					intent.putExtra("position", currentPosition+1);
+//					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+//					intent.putExtra("parentNodeHandle", -1L);
+//					context.startActivity(intent);
+//				}
+//				else{
+//					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+//					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+//					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+//						context.startActivity(viewIntent);
+//					}
+//					else{
+//						Intent intentShare = new Intent(Intent.ACTION_SEND);
+//						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+//						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+//							context.startActivity(intentShare);
+//						}
+//					}
+//				}
 				positionClicked = -1;
 				notifyDataSetChanged();
 				break;
@@ -583,33 +846,113 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 			case R.id.offline_grid_option_delete1:{
-				File currentFile = new File((String)getItem(currentPosition));
+				MegaOffline mOff = (MegaOffline) getItem(currentPosition);
+				
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				
-				try{
-					Util.deleteFolderAndSubfolders(context, currentFile.getParentFile());
-				}
-				catch(Exception e){};
+				deleteOffline(context, mOff);
 				
 				fragment.refreshPaths();
 				break;
 			}
 			case R.id.offline_grid_option_delete2:{
-				File currentFile = new File((String)getItem(currentPosition+1));
+				MegaOffline mOff = (MegaOffline) getItem(currentPosition+1);
 				setPositionClicked(-1);
 				notifyDataSetChanged();
 				
-				try{
-					Util.deleteFolderAndSubfolders(context, currentFile.getParentFile());
-				}
-				catch(Exception e){};
+				deleteOffline(context, mOff);
 				
 				fragment.refreshPaths();
 				break;
 			}
 		}
 	}
+	
+private int deleteOffline(Context context,MegaOffline node){
+		
+		log("deleteOffline");
+
+//		dbH = new DatabaseHandler(context);
+		dbH = DatabaseHandler.getDbHandler(context);
+
+		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
+		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
+		MegaOffline parentNode = null;	
+		
+		//Delete children
+		mOffListChildren=dbH.findByParentId(node.getId());
+		if(mOffListChildren.size()>0){
+			//The node have childrens, delete
+			deleteChildrenDB(mOffListChildren);			
+		}
+		
+		int parentId = node.getParentId();
+		log("Finding parents...");
+		//Delete parents
+		if(parentId!=-1){
+			mOffListParent=dbH.findByParentId(parentId);
+			
+			log("Same Parent?:" +mOffListParent.size());
+			
+			if(mOffListParent.size()<1){
+				//No more node with the same parent, keep deleting				
+
+				parentNode = dbH.findById(parentId);
+				log("Recursive parent: "+parentNode.getName());
+				if(parentNode != null){
+					deleteOffline(context, parentNode);	
+						
+				}	
+			}			
+		}	
+		
+		log("Remove the node physically");
+		//Remove the node physically
+		File destination = null;								
+
+		if (Environment.getExternalStorageDirectory() != null){
+			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
+		}
+		else{
+			destination = context.getFilesDir();
+		}	
+
+		try{
+			File offlineFile = new File(destination, node.getName());	
+			log("Delete in phone: "+node.getName());
+			Util.deleteFolderAndSubfolders(context, offlineFile);
+		}
+		catch(Exception e){
+			log("EXCEPTION: deleteOffline - adapter");
+		};		
+		
+		log("Delete in DB: "+node.getId());
+		dbH.removeById(node.getId());		
+		
+		return 1;		
+	}
+	
+	private void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
+		
+		log("deleteChildenDB: "+mOffListChildren.size());
+		MegaOffline mOffDelete=null;
+	
+		for(int i=0; i<mOffListChildren.size(); i++){	
+			
+			mOffDelete=mOffListChildren.get(i);
+			
+			log("Children "+i+ ": "+ mOffDelete.getName());
+			ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
+			if(mOffListChildren2.size()>0){
+				//The node have children, delete				
+				deleteChildrenDB(mOffListChildren2);				
+			}	
+			
+			int lines = dbH.removeById(mOffDelete.getId());		
+			log("Borradas; "+lines);
+		}		
+}	
 	
 	private static void log(String log) {
 		Util.log("MegaOfflineGridAdapter", log);

@@ -376,6 +376,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			case R.id.offline_list_option_open:{
 				positionClicked = -1;
 				notifyDataSetChanged();
+				
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
 				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
@@ -521,8 +522,8 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		dbH.removeById(node.getId());		
 		
 		return 1;		
-	}
-	
+	}	
+
 	private void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
 		
 		log("deleteChildenDB: "+mOffListChildren.size());
