@@ -251,6 +251,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	MegaApplication app;
 	
 	NavigationDrawerAdapter nDA;
+	
+	String pathNavigation = "/";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -424,6 +426,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         }
         
         dbH.setAttrOnline(true);
+        this.setPathNavigationOffline(pathNavigation);
         
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
@@ -1355,8 +1358,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (oF == null){
     				oF = new OfflineFragment();
     				oF.setIsList(isListOffline);
+    				oF.setPathNavigation("/");
     			}
     			else{
+    				oF.setPathNavigation("/");
     				oF.setIsList(isListOffline);
     			}
     			
@@ -2120,7 +2125,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						fragTransaction.commit();
 						
 						isListOffline = !isListOffline;
-						oF.setIsList(isListOffline);
+						oF.setIsList(isListOffline);						
+						oF.setPathNavigation(pathNavigation);
+						//oF.setGridNavigation(false);
+						//oF.setParentHandle(parentHandleSharedWithMe);
 						
 						fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.attach(currentFragment);
@@ -3710,6 +3718,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void setParentHandleSearch(long parentHandleSearch){
 		this.parentHandleSearch = parentHandleSearch;
+	}
+	public void setPathNavigationOffline(String pathNavigation){
+		this.pathNavigation = pathNavigation;
 	}
 	
 	public void setPauseIconVisible(boolean visible){

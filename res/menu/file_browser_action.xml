@@ -47,6 +47,8 @@
         android:orderInCategory="125"
         android:showAsAction="always"
         android:title="@string/context_move_to_trash"
-        MEGA:showAsAction="ifRoom" />    
+        MEGA:showAsAction="ifRoom" />   
+        
+    
 
 </menu>

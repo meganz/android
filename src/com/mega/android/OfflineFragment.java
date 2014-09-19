@@ -54,6 +54,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	long parentHandle = -1;
 	boolean isList = true;
+	boolean gridNavigation=false;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
@@ -66,28 +67,112 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<String> documents = getSelectedDocuments();
+			List<MegaOffline> documents = getSelectedDocuments();
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_trash:{
 					
 					for (int i=0;i<documents.size();i++){
-						File f = new File(documents.get(i));
-						try{
-							Util.deleteFolderAndSubfolders(context, f.getParentFile());
-						}
-						catch(Exception e){};
+						
+						deleteOffline(context, documents.get(i));
+
 					}
 					
 					clearSelections();
 					hideMultipleSelect();
-					refreshPaths();
+					refreshPaths(documents.get(0));
 					break;
 				}	
 				
 			}
 			return false;
 		}
+		
+		private int deleteOffline(Context context,MegaOffline node){
+			
+			log("deleteOffline");
+
+//			dbH = new DatabaseHandler(context);
+			dbH = DatabaseHandler.getDbHandler(context);
+
+			ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
+			ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
+			MegaOffline parentNode = null;	
+			
+			//Delete children
+			mOffListChildren=dbH.findByParentId(node.getId());
+			if(mOffListChildren.size()>0){
+				//The node have childrens, delete
+				deleteChildrenDB(mOffListChildren);			
+			}
+			
+			int parentId = node.getParentId();
+			log("Finding parents...");
+			//Delete parents
+			if(parentId!=-1){
+				mOffListParent=dbH.findByParentId(parentId);
+				
+				log("Same Parent?:" +mOffListParent.size());
+				
+				if(mOffListParent.size()<1){
+					//No more node with the same parent, keep deleting				
+
+					parentNode = dbH.findById(parentId);
+					log("Recursive parent: "+parentNode.getName());
+					if(parentNode != null){
+						deleteOffline(context, parentNode);	
+							
+					}	
+				}			
+			}	
+			
+			log("Remove the node physically");
+			//Remove the node physically
+			File destination = null;								
+
+			if (Environment.getExternalStorageDirectory() != null){
+				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
+			}
+			else{
+				destination = context.getFilesDir();
+			}	
+
+			try{
+				File offlineFile = new File(destination, node.getName());	
+				log("Delete in phone: "+node.getName());
+				Util.deleteFolderAndSubfolders(context, offlineFile);
+			}
+			catch(Exception e){
+				log("EXCEPTION: deleteOffline - adapter");
+			};		
+			
+			log("Delete in DB: "+node.getId());
+			dbH.removeById(node.getId());		
+			
+			return 1;		
+		}
+		
+		private void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
+
+			log("deleteChildenDB: "+mOffListChildren.size());
+			MegaOffline mOffDelete=null;
+
+			for(int i=0; i<mOffListChildren.size(); i++){	
+
+				mOffDelete=mOffListChildren.get(i);
+
+				log("Children "+i+ ": "+ mOffDelete.getName());
+				ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
+				if(mOffListChildren2.size()>0){
+					//The node have children, delete				
+					deleteChildrenDB(mOffListChildren2);				
+				}	
+
+				int lines = dbH.removeById(mOffDelete.getId());		
+				log("Borradas; "+lines);
+			}		
+		}
+		
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -105,7 +190,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<String> selected = getSelectedDocuments();
+			List<MegaOffline> selected = getSelectedDocuments();
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -128,8 +213,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		}
 		
 	}
-	
-	
+		
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -164,9 +248,16 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
 						
-			mOffList=dbH.findByPath("/");
-			pathNavigation= "/";
-				
+//			if(gridNavigation){
+//				mOffList=dbH.findByPath(pathNavigation);
+//			}
+//			else{
+//				setPathNavigation("/");
+//				mOffList=dbH.findByPath(pathNavigation);				
+//			}
+			log("Ahora la navigation es: "+pathNavigation);
+			mOffList=dbH.findByPath(pathNavigation);
+									
 			for(int i=0; i<mOffList.size();i++){
 				
 				File offlineDirectory = null;
@@ -219,48 +310,51 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			listView.setItemsCanFocus(false);
 	        
 	        emptyImageView = (ImageView) v.findViewById(R.id.offline_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.offline_grid_empty_text);			
+			emptyTextView = (TextView) v.findViewById(R.id.offline_grid_empty_text);
 			
-			File offlineDirectory = null;
-			if (Environment.getExternalStorageDirectory() != null){
-				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
-			}
-			else{
-				offlineDirectory = context.getFilesDir();
-			}
+			mOffList=dbH.findByPath(pathNavigation);
 			
-			if (offlineDirectory.exists() && offlineDirectory.isDirectory()){
-				File[] fList = offlineDirectory.listFiles();
-				for (File f : fList){
-					String [] s = f.getName().split("_");
-					if (s.length > 0){
-						long handle = -1;
-						try{
-							handle = Long.parseLong(s[0]);
-						}
-						catch(Exception e){ }
-						
-						if (handle != -1){
-							//paths.add(f.getAbsolutePath());		
-						}						
-					}					
+			for(int i=0; i<mOffList.size();i++){
+				
+				File offlineDirectory = null;
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
 				}
+				else{
+					offlineDirectory = context.getFilesDir();
+				}	
+				
+				if (!offlineDirectory.exists()){
+					dbH.removeById(mOffList.get(i).getId());
+					mOffList.remove(i);
+					
+				}			
+			}
+			
+			if (adapterGrid == null){
+				adapterGrid = new MegaOfflineGridAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
 			}
 			else{
-				offlineDirectory.mkdirs();
+				adapterGrid.setNodes(mOffList);
 			}
 			
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaOfflineGridAdapter(this, context, paths, listView, emptyImageView, emptyTextView, aB);
-//			}
-//			else{
-//				adapterGrid.setPaths(paths);
-//			}
-//			adapterGrid.setPositionClicked(-1);
-//			
-//			listView.setAdapter(adapterGrid);
+						
+			if (adapterList.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}	
 			
-//			setPaths(paths);
+			adapterGrid.setPositionClicked(-1);
+			//adapterGrid.setMultipleSelect(false);
+			listView.setAdapter(adapterGrid);
 			
 			return v;
 		}		
@@ -301,7 +395,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			else{
 				
 				MegaOffline currentNode = mOffList.get(position);
-				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";				
+				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
+				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
 				
 				File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
 				
@@ -437,11 +532,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
-		List<String> documents = getSelectedDocuments();
+		List<MegaOffline> documents = getSelectedDocuments();
 		int files = 0;
 		int folders = 0;
-		for (String document : documents) {
-			File f = new File(document);
+		for (MegaOffline document : documents) {
+			File f = new File(document.getName());
 			if (f.isFile()) {
 				files++;
 			} 
@@ -478,14 +573,16 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	/*
 	 * Get list of all selected documents
 	 */
-	private List<String> getSelectedDocuments() {
-		ArrayList<String> documents = new ArrayList<String>();
+	private List<MegaOffline> getSelectedDocuments() {
+		ArrayList<MegaOffline> documents = new ArrayList<MegaOffline>();
+		
 		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
 		for (int i = 0; i < checkedItems.size(); i++) {
 			if (checkedItems.valueAt(i) == true) {
-				String currentPath = adapterList.getPathAt(checkedItems.keyAt(i));
-				if (currentPath != null){
-					documents.add(currentPath);
+				
+				MegaOffline currentNode = mOffList.get(checkedItems.keyAt(i));
+				if (currentNode != null){
+					documents.add(currentNode);
 				}
 			}
 		}
@@ -518,6 +615,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
 				int index=pathNavigation.lastIndexOf("/");				
 				pathNavigation=pathNavigation.substring(0,index+1);
+				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
 				
 				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
 				mOffListNavigation=dbH.findByPath(pathNavigation);				
@@ -528,10 +626,35 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			else{
 					return 0;
 			}
-		}
+		}		
+		else{
+		
+			if (adapterGrid.getPositionClicked() != -1){
+				adapterGrid.setPositionClicked(-1);
+				adapterGrid.notifyDataSetChanged();
+				return 1;
+			}
+			else if(!pathNavigation.equals("/")){
+				//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
 	
-		return 0;
-//		else{
+				// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
+				
+				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+				int index=pathNavigation.lastIndexOf("/");				
+				pathNavigation=pathNavigation.substring(0,index+1);
+				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+				
+				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
+				mOffListNavigation=dbH.findByPath(pathNavigation);				
+				adapterGrid.setNodes(mOffListNavigation);
+				//adapterGrid.setPathNavigation?
+				this.setNodes(mOffListNavigation);
+				return 2;
+			}
+			else{
+					return 0;
+			}
+					
 //			parentHandle = adapterGrid.getParentHandle();
 //			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 //			
@@ -569,7 +692,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 //					return 0;
 //				}
 //			}
-//		}
+		}
 	}
 	
 	public ListView getListView(){
@@ -698,15 +821,21 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		
 		return nodeToShow;
 		
-	}
+	}	
 	
-	public void setPath(String path){
-		
-		mOffList=dbH.findByPath("/");	
-		
-		
-		setNodes(mOffList);
-		listView.invalidateViews();
+	public void setPathNavigation(String _pathNavigation){
+		log("En llamada Manager pathNav: "+_pathNavigation);
+		this.pathNavigation = _pathNavigation;
+		if (isList){
+			if (adapterList != null){	
+				adapterList.setNodes(dbH.findByPath(_pathNavigation));
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.setNodes(dbH.findByPath(_pathNavigation));
+			}
+		}
 	}
 	
 	public void setIsList(boolean isList){
