@@ -83,12 +83,13 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
     	String currentPath;
     	
     	public OfflineThumbnailAsyncTask(ViewHolderOfflineList holder) {
+    		log("OfflineThumbnailAsyncTask::OfflineThumbnailAsyncTask");
 			this.holder = holder;
 		}
     	
 		@Override
 		protected Bitmap doInBackground(String... params) {
-
+			log("OfflineThumbnailAsyncTask::doInBackground");
 			currentPath = params[0];
 			File currentFile = new File(currentPath);
 			
@@ -122,6 +123,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		
 		@Override
 		protected void onPostExecute(Bitmap thumb){
+			log("OfflineThumbnailAsyncTask::onPostExecute");
 			if (thumb != null){
 				if (holder.currentPath.compareTo(currentPath) == 0){
 					holder.imageView.setImageBitmap(thumb);
@@ -133,6 +135,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
     }
 	
 	public MegaOfflineListAdapter(OfflineFragment _fragment, Context _context, ArrayList<MegaOffline> _mOffList, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
+		log("MegaOfflineListAdapter");
 		this.fragment = _fragment;
 		this.context = _context;
 		this.mOffList = _mOffList;
@@ -146,6 +149,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	}
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
+		log("setNodes");
 		this.mOffList = mOffList;
 		positionClicked = -1;	
 		notifyDataSetChanged();
@@ -153,7 +157,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		log("MegaOfflineListAdapter:getView");
+		log("getView");
 		View v;		
 	
 		listFragment = (ListView) parent;
@@ -338,34 +342,41 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public boolean isEnabled(int position) {
+		log("isEnabled");
 		return super.isEnabled(position);
 	}
 
 	@Override
     public int getCount() {
+		log("getCount");
 		return mOffList.size();
     }
  
     @Override
     public Object getItem(int position) {
+    	log("getItem");
         return mOffList.get(position);
     }
  
     @Override
     public long getItemId(int position) {
+    	log("getItemId");
         return position;
     }    
     
     public int getPositionClicked (){
+    	log("getPositionClicked");
     	return positionClicked;
     }
     
     public void setPositionClicked(int p){
+    	log("setPositionClicked");
     	positionClicked = p;
     }
 
 	@Override
 	public void onClick(View v) {
+		log("onClick");
 		ViewHolderOfflineList holder = (ViewHolderOfflineList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
@@ -441,6 +452,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	 * Get path at specified position
 	 */
 	public String getPathAt(int position) {
+		log("getPathAt");
 //		try {
 //			if(paths != null){
 //				return paths.get(position);
@@ -450,10 +462,12 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	}
 	
 	public boolean isMultipleSelect() {
+		log("isMultipleSelect");
 		return multipleSelect;
 	}
 
 	public void setMultipleSelect(boolean multipleSelect) {
+		log("setMultipleSelect");
 		if(this.multipleSelect != multipleSelect){
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();

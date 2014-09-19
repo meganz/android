@@ -285,7 +285,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.currentPath = transfer.getPath();
 			
 			if (MimeType.typeForName(transfer.getFileName()).isImage()){
-				Bitmap thumb = null;
+				/*Bitmap thumb = null;
 				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentPath);
 				if (thumb != null){
 					holder.imageView.setImageBitmap(thumb);
@@ -297,7 +297,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 					catch(Exception e){
 						//Too many AsyncTasks
 					}
-				}
+				}*/
 			}
 		}
 			
