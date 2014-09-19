@@ -256,6 +256,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate");
 
 //	    dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -357,7 +358,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         
         if (!Util.isOnline(this)){
         	
-        	dbH.setAttrOnline(false);
+        	Intent offlineIntent = new Intent(this, OfflineActivity.class);
+			startActivity(offlineIntent);
+			finish();
+        	return;
+        	/*dbH.setAttrOnline(false);
         	
         	userName.setVisibility(View.INVISIBLE);
         	userEmail.setVisibility(View.INVISIBLE);
@@ -381,11 +386,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	        
 	        mDrawerToggle = new ActionBarDrawerToggle(
-	                this,                  /* host Activity */
-	                mDrawerLayout,         /* DrawerLayout object */
-	                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
-	                R.string.app_name,  /* "open drawer" description for accessibility */
-	                R.string.app_name  /* "close drawer" description for accessibility */
+	                this,                  // host Activity 
+	                mDrawerLayout,         // DrawerLayout object 
+	                R.drawable.ic_drawer,  // nav drawer image to replace 'Up' caret 
+	                R.string.app_name,  // "open drawer" description for accessibility 
+	                R.string.app_name  // "close drawer" description for accessibility 
 	                ) {
 	            public void onDrawerClosed(View view) {
 	                supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
@@ -422,7 +427,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			//INITIAL FRAGMENT
 			selectDrawerItem(drawerItem);
 			
-        	return;
+        	return;*/
         }
         
         dbH.setAttrOnline(true);
@@ -711,6 +716,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     @Override
 	protected void onSaveInstanceState(Bundle outState) {
+    	log("onSaveInstaceState");
     	super.onSaveInstanceState(outState);
     	
     	long pHBrowser = -1;
@@ -810,10 +816,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     @Override
     protected void onDestroy(){
-    	super.onDestroy();
-    	
     	log("onDestroy()");
-    	
+
+    	super.onDestroy();
+    	    	
     	if (megaApi.getRootNode() != null){
     		megaApi.removeGlobalListener(this);
     	
@@ -824,7 +830,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     @Override
 	protected void onNewIntent(Intent intent){
-    	
+    	log("onNewIntent");
     	if ((intent != null) && Intent.ACTION_SEARCH.equals(intent.getAction())){
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
     		parentHandleSearch = -1;
@@ -844,17 +850,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     @Override
 	protected void onPause() {
-    	managerActivity = null;
     	log("onPause");
+    	managerActivity = null;
     	super.onPause();
     }
     
     @Override
 	protected void onResume() {
+    	log("onResume");
     	super.onResume();
     	managerActivity = this;
-    	
-    	log("onResume");
     	
     	Intent intent = getIntent(); 
     	
@@ -988,6 +993,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * Open MEGA link from intent from another app
 	 */
 	private void handleOpenLinkIntent(Intent intent) {
+		log("handleOpenLinkIntent");
 		final String url = intent.getDataString();
 		log("url: " + url);
 
@@ -1001,6 +1007,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * Show Import Dialog
 	 */
 	private void importLink(final String url) {
+		log("importLink");
 		this.urlLink = url;
 		String[] parts = parseDownloadUrl(url);
 		if (parts == null) {
@@ -1040,6 +1047,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * Check MEGA url and parse if valid
 	 */
 	private String[] parseDownloadUrl(String url) {
+		log("parseDownloadUrl");
 		if (url == null) {
 			return null;
 		}
@@ -1052,6 +1060,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
     
     public void selectDrawerItem(DrawerItem item){
+    	log("selectDrawerItem");
     	switch (item){
     		case CLOUD_DRIVE:{
 				if (fbF == null){
@@ -1489,6 +1498,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	public void onBackPressed() {
+		log("onBackPressed");
 		try { 
 			statusDialog.dismiss();	
 		} 
@@ -1601,6 +1611,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onPostCreate(Bundle savedInstanceState){
+		log("onPostCreate");
 		super.onPostCreate(savedInstanceState);
 		if (!openLink){
 			mDrawerToggle.syncState();
@@ -1610,7 +1621,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		
+		log("onCreateOptionsMenu");
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_manager, menu);
@@ -1841,7 +1852,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		
+		log("onOptionsItemSelected");
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -1996,7 +2007,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		
+		log("onItemClick");
 		if (nDA != null){
 			nDA.setPositionClicked(position);
 		}
@@ -2010,7 +2021,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onClick(View v) {
-
+		log("onClick");
 		switch(v.getId()){
 			case R.id.menu_action_bar_grid:{
 				
@@ -2269,6 +2280,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		log("onRequestStart");
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log("account_details request start");
 		}
@@ -2303,6 +2315,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -2692,7 +2705,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,MegaError e) {
-
+		log("onRequestTemporaryError");
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout temporary error");
 		}	
@@ -2726,17 +2739,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public ActionBarDrawerToggle getmDrawerToggle() {
+		log("getmDrawerToggle");
 		return mDrawerToggle;
 	}
 
 	public void setmDrawerToggle(ActionBarDrawerToggle mDrawerToggle) {
+		log("setmDrawerToggle");
 		this.mDrawerToggle = mDrawerToggle;
 	}
 	
 	File destination;
 	
 	public void onFileClick(ArrayList<Long> handleList){
-		
+		log("onFileClick");
 		long size = 0;
 		long[] hashes = new long[handleList.size()];
 		for (int i=0;i<handleList.size();i++){
@@ -2779,7 +2794,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void moveToTrash(ArrayList<Long> handleList){
-		
+		log("moveToTrash");
 		isClearRubbishBin = false;
 		
 		if (!Util.isOnline(this)){
@@ -2836,7 +2851,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
-		
+		log("getPublicLinkAndShareIt");
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
@@ -2864,6 +2879,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * Display keyboard
 	 */
 	private void showKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -2894,6 +2910,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 
 	public void showClearRubbishBinDialog(String editText){
+		log("showClearRubbishBinDialog");
 		if (rbF.isVisible()){
 			rbF.setPositionClicked(-1);
 			rbF.notifyDataSetChanged();
@@ -2920,6 +2937,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showNewContactDialog(String editText){
+		log("showNewContactDialog");
 		if (cF.isVisible()){
 			cF.setPositionClicked(-1);
 			cF.notifyDataSetChanged();
@@ -2984,7 +3002,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showNewFolderDialog(String editText){
-		
+		log("showNewFolderDialog");
 		if (fbF.isVisible()){
 			fbF.setPositionClicked(-1);
 			fbF.notifyDataSetChanged();
@@ -3048,6 +3066,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	private void clearRubbishBin(){
+		log("clearRubbishBin");
 		if (rbF != null){
 			NodeList rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 			
@@ -3070,7 +3089,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	private void addContact(String contactEmail){
-		
+		log("addContact");
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
@@ -3094,7 +3113,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	private void createFolder(String title) {
-		
+		log("createFolder");
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
@@ -3133,7 +3152,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showRenameDialog(final MegaNode document, String text){
-		
+		log("showRenameDialog");
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
@@ -3206,6 +3225,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	private void rename(MegaNode document, String newName){
+		log("rename");
 		if (newName.equals(document.getName())) {
 			return;
 		}
@@ -3236,7 +3256,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showMove(ArrayList<Long> handleList){
-		
+		log("showMove");
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -3248,7 +3268,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showCopy(ArrayList<Long> handleList){
-		
+		log("showCopy");
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -3263,7 +3283,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
 	 */
 	public static boolean isIntentAvailable(Context ctx, Intent intent) {
-
+		log("isIntentAvailable");
 		final PackageManager mgr = ctx.getPackageManager();
 		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
 		return list.size() > 0;
@@ -3271,7 +3291,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		
+		log("onActivityResult");
 		if (intent == null) {
 			return;
 		}
@@ -3551,7 +3571,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * Get list of all child files
 	 */
 	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
-		
+		log("getDlList");
 		if (megaApi.getRootNode() == null)
 			return;
 		
@@ -3576,16 +3596,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		Context context;
 		
 		FilePrepareTask(Context context){
+			log("FilePrepareTask::FilePrepareTask");
 			this.context = context;
 		}
 		
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
+			log("FilePrepareTask::doInBackGround");
 			return ShareInfo.processIntent(params[0], context);
 		}
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
+			log("FilePrepareTask::onPostExecute");
 			filePreparedInfos = info;
 			onIntentProcessed();
 		}
@@ -3595,6 +3618,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 * Handle processed upload intent
 	 */
 	public void onIntentProcessed() {
+		log("onIntentProcessed");
 		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try { 
@@ -3634,6 +3658,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api) {
+		log("onUsersUpdate");
 		if (cF != null){
 			if (cF.isVisible()){	
 				UserList contacts = megaApi.getContacts();
@@ -3701,22 +3726,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
+		log("onReloadNeeded");
 		// TODO Fetch nodes from MEGA		
 	}	
 	
 	public void setParentHandleBrowser(long parentHandleBrowser){
+		log("setParentHandleBrowser");
 		this.parentHandleBrowser = parentHandleBrowser;
 	}
 	
 	public void setParentHandleRubbish(long parentHandleRubbish){
+		log("setParentHandleRubbish");
 		this.parentHandleRubbish = parentHandleRubbish;
 	}
 	
 	public void setParentHandleSharedWithMe(long parentHandleSharedWithMe){
+		log("setParentHandleSharedWithMe");
 		this.parentHandleSharedWithMe = parentHandleSharedWithMe;
 	}
 	
 	public void setParentHandleSearch(long parentHandleSearch){
+		log("setParentHandleSearch");
 		this.parentHandleSearch = parentHandleSearch;
 	}
 	public void setPathNavigationOffline(String pathNavigation){
@@ -3724,6 +3754,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void setPauseIconVisible(boolean visible){
+		log("setPauseIconVisible");
 		pauseIconVisible = visible;
 		if (addMenuItem != null){
 			addMenuItem.setVisible(visible);
@@ -3731,13 +3762,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void setTransfers(TransferList transfersList){
+		log("setTransfers");
 		if (tF != null){
 			tF.setTransfers(transfersList);
 		}
 	}
 	
 	private void getOverflowMenu() {
-
+		log("getOverflowMenu");
 	     try {
 	        ViewConfiguration config = ViewConfiguration.get(this);
 	        Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
@@ -3751,16 +3783,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void setDownloadPlay(boolean downloadPlay){
+		log("setDownloadPlay");
 		this.downloadPlay = downloadPlay;
 	}
 	
 	@Override
-	public boolean onKeyUp(int keyCode, KeyEvent event) {		
+	public boolean onKeyUp(int keyCode, KeyEvent event) {
+		log("onKeyUp");
 		return super.onKeyUp(keyCode, event);
 	}
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		log("onTransferStart");
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
@@ -3798,6 +3833,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
+		log("onTransferFinish");
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
@@ -3866,11 +3902,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		log("onRequestUpdate");
 		// TODO Auto-generated method stub
 		
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+		log("downloadTo");
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);
@@ -3972,6 +4010,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
+		log("onTransferData");
 		return true;
 	}
 }

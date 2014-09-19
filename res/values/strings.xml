@@ -44,6 +44,7 @@
     <string name="botonVerActionBar">Ver</string>
     
     <string name="manager_activity">MEGA_COM</string>
+    <string name="offline_activity">Saved for offline</string>
     
     <string name="search_files_and_folders">Search</string>
     

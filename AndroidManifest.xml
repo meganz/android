@@ -94,6 +94,12 @@
                 android:resource="@xml/searchable" />         
         </activity>
         
+        <activity 
+            android:name="OfflineActivity"
+            android:label="@string/offline_activity"
+            android:launchMode="singleTop" >            
+        </activity>
+        
         <activity android:name="OpenLinkActivity" android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" ></action>

@@ -147,6 +147,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 	
 	private int shouldRun(){
+		
+		if (!Util.isOnline(this)){
+			log("Not online");
+			finish();
+			return START_NOT_STICKY;
+		}
+		
 		credentials = dbH.getCredentials();
 		
 		if (credentials == null){
