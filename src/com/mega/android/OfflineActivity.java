@@ -8,6 +8,8 @@ public class OfflineActivity extends PinActivity{
 	OfflineFragment oF;
 	
 	boolean isListOffline = true;
+
+	String pathNavigation = "/";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,9 +26,14 @@ public class OfflineActivity extends PinActivity{
 		
 		setContentView(R.layout.activity_offline);
 		
+		if (savedInstanceState != null){
+			this.pathNavigation = "/";
+		}
+		
 		if (oF == null){
 			oF = new OfflineFragment();
 			oF.setIsList(isListOffline);
+			oF.setPathNavigation(pathNavigation);
 		}
 		else{
 			oF.setIsList(isListOffline);
@@ -42,6 +49,16 @@ public class OfflineActivity extends PinActivity{
 //		    			
 //		customListGrid.setVisibility(View.VISIBLE);
 //		customSearch.setVisibility(View.VISIBLE);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+    	log("onSaveInstaceState");
+    	super.onSaveInstanceState(outState);
+    	
+    	String pathOffline = this.pathNavigation;
+    	
+    	outState.putString("pathOffline", pathOffline);
 	}
 	
 	@Override
@@ -65,6 +82,9 @@ public class OfflineActivity extends PinActivity{
 		}
 	}
 	
+	public void setPathNavigationOffline(String pathNavigation){
+		this.pathNavigation = pathNavigation;
+	}
 	
 	public static void log(String message) {
 		Util.log("OfflineActivity", message);	

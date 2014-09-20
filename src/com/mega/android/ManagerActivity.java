@@ -724,6 +724,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	long pHSharedWithMe = -1;
     	long pHSearch = -1;
     	int visibleFragment = -1;
+    	String pathOffline = this.pathNavigation;
+    	
     	int order = this.orderGetChildren;
     	if (fbF != null){
     		pHBrowser = fbF.getParentHandle();
@@ -3749,6 +3751,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("setParentHandleSearch");
 		this.parentHandleSearch = parentHandleSearch;
 	}
+	
 	public void setPathNavigationOffline(String pathNavigation){
 		this.pathNavigation = pathNavigation;
 	}
