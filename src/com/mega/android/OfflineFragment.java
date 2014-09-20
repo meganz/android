@@ -67,6 +67,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			log("ActionBarCallBack::onActionItemClicked");
 			List<MegaOffline> documents = getSelectedDocuments();
 			
 			switch(item.getItemId()){
@@ -176,6 +177,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			log("ActionBarCallBack::onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.file_browser_action, menu);
 			return true;
@@ -183,6 +185,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
+			log("ActionBarCallBack::onDestroActionMode");
 			adapterList.setMultipleSelect(false);
 			listView.setOnItemLongClickListener(offlineFragment);
 			clearSelections();
@@ -190,6 +193,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			log("ActionBarCallBack::onPrepareActionMode");
 			List<MegaOffline> selected = getSelectedDocuments();
 			boolean showDownload = false;
 			boolean showRename = false;
@@ -227,14 +231,16 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+		log("onCreateView");
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
-		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		if (context instanceof ManagerActivity){
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+		}
 		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
@@ -362,6 +368,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		
 	@Override
     public void onAttach(Activity activity) {
+		log("onAttach");
         super.onAttach(activity);
         context = activity;
         aB = ((ActionBarActivity)activity).getSupportActionBar();
@@ -369,7 +376,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	@Override
 	public void onClick(View v) {
-
+		log("onClick");
 		switch(v.getId()){
 
 		}
@@ -396,8 +403,12 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				
 				MegaOffline currentNode = mOffList.get(position);
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
-				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
-				
+				if (context instanceof ManagerActivity){
+					((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+				}
+				else if (context instanceof OfflineActivity){
+					((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+				}
 				File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
 				
 				if(currentFile.exists()&&currentFile.isDirectory()){
@@ -503,6 +514,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		log("onItemLongClick");
 		if (adapterList.getPositionClicked() == -1){
 			clearSelections();
 			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
@@ -518,6 +530,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		log("clearSelections");
 		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
 		for (int i = 0; i < checkedItems.size(); i++) {
 			if (checkedItems.valueAt(i) == true) {
@@ -529,6 +542,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	private void updateActionModeTitle() {
+		log("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
@@ -574,6 +588,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	 * Get list of all selected documents
 	 */
 	private List<MegaOffline> getSelectedDocuments() {
+		log("getSelectedDocuments");
 		ArrayList<MegaOffline> documents = new ArrayList<MegaOffline>();
 		
 		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
@@ -593,6 +608,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
+		log("hideMultipleSelect");
 		adapterList.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -600,28 +616,38 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public int onBackPressed(){
-
+		log("onBackPressed");
 		if (isList){
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();
 				return 1;
 			}
-			else if(!pathNavigation.equals("/")){
-				//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
-
-				// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
-				
-				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
-				int index=pathNavigation.lastIndexOf("/");				
-				pathNavigation=pathNavigation.substring(0,index+1);
-				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
-				
-				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-				mOffListNavigation=dbH.findByPath(pathNavigation);				
-				adapterList.setNodes(mOffListNavigation);				
-				this.setNodes(mOffListNavigation);
-				return 2;
+			else if(pathNavigation != null){
+				if (!pathNavigation.equals("/")){
+					//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
+	
+					// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
+					
+					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+					int index=pathNavigation.lastIndexOf("/");				
+					pathNavigation=pathNavigation.substring(0,index+1);
+					if (context instanceof ManagerActivity){
+						((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+					}
+					else if (context instanceof OfflineActivity){
+						((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+					}
+					
+					ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
+					mOffListNavigation=dbH.findByPath(pathNavigation);				
+					adapterList.setNodes(mOffListNavigation);				
+					this.setNodes(mOffListNavigation);
+					return 2;
+				}
+				else{
+					return 0;
+				}
 			}
 			else{
 					return 0;
@@ -634,22 +660,32 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				adapterGrid.notifyDataSetChanged();
 				return 1;
 			}
-			else if(!pathNavigation.equals("/")){
-				//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
-	
-				// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
-				
-				pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
-				int index=pathNavigation.lastIndexOf("/");				
-				pathNavigation=pathNavigation.substring(0,index+1);
-				((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
-				
-				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-				mOffListNavigation=dbH.findByPath(pathNavigation);				
-				adapterGrid.setNodes(mOffListNavigation);
-				//adapterGrid.setPathNavigation?
-				this.setNodes(mOffListNavigation);
-				return 2;
+			else if(pathNavigation != null){
+				if (!pathNavigation.equals("/")){
+					//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
+		
+					// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
+					
+					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+					int index=pathNavigation.lastIndexOf("/");				
+					pathNavigation=pathNavigation.substring(0,index+1);
+					if (context instanceof ManagerActivity){
+						((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+					}
+					else if (context instanceof OfflineActivity){
+						((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+					}
+					
+					ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
+					mOffListNavigation=dbH.findByPath(pathNavigation);				
+					adapterGrid.setNodes(mOffListNavigation);
+					//adapterGrid.setPathNavigation?
+					this.setNodes(mOffListNavigation);
+					return 2;
+				}
+				else{
+					return 0;
+				}
 			}
 			else{
 					return 0;
@@ -696,11 +732,12 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public ListView getListView(){
+		log("getListView");
 		return listView;
 	}
 	
 	public void setNodes(ArrayList<MegaOffline> mOff){
-		
+		log("setNodes");
 		this.mOffList = mOff;
 		
 
@@ -741,6 +778,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public void setPositionClicked(int positionClicked){
+		log("setPositionClicked");
 		if (isList){
 			if (adapterList != null){
 				adapterList.setPositionClicked(positionClicked);
@@ -754,6 +792,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public void notifyDataSetChanged(){
+		log("notifyDataSetChanged");
 		if (isList){
 			if (adapterList != null){
 				adapterList.notifyDataSetChanged();
@@ -767,7 +806,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public void refreshPaths(){
-		
+		log("refreshPaths()");
 		mOffList=dbH.findByPath("/");			
 		
 		setNodes(mOffList);
@@ -775,7 +814,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public void refreshPaths(MegaOffline mOff){
-		
+		log("refreshPaths(MegaOffline mOff");
 		int index=0;
 		MegaOffline retFindPath = null;
 		
@@ -800,7 +839,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	private MegaOffline findPath (String pathNavigation){
-		
+		log("findPath");
 		MegaOffline nodeToShow = null;
 		int index=pathNavigation.lastIndexOf("/");	
 		String pathToShow = pathNavigation.substring(0, index+1);
@@ -824,7 +863,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}	
 	
 	public void setPathNavigation(String _pathNavigation){
-		log("En llamada Manager pathNav: "+_pathNavigation);
+		log("setPathNavigation");
 		this.pathNavigation = _pathNavigation;
 		if (isList){
 			if (adapterList != null){	
@@ -839,14 +878,17 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public void setIsList(boolean isList){
+		log("setIsList");
 		this.isList = isList;
 	}
 	
 	public boolean getIsList(){
+		log("getIsList");
 		return isList;
 	}
 	
 	public void setOrder(int orderGetChildren){
+		log("setOrder");
 		this.orderGetChildren = orderGetChildren;
 	}
 	
