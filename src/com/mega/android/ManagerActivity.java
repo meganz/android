@@ -1520,6 +1520,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (cF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
@@ -1530,6 +1533,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (rbF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
@@ -1540,6 +1546,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (swmF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
@@ -1550,6 +1559,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (tF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
@@ -1560,6 +1572,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (maF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
@@ -1581,6 +1596,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (fbF != null){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
 					}
 					else{
 						super.onBackPressed();
@@ -1595,6 +1613,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (sF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
@@ -1605,6 +1626,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (psF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
 					return;
 				}
 			}
