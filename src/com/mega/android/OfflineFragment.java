@@ -819,32 +819,40 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		MegaOffline retFindPath = null;
 		
 		//Find in the tree, the last existing node
-		String pathNavigation= mOff.getPath();
+		String pNav= mOff.getPath();
 		
 		if(mOff.getType()==DB_FILE){
 			
-			index=pathNavigation.lastIndexOf("/");				
-			pathNavigation=pathNavigation.substring(0,index+1);
+			index=pNav.lastIndexOf("/");				
+			pNav=pNav.substring(0,index+1);
 			
 		}
 		else{
-			pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+			pNav=pNav.substring(0,pNav.length()-1);
 		}	
-		
-		retFindPath=findPath(pathNavigation);		
-		mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");			
-		//Bucar la lista de
+			
+		if(pNav.length()==0){
+			mOffList=dbH.findByPath("/");
+		}
+		else{
+			retFindPath=findPath(pNav);	
+			mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");
+		}
+				
 		setNodes(mOffList);
+		pathNavigation=pNav;
 		listView.invalidateViews();
 	}
 	
-	private MegaOffline findPath (String pathNavigation){
-		log("findPath");
+	private MegaOffline findPath (String pNav){
+		
+		log("Path Navigation" + pNav);
+		
 		MegaOffline nodeToShow = null;
-		int index=pathNavigation.lastIndexOf("/");	
-		String pathToShow = pathNavigation.substring(0, index+1);
+		int index=pNav.lastIndexOf("/");	
+		String pathToShow = pNav.substring(0, index+1);
 		log("Path: "+ pathToShow);
-		String nameToShow = pathNavigation.substring(index+1, pathNavigation.length());
+		String nameToShow = pNav.substring(index+1, pNav.length());
 		log("Name: "+ nameToShow);
 		
 		nodeToShow = dbH.findbyPathAndName(pathToShow, nameToShow);
@@ -855,7 +863,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			return nodeToShow;
 		}
 		else{
-			findPath (pathNavigation);
+			findPath (pathToShow);
 		}
 		
 		return nodeToShow;
