@@ -2767,7 +2767,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		boolean askMe = true;
-		String downloadLocationDefaultPath = "";
+		String downloadLocationDefaultPath = Util.downloadDIR;
 		prefs = dbH.getPreferences();		
 		if (prefs != null){
 			if (prefs.getStorageAskAlways() != null){
@@ -2791,6 +2791,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
 		}
 		else{
+			File defaultPathF = new File(downloadLocationDefaultPath);
+			defaultPathF.mkdirs();
 			downloadTo(downloadLocationDefaultPath, null, size, hashes);
 		}		
 	}
