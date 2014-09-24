@@ -3760,7 +3760,32 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void setParentHandleBrowser(long parentHandleBrowser){
 		log("setParentHandleBrowser");
+		
+		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+
+		
+		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();
+		
 		this.parentHandleBrowser = parentHandleBrowser;
+		
+		tL = megaApi.getTransfers();
+		//Actualizar la lista de transferencias...
+		
+		for(int i=0; i<tL.size(); i++){
+			
+			MegaTransfer tempT = tL.get(i);
+			long handleT = tempT.getNodeHandle();
+			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+			MegaNode parentT = megaApi.getParentNode(nodeT);
+			
+			if(parentT.getHandle() == this.parentHandleBrowser){
+				
+				mTHash.put(handleT,tempT);				
+			}			
+		}			
+		
+		fbF.setTransfers(mTHash);		
+		
 	}
 	
 	public void setParentHandleRubbish(long parentHandleRubbish){
@@ -3825,35 +3850,34 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferStart");
+		
+
+		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
-				
+		
+		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();	
 		tL = megaApi.getTransfers();
+		//Actualizar la lista de transferencias...
 		tF.setTransfers(tL);
-//		
-//		if (transfersListArray == null){
-//			TransferList tL = megaApi.getTransfers();
-//			transfersListArray = new SparseArray<TransfersHolder>();
-//			
-//			for (int i = 0; i< tL.size(); i++){
-//				MegaTransfer t = tL.get(i);
-//				TransfersHolder th = new TransfersHolder();
-//				
-//				th.setName(new String(t.getFileName()));
-//				
-//				transfersListArray.put(t.getTag(), th);
-//			}
-//		}
-//		else{
-//			TransfersHolder th = new TransfersHolder();
-//			
-//			th.setName(new String(transfer.getFileName()));
-//			
-//			transfersListArray.put(transfer.getTag(), th);
-//		}
-//		
-//		tF.setTransfers(transfersListArray);
+		
+		for(int i=0; i<tL.size(); i++){
+			
+			MegaTransfer tempT = tL.get(i).copy();
+			long handleT = tempT.getNodeHandle();
+			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+			MegaNode parentT = megaApi.getParentNode(nodeT);
+			
+			if(parentT.getHandle() == this.parentHandleBrowser){
+				
+				mTHash.put(handleT,tempT);
+				
+			}			
+		}			
+		
+		fbF.setTransfers(mTHash);	
 		
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 
@@ -3863,64 +3887,70 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		log("onTransferFinish");
+		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
 		
+		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();	
 		tL = megaApi.getTransfers();
+		//Actualizar la lista de transferencias...
 		tF.setTransfers(tL);
 		
-//		
-//		if (transfersListArray == null){
-//			TransferList tL = megaApi.getTransfers();
-//			transfersListArray = new SparseArray<TransfersHolder>();
-//			
-//			for (int i = 0; i< tL.size(); i++){
-//				MegaTransfer t = tL.get(i);
-//				TransfersHolder th = new TransfersHolder();
-//				
-//				th.setName(new String(t.getFileName()));
-//				
-//				transfersListArray.put(t.getTag(), th);
-//			}
-//		}
-//		else{
-//			transfersListArray.remove(transfer.getTag());
-//		}
-//		
-//		tF.setTransfers(transfersListArray);
+		for(int i=0; i<tL.size(); i++){
+			
+			MegaTransfer tempT = tL.get(i).copy();
+			long handleT = tempT.getNodeHandle();
+			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+			MegaNode parentT = megaApi.getParentNode(nodeT);
+			
+			if(parentT.getHandle() == this.parentHandleBrowser){
+				
+				mTHash.put(handleT,tempT);
+				
+			}			
+		}			
 		
+		fbF.setTransfers(mTHash);	
+
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
-		
+		//HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
 		
+		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();	
 		tL = megaApi.getTransfers();
+		//Actualizar la lista de transferencias...
 		tF.setTransfers(tL);
+		fbF.setCurrentTransfer(transfer);	
 		
-//		if (tF != null){
-//			if (tF.isVisible()){
-//				TransferList tl = megaApi.getTransfers();
-//				tF.setTransfers(tl);
-//			}
-//		}
+//		for(int i=0; i<tL.size(); i++){
+//			
+//			MegaTransfer tempT = tL.get(i);
+//			long handleT = tempT.getNodeHandle();
+//			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+//			MegaNode parentT = megaApi.getParentNode(nodeT);
+//			
+//			if(parentT.getHandle() == this.parentHandleBrowser){
+//				
+//				mTHash.put(handleT,tempT);
+//				
+//			}			
+//		}			
+		//fbF.getParentFragment()
 	}
 
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		if (tF == null){
-			tF = new TransfersFragment();
-		}
-		
-		tL = megaApi.getTransfers();
-		tF.setTransfers(tL);
 		
 		log("onTransferTemporaryError: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
@@ -3943,8 +3973,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			StatFs stat = new StatFs(parentPath);
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
-		catch(Exception ex){}
-		
+		catch(Exception ex){}		
 		
 		if (hashes == null){
 			if(url != null) {

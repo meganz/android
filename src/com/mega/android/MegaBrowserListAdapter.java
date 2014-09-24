@@ -1,13 +1,16 @@
 package com.mega.android;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.ShareList;
+import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -29,6 +32,7 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -49,6 +53,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 	ImageView emptyImageViewFragment;
 	TextView emptyTextViewFragment;
 	ActionBar aB;
+	HashMap<Long, MegaTransfer> mTHash = null;
+	
+	MegaTransfer currentTransfer = null;
 
 	boolean multipleSelect;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
@@ -67,6 +74,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 		RelativeLayout optionsLayout;
 		ImageView optionDownload;
 		ImageView optionProperties;
+        ProgressBar transferProgressBar;
 		ImageView optionRename;
 		ImageView optionCopy;
 		ImageView optionMove;
@@ -159,31 +167,20 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			convertView = inflater.inflate(R.layout.item_file_list, parent,
 					false);
 			holder = new ViewHolderBrowserList();
-			holder.itemLayout = (RelativeLayout) convertView
-					.findViewById(R.id.file_list_item_layout);
-			holder.checkbox = (CheckBox) convertView
-					.findViewById(R.id.file_list_checkbox);
+			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
 			holder.checkbox.setClickable(false);
-			holder.imageView = (ImageView) convertView
-					.findViewById(R.id.file_list_thumbnail);
-			holder.textViewFileName = (TextView) convertView
-					.findViewById(R.id.file_list_filename);
+			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
+			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);			
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp(
-					(225 * scaleW), outMetrics);
-			holder.textViewFileSize = (TextView) convertView
-					.findViewById(R.id.file_list_filesize);
-			holder.imageButtonThreeDots = (ImageButton) convertView
-					.findViewById(R.id.file_list_three_dots);
-			holder.optionsLayout = (RelativeLayout) convertView
-					.findViewById(R.id.file_list_options);
-			holder.optionDownload = (ImageView) convertView
-					.findViewById(R.id.file_list_option_download);
-			holder.optionDownload.getLayoutParams().width = Util.px2dp(
-					(35 * scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionDownload.getLayoutParams())
-					.setMargins(Util.px2dp((9 * scaleW), outMetrics),
-							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
+			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
+			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
+			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
+			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
+			holder.optionDownload = (ImageView) convertView.findViewById(R.id.file_list_option_download);
+			holder.optionDownload.getLayoutParams().width = Util.px2dp((35 * scaleW), outMetrics);	
+			((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 			holder.optionProperties = (ImageView) convertView
 					.findViewById(R.id.file_list_option_properties);
 			holder.optionProperties.getLayoutParams().width = Util.px2dp(
@@ -251,6 +248,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 				holder.checkbox.setChecked(false);
 			}
 		}
+		
+		holder.transferProgressBar.setVisibility(View.GONE);
+		holder.textViewFileSize.setVisibility(View.VISIBLE);
 
 		holder.currentPosition = position;
 
@@ -275,9 +275,36 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			}
 		} else {
 			long nodeSize = node.getSize();
-			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			holder.imageView.setImageResource(MimeType.typeForName(
-					node.getName()).getIconResourceId());
+			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
+			
+			if(mTHash!=null){
+				
+				MegaTransfer tempT = mTHash.get(node.getHandle());
+				
+				if (tempT!=null){
+					holder.transferProgressBar.setVisibility(View.VISIBLE);		
+					holder.textViewFileSize.setVisibility(View.GONE);	
+					
+					double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
+					holder.transferProgressBar.setProgress((int)progressValue);
+				}
+				
+				if (currentTransfer != null){
+					if (node.getHandle() == currentTransfer.getNodeHandle()){
+						holder.transferProgressBar.setVisibility(View.VISIBLE);		
+						holder.textViewFileSize.setVisibility(View.GONE);	
+						double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
+						holder.transferProgressBar.setProgress((int)progressValue);
+					}
+				}
+				
+				if(mTHash.size() == 0){
+					holder.transferProgressBar.setVisibility(View.GONE);		
+					holder.textViewFileSize.setVisibility(View.VISIBLE);	
+				}
+			}			
+			
+			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 
 			if (node.hasThumbnail()) {
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -880,6 +907,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 	public void setOrder(int orderGetChildren) {
 		this.orderGetChildren = orderGetChildren;
 	}
+	
+    public void setTransfers(HashMap<Long, MegaTransfer> _mTHash)
+    {
+    	this.mTHash = _mTHash;
+    	notifyDataSetChanged();
+    }
+    
+    public void setCurrentTransfer(MegaTransfer mT)
+    {
+    	this.currentTransfer = mT;
+    	MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
+    	if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
+    		notifyDataSetChanged();    		
+    	}
+    }   
+    
 
 	private static void log(String log) {
 		Util.log("MegaBrowserListAdapter", log);

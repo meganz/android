@@ -104,6 +104,7 @@
 		style="@style/MEGAProgressBarTransfers"  
 		android:layout_margin="5dip" 
 		android:layout_below="@id/transfers_list_filename"
+		android:paddingRight="5dp"
         android:layout_toRightOf="@id/transfers_list_thumbnail" />
     
     <ImageButton 

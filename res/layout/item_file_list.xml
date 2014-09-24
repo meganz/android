@@ -51,6 +51,16 @@
 		android:paddingTop="25dp"
         android:paddingRight="15dp" />
     
+     <ProgressBar
+	    android:id="@+id/transfers_list__browser_bar"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		style="@style/MEGAProgressBarTransfers"  
+		android:layout_margin="5dip" 
+        android:layout_toRightOf="@id/file_list_thumbnail"
+        android:layout_toLeftOf="@id/file_list_three_dots"
+        android:layout_below="@id/file_list_filename" />    
+    
     <ImageView
         android:id="@+id/file_list_arrow_selection"
         android:layout_width="wrap_content"

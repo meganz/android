@@ -3,12 +3,14 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.ShareList;
 
@@ -38,6 +40,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -60,6 +63,9 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	ImageView emptyImageViewFragment;
 	TextView emptyTextViewFragment;
 	ActionBar aB;
+	
+	HashMap<Long, MegaTransfer> mTHash = null;
+	MegaTransfer currentTransfer = null;
 	
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
 	
@@ -124,6 +130,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
         ImageView arrowSelection1;
         RelativeLayout optionsLayout1;
 //        ImageButton optionOpen1;
+        ProgressBar transferProgressBar1;
+        ProgressBar transferProgressBar2;
         ImageView optionProperties1;
         ImageView optionDownload1;
         ImageView optionRename1;
@@ -225,6 +233,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			
 			holder.imageButtonThreeDots1 = (ImageButton) v.findViewById(R.id.file_grid_three_dots1);
 			holder.imageButtonThreeDots2 = (ImageButton) v.findViewById(R.id.file_grid_three_dots2);
+
 			
 			holder.optionsLayout1 = (RelativeLayout) v.findViewById(R.id.file_grid_options1);
 //			holder.optionOpen1 = (ImageButton) v.findViewById(R.id.file_grid_option_open1);
@@ -279,179 +288,17 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection2);
 			holder.arrowSelection2.setVisibility(View.GONE);
-		
-//			if (convertView == null) {
-//				convertView = inflater.inflate(R.layout.item_file_grid, parent, false);
-//				holder = new ViewHolderBrowserGrid();
-//				holder.itemLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout1);
-//				holder.itemLayout2 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout2);
-//				
-//				//Set width and height itemLayout1
-//				RelativeLayout.LayoutParams paramsIL1 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-//				paramsIL1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-//				paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-//				paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//				holder.itemLayout1.setLayoutParams(paramsIL1);
-//				
-//				//Set width and height itemLayout2
-//				RelativeLayout.LayoutParams paramsIL2 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-//				paramsIL2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-//				paramsIL2.addRule(RelativeLayout.RIGHT_OF, R.id.file_grid_item_layout1);
-//				paramsIL2.addRule(RelativeLayout.LEFT_OF, R.id.file_grid_separator_final);
-//				paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//				TranslateAnimation anim = new TranslateAnimation(Util.px2dp(-5*scaleW, outMetrics), Util.px2dp(-5*scaleW, outMetrics), 0, 0);
-//		        anim.setDuration(0);
-//		        
-//		        holder.itemLayout2.startAnimation(anim);
-//				holder.itemLayout2.setLayoutParams(paramsIL2);
-//				
-//				holder.imageView1 = (ImageButton) convertView.findViewById(R.id.file_grid_thumbnail1);
-//	            holder.imageView2 = (ImageButton) convertView.findViewById(R.id.file_grid_thumbnail2);
-//	            
-//	            
-//				RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-//				paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//				holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//				paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-//				holder.imageView1.setLayoutParams(paramsIV1);
-//				
-//				RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-//				paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//				holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//				paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-//				holder.imageView2.setLayoutParams(paramsIV2);
-//
-//				holder.textViewFileName1 = (TextView) convertView.findViewById(R.id.file_grid_filename1);
-//				holder.textViewFileName1.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//				holder.textViewFileName1.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
-//				holder.textViewFileName1.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-//				holder.textViewFileName1.setSingleLine(true);
-//				holder.textViewFileName2 = (TextView) convertView.findViewById(R.id.file_grid_filename2);
-//				holder.textViewFileName2.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//				holder.textViewFileName2.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
-//				holder.textViewFileName2.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-//				holder.textViewFileName2.setSingleLine(true);
-//				
-//				holder.textViewFileSize1 = (TextView) convertView.findViewById(R.id.file_grid_filesize1);
-//				holder.textViewFileSize2 = (TextView) convertView.findViewById(R.id.file_grid_filesize2);
-//				
-//				holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.file_grid_three_dots1);
-//				holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.file_grid_three_dots2);
-//				
-//				holder.optionsLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_options1);
-//				holder.optionOpen1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_open1);
-//				holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//				holder.optionProperties1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_properties1);
-//				holder.optionProperties1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//				holder.optionDownload1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_download1);
-//				holder.optionDownload1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//				holder.optionDelete1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_delete1);
-//				holder.optionDelete1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-//				holder.arrowSelection1 = (ImageView) convertView.findViewById(R.id.file_grid_arrow_selection1);
-//				holder.arrowSelection1.setVisibility(View.GONE);
-//
-//				holder.optionsLayout2 = (RelativeLayout) convertView.findViewById(R.id.file_grid_options2);
-//				holder.optionOpen2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_open2);
-//				holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//				holder.optionProperties2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_properties2);
-//				holder.optionProperties2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//				holder.optionDownload2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_download2);
-//				holder.optionDownload2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//				holder.optionDelete2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_delete2);
-//				holder.optionDelete2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-//				holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.file_grid_arrow_selection2);
-//				holder.arrowSelection2.setVisibility(View.GONE);
-				
-//				convertView.setTag(holder);
-//			}
-//			else{
-//				holder = (ViewHolderBrowserGrid) convertView.getTag();
-//				if (holder == null){
-//					convertView = inflater.inflate(R.layout.item_file_grid, parent, false);
-//					holder = new ViewHolderBrowserGrid();
-//					holder.itemLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout1);
-//					holder.itemLayout2 = (RelativeLayout) convertView.findViewById(R.id.file_grid_item_layout2);
-//					
-//					//Set width and height itemLayout1
-//					RelativeLayout.LayoutParams paramsIL1 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-//					paramsIL1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-//					paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-//					paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//					holder.itemLayout1.setLayoutParams(paramsIL1);
-//					
-//					//Set width and height itemLayout2
-//					RelativeLayout.LayoutParams paramsIL2 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-//					paramsIL2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-//					paramsIL2.addRule(RelativeLayout.RIGHT_OF, R.id.file_grid_item_layout1);
-//					paramsIL2.addRule(RelativeLayout.LEFT_OF, R.id.file_grid_separator_final);
-//					paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//					TranslateAnimation anim = new TranslateAnimation(Util.px2dp(-5*scaleW, outMetrics), Util.px2dp(-5*scaleW, outMetrics), 0, 0);
-//			        anim.setDuration(0);
-//			        
-//			        holder.itemLayout2.startAnimation(anim);
-//					holder.itemLayout2.setLayoutParams(paramsIL2);
-//					
-//					holder.imageView1 = (ImageButton) convertView.findViewById(R.id.file_grid_thumbnail1);
-//		            holder.imageView2 = (ImageButton) convertView.findViewById(R.id.file_grid_thumbnail2);
-//		            
-//		            
-//					RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-//					paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//					holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//					paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-//					holder.imageView1.setLayoutParams(paramsIV1);
-//					
-//					RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-//					paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//					holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//					paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-//					holder.imageView2.setLayoutParams(paramsIV2);
-//
-//					holder.textViewFileName1 = (TextView) convertView.findViewById(R.id.file_grid_filename1);
-//					holder.textViewFileName1.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//					holder.textViewFileName1.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
-//					holder.textViewFileName1.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-//					holder.textViewFileName1.setSingleLine(true);
-//					holder.textViewFileName2 = (TextView) convertView.findViewById(R.id.file_grid_filename2);
-//					holder.textViewFileName2.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-//					holder.textViewFileName2.getLayoutParams().width = Util.px2dp((125*scaleW), outMetrics);
-//					holder.textViewFileName2.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-//					holder.textViewFileName2.setSingleLine(true);
-//					
-//					holder.textViewFileSize1 = (TextView) convertView.findViewById(R.id.file_grid_filesize1);
-//					holder.textViewFileSize2 = (TextView) convertView.findViewById(R.id.file_grid_filesize2);
-//					
-//					holder.imageButtonThreeDots1 = (ImageButton) convertView.findViewById(R.id.file_grid_three_dots1);
-//					holder.imageButtonThreeDots2 = (ImageButton) convertView.findViewById(R.id.file_grid_three_dots2);
-//					
-//					holder.optionsLayout1 = (RelativeLayout) convertView.findViewById(R.id.file_grid_options1);
-//					holder.optionOpen1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_open1);
-//					holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//					holder.optionProperties1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_properties1);
-//					holder.optionProperties1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//					holder.optionDownload1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_download1);
-//					holder.optionDownload1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//					holder.optionDelete1 = (ImageButton) convertView.findViewById(R.id.file_grid_option_delete1);
-//					holder.optionDelete1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-//					holder.arrowSelection1 = (ImageView) convertView.findViewById(R.id.file_grid_arrow_selection1);
-//					holder.arrowSelection1.setVisibility(View.GONE);
-//
-//					holder.optionsLayout2 = (RelativeLayout) convertView.findViewById(R.id.file_grid_options2);
-//					holder.optionOpen2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_open2);
-//					holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//					holder.optionProperties2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_properties2);
-//					holder.optionProperties2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//					holder.optionDownload2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_download2);
-//					holder.optionDownload2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//					holder.optionDelete2 = (ImageButton) convertView.findViewById(R.id.file_grid_option_delete2);
-//					holder.optionDelete2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-//					holder.arrowSelection2 = (ImageView) convertView.findViewById(R.id.file_grid_arrow_selection2);
-//					holder.arrowSelection2.setVisibility(View.GONE);
-//					
-//					convertView.setTag(holder);
-//				}
-//			}
 
+			
+			holder.transferProgressBar1 = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar1);
+			holder.transferProgressBar2 = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar2);
+			
+			
+			holder.transferProgressBar1.setVisibility(View.GONE);
+			holder.transferProgressBar2.setVisibility(View.GONE);
+			holder.textViewFileSize1.setVisibility(View.VISIBLE);
+			holder.textViewFileSize2.setVisibility(View.VISIBLE);
+			
 			holder.currentPosition = position;
 
 			MegaNode node1 = (MegaNode) getItem(position);
@@ -478,6 +325,33 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				long node1Size = node1.getSize();
 				holder.textViewFileSize1.setText(Util.getSizeString(node1Size));
 				holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+				
+				if(mTHash!=null){
+					
+					MegaTransfer tempT = mTHash.get(node1.getHandle());
+					
+					if (tempT!=null){
+						holder.transferProgressBar1.setVisibility(View.VISIBLE);		
+						holder.textViewFileSize1.setVisibility(View.GONE);	
+						
+						double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
+						holder.transferProgressBar1.setProgress((int)progressValue);
+					}
+					
+					if (currentTransfer != null){
+						if (node1.getHandle() == currentTransfer.getNodeHandle()){
+							holder.transferProgressBar1.setVisibility(View.VISIBLE);		
+							holder.textViewFileSize1.setVisibility(View.GONE);	
+							double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
+							holder.transferProgressBar1.setProgress((int)progressValue);
+						}
+					}
+					
+					if(mTHash.size() == 0){
+						holder.transferProgressBar1.setVisibility(View.GONE);		
+						holder.textViewFileSize1.setVisibility(View.VISIBLE);	
+					}
+				}			
 				
 				if (node1.hasThumbnail()){
 					thumb1 = ThumbnailUtils.getThumbnailFromCache(node1);
@@ -550,6 +424,33 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					long node2Size = node2.getSize();
 					holder.textViewFileSize2.setText(Util.getSizeString(node2Size));
 					holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+					
+					if(mTHash!=null){
+						
+						MegaTransfer tempT = mTHash.get(node2.getHandle());
+						
+						if (tempT!=null){
+							holder.transferProgressBar2.setVisibility(View.VISIBLE);		
+							holder.textViewFileSize2.setVisibility(View.GONE);	
+							
+							double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
+							holder.transferProgressBar2.setProgress((int)progressValue);
+						}
+						
+						if (currentTransfer != null){
+							if (node2.getHandle() == currentTransfer.getNodeHandle()){
+								holder.transferProgressBar2.setVisibility(View.VISIBLE);		
+								holder.textViewFileSize2.setVisibility(View.GONE);	
+								double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
+								holder.transferProgressBar2.setProgress((int)progressValue);
+							}
+						}
+						
+						if(mTHash.size() == 0){
+							holder.transferProgressBar2.setVisibility(View.GONE);		
+							holder.textViewFileSize2.setVisibility(View.VISIBLE);	
+						}
+					}						
 					
 					if (node2.hasThumbnail()){
 						thumb2 = ThumbnailUtils.getThumbnailFromCache(node2);
@@ -1296,6 +1197,21 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 		}
 	}
+	
+    public void setTransfers(HashMap<Long, MegaTransfer> _mTHash)
+    {
+    	this.mTHash = _mTHash;
+    	notifyDataSetChanged();
+    }
+    
+    public void setCurrentTransfer(MegaTransfer mT)
+    {
+    	this.currentTransfer = mT;
+    	MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
+    	if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
+    		notifyDataSetChanged();    		
+    	}
+    } 
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
