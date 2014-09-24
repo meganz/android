@@ -209,16 +209,12 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 			holder.itemLayout1.setLayoutParams(paramsIL1);
 			
-			//Set width and height itemLayout2
+			//Set width and height itemLayout2		
 			RelativeLayout.LayoutParams paramsIL2 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-			paramsIL2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-			paramsIL2.addRule(RelativeLayout.RIGHT_OF, R.id.offline_grid_item_layout1);
-			paramsIL2.addRule(RelativeLayout.LEFT_OF, R.id.offline_grid_separator_final);
+			paramsIL2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+			paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);			
 			paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-			TranslateAnimation anim = new TranslateAnimation(Util.px2dp(-5*scaleW, outMetrics), Util.px2dp(-5*scaleW, outMetrics), 0, 0);
-	        anim.setDuration(0);
-	        
-	        holder.itemLayout2.startAnimation(anim);
+
 			holder.itemLayout2.setLayoutParams(paramsIL2);
 			
 			holder.imageView1 = (ImageButton) v.findViewById(R.id.offline_grid_thumbnail1);

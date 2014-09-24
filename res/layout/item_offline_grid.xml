@@ -119,23 +119,14 @@
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>
-    
-    <View
-	    android:id="@+id/offline_grid_separator_final"
-		android:layout_width="5dp"
-		android:layout_height="0dp"
-		android:background="@null"
-        android:layout_alignParentRight="true" />
-    
+           
     <RelativeLayout 
-        android:layout_width="172dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/offline_grid_item_layout2"
         android:layout_toRightOf="@id/offline_grid_item_layout2"
         android:background="@drawable/background_item_grid"
-        android:layout_toLeftOf="@id/offline_grid_separator_final"
-        android:layout_marginTop="5dp"
-        android:descendantFocusability="blocksDescendants" >
+        android:layout_alignParentRight="true">
         
         <ImageButton
 	        android:id="@+id/offline_grid_thumbnail2"
