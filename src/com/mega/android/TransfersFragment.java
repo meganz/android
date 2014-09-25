@@ -181,7 +181,7 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		tL = megaApi.getTransfers();
 		
 		listView = (ListView) v.findViewById(R.id.transfers_list_view);
-		listView.setOnItemClickListener(this);
+		listView.setOnItemClickListener(null);
 		listView.setOnItemLongClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);

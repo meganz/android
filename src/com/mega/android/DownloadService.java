@@ -1,12 +1,6 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -17,7 +11,6 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.TransferList;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -28,19 +21,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
-import android.text.InputFilter.LengthFilter;
 import android.text.format.Formatter;
+import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -48,7 +39,7 @@ import android.widget.Toast;
  * Background service to download files
  */
 public class DownloadService extends Service implements MegaTransferListenerInterface, MegaRequestListenerInterface{
-
+	
 	// Action to stop download
 	public static String ACTION_CANCEL = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_ONE_DOWNLOAD = "CANCEL_ONE_DOWNLOAD";
@@ -59,14 +50,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_OFFLINE = "IS_OFFLINE";
 	
-	private int totalCount = 0;
 	private int successCount = 0;
-	private int doneCount = 0;
-	private long totalSize = 0;
-	private long downloadedSize = 0;
-	
-	private int lastError = 0;
-	
+	private int errorCount = 0;
+		
 	private boolean isForeground = false;
 	private boolean canceled;
 	
@@ -88,6 +74,20 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private Notification.Builder mBuilder;
 	private NotificationManager mNotificationManager;
 	
+	private SparseArray<MegaTransfer> currentTransfers;
+	private SparseArray<MegaTransfer> transfersOK;
+	private SparseArray<MegaTransfer> transfersError;
+	private SparseArray<Long> transfersDownloadedSize;
+	
+	int lastTag = -1;
+	int totalToDownload;
+	int totalDownloaded;
+	int totalDownloadedError;
+	long totalSizeToDownload;
+	long totalSizeDownloaded;
+	long totalSizeDownloadedError;	
+	
+	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -97,17 +97,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
-		totalCount = 0;
-		doneCount = 0;
 		successCount = 0;
-		totalSize = 0;
-		downloadedSize = 0;
-		lastError = 0;
+		
+		totalToDownload = 0;
+		totalDownloaded = 0;
+		totalDownloadedError = 0;
+		totalSizeToDownload = 0;
+		totalSizeDownloaded = 0;
+		totalSizeDownloadedError = 0;
 		
 		isForeground = false;
 		canceled = false;
-
 		
+		currentTransfers = new SparseArray<MegaTransfer>();
+		transfersOK = new SparseArray<MegaTransfer>();
+		transfersError = new SparseArray<MegaTransfer>();
+		transfersDownloadedSize = new SparseArray<Long>();
 		
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -148,16 +153,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else if (intent.getAction().equals(ACTION_CANCEL_ONE_DOWNLOAD)){
 				log("Cancel one download intent");
-				totalCount--;
-				if (totalCount == 0){
-					megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
-				}
-				totalSize = downloadedSize;
-				TransferList tL = megaApi.getTransfers();
-				for (int i=0;i<tL.size();i++){
-					totalSize += tL.get(i).getTotalBytes();
-				}
-				updateProgressNotification(downloadedSize);
+								
 				return START_NOT_STICKY;
 			}
 		}
@@ -169,7 +165,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private void onQueueComplete() {
 		log("onQueueComplete");
 		log("Stopping foreground!");
-		log("stopping service! success: " + successCount + " total: " + totalCount);
+		log("stopping service! success: " + successCount + " total: " + totalToDownload);
 		megaApi.resetTotalDownloads();
 		
 		if((lock != null) && (lock.isHeld()))
@@ -177,25 +173,36 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
 		
-		if (!isOffline){
-			if (successCount == 0) {
-				log("stopping service!2");
-				showCompleteFailNotification();
-			} else {
-				log("stopping service!");
-				showCompleteSuccessNotification();
+		if ((successCount + errorCount) > 0){
+			if (!isOffline){
+				if (successCount == 0) {
+					log("stopping service!2");
+					showCompleteFailNotification();
+				} else {
+					log("stopping service!");
+					showCompleteSuccessNotification();
+				}
 			}
 		}
+		
+		long totalFromSparse = 0;
+		for (int i=0; i<transfersDownloadedSize.size(); i++){
+			totalFromSparse += transfersDownloadedSize.valueAt(i);
+		}
+		
+		log("totalSizeDownloaded: " + totalSizeDownloaded + "______ TOTALFROMSPARSE: " + totalFromSparse);
+		
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
 		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
 		stopSelf();
 	}
 	
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 		
-		updateProgressNotification(downloadedSize);
+		updateProgressNotification(totalSizeDownloaded);
 		
 		long hash = intent.getLongExtra(EXTRA_HASH, -1);
 		String url = intent.getStringExtra(EXTRA_URL);
@@ -231,6 +238,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		log("dir: " + currentDir.getAbsolutePath() + " file: " + document.getName() + "  Size: " + document.getSize());
 		if(!checkCurrentFile(document)){
+			log("checkCurrentFile == false");
+			
+			if (currentTransfers.size() == 0){
+				successCount = transfersOK.size();
+				errorCount = transfersError.size();
+				onQueueComplete();
+			}
+
 			return;
 		}
 		
@@ -244,6 +259,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if (currentDir.isDirectory()){
 			log("To download(dir): " + currentDir.getAbsolutePath() + "/");
 			megaApi.startDownload(document, currentDir.getAbsolutePath() + "/", this);
+		}
+		else{
+			log("currentDir is not a directory");
 		}
 //		else{
 //			log("To download(file): " + currentDir.getAbsolutePath());
@@ -264,13 +282,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 	
 	boolean checkCurrentFile(MegaNode document)	{
-		if(currentFile.exists() && (document.getSize() == currentFile.length()))
-		{
+		if(currentFile.exists() && (document.getSize() == currentFile.length())){
+			
 			currentFile.setReadable(true, false);
-			downloadedSize += document.getSize();
-			log("size: " + downloadedSize);
-			updateProgressNotification(downloadedSize);
-			onDownloadComplete(true);
+			Toast.makeText(getApplicationContext(), document.getName() + " already downloaded", Toast.LENGTH_SHORT).show();
+			
 			return false;
 		}
 		
@@ -288,29 +304,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 	
 	/*
-	 * Handle download file complete
-	 */
-	private void onDownloadComplete(boolean success) {
-		log("onDownloadComplete");
-		
-		if (success){
-			successCount++;
-		}
-		doneCount++;
-		
-		if (doneCount == totalCount){
-			onQueueComplete();
-		}
-	}
-	
-	/*
 	 * Show download fail notification
 	 */
 	private void showCompleteFailNotification() {		
 		log("showCompleteFailNotification");
 		String title = getString(R.string.download_failed);
 		String message = getString(R.string.error_server_connection_problem);
-		if(lastError != 0) message = MegaError.getErrorString(lastError);
+//		if(lastError != 0) message = MegaError.getErrorString(lastError);
 
 		Intent intent = new Intent(DownloadService.this, ManagerActivity.class);
 		
@@ -338,7 +338,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						successCount) + " "
 				+ getString(R.string.download_downloaded);
 		size = getString(R.string.general_total_size) + " "
-				+ Formatter.formatFileSize(DownloadService.this, totalSize);
+				+ Formatter.formatFileSize(DownloadService.this, totalSizeToDownload);
 
 		Intent intent = null;
 		if(successCount != 1)
@@ -395,41 +395,41 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@SuppressLint("NewApi")
 	private void updateProgressNotification(final long progress) {
 		log("updateProgressNotification");
-		int progressPercent = (int) Math.round((double) progress / totalSize
+		int progressPercent = (int) Math.round((double) progress / totalSizeToDownload
 				* 100);
-		log(progressPercent + " " + progress + " " + totalSize);
-		int left = totalCount - doneCount;
-		int current = totalCount - left + 1;
+		log(progressPercent + " " + progress + " " + totalSizeToDownload);
+		int left = totalToDownload - (totalDownloaded + totalDownloadedError);
+		int current = totalToDownload - left + 1;
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		
 		String message = "";
-		if (totalCount == 0){
+		if (totalToDownload == 0){
 			message = getString(R.string.download_preparing_files);
 		}
 		else{
 			message = getString(R.string.download_downloading) + " "
 					+ current + " ";
-			if (totalCount == 1) {
+			if (totalToDownload == 1) {
 				message += getResources().getQuantityString(
 						R.plurals.general_num_files, 1);
 			} 
 			else {
 				message += getString(R.string.general_x_of_x)
 						+ " "
-						+ totalCount;
+						+ totalToDownload;
 				
 				if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB)
 				{
 					message += " "
 						+ getResources().getQuantityString(
-								R.plurals.general_num_files, totalCount);
+								R.plurals.general_num_files, totalToDownload);
 				}
 			}
 		}
 
 		Intent intent = new Intent(DownloadService.this, ManagerActivity.class);
 		intent.setAction(ManagerActivity.ACTION_CANCEL_DOWNLOAD);	
-		String info = Util.getProgressSize(DownloadService.this, progress, totalSize);
+		String info = Util.getProgressSize(DownloadService.this, progress, totalSizeToDownload);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
 		Notification notification = null;
@@ -444,7 +444,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				.setContentText(getString(R.string.download_touch_to_cancel))
 				.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
-//					notification = mBuilder.build();
 		}
 		else
 		{
@@ -474,6 +473,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
 		stopSelf();
 	}
 	
@@ -491,41 +491,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
-	
-	/*
-	 * Create new file to download to
-	 */
-	private File getFile(MegaNode document, Intent intent) {
-		boolean toDownloads = (intent.hasExtra(EXTRA_PATH) == false);
-		File file, destDir;
-		if (toDownloads) {
-			destDir = Environment
-					.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-		} else {
-			destDir = new File(intent.getStringExtra(EXTRA_PATH));
-		}
-		file = new File(destDir, new String(document.getName()));
-		for (int i = 0;; i++) {
-			String name = i == 0 ? new String(document.getName()) : (i + 1) + "_"
-					+ new String(document.getName());
-			file = new File(destDir, name);
-			if (file.exists() && (file.length() != document.getSize())) {
-				continue;
-			}
-			break;
-		}
-		
-		log("save to " + file.getAbsolutePath());
-		return file;
-	}
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Download start: " + transfer.getFileName() + "_" + megaApi.getTotalDownloads());
-		totalCount++;
-		totalSize += transfer.getTotalBytes();
-//		updateProgressNotification(downloadedSize);
-//		totalSize += intent.getLongExtra(EXTRA_SIZE, 0);
+		
+		currentTransfers.put(transfer.getTag(), transfer);
+		totalToDownload++;
+		totalSizeToDownload += transfer.getTotalBytes();
+		
+		log("CURRENTTRANSFERS.SIZE = " + currentTransfers.size() + "___" + "TOTALTODOWNLOAD: " + totalToDownload + "___" + "TOTALSIZETODOWNLOAD: " + totalSizeToDownload + "____" + "TRANSFER.TAG: " + transfer.getTag());
 	}
 
 	@Override
@@ -547,8 +522,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else{
 			if (error.getErrorCode() == MegaError.API_OK) {
 				log("Download OK: " + transfer.getFileName());
-				downloadedSize += transfer.getTransferredBytes();
 				log("DOWNLOADFILE: " + transfer.getPath());
+				
+				totalDownloaded++;
+				currentTransfers.remove(transfer.getTag());
+				transfersOK.put(transfer.getTag(), transfer);
+				long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
+				totalSizeDownloaded += (transfer.getTotalBytes()-currentSizeDownloaded);
+				transfersDownloadedSize.put(transfer.getTag(), transfer.getTotalBytes());
 				
 				File resultFile = new File(transfer.getPath());
 				File treeParent = resultFile.getParentFile();
@@ -562,74 +543,38 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				resultFile.setExecutable(true, false);
 				
 				String filePath = transfer.getPath();
-				
-				/*if (isOffline){
-					
-					String[] s = filePath.split(transfer.getFileName());
-					String newFileName = "";
-					newFileName = s[0] + transfer.getNodeHandle() + "_" + transfer.getFileName();
-					
-					File o = new File(filePath + ".mega");
-					if (o.exists()){
-						File d = new File(newFileName);
-						d.setReadable(true, false);
-						d.setExecutable(true, false);
-						o.renameTo(d);
-					}
-						
-					
-					if (resultFile.exists()){
-						File d = new File(newFileName);
-						d.setReadable(true, false);
-						d.setExecutable(true, false);
-						resultFile.renameTo(d);
-					}
-					
-//					MediaScannerConnection.scanFile(this,
-//							new String[] { newFileName }, null,
-//					        new MediaScannerConnection.OnScanCompletedListener() {
-//					      		public void onScanCompleted(String path, Uri uri) {
-//					      			log("Scanned Offline: " + path);
-//					      		}
-//					 		}
-//					);
-					
-					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-					File f = new File(newFileName);
-				    Uri contentUri = Uri.fromFile(f);
-				    mediaScanIntent.setData(contentUri);
-				    this.sendBroadcast(mediaScanIntent);
-				    
-					log("isoffline");
-					
-				}
-				else{
-					log("not offline");
-//					MediaScannerConnection.scanFile(this,
-//							new String[] { filePath }, null,
-//					        new MediaScannerConnection.OnScanCompletedListener() {
-//					      		public void onScanCompleted(String path, Uri uri) {
-//					      			log("Scanned: " + path);
-//					      		}
-//					 		}
-//					);
-					*/
-					Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-					File f = new File(filePath);
-				    Uri contentUri = Uri.fromFile(f);
-				    mediaScanIntent.setData(contentUri);
-				    this.sendBroadcast(mediaScanIntent);
-				/*}*/
-							
-				onDownloadComplete(true);
+
+				Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+				File f = new File(filePath);
+			    Uri contentUri = Uri.fromFile(f);
+			    mediaScanIntent.setData(contentUri);
+			    this.sendBroadcast(mediaScanIntent);
 			}
 			else 
 			{
 				log("Download Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
-				lastError = error.getErrorCode();
-				File file = new File(transfer.getPath());
-				file.delete();
-				onDownloadComplete(false);
+
+				if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
+					totalToDownload--;
+					totalSizeToDownload -= transfer.getTotalBytes();
+					currentTransfers.remove(transfer.getTag());
+					File file = new File(transfer.getPath());
+					file.delete();
+				}
+				else{
+					totalDownloadedError++;
+					totalSizeDownloadedError += transfer.getTotalBytes();
+					currentTransfers.remove(transfer.getTag());
+					transfersError.put(transfer.getTag(), transfer);
+					File file = new File(transfer.getPath());
+					file.delete();
+				}
+			}
+			log("CURRENTTRANSFERS: " + currentTransfers.size() + "___ OK: " + transfersOK.size() + "___ ERROR: " + transfersError.size());
+			if (currentTransfers.size() == 0){
+				successCount = transfersOK.size();
+				errorCount = transfersError.size();
+				onQueueComplete();
 			}
 		}		
 	}
@@ -648,10 +593,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			DownloadService.this.cancel();
 			return;
 		}
-				
+		
+		long currentSizeDownloaded = 0;
+		if (transfersDownloadedSize.get(transfer.getTag()) != null){
+			currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
+		}
+		totalSizeDownloaded += (transfer.getTransferredBytes()-currentSizeDownloaded);
+		transfersDownloadedSize.put(transfer.getTag(), transfer.getTransferredBytes());
+		
 		final long bytes = transfer.getTransferredBytes();
 		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
-    	updateProgressNotification(downloadedSize + bytes);
+    	updateProgressNotification(totalSizeDownloaded);
 		
 	}
 
@@ -675,8 +627,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (e.getErrorCode() == MegaError.API_OK){
 				megaApi.pauseTransfers(false, this);
 				megaApi.resetTotalDownloads();
-				totalCount = 0;
-				totalSize = 0;
+				totalSizeToDownload = 0;
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
@@ -689,7 +640,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			log("Public node received");
 			if (e.getErrorCode() != MegaError.API_OK) {
 				log("Public node error");
-				lastError = e.getErrorCode();
 				return;
 			}
 			else {
@@ -704,9 +654,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					currentFile = currentDir;
 					log("CURREN");
 				}
-	//			currentFile = getFile(node, currentIntent);
-	//			if(!checkCurrentFile(node)) return;
-	//			
+
 				log("Public node download launched");
 				if(!wl.isHeld()) wl.acquire();
 				if(!lock.isHeld()) lock.acquire();
@@ -714,7 +662,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
 					megaApi.startPublicDownload(node, currentDir.getAbsolutePath() + "/", this);
 				}
-	//			megaApi.startPublicDownload(node, currentFile.getAbsolutePath(), this);
 			}
 		}
 	}
@@ -731,8 +678,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestUpdate");
 	}
 
 	@Override
