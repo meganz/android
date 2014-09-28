@@ -3761,31 +3761,37 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void setParentHandleBrowser(long parentHandleBrowser){
 		log("setParentHandleBrowser");
 		
+		this.parentHandleBrowser = parentHandleBrowser;
+
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
-		
-		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();
-		
-		this.parentHandleBrowser = parentHandleBrowser;
-		
+		//Update transfer list
+		if (tF == null){
+			tF = new TransfersFragment();
+		}
 		tL = megaApi.getTransfers();
-		//Actualizar la lista de transferencias...
-		
-		for(int i=0; i<tL.size(); i++){
-			
-			MegaTransfer tempT = tL.get(i);
-			long handleT = tempT.getNodeHandle();
-			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-			MegaNode parentT = megaApi.getParentNode(nodeT);
-			
-			if(parentT.getHandle() == this.parentHandleBrowser){
+		tF.setTransfers(tL);		
+
+		//Update File Browser Fragment
+		if (fbF != null){
+			for(int i=0; i<tL.size(); i++){
 				
-				mTHash.put(handleT,tempT);				
-			}			
-		}			
-		
-		fbF.setTransfers(mTHash);		
-		
+				MegaTransfer tempT = tL.get(i).copy();
+				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					long handleT = tempT.getNodeHandle();
+					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+					MegaNode parentT = megaApi.getParentNode(nodeT);
+					
+					if (parentT != null){
+						if(parentT.getHandle() == this.parentHandleBrowser){	
+							mTHash.put(handleT,tempT);						
+						}
+					}
+				}
+			}
+			
+			fbF.setTransfers(mTHash);
+		}
 	}
 	
 	public void setParentHandleRubbish(long parentHandleRubbish){

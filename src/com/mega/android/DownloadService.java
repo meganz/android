@@ -132,7 +132,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 	
 	@Override
-	public void onDestroy(){				
+	public void onDestroy(){
+		if((lock != null) && (lock.isHeld()))
+			try{ lock.release(); } catch(Exception ex) {}
+		if((wl != null) && (wl.isHeld()))
+			try{ wl.release(); } catch(Exception ex) {}
 		super.onDestroy();
 	}
 	
@@ -342,13 +346,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		Intent intent = null;
 		if(successCount != 1)
-		{
-			if (getApplicationContext() == null){
-				log("ES NULL");
-			}
-			else{
-				log("NO ES NULL");	
-			}			
+		{		
 			intent = new Intent(getApplicationContext(), ManagerActivity.class);
 		}
 		else
@@ -557,6 +555,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
 					totalToDownload--;
 					totalSizeToDownload -= transfer.getTotalBytes();
+					Long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
+					if (currentSizeDownloaded != null){
+						totalSizeDownloaded -= currentSizeDownloaded;
+					}
 					currentTransfers.remove(transfer.getTag());
 					File file = new File(transfer.getPath());
 					file.delete();
