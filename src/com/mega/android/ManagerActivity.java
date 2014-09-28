@@ -3850,34 +3850,36 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferStart");
-		
 
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
+		//Update transfer list
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
-		
-		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();	
 		tL = megaApi.getTransfers();
-		//Actualizar la lista de transferencias...
-		tF.setTransfers(tL);
-		
-		for(int i=0; i<tL.size(); i++){
-			
-			MegaTransfer tempT = tL.get(i).copy();
-			long handleT = tempT.getNodeHandle();
-			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-			MegaNode parentT = megaApi.getParentNode(nodeT);
-			
-			if(parentT.getHandle() == this.parentHandleBrowser){
+		tF.setTransfers(tL);		
+
+		//Update File Browser Fragment
+		if (fbF != null){
+			for(int i=0; i<tL.size(); i++){
 				
-				mTHash.put(handleT,tempT);
-				
-			}			
-		}			
-		
-		fbF.setTransfers(mTHash);	
+				MegaTransfer tempT = tL.get(i).copy();
+				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					long handleT = tempT.getNodeHandle();
+					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+					MegaNode parentT = megaApi.getParentNode(nodeT);
+					
+					if (parentT != null){
+						if(parentT.getHandle() == this.parentHandleBrowser){	
+							mTHash.put(handleT,tempT);						
+						}
+					}
+				}
+			}
+			
+			fbF.setTransfers(mTHash);
+		}		
 		
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 
@@ -3889,30 +3891,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("onTransferFinish");
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
+		//Update transfer list
 		if (tF == null){
 			tF = new TransfersFragment();
-		}
-		
-		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();	
+		}		
 		tL = megaApi.getTransfers();
-		//Actualizar la lista de transferencias...
-		tF.setTransfers(tL);
+		tF.setTransfers(tL);		
 		
-		for(int i=0; i<tL.size(); i++){
-			
-			MegaTransfer tempT = tL.get(i).copy();
-			long handleT = tempT.getNodeHandle();
-			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-			MegaNode parentT = megaApi.getParentNode(nodeT);
-			
-			if(parentT.getHandle() == this.parentHandleBrowser){
+		//Update File Browser Fragment
+		if (fbF != null){
+			for(int i=0; i<tL.size(); i++){
 				
-				mTHash.put(handleT,tempT);
+				MegaTransfer tempT = tL.get(i).copy();
+				long handleT = tempT.getNodeHandle();
+				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+				MegaNode parentT = megaApi.getParentNode(nodeT);
 				
-			}			
-		}			
-		
-		fbF.setTransfers(mTHash);	
+				if (parentT != null){
+					if(parentT.getHandle() == this.parentHandleBrowser){
+						mTHash.put(handleT,tempT);
+					}
+				}			
+			}
+			fbF.setTransfers(mTHash);	
+		}
 
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
@@ -3920,32 +3922,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
-		//HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
+		//Update transfer list
 		if (tF == null){
 			tF = new TransfersFragment();
 		}
 		
-		//ArrayList<MegaTransfer> mTList = new ArrayList<MegaTransfer> ();	
-		tL = megaApi.getTransfers();
-		//Actualizar la lista de transferencias...
-		tF.setTransfers(tL);
-		fbF.setCurrentTransfer(transfer);	
-		
-//		for(int i=0; i<tL.size(); i++){
-//			
-//			MegaTransfer tempT = tL.get(i);
-//			long handleT = tempT.getNodeHandle();
-//			MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-//			MegaNode parentT = megaApi.getParentNode(nodeT);
-//			
-//			if(parentT.getHandle() == this.parentHandleBrowser){
-//				
-//				mTHash.put(handleT,tempT);
-//				
-//			}			
-//		}			
-		//fbF.getParentFragment()
+		//TODO: Change this so only the current transfer is updated.
+		if (tF.isVisible()){
+			tL = megaApi.getTransfers();
+			tF.setTransfers(tL);
+		}
+
+		if (fbF != null){
+			if (fbF.isVisible()){
+				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					fbF.setCurrentTransfer(transfer);			
+				}		
+			}
+		}
 	}
 
 	@Override

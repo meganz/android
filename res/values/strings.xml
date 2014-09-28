@@ -32,7 +32,7 @@
     <string name="action_logout">Logout</string>
     <string name="action_add">Add</string>
     <string name="action_create_folder">Create folder</string>
-    <string name="action_upload">Upload</string>
+    <string name="action_upload">Upload to</string>
     <string name="action_settings">Settings</string>
     <string name="action_search">Search</string>
     <string name="action_refresh">Refresh</string>
