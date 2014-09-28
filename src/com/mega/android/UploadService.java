@@ -1,12 +1,7 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -17,7 +12,6 @@ import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.NodeList;
-import com.mega.sdk.TransferList;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -26,17 +20,15 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
+import android.util.SparseArray;
 import android.widget.RemoteViews;
 
 /*
@@ -53,22 +45,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	public static String EXTRA_PARENT_HASH = "MEGA_PARENT_HASH";
 	
 	
-	private int totalCount = 0;
 	private int successCount = 0;
-	private int doneCount = 0;
+	private int errorCount = 0;
 	
-	private long totalSize = 0;
-	private long uploadedSize = 0;
-	private int lastError = 0;
 	private boolean isForeground = false;
 	private boolean canceled;
 	
-	private HashMap<String, Long> createdFolders;
 	MegaApplication app;
 	MegaApiAndroid megaApi;
-	
-	Handler guiHandler;
-	
+		
 	WifiLock lock;
 	WakeLock wl;
 	
@@ -86,49 +71,46 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	private int notificationId = 1;
 	private int notificationIdFinal = 5;
 	
-	private class IntentData{
-		long parentHandle;
-		File file;
-		
-		IntentData (File file, long parentHandle){
-			this.file = file;
-			this.parentHandle = parentHandle;
-		}
-		
-		public void setParentHandle(long parentHandle){
-			this.parentHandle = parentHandle;
-		}
-		
-		public long getParentHandle(){
-			return parentHandle;
-		}
-		
-		public void setFile (File file){
-			this.file = file;
-		}
-		
-		public File getFile(){
-			return file;
-		}
-	}
+	private SparseArray<MegaTransfer> currentTransfers;
+	private SparseArray<MegaTransfer> transfersOK;
+	private SparseArray<MegaTransfer> transfersError;
+	private SparseArray<Long> transfersUploadedSize;
+	
+	int lastTag = -1;
+	int totalToUpload;
+	int totalUploaded;
+	int totalUploadedError;
+	long totalSizeToUpload;
+	long totalSizeUploaded;
+	long totalSizeUploadedError;
 	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		log("onCreate");
-		totalCount = 0;
+		
+		app = (MegaApplication)getApplication();
+		megaApi = app.getMegaApi();
+		
 		successCount = 0;
-		totalSize = 0;
-		uploadedSize = 0;
-		lastError = 0;
+		
+		totalToUpload = 0;
+		totalUploaded = 0;
+		totalUploadedError = 0;
+		totalSizeToUpload = 0;
+		totalSizeUploaded = 0;
+		totalSizeUploadedError = 0;
+		
+		currentTransfers = new SparseArray<MegaTransfer>();
+		transfersOK = new SparseArray<MegaTransfer>();
+		transfersError = new SparseArray<MegaTransfer>();
+		transfersUploadedSize = new SparseArray<Long>();
+		
 		isForeground = false;
 		canceled = false;
 
-		createdFolders = new HashMap<String, Long>();
-		app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
-		guiHandler = new Handler();
+		
 		
 		int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -173,38 +155,22 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 			else if (intent.getAction().equals(ACTION_CANCEL_ONE_UPLOAD)){
 				log("Cancel one upload intent");
-				totalCount--;
-				if (totalCount == 0){
-					megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-				}
-				totalSize = uploadedSize;
-				TransferList tL = megaApi.getTransfers();
-				for (int i=0;i<tL.size();i++){
-					totalSize += tL.get(i).getTotalBytes();
-				}
-				updateProgressNotification(uploadedSize);
+				
 				return START_NOT_STICKY;
 			}
 		}
 	
 		onHandleIntent(intent);
 			
-		return START_REDELIVER_INTENT;
+		return START_NOT_STICKY;
 	}
 	
 	protected void onHandleIntent(final Intent intent) {
 		log("onHandleIntent");
 
-		updateProgressNotification(uploadedSize);
+		updateProgressNotification(totalSizeUploaded);
 
 		final File file = new File(intent.getStringExtra(EXTRA_FILEPATH));
-		File parent;
-		if (intent.hasExtra(EXTRA_FOLDERPATH)) {
-			parent = new File(intent.getStringExtra(EXTRA_FOLDERPATH));
-		} 
-		else {
-			parent = file.getParentFile();
-		}
 		
 		long parentHandle = intent.getLongExtra(EXTRA_PARENT_HASH, 0);
 		
@@ -229,23 +195,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 	}
 	
-	
-	/*
-	 * Handle download file complete
-	 */
-	private void onUploadComplete(boolean success) {
-		log("onDownloadComplete");
-		
-		if (success){
-			successCount++;
-		}
-		doneCount++;
-		
-		if (doneCount == totalCount){
-			onQueueComplete();
-		}
-	}
-	
 	/*
 	 * Stop uploading service
 	 */
@@ -253,6 +202,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
 		stopSelf();
 	}
 	
@@ -265,17 +215,15 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * No more intents in the queue
 	 */
 	private void onQueueComplete() {
-		
 		log("onQueueComplete");
 		log("Stopping foreground!");
-		log("stopping service! success: " + successCount + " total: " + totalCount);
-		megaApi.resetTotalUploads();
+		log("stopping service! success: " + successCount + " total: " + totalToUpload);
+		megaApi.resetTotalDownloads();
 		
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
-		
 		
 		//Sleep so the SDK keeps alive
 		//TODO: Must create a method to know if the SDK is waiting for any operation
@@ -285,17 +233,28 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			e.printStackTrace();
 		}
 		
-		if (successCount == 0) {
-			log("stopping service!2");
-			showCompleteFailNotification();
-		} else {
-			log("stopping service!");
-			showCompleteSuccessNotification();
+		if ((successCount + errorCount) > 0){
+			if (successCount == 0) {
+				log("stopping service!2");
+				showCompleteFailNotification();
+			} else {
+				log("stopping service!");
+				showCompleteSuccessNotification();
+			}
 		}
+		
+		long totalFromSparse = 0;
+		for (int i=0; i<transfersUploadedSize.size(); i++){
+			totalFromSparse += transfersUploadedSize.valueAt(i);
+		}
+		
+		log("totalSizeUploaded: " + totalSizeUploaded + "______ TOTALFROMSPARSE: " + totalFromSparse);
 				
+		
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
 		stopForeground(true);
+		mNotificationManager.cancel(notificationId);
 		stopSelf();
 	}
 	
@@ -303,12 +262,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * Show complete error notification
 	 */
 	private void showCompleteFailNotification() {
-		
-		
 		log("showCompleteFailNotification");
 		String title = getString(R.string.upload_failed);
 		String message = getString(R.string.error_server_connection_problem);
-		if(lastError != 0) message = MegaError.getErrorString(lastError);
+//		if(lastError != 0) message = MegaError.getErrorString(lastError);
 
 		Intent intent = new Intent(UploadService.this, ManagerActivity.class);
 		
@@ -335,7 +292,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				+ getResources().getQuantityString(R.plurals.general_num_files,
 						successCount) + " " + getString(R.string.upload_uploaded);
 		size = getString(R.string.general_total_size) + " "
-				+ Formatter.formatFileSize(UploadService.this, totalSize);
+				+ Formatter.formatFileSize(UploadService.this, totalSizeToUpload);
 
 		Intent intent = new Intent(UploadService.this, ManagerActivity.class);
 		
@@ -356,7 +313,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		
 		File folder;
 		long parentHandle;
-		ArrayList<IntentData> intents;
 		ArrayList<String> foldersPath = new ArrayList<String>();
 		boolean firstFolder = false;
 		long firstFolderHandle = -1;
@@ -365,7 +321,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		UploadFolderTask(File folder, long parentHandle, UploadService uploadService){
 			this.folder = folder;
 			this.parentHandle = parentHandle;
-			this.intents = new ArrayList<UploadService.IntentData>();
 			this.uploadService = uploadService;
 		}
 
@@ -485,81 +440,76 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 		@Override
 		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
+			log("onRequestUpdate:" + request.getName());
 		}
 	}
 	
 	@SuppressLint("NewApi")
 	private void updateProgressNotification(final long progress) {
-		guiHandler.post(new Runnable(){
-			public void run(){	
-				log("updateProgressNotification");
-				int progressPercent = (int) Math.round((double) progress / totalSize
-						* 100);
-				log(progressPercent + " " + progress + " " + totalSize);
-				int left = totalCount - doneCount;
-				int current = totalCount - left + 1;
-				int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-				
-				String message = "";
-				if (totalCount == 0){
-					message = getString(R.string.download_preparing_files);
-				}
-				else{
-
-					message = getString(R.string.upload_uploading) + " " + current + " ";
-					if (totalCount == 1) {
-						message += getResources().getQuantityString(R.plurals.general_num_files, 1);
-					} else {
-						message += getString(R.string.general_x_of_x) + " " + totalCount;
-								
-						if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB){
-							message += " " + getResources().getQuantityString(R.plurals.general_num_files, totalCount);
-						}
-					}
-				}
-				
-				Intent intent = new Intent(UploadService.this, ManagerActivity.class);
-				intent.setAction(ManagerActivity.ACTION_CANCEL_UPLOAD);
-				String info = Util.getProgressSize(UploadService.this, progress, totalSize);
-
-				PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
-				Notification notification = null;
-				
-				if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
-					mBuilder
-						.setSmallIcon(R.drawable.ic_stat_notify_upload)
-						.setProgress(100, progressPercent, false)
-						.setContentIntent(pendingIntent)
-						.setOngoing(true).setContentTitle(message).setContentInfo(info)
-						.setContentText(getString(R.string.upload_touch_to_cancel))
-						.setOnlyAlertOnce(true);
-					notification = mBuilder.getNotification();
-//					notification = mBuilder.build();
-				}
-				else
-				{
-					notification = new Notification(R.drawable.ic_stat_notify_upload, null, 1);
-					notification.flags |= Notification.FLAG_ONGOING_EVENT;
-					notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
-					notification.contentIntent = pendingIntent;
-					notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_upload);
-					notification.contentView.setTextViewText(R.id.status_text, message);
-					notification.contentView.setTextViewText(R.id.progress_text, info);
-					notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
-				}
-					
-					
-				if (!isForeground) {
-					log("starting foreground!");
-					startForeground(notificationId, notification);
-					isForeground = true;
-				} else {
-					mNotificationManager.notify(notificationId, notification);
+		log("updateProgressNotification");
+		int progressPercent = (int) Math.round((double) progress / totalSizeToUpload
+				* 100);
+		log(progressPercent + " " + progress + " " + totalSizeToUpload);
+		int left = totalToUpload - (totalUploaded + totalUploadedError);
+		int current = totalToUpload - left + 1;
+		
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		
+		String message = "";
+		if (totalToUpload == 0){
+			message = getString(R.string.download_preparing_files);
+		}
+		else{
+			message = getString(R.string.upload_uploading) + " " + current + " ";
+			if (totalToUpload == 1) {
+				message += getResources().getQuantityString(R.plurals.general_num_files, 1);
+			} else {
+				message += getString(R.string.general_x_of_x) + " " + totalToUpload;
+						
+				if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB){
+					message += " " + getResources().getQuantityString(R.plurals.general_num_files, totalToUpload);
 				}
 			}
-		});
+		}
+		
+		Intent intent = new Intent(UploadService.this, ManagerActivity.class);
+		intent.setAction(ManagerActivity.ACTION_CANCEL_UPLOAD);
+		String info = Util.getProgressSize(UploadService.this, progress, totalSizeToUpload);
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(UploadService.this, 0, intent, 0);
+		Notification notification = null;
+		
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)	{
+			mBuilder
+				.setSmallIcon(R.drawable.ic_stat_notify_upload)
+				.setProgress(100, progressPercent, false)
+				.setContentIntent(pendingIntent)
+				.setOngoing(true).setContentTitle(message).setContentInfo(info)
+				.setContentText(getString(R.string.upload_touch_to_cancel))
+				.setOnlyAlertOnce(true);
+			notification = mBuilder.getNotification();
+//					notification = mBuilder.build();
+		}
+		else
+		{
+			notification = new Notification(R.drawable.ic_stat_notify_upload, null, 1);
+			notification.flags |= Notification.FLAG_ONGOING_EVENT;
+			notification.contentView = new RemoteViews(getApplicationContext().getPackageName(), R.layout.download_progress);
+			notification.contentIntent = pendingIntent;
+			notification.contentView.setImageViewResource(R.id.status_icon, R.drawable.ic_stat_notify_upload);
+			notification.contentView.setTextViewText(R.id.status_text, message);
+			notification.contentView.setTextViewText(R.id.progress_text, info);
+			notification.contentView.setProgressBar(R.id.status_progress, 100, progressPercent, false);
+		}
+			
+			
+		if (!isForeground) {
+			log("starting foreground!");
+			startForeground(notificationId, notification);
+			isForeground = true;
+		} else {
+			mNotificationManager.notify(notificationId, notification);
+		}
 	}
 	
 	public static void log(String log) {
@@ -569,13 +519,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("Upload start: " + transfer.getFileName() + "_" + megaApi.getTotalUploads());
-		totalCount++;
-		totalSize += transfer.getTotalBytes();
+		
+		currentTransfers.put(transfer.getTag(), transfer);
+		totalToUpload++;
+		totalSizeToUpload += transfer.getTotalBytes();
+		
+		log("CURRENTTRANSFERS.SIZE = " + currentTransfers.size() + "___" + "TOTALTOUPLOAD: " + totalToUpload + "___" + "TOTALSIZETOUPLOAD: " + totalSizeToUpload + "____" + "TRANSFER.TAG: " + transfer.getTag());
 	}
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
+			MegaError error) {
 		log("Upload finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if (canceled) {
@@ -589,16 +543,33 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			UploadService.this.cancel();
 		}		
 		else{
-			if (e.getErrorCode() == MegaError.API_OK) {
+			if (error.getErrorCode() == MegaError.API_OK) {
 				log("Upload OK: " + transfer.getFileName());
-				uploadedSize += transfer.getTransferredBytes();
-				log("UPLOADEDFILE: " + transfer.getPath());
-				onUploadComplete(true);
+				
+				totalUploaded++;
+				currentTransfers.remove(transfer.getTag());
+				transfersOK.put(transfer.getTag(), transfer);
+				long currentSizeUploaded = transfersUploadedSize.get(transfer.getTag());
+				totalSizeUploaded += (transfer.getTotalBytes()-currentSizeUploaded);
+				transfersUploadedSize.put(transfer.getTag(), transfer.getTotalBytes());
 			}
 			else{
-				log("Upload Error: " + transfer.getFileName() + "_" + e.getErrorCode() + "___" + e.getErrorString());
-				lastError = e.getErrorCode();
-				onUploadComplete(false);
+				log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
+				if(error.getErrorCode() == MegaError.API_EINCOMPLETE){
+					totalToUpload--;
+					totalSizeToUpload -= transfer.getTotalBytes();
+					Long currentSizeUploaded = transfersUploadedSize.get(transfer.getTag());
+					if (currentSizeUploaded != null){
+						totalSizeUploaded -= currentSizeUploaded;
+					}
+					currentTransfers.remove(transfer.getTag());
+				}
+				else{
+					totalUploadedError++;
+					totalSizeUploadedError += transfer.getTotalBytes();
+					currentTransfers.remove(transfer.getTag());
+					transfersError.put(transfer.getTag(), transfer);
+				}
 			}
 			
 			if (getApplicationContext().getExternalCacheDir() != null){
@@ -612,6 +583,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				if (localFile.exists()){
 					localFile.delete();
 				}
+			}
+			
+			log("CURRENTTRANSFERS: " + currentTransfers.size() + "___ OK: " + transfersOK.size() + "___ ERROR: " + transfersError.size());
+			if (currentTransfers.size() == 0){
+				successCount = transfersOK.size();
+				errorCount = transfersError.size();
+				onQueueComplete();
 			}
 		}
 	}
@@ -631,9 +609,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			return;
 		}
 				
+		
+		long currentSizeUploaded = 0;
+		if (transfersUploadedSize.get(transfer.getTag()) != null){
+			currentSizeUploaded = transfersUploadedSize.get(transfer.getTag());
+		}
+		totalSizeUploaded += (transfer.getTransferredBytes()-currentSizeUploaded);
+		transfersUploadedSize.put(transfer.getTag(), transfer.getTransferredBytes());
+		
 		final long bytes = transfer.getTransferredBytes();
 		log("Transfer update: " + transfer.getFileName() + "  Bytes: " + bytes);
-    	updateProgressNotification(uploadedSize + bytes);
+		updateProgressNotification(totalSizeUploaded);
 	}
 
 	@Override
@@ -655,8 +641,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			if (e.getErrorCode() == MegaError.API_OK){
 				megaApi.pauseTransfers(false, this);
 				megaApi.resetTotalUploads();
-				totalCount = 0;
-				totalSize = 0;
+				totalSizeToUpload = 0;
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
@@ -675,8 +660,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestUpdate: " + request.getName());
 	}
 
 	@Override
