@@ -334,9 +334,7 @@ public class ContactFileListActivity extends PinActivity implements
 			}
 
 			if (adapter == null) {
-				adapter = new MegaBrowserListAdapter(this, contactNodes, -1,
-						listView, emptyImage, emptyText, aB,
-						ManagerActivity.CONTACT_FILE_ADAPTER);
+				adapter = new MegaBrowserListAdapter(this, contactNodes, -1,listView, emptyImage, emptyText, aB,ManagerActivity.CONTACT_FILE_ADAPTER);
 			} else {
 				adapter.setNodes(contactNodes);
 				adapter.setParentHandle(-1);
@@ -583,6 +581,20 @@ public class ContactFileListActivity extends PinActivity implements
 				}
 				log("move nodes request finished");
 			}
+		} else if (request.getType() == MegaRequest.TYPE_RENAME){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
+			}
+			else{
+				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
+			}
+			log("rename nodes request finished");
+			
 		} else if (request.getType() == MegaRequest.TYPE_REMOVE) {
 
 			if (e.getErrorCode() == MegaError.API_OK) {
@@ -1499,5 +1511,4 @@ public class ContactFileListActivity extends PinActivity implements
 		intent.putExtra("MOVE_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
-
 }
