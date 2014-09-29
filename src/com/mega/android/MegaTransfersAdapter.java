@@ -271,27 +271,33 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 			holder.document = transfer.getNodeHandle();
 			
-			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
-			
-			Bitmap thumb = null;
-			if (node.hasThumbnail()){
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null){
-					holder.imageView.setImageBitmap(thumb);
-				}
-				else{
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+			//if node == null --> Public node
+			if (node == null){
+				holder.imageView.setImageResource(MimeType.typeForName(transfer.getFileName()).getIconResourceId());	
+			}
+			else{
+				holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+				
+				Bitmap thumb = null;
+				if (node.hasThumbnail()){
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
-					else{ 
-						try{
-							thumb = ThumbnailUtils.getThumbnailFromMegaTransfer(node, context, holder, megaApi, this);
-						}
-						catch(Exception e){} //Too many AsyncTasks
-						
+					else{
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
+						}
+						else{ 
+							try{
+								thumb = ThumbnailUtils.getThumbnailFromMegaTransfer(node, context, holder, megaApi, this);
+							}
+							catch(Exception e){} //Too many AsyncTasks
+							
+							if (thumb != null){
+								holder.imageView.setImageBitmap(thumb);
+							}
 						}
 					}
 				}
