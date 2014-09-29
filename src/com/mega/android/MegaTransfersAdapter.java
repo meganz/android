@@ -53,6 +53,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	Context context;
 //	SparseArray<TransfersHolder> transfersListArray;
 	TransferList tL = null;
+	MegaTransfer currentTransfer = null;
 	int positionClicked;
 	ActionBar aB;
 
@@ -168,6 +169,12 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
     	this.tL = transfers;
     	notifyDataSetChanged();
     }
+    
+    public void setCurrentTransfer(MegaTransfer mT)
+    {
+    	this.currentTransfer = mT;
+    	notifyDataSetChanged();    		
+   }   
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -224,8 +231,19 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		holder.currentPosition = position;
 		
 		holder.imageButtonThreeDots.setOnClickListener(this);
-		
-		MegaTransfer transfer = (MegaTransfer) getItem(position);
+		MegaTransfer transfer = null;
+		MegaTransfer transferFromList = (MegaTransfer) getItem(position);
+		if (currentTransfer == null){
+			transfer = transferFromList;
+		}
+		else{
+			if (transferFromList.getTag() == currentTransfer.getTag()){
+				transfer = currentTransfer;
+			}
+			else{
+				transfer = transferFromList;
+			}
+		}
 		String fileName = transfer.getFileName();
 		holder.textViewFileName.setText(fileName);
 		

@@ -405,6 +405,14 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		this.tL = _transfers;
 		
 		if (adapter != null){
+			if (tL == null){
+				adapter.setPositionClicked(-1);
+			}
+			else{
+				if (tL.size() == 0){
+					adapter.setPositionClicked(-1);
+				}
+			}
 			adapter.setTransfers(tL);
 		}
 		
@@ -434,6 +442,12 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 				pauseImage.setVisibility(View.GONE);
 				pauseText.setVisibility(View.GONE);
 			}
+		}
+	}
+	
+	public void setCurrentTransfer(MegaTransfer mT){
+		if (adapter != null){
+			adapter.setCurrentTransfer(mT);
 		}
 	}
 	
