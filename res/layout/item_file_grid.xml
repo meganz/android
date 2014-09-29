@@ -71,7 +71,7 @@
        <ProgressBar
 	    android:id="@+id/transfers_list__browser_bar1"
 		android:layout_width="fill_parent"
-		android:layout_height="30dp" 
+		android:layout_height="wrap_content" 
 		android:paddingRight="10dp"
 		android:paddingBottom="10dp"
 		style="@style/MEGAProgressBarTransfers"  
@@ -245,14 +245,13 @@
 	    android:id="@+id/transfers_list__browser_bar2"
 		android:layout_width="fill_parent"
 		style="@style/MEGAProgressBarTransfers"  
-		android:layout_margin="5dip" 
-		android:layout_height="30dp" 
+		android:layout_height="wrap_content" 
 		android:paddingRight="10dp"
 		android:paddingBottom="10dp"
-        android:layout_toRightOf="@id/file_grid_thumbnail2"
+		android:layout_margin="5dip"
         android:layout_toLeftOf="@id/file_grid_three_dots2"
-        android:layout_below="@id/file_grid_filename2" /> 
-
+        android:layout_below="@id/file_grid_filename2" />    
+  
         <ImageView
 	        android:id="@+id/file_grid_arrow_selection2"
 	        android:layout_width="wrap_content"

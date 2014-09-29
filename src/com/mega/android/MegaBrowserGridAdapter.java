@@ -438,9 +438,17 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 						if (currentTransfer != null){
+							log("Entrooo");
+							
+							log("Handle: "+node2.getHandle());
+							log("Traaaaaansfer: "+currentTransfer.getNodeHandle());
+							
+						
 							if (node2.getHandle() == currentTransfer.getNodeHandle()){
+								log("setVisibility");
 								holder.transferProgressBar2.setVisibility(View.VISIBLE);		
 								holder.textViewFileSize2.setVisibility(View.GONE);	
+								
 								double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
 								holder.transferProgressBar2.setProgress((int)progressValue);
 							}

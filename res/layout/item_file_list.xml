@@ -56,7 +56,8 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content" 
 		style="@style/MEGAProgressBarTransfers"  
-		android:layout_margin="5dip" 
+		android:layout_margin="5dip"
+		android:paddingRight="5dp" 
         android:layout_toRightOf="@id/file_list_thumbnail"
         android:layout_toLeftOf="@id/file_list_three_dots"
         android:layout_below="@id/file_list_filename" />    
