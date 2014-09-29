@@ -258,6 +258,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
+				if (mTHash != null){
+					adapterList.setTransfers(mTHash);
+				}
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -292,6 +295,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	        
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
+				if (mTHash != null){
+					adapterGrid.setTransfers(mTHash);
+				}
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
