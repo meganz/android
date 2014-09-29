@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,21 +47,17 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
-import android.os.UserManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils.TruncateAt;
-import android.text.format.Formatter;
 import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -79,10 +74,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -253,6 +246,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	NavigationDrawerAdapter nDA;
 	
 	String pathNavigation = "/";
+	
+	long lastTimeOnTransferUpdate = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -3755,7 +3750,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
 		log("onReloadNeeded");
-		// TODO Fetch nodes from MEGA		
 	}	
 	
 	public void setParentHandleBrowser(long parentHandleBrowser){
@@ -3902,7 +3896,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			tF = new TransfersFragment();
 		}		
 		tL = megaApi.getTransfers();
-		tF.setTransfers(tL);		
+		tF.setTransfers(tL);	
 		
 		//Update File Browser Fragment
 		if (fbF != null){
@@ -3924,7 +3918,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
-
+	
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
@@ -3934,16 +3928,34 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			tF = new TransfersFragment();
 		}
 		
-		//TODO: Change this so only the current transfer is updated.
 		if (tF.isVisible()){
-			tL = megaApi.getTransfers();
-			tF.setTransfers(tL);
+			Time now = new Time();
+			now.setToNow();
+			long nowMillis = now.toMillis(false);
+			if (lastTimeOnTransferUpdate < 0){
+				lastTimeOnTransferUpdate = now.toMillis(false);
+				tF.setCurrentTransfer(transfer);
+			}
+			else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+				lastTimeOnTransferUpdate = nowMillis;
+				tF.setCurrentTransfer(transfer);
+			}
 		}
 
 		if (fbF != null){
 			if (fbF.isVisible()){
 				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					fbF.setCurrentTransfer(transfer);			
+					Time now = new Time();
+					now.setToNow();
+					long nowMillis = now.toMillis(false);
+					if (lastTimeOnTransferUpdate < 0){
+						lastTimeOnTransferUpdate = now.toMillis(false);
+						fbF.setCurrentTransfer(transfer);
+					}
+					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+						lastTimeOnTransferUpdate = nowMillis;
+						fbF.setCurrentTransfer(transfer);
+					}			
 				}		
 			}
 		}
@@ -3962,9 +3974,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate");
-		// TODO Auto-generated method stub
-		
+		log("onRequestUpdate");		
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
