@@ -386,10 +386,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					}
 				}
 				else{
+					//Is file
 					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
+						intent.putExtra("isFolderLink", false);
 						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
 							intent.putExtra("parentNodeHandle", -1L);
 						}

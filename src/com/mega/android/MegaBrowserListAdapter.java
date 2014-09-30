@@ -794,8 +794,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 				((ManagerActivity) context).showRenameDialog(n, n.getName());
 			}
 			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactFileListActivity) context).showRenameDialog(n,
-						n.getName());
+				((ContactFileListActivity) context).showRenameDialog(n,	n.getName());
 			}
 
 			break;
