@@ -916,8 +916,7 @@ public class ContactFileListActivity extends PinActivity implements
 					if (prefs.getStorageDownloadLocation() != null) {
 						if (prefs.getStorageDownloadLocation().compareTo("") != 0) {
 							askMe = false;
-							downloadLocationDefaultPath = prefs
-									.getStorageDownloadLocation();
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
 						}
 					}
 				}

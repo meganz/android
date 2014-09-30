@@ -1131,7 +1131,7 @@ public void moveToTrash(){
 				service.putExtra(DownloadService.EXTRA_URL, url);
 				service.putExtra(DownloadService.EXTRA_SIZE, size);
 				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-				service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
+				service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
 				startService(service);
 			}
 		}
@@ -1188,7 +1188,7 @@ public void moveToTrash(){
 						service.putExtra(DownloadService.EXTRA_URL, url);
 						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
 						service.putExtra(DownloadService.EXTRA_PATH, path);
-						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
+						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
 						startService(service);
 					}
 				}
@@ -1203,7 +1203,7 @@ public void moveToTrash(){
 					service.putExtra(DownloadService.EXTRA_URL, url);
 					service.putExtra(DownloadService.EXTRA_SIZE, size);
 					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
+					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, isFolderLink);
 					startService(service);
 				}
 				else {

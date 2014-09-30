@@ -220,7 +220,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		
 		MegaNode document = megaApi.getNodeByHandle(hash);
-		
+	
 		if((document == null) && (url == null)){
 			log("Node not found");
 			return;
