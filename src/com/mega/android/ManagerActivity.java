@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.andpdf.pdfviewer.PdfViewerActivity;
+
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.sdk.MegaAccountDetails;
@@ -127,7 +129,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
 	public static String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
-	
+	public static String ACTION_OPEN_PDF = "OPEN_PDF";
+	public static String EXTRA_PATH_PDF = "PATH_PDF";
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
@@ -877,8 +880,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				setIntent(null);
 			}
     					
-    		if (intent.getAction() != null){    			
-    			if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
+    		if (intent.getAction() != null){ 
+    			
+    			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){
+    				
+    				//TODO open visor
+    				log("En Manager Activity entro por el intent bien");
+    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
+    				
+    				log("Path: "+pathPdf);
+    				Intent intentPdf = new Intent(managerActivity, PdfFileViewerActivity.class);    				
+    				intentPdf.putExtra(PdfViewerActivity.EXTRA_PDFFILENAME, pathPdf);
+    			    startActivity(intentPdf);
+    				
+    			}    			
+    			else if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
 					Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
@@ -3886,8 +3902,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 
 	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError e) {
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferFinish");
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
@@ -4012,6 +4027,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 						catch(Exception e) {}
 						
+						//TODO: SI ES UN PDF --> ABRIR NUESTRO VISOR CON LOCALPATH
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
 						if (isIntentAvailable(this, viewIntent))

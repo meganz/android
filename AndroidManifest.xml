@@ -234,6 +234,11 @@
             android:label="@string/settings_pin_lock" >
         </activity>
         
+        <activity
+            android:name="PdfFileViewerActivity"
+            android:label="@string/pdf_file_viewer_activity" >
+        </activity>
+        
         <service
             android:name="CameraSyncService"
             android:exported="false" >
