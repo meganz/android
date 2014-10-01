@@ -3,6 +3,8 @@ package com.mega.android;
 import java.io.File;
 import java.util.List;
 
+import net.sf.andpdf.pdfviewer.PdfViewerActivity;
+
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -49,6 +51,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_PATH = "SAVE_PATH";
 	public static String EXTRA_FOLDER_LINK = "FOLDER_LINK";
 	public static String EXTRA_OFFLINE = "IS_OFFLINE";
+	public static String ACTION_OPEN_PDF = "OPEN_PDF";
+	public static String EXTRA_PATH_PDF = "PATH_PDF";
+	
 	
 	private int successCount = 0;
 	private int errorCount = 0;
@@ -351,7 +356,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else
 		{
-			if (MimeType.typeForName(currentFile.getName()).isDocument()){
+			if (MimeType.typeForName(currentFile.getName()).isPdf()){
+				log("Es pdf, tengo que lanzar intent.....");
+				//TODO descargarlo y mostrarlo
+				Intent intentPdf = new Intent(this, ManagerActivity.class);
+				intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+				intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+			    startActivity(intentPdf);
+				log("Lanzo intent al manager.....");
+			}
+			else if (MimeType.typeForName(currentFile.getName()).isDocument()){
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
 				viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -377,14 +392,16 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				
 		}
 		
-		mBuilderCompat
-				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-				.setAutoCancel(true).setTicker(notificationTitle)
-				.setContentTitle(notificationTitle).setContentText(size)
-				.setOngoing(false);
-
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		if (!MimeType.typeForName(currentFile.getName()).isPdf()){
+			mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(notificationTitle)
+					.setContentTitle(notificationTitle).setContentText(size)
+					.setOngoing(false);
+	
+			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
+		}
 	}
 	
 	/*

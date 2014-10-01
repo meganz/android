@@ -119,6 +119,10 @@ public class MimeType {
 	public boolean isImage() {
 		return type.startsWith("image/");
 	}
+	
+	public boolean isPdf(){
+		return type.startsWith("application/pdf");
+	}
 
 	/*
 	 * Once a file is downloaded, prior to create the preview, check if the file is really an image
