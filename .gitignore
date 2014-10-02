@@ -5,4 +5,5 @@
 /.project
 /proguard
 /obj
-/libs
+/libs/armeabi
+/libs/x86
