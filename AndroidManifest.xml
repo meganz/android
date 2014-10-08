@@ -239,6 +239,36 @@
             android:label="@string/pdf_file_viewer_activity" >
         </activity>
         
+<!-- Pegado del visor -->
+		<activity android:name=".pdfViewer.OpenFileActivity" android:label="@string/pdf_file_viewer_activity"
+			android:configChanges="orientation|keyboardHidden"
+			android:uiOptions="splitActionBarWhenNarrow">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<category android:name="android.intent.category.BROWSABLE"></category>
+				<data android:mimeType="application/pdf" android:scheme="file"></data>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<category android:name="android.intent.category.BROWSABLE"></category>
+				<data android:mimeType="application/pdf" android:scheme="content"></data>
+			</intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<category android:name="android.intent.category.BROWSABLE"></category>
+				<data android:host="*" android:scheme="file"
+					android:pathPattern=".*\.[pP][dD][fF]" />
+			</intent-filter>
+
+		</activity>
+
+		<activity android:name="Options" android:label="@string/options" />
+		
+		<!-- Pegado del visor -->
+        
         <service
             android:name="CameraSyncService"
             android:exported="false" >
