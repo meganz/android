@@ -5,5 +5,5 @@
 /.project
 /proguard
 /obj
-/libs/armeabi
-/libs/x86
+/libs/armeabi/libmega.so
+/libs/x86/libmega.so

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  	<ListPreference		android:title="@string/orientation"
+  		android:defaultValue="@string/default_orientation"
+  		android:entries="@array/orientation_labels"
+  		android:entryValues="@array/orientations"
+  		android:key="orientation"/>
+  	<PreferenceCategory android:title="@string/viewer">
+    <CheckBoxPreference
+    	android:title="@string/fullscreen"
+    	android:defaultValue="false"
+    	android:key="fullscreen"/>
+    <ListPreference
+    	android:title="@string/color_mode"
+    	android:defaultValue="@string/default_color_mode"
+    	android:entries="@array/color_mode_labels"
+    	android:entryValues="@array/color_modes"
+    	android:key="colorMode"/>
+    <CheckBoxPreference
+    	android:title="@string/omit_images"
+    	android:defaultValue="false"
+    	android:key="omitImages"/>
+    <ListPreference
+    	android:title="@string/zoom_animation"
+    	android:defaultValue="@string/default_zoom_animation"
+    	android:entries="@array/zoom_animation_labels"
+    	android:entryValues="@array/zoom_animations"
+    	android:key="zoomAnimation"
+    	/>
+    <ListPreference
+    	android:title="@string/page_animation"
+    	android:defaultValue="@string/default_page_animation"
+    	android:entries="@array/page_animation_labels"
+    	android:entryValues="@array/page_animations"
+    	android:key="pageAnimation"
+    	/>
+    <ListPreference
+    	android:title="@string/fade_speed"
+    	android:defaultValue="@string/default_fade_speed"
+    	android:entries="@array/fade_speed_labels"
+    	android:entryValues="@array/fade_speeds"
+    	android:key="fadeSpeed"
+    	/>
+    <CheckBoxPreference
+    	android:title="@string/show_zoom_on_scroll"
+    	android:defaultValue="false"
+    	android:key="showZoomOnScroll"/>
+    <CheckBoxPreference
+    	android:title="@string/render_ahead"
+    	android:summary="@string/render_ahead_sub"
+    	android:defaultValue="true"
+    	android:key="renderAhead"/>
+    <CheckBoxPreference
+    	android:title="@string/vertical_scroll_lock"
+    	android:summary="@string/vertical_scroll_lock_sub"
+    	android:defaultValue="false"
+    	android:key="verticalScrollLock"/>
+    <ListPreference
+    	android:title="@string/side_margin"
+    	android:defaultValue="@string/default_side_margin"
+    	android:entries="@array/margin_labels"
+    	android:entryValues="@array/margins"
+    	android:key="sideMargins2"/>
+    <ListPreference
+    	android:title="@string/top_margin"
+    	android:defaultValue="@string/default_top_margin"
+    	android:entries="@array/margin_labels"
+    	android:entryValues="@array/margins"
+    	android:key="topMargin"/>
+    <ListPreference
+    	android:title="@string/box"
+    	android:defaultValue="@string/default_box"
+    	android:entries="@array/box_labels"
+    	android:entryValues="@array/boxes"
+    	android:key="boxType"
+    	/>
+    <ListPreference
+    	android:title="@string/double_tap_action"
+    	android:defaultValue="@string/default_double_tap_action"
+    	android:entries="@array/double_tap_action_labels"
+    	android:entryValues="@array/double_tap_actions"
+    	android:key="doubleTap"
+    	/>
+
+    <ListPreference
+    	android:title="@string/volume_pair"
+    	android:defaultValue="@string/default_volume_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="volumePair"/>
+
+    <ListPreference
+    	android:title="@string/up_down_pair"
+    	android:defaultValue="@string/default_up_down_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="upDownPair"/>
+
+    <ListPreference
+    	android:title="@string/left_right_pair"
+    	android:defaultValue="@string/default_left_right_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="leftRightPair"/>
+
+    <ListPreference
+    	android:title="@string/zoom_pair"
+    	android:defaultValue="@string/default_zoom_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="zoomPair"/>
+
+    <ListPreference
+    	android:title="@string/long_zoom_pair"
+    	android:defaultValue="@string/default_long_zoom_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="longZoomPair"/>
+
+    <ListPreference
+    	android:title="@string/top_bottom_tap_pair"
+    	android:defaultValue="@string/default_top_bottom_tap_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="topBottomTapPair"/>
+
+    <ListPreference
+    	android:title="@string/extra_cache"
+    	android:defaultValue="@string/default_extra_cache"
+    	android:entries="@array/extra_cache_labels"
+    	android:entryValues="@array/extra_caches"
+    	android:key="extraCache"
+    	/>
+    	
+    <CheckBoxPreference 
+    	android:title="@string/keep_on"
+    	android:key="keepOn"
+    	android:defaultValue="false"
+    />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+    android:title="@string/hw">
+    <ListPreference
+    	android:title="@string/right_up_down_pair"
+    	android:defaultValue="@string/default_right_up_down_pair"
+    	android:entries="@array/action_pair_labels"
+    	android:entryValues="@array/action_pairs"
+    	android:key="rightUpDownPair"/>
+    </PreferenceCategory>
+
+    <CheckBoxPreference
+    	android:title="@string/eink"
+    	android:defaultValue="false"
+    	android:key="eink"/>
+    <CheckBoxPreference
+    	android:title="@string/nook2"
+    	android:defaultValue="false"
+    	android:key="nook2"/>
+
+    <PreferenceCategory
+    android:title="@string/selector">
+    <CheckBoxPreference
+    	android:title="@string/dirs_first"
+    	android:defaultValue="true"
+    	android:key="dirsFirst"/>
+    <CheckBoxPreference
+    	android:title="@string/show_extension"
+    	android:defaultValue="false"
+    	android:key="showExtension"/>
+    <CheckBoxPreference
+    	android:title="@string/history"
+    	android:defaultValue="true"
+    	android:key="history"/>
+    </PreferenceCategory>    	
+</PreferenceScreen>

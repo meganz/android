@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="6dip"
+    android:paddingRight="6dip"
+    >
+    <ImageView 
+    android:id="@+id/upfolder"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/upfolder" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"
+    />
+    <ImageView 
+    android:id="@+id/folder"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/folder" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"
+    />
+    <ImageView 
+    android:id="@+id/home"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/home" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"    
+    />
+    <ImageView 
+    android:id="@+id/recent1"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/recent1" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"    
+    />
+    <ImageView 
+    android:id="@+id/recent2"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/recent2" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"    
+    />
+    <ImageView 
+    android:id="@+id/recent3"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/recent3" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"    
+    />
+    <ImageView 
+    android:id="@+id/recent4"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/recent4" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"    
+    />
+    <ImageView 
+    android:id="@+id/recent5"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/recent5" 
+    android:layout_gravity="center_vertical"
+    android:visibility="gone"    
+    />
+    <TextView android:text="TextView" 
+	android:id="@+id/text" android:layout_width="fill_parent" 
+	android:layout_height="wrap_content"
+	android:minHeight="?android:attr/listPreferredItemHeight"
+	android:textAppearance="?android:attr/textAppearanceLarge"
+	android:gravity="center_vertical" 
+	android:paddingLeft="6dip" 
+/>    
+</LinearLayout>

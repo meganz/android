@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.andpdf.pdfviewer.PdfViewerActivity;
-
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.sdk.MegaAccountDetails;
@@ -26,6 +24,8 @@ import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 import com.mega.sdk.TransferList;
 import com.mega.sdk.UserList;
+
+import com.mega.android.pdfViewer.OpenFileActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -64,6 +64,7 @@ import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.Gravity;
@@ -109,6 +110,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case SEARCH: return context.getString(R.string.search_files_and_folders);
 			}
 			return null;
+			
 		}
 	}
 	
@@ -884,14 +886,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){
     				
-    				//TODO open visor
-    				log("En Manager Activity entro por el intent bien");
+
     				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
     				
     				log("Path: "+pathPdf);
-    				Intent intentPdf = new Intent(managerActivity, PdfFileViewerActivity.class);    				
-    				intentPdf.putExtra(PdfViewerActivity.EXTRA_PDFFILENAME, pathPdf);
-    			    startActivity(intentPdf);
+//    				Intent intentPdf = new Intent(managerActivity, PdfFileViewerActivity.class);    				
+//    				intentPdf.putExtra(PdfViewerActivity.EXTRA_PDFFILENAME, pathPdf);
+//    			    startActivity(intentPdf);
+    			    
+    			    File pdfFile = new File(pathPdf);
+    			    
+    			    Intent intentPdf = new Intent();
+    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+    			    intentPdf.setClass(this, OpenFileActivity.class);
+    			    intentPdf.setAction("android.intent.action.VIEW");
+    				this.startActivity(intentPdf);	
     				
     			}    			
     			else if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){

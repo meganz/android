@@ -3,8 +3,6 @@ package com.mega.android;
 import java.io.File;
 import java.util.List;
 
-import net.sf.andpdf.pdfviewer.PdfViewerActivity;
-
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -684,6 +682,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		}
 	}
+	
 
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
