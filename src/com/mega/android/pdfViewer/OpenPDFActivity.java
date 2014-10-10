@@ -8,7 +8,9 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,13 +26,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -50,6 +55,7 @@ import android.widget.Toast;
 
 import com.mega.android.PinActivity;
 import com.mega.android.R;
+import com.mega.android.Util;
 import com.mega.android.pdfViewer.PDFPagesProvider;
 import com.mega.android.pdfViewer.BookmarkEntry;
 
@@ -69,9 +75,11 @@ import com.mega.android.pdfViewer.BookmarkEntry;
 /**
  * Document display activity.
  */
-public class OpenFileActivity extends PinActivity implements SensorEventListener {
+public class OpenPDFActivity extends PinActivity implements SensorEventListener {
 
 	private final static String TAG = "com.mega.android.pdfViewer";
+	
+	private ActionBar aB = null;
 	
 	private final static int[] zoomAnimations = {
 		R.anim.zoom_disappear, R.anim.zoom_almost_disappear, R.anim.zoom
@@ -112,15 +120,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 	private Runnable zoomRunnable = null;
 	private Runnable pageRunnable = null;
 	
-	private MenuItem aboutMenuItem = null;
-	private MenuItem gotoPageMenuItem = null;
-	private MenuItem rotateLeftMenuItem = null;
-	private MenuItem rotateRightMenuItem = null;
-	private MenuItem findTextMenuItem = null;
-	private MenuItem clearFindTextMenuItem = null;
-	private MenuItem chooseFileMenuItem = null;
-	private MenuItem optionsMenuItem = null;
-	// #ifdef pro
+		// #ifdef pro
 // 	private MenuItem tableOfContentsMenuItem = null;
 // 	private MenuItem textReflowMenuItem = null;
 	// #endif
@@ -149,6 +149,19 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 	private ImageButton zoomUpButton;
 	private Animation zoomAnim;
 	private LinearLayout zoomLayout;
+	
+	
+	//private MenuItem aboutMenuItem = null;
+	private MenuItem gotoPageMenuItem = null;
+	private MenuItem rotateLeftMenuItem = null;
+	private MenuItem rotateRightMenuItem = null;
+	private MenuItem findTextMenuItem = null;
+	private MenuItem clearFindTextMenuItem = null;
+	private MenuItem optionsMenuItem = null;
+	private MenuItem zoomDownItem = null;
+	private MenuItem zoomUpItem = null;
+	private MenuItem zoomWidthItem = null;
+	
 
 	// page number display
 	private TextView pageNumberTextView;
@@ -163,18 +176,19 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 	private int colorMode = Options.COLOR_MODE_NORMAL;
 
 	private SensorManager sensorManager;
-	private static final int ZOOM_COLOR_NORMAL = 0;
-	private static final int ZOOM_COLOR_RED = 1;
-	private static final int ZOOM_COLOR_GREEN = 2;
-	private static final int[] zoomUpId = {
-		R.drawable.btn_zoom_up, R.drawable.red_btn_zoom_up, R.drawable.green_btn_zoom_up
-	};
-	private static final int[] zoomDownId = {
-		R.drawable.btn_zoom_down, R.drawable.red_btn_zoom_down, R.drawable.green_btn_zoom_down		
-	};
-	private static final int[] zoomWidthId = {
-		R.drawable.btn_zoom_width, R.drawable.red_btn_zoom_width, R.drawable.green_btn_zoom_width		
-	};
+//	private static final int ZOOM_COLOR_NORMAL = 0;
+//	private static final int ZOOM_COLOR_RED = 1;
+//	private static final int ZOOM_COLOR_GREEN = 2;
+//	private static final int[] zoomUpId = {
+//		R.drawable.btn_zoom_up, R.drawable.red_btn_zoom_up, R.drawable.green_btn_zoom_up
+//	};
+//	private static final int[] zoomDownId = {
+//		R.drawable.btn_zoom_down, R.drawable.red_btn_zoom_down, R.drawable.green_btn_zoom_down		
+//	};
+//	private static final int[] zoomWidthId = {
+//		R.drawable.btn_zoom_width, R.drawable.red_btn_zoom_width, R.drawable.green_btn_zoom_width		
+//	};
+	
 	private float[] gravity = { 0f, -9.81f, 0f};
 	private long gravityAge = 0;
 
@@ -205,7 +219,10 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 		this.box = Integer.parseInt(options.getString(Options.PREF_BOX, "2"));
 //		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		ActionBar aB = getSupportActionBar();
+		if (aB == null){
+			aB = getSupportActionBar();
+		}
+		
 		aB.show();
         
         // Get display metrics
@@ -377,9 +394,9 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 		actions = new Actions(options);
 		this.pagesView.setActions(actions);
 
-		setZoomLayout(options);
+		//setZoomLayout(options);
 		
-		this.pagesView.setZoomLayout(zoomLayout);
+//		this.pagesView.setZoomLayout(zoomLayout);
 		
 		this.showZoomOnScroll = options.getBoolean(Options.PREF_SHOW_ZOOM_ON_SCROLL, false);
 		this.pagesView.setSideMargins(
@@ -411,11 +428,12 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 		this.pagesView.invalidate();
 		int zoomAnimNumber = Integer.parseInt(options.getString(Options.PREF_ZOOM_ANIMATION, "2"));
 		
-		if (zoomAnimNumber == Options.ZOOM_BUTTONS_DISABLED)
-			zoomAnim = null;
-		else 
-			zoomAnim = AnimationUtils.loadAnimation(this,
-				zoomAnimations[zoomAnimNumber]);		
+//		if (zoomAnimNumber == Options.ZOOM_BUTTONS_DISABLED)
+//			zoomAnim = null;
+//		else 
+//			zoomAnim = AnimationUtils.loadAnimation(this,
+//				zoomAnimations[zoomAnimNumber]);	
+		
 		int pageNumberAnimNumber = Integer.parseInt(options.getString(Options.PREF_PAGE_ANIMATION, "3"));
 		
 		if (pageNumberAnimNumber == Options.PAGE_NUMBER_DISABLED)
@@ -436,7 +454,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 // #endif
 		
 // #ifdef lite
-		this.zoomLayout.setVisibility(zoomAnim == null ? View.GONE : View.VISIBLE);
+		//this.zoomLayout.setVisibility(zoomAnim == null ? View.GONE : View.VISIBLE);
 // #endif
         
         showAnimated(true);
@@ -448,24 +466,24 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     private void setFindButtonHandlers() {
     	this.findPrevButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				OpenFileActivity.this.findPrev();
+				OpenPDFActivity.this.findPrev();
 			}
     	});
     	this.findNextButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				OpenFileActivity.this.findNext();
+				OpenPDFActivity.this.findNext();
 			}
     	});
     	this.findHideButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				OpenFileActivity.this.findHide();
+				OpenPDFActivity.this.findHide();
 			}
     	});
     }
     
     /**
      * Set handlers on zoom level buttons
-     */
+     *//*
     private void setZoomButtonHandlers() {
     	this.zoomDownButton.setOnLongClickListener(new View.OnLongClickListener() {
 			public boolean onLongClick(View v) {
@@ -500,7 +518,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 				return true;
 			}
     	});
-    }
+    }*/
 
     private void startPDF(SharedPreferences options) {
 	    this.pdf = this.getPDF();
@@ -584,25 +602,60 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
-    	if (menuItem == this.aboutMenuItem) {
-//			Intent intent = new Intent();
-//			intent.setClass(this, AboutPDFViewActivity.class);
-//			this.startActivity(intent);
-    		return true;
-    	} else if (menuItem == this.gotoPageMenuItem) {
-    		this.showGotoPageDialog();
-    	} else if (menuItem == this.rotateLeftMenuItem) {
-    		this.pagesView.rotate(-1);
-    	} else if (menuItem == this.rotateRightMenuItem) {
-    		this.pagesView.rotate(1);
-    	} else if (menuItem == this.findTextMenuItem) {
+    	log("onOptionsItemSelected");
+    	if (menuItem == this.findTextMenuItem) {
     		this.showFindDialog();
     	} else if (menuItem == this.clearFindTextMenuItem) {
     		this.clearFind();
-    	} else if (menuItem == this.chooseFileMenuItem) {
-//    		startActivity(new Intent(this, ChooseFileActivity.class));
     	} else if (menuItem == this.optionsMenuItem) {
     		startActivity(new Intent(this, Options.class));
+    	}
+    	
+    	switch (menuItem.getItemId()) {
+	    	case R.id.open_pdf_action_zoomUp:{
+	    		log("Entro en CASE zoomUp");
+	    		pagesView.doAction(actions.getAction(Actions.ZOOM_OUT));
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_zoomDown:{
+	    		log("Entro en CASE zoomDown");
+	    		pagesView.doAction(actions.getAction(Actions.ZOOM_IN));
+	    		return true;	
+	    	}
+	    	case R.id.open_pdf_action_zoomWidth:{
+	    		log("-----Entro en CASE zoomWidth");
+	    		pagesView.zoomWidth();	
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_rotate_page_left:{
+	    		log("-----Entro en CASE LEFT");
+	    		this.pagesView.rotate(-1);
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_rotate_page_right:{
+	    		log("-----Entro en CASE RIGHT");
+	    		this.pagesView.rotate(1);
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_options:{
+	    		startActivity(new Intent(this, Options.class));
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_goToPage:{
+	    		log("-----Entro en CASE GOTO");
+	    		this.showGotoPageDialog();
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_find_text:{
+	    		this.showFindDialog();
+	    		return true;
+	    	}
+	    	case R.id.open_pdf_action_clear_find_text:{
+	    		this.clearFind();
+	    		return true;
+	    	}
+    	}
+    	
     	// #ifdef pro
 // 		} else if (menuItem == this.tableOfContentsMenuItem) {
 // 			Outline outline = this.pdf.getOutline();
@@ -615,7 +668,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 // 			this.setTextReflowMode(! this.textReflowMode);
 // 
 		// #endif
-		}
+		
     	return false;
     }
     
@@ -627,9 +680,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     	}
     }
     
- 
-
-	/**
+ 	/**
      * Intercept touch events to handle the zoom buttons animation
      */
     @Override
@@ -660,16 +711,17 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 //     		return;
 //     	}
 // #endif
-    	if (zoomAnim == null) {
-    		zoomLayout.setVisibility(View.GONE);
-    		return;
-    	}
-    	
-    	zoomLayout.clearAnimation();
-    	zoomLayout.setVisibility(View.VISIBLE);
+//    	if (zoomAnim == null) {
+//    		zoomLayout.setVisibility(View.GONE);
+//    		return;
+//    	}
+//    	
+//    	zoomLayout.clearAnimation();
+//    	zoomLayout.setVisibility(View.VISIBLE);
     	zoomHandler.removeCallbacks(zoomRunnable);
     	zoomHandler.postDelayed(zoomRunnable, fadeStartOffset);
     }
+    
     
     private void fadeZoom() {
 // #ifdef pro
@@ -723,8 +775,8 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
      * Show zoom buttons and page number
      */
     public void showAnimated(boolean alsoZoom) {
-    	if (alsoZoom)
-    		showZoom();
+//    	if (alsoZoom)
+//    		showZoom();
     	showPageNumber(true);
     }
     
@@ -768,16 +820,16 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 			public void onClick(View v) {
 				int pageNumber = -1;
 				try {
-					pageNumber = Integer.parseInt(OpenFileActivity.this.pageNumberInputField.getText().toString())-1;
+					pageNumber = Integer.parseInt(OpenPDFActivity.this.pageNumberInputField.getText().toString())-1;
 				} catch (NumberFormatException e) {
 					/* ignore */
 				}
 				d.dismiss();
 				if (pageNumber >= 0 && pageNumber < pagecount) {
-					OpenFileActivity.this.gotoPage(pageNumber);
+					OpenPDFActivity.this.gotoPage(pageNumber);
 
 				} else {
-					OpenFileActivity.this.errorMessage("Invalid page number");
+					OpenPDFActivity.this.errorMessage("Invalid page number");
 				}
 			}
     	});
@@ -786,7 +838,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     	page1Button.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				d.dismiss();
-				OpenFileActivity.this.gotoPage(0);
+				OpenPDFActivity.this.gotoPage(0);
 			}
     	});
     	Button lastPageButton = new Button(this);
@@ -794,7 +846,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     	lastPageButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				d.dismiss();
-				OpenFileActivity.this.gotoPage(pagecount-1);
+				OpenPDFActivity.this.gotoPage(pagecount-1);
 			}
     	});
     	LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -840,12 +892,24 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     public boolean onCreateOptionsMenu(Menu menu) {
     	super.onCreateOptionsMenu(menu);
     	
-    	this.gotoPageMenuItem = menu.add(R.string.goto_page);
-    	this.rotateRightMenuItem = menu.add(R.string.rotate_page_left);
-    	this.rotateLeftMenuItem = menu.add(R.string.rotate_page_right);
-    	this.clearFindTextMenuItem = menu.add(R.string.clear_find_text);
-    	this.chooseFileMenuItem = menu.add(R.string.choose_file);
-    	this.optionsMenuItem = menu.add(R.string.options);
+    	log("onCreateOptionsMenu");
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.open_pdf_activity, menu);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+    	    	
+    	this.zoomDownItem = menu.findItem(R.id.open_pdf_action_zoomDown);
+    	this.zoomUpItem = menu.findItem(R.id.open_pdf_action_zoomUp);
+    	this.zoomWidthItem = menu.findItem(R.id.open_pdf_action_zoomWidth);
+    	
+    	this.gotoPageMenuItem =  menu.findItem(R.id.open_pdf_action_goToPage);
+    	this.rotateRightMenuItem = menu.findItem(R.id.open_pdf_action_rotate_page_left);
+    	this.rotateLeftMenuItem = menu.findItem(R.id.open_pdf_action_rotate_page_right);
+    	this.findTextMenuItem = menu.findItem(R.id.open_pdf_action_find_text);
+    	this.clearFindTextMenuItem = menu.findItem(R.id.open_pdf_action_clear_find_text);    	
+    	this.optionsMenuItem = menu.findItem(R.id.open_pdf_action_options);
+    	
+    	
     	/* The following appear on the second page.  The find item can safely be kept
     	 * there since it can also be accessed from the search key on most devices.
     	 */
@@ -853,9 +917,8 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     	// #ifdef pro
 //     	this.tableOfContentsMenuItem = menu.add(R.string.table_of_contents);
 //     	this.textReflowMenuItem = menu.add(R.string.text_reflow);
-    	// #endif
-		this.findTextMenuItem = menu.add(R.string.find_text);
-    	this.aboutMenuItem = menu.add(R.string.about);
+    	// #endif				
+    	
     	return true;
     }
         
@@ -894,8 +957,8 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     	goButton.setText(R.string.find_go_button);
     	goButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				String text = OpenFileActivity.this.findTextInputField.getText().toString();
-				OpenFileActivity.this.findText(text);
+				String text = OpenPDFActivity.this.findTextInputField.getText().toString();
+				OpenPDFActivity.this.findText(text);
 				dialog.dismiss();
 			}
     	});
@@ -909,7 +972,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
     	dialog.setContentView(contents);
     	dialog.show();
     }
-    
+    /*
     private void setZoomLayout(SharedPreferences options) {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -951,7 +1014,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
         setZoomButtonHandlers();
 		activityLayout.addView(zoomLayout,lp);
     }
-    
+    */
     private void findText(String text) {
     	Log.d(TAG, "findText(" + text + ")");
     	this.findText = text;
@@ -986,7 +1049,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
      * Helper class that handles search progress, search cancelling etc.
      */
 	static class Finder implements Runnable, DialogInterface.OnCancelListener, DialogInterface.OnClickListener {
-		private OpenFileActivity parent = null;
+		private OpenPDFActivity parent = null;
 		private boolean forward;
 		private AlertDialog dialog = null;
 		private String text;
@@ -997,7 +1060,7 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 		 * Constructor for finder.
 		 * @param parent parent activity
 		 */
-		public Finder(OpenFileActivity parent, boolean forward) {
+		public Finder(OpenPDFActivity parent, boolean forward) {
 			this.parent = parent;
 			this.forward = forward;
 			this.text = parent.findText;
@@ -1313,5 +1376,9 @@ public class OpenFileActivity extends PinActivity implements SensorEventListener
 //
 // 	}
 // #endif
+	
+	public static void log(String log) {
+		Util.log("OpenPDFActivity", log);
+	}
 
 }

@@ -15,7 +15,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Options extends PreferenceActivity implements OnSharedPreferenceChangeListener {
-	private final static String TAG = "cx.hell.android.pdfview";
+	private final static String TAG = "com.mega.android.pdfViewer.Options";
 
 	public final static String PREF_TAG = "Options";
 	public final static String PREF_ZOOM_ANIMATION = "zoomAnimation";

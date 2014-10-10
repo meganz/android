@@ -19,7 +19,7 @@ import com.mega.android.pdfViewer.FindResult;
  */
 public class PDF {
 	
-	private final static String TAG = "cx.hell.android.pdfview";
+	private final static String TAG = "com.mega.android.pdfViewer.PDF";
 	
 	static {
         System.loadLibrary("pdfview2");

@@ -25,7 +25,7 @@ import com.mega.sdk.NodeList;
 import com.mega.sdk.TransferList;
 import com.mega.sdk.UserList;
 
-import com.mega.android.pdfViewer.OpenFileActivity;
+import com.mega.android.pdfViewer.OpenPDFActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -884,8 +884,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					
     		if (intent.getAction() != null){ 
     			
-    			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){
-    				
+    			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
 
     				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
     				
@@ -898,7 +897,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			    
     			    Intent intentPdf = new Intent();
     			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-    			    intentPdf.setClass(this, OpenFileActivity.class);
+    			    intentPdf.setClass(this, OpenPDFActivity.class);
     			    intentPdf.setAction("android.intent.action.VIEW");
     				this.startActivity(intentPdf);	
     				
