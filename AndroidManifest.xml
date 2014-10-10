@@ -240,7 +240,7 @@
         </activity>
         
 <!-- Pegado del visor -->
-		<activity android:name=".pdfViewer.OpenFileActivity" android:label="@string/pdf_file_viewer_activity"
+		<activity android:name=".pdfViewer.OpenPDFActivity" android:label="@string/pdf_file_viewer_activity"
 			android:configChanges="orientation|keyboardHidden"
 			android:uiOptions="splitActionBarWhenNarrow">
 			<intent-filter>
@@ -265,7 +265,7 @@
 
 		</activity>
 
-		<activity android:name="Options" android:label="@string/options" />
+		<activity android:name=".pdfViewer.Options" android:label="@string/options" />
 		
 		<!-- Pegado del visor -->
         

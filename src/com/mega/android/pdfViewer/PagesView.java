@@ -25,11 +25,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
+
+import com.mega.android.Util;
 import com.mega.android.pdfViewer.BookmarkEntry;
 import com.mega.android.pdfViewer.Actions;
 import com.mega.android.pdfViewer.AndroidReflections;
 import com.mega.android.pdfViewer.Bookmark;
-import com.mega.android.pdfViewer.OpenFileActivity;
+import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.android.pdfViewer.Options;
 
 /**
@@ -42,7 +44,7 @@ public class PagesView extends View implements
 	/**
 	 * Logging tag.
 	 */
-	private static final String TAG = "cx.hell.android.pdfview";
+	private static final String TAG = "com.mega.android.pdfViewer.PagesView";
 	
 	/* Experiments show that larger tiles are faster, but the gains do drop off,
 	 * and must be balanced against the size of memory chunks being requested.
@@ -249,7 +251,7 @@ public class PagesView extends View implements
 					}
 		});
 		
-		final OpenFileActivity openFileActivity = (OpenFileActivity)activity;
+		final OpenPDFActivity openFileActivity = (OpenPDFActivity)activity;
 		final PagesView pagesView = this;
 		
 		gestureDetector.setOnDoubleTapListener(new OnDoubleTapListener() {
@@ -528,7 +530,7 @@ public class PagesView extends View implements
 		if (this.scroller.computeScrollOffset()) {
 			left = this.scroller.getCurrX();
 			top = this.scroller.getCurrY();
-			((OpenFileActivity)activity).showPageNumber(false);
+			((OpenPDFActivity)activity).showPageNumber(false);
 			postInvalidate();
 		}
 	}
@@ -894,7 +896,7 @@ public class PagesView extends View implements
 			
 			switch (keyCode) {
 			case KeyEvent.KEYCODE_SEARCH:
-				((OpenFileActivity)activity).showFindDialog();
+				((OpenPDFActivity)activity).showFindDialog();
 				return true;
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
 				if (action == Actions.ACTION_NONE)
@@ -1494,6 +1496,7 @@ public class PagesView extends View implements
 			scrollToPage(currentPage + 1);
 			return true;
 		case Actions.ACTION_SCREEN_DOWN:
+			log("Screen Down");
 			this.top += this.getHeight() - 16;
 			this.invalidate();
 			return true;
@@ -1524,5 +1527,9 @@ public class PagesView extends View implements
 
 	public void setZoomLayout(LinearLayout zoomLayout) {
 		this.zoomLayout = zoomLayout;
+	}
+	
+	public static void log(String log) {
+		Util.log("PagesView", log);
 	}
 }

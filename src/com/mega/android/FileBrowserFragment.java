@@ -13,7 +13,6 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.NodeList;
-import com.mega.sdk.TransferList;
 
 import android.app.Activity;
 import android.content.Context;
