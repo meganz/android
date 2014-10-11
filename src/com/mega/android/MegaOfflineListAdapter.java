@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.ShareList;
 
@@ -380,14 +381,15 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		ViewHolderOfflineList holder = (ViewHolderOfflineList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
-		String currentPath = mOff.getPath()+mOff.getName(); 
+//		String currentPath = mOff.getPath()+mOff.getName(); 
+		String currentPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOff.getPath() + mOff.getName();
 		File currentFile = new File(currentPath);
 		
 		switch (v.getId()){
 			case R.id.offline_list_option_open:{
 				positionClicked = -1;
 				notifyDataSetChanged();
-				
+								
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
 				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
