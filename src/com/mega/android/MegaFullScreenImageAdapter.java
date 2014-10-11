@@ -97,6 +97,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				}
 				
 				if (holderIsVisible){
+					PreviewUtils.previewCache.put(handle, preview);
 					visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
 					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
@@ -306,6 +307,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		if (node.hasPreview()){
 			preview = PreviewUtils.getPreviewFromCache(node);
 			if (preview != null){
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
 				holder.imgDisplay.setImageBitmap(preview);
 				holder.progressBar.setVisibility(View.GONE);
 			}
@@ -322,6 +324,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		else{
 			preview = PreviewUtils.getPreviewFromCache(node);
 			if (preview != null){
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
 				holder.imgDisplay.setImageBitmap(preview);
 				holder.progressBar.setVisibility(View.GONE);
 			}
@@ -474,6 +477,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 					
 					if (holderIsVisible){
 						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, activity);
+						PreviewUtils.previewCache.put(handle, bitmap);						
 						visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
 						visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					}
