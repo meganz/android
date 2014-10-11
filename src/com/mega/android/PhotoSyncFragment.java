@@ -325,6 +325,10 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
+			
+			if (nodesArray != null){
+				nodesArray.clear();
+			}
 			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 			int month = 0;
 			int year = 0;
