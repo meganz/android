@@ -60,7 +60,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	NodeList nodes;
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
-
 	
 	private ActionMode actionMode;
 	

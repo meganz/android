@@ -51,6 +51,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_OFFLINE = "IS_OFFLINE";
 	public static String ACTION_OPEN_PDF = "OPEN_PDF";
 	public static String EXTRA_PATH_PDF = "PATH_PDF";
+	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
+	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	
 	
 	private int successCount = 0;
@@ -355,13 +357,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else
 		{
 			if (MimeType.typeForName(currentFile.getName()).isPdf()){
-				log("Es pdf, tengo que lanzar intent.....");
-				//TODO descargarlo y mostrarlo
+				
 				Intent intentPdf = new Intent(this, ManagerActivity.class);
 				intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
 				intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
-			    startActivity(intentPdf);
+			    startActivity(intentPdf);				
+			}
+			else if (MimeType.typeForName(currentFile.getName()).isZip()){
+				log("Download success of zip file!");
+				
+				Intent intentZip = new Intent(this, ManagerActivity.class);
+				intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);				
+				intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());			    
+			    startActivity(intentZip);
 				log("Lanzo intent al manager.....");
 			}
 			else if (MimeType.typeForName(currentFile.getName()).isDocument()){

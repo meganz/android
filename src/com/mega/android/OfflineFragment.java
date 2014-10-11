@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -460,6 +461,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							intent.putExtra("parentNodeHandle", -1L);
 							intent.putExtra("offlinePathDirectory", currentFile.getParent());
 							startActivity(intent);
+						}
+						else if(currentFile.exists()&&MimeType.typeForName(currentFile.getName()).isPdf()){
+		    			    log("Offline - File PDF");		    			    
+		    			    Intent intentPdf = new Intent();
+		    			    intentPdf.setDataAndType(Uri.fromFile(currentFile), "application/pdf");
+		    			    intentPdf.setClass(context, OpenPDFActivity.class);
+		    			    intentPdf.setAction("android.intent.action.VIEW");
+		    				this.startActivity(intentPdf);						
+							
 						}
 						else{
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);

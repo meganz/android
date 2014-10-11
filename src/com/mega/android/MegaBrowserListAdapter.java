@@ -84,9 +84,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 		long document;
 	}
 
-	public MegaBrowserListAdapter(Context _context, NodeList _nodes,
-			long _parentHandle, ListView listView, ImageView emptyImageView,
-			TextView emptyTextView, ActionBar aB, int type) {
+	public MegaBrowserListAdapter(Context _context, NodeList _nodes,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -152,8 +150,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 
 		ViewHolderBrowserList holder = null;
 
-		Display display = ((Activity) context).getWindowManager()
-				.getDefaultDisplay();
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
@@ -161,11 +158,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
 
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
-			convertView = inflater.inflate(R.layout.item_file_list, parent,
-					false);
+			convertView = inflater.inflate(R.layout.item_file_list, parent,false);
 			holder = new ViewHolderBrowserList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
 			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);

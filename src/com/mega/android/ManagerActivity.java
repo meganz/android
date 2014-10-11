@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
@@ -134,6 +137,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_OPEN_PDF = "OPEN_PDF";
 	public static String EXTRA_PATH_PDF = "PATH_PDF";
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
+	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
+	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -884,7 +889,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					
     		if (intent.getAction() != null){ 
     			
-    			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
+    			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
+
+//    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_ZIP);
+//    				
+//    				//Lanzar nueva activity
+//    				try {
+//    					myZipFile = new ZipFile(pathPdf);
+//
+//    					Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+//    					while (zipEntries.hasMoreElements()) {
+//    						System.out.println(((ZipEntry)zipEntries.nextElement()).getName());
+//    						// you can do what ever you want on each zip file
+//    					}
+//    				} catch (IOException e) {
+//    					// TODO Auto-generated catch block
+//    					e.printStackTrace();
+//    				} 	
+    				
+    			}
+    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
 
     				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
     				
@@ -4036,19 +4060,35 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						catch(Exception e) {}
 						
 						//TODO: SI ES UN PDF --> ABRIR NUESTRO VISOR CON LOCALPATH
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-						if (isIntentAvailable(this, viewIntent))
-							startActivity(viewIntent);
-						else{
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, intentShare))
-								startActivity(intentShare);
-							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-						}								
-						return;
+						
+						if(MimeType.typeForName(tempNode.getName()).isPdf()){
+							
+							log("Opening already donwloaded PDF");
+		    			    File pdfFile = new File(localPath);
+		    			    
+		    			    Intent intentPdf = new Intent();
+		    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+		    			    intentPdf.setClass(this, OpenPDFActivity.class);
+		    			    intentPdf.setAction("android.intent.action.VIEW");
+		    				this.startActivity(intentPdf);
+							
+						}
+						//TODO: SI ES UN zip --> ABRIR NUESTRO VISOR CON LOCALPATH
+						else{							
+							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							if (isIntentAvailable(this, viewIntent))
+								startActivity(viewIntent);
+							else{
+								Intent intentShare = new Intent(Intent.ACTION_SEND);
+								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+								if (isIntentAvailable(this, intentShare))
+									startActivity(intentShare);
+								String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+							}								
+							return;
+						}
 					}
 				}
 			}

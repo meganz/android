@@ -123,6 +123,16 @@ public class MimeType {
 	public boolean isPdf(){
 		return type.startsWith("application/pdf");
 	}
+	
+	public boolean isZip(){
+		
+		if(type.startsWith("application/zip")||type.startsWith("multipart/x-zip")){
+			return true;
+		}
+		return false;
+		
+	}
+	
 
 	/*
 	 * Once a file is downloaded, prior to create the preview, check if the file is really an image
