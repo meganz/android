@@ -53,6 +53,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_PATH_PDF = "PATH_PDF";
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
+	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	
 	
 	private int successCount = 0;
@@ -63,6 +64,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	
 	private boolean isOffline = false;
 	private boolean isFolderLink = false;
+	private boolean fromContactFile = false;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -217,6 +219,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		String url = intent.getStringExtra(EXTRA_URL);
 		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
 		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
+		fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
 		if (isFolderLink){
 			megaApi = app.getMegaApiFolder();
 		}
@@ -358,11 +361,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		{
 			if (MimeType.typeForName(currentFile.getName()).isPdf()){
 				
-				Intent intentPdf = new Intent(this, ManagerActivity.class);
-				intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
-				intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
-			    startActivity(intentPdf);				
+				if (fromContactFile){
+					Intent intentPdf = new Intent(this, ContactFileListActivity.class);
+					intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+					intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intentPdf.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+					intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+				    startActivity(intentPdf);
+				}
+				else{
+					Intent intentPdf = new Intent(this, ManagerActivity.class);
+					intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+					intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+				    startActivity(intentPdf);				
+				}
 			}
 			else if (MimeType.typeForName(currentFile.getName()).isZip()){
 				log("Download success of zip file!");
@@ -400,16 +413,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				
 		}
 		
-		if (!MimeType.typeForName(currentFile.getName()).isPdf()){
-			mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_notify_download)
-					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-					.setAutoCancel(true).setTicker(notificationTitle)
-					.setContentTitle(notificationTitle).setContentText(size)
-					.setOngoing(false);
-	
-			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
-		}
+		mBuilderCompat
+		.setSmallIcon(R.drawable.ic_stat_notify_download)
+		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+		.setAutoCancel(true).setTicker(notificationTitle)
+		.setContentTitle(notificationTitle).setContentText(size)
+		.setOngoing(false);
+
+		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
 	/*
