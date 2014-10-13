@@ -391,6 +391,31 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
+	private class FolderCreation{
+		public String localPath;
+		public String folderName;
+		public String parentFolderPath;
+		public long parentFolderHandle;
+		
+		FolderCreation(String localPath, String folderName, String parentFolderPath){
+			this.localPath = localPath;
+			this.folderName = folderName;
+			this.parentFolderPath = parentFolderPath;
+			this.parentFolderHandle = -1;
+		}
+		
+		FolderCreation(String localPath, String folderName, String parentFolderPath, long parentFolderHandle){
+			this.localPath = localPath;
+			this.folderName = folderName;
+			this.parentFolderPath = parentFolderPath;
+			this.parentFolderHandle = parentFolderHandle;
+		}
+	}
+	
+	ArrayList<FolderCreation> foldersCreation = new ArrayList<FolderCreation>();
+	
+	
+	
 	/*
 	 * Upload folder
 	 */
@@ -402,29 +427,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		boolean firstFolder = false;
 		long firstFolderHandle = -1;
 		UploadService uploadService;
-		
-		private class FolderCreation{
-			public String localPath;
-			public String folderName;
-			public String parentFolderPath;
-			public long parentFolderHandle;
-			
-			FolderCreation(String localPath, String folderName, String parentFolderPath){
-				this.localPath = localPath;
-				this.folderName = folderName;
-				this.parentFolderPath = parentFolderPath;
-				this.parentFolderHandle = -1;
-			}
-			
-			FolderCreation(String localPath, String folderName, String parentFolderPath, long parentFolderHandle){
-				this.localPath = localPath;
-				this.folderName = folderName;
-				this.parentFolderPath = parentFolderPath;
-				this.parentFolderHandle = parentFolderHandle;
-			}
-		}
-		
-		ArrayList<FolderCreation> foldersCreation = new ArrayList<FolderCreation>();
 		
 		UploadFolderTask(File folder, long parentHandle, UploadService uploadService){
 			this.folder = folder;
@@ -959,7 +961,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			totalUploaded++;
 			transfersCopy.remove(megaFingerPrint);
 			
-			if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0)){
+			if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
 				successCount = transfersOK.size();
 				errorCount = transfersError.size();
 				onQueueComplete();
