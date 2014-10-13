@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
@@ -19,8 +20,11 @@ import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.TransferList;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -39,6 +43,7 @@ import android.os.StatFs;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Display;
@@ -61,7 +66,7 @@ import android.widget.Toast;
 
 public class ContactFileListActivity extends PinActivity implements
 		MegaRequestListenerInterface, OnItemClickListener,
-		OnItemLongClickListener, OnClickListener, MegaGlobalListenerInterface {
+		OnItemLongClickListener, OnClickListener, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
@@ -114,6 +119,10 @@ public class ContactFileListActivity extends PinActivity implements
 
 	MenuItem uploadButton;
 
+	TransferList tL;
+	HashMap<Long, MegaTransfer> mTHash = null;
+	long lastTimeOnTransferUpdate = -1;
+	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -248,6 +257,7 @@ public class ContactFileListActivity extends PinActivity implements
 		}
 
 		megaApi.addGlobalListener(this);
+		megaApi.addTransferListener(this);
 
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
@@ -335,6 +345,9 @@ public class ContactFileListActivity extends PinActivity implements
 
 			if (adapter == null) {
 				adapter = new MegaBrowserListAdapter(this, contactNodes, -1,listView, emptyImage, emptyText, aB,ManagerActivity.CONTACT_FILE_ADAPTER);
+				if (mTHash != null){
+					adapter.setTransfers(mTHash);
+				}
 			} else {
 				adapter.setNodes(contactNodes);
 				adapter.setParentHandle(-1);
@@ -352,6 +365,7 @@ public class ContactFileListActivity extends PinActivity implements
 		super.onDestroy();
 
 		megaApi.removeGlobalListener(this);
+		megaApi.removeTransferListener(this);
 	}
 
 	@Override
@@ -1238,6 +1252,7 @@ public class ContactFileListActivity extends PinActivity implements
 				service.putExtra(DownloadService.EXTRA_URL, url);
 				service.putExtra(DownloadService.EXTRA_SIZE, size);
 				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
+				service.putExtra(DownloadService.EXTRA_CONTACT_ACTIVITY, true);
 				startService(service);
 			}
 		} else {
@@ -1332,6 +1347,31 @@ public class ContactFileListActivity extends PinActivity implements
 				}
 			}
 		}
+	}
+	
+	@Override
+	protected void onResume() {
+    	log("onResume");
+    	super.onResume();
+    	
+    	Intent intent = getIntent(); 
+    	
+    	if (intent != null) {    	
+    		if (intent.getAction() != null){ 
+    			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){ 
+    				String pathPdf=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_PDF);
+    				
+    				File pdfFile = new File(pathPdf);
+    			    
+    			    Intent intentPdf = new Intent();
+    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+    			    intentPdf.setClass(this, OpenPDFActivity.class);
+    			    intentPdf.setAction("android.intent.action.VIEW");
+    				this.startActivity(intentPdf);
+    			}
+    		}
+    	}
+    	
 	}
 
 	// Add, it is repetitive code... pending with Jesus: organize!
@@ -1509,5 +1549,134 @@ public class ContactFileListActivity extends PinActivity implements
 		}
 		intent.putExtra("MOVE_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+	}
+	
+	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
+		this.mTHash = _mTHash;
+		
+		if (adapter != null){
+			adapter.setTransfers(mTHash);
+		}
+	}
+	
+	public void setCurrentTransfer(MegaTransfer mT){
+		if (adapter != null){
+			adapter.setCurrentTransfer(mT);
+		}
+	}
+
+	@Override
+	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		log("onTransferStart");
+		
+		HashMap<Long, MegaTransfer> mTHashLocal = new HashMap<Long, MegaTransfer>();
+
+		tL = megaApi.getTransfers();
+
+		for(int i=0; i<tL.size(); i++){
+			
+			MegaTransfer tempT = tL.get(i).copy();
+			if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+				long handleT = tempT.getNodeHandle();
+				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+				MegaNode parentT = megaApi.getParentNode(nodeT);
+				
+				if (parentT != null){
+					if(parentT.getHandle() == this.parentHandle){	
+						mTHashLocal.put(handleT,tempT);						
+					}
+				}
+			}
+		}
+		
+		setTransfers(mTHashLocal);
+		
+		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
+	}
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+			MegaError e) {
+		log("onTransferFinish");
+		
+		HashMap<Long, MegaTransfer> mTHashLocal = new HashMap<Long, MegaTransfer>();
+
+		tL = megaApi.getTransfers();
+
+		for(int i=0; i<tL.size(); i++){
+			
+			MegaTransfer tempT = tL.get(i).copy();
+			if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+				long handleT = tempT.getNodeHandle();
+				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+				MegaNode parentT = megaApi.getParentNode(nodeT);
+				
+				if (parentT != null){
+					if(parentT.getHandle() == this.parentHandle){	
+						mTHashLocal.put(handleT,tempT);						
+					}
+				}
+			}
+		}
+		
+		setTransfers(mTHashLocal);
+		
+		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
+	}
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		log("onTransferUpdate");
+		
+		if (mTHash == null){
+			HashMap<Long, MegaTransfer> mTHashLocal = new HashMap<Long, MegaTransfer>();
+
+			tL = megaApi.getTransfers();
+
+			for(int i=0; i<tL.size(); i++){
+				
+				MegaTransfer tempT = tL.get(i).copy();
+				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					long handleT = tempT.getNodeHandle();
+					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+					MegaNode parentT = megaApi.getParentNode(nodeT);
+					
+					if (parentT != null){
+						if(parentT.getHandle() == this.parentHandle){	
+							mTHashLocal.put(handleT,tempT);						
+						}
+					}
+				}
+			}
+			
+			setTransfers(mTHashLocal);
+		}
+
+		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+			Time now = new Time();
+			now.setToNow();
+			long nowMillis = now.toMillis(false);
+			if (lastTimeOnTransferUpdate < 0){
+				lastTimeOnTransferUpdate = now.toMillis(false);
+				setCurrentTransfer(transfer);
+			}
+			else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+				lastTimeOnTransferUpdate = nowMillis;
+				setCurrentTransfer(transfer);
+			}			
+		}		
+	}
+
+	@Override
+	public void onTransferTemporaryError(MegaApiJava api,
+			MegaTransfer transfer, MegaError e) {
+		log("onTransferTemporaryError");
+	}
+
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
+			byte[] buffer) {
+		log("onTransferData");
+		return true;
 	}
 }
