@@ -3927,7 +3927,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			fbF.setTransfers(mTHash);
-		}		
+		}
+		
+		if (swmF != null){
+			for(int i=0; i<tL.size(); i++){
+				
+				MegaTransfer tempT = tL.get(i).copy();
+				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					long handleT = tempT.getNodeHandle();
+					
+					mTHash.put(handleT,tempT);						
+				}
+			}
+			
+			swmF.setTransfers(mTHash);
+		}
 		
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 
@@ -3961,6 +3975,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}			
 			}
 			fbF.setTransfers(mTHash);	
+		}
+		
+		if (swmF != null){
+			for(int i=0; i<tL.size(); i++){
+				
+				MegaTransfer tempT = tL.get(i).copy();
+				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					long handleT = tempT.getNodeHandle();
+	
+					mTHash.put(handleT,tempT);						
+				}
+			}
+			
+			swmF.setTransfers(mTHash);
 		}
 
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
@@ -4002,6 +4030,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
 						lastTimeOnTransferUpdate = nowMillis;
 						fbF.setCurrentTransfer(transfer);
+					}			
+				}		
+			}
+		}
+		
+		if (swmF != null){
+			if (swmF.isVisible()){
+				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
+					Time now = new Time();
+					now.setToNow();
+					long nowMillis = now.toMillis(false);
+					if (lastTimeOnTransferUpdate < 0){
+						lastTimeOnTransferUpdate = now.toMillis(false);
+						swmF.setCurrentTransfer(transfer);
+					}
+					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
+						lastTimeOnTransferUpdate = nowMillis;
+						swmF.setCurrentTransfer(transfer);
 					}			
 				}		
 			}

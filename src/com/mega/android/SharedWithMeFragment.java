@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -10,6 +11,7 @@ import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.NodeList;
 
 import android.app.Activity;
@@ -52,6 +54,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	NodeList nodes;
+	
+	HashMap<Long, MegaTransfer> mTHash = null;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -250,6 +254,9 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			emptyTextView = (TextView) v.findViewById(R.id.sharedwithme_list_empty_text);
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
+				if (mTHash != null){
+					adapterList.setTransfers(mTHash);
+				}
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -285,6 +292,9 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
+				if (mTHash != null){
+					adapterGrid.setTransfers(mTHash);
+				}
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
@@ -722,6 +732,37 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				adapterGrid.setOrder(orderGetChildren);
 			}
 		}
+	}
+	
+	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
+		this.mTHash = _mTHash;
+		
+		if (isList){
+			if (adapterList != null){
+				adapterList.setTransfers(mTHash);
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.setTransfers(mTHash);
+			}
+		}	
+	
+	}
+	
+	public void setCurrentTransfer(MegaTransfer mT){
+		if (isList){
+			if (adapterList != null){
+				adapterList.setCurrentTransfer(mT);
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.setCurrentTransfer(mT);
+			}
+		}	
+		
+		
 	}
 	
 	private static void log(String log) {

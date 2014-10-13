@@ -274,6 +274,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			
 			if(mTHash!=null){
 				
+				log("NODE: " + mTHash.get(node.getHandle()));
 				MegaTransfer tempT = mTHash.get(node.getHandle());
 				
 				if (tempT!=null){
@@ -914,6 +915,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
     	MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
     	if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
     		notifyDataSetChanged();    		
+    	}
+    	
+    	if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+    		notifyDataSetChanged();
     	}
     }   
     
