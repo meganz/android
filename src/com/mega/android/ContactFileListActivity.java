@@ -1007,6 +1007,8 @@ public class ContactFileListActivity extends PinActivity implements
 							file.getAbsolutePath());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME,
 							file.getName());
+					log("FOLDER: EXTRA_FILEPATH: " + file.getAbsolutePath());
+					log("FOLDER: EXTRA_NAME: " + file.getName());
 				} else {
 					ShareInfo info = ShareInfo.infoFromFile(file);
 					if (info == null) {
@@ -1018,12 +1020,18 @@ public class ContactFileListActivity extends PinActivity implements
 							info.getTitle());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE,
 							info.getSize());
+					
+					log("FILE: EXTRA_FILEPATH: " + info.getFileAbsolutePath());
+					log("FILE: EXTRA_NAME: " + info.getTitle());
+					log("FILE: EXTRA_SIZE: " + info.getSize());
 				}
 
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH,
 						folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH,
 						parentNode.getHandle());
+				log("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
+								
 				startService(uploadServiceIntent);
 				i++;
 			}
@@ -1196,7 +1204,7 @@ public class ContactFileListActivity extends PinActivity implements
 		else{		
 			NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren);
 			log("----num nodes:" + nodes.size());
-			log("----parentHandle: "+megaApi.getNodeByHandle(parentHandle));
+			log("----parentHandle: "+parentHandle + "___" + megaApi.getNodeByHandle(parentHandle).getName());
 			
 			if (nodes.size() == 0) {
 				listView.setVisibility(View.GONE);
