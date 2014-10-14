@@ -8,8 +8,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
@@ -891,31 +889,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
 
-//    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_ZIP);
-//    				
-//    				//Lanzar nueva activity
-//    				try {
-//    					myZipFile = new ZipFile(pathPdf);
-//
-//    					Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-//    					while (zipEntries.hasMoreElements()) {
-//    						System.out.println(((ZipEntry)zipEntries.nextElement()).getName());
-//    						// you can do what ever you want on each zip file
-//    					}
-//    				} catch (IOException e) {
-//    					// TODO Auto-generated catch block
-//    					e.printStackTrace();
-//    				} 	
+    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
+    				
+    				log("Path: "+pathZip);
+    				
+    				//Lanzar nueva activity ZipBrowserActivity
+    				
+    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);    				
+    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
+    				//frgsfg
+    			    startActivity(intentZip);
+   				
     				
     			}
     			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
 
     				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
-    				
-    				log("Path: "+pathPdf);
-//    				Intent intentPdf = new Intent(managerActivity, PdfFileViewerActivity.class);    				
-//    				intentPdf.putExtra(PdfViewerActivity.EXTRA_PDFFILENAME, pathPdf);
-//    			    startActivity(intentPdf);
     			    
     			    File pdfFile = new File(pathPdf);
     			    
@@ -4119,7 +4108,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    				this.startActivity(intentPdf);
 							
 						}
-						//TODO: SI ES UN zip --> ABRIR NUESTRO VISOR CON LOCALPATH
+						else if(MimeType.typeForName(tempNode.getName()).isZip()){
+							log("Opening already donwloaded ZIP");
+		    			    File zipFile = new File(localPath);
+		    			    
+		    			    Intent intentZip = new Intent();
+		    			    intentZip.setClass(this, ZipBrowserActivity.class);
+		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+
+		    				this.startActivity(intentZip);
+							
+						}
 						else{							
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());

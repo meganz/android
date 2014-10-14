@@ -235,6 +235,11 @@
         </activity>
         
         <activity
+            android:name="ZipBrowserActivity"
+            android:label="@string/zip_browser_activity" >
+        </activity>
+        
+        <activity
             android:name="PdfFileViewerActivity"
             android:label="@string/pdf_file_viewer_activity" >
         </activity>
