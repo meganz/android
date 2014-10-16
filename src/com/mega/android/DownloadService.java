@@ -381,7 +381,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Download success of zip file!");
 				
 				Intent intentZip = new Intent(this, ManagerActivity.class);
-				intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);				
+				intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
+				intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());			    
 			    startActivity(intentZip);
 				log("Lanzo intent al manager.....");
