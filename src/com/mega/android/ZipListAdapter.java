@@ -37,6 +37,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 	ListView listFragment;	
 	ActionBar aB;
 	List<ZipEntry> zipNodeList;
+	String currentFolder;
 	
 	/* public static view holder class */
 	public class ViewHolderBrowserList {
@@ -60,15 +61,18 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		long document;
 	}
 	
-	public ZipListAdapter(Context _context, ListView _listView, ActionBar _aB, List<ZipEntry> _zipNodes) {
+	public ZipListAdapter(ZipBrowserActivity _context, ListView _listView, ActionBar _aB, List<ZipEntry> _zipNodes, String _currentFolder) {
 		
 		this.context = _context;				
 		this.listFragment = _listView;
 		this.zipNodeList = _zipNodes;		
 		this.aB = aB;
-		this.positionClicked = -1;
+		this.positionClicked = -1;		
+		//Set the name of the folder
+		this.currentFolder = _currentFolder;
 	}
-	
+
+
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -104,11 +108,33 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			holder = (ViewHolderBrowserList) convertView.getTag();
 		}
 
-		ZipEntry zipNode = (ZipEntry) getItem(position);	
+		ZipEntry zipNode = (ZipEntry) getItem(position);		
 				
-
+		log("En la carpeta: " +currentFolder);
 		
-		holder.textViewFileName.setText(zipNode.getName());
+		String nameFile = zipNode.getName();
+		
+		if(zipNode.isDirectory()){		
+			
+			
+			int index = nameFile.lastIndexOf("/");
+			
+			nameFile=nameFile.substring(0, nameFile.length()-1);
+			
+			//nameFile = nameFile.replace(currentFolder+"/", "");
+			index = nameFile.lastIndexOf("/");
+			
+			nameFile = nameFile.substring(index+1, nameFile.length());
+			
+		}
+		else{
+			int	index = nameFile.lastIndexOf("/");
+			
+			nameFile = nameFile.substring(index+1, nameFile.length());
+		}	
+		
+				
+		holder.textViewFileName.setText(nameFile);
 		holder.textViewFileSize.setText(""+zipNode.getSize());
 		
 		if (zipNode.isDirectory()) {
@@ -146,6 +172,11 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		
 		return zipNodeList.get(position);
 	}
+	
+	public void setNodes (List<ZipEntry> _nodes){
+		this.zipNodeList=_nodes;
+		notifyDataSetChanged();
+	}
 
 	@Override
 	public long getItemId(int position) {
@@ -163,5 +194,12 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 	private static void log(String log) {
 		Util.log("ZipListAdapter", log);
 	}
+	
+	public void setFolder(String folder){
+		log("setFolder: "+folder);
+		this.currentFolder=folder;
+	}
+	
+	
 
 }
