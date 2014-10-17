@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.mega.android.PhotoSyncFragment.PhotoSyncGridHolder;
-import com.mega.android.PhotoSyncFragment.PhotoSyncHolder;
+import com.mega.android.CameraUploadFragment.PhotoSyncGridHolder;
+import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;

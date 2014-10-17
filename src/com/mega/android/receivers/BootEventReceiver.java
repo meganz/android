@@ -32,7 +32,7 @@ public class BootEventReceiver extends BroadcastReceiver {
 				log("Now I start the service");
 				c.startService(new Intent(c, CameraSyncService.class));		
 			}
-		}, 30 * 1000);
+		}, 5 * 1000);
 	}
 	
 	public static void log(String message) {

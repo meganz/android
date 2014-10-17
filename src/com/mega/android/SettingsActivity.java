@@ -338,7 +338,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 						log("Now I start the service");
 						startService(new Intent(preferencesActivity, CameraSyncService.class));		
 					}
-				}, 30 * 1000);
+				}, 5 * 1000);
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
 				cameraUploadHow.setSummary(wifi);
@@ -439,7 +439,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 					log("Now I start the service");
 					startService(new Intent(preferencesActivity, CameraSyncService.class));		
 				}
-			}, 30 * 1000);
+			}, 5 * 1000);
 		}
 	}
 	
