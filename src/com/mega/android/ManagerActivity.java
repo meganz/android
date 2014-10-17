@@ -95,7 +95,7 @@ import android.widget.Toast;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, PHOTO_SYNC, TRANSFERS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, CAMERA_UPLOADS, TRANSFERS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -105,7 +105,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case SHARED_WITH_ME: return context.getString(R.string.section_shared_with_me);
 				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
 				case CONTACTS: return context.getString(R.string.section_contacts);
-				case PHOTO_SYNC: return context.getString(R.string.section_image_viewer);
+				case CAMERA_UPLOADS: return context.getString(R.string.section_image_viewer);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
 				case ACCOUNT: return context.getString(R.string.section_account);
 				case SEARCH: return context.getString(R.string.search_files_and_folders);
@@ -192,7 +192,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListRubbishBin = true;
 	private boolean isListSharedWithMe = true;
 	private boolean isListOffline = true;
-	private boolean isListPhotoSync = true;
+	private boolean isListCameraUpload = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
@@ -201,7 +201,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private MyAccountFragment maF;
     private OfflineFragment oF;
     private SearchFragment sF;
-    private PhotoSyncFragment psF;
+    private CameraUploadFragment psF;
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
@@ -692,13 +692,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						break;
 					}
 					case 12:{
-						drawerItem = DrawerItem.PHOTO_SYNC;
-						isListPhotoSync = true;
+						drawerItem = DrawerItem.CAMERA_UPLOADS;
+						isListCameraUpload = true;
 						break;
 					}
 					case 13:{
-						drawerItem = DrawerItem.PHOTO_SYNC;
-						isListPhotoSync = false;
+						drawerItem = DrawerItem.CAMERA_UPLOADS;
+						isListCameraUpload = false;
 						break;
 					}
 					
@@ -801,7 +801,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	if (psF != null){
     		if (psF.isVisible()){
-    			if (isListPhotoSync){
+    			if (isListCameraUpload){
     				visibleFragment = 12;
     			}
     			else{
@@ -1480,19 +1480,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			break;
     		}
-    		case PHOTO_SYNC:{
+    		case CAMERA_UPLOADS:{
    			
     			if (psF == null){
-    				psF = new PhotoSyncFragment();
-    				psF.setIsList(isListPhotoSync);
+    				psF = new CameraUploadFragment();
+    				psF.setIsList(isListCameraUpload);
 				}
 				else{
-					psF.setIsList(isListPhotoSync);
+					psF.setIsList(isListCameraUpload);
 				}
 				
 				
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, psF, "psF").commit();
-				if (isListPhotoSync){					
+				if (isListCameraUpload){					
 					customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 				}
 				else{
@@ -2221,14 +2221,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						fragTransaction.detach(currentFragment);
 						fragTransaction.commit();
 						
-						isListPhotoSync = !isListPhotoSync;
-						psF.setIsList(isListPhotoSync);
+						isListCameraUpload = !isListCameraUpload;
+						psF.setIsList(isListCameraUpload);
 						
 						fragTransaction = getSupportFragmentManager().beginTransaction();
 						fragTransaction.attach(currentFragment);
 						fragTransaction.commit();
 						
-						if (isListPhotoSync){
+						if (isListCameraUpload){
 							ImageButton customListGrid = (ImageButton)getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 							customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 						}
@@ -3771,9 +3771,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		if (psF != null){
 			if (psF.isVisible()){
-				long photoSyncHandle = psF.getPhotoSyncHandle();
-				MegaNode nps = megaApi.getNodeByHandle(photoSyncHandle);
-				log("photoSyncHandle: " + photoSyncHandle);
+				long cameraUploadHandle = psF.getPhotoSyncHandle();
+				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+				log("cameraUploadHandle: " + cameraUploadHandle);
 				if (nps != null){
 					log("nps != null");
 					NodeList nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);

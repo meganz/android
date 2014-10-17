@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">MEGA_COM</string>
-    <string name="app_version">0.36</string>
+    <string name="app_version">0.36_NewSDK</string>
     
     <string name="general_total_size">Total size</string>
     <string name="general_x_of_x"> of </string>
@@ -127,7 +127,7 @@
 	<string name="section_shared_with_me">Shared with me</string>
 	<string name="section_rubbish_bin">Rubbish Bin</string>
 	<string name="section_contacts">Contacts</string>
-	<string name="section_image_viewer">Photo Sync</string>
+	<string name="section_image_viewer">Camera Uploads</string>
 	<string name="section_transfers">Transfers</string>
 	<string name="section_account">My Account</string>
 	<string name="section_photo_sync">Photo Sync</string>

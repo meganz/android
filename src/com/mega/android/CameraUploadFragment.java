@@ -44,7 +44,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PhotoSyncFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener, MegaRequestListenerInterface{
+public class CameraUploadFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener, MegaRequestListenerInterface{
 
 	Context context;
 	ActionBar aB;
@@ -53,7 +53,7 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	TextView emptyTextView;
 	MegaPhotoSyncListAdapter adapterList;
 	MegaPhotoSyncGridAdapter adapterGrid;
-	PhotoSyncFragment fileBrowserFragment = this;
+	CameraUploadFragment fileBrowserFragment = this;
 	
 	MegaApiAndroid megaApi;
 		
@@ -62,8 +62,8 @@ public class PhotoSyncFragment extends Fragment implements OnClickListener, OnIt
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	NodeList nodes;
-	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<PhotoSyncFragment.PhotoSyncHolder>();
-	ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<PhotoSyncFragment.PhotoSyncGridHolder>();
+	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragment.PhotoSyncHolder>();
+	ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragment.PhotoSyncGridHolder>();
 	
 	private ActionMode actionMode;
 	
