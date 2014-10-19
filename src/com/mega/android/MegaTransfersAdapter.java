@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import com.mega.android.MegaOfflineListAdapter.ViewHolderOfflineList;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApi;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -141,23 +143,23 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		
 	/*private view holder class*/
     public class ViewHolderTransfer {
-    	CheckBox checkbox;
-		ImageView imageView;
-		ImageView iconDownloadUploadView;
-        TextView textViewFileName;
-        ImageView imageViewCompleted;
-        TextView textViewCompleted;
-        ImageView imageViewOneDot;
-        TextView textViewRate;
-        ProgressBar transferProgressBar;
-        ImageButton imageButtonThreeDots;
-        RelativeLayout itemLayout;
-        ImageView arrowSelection;
-        RelativeLayout optionsLayout;
-        ImageButton optionRemove;
-        int currentPosition;
-        long document;
-        String currentPath;
+    	public CheckBox checkbox;
+    	public ImageView imageView;
+    	public ImageView iconDownloadUploadView;
+    	public TextView textViewFileName;
+    	public ImageView imageViewCompleted;
+    	public TextView textViewCompleted;
+    	public ImageView imageViewOneDot;
+    	public TextView textViewRate;
+    	public ProgressBar transferProgressBar;
+    	public ImageButton imageButtonThreeDots;
+    	public RelativeLayout itemLayout;
+    	public ImageView arrowSelection;
+    	public RelativeLayout optionsLayout;
+    	public ImageButton optionRemove;
+    	public int currentPosition;
+    	public long document;
+    	public String currentPath;
     }
     
 //    public void setTransfers(SparseArray<TransfersHolder> transfers){

@@ -2,6 +2,8 @@ package com.mega.android;
 
 import java.util.ArrayList;
 
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
@@ -43,13 +45,13 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	
 	/*public static view holder class*/
     public class ViewHolderExplorer {
-        ImageView imageView;
-        TextView textViewFileName;
-        TextView textViewFileSize;
-        TextView textViewUpdated;
-        RelativeLayout itemLayout;
-        int currentPosition;
-        long document;
+    	public ImageView imageView;
+    	public TextView textViewFileName;
+    	public TextView textViewFileSize;
+    	public TextView textViewUpdated;
+    	public RelativeLayout itemLayout;
+    	public int currentPosition;
+    	public long document;
     }
 	
 	public MegaExplorerAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView){

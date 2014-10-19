@@ -8,6 +8,8 @@ import java.util.List;
 
 import com.mega.android.CameraUploadFragment.PhotoSyncGridHolder;
 import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
@@ -101,18 +103,18 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	
 	/*private view holder class*/
     public class ViewHolderPhotoSyncGrid {
-    	RelativeLayout itemLayout;
-        ImageButton imageView1;
-        ImageButton imageView2;
-        ImageButton imageView3;
+    	public RelativeLayout itemLayout;
+    	public ImageButton imageView1;
+    	public ImageButton imageView2;
+    	public ImageButton imageView3;
         
-        RelativeLayout monthLayout;
-        TextView monthTextView;
+    	public RelativeLayout monthLayout;
+    	public TextView monthTextView;
 
-        int currentPosition;
-        long document1;
-        long document2;
-        long document3;
+    	public int currentPosition;
+    	public long document1;
+    	public long document2;
+    	public long document3;
     }
     
     ViewHolderPhotoSyncGrid holder = null;

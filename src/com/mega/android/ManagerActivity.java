@@ -27,6 +27,7 @@ import com.mega.sdk.TransferList;
 import com.mega.sdk.UserList;
 
 import com.mega.android.pdfViewer.OpenPDFActivity;
+import com.mega.android.utils.Util;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -137,6 +138,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String EXTRA_OPEN_FOLDER = "EXTRA_OPEN_FOLER";
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
+	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -4098,7 +4100,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						
 						if(MimeType.typeForName(tempNode.getName()).isPdf()){
 							
-							log("Opening already donwloaded PDF");
 		    			    File pdfFile = new File(localPath);
 		    			    
 		    			    Intent intentPdf = new Intent();
@@ -4109,12 +4110,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							
 						}
 						else if(MimeType.typeForName(tempNode.getName()).isZip()){
-							log("Opening already donwloaded ZIP");
+							
 		    			    File zipFile = new File(localPath);
 		    			    
 		    			    Intent intentZip = new Intent();
 		    			    intentZip.setClass(this, ZipBrowserActivity.class);
 		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
 
 		    				this.startActivity(intentZip);
 							

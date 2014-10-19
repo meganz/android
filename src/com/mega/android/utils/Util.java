@@ -1,4 +1,4 @@
-package com.mega.android;
+package com.mega.android.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +15,11 @@ import java.util.Date;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.mega.android.DatabaseHandler;
+import com.mega.android.MimeType;
+import com.mega.android.R;
+import com.mega.android.R.id;
+import com.mega.android.R.layout;
 import com.mega.sdk.MegaError;
 
 import android.annotation.SuppressLint;

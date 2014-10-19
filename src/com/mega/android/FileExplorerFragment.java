@@ -3,6 +3,7 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;

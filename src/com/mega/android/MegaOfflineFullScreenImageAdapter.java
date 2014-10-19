@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.mega.android.utils.PreviewUtils;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.components.TouchImageView;
 
 import android.app.Activity;

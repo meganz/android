@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.components.MySwitch;
 import com.mega.components.NestedListView;

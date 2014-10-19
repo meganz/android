@@ -1,6 +1,6 @@
 package com.mega.android.authenticator;
 
-import com.mega.android.Util;
+import com.mega.android.utils.Util;
 
 import android.app.Service;
 import android.content.Intent;

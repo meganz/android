@@ -2,6 +2,8 @@ package com.mega.android;
 
 import java.util.HashMap;
 
+import com.mega.android.utils.Util;
+
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

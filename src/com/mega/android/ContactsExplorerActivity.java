@@ -3,6 +3,7 @@ package com.mega.android;
 import java.util.ArrayList;
 
 import com.mega.android.ContactsExplorerAdapter.OnItemCheckClickListener;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;

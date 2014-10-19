@@ -3,6 +3,9 @@ package com.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 
+import com.mega.android.utils.PreviewUtils;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.components.TouchImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -50,11 +53,11 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	
 	/*view holder class*/
     public class ViewHolderFullImage {
-        TouchImageView imgDisplay;
-        ProgressBar progressBar;
-        ProgressBar downloadProgressBar;
-        long document;
-        int position;
+    	public TouchImageView imgDisplay;
+    	public ProgressBar progressBar;
+    	public ProgressBar downloadProgressBar;
+    	public long document;
+    	public int position;
     }
     
     private class PreviewAsyncTask extends AsyncTask<Long, Void, Integer>{

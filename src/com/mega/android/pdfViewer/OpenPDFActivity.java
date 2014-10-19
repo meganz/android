@@ -55,9 +55,9 @@ import android.widget.Toast;
 
 import com.mega.android.PinActivity;
 import com.mega.android.R;
-import com.mega.android.Util;
 import com.mega.android.pdfViewer.PDFPagesProvider;
 import com.mega.android.pdfViewer.BookmarkEntry;
+import com.mega.android.utils.Util;
 
 
 // #ifdef pro

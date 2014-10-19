@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.utils.PreviewUtils;
+import com.mega.android.utils.Util;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.components.ExtendedViewPager;
 import com.mega.components.TouchImageView;

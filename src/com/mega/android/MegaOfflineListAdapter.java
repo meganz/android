@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.mega.android.pdfViewer.OpenPDFActivity;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.ShareList;
 
