@@ -292,12 +292,14 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
 					generatingKeysText.setVisibility(View.VISIBLE);
+//					megaApi.fastLogin(gSession, this);
+					
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					loggingInText.setVisibility(View.VISIBLE);
-					fetchingNodesText.setVisibility(View.GONE);
+					fetchingNodesText.setVisibility(View.VISIBLE);
 					prepareNodesText.setVisibility(View.GONE);
-					megaApi.fastLogin(gSession, this);
+					megaApi.fetchNodes(loginActivity);
 					return;
 				}
 				else{
