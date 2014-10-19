@@ -583,4 +583,7 @@
     <string name="close">Close</string>
     <string name="text_reflow">Text Reflow</string>
     
+    <string name="ZIP_download_permission">The zip file will be downloaded and unzipped</string>
+    <string name="ZIP_unzip_permission">The zip file will be unzipped </string>
+    
 </resources>

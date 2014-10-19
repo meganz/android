@@ -3,6 +3,8 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.android.utils.Util;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;

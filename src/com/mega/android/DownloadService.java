@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.File;
 import java.util.List;
 
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -54,6 +55,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
+	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	
 	
 	private int successCount = 0;
@@ -65,6 +67,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isOffline = false;
 	private boolean isFolderLink = false;
 	private boolean fromContactFile = false;
+	private String pathFileToOpen;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -73,7 +76,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	WakeLock wl;
 	
 	File currentFile;
-	File currentDir;
+	File currentDir;	
+	MegaNode currentDocument;
 	
 	private int notificationId = 2;
 	private int notificationIdFinal = 4;
@@ -220,6 +224,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
 		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
 		fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
+		if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
+			pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
+		}
+		else{
+			pathFileToOpen=null;
+		}
+		log("en DownloadService saco el path del file: "+pathFileToOpen);
+		
 		if (isFolderLink){
 			megaApi = app.getMegaApiFolder();
 		}
@@ -227,9 +239,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaApi = app.getMegaApi();
 		}
 		
-		MegaNode document = megaApi.getNodeByHandle(hash);
+		currentDocument = megaApi.getNodeByHandle(hash);
 	
-		if((document == null) && (url == null)){
+		if((currentDocument == null) && (url == null)){
 			log("Node not found");
 			return;
 		}
@@ -241,15 +253,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			return;
 		}
 		
-		currentDir = getDir(document, intent);
+		currentDir = getDir(currentDocument, intent);
 		if (currentDir.isDirectory()){
-			currentFile = new File(currentDir, document.getName());
+			currentFile = new File(currentDir, currentDocument.getName());
 		}
 		else{
 			currentFile = currentDir;
 		}
-		log("dir: " + currentDir.getAbsolutePath() + " file: " + document.getName() + "  Size: " + document.getSize());
-		if(!checkCurrentFile(document)){
+		log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
+		if(!checkCurrentFile(currentDocument)){
 			log("checkCurrentFile == false");
 			
 			if (currentTransfers.size() == 0){
@@ -270,7 +282,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if (currentDir.isDirectory()){
 			log("To download(dir): " + currentDir.getAbsolutePath() + "/");
-			megaApi.startDownload(document, currentDir.getAbsolutePath() + "/", this);
+			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 		}
 		else{
 			log("currentDir is not a directory");
@@ -378,13 +390,28 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 			}
 			else if (MimeType.typeForName(currentFile.getName()).isZip()){
-				log("Download success of zip file!");
+				log("Download success of zip file!");				
 				
-				Intent intentZip = new Intent(this, ManagerActivity.class);
-				intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
-				intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());			    
-			    startActivity(intentZip);
+				if(pathFileToOpen!=null){
+					Intent intentZip = new Intent(this, ZipBrowserActivity.class);
+					intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
+					intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+					intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+					intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+					startActivity(intentZip);
+					
+				}
+				else{
+					Intent intentZip = new Intent(this, ManagerActivity.class);
+					intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
+					intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+					startActivity(intentZip);
+				}
+				
+				//intentZip.putExtra(ManagerActivity.ZIP_FILE_TO_OPEN, pathFileToOpen);
+			    
 				log("Lanzo intent al manager.....");
 			}
 			else if (MimeType.typeForName(currentFile.getName()).isDocument()){

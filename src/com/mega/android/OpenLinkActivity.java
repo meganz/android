@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 
 import android.app.Activity;

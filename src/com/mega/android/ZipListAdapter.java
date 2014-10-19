@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 
 import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
 
@@ -109,8 +110,6 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		}
 
 		ZipEntry zipNode = (ZipEntry) getItem(position);		
-				
-		log("En la carpeta: " +currentFolder);
 		
 		String nameFile = zipNode.getName();
 		
@@ -120,20 +119,19 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			int index = nameFile.lastIndexOf("/");
 			
 			nameFile=nameFile.substring(0, nameFile.length()-1);
-			
-			//nameFile = nameFile.replace(currentFolder+"/", "");
-			index = nameFile.lastIndexOf("/");
-			
+			index = nameFile.lastIndexOf("/");			
 			nameFile = nameFile.substring(index+1, nameFile.length());
+			
+			holder.textViewFileSize.setText("Pendiente");
 			
 		}
 		else{
-			int	index = nameFile.lastIndexOf("/");
-			
+			int	index = nameFile.lastIndexOf("/");			
 			nameFile = nameFile.substring(index+1, nameFile.length());
+			
+			holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));			
 		}	
-		
-				
+						
 		holder.textViewFileName.setText(nameFile);
 		holder.textViewFileSize.setText(""+zipNode.getSize());
 		

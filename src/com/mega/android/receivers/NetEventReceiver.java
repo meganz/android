@@ -8,7 +8,7 @@ import android.os.Handler;
 import com.mega.android.CameraSyncService;
 import com.mega.android.DatabaseHandler;
 import com.mega.android.MegaAttributes;
-import com.mega.android.Util;
+import com.mega.android.utils.Util;
 
 public class NetEventReceiver extends BroadcastReceiver {
 	

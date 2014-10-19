@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import com.mega.android.FileStorageAdapter.OnItemCheckClickListener;
+import com.mega.android.utils.Util;
 
 import android.app.AlertDialog;
 import android.content.Context;

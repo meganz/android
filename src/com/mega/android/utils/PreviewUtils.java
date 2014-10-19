@@ -1,4 +1,4 @@
-package com.mega.android;
+package com.mega.android.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,9 +18,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.mega.android.PreviewCache;
 import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import com.mega.android.ThumbnailUtils.ResizerParams;
-import com.mega.android.ThumbnailUtils.ThumbnailDownloadListenerList;
 import com.mega.components.TouchImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;

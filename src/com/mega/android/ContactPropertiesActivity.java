@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 
+import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;

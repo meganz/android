@@ -3,6 +3,8 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
@@ -64,24 +66,24 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 
 	/* public static view holder class */
 	public class ViewHolderBrowserList {
-		CheckBox checkbox;
-		ImageView imageView;
-		TextView textViewFileName;
-		TextView textViewFileSize;
-		ImageButton imageButtonThreeDots;
-		RelativeLayout itemLayout;
-		ImageView arrowSelection;
-		RelativeLayout optionsLayout;
-		ImageView optionDownload;
-		ImageView optionProperties;
-        ProgressBar transferProgressBar;
-		ImageView optionRename;
-		ImageView optionCopy;
-		ImageView optionMove;
-		ImageView optionPublicLink;
-		ImageView optionDelete;
-		int currentPosition;
-		long document;
+		public CheckBox checkbox;
+		public ImageView imageView;
+		public TextView textViewFileName;
+		public TextView textViewFileSize;
+		public ImageButton imageButtonThreeDots;
+		public RelativeLayout itemLayout;
+		public ImageView arrowSelection;
+		public RelativeLayout optionsLayout;
+		public ImageView optionDownload;
+		public ImageView optionProperties;
+		public ProgressBar transferProgressBar;
+		public ImageView optionRename;
+		public ImageView optionCopy;
+		public ImageView optionMove;
+		public ImageView optionPublicLink;
+		public ImageView optionDelete;
+		public int currentPosition;
+		public long document;
 	}
 
 	public MegaBrowserListAdapter(Context _context, NodeList _nodes,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
@@ -235,8 +237,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			holder.arrowSelection.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
 
-			SparseBooleanArray checkedItems = listFragment
-					.getCheckedItemPositions();
+			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
 			if (checkedItems.get(position, false) == true) {
 				holder.checkbox.setChecked(true);
 			} else {

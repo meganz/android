@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.os.Handler;
 
 import com.mega.android.CameraSyncService;
-import com.mega.android.Util;
+import com.mega.android.utils.Util;
 
 public class CameraEventReceiver extends BroadcastReceiver {
 	

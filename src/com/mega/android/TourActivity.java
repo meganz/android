@@ -1,5 +1,6 @@
 package com.mega.android;
 
+import com.mega.android.utils.Util;
 import com.mega.components.LoopViewPager;
 
 import android.annotation.SuppressLint;

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
@@ -57,25 +59,25 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 	
 	/*public static view holder class*/
     public class ViewHolderPhotoSyncList {
-    	CheckBox checkbox;
-        ImageView imageView;
-        TextView textViewFileName;
-        TextView textViewFileSize;
-        ImageButton imageButtonThreeDots;
-        RelativeLayout itemLayout;
-        ImageView arrowSelection;
-        RelativeLayout optionsLayout;
-        ImageView optionDownload;
-        ImageView optionProperties;
-        ImageView optionRename;
-        ImageView optionCopy;
-        ImageView optionMove;
-        ImageView optionPublicLink;
-        ImageView optionDelete;
-        RelativeLayout monthLayout;
-        TextView monthTextView;
-        int currentPosition;
-        long document;
+    	public CheckBox checkbox;
+    	public ImageView imageView;
+    	public TextView textViewFileName;
+    	public TextView textViewFileSize;
+    	public ImageButton imageButtonThreeDots;
+    	public RelativeLayout itemLayout;
+    	public ImageView arrowSelection;
+    	public RelativeLayout optionsLayout;
+    	public ImageView optionDownload;
+    	public ImageView optionProperties;
+    	public ImageView optionRename;
+    	public ImageView optionCopy;
+    	public ImageView optionMove;
+    	public ImageView optionPublicLink;
+    	public ImageView optionDelete;
+    	public RelativeLayout monthLayout;
+    	public TextView monthTextView;
+    	public int currentPosition;
+    	public long document;
     }
 	
 	public MegaPhotoSyncListAdapter(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, NodeList _nodes) {

@@ -1,7 +1,7 @@
 package com.mega.components;
 
 import com.mega.android.R;
-import com.mega.android.Util;
+import com.mega.android.utils.Util;
 
 import android.content.Context;
 import android.util.AttributeSet;

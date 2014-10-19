@@ -1,9 +1,19 @@
-package com.mega.android;
+package com.mega.android.utils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.mega.android.MegaBrowserGridAdapter;
+import com.mega.android.MegaBrowserListAdapter;
+import com.mega.android.MegaExplorerAdapter;
+import com.mega.android.MegaFullScreenImageAdapter;
+import com.mega.android.MegaPhotoSyncGridAdapter;
+import com.mega.android.MegaPhotoSyncListAdapter;
+import com.mega.android.MegaTransfersAdapter;
+import com.mega.android.MimeType;
+import com.mega.android.R;
+import com.mega.android.ThumbnailCache;
 import com.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
 import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import com.mega.android.MegaExplorerAdapter.ViewHolderExplorer;
@@ -11,6 +21,7 @@ import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
 import com.mega.android.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import com.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
 import com.mega.android.MegaTransfersAdapter.ViewHolderTransfer;
+import com.mega.android.R.anim;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;

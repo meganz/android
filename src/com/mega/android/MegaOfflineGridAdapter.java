@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;

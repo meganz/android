@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mega.android.utils.Util;
+
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
