@@ -158,7 +158,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
             long id) {
 		
 		if (isList){
-			Intent i = new Intent(context, ContactPropertiesActivity.class);
+			Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 			i.putExtra("name", visibleContacts.get(position).getEmail());
 			startActivity(i);
 		}

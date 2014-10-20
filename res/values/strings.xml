@@ -130,7 +130,7 @@
 	<string name="section_image_viewer">Camera Uploads</string>
 	<string name="section_transfers">Transfers</string>
 	<string name="section_account">My Account</string>
-	<string name="section_photo_sync">Photo Sync</string>
+	<string name="section_photo_sync">Camera Upload</string>
 	<string name="used_space_text">Used Space</string>
 	<string name="used_space">%1$s of %2$s</string>
 	

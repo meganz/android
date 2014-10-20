@@ -96,7 +96,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			break;
 		}
 		case ManagerActivity.CONTACT_FILE_ADAPTER: {
-			((ContactFileListActivity) context).setParentHandle(parentHandle);
+			((ContactPropertiesMainActivity) context).setParentHandle(parentHandle);
 			break;
 		}
 		case ManagerActivity.RUBBISH_BIN_ADAPTER: {
@@ -726,7 +726,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(n.getHandle());
 			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactFileListActivity) context).onFileClick(handleList);
+				((ContactPropertiesMainActivity) context).onFileClick(handleList);
 			} else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
 				((FolderLinkActivity) context).onFileClick(handleList);
 			} else {
@@ -771,7 +771,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
 				((ManagerActivity) context).moveToTrash(handleList);
 			} else {
-				((ContactFileListActivity) context).moveToTrash(handleList);
+				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
 			}
 			break;
 		}
@@ -791,7 +791,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 				((ManagerActivity) context).showRenameDialog(n, n.getName());
 			}
 			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactFileListActivity) context).showRenameDialog(n,	n.getName());
+				((ContactPropertiesMainActivity) context).showRenameDialog(n,	n.getName());
 			}
 
 			break;
@@ -804,7 +804,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
 				((ManagerActivity) context).showMove(handleList);
 			} else {
-				((ContactFileListActivity) context).showMove(handleList);
+				((ContactPropertiesMainActivity) context).showMove(handleList);
 			}
 			break;
 		}
@@ -816,7 +816,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
 				((ManagerActivity) context).showCopy(handleList);
 			} else {
-				((ContactFileListActivity) context).showCopy(handleList);
+				((ContactPropertiesMainActivity) context).showCopy(handleList);
 			}
 			break;
 		}
@@ -863,7 +863,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			break;
 		}
 		case ManagerActivity.CONTACT_FILE_ADAPTER: {
-			((ContactFileListActivity) context).setParentHandle(parentHandle);
+			((ContactPropertiesMainActivity) context).setParentHandle(parentHandle);
 			break;
 		}
 		case ManagerActivity.RUBBISH_BIN_ADAPTER: {

@@ -293,7 +293,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			if (photosyncHandle == -1){
 				NodeList nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
-					if ((CameraSyncService.PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
 						dbH.setCamSyncHandle(photosyncHandle);
 						listView.setVisibility(View.VISIBLE);
@@ -317,7 +317,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					emptyTextView.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 					
-					megaApi.createFolder(CameraSyncService.PHOTO_SYNC, megaApi.getRootNode(), this);
+					megaApi.createFolder(CameraSyncService.CAMERA_UPLOADS, megaApi.getRootNode(), this);
 					
 					return v;
 				}
@@ -411,7 +411,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			if (photosyncHandle == -1){
 				NodeList nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
-					if ((CameraSyncService.PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
 						dbH.setCamSyncHandle(photosyncHandle);
 						listView.setVisibility(View.VISIBLE);
@@ -435,7 +435,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					emptyTextView.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 					
-					megaApi.createFolder(CameraSyncService.PHOTO_SYNC, megaApi.getRootNode(), this);
+					megaApi.createFolder(CameraSyncService.CAMERA_UPLOADS, megaApi.getRootNode(), this);
 				}
 			}
 			else{

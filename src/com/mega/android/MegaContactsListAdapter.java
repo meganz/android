@@ -335,7 +335,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		
 		switch (v.getId()){
 			case R.id.contact_list_option_properties:{
-				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				i.putExtra("name", c.getEmail());
 				context.startActivity(i);							
 				positionClicked = -1;

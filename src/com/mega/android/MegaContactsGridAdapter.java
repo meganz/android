@@ -514,7 +514,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		switch (v.getId()){
 			case R.id.contact_grid_option_properties1:{
 				MegaUser c = (MegaUser) getItem(currentPosition);
-				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				i.putExtra("name", c.getEmail());
 				context.startActivity(i);							
 				positionClicked = -1;
@@ -523,7 +523,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			}
 			case R.id.contact_grid_option_properties2:{
 				MegaUser c = (MegaUser) getItem(currentPosition+1);
-				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				i.putExtra("name", c.getEmail());
 				context.startActivity(i);							
 				positionClicked = -1;
@@ -565,14 +565,14 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				break;
 			}
 			case R.id.contact_grid_thumbnail1:{
-				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				MegaUser contact = (MegaUser) getItem(currentPosition);
 				i.putExtra("name", contact.getEmail());
 				context.startActivity(i);
 				break;
 			}
 			case R.id.contact_grid_thumbnail2:{
-				Intent i = new Intent(context, ContactPropertiesActivity.class);
+				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				MegaUser contact = (MegaUser) getItem(currentPosition+1);
 				i.putExtra("name", contact.getEmail());
 				context.startActivity(i);
