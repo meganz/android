@@ -226,6 +226,7 @@
 	<string name="error_temporary_unavaible">Resource temporarily not available, please try again later</string>
 	<string name="upload_can_not_open">Cannot open selected file</string>
 	<string name="upload_began">Upload has started</string>
+	<string name="unzipping_process">Unzipping file</string>
 		
 	<string name="error_io_problem">Filesystem problem</string>
 	

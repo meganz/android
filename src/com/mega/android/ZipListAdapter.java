@@ -1,5 +1,6 @@
 package com.mega.android;
 
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
@@ -76,6 +77,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		log("onCreate");
 
 		ViewHolderBrowserList holder = null;
 
@@ -113,8 +115,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		
 		String nameFile = zipNode.getName();
 		
-		if(zipNode.isDirectory()){		
-			
+		if(zipNode.isDirectory()){			
 			
 			int index = nameFile.lastIndexOf("/");
 			
@@ -122,26 +123,26 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			index = nameFile.lastIndexOf("/");			
 			nameFile = nameFile.substring(index+1, nameFile.length());
 			
-			holder.textViewFileSize.setText("Pendiente");
+			String info = ((ZipBrowserActivity)context).countFiles(nameFile);
+			
+			holder.textViewFileSize.setText(info);
+			holder.imageView.setImageResource(R.drawable.mime_folder);
+			
+			//TODO: how to know the files & folders inside
+			
 			
 		}
 		else{
 			int	index = nameFile.lastIndexOf("/");			
 			nameFile = nameFile.substring(index+1, nameFile.length());
 			
-			holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));			
+			holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));	
+			holder.imageView.setImageResource(MimeType.typeForName(zipNode.getName()).getIconResourceId());
 		}	
 						
 		holder.textViewFileName.setText(nameFile);
-		holder.textViewFileSize.setText(""+zipNode.getSize());
-		
-		if (zipNode.isDirectory()) {
-			holder.imageView.setImageResource(R.drawable.mime_folder);
-		}
-		else{
-			holder.imageView.setImageResource(MimeType.typeForName(zipNode.getName()).getIconResourceId());
-		}
-		
+//		holder.textViewFileSize.setText(""+zipNode.getSize());		
+				
 		if (positionClicked == -1){
 			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
@@ -159,8 +160,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub		
 		return zipNodeList.size();
 	}
 
@@ -197,7 +197,4 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		log("setFolder: "+folder);
 		this.currentFolder=folder;
 	}
-	
-	
-
 }

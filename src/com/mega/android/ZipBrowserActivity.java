@@ -1,52 +1,43 @@
 package com.mega.android;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
-
-import com.mega.android.FileStorageActivity.Mode;
-import com.mega.android.pdfViewer.OpenPDFActivity;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
-
-import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StatFs;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.TextView;
+import android.widget.ListView;
+
+import com.mega.android.pdfViewer.OpenPDFActivity;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaNode;
 
 public class ZipBrowserActivity extends PinActivity implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 	
@@ -55,13 +46,15 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static String ACTION_OPEN_ZIP_FILE = "OPEN_ZIP_FILE";
 
-	
-    private AlertDialog zipAlertDialog;
     MegaApplication app;
     private MegaApiAndroid megaApi;
     DatabaseHandler dbH = null;
     MegaPreferences prefs = null;
-    
+    ProgressDialog temp = null;
+	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
+//	private static boolean activityVisible;
+	
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	
 	ListView listView;
@@ -76,7 +69,82 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 	String currentFolder;
 	String currentPath;
 	int depth;
-	String downloadLocationDefaultPath;
+	String downloadLocationDefaultPath;	
+	
+	/*
+	 * Background task to unzip the file.zip
+	 */
+	private class UnZipTask extends AsyncTask<String, Void, String> {
+		Context context;
+		String pathZipTask;
+		int position;
+		
+		UnZipTask(Context _context, String _pathZipTask, int _position){
+			this.context = context;
+			this.pathZipTask = _pathZipTask;
+			this.position = _position;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {			
+	
+			this.unpackZip();		
+			return "SUCCESS";
+		}
+
+		@Override
+		protected void onPostExecute(String info) {
+			//Open the file
+			log("onPostExecute");
+			
+			if (temp.isShowing()){
+				try{
+					temp.dismiss();
+					openFile(position);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();					
+				}				
+			}			
+		}
+		
+		private boolean unpackZip()
+		{			
+			int index = pathZip.lastIndexOf("/");
+			String destination = pathZip.substring(0, index+1);			
+			try 
+			{
+				FileInputStream fin = new FileInputStream(pathZipTask);
+				ZipInputStream zin = new ZipInputStream(new BufferedInputStream(fin));
+				ZipEntry ze = null; 
+
+				while((ze = zin.getNextEntry()) != null) {
+					if(ze.isDirectory()) {
+						File f = new File(destination + ze.getName());
+						f.mkdirs();
+					} else { 
+						byte[] buffer2 = new byte[1024];
+						FileOutputStream fout = new FileOutputStream(destination + ze.getName());
+						for(int c = zin.read(buffer2); c > 0; c = zin.read(buffer2)) {
+							fout.write(buffer2,0,c);
+						}
+						zin.closeEntry();
+						fout.close();
+					}
+				}
+				zin.close();
+
+			} 
+			catch(IOException e)
+			{
+				e.printStackTrace();
+				return false;
+			}
+		
+			return true;
+		}
+	}	
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){		
@@ -154,8 +222,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 						if(pE.length<depth){
 							zipNodes.add(element);
 						}
-					}
-					
+					}					
 				}
 				else{
 					
@@ -163,15 +230,13 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 					if(pE.length==depth-1){
 						zipNodes.add(element);
 					}
-				}				
-				
+				}					
 			}
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		} 	
-		
-				
+						
 		if (adapterList == null){
 			adapterList = new ZipListAdapter(this, listView, aB, zipNodes, currentFolder);
 			
@@ -182,27 +247,80 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		}		
 
 		listView.setAdapter(adapterList);		
+	}
+	
+	public void openFile(int position) {
+		log("openFile");
+	
 		
+		if (dbH == null){
+//			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+		
+		String downloadLocationDefaultPath = Util.downloadDIR;
+		prefs = dbH.getPreferences();		
+		if (prefs != null){
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}		
+		
+		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
+		log("The absolutePath of the file to open is: "+absolutePath);
+		 
+		if (MimeType.typeForName(absolutePath).isImage()){
+			Intent intent = new Intent(this, FullScreenImageViewer.class);
+			intent.putExtra("position", position);
+			intent.putExtra("adapterType", ManagerActivity.ZIP_ADAPTER);
+			intent.putExtra("parentNodeHandle", -1L);			
+			File currentFile = new File(absolutePath);			
+			intent.putExtra("offlinePathDirectory", currentFile.getParent());
+			startActivity(intent);
+					
+		}
+		else if(MimeType.typeForName(absolutePath).isPdf()){
+			
+		    File pdfFile = new File(absolutePath);
+		    
+		    Intent intentPdf = new Intent();
+		    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+		    intentPdf.setClass(this, OpenPDFActivity.class);
+		    intentPdf.setAction("android.intent.action.VIEW");
+			this.startActivity(intentPdf);
+			
+		}
+		else{							
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeType.typeForName(absolutePath).getType());
+			if (isIntentAvailable(this, viewIntent))
+				startActivity(viewIntent);
+			else{
+				Intent intentShare = new Intent(Intent.ACTION_SEND);
+				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeType.typeForName(absolutePath).getType());
+				if (isIntentAvailable(this, intentShare))
+					startActivity(intentShare);
+				String toastMessage = getString(R.string.already_downloaded) + ": " + absolutePath;
+				Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+			}								
+			return;
+		}		
 	}
 	
-	@Override
-	protected void onResume() {
-		log("onResume");
-		super.onResume();
+	public static boolean isIntentAvailable(Context ctx, Intent intent) {
+		log("isIntentAvailable");
+		final PackageManager mgr = ctx.getPackageManager();
+		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+		return list.size() > 0;
 	}
 	
-	@Override
-	protected void onPause(){
-		log("onPause");
-		super.onPause();
-	}
-	
-	@Override
-	public void onDestroy(){
-		log("onDestroy");
-		super.onDestroy();
-	}
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
     	log("onSaveInstaceState");
@@ -212,7 +330,6 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		Util.log("ZipBrowserActivity", log);
 	}
 
-
 	@Override
 	public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2,
 			long arg3) {
@@ -220,12 +337,9 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		return false;
 	}
 
-
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		log("onItemClick");
-		
-		depth=depth+1;		
+		log("onItemClick");			
 	
 		ZipEntry currentNode = zipNodes.get(position);		
 		currentPath=currentNode.getName();
@@ -233,31 +347,44 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		log("Dentro del comprimida: "+currentPath);
 		
 		if(currentNode.isDirectory()){		
-			
+			depth=depth+1;	
 			listDirectory(currentPath);	
 			this.setFolder(currentPath);
 			adapterList.setNodes(zipNodes);				
 		}
-		else{		
-			this.setLocationDownload();
+		else{	
 			
-			//Unzip the file
-			this.unpackZip();
-			
-			//Open the file
-			
-			//TODO: open file		
-					
-			
-		}
-		
-			
+			int index = pathZip.lastIndexOf("/");
+			index = pathZip.lastIndexOf(".");
+			String checkFolder = pathZip.substring(0, index);
+			log("checkFolder: "+checkFolder);
+
+			File check = new File(checkFolder);
+			if(check.exists()){
+				log("Ya está descomprimido");
+				openFile(position);
+
+			}
+			else{
+				UnZipTask unZipTask = new UnZipTask(this, pathZip, position);
+				unZipTask.execute();
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.unzipping_process));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+			}							
+		}			
 	}
 
 	
 	private void listDirectory (String directory){
+		log("listDirectory: "+directory);
 		
-		zipNodes.removeAll(zipNodes);
+		zipNodes.clear();
 		
 		Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
 		while (zipEntries.hasMoreElements()) {
@@ -267,18 +394,18 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			if(element.getName().startsWith(directory)){
 				
 				if(element.isDirectory()){
-					log("Directorio");
+					log("Directory: "+element.getName());
 					
 					if(!element.getName().equals(directory)){
-						String[] pE = element.getName().split("/");
-						if(pE.length<depth){
+						String[] pE = element.getName().split("/");						
+						if(pE.length<depth){							
 							zipNodes.add(element);
 						}
 					}
 				}
 				else{			
-					
-					String[] pE = element.getName().split("/");
+					log("File: "+element.getName());
+					String[] pE = element.getName().split("/");					
 					if(pE.length<depth){
 						zipNodes.add(element);
 					}					
@@ -291,25 +418,39 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		
 		depth=depth-1;
 		
+		log("Depth: "+depth);
+		
 		if(depth<3){
 			super.onBackPressed();
 		}
 		else{
 			
 			if(currentPath==null || currentPath.length()==0){
+
 				currentPath=pathZip;
-				depth=3;
-				listDirectory(currentPath);				
-			}
-			else{
 				int index = currentPath.lastIndexOf("/");		
-				currentPath=currentPath.substring(0, currentPath.length()-1);		
+				currentPath = currentPath.substring(0, index);
 				index = currentPath.lastIndexOf("/");		
 				currentPath = currentPath.substring(0, index+1);
-				
-				listDirectory(currentPath);	
-			}			
+				depth=3;							
+			}
+			else{
 
+				if(currentPath.endsWith("/")){
+					currentPath=currentPath.substring(0, currentPath.length()-1);	
+					int index = currentPath.lastIndexOf("/");		
+					currentPath = currentPath.substring(0, index+1);
+					
+				}
+				else{
+					int index = currentPath.lastIndexOf("/");		
+					currentPath = currentPath.substring(0, index);
+					index = currentPath.lastIndexOf("/");		
+					currentPath = currentPath.substring(0, index+1);
+				}	
+			}	
+			
+			listDirectory(currentPath);	
 			this.setFolder(currentPath);
 			adapterList.setNodes(zipNodes);	
 		}	
@@ -334,82 +475,62 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		log("setFolder: "+currentFolder);
 		adapterList.setFolder(currentFolder);
 	}
-	
-	public void setLocationDownload(){
-		log("setLocationDownload");
+
+	public String countFiles(String directory){
+		log("countFiles: "+directory);
 		
-		if (dbH == null){
-			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		}
+		int index = pathZip.lastIndexOf("/");
+		String toEliminate = pathZip.substring(0, index+1);
 		
-		prefs = dbH.getPreferences();		
-		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
-				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					if (prefs.getStorageDownloadLocation() != null){
-						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
-							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
-						}
-					}
-				}
-			}
-		}
-	}	
-	
-	private boolean unpackZip()
-	{       
-		MegaNode tempNode = megaApi.getNodeByHandle(handleZip);
-		String absolutePath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), downloadLocationDefaultPath);
-
-		log("LocalPAth para zip: "+absolutePath);
-		log("NAme para zip: "+tempNode.getName());		
-
-		int index = absolutePath.lastIndexOf("/");
-
-		String destination = absolutePath.substring(0, index+1);
-
-		index = absolutePath.lastIndexOf(".");
-
-		String checkFolder = absolutePath.substring(0, index);
-
-		log("checkFolder: "+checkFolder);
-
-		File check = new File(checkFolder);
-		if(check.exists()){
-			log("Ya está descomprimido");
-			return true;
-
+		String currentPathCount= currentPath.replace(".zip", "");
+		
+		currentPathCount= currentPathCount.replace(toEliminate, "");
+		if(currentPathCount.lastIndexOf("/")==currentPathCount.length()-1){
+			currentPathCount=currentPathCount+directory+"/";
 		}
 		else{
-			try 
-			{
-				FileInputStream fin = new FileInputStream(absolutePath);
-				ZipInputStream zin = new ZipInputStream(new BufferedInputStream(fin));
-				ZipEntry ze = null; 
+			currentPathCount=currentPathCount+"/"+directory+"/";
+		}
+		
+		int numFolders=0;
+		int numFiles=0;
+		Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+		while (zipEntries.hasMoreElements()) {
 
-				while((ze = zin.getNextEntry()) != null) {
-					if(ze.isDirectory()) {
-						File f = new File(destination + ze.getName());
-						f.mkdirs();
-					} else { 
-						byte[] buffer2 = new byte[1024];
-						FileOutputStream fout = new FileOutputStream(destination + ze.getName());
-						for(int c = zin.read(buffer2); c > 0; c = zin.read(buffer2)) {
-							fout.write(buffer2,0,c);
-						}
-						zin.closeEntry();
-						fout.close();
+			ZipEntry element = zipEntries.nextElement();	
+
+			if(element.getName().startsWith(currentPathCount)){
+
+				if(element.isDirectory()){
+					//log("Directory: "+element.getName());
+					if(!element.getName().equals(currentPathCount)){
+						numFolders++;
 					}
 				}
-				zin.close();
-
-			} 
-			catch(IOException e)
-			{
-				e.printStackTrace();
-				return false;
+				else{			
+					numFiles++;			
+				}
 			}
 		}
-		return true;
+		
+		String info = "";
+		if (numFolders > 0) {
+			info = numFolders
+					+ " "
+					+ this.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0) {
+				info = info
+						+ ", "
+						+ numFiles
+						+ " "
+						+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+			}
+		} else {
+			info = numFiles
+					+ " "
+					+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+		}
+
+		return info;
 	}
 }
