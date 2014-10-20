@@ -14,16 +14,20 @@ import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -32,79 +36,86 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ContactPropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface {
+public class ContactPropertiesFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
 	
-	TextView nameView;
 	TextView contentTextView;
 	RoundedImageView imageView;
 	RelativeLayout contentLayout;
 	TextView contentDetailedTextView;
 	TextView infoEmail;
 	TextView infoAdded;
-	ImageView statusImageView;
 	ImageButton eyeButton;
 	TableLayout contentTable;
-	ActionBar aB;
+	
 	
 	String userEmail;
+	
+	
+	
+	Context context;
+	ActionBar aB;
 	
 	MegaApiAndroid megaApi;
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		
+	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
-			megaApi = ((MegaApplication) getApplication()).getMegaApi();
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		aB = getSupportActionBar();
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayShowTitleEnabled(false);
-		aB.setLogo(R.drawable.ic_action_navigation_accept);
+		super.onCreate(savedInstanceState);
+		log("onCreate");
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		
+		if (megaApi == null){
+			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+		}
+		
+		if (aB == null){
+			aB = ((ActionBarActivity)context).getSupportActionBar();
+		}
+		
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
+		float scaleW = Util.getScaleW(outMetrics, density);
+		float scaleH = Util.getScaleH(outMetrics, density);
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = getResources().getDisplayMetrics().density;
+		View v = null;
 		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-		
-		Bundle extras = getIntent().getExtras();
-		if (extras != null){
-			userEmail = extras.getString("name");
+		if (userEmail != null){
+			v = inflater.inflate(R.layout.fragment_contact_properties, container, false);
 			
-			setContentView(R.layout.activity_contact_properties);
-			nameView = (TextView) findViewById(R.id.contact_properties_name);
-			imageView = (RoundedImageView) findViewById(R.id.contact_properties_image);
+			imageView = (RoundedImageView) v.findViewById(R.id.contact_properties_image);
 			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
 			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
-			contentLayout = (RelativeLayout) findViewById(R.id.contact_properties_content);
-			contentTextView = (TextView) findViewById(R.id.contact_properties_content_text);
-			contentDetailedTextView = (TextView) findViewById(R.id.contact_properties_content_detailed);
-			statusImageView = (ImageView) findViewById(R.id.contact_properties_status);
-			eyeButton = (ImageButton) findViewById(R.id.contact_properties_content_eye);
-			contentTable = (TableLayout) findViewById(R.id.contact_properties_content_table);
-//			eyeButton.setOnClickListener(this);
+			contentLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_content);
+			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_text);
+			contentDetailedTextView = (TextView) v.findViewById(R.id.contact_properties_content_detailed);
+			eyeButton = (ImageButton) v.findViewById(R.id.contact_properties_content_eye);
+			contentTable = (TableLayout) v.findViewById(R.id.contact_properties_content_table);
+			eyeButton.setOnClickListener(this);
 			contentTable.setOnClickListener(this);
 			
-			infoEmail = (TextView) findViewById(R.id.contact_properties_info_data_email);
-			infoAdded = (TextView) findViewById(R.id.contact_properties_info_data_added);
+			infoEmail = (TextView) v.findViewById(R.id.contact_properties_info_data_email);
+			infoAdded = (TextView) v.findViewById(R.id.contact_properties_info_data_added);
 			
-			nameView.setText(userEmail);
-
 			MegaUser contact = megaApi.getContact(userEmail);
 			contentDetailedTextView.setText(getDescription(megaApi.getInShares(contact)));
 			
 			File avatar = null;
-			if (getExternalCacheDir() != null){
-				avatar = new File(getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
 			}
 			else{
-				avatar = new File(getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
+				avatar = new File(context.getCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
 			}
+			
 			Bitmap imBitmap = null;
 			if (avatar.exists()){
 				if (avatar.length() > 0){
@@ -114,11 +125,11 @@ public class ContactPropertiesActivity extends PinActivity implements OnClickLis
 					imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
 					if (imBitmap == null) {
 						avatar.delete();
-						if (getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
 						}
 						else{
-							megaApi.getUserAvatar(contact, getCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail(), this);
 						}
 					}
 					else{
@@ -129,51 +140,40 @@ public class ContactPropertiesActivity extends PinActivity implements OnClickLis
 			
 			infoEmail.setText(userEmail);
 			infoAdded.setText(contact.getTimestamp()+"");
-		
-//			if (position < 2){
-//				statusImageView.setImageResource(R.drawable.contact_green_dot);
-//			}
-//			else if (position == 2){
-//				statusImageView.setImageResource(R.drawable.contact_yellow_dot);
-//			}
-//			else if (position == 3){
-//				statusImageView.setImageResource(R.drawable.contact_red_dot);
-//			}
 		}
+
+		return v;
 	}
+	
+	public void setUserEmail(String userEmail){
+		this.userEmail = userEmail;
+	}
+	
+	public String getUserEmail(){
+		return this.userEmail;
+	}
+	
+	@Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        context = activity;
+        aB = ((ActionBarActivity)activity).getSupportActionBar();
+    }	
 	
 	@Override
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
-			case R.id.contact_properties_content_eye:{
-				Intent i = new Intent(this, ContactFileListActivity.class);
-				i.putExtra("name", userEmail);
-				startActivity(i);
-				finish();
-				break;
-			}
+			case R.id.contact_properties_content_eye:
 			case R.id.contact_properties_content_table:{
-				Intent i = new Intent(this, ContactFileListActivity.class);
-				i.putExtra("name", userEmail);
-				startActivity(i);
-				finish();
+				((ContactPropertiesMainActivity)context).onContentClick(userEmail);
+//				Intent i = new Intent(context, ContactFileListActivity.class);
+//				i.putExtra("name", userEmail);
+//				startActivity(i);
+////				finish();
 				break;
 			}
-		
 		}
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	    // Respond to the action bar's Up/Home button
-		    case android.R.id.home:{
-		    	finish();
-		    	return true;
-		    }
-		}	    
-	    return super.onOptionsItemSelected(item);
 	}
 	
 	public String getDescription(NodeList nodes){
@@ -221,11 +221,11 @@ public class ContactPropertiesActivity extends PinActivity implements OnClickLis
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
 			if (e.getErrorCode() == MegaError.API_OK){
 				File avatar = null;
-				if (getExternalCacheDir() != null){
-					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				if (context.getExternalCacheDir() != null){
+					avatar = new File(context.getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
 				}
 				else{
-					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+					avatar = new File(context.getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
 				}
 				Bitmap imBitmap = null;
 				if (avatar.exists()){

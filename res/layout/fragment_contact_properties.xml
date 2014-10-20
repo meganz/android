@@ -10,28 +10,11 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent">
 
-    
-     <TextView
-        android:id="@+id/contact_properties_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingLeft="30dp" />
-     
-     <ImageView
-         android:id="@+id/contact_properties_status"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content" 
-         android:layout_toRightOf="@id/contact_properties_name"
-         android:paddingLeft="7dp"
-         android:paddingTop="11dp"/>
-          
      <com.mega.components.RoundedImageView 
          android:id="@+id/contact_properties_image"
          android:layout_width="270dp"
          android:layout_height="270dp"
          android:layout_centerHorizontal="true"
-         android:layout_below="@id/contact_properties_name"
          android:paddingLeft="30dp"
          android:paddingRight="30dp"
          rounded:corner_radius="10dp" 
