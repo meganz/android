@@ -148,6 +148,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int FOLDER_LINK_ADAPTER = 2005;
 	final public static int SEARCH_ADAPTER = 2006;
 	final public static int PHOTO_SYNC_ADAPTER = 2007;
+	final public static int ZIP_ADAPTER = 2008;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;

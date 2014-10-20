@@ -156,9 +156,10 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		MegaNode parentNode;		
 		
 		adapterType = intent.getIntExtra("adapterType", 0);
-		if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+		if ((adapterType == ManagerActivity.OFFLINE_ADAPTER) || (adapterType == ManagerActivity.ZIP_ADAPTER)){
 			String offlinePathDirectory = intent.getStringExtra("offlinePathDirectory");
-			
+			log("OFFLINEPATHDIRECTORY: "  + offlinePathDirectory);
+		
 			File offlineDirectory = new File(offlinePathDirectory);
 //			if (Environment.getExternalStorageDirectory() != null){
 //				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR);
@@ -171,7 +172,9 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			int imageNumber = 0;
 			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
+			log("SIZE: " + fList.length);
 			for (File f : fList){
+				log("F: " + f.getAbsolutePath());
 				if (MimeType.typeForName(f.getName()).isImage()){
 					paths.add(f.getAbsolutePath());
 					if (index == positionG){
@@ -182,7 +185,12 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 				index++;				
 			}
 			
-			adapterOffline = new MegaOfflineFullScreenImageAdapter(fullScreenImageViewer, paths);
+			if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+				adapterOffline = new MegaOfflineFullScreenImageAdapter(fullScreenImageViewer, paths);
+			}
+			else if(adapterType == ManagerActivity.ZIP_ADAPTER){
+				adapterOffline = new MegaOfflineFullScreenImageAdapter(fullScreenImageViewer, paths, true);
+			}
 			
 			viewPager.setAdapter(adapterOffline);
 			
@@ -404,7 +412,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 				positionG = newPosition;
 				
 				try{
-					if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+					if ((adapterType == ManagerActivity.OFFLINE_ADAPTER) || (adapterType == ManagerActivity.ZIP_ADAPTER)){
 						
 					}
 					else{
@@ -424,7 +432,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 	@Override
 	public void onClick(View v) {
 		
-		if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+		if ((adapterType == ManagerActivity.OFFLINE_ADAPTER) || (adapterType == ManagerActivity.ZIP_ADAPTER)){
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
 					finish();
@@ -555,7 +563,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		super.onSaveInstanceState(savedInstanceState);
 
 		savedInstanceState.putInt("adapterType", adapterType);
-		if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+		if ((adapterType == ManagerActivity.OFFLINE_ADAPTER) || (adapterType == ManagerActivity.ZIP_ADAPTER)){
 			
 		}
 		else{
@@ -570,7 +578,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		
 		adapterType = savedInstanceState.getInt("adapterType");
 		
-		if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
+		if ((adapterType == ManagerActivity.OFFLINE_ADAPTER) || (adapterType == ManagerActivity.ZIP_ADAPTER)){
 			
 		}
 		else{

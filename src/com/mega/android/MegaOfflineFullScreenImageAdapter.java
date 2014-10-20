@@ -38,7 +38,7 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 	private SparseArray<ViewHolderOfflineFullImage> visibleImgs = new SparseArray<ViewHolderOfflineFullImage>();
 	private boolean aBshown = true;
 	DatabaseHandler dbH = null;
-	
+	private boolean zipImage = false;
 	
 	private class OfflinePreviewAsyncTask extends AsyncTask<String, Void, Bitmap>{
 		
@@ -109,6 +109,17 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		this.megaFullScreenImageAdapter = this;
 //		dbH = new DatabaseHandler(activity);
 		dbH = DatabaseHandler.getDbHandler(activity);
+		this.zipImage = false;
+	}
+	
+	// constructor
+	public MegaOfflineFullScreenImageAdapter(Activity activity, ArrayList<String> paths, boolean zipImage) {
+		this.activity = activity;
+		this.paths = paths;
+		this.megaFullScreenImageAdapter = this;
+//			dbH = new DatabaseHandler(activity);
+		dbH = DatabaseHandler.getDbHandler(activity);
+		this.zipImage = zipImage;
 	}
 
 	@Override
@@ -148,29 +159,39 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		
 		//Get the path of the file
 		
-		String pathFile = currentFile.getAbsolutePath();		
-		String[] subPath=pathFile.split(Util.offlineDIR);		
-		int index = subPath[1].lastIndexOf("/");		
-		pathFile = subPath[1].substring(0, index+1);
-		
-		//Get the handle from the db
-		MegaOffline mOff = dbH.findbyPathAndName(pathFile, currentFile.getName());
-		
-		long handle = Long.parseLong(mOff.getHandle());
-		holder.currentHandle = handle;
-		
-		log("Handle gatito" + mOff.getHandle() );
-		
-		preview = PreviewUtils.getPreviewFromCache(handle);
-		if (preview != null){
-			holder.imgDisplay.setImageBitmap(preview);
+		if (!zipImage){
+			String pathFile = currentFile.getAbsolutePath();
+			String[] subPath=pathFile.split(Util.offlineDIR);		
+			int index = subPath[1].lastIndexOf("/");		
+			pathFile = subPath[1].substring(0, index+1);
+			
+			//Get the handle from the db
+			MegaOffline mOff = dbH.findbyPathAndName(pathFile, currentFile.getName());
+			
+			long handle = Long.parseLong(mOff.getHandle());
+			holder.currentHandle = handle;
+			
+			log("Handle: " + mOff.getHandle() );
+			
+			preview = PreviewUtils.getPreviewFromCache(handle);
+			if (preview != null){
+				holder.imgDisplay.setImageBitmap(preview);
+			}
+			else{
+				thumb = ThumbnailUtils.getThumbnailFromCache(handle);
+				if (thumb != null){
+					holder.imgDisplay.setImageBitmap(thumb);
+				}
+				
+				try{
+					new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
+				}
+				catch(Exception e){
+					//Too many AsyncTasks
+				}
+			}
 		}
 		else{
-			thumb = ThumbnailUtils.getThumbnailFromCache(handle);
-			if (thumb != null){
-				holder.imgDisplay.setImageBitmap(thumb);
-			}
-			
 			try{
 				new OfflinePreviewAsyncTask(holder).execute(currentFile.getAbsolutePath());
 			}
