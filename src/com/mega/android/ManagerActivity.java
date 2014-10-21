@@ -3185,16 +3185,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			return;	
 		}
 		
-		statusDialog = null;
-		try {
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.context_creating_folder));
-			statusDialog.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		
 		long parentHandle;
 		if (fbF.isVisible()){
 			parentHandle = fbF.getParentHandle();
@@ -3209,8 +3199,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			parentNode = megaApi.getRootNode();
 		}
 		
-		megaApi.createFolder(title, parentNode, this);
+		boolean exists = false;
+		NodeList nL = megaApi.getChildren(parentNode);
+		for (int i=0;i<nL.size();i++){
+			if (title.compareTo(nL.get(i).getName()) == 0){
+				exists = true;
+			}
+		}
 		
+		if (!exists){
+			statusDialog = null;
+			try {
+				statusDialog = new ProgressDialog(this);
+				statusDialog.setMessage(getString(R.string.context_creating_folder));
+				statusDialog.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			
+			megaApi.createFolder(title, parentNode, this);
+		}
+		else{
+			Toast.makeText(this, "Folder already exists", Toast.LENGTH_LONG).show();
+		}		
 	}
 	
 	public void showRenameDialog(final MegaNode document, String text){
