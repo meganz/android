@@ -7,6 +7,7 @@ import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
@@ -36,7 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
 
-public class FileExplorerActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface{
+public class FileExplorerActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	
@@ -78,6 +79,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	private List<ShareInfo> filePreparedInfos;
 	
+	NodeList nodes;
+	
 	/*
 	 * Background task to process files for uploading
 	 */
@@ -118,6 +121,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		
+		megaApi.addGlobalListener(this);
 		
 		Intent intent = getIntent();
 		if (megaApi.getRootNode() == null){
@@ -421,16 +426,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		return;	
 	}
 	
-	statusDialog = null;
-	try {
-		statusDialog = new ProgressDialog(this);
-		statusDialog.setMessage(getString(R.string.context_creating_folder));
-		statusDialog.show();
-	}
-	catch(Exception e){
-		return;
-	}
-	
 	long parentHandle = fe.getParentHandle();	
 	MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 	
@@ -438,7 +433,31 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		parentNode = megaApi.getRootNode();
 	}
 	
-	megaApi.createFolder(title, parentNode, this);
+	
+	boolean exists = false;
+	NodeList nL = megaApi.getChildren(parentNode);
+	for (int i=0;i<nL.size();i++){
+		if (title.compareTo(nL.get(i).getName()) == 0){
+			exists = true;
+		}
+	}
+	
+	if (!exists){
+		statusDialog = null;
+		try {
+			statusDialog = new ProgressDialog(this);
+			statusDialog.setMessage(getString(R.string.context_creating_folder));
+			statusDialog.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		
+		megaApi.createFolder(title, parentNode, this);
+	}
+	else{
+		Toast.makeText(this, "Folder already exists", Toast.LENGTH_LONG).show();
+	}
 	
 }
 
@@ -461,13 +480,13 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+		log("onRequestStart");
 	}
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
+		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_MKDIR){
 			try { 
 				statusDialog.dismiss();	
@@ -476,7 +495,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
 				fe.setNodes(nodes);
 				fe.getListView().invalidateViews();
 			}
@@ -492,6 +511,26 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUsersUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onNodesUpdate(MegaApiJava api) {
+		log("onNodesUpdate");
+		nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
+		fe.setNodes(nodes);
+		fe.getListView().invalidateViews();
+	}
+
+	@Override
+	public void onReloadNeeded(MegaApiJava api) {
 		// TODO Auto-generated method stub
 		
 	}
