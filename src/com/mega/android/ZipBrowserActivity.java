@@ -47,24 +47,20 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 	public static String ACTION_OPEN_ZIP_FILE = "OPEN_ZIP_FILE";
 
     MegaApplication app;
-    private MegaApiAndroid megaApi;
     DatabaseHandler dbH = null;
     MegaPreferences prefs = null;
     ProgressDialog temp = null;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-	
-//	private static boolean activityVisible;
-	
+
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	
+	boolean folderzipped = false;
+    
 	ListView listView;
-	long totalSize; 
+
 	ZipListAdapter adapterList;
 	ActionBar aB;
-//	List<String> filePaths;
 	ZipFile myZipFile;
 	String pathZip;
-	long handleZip;
 	List<ZipEntry> zipNodes;
 	String currentFolder;
 	String currentPath;
@@ -75,12 +71,10 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 	 * Background task to unzip the file.zip
 	 */
 	private class UnZipTask extends AsyncTask<String, Void, String> {
-		Context context;
 		String pathZipTask;
 		int position;
 		
 		UnZipTask(Context _context, String _pathZipTask, int _position){
-			this.context = context;
 			this.pathZipTask = _pathZipTask;
 			this.position = _position;
 		}
@@ -153,18 +147,15 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		super.onCreate(savedInstanceState);
 		
 		app = (MegaApplication)getApplication();
-		megaApi = app.getMegaApi();
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				
 		depth=3;
-		totalSize=0;
 		
 		zipNodes = new ArrayList<ZipEntry>();
 			
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
-			pathZip = extras.getString(EXTRA_PATH_ZIP);
-			handleZip = extras.getLong(EXTRA_HANDLE_ZIP);			
+			pathZip = extras.getString(EXTRA_PATH_ZIP);					
 		}
 		
 		currentPath = pathZip;
@@ -190,6 +181,25 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		listView.setItemsCanFocus(false);
 		
+
+		try {
+			myZipFile = new ZipFile(pathZip);			
+	
+			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+			while (zipEntries.hasMoreElements()) {
+				
+				ZipEntry element = zipEntries.nextElement();	
+				
+				log(element.getName());
+			}
+				
+				
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		} 
+
+			
 		String[] parts = pathZip.split("/");
 		if(parts.length>0){
 
@@ -202,40 +212,99 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			currentFolder= pathZip;
 		}
 		
-		aB.setTitle("ZIP "+currentFolder);
-				
+		folderzipped = false;
+		
 		try {
-			myZipFile = new ZipFile(pathZip);
-			
+			myZipFile = new ZipFile(pathZip);			
+	
 			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
 			while (zipEntries.hasMoreElements()) {
 				
-				ZipEntry element = zipEntries.nextElement();	
+				ZipEntry element = zipEntries.nextElement();				
 				
-				totalSize= totalSize+element.getSize();
-				
-				if(element.isDirectory()){
-
-					if(!element.getName().equals(currentFolder+"/")){
-
-						String[] pE = element.getName().split("/");
-						if(pE.length<depth){
-							zipNodes.add(element);
-						}
-					}					
+				if(element.getName().startsWith(currentFolder+"/")){
+					folderzipped=true;					
 				}
 				else{
+					folderzipped=false;	
 					
-					String[] pE = element.getName().split("/");
-					if(pE.length==depth-1){
-						zipNodes.add(element);
-					}
-				}					
+				}				
 			}
+	
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		} 	
+		
+		if(folderzipped){	
+			aB.setTitle("ZIP "+currentFolder);
+			
+			try {
+				myZipFile = new ZipFile(pathZip);			
+		
+				Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+				while (zipEntries.hasMoreElements()) {
+					
+					ZipEntry element = zipEntries.nextElement();	
+		
+					if(element.isDirectory()){
+
+						if(!element.getName().equals(currentFolder+"/")){
+
+							String[] pE = element.getName().split("/");
+							if(pE.length<depth){
+								zipNodes.add(element);
+							}
+						}					
+					}
+					else{
+						
+						String[] pE = element.getName().split("/");
+						if(pE.length==depth-1){
+							zipNodes.add(element);
+						}
+					}					
+				}
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			} 	
+			
+		}
+		else{
+			currentFolder="";
+			aB.setTitle("ZIP Browser");
+			
+			try {
+				myZipFile = new ZipFile(pathZip);			
+		
+				Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+				while (zipEntries.hasMoreElements()) {
+					
+					ZipEntry element = zipEntries.nextElement();	
+										
+					if(element.isDirectory()){
+
+						String[] pE = element.getName().split("/");
+						if(pE.length<3){
+							zipNodes.add(element);
+						}
+											
+					}
+					else{
+						
+						String[] pE = element.getName().split("/");
+						if(pE.length==1){
+							zipNodes.add(element);
+						}
+					}					
+				}
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			} 	
+		}			
+		
 						
 		if (adapterList == null){
 			adapterList = new ZipListAdapter(this, listView, aB, zipNodes, currentFolder);
@@ -341,10 +410,11 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		log("onItemClick");			
 	
-		ZipEntry currentNode = zipNodes.get(position);		
+		ZipEntry currentNode = zipNodes.get(position);
+		
 		currentPath=currentNode.getName();
 		
-		log("Dentro del comprimida: "+currentPath);
+		log("onItemClick, currentPath: "+currentPath);
 		
 		if(currentNode.isDirectory()){		
 			depth=depth+1;	
@@ -354,64 +424,108 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		}
 		else{	
 			
-			int index = pathZip.lastIndexOf("/");
-			index = pathZip.lastIndexOf(".");
-			String checkFolder = pathZip.substring(0, index);
-			log("checkFolder: "+checkFolder);
-
-			File check = new File(checkFolder);
-			if(check.exists()){
-				log("Ya está descomprimido");
-				openFile(position);
-
+			String checkFolder = null;
+			
+			if(!folderzipped){
+				int index = pathZip.lastIndexOf("/");
+				checkFolder = pathZip.substring(0, index);
+				checkFolder = checkFolder+"/"+currentPath;
+				log(checkFolder+"/"+currentPath);
 			}
 			else{
-				UnZipTask unZipTask = new UnZipTask(this, pathZip, position);
-				unZipTask.execute();
-				try{
-					temp = new ProgressDialog(this);
-					temp.setMessage(getString(R.string.unzipping_process));
-					temp.show();
+				int index = pathZip.lastIndexOf(".");
+				checkFolder = pathZip.substring(0, index);
+				log("checkFolder: "+checkFolder);
+			}
+
+			if(checkFolder!=null){
+				File check = new File(checkFolder);
+			
+				if(check.exists()){
+					log("Already unzipped");
+					openFile(position);
+
 				}
-				catch(Exception e){
-					return;
-				}
-			}							
+				else{
+					UnZipTask unZipTask = new UnZipTask(this, pathZip, position);
+					unZipTask.execute();
+					try{
+						temp = new ProgressDialog(this);
+						temp.setMessage(getString(R.string.unzipping_process));
+						temp.show();
+					}
+					catch(Exception e){
+						return;
+					}
+				}				
+				
+			}
+			
+									
 		}			
 	}
-
 	
 	private void listDirectory (String directory){
 		log("listDirectory: "+directory);
 		
 		zipNodes.clear();
 		
-		Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-		while (zipEntries.hasMoreElements()) {
+		if(directory.isEmpty()){
 			
-			ZipEntry element = zipEntries.nextElement();	
-			
-			if(element.getName().startsWith(directory)){
+			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+			while (zipEntries.hasMoreElements()) {
 				
-				if(element.isDirectory()){
-					log("Directory: "+element.getName());
+				ZipEntry element = zipEntries.nextElement();	
+				
+				if(element.getName().startsWith(directory)){
 					
-					if(!element.getName().equals(directory)){
-						String[] pE = element.getName().split("/");						
-						if(pE.length<depth){							
+					if(element.isDirectory()){
+
+						String[] pE = element.getName().split("/");
+						if(pE.length<3){
+							zipNodes.add(element);
+						}
+											
+					}
+					else{
+						
+						String[] pE = element.getName().split("/");
+						if(pE.length==1){
 							zipNodes.add(element);
 						}
 					}
 				}
-				else{			
-					log("File: "+element.getName());
-					String[] pE = element.getName().split("/");					
-					if(pE.length<depth){
-						zipNodes.add(element);
-					}					
+			}
+		}
+		else{
+		
+			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+			while (zipEntries.hasMoreElements()) {
+				
+				ZipEntry element = zipEntries.nextElement();	
+				
+				if(element.getName().startsWith(directory)){
+					
+					if(element.isDirectory()){
+						log("Directory: "+element.getName());
+						
+						if(!element.getName().equals(directory)){
+							String[] pE = element.getName().split("/");						
+							if(pE.length<depth){							
+								zipNodes.add(element);
+							}
+						}
+					}
+					else{			
+						log("File: "+element.getName());
+						String[] pE = element.getName().split("/");					
+						if(pE.length<depth){
+							zipNodes.add(element);
+						}					
+					}
 				}
 			}
-		}		
+		}	
 	}
 	
 	public void onBackPressed(){
@@ -420,8 +534,18 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		
 		log("Depth: "+depth);
 		
+		log("onBackPressed, currentPath: "+currentPath);
+		
 		if(depth<3){
 			super.onBackPressed();
+			
+		} 
+		else if (depth==3&&(!folderzipped)){
+			log("Entro por 4444444");
+			currentPath="";
+			listDirectory(currentPath);	
+			this.setFolder(currentPath);
+			adapterList.setNodes(zipNodes);	
 		}
 		else{
 			
@@ -432,7 +556,8 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 				currentPath = currentPath.substring(0, index);
 				index = currentPath.lastIndexOf("/");		
 				currentPath = currentPath.substring(0, index+1);
-				depth=3;							
+				depth=3;	
+				log("Entro por 11111");
 			}
 			else{
 
@@ -440,13 +565,14 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 					currentPath=currentPath.substring(0, currentPath.length()-1);	
 					int index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index+1);
-					
+					log("Entro por 22222");
 				}
 				else{
 					int index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index);
 					index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index+1);
+					log("Entro por 33333");
 				}	
 			}	
 			
@@ -458,7 +584,6 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 
 	@Override
 	public void onClick(View v) {
-
 		
 	}
 	
@@ -471,8 +596,13 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			currentFolder= pathZip;
 		}
 		
-		aB.setTitle("ZIP "+currentFolder);
-		log("setFolder: "+currentFolder);
+		if(currentFolder.length()>0){
+			aB.setTitle("ZIP "+currentFolder);
+		}
+		else {
+			aB.setTitle("ZIP Browser");
+		}
+		//log("setFolder: "+currentFolder);
 		adapterList.setFolder(currentFolder);
 	}
 
@@ -485,34 +615,62 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		String currentPathCount= currentPath.replace(".zip", "");
 		
 		currentPathCount= currentPathCount.replace(toEliminate, "");
-		if(currentPathCount.lastIndexOf("/")==currentPathCount.length()-1){
-			currentPathCount=currentPathCount+directory+"/";
-		}
-		else{
-			currentPathCount=currentPathCount+"/"+directory+"/";
-		}
 		
 		int numFolders=0;
-		int numFiles=0;
-		Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
-		while (zipEntries.hasMoreElements()) {
+		int numFiles=0;	
 
-			ZipEntry element = zipEntries.nextElement();	
+		if(depth==3&&!folderzipped){
 
-			if(element.getName().startsWith(currentPathCount)){
+			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+			while (zipEntries.hasMoreElements()) {
 
-				if(element.isDirectory()){
-					//log("Directory: "+element.getName());
-					if(!element.getName().equals(currentPathCount)){
-						numFolders++;
+				ZipEntry element = zipEntries.nextElement();
+
+				if(element.getName().startsWith(directory+"/")){
+
+					if(element.isDirectory()){
+						//log("Directory: "+element.getName());
+						if(!element.getName().equals(directory+"/")){
+							numFolders++;
+						}
 					}
-				}
-				else{			
-					numFiles++;			
+					else{
+						numFiles++;			
+					}
 				}
 			}
 		}
-		
+		else{
+			if(currentPathCount.lastIndexOf("/")==currentPathCount.length()-1){
+				currentPathCount=currentPathCount+directory+"/";
+			}
+			else{				
+				currentPathCount=currentPathCount+"/"+directory+"/";
+			}
+
+			Enumeration<? extends ZipEntry> zipEntries = myZipFile.entries();
+			while (zipEntries.hasMoreElements()) {
+
+				ZipEntry element = zipEntries.nextElement();	
+
+				if(element.getName().startsWith(currentPathCount)){
+
+					if(element.isDirectory()){
+
+						//log("Directory: "+element.getName());
+						if(!element.getName().equals(currentPathCount)){
+
+							numFolders++;
+						}
+					}
+					else{
+
+						numFiles++;			
+					}
+				}
+			}
+		}
+
 		String info = "";
 		if (numFolders > 0) {
 			info = numFolders
@@ -530,7 +688,6 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 					+ " "
 					+ this.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
 		}
-
 		return info;
 	}
 }
