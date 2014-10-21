@@ -374,10 +374,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			if (MimeType.typeForName(currentFile.getName()).isPdf()){
 				
 				if (fromContactFile){
+					log("FROM CONTACT FILE");
 					Intent intentPdf = new Intent(this, ContactPropertiesMainActivity.class);
 					intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
 					intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					intentPdf.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 					intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
 				    startActivity(intentPdf);
 				}
