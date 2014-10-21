@@ -356,7 +356,15 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					nodesArray.add(psh);
 					log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
 				}
-			}			
+			}	
+			
+			if (nodes.size() == 0){
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				emptyTextView.setText("Click to turn on Camera Upload");
+				emptyImageView.setOnClickListener(this);
+				listView.setVisibility(View.GONE);
+			}
 			
 			if (adapterList == null){
 				adapterList = new MegaPhotoSyncListAdapter(context, nodesArray, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes);
@@ -600,7 +608,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	public void onClick(View v) {
 
 		switch(v.getId()){
-
+			case R.id.file_list_empty_image:{
+				Intent intent = new Intent(context, SettingsActivity.class);
+				context.startActivity(intent);
+				break;
+			}
 		}
 	}
 	
@@ -1037,8 +1049,10 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(context, "PhotoSync Folder created", Toast.LENGTH_LONG).show();
 				emptyImageView.setVisibility(View.VISIBLE);
+				emptyImageView.setOnClickListener(this);
 				emptyTextView.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
+				emptyTextView.setText("Click to turn on Camera Upload");
 			}
 		}
 	}
