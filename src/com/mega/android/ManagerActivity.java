@@ -4135,8 +4135,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 								String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 							}								
-							return;
 						}
+						return;
 					}
 				}
 			}

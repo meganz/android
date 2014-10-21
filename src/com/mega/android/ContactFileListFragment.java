@@ -23,7 +23,6 @@ import com.mega.sdk.NodeList;
 import com.mega.sdk.TransferList;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -31,7 +30,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -98,15 +96,8 @@ public class ContactFileListFragment extends Fragment implements
 
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
-	public UploadHereDialog uploadDialog;
-
-	private List<ShareInfo> filePreparedInfos;
-	private AlertDialog renameDialog;
-
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
-
-	MenuItem uploadButton;
 
 	TransferList tL;
 	HashMap<Long, MegaTransfer> mTHash = null;
@@ -356,6 +347,16 @@ public class ContactFileListFragment extends Fragment implements
 		return v;
 	}
 	
+	public boolean showUpload(){
+		if (!parentHandleStack.isEmpty()){
+			if ((megaApi.checkAccess(megaApi.getNodeByHandle(parentHandle), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(megaApi.getNodeByHandle(parentHandle), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	public void setNodes(long parentHandle){
 		if (megaApi.getNodeByHandle(parentHandle) == null){
 			parentHandle = -1;
@@ -520,9 +521,14 @@ public class ContactFileListFragment extends Fragment implements
 			MegaError e) {
 		log("onRequestTemporaryError");
 	}
+	
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		log("onRequestUpdate");
+	}
 
 	public static void log(String log) {
-		Util.log("ContactFileListActivity", log);
+		Util.log("ContactFileListFragment", log);
 	}
 
 	@Override
@@ -762,191 +768,6 @@ public class ContactFileListFragment extends Fragment implements
 //		}
 //		}
 	}
-
-//
-//	@Override
-//	protected void onActivityResult(int requestCode, int resultCode,
-//			Intent intent) {
-//		if (intent == null) {
-//			return;
-//		}
-//
-//		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
-//			Uri uri = intent.getData();
-//			intent.setAction(Intent.ACTION_GET_CONTENT);
-//			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-//			filePrepareTask.execute(intent);
-//			ProgressDialog temp = null;
-//			try {
-//				temp = new ProgressDialog(this);
-//				temp.setMessage(getString(R.string.upload_prepare));
-//				temp.show();
-//			} catch (Exception e) {
-//				return;
-//			}
-//			statusDialog = temp;
-//		} else if (requestCode == REQUEST_CODE_GET_LOCAL
-//				&& resultCode == RESULT_OK) {
-//
-//			String folderPath = intent
-//					.getStringExtra(FileStorageActivity.EXTRA_PATH);
-//			ArrayList<String> paths = intent
-//					.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
-//
-//			int i = 0;
-//
-//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//			if (parentNode == null) {
-//				parentNode = megaApi.getRootNode();
-//			}
-//
-//			for (String path : paths) {
-//				Intent uploadServiceIntent = new Intent(this,
-//						UploadService.class);
-//				File file = new File(path);
-//				if (file.isDirectory()) {
-//					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH,
-//							file.getAbsolutePath());
-//					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME,
-//							file.getName());
-//					log("FOLDER: EXTRA_FILEPATH: " + file.getAbsolutePath());
-//					log("FOLDER: EXTRA_NAME: " + file.getName());
-//				} else {
-//					ShareInfo info = ShareInfo.infoFromFile(file);
-//					if (info == null) {
-//						continue;
-//					}
-//					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH,
-//							info.getFileAbsolutePath());
-//					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME,
-//							info.getTitle());
-//					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE,
-//							info.getSize());
-//					
-//					log("FILE: EXTRA_FILEPATH: " + info.getFileAbsolutePath());
-//					log("FILE: EXTRA_NAME: " + info.getTitle());
-//					log("FILE: EXTRA_SIZE: " + info.getSize());
-//				}
-//
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH,
-//						folderPath);
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH,
-//						parentNode.getHandle());
-//				log("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-//								
-//				startService(uploadServiceIntent);
-//				i++;
-//			}
-//
-//		} 
-//	}
-
-	/*
-	 * Background task to process files for uploading
-	 */
-	private class FilePrepareTask extends
-			AsyncTask<Intent, Void, List<ShareInfo>> {
-		Context context;
-
-		FilePrepareTask(Context context) {
-			this.context = context;
-		}
-
-		@Override
-		protected List<ShareInfo> doInBackground(Intent... params) {
-			return ShareInfo.processIntent(params[0], context);
-		}
-
-		@Override
-		protected void onPostExecute(List<ShareInfo> info) {
-			filePreparedInfos = info;
-			onIntentProcessed();
-		}
-	}
-
-	/*
-	 * Handle processed upload intent
-	 */
-	public void onIntentProcessed() {
-//		List<ShareInfo> infos = filePreparedInfos;
-//		if (statusDialog != null) {
-//			try {
-//				statusDialog.dismiss();
-//			} catch (Exception ex) {
-//			}
-//		}
-//
-//		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//		if (parentNode == null) {
-//			Util.showErrorAlertDialog(
-//					getString(R.string.error_temporary_unavaible), false, this);
-//			return;
-//		}
-//
-//		if (infos == null) {
-//			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
-//					false, this);
-//		} else {
-//			Toast.makeText(getApplicationContext(),
-//					getString(R.string.upload_began), Toast.LENGTH_SHORT)
-//					.show();
-//			for (ShareInfo info : infos) {
-//				Intent intent = new Intent(this, UploadService.class);
-//				intent.putExtra(UploadService.EXTRA_FILEPATH,
-//						info.getFileAbsolutePath());
-//				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-//				intent.putExtra(UploadService.EXTRA_PARENT_HASH,
-//						parentNode.getHandle());
-//				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-//				startService(intent);
-//			}
-//		}
-	}
-
-//	@Override
-//	public void onUsersUpdate(MegaApiJava api) {
-//		// TODO Auto-generated method stub
-//
-//	}
-//
-//
-//	@Override
-//	public void onReloadNeeded(MegaApiJava api) {
-//		// TODO Auto-generated method stub
-//
-//	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-
-	}
-//	
-//	@Override
-//	protected void onResume() {
-//    	log("onResume");
-//    	super.onResume();
-//    	
-//    	Intent intent = getIntent(); 
-//    	
-//    	if (intent != null) {    	
-//    		if (intent.getAction() != null){ 
-//    			if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){ 
-//    				String pathPdf=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_PDF);
-//    				
-//    				File pdfFile = new File(pathPdf);
-//    			    
-//    			    Intent intentPdf = new Intent();
-//    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-//    			    intentPdf.setClass(this, OpenPDFActivity.class);
-//    			    intentPdf.setAction("android.intent.action.VIEW");
-//    				this.startActivity(intentPdf);
-//    			}
-//    		}
-//    	}
-//    	
-//	}
-//
 	
 	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
 		this.mTHash = _mTHash;
@@ -961,119 +782,4 @@ public class ContactFileListFragment extends Fragment implements
 			adapter.setCurrentTransfer(mT);
 		}
 	}
-
-//	@Override
-//	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
-//		log("onTransferStart");
-//		
-//		HashMap<Long, MegaTransfer> mTHashLocal = new HashMap<Long, MegaTransfer>();
-//
-//		tL = megaApi.getTransfers();
-//
-//		for(int i=0; i<tL.size(); i++){
-//			
-//			MegaTransfer tempT = tL.get(i).copy();
-//			if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-//				long handleT = tempT.getNodeHandle();
-//				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-//				MegaNode parentT = megaApi.getParentNode(nodeT);
-//				
-//				if (parentT != null){
-//					if(parentT.getHandle() == this.parentHandle){	
-//						mTHashLocal.put(handleT,tempT);						
-//					}
-//				}
-//			}
-//		}
-//		
-//		setTransfers(mTHashLocal);
-//		
-//		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
-//	}
-//
-//	@Override
-//	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-//			MegaError e) {
-//		log("onTransferFinish");
-//		
-//		HashMap<Long, MegaTransfer> mTHashLocal = new HashMap<Long, MegaTransfer>();
-//
-//		tL = megaApi.getTransfers();
-//
-//		for(int i=0; i<tL.size(); i++){
-//			
-//			MegaTransfer tempT = tL.get(i).copy();
-//			if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-//				long handleT = tempT.getNodeHandle();
-//				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-//				MegaNode parentT = megaApi.getParentNode(nodeT);
-//				
-//				if (parentT != null){
-//					if(parentT.getHandle() == this.parentHandle){	
-//						mTHashLocal.put(handleT,tempT);						
-//					}
-//				}
-//			}
-//		}
-//		
-//		setTransfers(mTHashLocal);
-//		
-//		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
-//	}
-//
-//	@Override
-//	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-//		log("onTransferUpdate");
-//		
-//		if (mTHash == null){
-//			HashMap<Long, MegaTransfer> mTHashLocal = new HashMap<Long, MegaTransfer>();
-//
-//			tL = megaApi.getTransfers();
-//
-//			for(int i=0; i<tL.size(); i++){
-//				
-//				MegaTransfer tempT = tL.get(i).copy();
-//				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
-//					long handleT = tempT.getNodeHandle();
-//					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
-//					MegaNode parentT = megaApi.getParentNode(nodeT);
-//					
-//					if (parentT != null){
-//						if(parentT.getHandle() == this.parentHandle){	
-//							mTHashLocal.put(handleT,tempT);						
-//						}
-//					}
-//				}
-//			}
-//			
-//			setTransfers(mTHashLocal);
-//		}
-//
-//		if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
-//			Time now = new Time();
-//			now.setToNow();
-//			long nowMillis = now.toMillis(false);
-//			if (lastTimeOnTransferUpdate < 0){
-//				lastTimeOnTransferUpdate = now.toMillis(false);
-//				setCurrentTransfer(transfer);
-//			}
-//			else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
-//				lastTimeOnTransferUpdate = nowMillis;
-//				setCurrentTransfer(transfer);
-//			}			
-//		}		
-//	}
-//
-//	@Override
-//	public void onTransferTemporaryError(MegaApiJava api,
-//			MegaTransfer transfer, MegaError e) {
-//		log("onTransferTemporaryError");
-//	}
-//
-//	@Override
-//	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
-//			byte[] buffer) {
-//		log("onTransferData");
-//		return true;
-//	}
 }
