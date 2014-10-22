@@ -471,6 +471,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	void uploadNextImage(){
 		log("uploadNextImage");
 		totalUploaded++;
+		
+		int result = shouldRun();
+		if (result != 0){
+			retryLater();
+			return;
+		}
+		
 		if (cameraFiles.size() > 0){
 			Media media = cameraFiles.poll();
 			
@@ -485,15 +492,32 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			
 			if (nodeExists == null){
 				log("SUBIR EL FICHERO: " + media.filePath);
-				currentTimeStamp = media.timestamp;
 				Calendar cal = Calendar.getInstance();
 				cal.setTimeInMillis(media.timestamp);
 				log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
-				megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
+				boolean photoAlreadyExists = false;
+				NodeList nL = megaApi.getChildren(cameraUploadNode);
+				for (int i=0;i<nL.size();i++){
+					if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
+						photoAlreadyExists = true;
+					}
+				}
+				
+				if (!photoAlreadyExists){
+					currentTimeStamp = media.timestamp;
+					megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
+				}
+				else{
+					currentTimeStamp = media.timestamp;
+					dbH.setCamSyncTimeStamp(currentTimeStamp);
+					File f = new File(media.filePath);
+					totalSizeUploaded += f.length();
+					uploadNextImage();	
+				}
 			}
 			else{
-				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());
-				if (megaApi.getNodeByPath("/" + PHOTO_SYNC + "/" + nodeExists.getName()) == null){
+				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());				
+				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
 					currentTimeStamp = media.timestamp;
 					megaApi.copyNode(nodeExists, cameraUploadNode, this);
 				}
@@ -580,6 +604,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	public void retryLaterShortTime(){
 		log("retryLaterShortTime");
+		stopped = true;
+		running = false;
 		handler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -700,21 +726,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				megaApi.fetchNodes(this);
 			}
 			else{
-				retryLater();
-				finish();				
+				retryLaterShortTime();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
 				retryLaterShortTime();
-				finish();				
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MKDIR){		
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Folder created");
 				retryLaterShortTime();
-				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){

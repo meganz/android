@@ -630,7 +630,6 @@ public class Util {
 		String extension = "";
 		String[] s = fileName.split("\\.");
 		if (s != null){
-			log("SIZE " + s.length);
 			if (s.length > 0){
 				extension = s[s.length-1];
 			}
