@@ -221,7 +221,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			((TableRow.LayoutParams) holder.optionRemove.getLayoutParams()).setMargins(Util.px2dp((100*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 			holder.optionRemove.setPadding(0, Util.px2dp((8*scaleH), outMetrics), 0, 0);
 //			holder.optionRemove.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.transfers_list_arrow_selection);
+//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.transfers_list_arrow_selection);
 			holder.arrowSelection.setVisibility(View.GONE);
 
 			convertView.setTag(holder);
@@ -333,7 +333,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.textViewCompleted.setVisibility(View.VISIBLE);
 			holder.imageViewCompleted.setVisibility(View.VISIBLE);
 			holder.textViewCompleted.setText("Queued");
-			holder.imageViewCompleted.setImageResource(R.drawable.transferqueued);
+			holder.imageViewCompleted.setImageResource(R.drawable.ic_queue);
 			holder.transferProgressBar.setVisibility(View.GONE);
 			holder.textViewRate.setVisibility(View.GONE);
 		}
@@ -357,7 +357,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
@@ -365,7 +365,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 			}
 		}
 		else{
@@ -373,7 +373,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 		}
 		
 		holder.optionRemove.setTag(holder);

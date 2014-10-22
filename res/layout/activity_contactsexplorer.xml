@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/menu_add_contact"
-                android:src="@drawable/ic_action_hardware_phone" />
+                android:src="@drawable/ic_phone" />
             
             <ImageButton
                 android:id="@+id/contacts_explorer_add_contact"
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/menu_add_contact"
-                android:src="@drawable/ic_action_social_add_person" />
+                android:src="@drawable/ic_add_contact" />
         </LinearLayout>
 
         <TextView

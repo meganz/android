@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/menu_new_folder"
-                android:src="@drawable/ic_menu_new_folder_dark" />
+                android:src="@drawable/ic_create_folder" />
         </LinearLayout>
 
         <TextView

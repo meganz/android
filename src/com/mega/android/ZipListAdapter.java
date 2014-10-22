@@ -1,27 +1,19 @@
 package com.mega.android;
 
-import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
-
-import com.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
@@ -29,8 +21,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.mega.android.utils.Util;
 
 public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 	
@@ -100,7 +93,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
-			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
+			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
 			
 			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
@@ -148,7 +141,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 			holder.transferProgressBar.setVisibility(View.GONE);
 			holder.arrowSelection.setVisibility(View.GONE);
 			holder.checkbox.setVisibility(View.GONE);

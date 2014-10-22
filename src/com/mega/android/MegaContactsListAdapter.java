@@ -144,7 +144,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         ImageView statusImageView;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-        ImageView arrowSelection;
+//        ImageView arrowSelection;
         RelativeLayout optionsLayout;
         ImageButton optionProperties;
         ImageButton optionSend;
@@ -185,8 +185,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.optionSend.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionRemove = (ImageButton) convertView.findViewById(R.id.contact_list_option_remove);
 			holder.optionRemove.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
-			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.contact_list_arrow_selection);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.contact_list_arrow_selection);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			convertView.setTag(holder);
 		}
 		else{
@@ -274,28 +274,28 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
-				holder.arrowSelection.setVisibility(View.VISIBLE);
+//				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 				ListView list = (ListView) parent;
 				list.smoothScrollToPosition(_position);
 			}
 			else{
-				holder.arrowSelection.setVisibility(View.GONE);
+//				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 			}
 		}
 		else{
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 		}
 		
 		holder.optionProperties.setTag(holder);

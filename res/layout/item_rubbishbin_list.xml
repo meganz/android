@@ -55,13 +55,13 @@
         android:id="@+id/rubbishbin_list_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/three_dots_background_white"
+        android:src="@drawable/ic_three_dots"
 		android:background="@null" 
         android:layout_alignTop="@id/rubbishbin_list_filename"
         android:layout_alignParentRight="true"
 		android:paddingTop="25dp"
         android:paddingRight="15dp" />
-    
+    <!--  
     <ImageView
         android:id="@+id/rubbishbin_list_arrow_selection"
         android:layout_width="wrap_content"
@@ -69,13 +69,13 @@
         android:src="@drawable/arrow_selection"
 		android:layout_alignBottom="@id/rubbishbin_list_thumbnail"
         android:layout_alignParentRight="true"
-        android:paddingRight="15dp" />
+        android:paddingRight="15dp" />-->
     
     <RelativeLayout
         android:id="@+id/rubbishbin_list_options"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rubbishbin_list_arrow_selection"
+        android:layout_below="@id/rubbishbin_list_three_dots"
         android:padding="0dp"
         android:background="#222222">
         
@@ -98,7 +98,7 @@
 		            android:id="@+id/rubbishbin_list_option_delete_permanently"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/rubbisbin_list_option_delete"
+		            android:src="@drawable/ic_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 

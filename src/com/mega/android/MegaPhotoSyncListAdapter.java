@@ -65,7 +65,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
     	public TextView textViewFileSize;
     	public ImageButton imageButtonThreeDots;
     	public RelativeLayout itemLayout;
-    	public ImageView arrowSelection;
+//    	public ImageView arrowSelection;
     	public RelativeLayout optionsLayout;
     	public ImageView optionDownload;
     	public ImageView optionProperties;
@@ -159,8 +159,8 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			holder.optionDelete = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_delete);
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.photo_sync_list_arrow_selection);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.photo_sync_list_arrow_selection);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			
 			convertView.setTag(holder);
 		}
@@ -174,7 +174,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		}
 		else{
 			holder.checkbox.setVisibility(View.VISIBLE);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
 			
 			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
@@ -259,27 +259,27 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 
 		if (positionClicked != -1){
 			if (positionClicked == position){
-				holder.arrowSelection.setVisibility(View.VISIBLE);
+//				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
-				holder.arrowSelection.setVisibility(View.GONE);
+//				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 			}
 		}
 		else{
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_white);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 		}
 		
 		holder.optionDownload.setTag(holder);

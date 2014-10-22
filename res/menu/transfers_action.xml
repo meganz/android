@@ -3,7 +3,7 @@
        
     <item
         android:id="@+id/cab_menu_trash"
-        android:icon="@drawable/ic_menu_discard_dark"
+        android:icon="@drawable/ic_delete"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/context_move_to_trash"

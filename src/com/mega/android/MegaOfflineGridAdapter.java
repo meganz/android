@@ -163,11 +163,11 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
         TextView textViewFileSize2;
         ImageButton imageButtonThreeDots1;
         ImageButton imageButtonThreeDots2;
-        ImageView arrowSelection1;
+//        ImageView arrowSelection1;
         RelativeLayout optionsLayout1;
         ImageButton optionOpen1;
         ImageView optionDelete1;
-        ImageView arrowSelection2;
+//        ImageView arrowSelection2;
         RelativeLayout optionsLayout2;
         ImageButton optionOpen2;
         ImageView optionDelete2;
@@ -259,8 +259,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			holder.optionDelete1 = (ImageView) v.findViewById(R.id.offline_grid_option_delete1);
 			holder.optionDelete1.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.offline_grid_arrow_selection1);
-			holder.arrowSelection1.setVisibility(View.GONE);
+//			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.offline_grid_arrow_selection1);
+//			holder.arrowSelection1.setVisibility(View.GONE);
 
 			holder.optionsLayout2 = (RelativeLayout) v.findViewById(R.id.offline_grid_options2);
 			holder.optionOpen2 = (ImageButton) v.findViewById(R.id.offline_grid_option_open2);
@@ -268,8 +268,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			holder.optionDelete2 = (ImageView) v.findViewById(R.id.offline_grid_option_delete2);
 			holder.optionDelete2.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.offline_grid_arrow_selection2);
-			holder.arrowSelection2.setVisibility(View.GONE);
+//			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.offline_grid_arrow_selection2);
+//			holder.arrowSelection2.setVisibility(View.GONE);
 
 			holder.currentPosition = position;
 
@@ -448,7 +448,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			
 			if (positionClicked != -1){
 				if (positionClicked == position){
-					holder.arrowSelection1.setVisibility(View.VISIBLE);
+//					holder.arrowSelection1.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout1.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					listFragment.smoothScrollToPosition(_position);
@@ -459,12 +459,12 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 //					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					holder.optionDelete1.getLayoutParams().width = Util.px2dp((165*scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.arrowSelection2.setVisibility(View.GONE);
+//					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;
 				}
 				else if (positionClicked == (position+1)){
-					holder.arrowSelection2.setVisibility(View.VISIBLE);
+//					holder.arrowSelection2.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout2.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					listFragment.smoothScrollToPosition(_position);
@@ -474,26 +474,26 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 //					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					holder.optionDelete2.getLayoutParams().width = Util.px2dp((165*scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-					holder.arrowSelection1.setVisibility(View.GONE);
+//					holder.arrowSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 					params1.height = 0;
 				}
 				else{
-					holder.arrowSelection1.setVisibility(View.GONE);
+//					holder.arrowSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 					params1.height = 0;
 					
-					holder.arrowSelection2.setVisibility(View.GONE);
+//					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;
 				}
 			}
 			else{
-				holder.arrowSelection1.setVisibility(View.GONE);
+//				holder.arrowSelection1.setVisibility(View.GONE);
 				LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 				params1.height = 0;
 				
-				holder.arrowSelection2.setVisibility(View.GONE);
+//				holder.arrowSelection2.setVisibility(View.GONE);
 				LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 				params2.height = 0;
 			}

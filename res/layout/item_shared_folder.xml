@@ -48,14 +48,14 @@
         android:id="@+id/shared_folder_contact_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/three_dots_background_shared"
+        android:src="@drawable/ic_three_dots"
 		android:background="@null" 
         android:layout_alignTop="@id/shared_folder_contact_name"
         android:layout_alignParentRight="true"
 		android:paddingTop="25dp"
         android:paddingLeft="5dp"
         android:paddingRight="15dp" />
-    
+    <!--  
     <ImageView
         android:id="@+id/shared_folder_contact_arrow_selection"
         android:layout_width="wrap_content"
@@ -64,12 +64,12 @@
 		android:layout_alignBottom="@id/shared_folder_contact_permissions"
         android:layout_alignParentRight="true"
         android:paddingRight="15dp" />
-    
+    -->
     <RelativeLayout
         android:id="@+id/shared_folder_contact_options"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/shared_folder_contact_arrow_selection"
+        android:layout_below="@id/shared_folder_contact_three_dots"
         android:padding="0dp"
         android:background="#222222">
         
@@ -92,7 +92,7 @@
 		            android:id="@+id/shared_folder_remove_share_option"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/remove_share_button"
+		            android:src="@drawable/ic_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null"

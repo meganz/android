@@ -14,7 +14,7 @@
 	    android:orderInCategory="120"
 	    android:showAsAction="always"
 	    android:title="Delete"
-	    android:icon="@drawable/ic_menu_discard_dark"
+	    android:icon="@drawable/ic_delete"
 	    MEGA:showAsAction="always" />
 
 </menu>
