@@ -294,6 +294,13 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 		else{
 			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			
+			if (position == 0 && contactsFromPhone.size() == 0) {
+                TextView textView = (TextView) inflater.inflate(R.layout.file_list_empty, parentView, false);
+                int resId = R.string.manager_folder_is_empty;
+                textView.setText(mContext.getString(resId));
+                return textView;
+            }	
+			
 			PhoneContacts contact = (PhoneContacts) getItem(position);
 			
 			int layoutId;

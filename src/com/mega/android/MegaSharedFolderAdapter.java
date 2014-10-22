@@ -183,7 +183,6 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
         TextView textViewPermissions;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-        ImageView arrowSelection;
         RelativeLayout optionsLayout;
         ImageButton optionPermissions;
         ImageButton optionRemoveShare;
@@ -229,8 +228,8 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			holder.optionPermissions.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionRemoveShare = (ImageButton) convertView.findViewById(R.id.shared_folder_remove_share_option);
 			holder.optionRemoveShare.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.shared_folder_contact_arrow_selection);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.shared_folder_contact_arrow_selection);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			convertView.setTag(holder); 
 		}
 		else{
@@ -243,7 +242,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		}
 		else{
 			holder.checkbox.setVisibility(View.VISIBLE);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
 			
 			SparseBooleanArray checkedItems = listViewActivity.getCheckedItemPositions();
@@ -339,11 +338,11 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
-				holder.arrowSelection.setVisibility(View.VISIBLE);
+//				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_grey);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 				ListView list = (ListView) parent;
 				list.smoothScrollToPosition(_position);
 				
@@ -353,19 +352,19 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				((TableRow.LayoutParams) holder.optionRemoveShare.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), 0, 0);
 			}
 			else{
-				holder.arrowSelection.setVisibility(View.GONE);
+//				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_shared);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 			}
 		}
 		else{
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
-			holder.imageButtonThreeDots.setImageResource(R.drawable.three_dots_background_shared);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 		}
 		
 		if (share.getUser() != null){

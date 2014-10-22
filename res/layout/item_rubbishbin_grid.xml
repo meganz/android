@@ -55,7 +55,7 @@
 	        android:id="@+id/rubbishbin_grid_three_dots1"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:src="@drawable/three_dots_background_white"
+	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
 			android:paddingTop="10dp"
 	        android:paddingLeft="2dp"
@@ -64,7 +64,7 @@
 	        android:layout_gravity="right"
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>
-        
+        <!--  
         <ImageView
 	        android:id="@+id/rubbishbin_grid_arrow_selection1"
 	        android:layout_width="wrap_content"
@@ -73,7 +73,7 @@
 	        android:layout_below="@id/rubbishbin_grid_three_dots1"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
-			android:paddingRight="14dp" />
+			android:paddingRight="14dp" />-->
                
     </RelativeLayout>
     
@@ -104,7 +104,7 @@
 		            android:id="@+id/rubbishbin_grid_option_delete_permanently1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/rubbisbin_list_option_delete"
+		            android:src="@drawable/ic_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
@@ -170,7 +170,7 @@
 	        android:id="@+id/rubbishbin_grid_three_dots2"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:src="@drawable/three_dots_background_white"
+	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
 			android:paddingTop="10dp"
 	        android:paddingLeft="2dp"
@@ -179,7 +179,7 @@
 	        android:layout_gravity="right"
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>
-        
+        <!--  
         <ImageView
 	        android:id="@+id/rubbishbin_grid_arrow_selection2"
 	        android:layout_width="wrap_content"
@@ -188,7 +188,7 @@
 	        android:layout_below="@id/rubbishbin_grid_three_dots2"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
-			android:paddingRight="14dp" />
+			android:paddingRight="14dp" />-->
         
     </RelativeLayout>
 
@@ -218,7 +218,7 @@
 		            android:id="@+id/rubbishbin_grid_option_delete_permanently2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/rubbisbin_list_option_delete"
+		            android:src="@drawable/ic_delete"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 

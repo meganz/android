@@ -129,7 +129,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
     	public TextView textViewFileSize2;
     	public ImageButton imageButtonThreeDots1;
     	public ImageButton imageButtonThreeDots2;
-    	public ImageView arrowSelection1;
+//    	public ImageView arrowSelection1;
     	public RelativeLayout optionsLayout1;
 //        ImageButton optionOpen1;
     	public ProgressBar transferProgressBar1;
@@ -141,7 +141,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
     	public ImageView optionMove1;
     	public ImageView optionPublicLink1;
     	public ImageView optionDelete1;
-    	public ImageView arrowSelection2;
+//    	public ImageView arrowSelection2;
     	public RelativeLayout optionsLayout2;
 //        ImageButton optionOpen2;
     	public ImageView optionProperties2;
@@ -261,8 +261,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			holder.optionDelete1 = (ImageView) v.findViewById(R.id.file_grid_option_delete1);
 			holder.optionDelete1.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection1);
-			holder.arrowSelection1.setVisibility(View.GONE);
+//			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection1);
+//			holder.arrowSelection1.setVisibility(View.GONE);
 
 			holder.optionsLayout2 = (RelativeLayout) v.findViewById(R.id.file_grid_options2);
 //			holder.optionOpen2 = (ImageButton) v.findViewById(R.id.file_grid_option_open2);
@@ -288,8 +288,8 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			holder.optionDelete2 = (ImageView) v.findViewById(R.id.file_grid_option_delete2);
 			holder.optionDelete2.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection2);
-			holder.arrowSelection2.setVisibility(View.GONE);
+//			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.file_grid_arrow_selection2);
+//			holder.arrowSelection2.setVisibility(View.GONE);
 
 			
 			holder.transferProgressBar1 = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar1);
@@ -527,7 +527,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			
 			if (positionClicked != -1){
 				if (positionClicked == position){
-					holder.arrowSelection1.setVisibility(View.VISIBLE);
+//					holder.arrowSelection1.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout1.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					listFragment.smoothScrollToPosition(_position);
@@ -575,12 +575,12 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						holder.optionDelete1.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					}
-					holder.arrowSelection2.setVisibility(View.GONE);
+//					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;
 				}
 				else if (positionClicked == (position+1)){
-					holder.arrowSelection2.setVisibility(View.VISIBLE);
+//					holder.arrowSelection2.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout2.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					listFragment.smoothScrollToPosition(_position);
@@ -628,26 +628,26 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						holder.optionDelete2.getLayoutParams().width = Util.px2dp((55*scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
 					}
-					holder.arrowSelection1.setVisibility(View.GONE);
+//					holder.arrowSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 					params1.height = 0;
 				}
 				else{
-					holder.arrowSelection1.setVisibility(View.GONE);
+//					holder.arr7owSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 					params1.height = 0;
-					
-					holder.arrowSelection2.setVisibility(View.GONE);
+//					
+//					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;
 				}
 			}
 			else{
-				holder.arrowSelection1.setVisibility(View.GONE);
+//				holder.arrowSelection1.setVisibility(View.GONE);
 				LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 				params1.height = 0;
 				
-				holder.arrowSelection2.setVisibility(View.GONE);
+//				holder.arrowSelection2.setVisibility(View.GONE);
 				LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 				params2.height = 0;
 			}

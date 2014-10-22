@@ -1152,7 +1152,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
-	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_create_folder);
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
 	    			rubbishBinMenuItem.setEnabled(true);
 	    			addMenuItem.setIcon(R.drawable.ic_menu_add);
@@ -1192,7 +1192,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 	    			logoutMenuItem.setVisible(true);
 	    			
-	    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_add_contact);
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			rubbishBinMenuItem.setEnabled(false);
 	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1246,7 +1246,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			rubbishBinMenuItem.setEnabled(false);
 	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
+	    			createFolderMenuItem.setIcon(R.drawable.ic_delete);
 	    		}
 
     			break;
@@ -1361,10 +1361,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			logoutMenuItem.setVisible(true);
 	    			
 	    			if (downloadPlay){
-	    				addMenuItem.setIcon(R.drawable.ic_menu_pause);
+	    				addMenuItem.setIcon(R.drawable.ic_pause);
 	    			}
 	    			else{
-	    				addMenuItem.setIcon(R.drawable.ic_menu_play);
+	    				addMenuItem.setIcon(R.drawable.ic_play);
 	    			}
 	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			rubbishBinMenuItem.setEnabled(false);
@@ -1474,7 +1474,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			settingsMenuItem.setVisible(true);
         			logoutMenuItem.setVisible(true);
         			
-        			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+        			createFolderMenuItem.setIcon(R.drawable.ic_create_folder);
         			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
         			rubbishBinMenuItem.setEnabled(true);
         			addMenuItem.setIcon(R.drawable.ic_menu_add);
@@ -1720,7 +1720,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);   			
     			
-    			createFolderMenuItem.setIcon(R.drawable.ic_menu_new_folder_dark);
+    			createFolderMenuItem.setIcon(R.drawable.ic_create_folder);
     			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
     			rubbishBinMenuItem.setEnabled(true);
     			addMenuItem.setIcon(R.drawable.ic_menu_add);
@@ -1740,7 +1740,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
-    			createFolderMenuItem.setIcon(R.drawable.ic_action_social_add_person);
+    			createFolderMenuItem.setIcon(R.drawable.ic_add_contact);
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			rubbishBinMenuItem.setEnabled(false);
     			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1760,7 +1760,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			logoutMenuItem.setVisible(true);
     			
-    			createFolderMenuItem.setIcon(R.drawable.ic_menu_discard_dark);
+    			createFolderMenuItem.setIcon(R.drawable.ic_delete);
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			rubbishBinMenuItem.setEnabled(false);
     			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1823,10 +1823,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			logoutMenuItem.setVisible(true);
     			
     			if (downloadPlay){
-    				addMenuItem.setIcon(R.drawable.ic_menu_pause);
+    				addMenuItem.setIcon(R.drawable.ic_pause);
     			}
     			else{
-    				addMenuItem.setIcon(R.drawable.ic_menu_play);
+    				addMenuItem.setIcon(R.drawable.ic_play);
     			}
     			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			rubbishBinMenuItem.setEnabled(false);
@@ -2738,11 +2738,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (tF != null){
 					if (tF.isVisible()){
 						if (!downloadPlay){
-							addMenuItem.setIcon(R.drawable.ic_menu_play);
+							addMenuItem.setIcon(R.drawable.ic_play);
 							tF.setPause(true);
 						}
 						else{
-							addMenuItem.setIcon(R.drawable.ic_menu_pause);
+							addMenuItem.setIcon(R.drawable.ic_pause);
 							tF.setPause(false);
 						}		
 					}

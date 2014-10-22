@@ -58,7 +58,7 @@
 	        android:id="@+id/file_grid_three_dots1"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:src="@drawable/three_dots_background_white"
+	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
 			android:paddingTop="10dp"
 	        android:paddingLeft="2dp"
@@ -78,7 +78,7 @@
 		android:layout_margin="5dip" 
         android:layout_toLeftOf="@id/file_grid_three_dots1"
         android:layout_below="@id/file_grid_filename1" /> 
-        
+         <!--
         <ImageView
 	        android:id="@+id/file_grid_arrow_selection1"
 	        android:layout_width="wrap_content"
@@ -88,7 +88,7 @@
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
 			android:paddingRight="14dp" />
-               
+               -->
     </RelativeLayout>
     
     <RelativeLayout
@@ -118,7 +118,7 @@
 		            android:id="@+id/file_grid_option_download1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_download"
+		            android:src="@drawable/ic_download"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 
@@ -126,7 +126,7 @@
 		            android:id="@+id/file_grid_option_properties1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_properties"
+		            android:src="@drawable/ic_properties"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		        
@@ -134,7 +134,7 @@
 		            android:id="@+id/file_grid_option_rename1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_rename"
+		            android:src="@drawable/ic_rename"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		        
@@ -158,7 +158,7 @@
 		            android:id="@+id/file_grid_option_public_link1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_download_link" 
+		            android:src="@drawable/ic_share" 
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
 	        
@@ -166,7 +166,7 @@
 		            android:id="@+id/file_grid_option_delete1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_discard" 
+		            android:src="@drawable/ic_delete" 
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 	        </TableRow>        
@@ -230,7 +230,7 @@
 	        android:id="@+id/file_grid_three_dots2"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:src="@drawable/three_dots_background_white"
+	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
 			android:paddingTop="10dp"
 	        android:paddingLeft="2dp"
@@ -251,7 +251,7 @@
 		android:layout_margin="5dip"
         android:layout_toLeftOf="@id/file_grid_three_dots2"
         android:layout_below="@id/file_grid_filename2" />    
-  
+   <!--
         <ImageView
 	        android:id="@+id/file_grid_arrow_selection2"
 	        android:layout_width="wrap_content"
@@ -260,7 +260,7 @@
 	        android:layout_below="@id/file_grid_three_dots2"
 			android:layout_alignParentBottom="true"
 			android:layout_alignParentRight="true"
-			android:paddingRight="14dp" />
+			android:paddingRight="14dp" />-->
         
     </RelativeLayout>
 
@@ -290,7 +290,7 @@
 		            android:id="@+id/file_grid_option_download2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_download"
+		            android:src="@drawable/ic_download"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 
@@ -298,7 +298,7 @@
 		            android:id="@+id/file_grid_option_properties2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_properties" 
+		            android:src="@drawable/ic_properties" 
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		        
@@ -306,7 +306,7 @@
 		            android:id="@+id/file_grid_option_rename2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_rename" 
+		            android:src="@drawable/ic_rename" 
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		        
@@ -330,7 +330,7 @@
 		            android:id="@+id/file_grid_option_public_link2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_download_link" 
+		            android:src="@drawable/ic_share" 
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
 	        
@@ -338,7 +338,7 @@
 		            android:id="@+id/file_grid_option_delete2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_discard" 
+		            android:src="@drawable/ic_delete" 
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
 	        </TableRow>        

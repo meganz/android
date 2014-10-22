@@ -50,13 +50,13 @@
 	        android:id="@+id/photo_sync_list_three_dots"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:src="@drawable/three_dots_background_white"
+	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
 	        android:layout_alignTop="@id/photo_sync_list_filename"
 	        android:layout_alignParentRight="true"
 			android:paddingTop="25dp"
 	        android:paddingRight="15dp" />
-	    
+	     <!--
 	    <ImageView
 	        android:id="@+id/photo_sync_list_arrow_selection"
 	        android:layout_width="wrap_content"
@@ -64,13 +64,13 @@
 	        android:src="@drawable/arrow_selection"
 			android:layout_alignBottom="@id/photo_sync_list_thumbnail"
 	        android:layout_alignParentRight="true"
-	        android:paddingRight="15dp" />
+	        android:paddingRight="15dp" />-->
 	    
 	    <RelativeLayout
 	        android:id="@+id/photo_sync_list_options"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/photo_sync_list_arrow_selection"
+	        android:layout_below="@id/photo_sync_list_three_dots"
 	        android:padding="0dp"
 	        android:background="#222222">
 	        
@@ -93,7 +93,7 @@
 			            android:id="@+id/photo_sync_list_option_download"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_download"
+			            android:src="@drawable/ic_download"
 			            android:layout_gravity="center_vertical"
 			            style="@style/dialogActionButton" />
 	
@@ -101,7 +101,7 @@
 			            android:id="@+id/photo_sync_list_option_properties"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_properties"
+			            android:src="@drawable/ic_properties"
 			            android:layout_gravity="center_vertical"
 			            style="@style/dialogActionButton" />
 			        
@@ -109,7 +109,7 @@
 			            android:id="@+id/photo_sync_list_option_rename"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_rename"
+			            android:src="@drawable/ic_rename"
 			            android:layout_gravity="center_vertical"
 			            style="@style/dialogActionButton" />
 			        
@@ -133,7 +133,7 @@
 			            android:id="@+id/photo_sync_list_option_public_link"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_download_link"
+			            android:src="@drawable/ic_share"
 			            android:layout_gravity="center_vertical" 
 			            style="@style/dialogActionButton" />
 		        
@@ -141,7 +141,7 @@
 			            android:id="@+id/photo_sync_list_option_delete"
 			            android:layout_width="wrap_content"
 			            android:layout_height="wrap_content"
-			            android:src="@drawable/ic_menu_discard"
+			            android:src="@drawable/ic_delete"
 			            android:layout_gravity="center_vertical" 
 			            style="@style/dialogActionButton" />
 		        </TableRow>        

@@ -199,8 +199,8 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		emptyText = (TextView) v.findViewById(R.id.transfers_empty_text);
 		pauseText = (TextView) v.findViewById(R.id.transfers_pause_text);
 		
-		emptyImage.setImageResource(R.drawable.no_active_transfers);
-		pauseImage.setImageResource(R.drawable.paused_transfers);
+		emptyImage.setImageResource(R.drawable.ic_no_active_transfers);
+		pauseImage.setImageResource(R.drawable.ic_pause_tranfers);
 		emptyText.setText(getString(R.string.transfers_empty));
 		pauseText.setText(getString(R.string.transfers_pause));
 		

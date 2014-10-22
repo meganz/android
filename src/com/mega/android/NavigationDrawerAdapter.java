@@ -69,25 +69,25 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 		
 		switch(position){
 			case 0:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_cloud,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cloud_drive,0,0,0);
 				break;
 			case 1:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_saved,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_saved_for_offline,0,0,0);
 				break;
 			case 2:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_shared,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shared_with_me,0,0,0);
 				break;
 			case 3:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_contacts,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
 				break;
 			case 4:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_photosync,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
 				break;
 			case 5:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_transfers,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_transfers,0,0,0);
 				break;
 			case 6:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_account,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_my_account,0,0,0);
 				break;
 		}
 		

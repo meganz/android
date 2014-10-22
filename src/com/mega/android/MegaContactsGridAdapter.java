@@ -172,12 +172,12 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
         TextView textViewContent2;
         ImageButton imageButtonThreeDots1;
         ImageButton imageButtonThreeDots2;
-        ImageView arrowSelection1;
+//        ImageView arrowSelection1;
         RelativeLayout optionsLayout1;
         ImageButton optionProperties1;
         ImageButton optionSend1;
         ImageButton optionRemove1;
-        ImageView arrowSelection2;
+//        ImageView arrowSelection2;
         RelativeLayout optionsLayout2;
         ImageButton optionProperties2;
         ImageButton optionSend2;
@@ -286,8 +286,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			holder.optionSend1.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionRemove1 = (ImageButton) v.findViewById(R.id.contact_grid_option_remove1);
 			holder.optionRemove1.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.contact_grid_arrow_selection1);
-			holder.arrowSelection1.setVisibility(View.GONE);
+//			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.contact_grid_arrow_selection1);
+//			holder.arrowSelection1.setVisibility(View.GONE);
 
 			holder.optionsLayout2 = (RelativeLayout) v.findViewById(R.id.contact_grid_options2);
 			holder.optionProperties2 = (ImageButton) v.findViewById(R.id.contact_grid_option_properties2);
@@ -296,8 +296,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			holder.optionSend2.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionRemove2 = (ImageButton) v.findViewById(R.id.contact_grid_option_remove2);
 			holder.optionRemove2.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
-			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.contact_grid_arrow_selection2);
-			holder.arrowSelection2.setVisibility(View.GONE);
+//			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.contact_grid_arrow_selection2);
+//			holder.arrowSelection2.setVisibility(View.GONE);
 			
 			v.setTag(holder);
 			
@@ -431,41 +431,41 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			
 			if (positionClicked != -1){
 				if (positionClicked == position){
-					holder.arrowSelection1.setVisibility(View.VISIBLE);
+//					holder.arrowSelection1.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout1.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					ListView list = (ListView) parent;
 					list.smoothScrollToPosition(_position);
-					holder.arrowSelection2.setVisibility(View.GONE);
+//					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;
 				}
 				else if (positionClicked == (position+1)){
-					holder.arrowSelection2.setVisibility(View.VISIBLE);
+//					holder.arrowSelection2.setVisibility(View.VISIBLE);
 					LayoutParams params = holder.optionsLayout2.getLayoutParams();
 					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 					ListView list = (ListView) parent;
 					list.smoothScrollToPosition(_position);
-					holder.arrowSelection1.setVisibility(View.GONE);
+//					holder.arrowSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 					params1.height = 0;
 				}
 				else{
-					holder.arrowSelection1.setVisibility(View.GONE);
+//					holder.arrowSelection1.setVisibility(View.GONE);
 					LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 					params1.height = 0;
 					
-					holder.arrowSelection2.setVisibility(View.GONE);
+//					holder.arrowSelection2.setVisibility(View.GONE);
 					LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 					params2.height = 0;
 				}
 			}
 			else{
-				holder.arrowSelection1.setVisibility(View.GONE);
+//				holder.arrowSelection1.setVisibility(View.GONE);
 				LayoutParams params1 = holder.optionsLayout1.getLayoutParams();
 				params1.height = 0;
 				
-				holder.arrowSelection2.setVisibility(View.GONE);
+//				holder.arrowSelection2.setVisibility(View.GONE);
 				LayoutParams params2 = holder.optionsLayout2.getLayoutParams();
 				params2.height = 0;
 			}

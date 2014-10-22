@@ -210,7 +210,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		
 		if (megaContacts){
 			windowTitle.setText(getResources().getString(R.string.context_mega_contacts));
-			megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_hardware_phone));
+			megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_phone));
 			
 			contacts = megaApi.getContacts();
 			visibleContacts.clear();
@@ -237,7 +237,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		}
 		else{
 			windowTitle.setText(getResources().getString(R.string.context_phone_contacts));
-			megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_contacts_dark));
+			megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_contact));
 		}
 		
 		
@@ -295,7 +295,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 				if (megaContacts){
 					addContactButton.setVisibility(View.VISIBLE);
 					windowTitle.setText(getResources().getString(R.string.context_mega_contacts));
-					megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_action_hardware_phone));
+					megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_phone));
 					
 					contacts = megaApi.getContacts();
 					visibleContacts.clear();
@@ -324,7 +324,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 				else{
 					addContactButton.setVisibility(View.INVISIBLE);
 					windowTitle.setText(getResources().getString(R.string.context_phone_contacts));
-					megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu_contacts_dark));
+					megaPhoneContacts.setImageDrawable(getResources().getDrawable(R.drawable.ic_user_contact));
 					
 					if (adapter != null){
 						adapter.setMegaContacts(megaContacts);

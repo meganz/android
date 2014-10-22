@@ -70,7 +70,7 @@
 		    android:id="@+id/full_image_viewer_download"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
-		    android:src="@drawable/ic_menu_download"
+		    android:src="@drawable/ic_download"
 		    android:layout_centerVertical="true"
 		    android:layout_toLeftOf="@id/full_image_viewer_share"
 		    android:layout_marginRight="5dp"
