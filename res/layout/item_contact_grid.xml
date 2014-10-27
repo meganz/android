@@ -72,10 +72,10 @@
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
-			android:paddingTop="10dp"
+			android:paddingTop="6dp"
 	        android:paddingLeft="2dp"
 	        android:paddingRight="10dp"
-	        android:paddingBottom="8dp"
+	        android:paddingBottom="12dp"
 	        android:layout_gravity="right"
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>
@@ -97,7 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/contact_grid_item_layout1"
-        android:background="#222222"
+        android:background="#2a2a2a"
         android:layout_alignParentLeft="true">
         
         <TableLayout
@@ -200,10 +200,10 @@
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/ic_three_dots"
 			android:background="@null" 
-			android:paddingTop="10dp"
+			android:paddingTop="6dp"
 	        android:paddingLeft="2dp"
 	        android:paddingRight="10dp"
-	        android:paddingBottom="8dp"
+	        android:paddingBottom="12dp"
 	        android:layout_gravity="right"
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>
@@ -225,7 +225,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/contact_grid_item_layout2"
-        android:background="#222222">
+        android:background="#2a2a2a">
         
         <TableLayout
             android:layout_width="fill_parent"

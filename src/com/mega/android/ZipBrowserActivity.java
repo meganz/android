@@ -94,6 +94,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			if (temp.isShowing()){
 				try{
 					temp.dismiss();
+										
 					openFile(position);
 				}
 				catch(Exception e)
@@ -105,8 +106,25 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		
 		private boolean unpackZip()
 		{			
-			int index = pathZip.lastIndexOf("/");
-			String destination = pathZip.substring(0, index+1);			
+			
+			//TODO:Comprobar el flag, de ahora en adelante si está unzip tener en cuenta que estará en la carpeta correspondiente
+			
+			String destination;		
+			
+			if(folderzipped){
+				int index = pathZip.lastIndexOf("/");
+				destination = pathZip.substring(0, index+1);
+				log("Destination1: "+destination);
+			}
+			else{
+				int index = pathZip.lastIndexOf(".");
+				destination = pathZip.substring(0, index);		
+				destination = destination +"/";
+				log("Destination2: "+destination);
+				File f = new File(destination);
+				f.mkdirs();				
+			}								
+				
 			try 
 			{
 				FileInputStream fin = new FileInputStream(pathZipTask);
@@ -134,7 +152,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			{
 				e.printStackTrace();
 				return false;
-			}
+			}			
 		
 			return true;
 		}
@@ -272,8 +290,9 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			
 		}
 		else{
-			currentFolder="";
-			aB.setTitle("ZIP Browser");
+			
+			aB.setTitle("ZIP "+currentFolder);
+			//currentFolder="";
 			
 			try {
 				myZipFile = new ZipFile(pathZip);			
@@ -342,6 +361,13 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		}		
 		
 		String absolutePath= downloadLocationDefaultPath+"/"+currentPath;
+		 if(!folderzipped){			 
+			 int index = pathZip.lastIndexOf(".");
+			 absolutePath = pathZip.substring(0, index);		
+			 absolutePath = absolutePath +"/"+currentPath;
+		 }
+		
+		
 		log("The absolutePath of the file to open is: "+absolutePath);
 		 
 		if (MimeType.typeForName(absolutePath).isImage()){
@@ -425,18 +451,8 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		else{	
 			
 			String checkFolder = null;
-			
-			if(!folderzipped){
-				int index = pathZip.lastIndexOf("/");
-				checkFolder = pathZip.substring(0, index);
-				checkFolder = checkFolder+"/"+currentPath;
-				log(checkFolder+"/"+currentPath);
-			}
-			else{
-				int index = pathZip.lastIndexOf(".");
-				checkFolder = pathZip.substring(0, index);
-				log("checkFolder: "+checkFolder);
-			}
+			int index = pathZip.lastIndexOf(".");
+			checkFolder = pathZip.substring(0, index);
 
 			if(checkFolder!=null){
 				File check = new File(checkFolder);
@@ -459,9 +475,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 					}
 				}				
 				
-			}
-			
-									
+			}									
 		}			
 	}
 	
@@ -541,7 +555,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			
 		} 
 		else if (depth==3&&(!folderzipped)){
-			log("Entro por 4444444");
+			
 			currentPath="";
 			listDirectory(currentPath);	
 			this.setFolder(currentPath);
@@ -557,7 +571,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 				index = currentPath.lastIndexOf("/");		
 				currentPath = currentPath.substring(0, index+1);
 				depth=3;	
-				log("Entro por 11111");
+				
 			}
 			else{
 
@@ -565,14 +579,14 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 					currentPath=currentPath.substring(0, currentPath.length()-1);	
 					int index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index+1);
-					log("Entro por 22222");
+					
 				}
 				else{
 					int index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index);
 					index = currentPath.lastIndexOf("/");		
 					currentPath = currentPath.substring(0, index+1);
-					log("Entro por 33333");
+					
 				}	
 			}	
 			
@@ -600,7 +614,19 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			aB.setTitle("ZIP "+currentFolder);
 		}
 		else {
-			aB.setTitle("ZIP Browser");
+			parts = pathZip.split("/");
+			if(parts.length>0){
+
+				currentFolder= parts[parts.length-1];
+				parts = currentFolder.split(".");
+				
+				currentFolder= currentFolder.replace(".zip", "");
+				
+			}else{
+				currentFolder= pathZip;
+			}
+			
+			aB.setTitle("ZIP "+currentFolder);
 		}
 		//log("setFolder: "+currentFolder);
 		adapterList.setFolder(currentFolder);
