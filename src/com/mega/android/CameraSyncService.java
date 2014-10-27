@@ -369,7 +369,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			retryLater();
 		}
 		
-		return START_REDELIVER_INTENT;		
+		return START_NOT_STICKY;		
 	}
 	
 	void initSync(){
@@ -466,6 +466,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}		
 				
 		uploadNextImage();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	void uploadNextImage(){
