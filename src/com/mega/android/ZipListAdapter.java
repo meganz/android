@@ -42,7 +42,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		TextView textViewFileSize;
 		ImageButton imageButtonThreeDots;
 		RelativeLayout itemLayout;
-		ImageView arrowSelection;
+		//ImageView arrowSelection;
 		RelativeLayout optionsLayout;
 		//ImageView optionDownload;
 		//ImageView optionProperties;
@@ -137,13 +137,13 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 //		holder.textViewFileSize.setText(""+zipNode.getSize());		
 				
 		if (positionClicked == -1){
-			holder.arrowSelection.setVisibility(View.GONE);
+			//holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
 			holder.transferProgressBar.setVisibility(View.GONE);
-			holder.arrowSelection.setVisibility(View.GONE);
+			//holder.arrowSelection.setVisibility(View.GONE);
 			holder.checkbox.setVisibility(View.GONE);
 		}
 
