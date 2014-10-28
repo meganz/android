@@ -76,26 +76,7 @@
         android:paddingBottom="7dp"
         android:textColor="@color/file_list_second_row" />
     
-<!--     <ImageView
-        android:id="@+id/transfers_list_bar_structure"
-        android:layout_width="250dp"
-        android:layout_height="25dp"
-        android:src="@drawable/bar_structure_transfers"
-        android:layout_below="@id/transfers_list_filename"
-        android:layout_toRightOf="@id/transfers_list_thumbnail" 
-        android:paddingLeft="5dp"
-        android:paddingBottom="7dp" />
-    
-    <ImageView
-        android:id="@+id/transfers_list_bar_fill"
-        android:layout_width="170dp"
-        android:layout_height="25dp"
-        android:src="@drawable/bar_fill_transfers"
-        android:layout_below="@id/transfers_list_filename"
-        android:layout_toRightOf="@id/transfers_list_thumbnail" 
-        android:paddingLeft="7dp"
-        android:paddingBottom="7dp" />
- -->
+
      
     <ProgressBar
 	    android:id="@+id/transfers_list_bar"
@@ -117,15 +98,6 @@
         android:layout_alignParentRight="true"
 		android:paddingTop="12dp"
         android:paddingRight="15dp" />
-    <!-- 
-    <ImageView
-        android:id="@+id/transfers_list_arrow_selection"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/arrow_selection"
-		android:layout_alignBottom="@id/transfers_list_thumbnail"
-        android:layout_alignParentRight="true"
-        android:paddingRight="15dp" /> -->
     
     <RelativeLayout
         android:id="@+id/transfers_list_options"

@@ -28,16 +28,6 @@
         rounded:border_width="2dp"
         rounded:border_color="@color/border_file_properties"/>
                 
-        <ImageView
-	        android:id="@+id/contact_grid_status_dot1"
-	        android:layout_width="wrap_content"
-			android:layout_height="30dp"
-			android:layout_alignParentTop="true"
-			android:layout_alignParentRight="true" 
-	        android:paddingTop="5dp"
-	        android:paddingRight="15dp"
-	        android:src="@drawable/contact_green_dot" />
-        
         <View
 	        android:id="@+id/contact_grid_separator1"
 	 		android:layout_width="wrap_content"
@@ -156,17 +146,7 @@
 	        rounded:corner_radius="27dp" 
 	        rounded:border_width="2dp"
 	        rounded:border_color="@color/border_file_properties"/>
-        
-        <ImageView
-	        android:id="@+id/contact_grid_status_dot2"
-	        android:layout_width="wrap_content"
-			android:layout_height="30dp"
-			android:layout_alignParentTop="true"
-			android:layout_alignParentRight="true" 
-	        android:paddingTop="5dp"
-	        android:paddingRight="15dp"
-	        android:src="@drawable/contact_green_dot" />
-        
+
         <View
 	        android:id="@+id/contact_grid_separator2"
 	 		android:layout_width="wrap_content"

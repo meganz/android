@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
@@ -37,10 +38,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Shader.TileMode;
 import android.net.Uri;
@@ -115,6 +118,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+	
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -174,6 +179,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private TableLayout topControlBar;
 	private TableLayout bottomControlBar;
 	private ImageView imageProfile;
+	private TextView textViewProfile;
 	private TextView userName;
 	private TextView userEmail;
 	private TextView usedSpaceText;
@@ -340,6 +346,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		setContentView(R.layout.activity_manager);
 
 		imageProfile = (ImageView) findViewById(R.id.profile_photo);
+		textViewProfile = (TextView) findViewById(R.id.profile_textview);
 		userEmail = (TextView) findViewById(R.id.profile_user_email);
 		userEmail.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 		userEmail.getLayoutParams().width = Util.px2dp((235*scaleW), outMetrics);
@@ -361,8 +368,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         usedSpaceBar = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
         usedSpaceBar.setProgress(0);
-//        barFill = (ImageView) findViewById(R.id.bar_fill);
-//        barStructure = (ImageView) findViewById(R.id.bar_structure);
         
         if (!Util.isOnline(this)){
         	
@@ -2677,6 +2682,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			boolean avatarExists = false;
 			if (e.getErrorCode() == MegaError.API_OK){
 				
 				File avatar = null;
@@ -2697,6 +2703,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							avatar.delete();
 						}
 						else{
+							avatarExists = true;
 							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
 							
 							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
@@ -2716,6 +2723,44 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 			}
+			
+			if (!avatarExists){
+				log("No existe el AVATAR");
+				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+				Canvas c = new Canvas(defaultAvatar);
+				Paint p = new Paint();
+				p.setAntiAlias(true);
+				p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+				
+				int radius; 
+		        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+		        	radius = defaultAvatar.getWidth()/2;
+		        else
+		        	radius = defaultAvatar.getHeight()/2;
+		        
+				c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+				imageProfile.setImageBitmap(defaultAvatar);
+				
+				Display display = getWindowManager().getDefaultDisplay();
+				DisplayMetrics outMetrics = new DisplayMetrics ();
+			    display.getMetrics(outMetrics);
+			    float density  = getResources().getDisplayMetrics().density;
+			    
+			    int avatarTextSize = getAvatarTextSize(density);
+			    log("DENSITY: " + density + ":::: " + avatarTextSize);
+			    if (request.getEmail() != null){
+				    if (request.getEmail().length() > 0){
+				    	log("TEXT: " + request.getEmail());
+				    	log("TEXT AT 0: " + request.getEmail().charAt(0));
+				    	String firstLetter = request.getEmail().charAt(0) + "";
+				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				    	textViewProfile.setText(firstLetter);
+				    	textViewProfile.setTextSize(32);
+				    	textViewProfile.setTextColor(Color.WHITE);
+				    }
+			    }				
+			}
+			
 			log("avatar user downloaded");
 		}
 		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
@@ -2765,6 +2810,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
+	}
+	
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,MegaError e) {
 		log("onRequestTemporaryError");

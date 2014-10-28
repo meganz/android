@@ -35,6 +35,9 @@
     <color name="contact_list_second_row">#848484</color>
     <color name="photo_sync_month_layout">#333333</color>
     
+    <color name="color_default_avatar_mega">#d90007</color>
+    <color name="color_default_avatar_phone">#777777</color>
+    
     
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
