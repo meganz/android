@@ -22,15 +22,7 @@
         android:layout_height="30dp"
         android:layout_toRightOf="@id/contact_list_thumbnail"
         android:paddingLeft="5dp"
-        android:paddingTop="7dp" />
-    
-    <ImageView
-        android:id="@+id/contact_list_status_dot"
-        android:layout_width="wrap_content"
-		android:layout_height="30dp" 
-        android:layout_toRightOf="@id/contact_list_name" 
-        android:paddingTop="5dp"
-        android:paddingLeft="5dp" />
+        android:paddingTop="7dp" />  
     
     <TextView
         android:id="@+id/contact_list_content"

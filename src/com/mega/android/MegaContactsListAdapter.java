@@ -141,7 +141,6 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
-        ImageView statusImageView;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
@@ -175,7 +174,6 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_item_layout);
 			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail);	        
 			holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_list_name);
-			holder.statusImageView = (ImageView) convertView.findViewById(R.id.contact_list_status_dot);
 			holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_list_content);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_options);
@@ -255,19 +253,6 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		String sharedNodesDescription = getDescription(sharedNodes);
 		
 		holder.textViewContent.setText(sharedNodesDescription);
-		
-        if (position < 2){
-        	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
-        }
-        else if (position == 2){
-        	holder.statusImageView.setImageResource(R.drawable.contact_yellow_dot);
-        }
-        else if (position == 3){
-        	holder.statusImageView.setImageResource(R.drawable.contact_red_dot);
-        }
-        else{
-        	holder.statusImageView.setImageResource(R.drawable.contact_green_dot);
-        }
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);

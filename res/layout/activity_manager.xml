@@ -31,13 +31,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             
-            <ImageView
-		    android:id="@+id/profile_photo" 
-		    android:layout_width="55dp"
-		    android:layout_height="55dp"
-		    android:paddingLeft="5dp"
-		    android:paddingTop="5dp"
-		    android:paddingBottom="5dp" />
+            <RelativeLayout
+                android:id="@+id/relative_layout_profile_avatar"
+                android:layout_width="55dp"
+				android:layout_height="55dp"
+				android:paddingLeft="5dp"
+			    android:paddingTop="5dp"
+			    android:paddingBottom="5dp" >
+            
+	            <ImageView
+				    android:id="@+id/profile_photo" 
+				    android:layout_width="55dp"
+				    android:layout_height="55dp" />
+	            
+	            <TextView
+	                android:id="@+id/profile_textview"
+	                android:layout_width="55dp"
+				    android:layout_height="wrap_content"
+				    android:paddingLeft="13dp" />
+	            
+	        </RelativeLayout>
             
             <TableLayout 
                 android:layout_width="fill_parent"
@@ -122,29 +135,6 @@
 					android:layout_height="wrap_content" 
 					style="@style/MEGAProgressBar"  
 					android:layout_margin="5dip" />
-                
-<!--                 <ImageView
-                    android:id="@+id/bar_structure"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|left"
-                    android:src="@drawable/bar_structure" 
-                    android:paddingLeft="3dp" 
-                    android:paddingRight="3dp"
-                    android:paddingTop="3dp"
-                    android:paddingBottom="3dp"/>
-                
-                <ImageView
-                    android:id="@+id/bar_fill"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|left" 
-                    android:src="@drawable/bar_fill"
-                    android:paddingLeft="5dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="10dp"
-                    android:layout_alignTop="@+id/bar_structure" />
- -->               
             </RelativeLayout>
         </TableRow>
 		

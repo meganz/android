@@ -161,11 +161,9 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	/*private view holder class*/
     private class ViewHolderContactsGrid {
         RoundedImageView imageView1;
-        ImageView statusImage1;
         TextView textViewContactName1;
         RelativeLayout itemLayout1;
         RoundedImageView imageView2;
-        ImageView statusImage2;
         TextView textViewContactName2;
         RelativeLayout itemLayout2;
         TextView textViewContent1;
@@ -242,13 +240,6 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
             
             holder.imageView2.setTag(holder);
             holder.imageView2.setOnClickListener(this);
-            
-            holder.statusImage1 = (ImageView) v.findViewById(R.id.contact_grid_status_dot1);
-            holder.statusImage2 = (ImageView) v.findViewById(R.id.contact_grid_status_dot2);
-            if (position == 2){
-            	holder.statusImage1.setImageResource(R.drawable.contact_yellow_dot);
-            	holder.statusImage2.setImageResource(R.drawable.contact_red_dot);
-            }
                         
 			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
 			paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -302,15 +293,6 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			v.setTag(holder);
 			
 			holder.currentPosition = position;
-			
-			if (position == 2){
-            	holder.statusImage1.setImageResource(R.drawable.contact_yellow_dot);
-            	holder.statusImage2.setImageResource(R.drawable.contact_red_dot);
-            }
-			else{
-				holder.statusImage1.setImageResource(R.drawable.contact_green_dot);
-            	holder.statusImage2.setImageResource(R.drawable.contact_green_dot);
-			}
 
 			MegaUser contact1 = (MegaUser) getItem(position);
 			holder.contactMail1 = contact1.getEmail();
