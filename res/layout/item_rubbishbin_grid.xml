@@ -88,8 +88,8 @@
         <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
-            
-            <TableRow>
+             
+            <TableRow><!-- 
 	            <ImageButton
 		            android:id="@+id/rubbishbin_grid_option_undo1"
 		            android:layout_width="wrap_content"
@@ -108,7 +108,7 @@
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
+		            android:layout_gravity="center_vertical"/> -->
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>
@@ -204,6 +204,7 @@
             android:layout_height="wrap_content">
             
             <TableRow>
+                <!--  
 	            <ImageButton
 		            android:id="@+id/rubbishbin_grid_option_undo2"
 		            android:layout_width="wrap_content"
@@ -222,7 +223,7 @@
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
+		            android:layout_gravity="center_vertical"/>-->
 	        </TableRow>        
         </TableLayout>
     </RelativeLayout>
