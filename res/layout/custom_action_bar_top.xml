@@ -27,15 +27,14 @@
                  android:visibility="visible"
                  android:layout_marginTop="4dip"
                  android:layout_marginBottom="4dip"
-                 android:layout_marginLeft="4dip"
-                 android:layout_marginRight="4dip"
+
                  android:scaleType="fitCenter"
                  android:adjustViewBounds="true"
                  android:clickable="false"
                  android:focusable="false" 
                  android:background="@drawable/selectable_background_mega" />
 	</LinearLayout>
-
+<!-- 
  	<LinearLayout
         android:id="@+id/custom_grid"
         android:layout_width="wrap_content"
@@ -49,13 +48,11 @@
 	                 android:visibility="visible"
 	                 android:layout_marginTop="4dip"
 	                 android:layout_marginBottom="4dip"
-	                 android:layout_marginLeft="4dip"
-	                 android:layout_marginRight="4dip"
 	                 android:scaleType="fitCenter"
 	                 android:adjustViewBounds="true"
 	                 android:clickable="false"
 	                 android:focusable="false"
 	                 android:background="@drawable/selectable_background_mega" />
-    </LinearLayout>
+    </LinearLayout> -->
     
 </LinearLayout>

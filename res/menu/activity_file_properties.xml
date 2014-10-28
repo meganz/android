@@ -14,7 +14,7 @@
 	    android:orderInCategory="100"
 	    android:showAsAction="always"
 	    android:title="@string/context_share_folder"
-	    android:icon="@drawable/ic_share_folder"
+	    android:icon="@drawable/ic_share"
 	    MEGA:showAsAction="always" />
 	
 	<item

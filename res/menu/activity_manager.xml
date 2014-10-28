@@ -20,48 +20,73 @@
 -->
 
 	<item
-	    android:id="@+id/action_new_folder"
-	    android:orderInCategory="100"
-	    android:showAsAction="always"
-	    android:title="@string/action_create_folder"
-	    android:icon="@drawable/ic_create_folder"
-	    MEGA:showAsAction="ifRoom" />
-	
-	<item
 	    android:id="@+id/action_add"
-	    android:orderInCategory="105"
-	    android:showAsAction="always"
-	    android:title="@string/action_add"
-	    android:icon="@drawable/ic_menu_add"
-	    MEGA:showAsAction="ifRoom" />
-	
-	<item
-	    android:id="@+id/action_rubbish_bin"
-	    android:orderInCategory="110"
-	    android:showAsAction="always"
-	    android:title="@string/section_rubbish_bin"
-	    android:icon="@drawable/ic_menu_upload_here_dark"
-	    MEGA:showAsAction="ifRoom" />
-	
-	<item
-	    android:id="@+id/action_menu_refresh"
-	    android:orderInCategory="115"
+	    android:orderInCategory="100"
 	    android:showAsAction="never"
-	    android:title="@string/action_refresh"
+	    android:title="@string/action_add"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_add_contact"
+	    android:orderInCategory="100"
+	    android:showAsAction="never"
+	    android:title="@string/menu_add_contact"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+
+	<item
+	    android:id="@+id/action_new_folder"
+	    android:orderInCategory="105"
+	    android:showAsAction="never"
+	    android:title="@string/action_create_folder"
+		android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_select"
+	    android:orderInCategory="110"
+	    android:showAsAction="never"
+	    android:title="@string/action_select"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_menu_sort_by"
-	    android:orderInCategory="120"
+	    android:orderInCategory="115"
 	    android:showAsAction="never"
 	    android:title="@string/action_sort_by"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	
 	<item
-	    android:id="@+id/action_menu_help"
+	    android:id="@+id/action_grid"
+	    android:orderInCategory="120"
+	    android:showAsAction="never"
+	    android:title="@string/action_grid"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+<!--  	
+	<item
+	    android:id="@+id/action_rubbish_bin"
+	    android:orderInCategory="110"
+	    android:showAsAction="never"
+	    android:title="@string/section_rubbish_bin"
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />-->
+	
+	<item
+	    android:id="@+id/action_menu_refresh"
 	    android:orderInCategory="125"
+	    android:showAsAction="never"
+	    android:title="@string/action_refresh"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_menu_help"
+	    android:orderInCategory="130"
 	    android:showAsAction="never"
 	    android:title="@string/action_help"
 	    android:icon="@drawable/ic_action_bar_null"
@@ -69,25 +94,27 @@
     
 	<item
 	    android:id="@+id/action_menu_upgrade_account"
-	    android:orderInCategory="130"
+	    android:orderInCategory="135"
 	    android:showAsAction="never"
 	    android:title="@string/action_upgrade_account"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	
-	<item
-	    android:id="@+id/action_menu_settings"
-	    android:orderInCategory="130"
-	    android:showAsAction="never"
-	    android:title="@string/action_settings"
-	    android:icon="@drawable/ic_action_bar_null"
-	    MEGA:showAsAction="never" />
-	
+
+	<!--  
 	<item
 	    android:id="@+id/action_menu_logout"
 	    android:orderInCategory="135"
 	    android:showAsAction="never"
 	    android:title="@string/action_logout"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />-->
+	
+		<item
+	    android:id="@+id/action_menu_settings"
+	    android:orderInCategory="140"
+	    android:showAsAction="never"
+	    android:title="@string/action_settings"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 </menu>

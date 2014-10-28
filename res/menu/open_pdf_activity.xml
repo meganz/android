@@ -6,7 +6,7 @@
 	    android:orderInCategory="100"
 	    android:showAsAction="always"
 	    android:title="@string/open_pdf_action_zoomDown"
-	    android:icon="@drawable/zoom_out"
+	    android:icon="@drawable/zoom_down_normal"
 	    MEGA:showAsAction="always" />
     	
     	<item
@@ -14,7 +14,7 @@
 	    android:orderInCategory="105"
 	    android:showAsAction="always"
 	    android:title="@string/open_pdf_action_zoomUp"
-	    android:icon="@drawable/zoom_in"
+	    android:icon="@drawable/zoom_up_normal"
 	    MEGA:showAsAction="always" />
     	
     	<item

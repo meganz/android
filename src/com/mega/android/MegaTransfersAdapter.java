@@ -154,7 +154,6 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
     	public ProgressBar transferProgressBar;
     	public ImageButton imageButtonThreeDots;
     	public RelativeLayout itemLayout;
-    	public ImageView arrowSelection;
     	public RelativeLayout optionsLayout;
     	public ImageButton optionRemove;
     	public int currentPosition;
@@ -222,7 +221,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			holder.optionRemove.setPadding(0, Util.px2dp((8*scaleH), outMetrics), 0, 0);
 //			holder.optionRemove.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 //			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.transfers_list_arrow_selection);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 
 			convertView.setTag(holder);
 		}
@@ -255,7 +254,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		}
 		else{
 			holder.checkbox.setVisibility(View.VISIBLE);
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
 			
 			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
@@ -353,7 +352,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
-				holder.arrowSelection.setVisibility(View.VISIBLE);
+//				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
@@ -361,7 +360,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
-				holder.arrowSelection.setVisibility(View.GONE);
+//				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -369,7 +368,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			}
 		}
 		else{
-			holder.arrowSelection.setVisibility(View.GONE);
+//			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);

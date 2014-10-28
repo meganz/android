@@ -6,6 +6,6 @@
 	    android:orderInCategory="110"
 	    android:showAsAction="always"
 		android:title="@string/context_share_folder"
-	    android:icon="@drawable/ic_share_folder"
+	    android:icon="@drawable/ic_share"
 	    MEGA:showAsAction="always" />
 </menu>
