@@ -53,7 +53,8 @@ CPP_SOURCES= sdk/src/attrmap.cpp \
     sdk/src/posix/net.cpp \
     sdk/src/gfx.cpp \
     sdk/src/gfx/external.cpp \
-    sdk/src/thread/posixthread.cpp
+    sdk/src/thread/posixthread.cpp \
+    sdk/src/logging.cpp
     
 C_SOURCES = sqlite3.c sdk/third_party/glob/glob.c
 
@@ -99,7 +100,8 @@ HEADERS= sdk/include/mega.h \
         sdk/include/mega/config-android.h \
         sdk/third_party/glob/glob.h \
         sdk/include/mega/gfx/external.h \
-        sdk/include/mega/thread/posixthread.h
+        sdk/include/mega/thread/posixthread.h \
+        sdk/include/mega/logging.h
 
 OBJECTS=$(CPP_SOURCES:.cpp=.o) $(C_SOURCES:.c=.o)
 C_WRAPPER_SOURCES = sdk/src/megaapi.cpp sdk/src/megaapi_impl.cpp

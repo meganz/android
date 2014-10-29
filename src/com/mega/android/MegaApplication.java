@@ -1,20 +1,12 @@
 package com.mega.android;
 
-import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
-
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
 import android.util.Log;
 
 public class MegaApplication extends Application
@@ -28,6 +20,9 @@ public class MegaApplication extends Application
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		MegaApiAndroid.setLoggerClass(new AndroidLogger());
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_DEBUG);
 //		new MegaTest(getMegaApi()).start();
 	}
 	
