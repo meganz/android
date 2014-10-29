@@ -524,9 +524,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onNodesUpdate(MegaApiJava api) {
 		log("onNodesUpdate");
-		nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
-		fe.setNodes(nodes);
-		fe.getListView().invalidateViews();
+		if (fe != null){
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
+			fe.setNodes(nodes);
+			fe.getListView().invalidateViews();
+		}
 	}
 
 	@Override
