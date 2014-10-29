@@ -398,7 +398,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 //	    permissionButton = menu.findItem(R.id.action_file_contact_list_permissions);
 //	    deleteShareButton = menu.findItem(R.id.action_file_contact_list_delete);
 	    addSharingContact = menu.findItem(R.id.action_folder_contacts_list_share_folder);
-	    
+	    	    
 //	    permissionButton.setVisible(false);
 //	    deleteShareButton.setVisible(false);
 	    addSharingContact.setVisible(true);

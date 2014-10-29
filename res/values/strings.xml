@@ -29,6 +29,9 @@
     <string name="general_pro_2">Pro II</string>
     <string name="general_pro_3">Pro III</string>
     
+    
+    <string name="action_change_mode_in">Incoming Shares</string>
+    <string name="action_change_mode_out">Outcoming Shares</string>
     <string name="action_logout">Logout</string>
     <string name="action_add">Upload&#8230;</string>
     <string name="action_create_folder">Create new folder</string>

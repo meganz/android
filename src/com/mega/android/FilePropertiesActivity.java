@@ -170,8 +170,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
-		aB.setDisplayShowTitleEnabled(false);
+		aB.setDisplayShowTitleEnabled(true);
 		aB.setLogo(R.drawable.ic_action_navigation_accept);
+		aB.setTitle(getString(R.string.file_properties_activity));
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();

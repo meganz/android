@@ -154,6 +154,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int PHOTO_SYNC_ADAPTER = 2007;
 	final public static int ZIP_ADAPTER = 2008;
 	
+	public static int MODE_IN = 0;
+	public static int MODE_OUT = 1;
+	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -173,6 +176,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem selectMenuItem;
 	private MenuItem thumbViewMenuItem;
 	private MenuItem addContactMenuItem;
+	private MenuItem modeShareIn;
+	private MenuItem modeShareOut;
 	
 	private static DrawerItem drawerItem;
 	
@@ -1202,7 +1207,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //	    			logoutMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
-	    			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //	    			createFolderMenuItem.setIcon(R.drawable.ic_add_contact);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
@@ -1254,7 +1260,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //	    			logoutMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
-	    			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
 //	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1268,19 +1275,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if (swmF == null){
     				swmF = new SharedWithMeFragment();
-    				swmF.setParentHandle(megaApi.getInboxNode().getHandle());
-    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
+    				//TODO cuando llegas a esto?
+//    				swmF.setParentHandle(megaApi.getInboxNode().getHandle());
+//    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
     				swmF.setIsList(isListSharedWithMe);
     				swmF.setOrder(orderGetChildren);
-    				NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-    				swmF.setNodes(nodes);
+//    				NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+//    				swmF.setNodes(nodes);
     			}
     			else{
     				swmF.setIsList(isListSharedWithMe);
     				swmF.setParentHandle(parentHandleSharedWithMe);
     				swmF.setOrder(orderGetChildren);
-    				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
-    				swmF.setNodes(nodes);
+//    				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
+//    				swmF.setNodes(nodes);
     			}
     			
     			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, swmF, "swmF").commit();
@@ -1305,8 +1313,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
+	    			selectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
+	    			
+	    			if(swmF.getModeShare()==MODE_IN){
+	    				modeShareOut.setVisible(true);	
+	    				modeShareIn.setVisible(false);	
+	    			}
+	    			else{
+	    				modeShareIn.setVisible(true);
+	    				modeShareOut.setVisible(false);
+	    			}	    			   			
 	    			
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
@@ -1342,7 +1359,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
-	    			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
 //	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1377,7 +1395,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
-
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 	    			
 	    			if (downloadPlay){
 	    				addMenuItem.setIcon(R.drawable.ic_pause);
@@ -1455,7 +1476,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //	    			logoutMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
-//	    			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
 //	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1496,7 +1518,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
 //        			logoutMenuItem.setVisible(true);
-        			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //        			createFolderMenuItem.setIcon(R.drawable.ic_create_folder);
 //        			rubbishBinMenuItem.setIcon(R.drawable.ic_menu_rubbish);
 //        			rubbishBinMenuItem.setEnabled(true);
@@ -1538,10 +1561,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
+	    			selectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
-	    			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
 //	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1734,6 +1758,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		helpMenuItem = menu.findItem(R.id.action_menu_help);
 		upgradeAccountMenuItem = menu.findItem(R.id.action_menu_upgrade_account);
 		settingsMenuItem = menu.findItem(R.id.action_menu_settings);
+		modeShareIn = menu.findItem(R.id.action_change_mode_in);
+		modeShareOut =  menu.findItem(R.id.action_change_mode_out);
 //		logoutMenuItem = menu.findItem(R.id.action_menu_logout);
 		
 		if (fbF != null){
@@ -1749,6 +1775,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
 //    			logoutMenuItem.setVisible(true);   			
     			
 //    			createFolderMenuItem.setIcon(R.drawable.ic_create_folder);
@@ -1773,7 +1801,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
-    			
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
 //    			createFolderMenuItem.setIcon(R.drawable.ic_add_contact);
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //    			rubbishBinMenuItem.setEnabled(false);
@@ -1796,7 +1825,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
-    			
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
 //    			createFolderMenuItem.setIcon(R.drawable.ic_delete);
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //    			rubbishBinMenuItem.setEnabled(false);
@@ -1816,8 +1846,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
+    			
+    			
+    			if(swmF.getModeShare()==MODE_IN){
+    				modeShareOut.setVisible(true);	
+    				modeShareIn.setVisible(false);	
+    			}
+    			else{
+    				modeShareIn.setVisible(true);
+    				modeShareOut.setVisible(false);
+    			}	    			   			
+    			
 //    			logoutMenuItem.setVisible(true);
     			
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1843,7 +1884,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
-    			
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //    			rubbishBinMenuItem.setEnabled(false);
 //    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1867,6 +1909,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
     			
     			if (downloadPlay){
     				addMenuItem.setIcon(R.drawable.ic_pause);
@@ -1902,7 +1946,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
-    			
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //    			rubbishBinMenuItem.setEnabled(false);
 //    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1927,7 +1972,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
-	    			
+	    			modeShareIn.setVisible(false);
+	    			modeShareOut.setVisible(false);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
 //	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1949,10 +1995,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
-    			
+    			modeShareIn.setVisible(false);
+    			modeShareOut.setVisible(false);
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //    			rubbishBinMenuItem.setEnabled(false);
 //    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -2113,45 +2160,85 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			fragTransaction.commit();
 
 	        		}
+	        	}
 
-	        		if (oF != null){
-	        			if (oF.isVisible()){
-	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oF");
-	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commit();
+        		if (oF != null){
+        			if (oF.isVisible()){
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oF");
+        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+        				fragTransaction.detach(currentFragment);
+        				fragTransaction.commit();
 
-	        				isListOffline = !isListOffline;
-	        				oF.setIsList(isListOffline);						
-	        				oF.setPathNavigation(pathNavigation);
-	        				//oF.setGridNavigation(false);
-	        				//oF.setParentHandle(parentHandleSharedWithMe);
+        				isListOffline = !isListOffline;
+        				oF.setIsList(isListOffline);						
+        				oF.setPathNavigation(pathNavigation);
+        				//oF.setGridNavigation(false);
+        				//oF.setParentHandle(parentHandleSharedWithMe);
 
-	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commit();
+        				fragTransaction = getSupportFragmentManager().beginTransaction();
+        				fragTransaction.attach(currentFragment);
+        				fragTransaction.commit();
 
 
-	        			}
-	        		}
+        			}
+        		}
 
-	        		if (psF != null){
-	        			if (psF.isVisible()){
-	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
-	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.detach(currentFragment);
-	        				fragTransaction.commit();
+        		if (psF != null){
+        			if (psF.isVisible()){
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
+        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+        				fragTransaction.detach(currentFragment);
+        				fragTransaction.commit();
 
-	        				isListCameraUpload = !isListCameraUpload;
-	        				psF.setIsList(isListCameraUpload);
+        				isListCameraUpload = !isListCameraUpload;
+        				psF.setIsList(isListCameraUpload);
 
-	        				fragTransaction = getSupportFragmentManager().beginTransaction();
-	        				fragTransaction.attach(currentFragment);
-	        				fragTransaction.commit();
+        				fragTransaction = getSupportFragmentManager().beginTransaction();
+        				fragTransaction.attach(currentFragment);
+        				fragTransaction.commit();
 
-	        			}
-	        		}
-	           	}
+        			}
+        		}
+           	
+	        	return true;
+	        }
+	        case R.id.action_change_mode_in:{
+	        	log("Change mode in");
+	        	if (swmF != null){
+        			if (swmF.isVisible()){
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("swmF");
+	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(currentFragment);
+	        			fragTransaction.commit();
+
+	        			swmF.setModeShare(MODE_IN);
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(currentFragment);
+	        			fragTransaction.commit();        				        				
+        			}
+	        	}
+	        	
+	        	return true;
+	        }
+	        case R.id.action_change_mode_out:{
+	        	log("Change mode out");
+	        	if (swmF != null){
+        			if (swmF.isVisible()){
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("swmF");
+	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(currentFragment);
+	        			fragTransaction.commit();
+
+	        			swmF.setModeShare(MODE_OUT);
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(currentFragment);
+	        			fragTransaction.commit();         				
+        			}
+	        	}
+	        	
+	        	
 	        	return true;
 	        }
 	        case R.id.action_menu_refresh:{
@@ -2476,15 +2563,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
-					}
-					
-					if (swmF != null){
-						if (swmF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-							swmF.setNodes(nodes);
-							swmF.getListView().invalidateViews();
-						}
-					}
+					}										
 				}
 				else{
 					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
@@ -2511,9 +2590,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 					if (swmF != null){
 						if (swmF.isVisible()){
+							//TODO: ojo con los hijos
 							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-							swmF.setNodes(nodes);
-							swmF.getListView().invalidateViews();
+//							swmF.setNodes(nodes);
+//							swmF.getListView().invalidateViews();
 						}
 					}
 				}
@@ -2564,8 +2644,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (swmF != null){
 					if (swmF.isVisible()){
 						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-						swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();
+						//TODO: ojo con los hijos
+//						swmF.setNodes(nodes);
+//						swmF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -2620,7 +2701,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (swmF != null){
 					if (swmF.isVisible()){
 						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-						swmF.setNodes(nodes);
+						//TODO: ojo con los hijos
+//						swmF.setNodes(nodes);
 						swmF.getListView().invalidateViews();
 					}
 				}
@@ -2654,8 +2736,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (swmF != null){
 					if (swmF.isVisible()){
 						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-						swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();
+						//TODO: ojo con los hijos
+//						swmF.setNodes(nodes);
+//						swmF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -3623,7 +3706,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (swmF != null){
 						if (swmF.isVisible()){
 							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
-							swmF.setNodes(nodes);
+							//TODO: ojo con los hijos
+//							swmF.setNodes(nodes);
 							swmF.getListView().invalidateViews();
 						}
 					}
@@ -3632,7 +3716,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (swmF != null){
 						if (swmF.isVisible()){
 							NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-							swmF.setNodes(nodes);
+							//TODO: ojo con los hijos
+//							swmF.setNodes(nodes);
 							swmF.getListView().invalidateViews();
 						}
 					}
@@ -3694,7 +3779,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						if (swmF.isVisible()){
 							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							swmF.setOrder(orderGetChildren);
-							swmF.setNodes(nodes);
+							//TODO: ojo con los hijos
+//							swmF.setNodes(nodes);
 							swmF.getListView().invalidateViews();
 						}
 					}
@@ -3704,14 +3790,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						if (swmF.isVisible()){
 							NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 							swmF.setOrder(orderGetChildren);
-							swmF.setNodes(nodes);
+							//TODO: ojo con los hijos
+//							swmF.setNodes(nodes);
 							swmF.getListView().invalidateViews();
 						}
 					}
 				}
 			}
 		}
-	}
+	}	
 	
 	/*
 	 * Get list of all child files
@@ -3851,7 +3938,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (swmF != null){
 			if (swmF.isVisible()){
 				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-				swmF.setNodes(nodes);
+//				swmF.setNodes(nodes);
 				swmF.getListView().invalidateViews();
 			}
 		}
