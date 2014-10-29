@@ -522,6 +522,12 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 								continue;
 							}
 						}
+						else{
+							nodesArrayGrid.add(psGH);
+						}
+					}
+					else{
+						nodesArrayGrid.add(psGH);
 					}
 				}			
 				
