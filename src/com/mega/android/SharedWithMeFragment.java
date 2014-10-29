@@ -13,7 +13,10 @@ import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
+import com.mega.sdk.ShareList;
+import com.mega.sdk.UserList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -43,20 +46,31 @@ import android.widget.Toast;
 
 public class SharedWithMeFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
+	public static int MODE_IN = 0;
+	public static int MODE_OUT = 1;
 	Context context;
 	ActionBar aB;
 	ListView listView;
-	MegaBrowserListAdapter adapterList;
+	MegaShareInOutAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
 	public SharedWithMeFragment sharedWithMeFragment = this;
+	MegaUser owner = null;
+	long initialParentHandle;
+	
+	ShareList outNodeList;
+	NodeList inNodeList;
 	
 	boolean isList = true;
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	NodeList nodes;
+	//NodeList nodes;
+	
+	int modeShare = MODE_IN; 
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
+	
+	ArrayList<MegaShareIn> megaShareInList = null;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -127,10 +141,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					hideMultipleSelect();
 					((ManagerActivity) context).moveToTrash(handleList);
 					break;
-				}
-				
-				
-				
+				}				
 			}
 			return false;
 		}
@@ -144,7 +155,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapterList.setMultipleSelect(false);
+//			adapterList.setMultipleSelect(false);
 			listView.setOnItemLongClickListener(sharedWithMeFragment);
 			clearSelections();
 		}
@@ -203,80 +214,113 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		megaShareInList = new ArrayList<MegaShareIn> ();
+		owner=null;
+		parentHandle = -1;
+		initialParentHandle = -1;
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
-		if (parentHandle == -1){
-			parentHandle = megaApi.getInboxNode().getHandle();
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-			nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-			aB.setTitle(getString(R.string.section_shared_with_me));	
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
+		if(parentHandle==-1){
+			aB.setTitle(getString(R.string.section_shared_with_me));			
+		}
+ 
+		
+		if(modeShare==MODE_IN){
+			
+			UserList uL = megaApi.getContacts();
+			
+			for(int i=0; i<uL.size();i++){
+				MegaUser user=uL.get(i);
+				inNodeList=megaApi.getInShares(user);
+				if(inNodeList.size()>0){
+					for(int j=0; j<inNodeList.size();j++){
+						MegaNode node = inNodeList.get(j);
+						MegaShareIn mSI = new MegaShareIn(user, node);
+						megaShareInList.add(mSI);
+					}
+				}
+			}
+
+			log("onCreateView: "+inNodeList.size());
 		}
 		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			
-			if (parentNode == null){
-				parentNode = megaApi.getInboxNode();
-				parentHandle = parentNode.getHandle();
-				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-			}
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			
-			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
-				aB.setTitle(getString(R.string.section_shared_with_me));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			}
-			else{
-				aB.setTitle(parentNode.getName());					
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			}
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			//TODO mode out
 		}
+			
+		//outNodeList.get(0).
+						
+//			//parentHandle = megaApi.getInboxNode().getHandle();
+//			((ManagerActivity)context).setParentHandleSharedWithMe(-1);
+//			//nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+//			aB.setTitle(getString(R.string.section_shared_with_me));	
+//			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+//			((ManagerActivity)context).supportInvalidateOptionsMenu();
+//		}
+//		else{
+//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+//			
+//			if (parentNode == null){
+//				parentNode = megaApi.getInboxNode();
+//				parentHandle = parentNode.getHandle();
+//				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+//			}
+//			nodes = megaApi.getChildren(parentNode, orderGetChildren);
+//			
+//			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
+//				aB.setTitle(getString(R.string.section_shared_with_me));	
+//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+//			}
+//			else{
+//				aB.setTitle(parentNode.getName());					
+//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+//			}
+//			((ManagerActivity)context).supportInvalidateOptionsMenu();
+//		}
 
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_sharedwithmelist, container, false);
 	        
 	        listView = (ListView) v.findViewById(R.id.sharedwithme_list_view);
 			listView.setOnItemClickListener(this);
-			listView.setOnItemLongClickListener(this);
-			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+			//listView.setOnItemLongClickListener(this);
+			//listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.sharedwithme_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.sharedwithme_list_empty_text);
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
+				adapterList = new MegaShareInOutAdapter(context, megaShareInList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_IN);
+				//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
 				if (mTHash != null){
 					adapterList.setTransfers(mTHash);
 				}
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
-				adapterList.setNodes(nodes);
+				adapterList.setNodes(megaShareInList);
 			}
 			
-			if (parentHandle == megaApi.getInboxNode().getHandle()){
-				aB.setTitle(getString(R.string.section_shared_with_me));
-			}
-			else{
-				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-			}
+//			if (parentHandle == megaApi.getInboxNode().getHandle()){
+//				aB.setTitle(getString(R.string.section_shared_with_me));
+//			}
+//			else{
+//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+//			}
 			
 			adapterList.setPositionClicked(-1);
-			adapterList.setMultipleSelect(false);
+//			adapterList.setMultipleSelect(false);
 
 			listView.setAdapter(adapterList);
 			
-			setNodes(nodes);
+			setNodes(megaShareInList);
 			
 			return v;
 		}
@@ -290,7 +334,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	        emptyImageView = (ImageView) v.findViewById(R.id.sharedwithme_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.sharedwithme_grid_empty_text);
 			
-			
+			/*
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
 				if (mTHash != null){
@@ -301,18 +345,12 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				adapterGrid.setParentHandle(parentHandle);
 				adapterGrid.setNodes(nodes);
 			}
-			
-			if (parentHandle == megaApi.getInboxNode().getHandle()){
-				aB.setTitle(getString(R.string.section_shared_with_me));
-			}
-			else{
-				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-			}
-				        
+			*/			
+		        
 			adapterGrid.setPositionClicked(-1);
 			listView.setAdapter(adapterGrid);
 			
-			setNodes(nodes);
+			setNodes(megaShareInList);
 			
 			return v;
 		}
@@ -339,7 +377,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			clearSelections();
 			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
 			listView.setItemChecked(position, true);
-			adapterList.setMultipleSelect(true);
+//			adapterList.setMultipleSelect(true);
 			updateActionModeTitle();
 			listView.setOnItemLongClickListener(null);
 		}
@@ -347,8 +385,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	}
 	
 	@Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,
-            long id) {
+    public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
 		
 		if (isList){
 			if (adapterList.isMultipleSelect()){
@@ -362,33 +399,50 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				updateActionModeTitle();
 				adapterList.notifyDataSetChanged();
 			}
-			else{
-				if (nodes.get(position).isFolder()){
-					MegaNode n = nodes.get(position);
+			else{				
+								
+				if (megaShareInList.get(position).getNode().isFolder()){
+					MegaNode parentNode = megaShareInList.get(position).getNode();
+					MegaUser user= megaShareInList.get(position).getUser();
+					owner=user;
+					NodeList childrenNodes;
 					
-					aB.setTitle(n.getName());
+					if(parentHandle==-1){						
+						initialParentHandle=megaShareInList.get(position).getNode().getHandle();
+						log("------------------Initial Parent Handle: "+initialParentHandle);
+					}
+					
+					aB.setTitle(parentNode.getName());
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
-					parentHandle = nodes.get(position).getHandle();
+					parentHandle = megaShareInList.get(position).getNode().getHandle();
 					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					adapterList.setParentHandle(parentHandle);
-					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-					adapterList.setNodes(nodes);
+					
+					childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
+					
+					megaShareInList.clear();
+					
+					for(int i=0; i<childrenNodes.size();i++){
+						
+						MegaNode nodeChild = childrenNodes.get(i);
+						MegaShareIn msIn = new MegaShareIn(user, nodeChild);
+						megaShareInList.add(msIn);
+						
+					}
+														
+					adapterList.setNodes(megaShareInList);
 					listView.setSelection(0);
 					
 					//If folder has no files
 					if (adapterList.getCount() == 0){
 						listView.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-						if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
-							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextView.setText(R.string.file_browser_empty_folder);
-						}
+						emptyTextView.setVisibility(View.VISIBLE);						
+						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+						emptyTextView.setText(R.string.file_browser_empty_folder);
+						
 					}
 					else{
 						listView.setVisibility(View.VISIBLE);
@@ -397,21 +451,21 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					}
 				}
 				else{
-					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+					if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
-						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_INCOMING){
+						if (megaApi.getParentNode(megaShareInList.get(position).getNode()).getType() == MegaNode.TYPE_INCOMING){
 							intent.putExtra("parentNodeHandle", -1L);
 						}
 						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(megaShareInList.get(position).getNode()).getHandle());
 						}
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						startActivity(intent);
 					}
-					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio()){
-						MegaNode file = nodes.get(position);
+					else if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isVideo() || MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isAudio()){
+						MegaNode file = megaShareInList.get(position).getNode();
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
 				  		String fileName = file.getName();
@@ -441,7 +495,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						adapterList.setPositionClicked(-1);
 						adapterList.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
+						handleList.add(megaShareInList.get(position).getNode().getHandle());
 						((ManagerActivity) context).onFileClick(handleList);
 					}
 				}
@@ -497,7 +551,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
 		for (int i = 0; i < checkedItems.size(); i++) {
 			if (checkedItems.valueAt(i) == true) {
-				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
+				MegaNode document = adapterList.getNodeAt(checkedItems.keyAt(i));
 				if (document != null){
 					documents.add(document);
 				}
@@ -531,50 +585,114 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	}
 	
 	public int onBackPressed(){
-		
+
 		if (isList){
+
 			parentHandle = adapterList.getParentHandle();
+			log("ParentHAndle onBack: "+parentHandle);
+
 			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-			
+
 			if (adapterList.getPositionClicked() != -1){
+				
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();
 				return 1;
 			}
 			else{
+			
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 				if (parentNode != null){
+
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
-						aB.setTitle(getString(R.string.section_shared_with_me));	
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					}
-					
+					emptyTextView.setVisibility(View.GONE);	
+
+					aB.setTitle(parentNode.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
+
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					adapterList.setNodes(nodes);
-					listView.setSelection(0);
 					adapterList.setParentHandle(parentHandle);
-					return 2;
+
+					NodeList childrenNodes;
+					childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
+
+					megaShareInList.clear();
+
+					for(int i=0; i<childrenNodes.size();i++){
+
+						MegaNode nodeChild = childrenNodes.get(i);
+						MegaShareIn msIn = new MegaShareIn(owner, nodeChild);
+						megaShareInList.add(msIn);
+
+					}				
+
+					adapterList.setNodes(megaShareInList);
+					listView.setSelection(0);
+					adapterList.setParentHandle(parentHandle);	
+					return 2;					
+					
 				}
 				else{
-					return 0;
-				}
+					if(initialParentHandle!=-1){
+						if(parentHandle==initialParentHandle){		
+							log("Set Initial Screen: "+parentHandle);
+													
+							aB.setTitle(getString(R.string.section_shared_with_me));	
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);							
+		
+							megaShareInList.clear();
+		
+							if(modeShare==MODE_IN){
+		
+								UserList uL = megaApi.getContacts();
+		
+								for(int i=0; i<uL.size();i++){
+									MegaUser user=uL.get(i);
+									inNodeList=megaApi.getInShares(user);
+									if(inNodeList.size()>0){
+										for(int j=0; j<inNodeList.size();j++){
+											MegaNode node = inNodeList.get(j);
+											MegaShareIn mSI = new MegaShareIn(user, node);
+											megaShareInList.add(mSI);
+										}
+									}
+								}
+							}
+							else{
+								//TODO: el modo out
+							}
+		
+							owner=null;
+							adapterList.setNodes(megaShareInList);
+							listView.setSelection(0);
+							adapterList.setParentHandle(-1);
+							parentHandle=-1;
+							((ManagerActivity)context).setParentHandleSharedWithMe(-1);
+							initialParentHandle=-1;	
+							return 2;	
+						}
+						else{
+							return 0;
+						}					
+					}
+					else{
+						adapterList.setParentHandle(-1);
+						((ManagerActivity)context).setParentHandleSharedWithMe(-1);
+						owner=null;						
+						return 0;
+					}
+				}				
 			}
 		}
 		else{
+			//GRID ADAPTER
 			parentHandle = adapterGrid.getParentHandle();
 			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-			
+
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);
 				adapterGrid.notifyDataSetChanged();
@@ -594,13 +712,13 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						aB.setTitle(parentNode.getName());					
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					}
-					
+
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
+
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					adapterGrid.setNodes(nodes);
+					//					nodes = megaApi.getChildren(parentNode, orderGetChildren);
+					//					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);
 					adapterGrid.setParentHandle(parentHandle);
 					return 2;
@@ -611,7 +729,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			}
 		}
 	}
-	
+
 	public void setIsList(boolean isList){
 		this.isList = isList;
 	}
@@ -647,22 +765,17 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		return listView;
 	}
 	
-	public void setNodes(NodeList nodes){
-		this.nodes = nodes;
+	public void setNodes(ArrayList<MegaShareIn> _megaShareInList){
+		this.megaShareInList = _megaShareInList;
 		if (isList){
 			if (adapterList != null){
-				adapterList.setNodes(nodes);
+				adapterList.setNodes(megaShareInList);
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getInboxNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_shared_with_me);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+					emptyTextView.setVisibility(View.VISIBLE);					
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);					
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);
@@ -673,7 +786,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		}
 		else{
 			if (adapterGrid != null){
-				adapterGrid.setNodes(nodes);
+				/*adapterGrid.setNodes(nodes);
 				if (adapterGrid.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
@@ -690,7 +803,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-				}			
+				}*/			
 			}
 		}
 	}
@@ -766,7 +879,19 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		
 	}
 	
+	public int getModeShare (){
+		
+		return modeShare;
+		
+	}
+	
+	public void setModeShare(int mode){
+		modeShare=mode;	
+		
+		
+	}
+	
 	private static void log(String log) {
-		Util.log("ContactsFragment", log);
+		Util.log("SharedWithMeFrangment", log);
 	}
 }

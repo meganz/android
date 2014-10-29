@@ -130,8 +130,7 @@
         <activity
             android:name="ContactPropertiesMainActivity"
             android:label="@string/contact_properties_activity"
-            android:launchMode="singleTop"
-            android:uiOptions="splitActionBarWhenNarrow" >            
+            android:launchMode="singleTop" >            
         </activity>
         
         <activity
@@ -146,8 +145,7 @@
             android:name="FileContactListActivity"
             android:label="@string/file_contact_list_activity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow" >            
+            android:configChanges="orientation|screenSize">            
         </activity>
         
         <activity 

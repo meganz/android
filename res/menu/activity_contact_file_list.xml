@@ -20,8 +20,8 @@
 	<item
 	    android:id="@+id/action_contact_file_list_upload"
 	    android:orderInCategory="110"
-	    android:showAsAction="always"
-	    android:title="More options"
+	    android:showAsAction="never"
+	    android:title="@string/action_add"	    
 	    android:icon="@drawable/ic_menu_upload_here_dark"
-	    MEGA:showAsAction="ifRoom" />
+	    MEGA:showAsAction="never" />
 </menu>

@@ -28,6 +28,22 @@
 	    MEGA:showAsAction="never" />
 	
 	<item
+	    android:id="@+id/action_change_mode_in"
+	    android:orderInCategory="100"
+	    android:showAsAction="never"
+	    android:title="@string/action_change_mode_in"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+		
+	<item
+	    android:id="@+id/action_change_mode_out"
+	    android:orderInCategory="105"
+	    android:showAsAction="never"
+	    android:title="@string/action_change_mode_out"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+	<item
 	    android:id="@+id/action_add_contact"
 	    android:orderInCategory="100"
 	    android:showAsAction="never"
