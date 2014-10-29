@@ -20,6 +20,7 @@ import com.mega.android.MimeType;
 import com.mega.android.R;
 import com.mega.android.R.id;
 import com.mega.android.R.layout;
+import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaError;
 
 import android.annotation.SuppressLint;
@@ -390,7 +391,8 @@ public class Util {
 	 */
 	public static void log(String origin, String message) {
 		if (DEBUG) {
-			Log.e(origin, message + "");
+			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
+//			Log.e(origin, message + "");
 		}
 	}
 	

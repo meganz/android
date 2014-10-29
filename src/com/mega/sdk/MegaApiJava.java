@@ -9,6 +9,7 @@ public class MegaApiJava
 {
 	MegaApi megaApi;
 	MegaGfxProcessor gfxProcessor;
+	static MegaLogger logger;
 	
 	boolean isRunCallbackThreaded()
 	{
@@ -38,7 +39,18 @@ public class MegaApiJava
 	public final static int ORDER_MODIFICATION_DESC = MegaApi.ORDER_MODIFICATION_DESC;
 	public final static int ORDER_ALPHABETICAL_ASC = MegaApi.ORDER_ALPHABETICAL_ASC;
 	public final static int ORDER_ALPHABETICAL_DESC = MegaApi.ORDER_ALPHABETICAL_DESC;
-	  
+	
+	public final static int LOG_LEVEL_FATAL = 0;
+	public final static int LOG_LEVEL_ERROR = LOG_LEVEL_FATAL + 1;
+	public final static int LOG_LEVEL_WARNING = LOG_LEVEL_ERROR + 1;
+	public final static int LOG_LEVEL_INFO = LOG_LEVEL_WARNING + 1;
+	public final static int LOG_LEVEL_DEBUG = LOG_LEVEL_INFO + 1;
+	public final static int LOG_LEVEL_MAX = LOG_LEVEL_DEBUG + 1;
+	
+	public final static int EVENT_FEEDBACK = 0;
+	public final static int EVENT_DEBUG = EVENT_FEEDBACK + 1;
+	public final static int EVENT_INVALID = EVENT_DEBUG + 1;
+	
 	public MegaApiJava(String appKey, String basePath)
 	{
 		megaApi = new MegaApi(appKey, basePath);
@@ -270,6 +282,32 @@ public class MegaApiJava
 	public String getMyEmail()
 	{
 		return megaApi.getMyEmail();
+	}
+	
+	public static void setLogLevel(int logLevel)
+	{
+		MegaApi.setLogLevel(logLevel);
+	}
+	
+	public static void setLoggerClass(MegaLogger megaLogger)
+	{
+		logger = megaLogger;
+		MegaApi.setLoggerClass(megaLogger);
+	}
+	
+	public static void log(int logLevel, String message, String filename, int line)
+	{
+		MegaApi.log(logLevel, message, filename, line);
+	}
+	
+	public static void log(int logLevel, String message, String filename)
+	{
+		MegaApi.log(logLevel, message, filename);
+	}
+	
+	public static void log(int logLevel, String message)
+	{
+		MegaApi.log(logLevel, message);
 	}
 
 	public void createFolder(String name, MegaNode parent, MegaRequestListenerInterface listener)
@@ -521,6 +559,26 @@ public class MegaApiJava
 	{
 		megaApi.logout();
 	}
+	
+	public void submitFeedback(int rating, String comment, MegaRequestListenerInterface listener) 
+	{
+		megaApi.submitFeedback(rating, comment, createDelegateRequestListener(listener));
+	}
+
+	public void submitFeedback(int rating, String comment) 
+	{
+		megaApi.submitFeedback(rating, comment);
+	}
+
+	public void reportDebugEvent(String text, MegaRequestListenerInterface listener) 
+	{
+		megaApi.reportDebugEvent(text, createDelegateRequestListener(listener));
+	}
+
+	public void reportDebugEvent(String text) 
+	{
+		megaApi.reportDebugEvent(text);
+	}
 
 	/****************************************************************************************************/
 	//TRANSFERS
@@ -716,6 +774,16 @@ public class MegaApiJava
 	public NodeList getInShares()
 	{
 		return megaApi.getInShares();
+	}
+	
+	public boolean isShared(MegaNode node) 
+	{
+		return megaApi.isShared(node);
+	}
+	
+	public ShareList getOutShares()
+	{
+		return megaApi.getOutShares();
 	}
 	
 	public ShareList getOutShares(MegaNode node)

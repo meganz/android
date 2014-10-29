@@ -36,6 +36,7 @@
 //Generate inheritable wrappers for listener objects
 %feature("director") MegaRequestListener;
 %feature("director") MegaTransferListener;
+%feature("director") MegaLogger;
 
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
 %typemap(directorargout) (char *buffer, size_t size)
