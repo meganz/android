@@ -666,6 +666,6 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
     
 
 	private static void log(String log) {
-		Util.log("MegaBrowserListAdapter", log);
+		Util.log("MegaShareInOutAdapter", log);
 	}
 }

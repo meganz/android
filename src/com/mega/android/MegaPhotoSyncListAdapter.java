@@ -1,7 +1,6 @@
 package com.mega.android;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
 import com.mega.android.utils.ThumbnailUtils;
@@ -10,7 +9,6 @@ import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,7 +33,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -65,7 +62,6 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
     	public TextView textViewFileSize;
     	public ImageButton imageButtonThreeDots;
     	public RelativeLayout itemLayout;
-//    	public ImageView arrowSelection;
     	public RelativeLayout optionsLayout;
     	public ImageView optionDownload;
     	public ImageView optionProperties;
@@ -137,6 +133,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.photo_sync_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.photo_sync_list_three_dots);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_list_options);
 			holder.optionDownload = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_download);
 			holder.optionDownload.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
@@ -159,8 +156,6 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			holder.optionDelete = (ImageView) convertView.findViewById(R.id.photo_sync_list_option_delete);
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.photo_sync_list_arrow_selection);
-//			holder.arrowSelection.setVisibility(View.GONE);
 			
 			convertView.setTag(holder);
 		}
@@ -174,7 +169,6 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		}
 		else{
 			holder.checkbox.setVisibility(View.VISIBLE);
-//			holder.arrowSelection.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
 			
 			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
@@ -256,10 +250,10 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		}
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
+		holder.imageButtonThreeDots.setVisibility(View.GONE);
 
 		if (positionClicked != -1){
 			if (positionClicked == position){
-//				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
@@ -267,7 +261,6 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
-//				holder.arrowSelection.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -275,7 +268,6 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			}
 		}
 		else{
-//			holder.arrowSelection.setVisibility(View.GONE);
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -304,36 +296,6 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		holder.optionPublicLink.setOnClickListener(this);
 		
 		return convertView;
-	}
-	
-	private String getInfoFolder (MegaNode n){
-		NodeList nL = megaApi.getChildren(n);
-		
-		int numFolders = 0;
-		int numFiles = 0;
-		
-		for (int i=0;i<nL.size();i++){
-			MegaNode c = nL.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
-		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		
-		return info;
 	}
 	
 	@Override
