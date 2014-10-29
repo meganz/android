@@ -516,8 +516,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 								year = d.getYear();
 								psGH.isNode = false;
 								psGH.monthYear = getImageDateString(month, year);
-								nodesArrayGrid.add(psGH);
-								log("METO EL MES (3): " + month + "__" + year);
+								nodesArrayGrid.add(psGH);								
 								i--;
 								continue;
 							}
