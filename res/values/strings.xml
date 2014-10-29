@@ -112,7 +112,7 @@
     <string name="create_account_activity">Create account</string>
     <string name="create_account_text">Create an account</string>
     <string name="name_text">name</string>
-    <string name="tos">I agree with MEGA\'s &lt;a href="http://g.static.mega.co.nz/pages/terms.html"&gt;terms of service&lt;/a&gt;</string>
+    <string name="tos">I agree with MEGA\'s &lt;a href="https://mega.co.nz/mobile_privacy.html"&gt;terms of service&lt;/a&gt;</string>
     <string name="button_create_account_text">Create account</string>
     <string name="already_account">Already have an account?</string>
     
