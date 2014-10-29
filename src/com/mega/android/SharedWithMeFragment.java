@@ -58,7 +58,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	long initialParentHandle;
 	
 	ShareList outNodeList;
-	NodeList inNodeList;
+	UserList uL;
 	
 	boolean isList = true;
 	long parentHandle = -1;
@@ -235,21 +235,21 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		
 		if(modeShare==MODE_IN){
 			
-			UserList uL = megaApi.getContacts();
+			uL = megaApi.getContacts();
 			
 			for(int i=0; i<uL.size();i++){
 				MegaUser user=uL.get(i);
-				inNodeList=megaApi.getInShares(user);
+				log("USER: " + user.getEmail());
+				NodeList inNodeList=megaApi.getInShares(user);
 				if(inNodeList.size()>0){
 					for(int j=0; j<inNodeList.size();j++){
-						MegaNode node = inNodeList.get(j);
+						MegaNode node = inNodeList.get(j).copy();
 						MegaShareIn mSI = new MegaShareIn(user, node);
+						log("node.getName() = " + node.getName());
 						megaShareInList.add(mSI);
 					}
 				}
 			}
-
-			log("onCreateView: "+inNodeList.size());
 		}
 		else{
 			//TODO mode out
@@ -648,14 +648,14 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		
 							if(modeShare==MODE_IN){
 		
-								UserList uL = megaApi.getContacts();
+								uL = megaApi.getContacts();
 		
 								for(int i=0; i<uL.size();i++){
 									MegaUser user=uL.get(i);
-									inNodeList=megaApi.getInShares(user);
+									NodeList inNodeList=megaApi.getInShares(user);
 									if(inNodeList.size()>0){
 										for(int j=0; j<inNodeList.size();j++){
-											MegaNode node = inNodeList.get(j);
+											MegaNode node = inNodeList.get(j).copy();
 											MegaShareIn mSI = new MegaShareIn(user, node);
 											megaShareInList.add(mSI);
 										}
@@ -892,6 +892,6 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	}
 	
 	private static void log(String log) {
-		Util.log("SharedWithMeFrangment", log);
+		Util.log("SharedWithMeFragment", log);
 	}
 }

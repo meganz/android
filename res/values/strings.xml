@@ -44,6 +44,7 @@
     <string name="action_upgrade_account">Upgrade account</string>
     <string name="action_select">Select</string>
     <string name="action_grid">Thumb view</string>
+    <string name="action_list">List view</string>
     <string name="botonOcultarActionBar">Ocultar</string>
     <string name="botonVerActionBar">Ver</string>
     
