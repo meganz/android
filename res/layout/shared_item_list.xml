@@ -1,0 +1,107 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/shared_view_item_layout" >
+    
+    <!-- Item for SHARED FOLDERS -->
+    
+    <RelativeLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:descendantFocusability="blocksDescendants"
+	    android:id="@+id/file_share_item_layout" >
+    
+    <ImageView
+        android:id="@+id/file_list_thumbnail_share"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp" 
+        android:scaleType="fitCenter"
+        android:layout_toRightOf="@id/file_list_checkbox" />    
+    
+    
+    <TextView
+        android:id="@+id/file_list_filename_share"
+        android:layout_width="225dp"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/file_list_thumbnail_share"
+        android:paddingLeft="3dp"
+        android:paddingTop="7dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        />
+    
+    <TextView
+        android:id="@+id/file_list_filesize_share"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/file_list_thumbnail_share"
+        android:layout_below="@+id/file_list_filename_share"
+        android:paddingLeft="3dp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/file_list_second_row" 
+        android:textSize="12sp"
+        android:ellipsize="end"
+        android:maxLines="1"/>
+    
+    <ProgressBar
+	    android:id="@+id/transfers_list_bar_share"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		style="@style/MEGAProgressBarTransfers"  
+		android:layout_margin="5dip"
+		android:paddingRight="5dp" 
+        android:layout_toRightOf="@id/file_list_thumbnail_share"
+        android:layout_below="@id/file_list_filename_share" /> 
+    
+    
+    </RelativeLayout>
+    
+    
+    <!-- Item for CONTACTS -->
+    <RelativeLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:descendantFocusability="blocksDescendants"
+	    android:id="@+id/contact_share_item_layout"
+	    android:background="@color/photo_sync_month_layout"	    
+	    android:longClickable="false"
+		android:clickable="false">
+	    
+	    <com.mega.components.RoundedImageView 
+	         android:id="@+id/contact_list_thumbnail"
+	         android:layout_width="54dp"
+	         android:layout_height="54dp"
+	         android:layout_marginLeft="5dp" 
+	         android:scaleType="fitCenter"
+	         android:paddingTop="3dp"
+	         rounded:corner_radius="27dp" 
+	         rounded:border_width="2dp"
+	         rounded:border_color="@color/border_file_properties"/>
+	    
+	    <TextView
+	        android:id="@+id/shared_contact_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="30dp"
+	        android:layout_toRightOf="@id/contact_list_thumbnail"
+	        android:paddingLeft="5dp"
+	        android:paddingTop="7dp" 
+	        android:textColor="@color/white"/>  
+	    
+	    <TextView
+	        android:id="@+id/shared_contact_content"
+	        android:layout_width="wrap_content"
+	        android:layout_height="30dp"
+	        android:layout_toRightOf="@id/contact_list_thumbnail"
+	        android:layout_below="@id/shared_contact_name"
+	        android:paddingLeft="5dp"
+	        android:paddingBottom="7dp"
+	        android:textColor="@color/white"/>
+    
+	</RelativeLayout>
+    
+    
+
+</RelativeLayout>
