@@ -529,7 +529,32 @@ public class MegaApiJava
 	{
 		megaApi.getAccountDetails();
 	}
+	
+	public void getPricing(MegaRequestListenerInterface listener) 
+	{
+	    megaApi.getPricing(createDelegateRequestListener(listener));
+	}
 
+	public void getPricing() 
+	{
+		megaApi.getPricing();
+	}
+
+	public void getPaymentUrl(long productHandle, MegaRequestListenerInterface listener) 
+	{
+		megaApi.getPaymentUrl(productHandle, createDelegateRequestListener(listener));
+	}
+
+	public void getPaymentUrl(long productHandle) 
+	{
+		megaApi.getPaymentUrl(productHandle);
+	}
+
+	public String exportMasterKey() 
+	{
+		return megaApi.exportMasterKey();
+	}
+	
 	public void changePassword(String oldPassword, String newPassword, MegaRequestListenerInterface listener)
 	{
 		megaApi.changePassword(oldPassword, newPassword, createDelegateRequestListener(listener));

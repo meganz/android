@@ -111,6 +111,9 @@
 %newobject mega::MegaApi::getFingerprint;
 %newobject mega::MegaApi::getNodeByFingerprint;
 %newobject mega::MegaApi::hasFingerprint;
+%newobject mega::MegaApi::exportMasterKey;
+%newobject mega::MegaRequest::getMegaAccountDetails;
+%newobject mega::MegaRequest::getPricing;
 
 typedef long long time_t;
 typedef long long uint64_t;

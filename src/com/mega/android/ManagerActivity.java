@@ -17,6 +17,7 @@ import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaPricing;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
@@ -1112,6 +1113,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	log("selectDrawerItem");
     	switch (item){
     		case CLOUD_DRIVE:{
+//    			
+//    			megaApi.getPricing(this);
+//    			
 				if (fbF == null){
 					fbF = new FileBrowserFragment();
 					if (parentHandleBrowser == -1){
@@ -2013,6 +2017,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	mSearchView.setIconified(false);
 	        	return true;
 	        }
+	        case R.id.action_add_contact:{
+	        	if (drawerItem == DrawerItem.CONTACTS){
+	        		showNewContactDialog(null);
+	        	}
+	        	
+	        	return true;
+	        }
 	        case R.id.action_new_folder:{
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
 	        		showNewFolderDialog(null);
@@ -2451,6 +2462,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish");
+//		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+//			MegaPricing p = request.getPricing();
+//			log("P.SIZE(): " + p.getNumProducts());
+//			if (p.getNumProducts() > 0){
+//				log("p[0] = " + p.getHandle(0));
+//			}
+//			
+//			megaApi.getPaymentUrl(p.getHandle(0), this);
+//		}
+//		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
+//			log("PAYMENT URL: " + request.getLink());
+//			log("EXPORT MASTER KEY: "  + megaApi.exportMasterKey());
+//		}
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
