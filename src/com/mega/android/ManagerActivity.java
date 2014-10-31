@@ -264,6 +264,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	NodeList searchNodes;
 	int levelsSearch = -1;
 	
+	int swmFMode = MODE_IN;
+	
 	private boolean openLink = false;
 	
 	MegaApplication app;
@@ -1295,11 +1297,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			
 	    			if(swmF.getModeShare()==MODE_IN){
 	    				modeShareOut.setVisible(true);	
-	    				modeShareIn.setVisible(false);	
+	    				modeShareIn.setVisible(false);	    				
 	    			}
 	    			else{
-	    				modeShareIn.setVisible(true);
-	    				modeShareOut.setVisible(false);
+	    				modeShareOut.setVisible(false);	
+	    				modeShareIn.setVisible(true);	
 	    			}	    			   			
 	    			
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -2204,6 +2206,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			fragTransaction.commit();
 
 	        			swmF.setModeShare(MODE_IN);
+	        			this.swmFMode=MODE_IN;
+	        			modeShareIn.setVisible(false);
+	        			modeShareOut.setVisible(true);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -2223,6 +2228,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			fragTransaction.commit();
 
 	        			swmF.setModeShare(MODE_OUT);
+	        			this.swmFMode=MODE_OUT;
+	        			modeShareIn.setVisible(true);
+	        			modeShareOut.setVisible(false);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
