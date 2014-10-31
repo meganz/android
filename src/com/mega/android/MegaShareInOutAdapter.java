@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
+import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
@@ -52,6 +53,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	long parentHandle = -1;
 
 	ArrayList<MegaShareIn> megaShareInList;
+	ShareList megaShareOutList;
 	
 	ListView listFragment;
 	ImageView emptyImageViewFragment;
@@ -60,6 +62,9 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
 	MegaTransfer currentTransfer = null;
+	
+	public static int MODE_IN = 0;
+	public static int MODE_OUT = 1;
 
 	//boolean multipleSelect;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
@@ -68,21 +73,20 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 
 	/* public static view holder class */
 	public class ViewHolderInOutShareList {
-		public CheckBox checkbox;
 		public ImageView imageView;
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
-		public ImageButton imageButtonThreeDots;
-		public RelativeLayout itemLayout;
+		public RelativeLayout itemLayoutFile;
+		public RelativeLayout itemLayoutContact;
 		//public ImageView arrowSelection;
 		public RelativeLayout optionsLayout;
 		public ImageView optionDownload;
 		public ImageView optionProperties;
 		public ProgressBar transferProgressBar;
-		public ImageView optionRename;
-		public ImageView optionPublicLink;
-		public ImageView optionDelete;
 		public int currentPosition;
+		public RoundedImageView contactThumbnail;
+		public TextView contactName;
+		public TextView contactContent;		
 		public long document;
 		//public TextView textViewOwner;
 	}
@@ -90,6 +94,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	public MegaShareInOutAdapter(Context _context, ArrayList<MegaShareIn> _megaShareInList,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
 		this.megaShareInList = _megaShareInList;
+		this.megaShareOutList = null;
 		this.parentHandle = _parentHandle;
 
 		this.listFragment = listView;
@@ -100,12 +105,15 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 		this.positionClicked = -1;
 
 		this.type = type;
+		
+		log("MegaShareInOutAdapter: "+type);
 
 		if (megaApi == null) {
 			megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApi();
 		}
 	}
-
+	
+	
 	public void setNodes(ArrayList<MegaShareIn> _megaShareInList) {
 		this.megaShareInList = _megaShareInList;
 		positionClicked = -1;
@@ -130,45 +138,20 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
-			convertView = inflater.inflate(R.layout.item_file_list, parent,false);
+			convertView = inflater.inflate(R.layout.shared_item_list, parent,false);
 			holder = new ViewHolderInOutShareList();
-			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_item_layout);
-			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
-			holder.checkbox.setClickable(false);
-			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
-			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);			
+			
+			holder.itemLayoutFile = (RelativeLayout) convertView.findViewById(R.id.file_share_item_layout);
+			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail_share);
+			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename_share);			
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
-			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
-			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
-			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
-
-			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
-			
-			//holder.textViewOwner = (TextView) convertView.findViewById(R.id.file_list_owner);				
+			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize_share);
+			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_bar_share);		
 					
-			holder.optionDownload = (ImageView) convertView.findViewById(R.id.file_list_option_download);
-			holder.optionDownload.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);	
-			((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((11 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			
-			holder.optionProperties = (ImageView) convertView.findViewById(R.id.file_list_option_properties);
-			holder.optionProperties.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((10 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			
-			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
-			holder.optionRename.getLayoutParams().width = Util.px2dp((40 * scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			
-			holder.optionPublicLink = (ImageView) convertView.findViewById(R.id.file_list_option_public_link);
-			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-			((TableRow.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			
-			holder.optionDelete = (ImageView) convertView.findViewById(R.id.file_list_option_delete);
-			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-//			
-//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
-//			holder.arrowSelection.setVisibility(View.GONE);
+			holder.itemLayoutContact = (RelativeLayout) convertView.findViewById(R.id.contact_share_item_layout);
+			holder.contactName = (TextView) convertView.findViewById(R.id.shared_contact_name);
+			holder.contactContent = (TextView) convertView.findViewById(R.id.shared_contact_content);
 
 			convertView.setTag(holder);
 		} else {
@@ -191,108 +174,244 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 //			}
 //		}
 		
-		holder.transferProgressBar.setVisibility(View.GONE);
-		holder.textViewFileSize.setVisibility(View.VISIBLE);
-
 		holder.currentPosition = position;
 
-//		HashMap<MegaUser,NodeList> _inSHash
+//		HashMap<MegaUser,NodeList> _inSHash	
 		
-		
-		
-		MegaShareIn mUserShare = (MegaShareIn) getItem(position);
-		MegaNode node = mUserShare.getNode();
-		MegaUser megaUser = mUserShare.getUser();
-
-		Bitmap thumb = null;
-
-		String data = node.getName()+" ("+megaUser.getEmail()+")";
-		holder.textViewFileName.setText(data);
-		//holder.textViewOwner.setText(megaUser.getEmail());
-
-		if (node.isFolder()) {
-			holder.textViewFileSize.setText(getInfoFolder(node));			
+		if(type==MODE_IN){
+			log("type=MODE_IN");
+			MegaShareIn mUserShare = (MegaShareIn) getItem(position);
+			MegaNode node = mUserShare.getNode();
+			MegaUser megaUser = mUserShare.getUser();
+	
+			Bitmap thumb = null;
 			
-			holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+			if(node==null){
+				//It is a contact
 				
-		} else {
-			long nodeSize = node.getSize();
-			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
-			
-			if(mTHash!=null){
+				holder.contactName.setText(megaUser.getEmail());
 				
-				log("NODE: " + mTHash.get(node.getHandle()));
-				MegaTransfer tempT = mTHash.get(node.getHandle());
+	//			holder.optionsLayout.setVisibility(View.GONE);
 				
-				if (tempT!=null){
-					holder.transferProgressBar.setVisibility(View.VISIBLE);		
-					holder.textViewFileSize.setVisibility(View.GONE);	
+				holder.itemLayoutFile.setVisibility(View.GONE);
+				holder.imageView.setVisibility(View.GONE);
+				holder.textViewFileName.setVisibility(View.GONE);			
+				holder.textViewFileSize.setVisibility(View.GONE);
+				
+				holder.transferProgressBar.setVisibility(View.GONE);	
+				
+				holder.itemLayoutContact.setVisibility(View.VISIBLE);
+				holder.contactName.setVisibility(View.VISIBLE);
+				holder.contactContent.setVisibility(View.VISIBLE);	
+				
+			}
+			else{
+				//It is node
+
+				holder.textViewFileName.setText(node.getName());
+
+	
+				if (node.isFolder()) {
+					holder.textViewFileSize.setText(getInfoFolder(node));			
 					
-					double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
-					holder.transferProgressBar.setProgress((int)progressValue);
-				}
-				
-				if (currentTransfer != null){
-					if (node.getHandle() == currentTransfer.getNodeHandle()){
-						holder.transferProgressBar.setVisibility(View.VISIBLE);		
-						holder.textViewFileSize.setVisibility(View.GONE);	
-						double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
-						holder.transferProgressBar.setProgress((int)progressValue);
-					}
-				}
-				
-				if(mTHash.size() == 0){
-					holder.transferProgressBar.setVisibility(View.GONE);		
-					holder.textViewFileSize.setVisibility(View.VISIBLE);	
-				}
-			}			
-			
-			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
-
-			if (node.hasThumbnail()) {
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null) {
-					holder.imageView.setImageBitmap(thumb);
+					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+						
 				} else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
-					if (thumb != null) {
-						holder.imageView.setImageBitmap(thumb);
-					} else {
-						try {
-							thumb = ThumbnailUtils.getThumbnailFromMegaListShare(node,context, holder, megaApi, this);
+					long nodeSize = node.getSize();
+					holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
+					
+					if(mTHash!=null){
+						
+						log("NODE: " + mTHash.get(node.getHandle()));
+						MegaTransfer tempT = mTHash.get(node.getHandle());
+						
+						if (tempT!=null){
+							holder.transferProgressBar.setVisibility(View.VISIBLE);		
+							holder.textViewFileSize.setVisibility(View.GONE);	
 							
-						} catch (Exception e) {
-						} // Too many AsyncTasks
-
+							double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
+							holder.transferProgressBar.setProgress((int)progressValue);
+						}
+						
+						if (currentTransfer != null){
+							if (node.getHandle() == currentTransfer.getNodeHandle()){
+								holder.transferProgressBar.setVisibility(View.VISIBLE);		
+								holder.textViewFileSize.setVisibility(View.GONE);	
+								double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
+								holder.transferProgressBar.setProgress((int)progressValue);
+							}
+						}
+						
+						if(mTHash.size() == 0){
+							holder.transferProgressBar.setVisibility(View.GONE);		
+							holder.textViewFileSize.setVisibility(View.VISIBLE);	
+						}
+					}			
+					
+					holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+	
+					if (node.hasThumbnail()) {
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
 						if (thumb != null) {
 							holder.imageView.setImageBitmap(thumb);
+						} else {
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+							if (thumb != null) {
+								holder.imageView.setImageBitmap(thumb);
+							} else {
+								try {
+									thumb = ThumbnailUtils.getThumbnailFromMegaListShare(node,context, holder, megaApi, this);
+									
+								} catch (Exception e) {
+								} // Too many AsyncTasks
+	
+								if (thumb != null) {
+									holder.imageView.setImageBitmap(thumb);
+								}
+							}
+						}
+					} else {
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null) {
+							holder.imageView.setImageBitmap(thumb);
+						} else {
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+							if (thumb != null) {
+								holder.imageView.setImageBitmap(thumb);
+							} else {
+								try {
+									ThumbnailUtils.createThumbnailListShare(context, node,holder, megaApi, this);
+								} catch (Exception e) {
+								} // Too many AsyncTasks
+							}
 						}
 					}
 				}
+							
+	//			holder.optionsLayout.setVisibility(View.GONE);
+				
+				holder.itemLayoutFile.setVisibility(View.VISIBLE);
+				holder.imageView.setVisibility(View.VISIBLE);
+				holder.textViewFileName.setVisibility(View.VISIBLE);			
+				holder.textViewFileSize.setVisibility(View.VISIBLE);
+				
+				holder.transferProgressBar.setVisibility(View.GONE);	
+				
+				holder.itemLayoutContact.setVisibility(View.GONE);
+				holder.contactName.setVisibility(View.GONE);
+				holder.contactContent.setVisibility(View.GONE);
+			}
+		}
+		else{
+			//type=MODE_OUT
+			log("type=MODE_OUT");
+			
+			MegaShareIn mUserShare = (MegaShareIn) getItem(position);
+			MegaNode node = mUserShare.getNode();
+			MegaUser megaUser = mUserShare.getUser();
+	
+			Bitmap thumb = null;
+			
+			holder.textViewFileName.setText(node.getName());
+
+			
+			if (node.isFolder()) {
+				holder.textViewFileSize.setText(getInfoFolder(node));			
+				
+				holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					
 			} else {
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null) {
-					holder.imageView.setImageBitmap(thumb);
-				} else {
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+				long nodeSize = node.getSize();
+				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
+				
+				if(mTHash!=null){
+					
+					log("NODE: " + mTHash.get(node.getHandle()));
+					MegaTransfer tempT = mTHash.get(node.getHandle());
+					
+					if (tempT!=null){
+						holder.transferProgressBar.setVisibility(View.VISIBLE);		
+						holder.textViewFileSize.setVisibility(View.GONE);	
+						
+						double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
+						holder.transferProgressBar.setProgress((int)progressValue);
+					}
+					
+					if (currentTransfer != null){
+						if (node.getHandle() == currentTransfer.getNodeHandle()){
+							holder.transferProgressBar.setVisibility(View.VISIBLE);		
+							holder.textViewFileSize.setVisibility(View.GONE);	
+							double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
+							holder.transferProgressBar.setProgress((int)progressValue);
+						}
+					}
+					
+					if(mTHash.size() == 0){
+						holder.transferProgressBar.setVisibility(View.GONE);		
+						holder.textViewFileSize.setVisibility(View.VISIBLE);	
+					}
+				}			
+				
+				holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+
+				if (node.hasThumbnail()) {
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
 						holder.imageView.setImageBitmap(thumb);
 					} else {
-						try {
-							ThumbnailUtils.createThumbnailListShare(context, node,holder, megaApi, this);
-						} catch (Exception e) {
-						} // Too many AsyncTasks
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						if (thumb != null) {
+							holder.imageView.setImageBitmap(thumb);
+						} else {
+							try {
+								thumb = ThumbnailUtils.getThumbnailFromMegaListShare(node,context, holder, megaApi, this);
+								
+							} catch (Exception e) {
+							} // Too many AsyncTasks
+
+							if (thumb != null) {
+								holder.imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+				} else {
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					if (thumb != null) {
+						holder.imageView.setImageBitmap(thumb);
+					} else {
+						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						if (thumb != null) {
+							holder.imageView.setImageBitmap(thumb);
+						} else {
+							try {
+								ThumbnailUtils.createThumbnailListShare(context, node,holder, megaApi, this);
+							} catch (Exception e) {
+							} // Too many AsyncTasks
+						}
 					}
 				}
 			}
+						
+//			holder.optionsLayout.setVisibility(View.GONE);
+			
+			holder.itemLayoutFile.setVisibility(View.VISIBLE);
+			holder.imageView.setVisibility(View.VISIBLE);
+			holder.textViewFileName.setVisibility(View.VISIBLE);			
+			holder.textViewFileSize.setVisibility(View.VISIBLE);
+			
+			holder.transferProgressBar.setVisibility(View.GONE);	
+			
+			holder.itemLayoutContact.setVisibility(View.GONE);
+			holder.contactName.setVisibility(View.GONE);
+			holder.contactContent.setVisibility(View.GONE);
+			
+			
 		}
-		holder.imageButtonThreeDots.setVisibility(View.GONE);
-		holder.checkbox.setVisibility(View.GONE);
-		holder.optionsLayout.setVisibility(View.GONE);
 
 //		holder.imageButtonThreeDots.setTag(holder);
 //		holder.imageButtonThreeDots.setOnClickListener(this);
 
+		/*
 		if (positionClicked != -1) {
 			if (positionClicked == position) {
 				//				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -402,12 +521,11 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 					}
 				}
 			}
-		}
+		}*/
 			
 		return convertView;
 	}
 				
-
 	private String getInfoFolder(MegaNode n) {
 		NodeList nL = megaApi.getChildren(n);
 
