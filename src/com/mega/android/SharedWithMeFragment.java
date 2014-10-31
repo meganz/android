@@ -71,6 +71,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
 	ArrayList<MegaShareIn> megaShareInList = null;
+	ArrayList<MegaShareIn> megaShareOutList = null;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -216,6 +217,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		}
 		
 		megaShareInList = new ArrayList<MegaShareIn> ();
+		megaShareOutList = new ArrayList<MegaShareIn> ();
+		
 		owner=null;
 		parentHandle = -1;
 		initialParentHandle = -1;
@@ -242,17 +245,37 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				log("USER: " + user.getEmail());
 				NodeList inNodeList=megaApi.getInShares(user);
 				if(inNodeList.size()>0){
+					MegaShareIn mSI = new MegaShareIn(user, null);
+					megaShareInList.add(mSI);
 					for(int j=0; j<inNodeList.size();j++){
 						MegaNode node = inNodeList.get(j).copy();
-						MegaShareIn mSI = new MegaShareIn(user, node);
+						mSI = new MegaShareIn(user, node);
 						log("node.getName() = " + node.getName());
 						megaShareInList.add(mSI);
-					}
-				}
+					}					
+				}				
 			}
 		}
 		else{
 			//TODO mode out
+			outNodeList = megaApi.getOutShares();
+			for(int i=0;i<outNodeList.size();i++){
+				
+				MegaShare mS = outNodeList.get(i);				
+				
+				MegaUser user=megaApi.getContact(mS.getUser());
+				log("USER: " + user.getEmail());
+					
+				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
+				MegaShareIn mSI = new MegaShareIn(user, node);
+				
+				log("NODE: " + node.getName());
+				
+				megaShareOutList.add(mSI);				
+				
+			}
+				
+			
 		}
 			
 		//outNodeList.get(0).
@@ -296,32 +319,54 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.sharedwithme_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.sharedwithme_list_empty_text);
-			if (adapterList == null){
-				adapterList = new MegaShareInOutAdapter(context, megaShareInList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_IN);
-				//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
-				if (mTHash != null){
-					adapterList.setTransfers(mTHash);
+			log("Llego aqui---------------");
+			
+			if(modeShare==MODE_IN){		
+				log("Creo adapter in");
+				if (adapterList == null){
+					adapterList = new MegaShareInOutAdapter(context, megaShareInList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_IN);
+					//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
+					if (mTHash != null){
+						adapterList.setTransfers(mTHash);
+					}
 				}
+				else{
+					adapterList.setParentHandle(parentHandle);
+					adapterList.setNodes(megaShareInList);
+				}
+				
+				adapterList.setPositionClicked(-1);
+//				adapterList.setMultipleSelect(false);
+
+				listView.setAdapter(adapterList);
+				
+				setNodes(megaShareInList);
+
 			}
 			else{
-				adapterList.setParentHandle(parentHandle);
-				adapterList.setNodes(megaShareInList);
+				//MODE OUT
+				log("Creo adapter OUT");
+				if (adapterList == null){
+					adapterList = new MegaShareInOutAdapter(context, megaShareOutList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_OUT);
+					//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
+					if (mTHash != null){
+						adapterList.setTransfers(mTHash);
+					}
+				}
+				else{
+					adapterList.setParentHandle(parentHandle);
+					adapterList.setNodes(megaShareOutList);
+				}
+				
+				adapterList.setPositionClicked(-1);
+//				adapterList.setMultipleSelect(false);
+
+				listView.setAdapter(adapterList);
+				
+				setNodes(megaShareOutList);
 			}
 			
-//			if (parentHandle == megaApi.getInboxNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_shared_with_me));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-			
-			adapterList.setPositionClicked(-1);
-//			adapterList.setMultipleSelect(false);
-
-			listView.setAdapter(adapterList);
-			
-			setNodes(megaShareInList);
-			
+	
 			return v;
 		}
 		else{
@@ -400,104 +445,110 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				adapterList.notifyDataSetChanged();
 			}
 			else{				
-								
-				if (megaShareInList.get(position).getNode().isFolder()){
-					MegaNode parentNode = megaShareInList.get(position).getNode();
-					MegaUser user= megaShareInList.get(position).getUser();
-					owner=user;
-					NodeList childrenNodes;
-					
-					if(parentHandle==-1){						
-						initialParentHandle=megaShareInList.get(position).getNode().getHandle();
-						log("------------------Initial Parent Handle: "+initialParentHandle);
-					}
-					
-					aB.setTitle(parentNode.getName());
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = megaShareInList.get(position).getNode().getHandle();
-					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-					adapterList.setParentHandle(parentHandle);
-					
-					childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
-					
-					megaShareInList.clear();
-					
-					for(int i=0; i<childrenNodes.size();i++){
+				 
+				if(megaShareInList.get(position).getNode()!=null){
+					if (megaShareInList.get(position).getNode().isFolder()){
+						MegaNode parentNode = megaShareInList.get(position).getNode();
+						MegaUser user= megaShareInList.get(position).getUser();
+						owner=user;
+						NodeList childrenNodes;
 						
-						MegaNode nodeChild = childrenNodes.get(i);
-						MegaShareIn msIn = new MegaShareIn(user, nodeChild);
-						megaShareInList.add(msIn);
+						if(parentHandle==-1){						
+							initialParentHandle=megaShareInList.get(position).getNode().getHandle();
+							log("------------------Initial Parent Handle: "+initialParentHandle);
+						}
 						
-					}
-														
-					adapterList.setNodes(megaShareInList);
-					listView.setSelection(0);
-					
-					//If folder has no files
-					if (adapterList.getCount() == 0){
-						listView.setVisibility(View.GONE);
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);						
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
+						aB.setTitle(parentNode.getName());
+						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+						((ManagerActivity)context).supportInvalidateOptionsMenu();
 						
-					}
-					else{
-						listView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-					}
-				}
-				else{
-					if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
-						if (megaApi.getParentNode(megaShareInList.get(position).getNode()).getType() == MegaNode.TYPE_INCOMING){
-							intent.putExtra("parentNodeHandle", -1L);
+						parentHandle = megaShareInList.get(position).getNode().getHandle();
+						((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+						adapterList.setParentHandle(parentHandle);
+						
+						childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
+						
+						megaShareInList.clear();
+						
+						for(int i=0; i<childrenNodes.size();i++){
+							
+							MegaNode nodeChild = childrenNodes.get(i);
+							MegaShareIn msIn = new MegaShareIn(user, nodeChild);
+							megaShareInList.add(msIn);
+							
+						}
+															
+						adapterList.setNodes(megaShareInList);
+						listView.setSelection(0);
+						
+						//If folder has no files
+						if (adapterList.getCount() == 0){
+							listView.setVisibility(View.GONE);
+							emptyImageView.setVisibility(View.VISIBLE);
+							emptyTextView.setVisibility(View.VISIBLE);						
+							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+							emptyTextView.setText(R.string.file_browser_empty_folder);
+							
 						}
 						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(megaShareInList.get(position).getNode()).getHandle());
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
 						}
-						intent.putExtra("orderGetChildren", orderGetChildren);
-						startActivity(intent);
-					}
-					else if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isVideo() || MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isAudio()){
-						MegaNode file = megaShareInList.get(position).getNode();
-						Intent service = new Intent(context, MegaStreamingService.class);
-				  		context.startService(service);
-				  		String fileName = file.getName();
-						try {
-							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-						} 
-						catch (UnsupportedEncodingException e) {
-							e.printStackTrace();
-						}
-						
-				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeType.typeForName(file.getName()).getType();
-				  		System.out.println("FILENAME: " + fileName);
-				  		
-				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		try
-				  		{
-				  			startActivity(mediaIntent);
-				  		}
-				  		catch(Exception e)
-				  		{
-				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-				  		}						
 					}
 					else{
-						adapterList.setPositionClicked(-1);
-						adapterList.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(megaShareInList.get(position).getNode().getHandle());
-						((ManagerActivity) context).onFileClick(handleList);
+						if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isImage()){
+							Intent intent = new Intent(context, FullScreenImageViewer.class);
+							intent.putExtra("position", position);
+							intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
+							if (megaApi.getParentNode(megaShareInList.get(position).getNode()).getType() == MegaNode.TYPE_INCOMING){
+								intent.putExtra("parentNodeHandle", -1L);
+							}
+							else{
+								intent.putExtra("parentNodeHandle", megaApi.getParentNode(megaShareInList.get(position).getNode()).getHandle());
+							}
+							intent.putExtra("orderGetChildren", orderGetChildren);
+							startActivity(intent);
+						}
+						else if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isVideo() || MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isAudio()){
+							MegaNode file = megaShareInList.get(position).getNode();
+							Intent service = new Intent(context, MegaStreamingService.class);
+					  		context.startService(service);
+					  		String fileName = file.getName();
+							try {
+								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+							} 
+							catch (UnsupportedEncodingException e) {
+								e.printStackTrace();
+							}
+							
+					  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+					  		String mimeType = MimeType.typeForName(file.getName()).getType();
+					  		System.out.println("FILENAME: " + fileName);
+					  		
+					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					  		try
+					  		{
+					  			startActivity(mediaIntent);
+					  		}
+					  		catch(Exception e)
+					  		{
+					  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+					  		}						
+						}
+						else{
+							adapterList.setPositionClicked(-1);
+							adapterList.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(megaShareInList.get(position).getNode().getHandle());
+							((ManagerActivity) context).onFileClick(handleList);
+						}
 					}
+					
+				}
+				else{
+					 //Pulsamos el contacto
 				}
 			}
 		}
@@ -652,14 +703,18 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		
 								for(int i=0; i<uL.size();i++){
 									MegaUser user=uL.get(i);
+									log("USER: " + user.getEmail());
 									NodeList inNodeList=megaApi.getInShares(user);
 									if(inNodeList.size()>0){
+										MegaShareIn mSI = new MegaShareIn(user, null);
+										megaShareInList.add(mSI);
 										for(int j=0; j<inNodeList.size();j++){
 											MegaNode node = inNodeList.get(j).copy();
-											MegaShareIn mSI = new MegaShareIn(user, node);
+											mSI = new MegaShareIn(user, node);
+											log("node.getName() = " + node.getName());
 											megaShareInList.add(mSI);
-										}
-									}
+										}					
+									}				
 								}
 							}
 							else{
@@ -874,21 +929,15 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			if (adapterGrid != null){
 				adapterGrid.setCurrentTransfer(mT);
 			}
-		}	
-		
-		
+		}		
 	}
 	
-	public int getModeShare (){
-		
-		return modeShare;
-		
+	public int getModeShare (){		
+		return modeShare;		
 	}
 	
 	public void setModeShare(int mode){
-		modeShare=mode;	
-		
-		
+		modeShare=mode;			
 	}
 	
 	private static void log(String log) {

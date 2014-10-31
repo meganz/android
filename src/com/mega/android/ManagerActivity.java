@@ -2228,8 +2228,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			fragTransaction.attach(currentFragment);
 	        			fragTransaction.commit();         				
         			}
-	        	}
-	        	
+	        	}        	
 	        	
 	        	return true;
 	        }
