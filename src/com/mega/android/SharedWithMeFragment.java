@@ -70,8 +70,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
-	ArrayList<MegaShareIn> megaShareInList = null;
-	ArrayList<MegaShareIn> megaShareOutList = null;
+	ArrayList<MegaShareAndroidElement> megaShareInList = null;
+	ArrayList<MegaShareAndroidElement> megaShareOutList = null;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -216,8 +216,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		megaShareInList = new ArrayList<MegaShareIn> ();
-		megaShareOutList = new ArrayList<MegaShareIn> ();
+		megaShareInList = new ArrayList<MegaShareAndroidElement> ();
+		megaShareOutList = new ArrayList<MegaShareAndroidElement> ();
 		
 		owner=null;
 		parentHandle = -1;
@@ -237,45 +237,93 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
  
 		
 		if(modeShare==MODE_IN){
+			if (adapterList != null){
+				adapterList.setType(MODE_IN);
+			}
 			
 			uL = megaApi.getContacts();
-			
+			megaShareInList.clear();
+			megaShareOutList.clear();
 			for(int i=0; i<uL.size();i++){
 				MegaUser user=uL.get(i);
 				log("USER: " + user.getEmail());
 				NodeList inNodeList=megaApi.getInShares(user);
 				if(inNodeList.size()>0){
-					MegaShareIn mSI = new MegaShareIn(user, null);
-					megaShareInList.add(mSI);
+					MegaShareAndroidElement mSIn = new MegaShareAndroidElement(user, null);
+					megaShareInList.add(mSIn);
 					for(int j=0; j<inNodeList.size();j++){
 						MegaNode node = inNodeList.get(j).copy();
-						mSI = new MegaShareIn(user, node);
+						mSIn = new MegaShareAndroidElement(user, node);
 						log("node.getName() = " + node.getName());
-						megaShareInList.add(mSI);
+						megaShareInList.add(mSIn);
 					}					
 				}				
 			}
 		}
 		else{
-			//TODO mode out
-			outNodeList = megaApi.getOutShares();
-			for(int i=0;i<outNodeList.size();i++){
-				
-				MegaShare mS = outNodeList.get(i);				
-				
-				MegaUser user=megaApi.getContact(mS.getUser());
-				log("USER: " + user.getEmail());
-					
-				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
-				MegaShareIn mSI = new MegaShareIn(user, node);
-				
-				log("NODE: " + node.getName());
-				
-				megaShareOutList.add(mSI);				
-				
+
+			if (adapterList != null){
+				adapterList.setType(MODE_OUT);
 			}
-				
 			
+			outNodeList = megaApi.getOutShares();
+			//outNodeList = megaApi.getOutShares();
+			log("outNodeList.size:" +outNodeList.size());
+			
+			long lastFolder=-1;
+			megaShareInList.clear();
+			megaShareOutList.clear();
+			
+			for(int k=0;k<outNodeList.size();k++){
+				
+				
+				MegaShare mS = outNodeList.get(k);				
+				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
+				
+				log("Node: "+node.getHandle());
+				
+				if(lastFolder!=node.getHandle()){
+					log("Entro por distinto");
+					if(mS.getUser()!=null){						
+						MegaUser user=megaApi.getContact(mS.getUser());					
+						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);					
+						megaShareOutList.add(mSOut);	
+								
+					}	
+					else{
+						
+						//Ojo el node que es public link
+						log("Public link");
+						
+						MegaUser user=null;					
+						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
+						megaShareOutList.add(mSOut);
+
+					}
+					lastFolder=node.getHandle();
+				}
+				else{
+					log("Entro por igual");
+					if(mS.getUser()!=null){
+						
+						MegaUser user=megaApi.getContact(mS.getUser());					
+						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
+						mSOut.setRepeat(true);
+						megaShareOutList.add(mSOut);	
+						lastFolder=node.getHandle();						
+						
+					}	
+					else{						
+						//Ojo el node que es public link
+						log("Public link");						
+						MegaUser user=null;					
+						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
+						mSOut.setRepeat(true);
+						megaShareOutList.add(mSOut);
+
+					}
+				}
+			}
 		}
 			
 		//outNodeList.get(0).
@@ -347,6 +395,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				//MODE OUT
 				log("Creo adapter OUT");
 				if (adapterList == null){
+					
 					adapterList = new MegaShareInOutAdapter(context, megaShareOutList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_OUT);
 					//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
 					if (mTHash != null){
@@ -445,111 +494,223 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				adapterList.notifyDataSetChanged();
 			}
 			else{				
-				 
-				if(megaShareInList.get(position).getNode()!=null){
-					if (megaShareInList.get(position).getNode().isFolder()){
-						MegaNode parentNode = megaShareInList.get(position).getNode();
-						MegaUser user= megaShareInList.get(position).getUser();
-						owner=user;
-						NodeList childrenNodes;
-						
-						if(parentHandle==-1){						
-							initialParentHandle=megaShareInList.get(position).getNode().getHandle();
-							log("------------------Initial Parent Handle: "+initialParentHandle);
-						}
-						
-						aB.setTitle(parentNode.getName());
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-						((ManagerActivity)context).supportInvalidateOptionsMenu();
-						
-						parentHandle = megaShareInList.get(position).getNode().getHandle();
-						((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-						adapterList.setParentHandle(parentHandle);
-						
-						childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
-						
-						megaShareInList.clear();
-						
-						for(int i=0; i<childrenNodes.size();i++){
+				 if(modeShare==MODE_IN){
+					if(megaShareInList.get(position).getNode()!=null){
+						if (megaShareInList.get(position).getNode().isFolder()){
+							MegaNode parentNode = megaShareInList.get(position).getNode();
+							MegaUser user= megaShareInList.get(position).getUser();
+							owner=user;
+							NodeList childrenNodes;
 							
-							MegaNode nodeChild = childrenNodes.get(i);
-							MegaShareIn msIn = new MegaShareIn(user, nodeChild);
-							megaShareInList.add(msIn);
+							if(parentHandle==-1){						
+								initialParentHandle=megaShareInList.get(position).getNode().getHandle();
+								log("------------------Initial Parent Handle: "+initialParentHandle);
+							}
 							
-						}
-															
-						adapterList.setNodes(megaShareInList);
-						listView.setSelection(0);
-						
-						//If folder has no files
-						if (adapterList.getCount() == 0){
-							listView.setVisibility(View.GONE);
-							emptyImageView.setVisibility(View.VISIBLE);
-							emptyTextView.setVisibility(View.VISIBLE);						
-							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextView.setText(R.string.file_browser_empty_folder);
+							aB.setTitle(parentNode.getName());
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+							((ManagerActivity)context).supportInvalidateOptionsMenu();
 							
-						}
-						else{
-							listView.setVisibility(View.VISIBLE);
-							emptyImageView.setVisibility(View.GONE);
-							emptyTextView.setVisibility(View.GONE);
-						}
-					}
-					else{
-						if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isImage()){
-							Intent intent = new Intent(context, FullScreenImageViewer.class);
-							intent.putExtra("position", position);
-							intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
-							if (megaApi.getParentNode(megaShareInList.get(position).getNode()).getType() == MegaNode.TYPE_INCOMING){
-								intent.putExtra("parentNodeHandle", -1L);
+							parentHandle = megaShareInList.get(position).getNode().getHandle();
+							((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+							adapterList.setParentHandle(parentHandle);
+							
+							childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
+							
+							megaShareInList.clear();
+							
+							for(int i=0; i<childrenNodes.size();i++){
+								
+								MegaNode nodeChild = childrenNodes.get(i);
+								MegaShareAndroidElement msIn = new MegaShareAndroidElement(user, nodeChild);
+								megaShareInList.add(msIn);
+								
+							}
+																
+							adapterList.setNodes(megaShareInList);
+							listView.setSelection(0);
+							
+							//If folder has no files
+							if (adapterList.getCount() == 0){
+								listView.setVisibility(View.GONE);
+								emptyImageView.setVisibility(View.VISIBLE);
+								emptyTextView.setVisibility(View.VISIBLE);						
+								emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+								emptyTextView.setText(R.string.file_browser_empty_folder);
+								
 							}
 							else{
-								intent.putExtra("parentNodeHandle", megaApi.getParentNode(megaShareInList.get(position).getNode()).getHandle());
+								listView.setVisibility(View.VISIBLE);
+								emptyImageView.setVisibility(View.GONE);
+								emptyTextView.setVisibility(View.GONE);
 							}
-							intent.putExtra("orderGetChildren", orderGetChildren);
-							startActivity(intent);
-						}
-						else if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isVideo() || MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isAudio()){
-							MegaNode file = megaShareInList.get(position).getNode();
-							Intent service = new Intent(context, MegaStreamingService.class);
-					  		context.startService(service);
-					  		String fileName = file.getName();
-							try {
-								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-							} 
-							catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-							
-					  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeType.typeForName(file.getName()).getType();
-					  		System.out.println("FILENAME: " + fileName);
-					  		
-					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					  		try
-					  		{
-					  			startActivity(mediaIntent);
-					  		}
-					  		catch(Exception e)
-					  		{
-					  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-					  		}						
 						}
 						else{
-							adapterList.setPositionClicked(-1);
-							adapterList.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(megaShareInList.get(position).getNode().getHandle());
-							((ManagerActivity) context).onFileClick(handleList);
+							if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isImage()){
+								Intent intent = new Intent(context, FullScreenImageViewer.class);
+								intent.putExtra("position", position);
+								intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
+								if (megaApi.getParentNode(megaShareInList.get(position).getNode()).getType() == MegaNode.TYPE_INCOMING){
+									intent.putExtra("parentNodeHandle", -1L);
+								}
+								else{
+									intent.putExtra("parentNodeHandle", megaApi.getParentNode(megaShareInList.get(position).getNode()).getHandle());
+								}
+								intent.putExtra("orderGetChildren", orderGetChildren);
+								startActivity(intent);
+							}
+							else if (MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isVideo() || MimeType.typeForName(megaShareInList.get(position).getNode().getName()).isAudio()){
+								MegaNode file = megaShareInList.get(position).getNode();
+								Intent service = new Intent(context, MegaStreamingService.class);
+						  		context.startService(service);
+						  		String fileName = file.getName();
+								try {
+									fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+								} 
+								catch (UnsupportedEncodingException e) {
+									e.printStackTrace();
+								}
+								
+						  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+						  		String mimeType = MimeType.typeForName(file.getName()).getType();
+						  		System.out.println("FILENAME: " + fileName);
+						  		
+						  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+						  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+						  		try
+						  		{
+						  			startActivity(mediaIntent);
+						  		}
+						  		catch(Exception e)
+						  		{
+						  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+						  		}						
+							}
+							else{
+								adapterList.setPositionClicked(-1);
+								adapterList.notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(megaShareInList.get(position).getNode().getHandle());
+								((ManagerActivity) context).onFileClick(handleList);
+							}
 						}
+						
 					}
-					
+					else{
+						 //Pulsamos el contacto
+					}
 				}
-				else{
-					 //Pulsamos el contacto
-				}
+				 else{
+					 //MODE OUT
+						if(megaShareOutList.get(position).getNode()!=null){
+							if (megaShareOutList.get(position).getNode().isFolder()){
+								MegaNode parentNode = megaShareOutList.get(position).getNode();
+								
+								MegaUser user= megaShareOutList.get(position).getUser();
+								owner=user;
+								NodeList childrenNodes;
+								
+								if(parentHandle==-1){						
+									initialParentHandle=megaShareOutList.get(position).getNode().getHandle();
+									log("------------------Initial Parent Handle: "+initialParentHandle);
+								}
+								
+								aB.setTitle(parentNode.getName());
+								((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+								((ManagerActivity)context).supportInvalidateOptionsMenu();
+								
+								parentHandle = megaShareOutList.get(position).getNode().getHandle();
+								((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+								adapterList.setParentHandle(parentHandle);
+								
+								childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
+								
+								megaShareOutList.clear();
+								
+								for(int i=0; i<childrenNodes.size();i++){
+									
+									MegaNode nodeChild = childrenNodes.get(i);
+									MegaShareAndroidElement msIn = new MegaShareAndroidElement(user, nodeChild);
+									megaShareOutList.add(msIn);
+									
+								}
+																	
+								adapterList.setNodes(megaShareOutList);
+								listView.setSelection(0);
+								
+								//If folder has no files
+								if (adapterList.getCount() == 0){
+									listView.setVisibility(View.GONE);
+									emptyImageView.setVisibility(View.VISIBLE);
+									emptyTextView.setVisibility(View.VISIBLE);						
+									emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+									emptyTextView.setText(R.string.file_browser_empty_folder);
+									
+								}
+								else{
+									listView.setVisibility(View.VISIBLE);
+									emptyImageView.setVisibility(View.GONE);
+									emptyTextView.setVisibility(View.GONE);
+								}
+							}
+							else{
+								if (MimeType.typeForName(megaShareOutList.get(position).getNode().getName()).isImage()){
+									Intent intent = new Intent(context, FullScreenImageViewer.class);
+									intent.putExtra("position", position);
+									intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
+									if (megaApi.getParentNode(megaShareOutList.get(position).getNode()).getType() == MegaNode.TYPE_INCOMING){
+										intent.putExtra("parentNodeHandle", -1L);
+									}
+									else{
+										intent.putExtra("parentNodeHandle", megaApi.getParentNode(megaShareOutList.get(position).getNode()).getHandle());
+									}
+									intent.putExtra("orderGetChildren", orderGetChildren);
+									startActivity(intent);
+								}
+								else if (MimeType.typeForName(megaShareOutList.get(position).getNode().getName()).isVideo() || MimeType.typeForName(megaShareOutList.get(position).getNode().getName()).isAudio()){
+									MegaNode file = megaShareOutList.get(position).getNode();
+									Intent service = new Intent(context, MegaStreamingService.class);
+							  		context.startService(service);
+							  		String fileName = file.getName();
+									try {
+										fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+									} 
+									catch (UnsupportedEncodingException e) {
+										e.printStackTrace();
+									}
+									
+							  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+							  		String mimeType = MimeType.typeForName(file.getName()).getType();
+							  		System.out.println("FILENAME: " + fileName);
+							  		
+							  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+							  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+							  		try
+							  		{
+							  			startActivity(mediaIntent);
+							  		}
+							  		catch(Exception e)
+							  		{
+							  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+							  		}						
+								}
+								else{
+									adapterList.setPositionClicked(-1);
+									adapterList.notifyDataSetChanged();
+									ArrayList<Long> handleList = new ArrayList<Long>();
+									handleList.add(megaShareOutList.get(position).getNode().getHandle());
+									((ManagerActivity) context).onFileClick(handleList);
+								}
+							}
+							
+						}
+						else{
+							 //Pulsamos el contacto
+						}
+					 
+					 
+					 
+				 }
 			}
 		}
     }
@@ -676,7 +837,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					for(int i=0; i<childrenNodes.size();i++){
 
 						MegaNode nodeChild = childrenNodes.get(i);
-						MegaShareIn msIn = new MegaShareIn(owner, nodeChild);
+						MegaShareAndroidElement msIn = new MegaShareAndroidElement(owner, nodeChild);
 						megaShareInList.add(msIn);
 
 					}				
@@ -696,6 +857,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);							
 		
 							megaShareInList.clear();
+							megaShareOutList.clear();
 		
 							if(modeShare==MODE_IN){
 		
@@ -706,11 +868,11 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 									log("USER: " + user.getEmail());
 									NodeList inNodeList=megaApi.getInShares(user);
 									if(inNodeList.size()>0){
-										MegaShareIn mSI = new MegaShareIn(user, null);
+										MegaShareAndroidElement mSI = new MegaShareAndroidElement(user, null);
 										megaShareInList.add(mSI);
 										for(int j=0; j<inNodeList.size();j++){
 											MegaNode node = inNodeList.get(j).copy();
-											mSI = new MegaShareIn(user, node);
+											mSI = new MegaShareAndroidElement(user, node);
 											log("node.getName() = " + node.getName());
 											megaShareInList.add(mSI);
 										}					
@@ -718,7 +880,67 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 								}
 							}
 							else{
-								//TODO: el modo out
+								//TODO: el modo out		
+								
+								outNodeList = megaApi.getOutShares();
+								//outNodeList = megaApi.getOutShares();
+								log("outNodeList.size:" +outNodeList.size());
+								
+								long lastFolder=-1;
+								megaShareInList.clear();
+								megaShareOutList.clear();
+								
+								for(int k=0;k<outNodeList.size();k++){
+									
+									
+									MegaShare mS = outNodeList.get(k);				
+									MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
+									
+									log("Node: "+node.getHandle());
+									
+									if(lastFolder!=node.getHandle()){
+										log("Entro por distinto");
+										if(mS.getUser()!=null){						
+											MegaUser user=megaApi.getContact(mS.getUser());					
+											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);					
+											megaShareOutList.add(mSOut);	
+													
+										}	
+										else{
+											
+											//Ojo el node que es public link
+											log("Public link");
+											
+											MegaUser user=null;					
+											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
+											megaShareOutList.add(mSOut);
+
+										}
+										lastFolder=node.getHandle();
+									}
+									else{
+										log("Entro por igual");
+										if(mS.getUser()!=null){
+											
+											MegaUser user=megaApi.getContact(mS.getUser());					
+											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
+											mSOut.setRepeat(true);
+											megaShareOutList.add(mSOut);	
+											lastFolder=node.getHandle();						
+											
+										}	
+										else{						
+											//Ojo el node que es public link
+											log("Public link");						
+											MegaUser user=null;					
+											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
+											mSOut.setRepeat(true);
+											megaShareOutList.add(mSOut);
+
+										}
+									}
+								}											
+								
 							}
 		
 							owner=null;
@@ -820,7 +1042,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		return listView;
 	}
 	
-	public void setNodes(ArrayList<MegaShareIn> _megaShareInList){
+	public void setNodes(ArrayList<MegaShareAndroidElement> _megaShareInList){
 		this.megaShareInList = _megaShareInList;
 		if (isList){
 			if (adapterList != null){
@@ -937,7 +1159,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	}
 	
 	public void setModeShare(int mode){
-		modeShare=mode;			
+		modeShare=mode;	
 	}
 	
 	private static void log(String log) {
