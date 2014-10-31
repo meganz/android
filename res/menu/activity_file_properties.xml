@@ -12,50 +12,50 @@
 	<item
 	    android:id="@+id/action_file_properties_share_folder"
 	    android:orderInCategory="105"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_share_folder"
 	    android:icon="@drawable/ic_share"
-	    MEGA:showAsAction="always" />
+	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_properties_get_link"
 	    android:orderInCategory="110"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_get_link_menu"
 	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_properties_rename"
 	    android:orderInCategory="115"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_rename"
 	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_properties_move"
 	    android:orderInCategory="120"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_move"
 	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_properties_copy"
 	    android:orderInCategory="125"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_copy"
 	    MEGA:showAsAction="never" />
 	
  	<item
 	    android:id="@+id/action_file_properties_send_link"
 	    android:orderInCategory="130"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_send_link"
 	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_properties_remove"
 	    android:orderInCategory="135"
-	    android:showAsAction="always"
+	    android:showAsAction="never"
 	    android:title="@string/context_remove"
 	    MEGA:showAsAction="never" />
 </menu>
