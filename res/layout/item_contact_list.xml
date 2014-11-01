@@ -4,23 +4,37 @@
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/contact_list_item_layout" >
+    
+    <RelativeLayout
+		android:id="@+id/contact_list_relative_layout_avatar"
+		android:layout_width="54dp"
+		android:layout_height="54dp"
+		android:layout_marginLeft="5dp" 
+		android:paddingTop="3dp" >
          
-    <com.mega.components.RoundedImageView 
-         android:id="@+id/contact_list_thumbnail"
-         android:layout_width="54dp"
-         android:layout_height="54dp"
-         android:layout_marginLeft="5dp" 
-         android:scaleType="fitCenter"
-         android:paddingTop="3dp"
-         rounded:corner_radius="27dp" 
-         rounded:border_width="2dp"
-         rounded:border_color="@color/border_file_properties"/>
+	    <com.mega.components.RoundedImageView 
+	         android:id="@+id/contact_list_thumbnail"
+	         android:layout_width="54dp"
+	         android:layout_height="54dp" 
+	         android:scaleType="fitCenter"         
+	         rounded:corner_radius="27dp" 
+	         rounded:border_width="2dp"
+	         rounded:border_color="@color/border_file_properties"/>
+	    
+	    <TextView
+	        android:id="@+id/contact_list_initial_letter"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent" 
+	        android:layout_centerInParent="true"
+		    android:gravity="center_horizontal|center_vertical" />
+	    
+    </RelativeLayout>
     
     <TextView
         android:id="@+id/contact_list_name"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_toRightOf="@id/contact_list_thumbnail"
+        android:layout_toRightOf="@id/contact_list_relative_layout_avatar"
         android:paddingLeft="5dp"
         android:paddingTop="7dp" />  
     
@@ -28,7 +42,7 @@
         android:id="@+id/contact_list_content"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_toRightOf="@id/contact_list_thumbnail"
+        android:layout_toRightOf="@id/contact_list_relative_layout_avatar"
         android:layout_below="@id/contact_list_name"
         android:paddingLeft="5dp"
         android:paddingBottom="7dp"

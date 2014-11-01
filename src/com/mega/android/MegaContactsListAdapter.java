@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
@@ -80,6 +81,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				MegaError e) {
 			log("onRequestFinish()");
 			if (e.getErrorCode() == MegaError.API_OK){
+				boolean avatarExists = false;
 				
 				pendingAvatars.remove(request.getEmail());
 				
@@ -102,13 +104,88 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 								avatar.delete();
 							}
 							else{
+								avatarExists = true;
 								holder.imageView.setImageBitmap(bitmap);
 							}
 						}
 					}
-					adapter.notifyDataSetChanged();
+					
+					if (!avatarExists){
+						createDefaultAvatar();
+					}
 				}
 			}
+			else{
+				pendingAvatars.remove(request.getEmail());
+				
+				if (holder.contactMail.compareTo(request.getEmail()) == 0){
+					createDefaultAvatar();
+				}
+			}
+		}
+		
+		public void createDefaultAvatar(){
+			log("createDefaultAvatar()");
+			
+			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			
+			int radius; 
+	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+	        	radius = defaultAvatar.getWidth()/2;
+	        else
+	        	radius = defaultAvatar.getHeight()/2;
+	        
+			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+			holder.imageView.setImageBitmap(defaultAvatar);
+			
+			
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = context.getResources().getDisplayMetrics().density;
+		    
+		    int avatarTextSize = getAvatarTextSize(density);
+		    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		    if (holder.contactMail != null){
+			    if (holder.contactMail.length() > 0){
+			    	log("TEXT: " + holder.contactMail);
+			    	log("TEXT AT 0: " + holder.contactMail.charAt(0));
+			    	String firstLetter = holder.contactMail.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.contactInitialLetter.setText(firstLetter);
+			    	holder.contactInitialLetter.setTextSize(32);
+			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
+			    }
+		    }
+		}
+		
+		private int getAvatarTextSize (float density){
+			float textSize = 0.0f;
+			
+			if (density > 3.0){
+				textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+			}
+			else if (density > 2.0){
+				textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+			}
+			else if (density > 1.5){
+				textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+			}
+			else if (density > 1.0){
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+			}
+			else if (density > 0.75){
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+			}
+			else{
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+			}
+			
+			return (int)textSize;
 		}
 
 		@Override
@@ -138,6 +215,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	/*private view holder class*/
     private class ViewHolderContactsList {
     	RoundedImageView imageView;
+    	TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
         TextView textViewContent;
@@ -172,7 +250,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			convertView = inflater.inflate(R.layout.item_contact_list, parent, false);
 			holder = new ViewHolderContactsList();
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_item_layout);
-			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail);	        
+			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail);	
+			holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_list_initial_letter);
 			holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_list_name);
 			holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_list_content);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots);

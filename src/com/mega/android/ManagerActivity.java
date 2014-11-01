@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.components.EditTextCursorWatcher;
+import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaAccountDetails;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -184,7 +185,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	private TableLayout topControlBar;
 	private TableLayout bottomControlBar;
-	private ImageView imageProfile;
+	private RoundedImageView imageProfile;
 	private TextView textViewProfile;
 	private TextView userName;
 	private TextView userEmail;
@@ -351,7 +352,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		setContentView(R.layout.activity_manager);
 
-		imageProfile = (ImageView) findViewById(R.id.profile_photo);
+		imageProfile = (RoundedImageView) findViewById(R.id.profile_photo);
 		textViewProfile = (TextView) findViewById(R.id.profile_textview);
 		userEmail = (TextView) findViewById(R.id.profile_user_email);
 		userEmail.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;

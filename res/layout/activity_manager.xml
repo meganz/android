@@ -1,5 +1,6 @@
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -37,18 +38,25 @@
 				android:layout_height="55dp"
 				android:paddingLeft="5dp"
 			    android:paddingTop="5dp"
-			    android:paddingBottom="5dp" >
+			    android:paddingBottom="5dp"
+			    android:paddingRight="5dp" >
             
-	            <ImageView
+	            <com.mega.components.RoundedImageView 
 				    android:id="@+id/profile_photo" 
-				    android:layout_width="55dp"
-				    android:layout_height="55dp" />
+				    android:layout_width="50dp"
+				    android:layout_height="50dp"
+				    android:scaleType="fitCenter"         
+			        rounded:corner_radius="25dp" 
+			        rounded:border_width="2dp"
+			        rounded:border_color="@color/border_file_properties" />
 	            
 	            <TextView
 	                android:id="@+id/profile_textview"
-	                android:layout_width="55dp"
-				    android:layout_height="wrap_content"
-				    android:paddingLeft="13dp" />
+	                android:layout_width="fill_parent"
+				    android:layout_height="fill_parent"
+				    android:layout_centerInParent="true"
+				    android:gravity="center_horizontal|center_vertical"
+				    android:paddingBottom="5dp"  />
 	            
 	        </RelativeLayout>
             

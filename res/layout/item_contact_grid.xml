@@ -17,16 +17,35 @@
         android:layout_marginTop="5dp"
         android:descendantFocusability="blocksDescendants" >
         
-        
-    <com.mega.components.RoundedImageView 
-	    android:id="@+id/contact_grid_thumbnail1"
-	    android:layout_width="157dp"
-	    android:layout_height="157dp"
-	    android:layout_centerHorizontal="true"
-	    android:scaleType="fitCenter"
-        rounded:corner_radius="27dp" 
-        rounded:border_width="2dp"
-        rounded:border_color="@color/border_file_properties"/>
+        <RelativeLayout
+			android:id="@+id/contact_grid_relative_layout_avatar1"
+			android:layout_width="157dp"
+		    android:layout_height="157dp"
+		    android:layout_centerHorizontal="true"
+		    android:paddingTop="5dp"
+		    android:paddingBottom="5dp"
+		    android:layout_marginLeft="5dp"
+		    android:layout_marginTop="5dp"
+		    android:layout_marginRight="5dp"
+			>
+		
+		    <com.mega.components.RoundedImageView 
+			    android:id="@+id/contact_grid_thumbnail1"
+			    android:layout_width="157dp"
+			    android:layout_height="157dp"
+			    android:scaleType="fitCenter"
+		        rounded:corner_radius="27dp" 
+		        rounded:border_width="2dp"
+		        rounded:border_color="@color/border_file_properties"/>
+		    
+		    <TextView
+		        android:id="@+id/contact_grid_initial_letter1"
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent" 
+		        android:layout_centerInParent="true"
+			    android:gravity="center_horizontal|center_vertical" />
+	    
+	    </RelativeLayout>
                 
         <View
 	        android:id="@+id/contact_grid_separator1"
@@ -36,7 +55,7 @@
 	        android:scaleType="fitCenter"
 	        android:layout_marginLeft="6dp"
 	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/contact_grid_thumbnail1"
+	        android:layout_below="@id/contact_grid_relative_layout_avatar1"
 	 		 />
         
         <TextView
@@ -137,15 +156,35 @@
         android:background="@drawable/background_item_grid"
         android:layout_alignParentRight="true">
         
-        <com.mega.components.RoundedImageView 
-		    android:id="@+id/contact_grid_thumbnail2"
-		    android:layout_width="157dp"
+        <RelativeLayout
+			android:id="@+id/contact_grid_relative_layout_avatar2"
+			android:layout_width="157dp"
 		    android:layout_height="157dp"
 		    android:layout_centerHorizontal="true"
-		    android:scaleType="fitCenter"
-	        rounded:corner_radius="27dp" 
-	        rounded:border_width="2dp"
-	        rounded:border_color="@color/border_file_properties"/>
+		    android:paddingTop="5dp"
+		    android:paddingBottom="5dp"
+		    android:layout_marginLeft="5dp"
+		    android:layout_marginTop="5dp"
+		    android:layout_marginRight="5dp"
+			>
+		
+		    <com.mega.components.RoundedImageView 
+			    android:id="@+id/contact_grid_thumbnail2"
+			    android:layout_width="157dp"
+			    android:layout_height="157dp"
+			    android:scaleType="fitCenter"
+		        rounded:corner_radius="27dp" 
+		        rounded:border_width="2dp"
+		        rounded:border_color="@color/border_file_properties"/>
+		    
+		    <TextView
+		        android:id="@+id/contact_grid_initial_letter2"
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent" 
+		        android:layout_centerInParent="true"
+			    android:gravity="center_horizontal|center_vertical" />
+	    
+	    </RelativeLayout>
 
         <View
 	        android:id="@+id/contact_grid_separator2"
@@ -155,7 +194,7 @@
 	        android:scaleType="fitCenter"
 	        android:layout_marginLeft="6dp"
 	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/contact_grid_thumbnail2"/>
+	        android:layout_below="@id/contact_grid_relative_layout_avatar2"/>
         
         <TextView
 	        android:id="@+id/contact_grid_filename2"

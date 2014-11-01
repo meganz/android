@@ -3,6 +3,7 @@ package com.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
@@ -22,7 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -76,6 +79,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			log("onRequestFinish()");
+			boolean avatarExists = false;
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (numView == 1){
 					if (holder.contactMail1.compareTo(request.getEmail()) == 0){
@@ -97,11 +101,11 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 									avatar.delete();
 								}
 								else{
+									avatarExists = true;
 									holder.imageView1.setImageBitmap(bitmap);
 								}
 							}
 						}
-						adapter.notifyDataSetChanged();
 					}
 				}
 				else if (numView == 2){
@@ -124,14 +128,101 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 									avatar.delete();
 								}
 								else{
+									avatarExists = true;
 									holder.imageView2.setImageBitmap(bitmap);
 								}
 							}
 						}
-						adapter.notifyDataSetChanged();
 					}
 				}
 			}
+			
+			if (!avatarExists){
+				createDefaultAvatar();
+			}
+		}
+		
+		public void createDefaultAvatar(){
+			log("createDefaultAvatar()");
+			
+			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			
+			int radius; 
+	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+	        	radius = defaultAvatar.getWidth()/2;
+	        else
+	        	radius = defaultAvatar.getHeight()/2;
+	        
+			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+			if (numView == 1){
+				holder.imageView1.setImageBitmap(defaultAvatar);
+			}
+			else if (numView == 2){
+				holder.imageView2.setImageBitmap(defaultAvatar);
+			}
+			
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = context.getResources().getDisplayMetrics().density;
+		    
+		    int avatarTextSize = getAvatarTextSize(density);
+		    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		    if (numView == 1){
+			    if (holder.contactMail1 != null){
+				    if (holder.contactMail1.length() > 0){
+				    	log("TEXT: " + holder.contactMail1);
+				    	log("TEXT AT 0: " + holder.contactMail1.charAt(0));
+				    	String firstLetter = holder.contactMail1.charAt(0) + "";
+				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				    	holder.contactInitialLetter1.setText(firstLetter);
+				    	holder.contactInitialLetter1.setTextSize(100);
+				    	holder.contactInitialLetter1.setTextColor(Color.WHITE);
+				    }
+			    }
+		    }
+		    else if (numView == 2){
+		    	if (holder.contactMail2 != null){
+				    if (holder.contactMail2.length() > 0){
+				    	log("TEXT: " + holder.contactMail2);
+				    	log("TEXT AT 0: " + holder.contactMail2.charAt(0));
+				    	String firstLetter = holder.contactMail2.charAt(0) + "";
+				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				    	holder.contactInitialLetter2.setText(firstLetter);
+				    	holder.contactInitialLetter2.setTextSize(100);
+				    	holder.contactInitialLetter2.setTextColor(Color.WHITE);
+				    }
+			    }
+		    }
+		}
+		
+		private int getAvatarTextSize (float density){
+			float textSize = 0.0f;
+			
+			if (density > 3.0){
+				textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+			}
+			else if (density > 2.0){
+				textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+			}
+			else if (density > 1.5){
+				textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+			}
+			else if (density > 1.0){
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+			}
+			else if (density > 0.75){
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+			}
+			else{
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+			}
+			
+			return (int)textSize;
 		}
 
 		@Override
@@ -161,9 +252,11 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	/*private view holder class*/
     private class ViewHolderContactsGrid {
         RoundedImageView imageView1;
+        TextView contactInitialLetter1;
         TextView textViewContactName1;
         RelativeLayout itemLayout1;
         RoundedImageView imageView2;
+        TextView contactInitialLetter2;
         TextView textViewContactName2;
         RelativeLayout itemLayout2;
         TextView textViewContent1;
@@ -230,10 +323,12 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			
 			holder.imageView1 = (RoundedImageView) v.findViewById(R.id.contact_grid_thumbnail1);
 			holder.imageView1.setCornerRadius(Util.px2dp(78*scaleW, outMetrics));
+			holder.contactInitialLetter1 = (TextView) v.findViewById(R.id.contact_grid_initial_letter1);
             holder.imageView2 = (RoundedImageView) v.findViewById(R.id.contact_grid_thumbnail2);
 			holder.imageView2.setCornerRadius(Util.px2dp(78*scaleW, outMetrics));
-			holder.imageView1.setPadding(0, Util.px2dp(5*scaleH, outMetrics), 0, Util.px2dp(5*scaleH, outMetrics));
-			holder.imageView2.setPadding(0, Util.px2dp(5*scaleH, outMetrics), 0, Util.px2dp(5*scaleH, outMetrics));
+			holder.contactInitialLetter2 = (TextView) v.findViewById(R.id.contact_grid_initial_letter2);
+//			holder.imageView1.setPadding(0, Util.px2dp(5*scaleH, outMetrics), 0, Util.px2dp(5*scaleH, outMetrics));
+//			holder.imageView2.setPadding(0, Util.px2dp(5*scaleH, outMetrics), 0, Util.px2dp(5*scaleH, outMetrics));
 
 			holder.imageView1.setTag(holder);
             holder.imageView1.setOnClickListener(this);
@@ -241,17 +336,17 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
             holder.imageView2.setTag(holder);
             holder.imageView2.setOnClickListener(this);
                         
-			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-			paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-			holder.imageView1.setLayoutParams(paramsIV1);
+//			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
+//			paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+//			holder.imageView1.setLayoutParams(paramsIV1);
 			
-			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-			holder.imageView2.setLayoutParams(paramsIV2);
+//			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
+//			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+//			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
+//			paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
+//			holder.imageView2.setLayoutParams(paramsIV2);
 
 			holder.textViewContactName1 = (TextView) v.findViewById(R.id.contact_grid_filename1);
 			holder.textViewContactName1.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
