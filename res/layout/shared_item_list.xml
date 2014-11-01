@@ -49,6 +49,7 @@
     <ProgressBar
 	    android:id="@+id/transfers_list_bar_share"
 		android:layout_width="fill_parent"
+		
 		android:layout_height="wrap_content" 
 		style="@style/MEGAProgressBarTransfers"  
 		android:layout_margin="5dip"
@@ -66,7 +67,8 @@
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/contact_share_item_layout"
-	    android:background="@color/photo_sync_month_layout"	    
+	    android:background="@color/photo_sync_month_layout"
+	    android:layout_below="@+id/file_share_item_layout"	    
 	    android:longClickable="false"
 		android:clickable="false">
 	    

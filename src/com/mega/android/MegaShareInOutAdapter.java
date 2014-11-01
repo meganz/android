@@ -52,7 +52,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 
 	long parentHandle = -1;
 
-	ArrayList<MegaShareIn> megaShareInList;
+	ArrayList<MegaShareAndroidElement> megaShareInList;
 	ShareList megaShareOutList;
 	
 	ListView listFragment;
@@ -67,7 +67,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	public static int MODE_OUT = 1;
 
 	//boolean multipleSelect;
-	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
+	int type = ManagerActivity.MODE_IN;
 
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
@@ -91,7 +91,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 		//public TextView textViewOwner;
 	}
 
-	public MegaShareInOutAdapter(Context _context, ArrayList<MegaShareIn> _megaShareInList,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
+	public MegaShareInOutAdapter(Context _context, ArrayList<MegaShareAndroidElement> _megaShareInList,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
 		this.megaShareInList = _megaShareInList;
 		this.megaShareOutList = null;
@@ -114,7 +114,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	}
 	
 	
-	public void setNodes(ArrayList<MegaShareIn> _megaShareInList) {
+	public void setNodes(ArrayList<MegaShareAndroidElement> _megaShareInList) {
 		this.megaShareInList = _megaShareInList;
 		positionClicked = -1;
 		notifyDataSetChanged();
@@ -180,7 +180,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 		
 		if(type==MODE_IN){
 			log("type=MODE_IN");
-			MegaShareIn mUserShare = (MegaShareIn) getItem(position);
+			MegaShareAndroidElement mUserShare = (MegaShareAndroidElement) getItem(position);
 			MegaNode node = mUserShare.getNode();
 			MegaUser megaUser = mUserShare.getUser();
 	
@@ -306,19 +306,88 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 			//type=MODE_OUT
 			log("type=MODE_OUT");
 			
-			MegaShareIn mUserShare = (MegaShareIn) getItem(position);
+			MegaShareAndroidElement mUserShare = (MegaShareAndroidElement) getItem(position);
 			MegaNode node = mUserShare.getNode();
 			MegaUser megaUser = mUserShare.getUser();
 	
 			Bitmap thumb = null;
 			
-			holder.textViewFileName.setText(node.getName());
-
-			
+			String lastFolder=null;
 			if (node.isFolder()) {
-				holder.textViewFileSize.setText(getInfoFolder(node));			
-				
-				holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+			
+				if(mUserShare.isRepeat()){
+					//Pongo el contacto	porque la carpeta es repetida		
+					log("ADAPTER is REPEAT: "+mUserShare.isRepeat());
+
+					if(megaUser!=null){
+						//pongo el contacto
+						
+						holder.contactName.setText(megaUser.getEmail());
+						
+						holder.itemLayoutFile.setVisibility(View.GONE);
+						holder.imageView.setVisibility(View.GONE);
+						holder.textViewFileName.setVisibility(View.GONE);			
+						holder.textViewFileSize.setVisibility(View.GONE);
+						
+						holder.transferProgressBar.setVisibility(View.GONE);	
+						
+						holder.itemLayoutContact.setVisibility(View.VISIBLE);
+						holder.contactName.setVisibility(View.VISIBLE);
+						holder.contactContent.setVisibility(View.VISIBLE);
+					}
+					else{
+						//pongo el public link
+						
+						holder.contactName.setText(R.string.file_properties_shared_folder_public_link);
+						
+						holder.itemLayoutFile.setVisibility(View.GONE);
+						holder.imageView.setVisibility(View.GONE);
+						holder.textViewFileName.setVisibility(View.GONE);			
+						holder.textViewFileSize.setVisibility(View.GONE);
+						
+						holder.transferProgressBar.setVisibility(View.GONE);	
+						
+						holder.itemLayoutContact.setVisibility(View.VISIBLE);
+						holder.contactName.setVisibility(View.VISIBLE);
+						holder.contactContent.setVisibility(View.VISIBLE);
+					}		
+					
+					
+				}
+				else{
+					//Pongo la carpeta
+					
+					log("ADAPTER is NOT");
+					
+					if(megaUser!=null){
+						//pongo el contacto
+						
+						holder.contactName.setText(megaUser.getEmail());
+
+					}
+					else{
+						//pongo el public link
+						
+						holder.contactName.setText(R.string.file_properties_shared_folder_public_link);
+			
+					}		
+					
+					holder.textViewFileName.setText(node.getName());
+					holder.textViewFileSize.setText(getInfoFolder(node));			
+					
+					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					
+					holder.itemLayoutFile.setVisibility(View.VISIBLE);
+					holder.imageView.setVisibility(View.VISIBLE);
+					holder.textViewFileName.setVisibility(View.VISIBLE);			
+					holder.textViewFileSize.setVisibility(View.VISIBLE);
+					
+					holder.transferProgressBar.setVisibility(View.GONE);	
+					
+					holder.itemLayoutContact.setVisibility(View.VISIBLE);
+					holder.contactName.setVisibility(View.VISIBLE);
+					holder.contactContent.setVisibility(View.VISIBLE);
+				}				
 					
 			} else {
 				long nodeSize = node.getSize();
@@ -390,22 +459,20 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 						}
 					}
 				}
+				
+				
+				holder.itemLayoutFile.setVisibility(View.VISIBLE);
+				holder.imageView.setVisibility(View.VISIBLE);
+				holder.textViewFileName.setVisibility(View.VISIBLE);			
+				holder.textViewFileSize.setVisibility(View.VISIBLE);
+				
+				holder.transferProgressBar.setVisibility(View.GONE);	
+				
+				holder.itemLayoutContact.setVisibility(View.GONE);
+				holder.contactName.setVisibility(View.GONE);
+				holder.contactContent.setVisibility(View.GONE);
 			}
-						
-//			holder.optionsLayout.setVisibility(View.GONE);
-			
-			holder.itemLayoutFile.setVisibility(View.VISIBLE);
-			holder.imageView.setVisibility(View.VISIBLE);
-			holder.textViewFileName.setVisibility(View.VISIBLE);			
-			holder.textViewFileSize.setVisibility(View.VISIBLE);
-			
-			holder.transferProgressBar.setVisibility(View.GONE);	
-			
-			holder.itemLayoutContact.setVisibility(View.GONE);
-			holder.contactName.setVisibility(View.GONE);
-			holder.contactContent.setVisibility(View.GONE);
-			
-			
+
 		}
 
 //		holder.imageButtonThreeDots.setTag(holder);
@@ -769,6 +836,15 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
     	notifyDataSetChanged();
     }
     
+	public void setType(int _type) {
+		this.type = _type;
+	}
+	
+    public int getType()
+    {
+    	return this.type;
+    }
+    
     public void setCurrentTransfer(MegaTransfer mT)
     {
     	this.currentTransfer = mT;
@@ -781,6 +857,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
     		notifyDataSetChanged();
     	}
     }   
+    
     
 
 	private static void log(String log) {

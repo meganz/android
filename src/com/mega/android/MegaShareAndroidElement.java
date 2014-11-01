@@ -4,12 +4,21 @@ import com.mega.sdk.MegaUser;
 import com.mega.sdk.NodeList;
 
 
-public class MegaShareIn {
+public class MegaShareAndroidElement {
 	
 	MegaUser user;
-	MegaNode node;	
+	MegaNode node;
+	boolean repeat=false;
 	
-	public MegaShareIn(MegaUser _user, MegaNode _node) {
+	public boolean isRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(boolean repeat) {
+		this.repeat = repeat;
+	}
+
+	public MegaShareAndroidElement(MegaUser _user, MegaNode _node) {
 		super();
 		this.user = _user;
 		this.node = _node;
