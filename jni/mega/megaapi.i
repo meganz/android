@@ -65,6 +65,15 @@
 %feature("director") mega::MegaTransferListener;
 %feature("director") mega::MegaLogger;
 
+
+%typemap(directorargout) (const char *time, int loglevel, const char *source, const char *message)
+%{ 
+	jenv->DeleteLocalRef(jtime); 
+	jenv->DeleteLocalRef(jsource);
+	jenv->DeleteLocalRef(jmessage); 
+%}
+
+
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
 %typemap(directorargout) (char *buffer, size_t size)
 %{ jenv->DeleteLocalRef($input); %}
