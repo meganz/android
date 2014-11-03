@@ -26,8 +26,7 @@
 		    android:paddingBottom="5dp"
 		    android:layout_marginLeft="5dp"
 		    android:layout_marginTop="5dp"
-		    android:layout_marginRight="5dp"
-			>
+		    android:layout_marginRight="5dp">
 		
 		    <com.mega.components.RoundedImageView 
 			    android:id="@+id/contact_grid_thumbnail1"
@@ -40,9 +39,8 @@
 		    
 		    <TextView
 		        android:id="@+id/contact_grid_initial_letter1"
-		        android:layout_width="fill_parent"
-		        android:layout_height="fill_parent" 
-		        android:layout_centerInParent="true"
+		        android:layout_width="157dp"
+		        android:layout_height="140dp" 
 			    android:gravity="center_horizontal|center_vertical" />
 	    
 	    </RelativeLayout>
@@ -179,8 +177,8 @@
 		    
 		    <TextView
 		        android:id="@+id/contact_grid_initial_letter2"
-		        android:layout_width="fill_parent"
-		        android:layout_height="fill_parent" 
+		        android:layout_width="157dp"
+		        android:layout_height="140dp" 
 		        android:layout_centerInParent="true"
 			    android:gravity="center_horizontal|center_vertical" />
 	    
