@@ -3,18 +3,6 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.util.VersionInfo;
-
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.TransferList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
-import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,7 +26,10 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaTransfer;
 
 public class TransfersFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -61,7 +51,7 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	
 //	SparseArray<TransfersHolder> transfersListArray = null;
 	
-	TransferList tL = null;
+	ArrayList<MegaTransfer> tL = null;
 	
 	private ActionMode actionMode;
 	
@@ -402,7 +392,7 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 //		}
 //	}
 	
-	public void setTransfers(TransferList _transfers){
+	public void setTransfers(ArrayList<MegaTransfer> _transfers){
 		this.tL = _transfers;
 		
 		if (adapter != null){

@@ -19,17 +19,16 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import com.mega.sdk.MegaApi;
+import android.os.Handler;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
+
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
-
-import android.os.Handler;
-import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
 public class MegaProxyServer
 {
@@ -610,9 +609,9 @@ public class MegaProxyServer
     	}
  
 		
-		MegaNode node = megaApi.getNodeByHandle(MegaApi.base64ToHandle(handler));
+		MegaNode node = megaApi.getNodeByHandle(MegaApiAndroid.base64ToHandle(handler));
 		if(node == null){
-			node = megaApiFolder.getNodeByHandle(MegaApi.base64ToHandle(handler));
+			node = megaApiFolder.getNodeByHandle(MegaApiAndroid.base64ToHandle(handler));
 			if (node == null){
 				showText("File not found");
 				return new Response( HTTP_NOTFOUND,

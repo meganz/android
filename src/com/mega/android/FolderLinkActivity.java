@@ -8,17 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mega.android.FileStorageActivity.Mode;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.NodeList;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,7 +17,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -45,6 +33,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+
 public class FolderLinkActivity extends PinActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener{
 	
 	FolderLinkActivity folderLinkActivity = this;
@@ -58,7 +55,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	TextView emptyTextView;
 	
 	long parentHandle = -1;
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	
 	MegaBrowserListAdapter adapterList;
 	
@@ -356,7 +353,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			return;
 		
 		folder.mkdir();
-		NodeList nodeList = megaApiFolder.getChildren(parent, orderGetChildren);
+		ArrayList<MegaNode> nodeList = megaApiFolder.getChildren(parent, orderGetChildren);
 		for(int i=0; i<nodeList.size(); i++){
 			MegaNode document = nodeList.get(i);
 			if (document.getType() == MegaNode.TYPE_FOLDER) {

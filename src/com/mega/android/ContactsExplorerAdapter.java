@@ -6,16 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mega.android.ContactsExplorerActivity.PhoneContacts;
-import com.mega.android.utils.Util;
-import com.mega.components.RoundedImageView;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaUser;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,6 +18,16 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.mega.android.ContactsExplorerActivity.PhoneContacts;
+import com.mega.android.utils.Util;
+import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaUser;
 
 /*
  * Adapter for FilestorageActivity list

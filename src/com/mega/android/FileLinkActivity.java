@@ -1,20 +1,9 @@
 package com.mega.android;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.mega.android.FileStorageActivity.Mode;
-import com.mega.android.utils.Util;
-import com.mega.components.RoundedImageView;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -39,6 +28,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.utils.Util;
+import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 
 public class FileLinkActivity extends PinActivity implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -221,7 +220,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK) {
-				document = request.getPublicNode().copy();
+				document = request.getPublicMegaNode();
 				
 				if (document == null){
 					Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, this);

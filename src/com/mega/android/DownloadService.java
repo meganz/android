@@ -3,16 +3,6 @@ package com.mega.android;
 import java.io.File;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaTransferListenerInterface;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -35,6 +25,16 @@ import android.text.format.Formatter;
 import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
 
 /*
  * Background service to download files
@@ -708,7 +708,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				return;
 			}
 			else {
-				MegaNode node = request.getPublicNode().copy();
+				MegaNode node = request.getPublicMegaNode();
 				
 				if (currentDir.isDirectory()){
 					currentFile = new File(currentDir, node.getName());

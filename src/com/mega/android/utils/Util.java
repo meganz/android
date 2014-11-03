@@ -8,60 +8,49 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.mega.android.DatabaseHandler;
-import com.mega.android.MimeType;
-import com.mega.android.R;
-import com.mega.android.R.id;
-import com.mega.android.R.layout;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaError;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.media.MediaScannerConnection;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
-import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mega.android.DatabaseHandler;
+import com.mega.android.MimeType;
+import com.mega.android.R;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaError;
 
 public class Util {
 	

@@ -8,12 +8,6 @@ public class MegaApiSWT extends MegaApiJava
 	}
 	
 	@Override
-	boolean isRunCallbackThreaded()
-	{
-		return true;
-	}
-	
-	@Override
 	void runCallback(Runnable runnable)
 	{
 		Display.getDefault().asyncExec(runnable);	

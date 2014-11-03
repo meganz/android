@@ -1,29 +1,15 @@
 package com.mega.android;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StatFs;
 import android.support.v7.app.ActionBar;
 import android.support.v7.view.ActionMode;
 import android.text.format.DateUtils;
@@ -36,17 +22,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 
-import com.mega.android.FileStorageActivity.Mode;
 import com.mega.android.utils.Util;
-import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -56,8 +40,6 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
 
 public class FileContactListActivity extends PinActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener, OnClickListener, MegaGlobalListenerInterface {
 
@@ -76,13 +58,13 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	ImageView emptyImage;
 	TextView emptyText;
 	
-	ShareList listContacts;	
+	ArrayList<MegaShare> listContacts;	
 	
 	ArrayList<MegaUser> listContactsArray = new ArrayList<MegaUser>();
 	
 	long nodeHandle;
 	MegaNode node;
-	NodeList contactNodes;
+	ArrayList<MegaNode> contactNodes;
 	
 	MegaSharedFolderAdapter adapter;
 	

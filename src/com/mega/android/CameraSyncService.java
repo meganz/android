@@ -8,17 +8,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.NodeList;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -42,6 +31,16 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.text.format.Time;
 import android.widget.RemoteViews;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface{
 
@@ -229,7 +228,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		if (cameraUploadHandle == -1){
-			NodeList nl = megaApi.getChildren(megaApi.getRootNode());
+			ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 			for (int i=0;i<nl.size();i++){
 				if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 					cameraUploadHandle = nl.get(i).getHandle();
@@ -502,7 +501,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				cal.setTimeInMillis(media.timestamp);
 				log("YYYY-MM-DD HH.MM.SS -- " + cal.get(Calendar.YEAR) + "-" + cal.get(Calendar.MONTH) + "-" + cal.get(Calendar.DAY_OF_MONTH) + " " + cal.get(Calendar.HOUR_OF_DAY) + "." + cal.get(Calendar.MINUTE) + "." + cal.get(Calendar.SECOND));
 				boolean photoAlreadyExists = false;
-				NodeList nL = megaApi.getChildren(cameraUploadNode);
+				ArrayList<MegaNode> nL = megaApi.getChildren(cameraUploadNode);
 				for (int i=0;i<nL.size();i++){
 					if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
 						photoAlreadyExists = true;

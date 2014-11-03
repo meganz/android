@@ -1,6 +1,6 @@
 package com.mega.sdk;
 
-public class DelegateMegaTreeProcessor extends MegaTreeProcessor
+class DelegateMegaTreeProcessor extends MegaTreeProcessor
 {
 	MegaApiJava megaApi;
 	MegaTreeProcessorInterface listener;

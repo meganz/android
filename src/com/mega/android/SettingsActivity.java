@@ -2,10 +2,6 @@ package com.mega.android;
 
 import java.io.File;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,8 +12,10 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
 
 public class SettingsActivity extends PinPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
 

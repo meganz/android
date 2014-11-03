@@ -1,6 +1,26 @@
 package com.mega.android;
 
 import java.io.File;
+import java.util.ArrayList;
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TextView;
 
 import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
@@ -11,30 +31,6 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class ContactPropertiesFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
 	
@@ -176,7 +172,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 		}
 	}
 	
-	public String getDescription(NodeList nodes){
+	public String getDescription(ArrayList<MegaNode> nodes){
 		int numFolders = 0;
 		int numFiles = 0;
 		

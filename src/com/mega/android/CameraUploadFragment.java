@@ -4,18 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -28,7 +17,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
-import android.text.format.DateUtils;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +32,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
 
 public class CameraUploadFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener, MegaRequestListenerInterface{
 
@@ -62,7 +59,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	boolean isList = true;
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragment.PhotoSyncHolder>();
 	ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragment.PhotoSyncGridHolder>();
 	
@@ -291,7 +288,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			}
 			
 			if (photosyncHandle == -1){
-				NodeList nl = megaApi.getChildren(megaApi.getRootNode());
+				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
 					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
@@ -417,7 +414,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			}
 			
 			if (photosyncHandle == -1){
-				NodeList nl = megaApi.getChildren(megaApi.getRootNode());
+				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
 					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						photosyncHandle = nl.get(i).getHandle();
@@ -911,7 +908,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		return listView;
 	}
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		this.nodesArray.clear();
 		int month = 0;

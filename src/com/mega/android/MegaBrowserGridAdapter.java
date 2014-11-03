@@ -4,41 +4,23 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -48,13 +30,21 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
+
 public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
 	
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	int positionClicked;
 	
 	MegaApiAndroid megaApi;
@@ -73,7 +63,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	public MegaBrowserGridAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int type) {
+	public MegaBrowserGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -101,7 +91,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		}
 	}
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		positionClicked = -1;	
 		notifyDataSetChanged();
@@ -310,7 +300,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileName1.setText(node1.getName());
 			if (node1.isFolder()){
 				holder.textViewFileSize1.setText(getInfoFolder(node1));
-				ShareList sl = megaApi.getOutShares(node1);
+				ArrayList<MegaShare> sl = megaApi.getOutShares(node1);
 				if (sl != null){
 					if (sl.size() > 0){
 						holder.imageView1.setImageResource(R.drawable.mime_folder_shared);		
@@ -409,7 +399,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				holder.textViewFileName2.setText(node2.getName());
 				if (node2.isFolder()){
 					holder.textViewFileSize2.setText(getInfoFolder(node2));
-					ShareList sl = megaApi.getOutShares(node2);
+					ArrayList<MegaShare> sl = megaApi.getOutShares(node2);
 					if (sl != null){
 						if (sl.size() > 0){
 							holder.imageView2.setImageResource(R.drawable.mime_folder_shared);		
@@ -714,7 +704,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	}
 	
 	private String getInfoFolder (MegaNode n){
-		NodeList nL = megaApi.getChildren(n);
+		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 		
 		int numFolders = 0;
 		int numFiles = 0;

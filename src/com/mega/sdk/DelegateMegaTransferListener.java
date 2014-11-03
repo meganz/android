@@ -1,6 +1,6 @@
 package com.mega.sdk;
 
-public class DelegateMegaTransferListener extends MegaTransferListener
+class DelegateMegaTransferListener extends MegaTransferListener
 {
 	MegaApiJava megaApi;
 	MegaTransferListenerInterface listener;
@@ -23,11 +23,7 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer megaTransfer;
-			if(megaApi.isRunCallbackThreaded())
-				megaTransfer = transfer.copy();
-			else
-				megaTransfer = transfer;
+			final MegaTransfer megaTransfer = transfer.copy();
 			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
@@ -43,19 +39,8 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer megaTransfer;
-			final MegaError megaError;
-			if(megaApi.isRunCallbackThreaded())
-			{
-				megaTransfer = transfer.copy();
-				megaError = e.copy();
-			}
-			else
-			{
-				megaTransfer = transfer;
-				megaError = e;
-			}
-			
+			final MegaTransfer megaTransfer = transfer.copy();
+			final MegaError megaError = e.copy();
 			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
@@ -74,11 +59,7 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer megaTransfer;
-			if(megaApi.isRunCallbackThreaded())
-				megaTransfer = transfer.copy();
-			else
-				megaTransfer = transfer;
+			final MegaTransfer megaTransfer = transfer.copy();
 			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
@@ -94,19 +75,8 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer megaTransfer;
-			final MegaError megaError;
-			if(megaApi.isRunCallbackThreaded())
-			{
-				megaTransfer = transfer.copy();
-				megaError = e.copy();
-			}
-			else
-			{
-				megaTransfer = transfer;
-				megaError = e;
-			}
-			
+			final MegaTransfer megaTransfer = transfer.copy();
+			final MegaError megaError = e.copy();
 			megaApi.runCallback(new Runnable()
 			{
 			    public void run() 
@@ -121,12 +91,7 @@ public class DelegateMegaTransferListener extends MegaTransferListener
 	{
 		if(listener != null)
 		{
-			final MegaTransfer megaTransfer;
-			if(megaApi.isRunCallbackThreaded())
-				megaTransfer = transfer.copy();
-			else
-				megaTransfer = transfer;
-			
+			final MegaTransfer megaTransfer = transfer.copy();
 			return listener.onTransferData(megaApi, megaTransfer, buffer);
 		}	  
 		return false;

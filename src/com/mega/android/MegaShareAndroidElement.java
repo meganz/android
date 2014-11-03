@@ -1,7 +1,6 @@
 package com.mega.android;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
 
 
 public class MegaShareAndroidElement {

@@ -2,9 +2,6 @@ package com.mega.android;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import com.mega.android.utils.Util;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,6 +10,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.util.Base64;
+
+import com.mega.android.utils.Util;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	

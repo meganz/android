@@ -6,18 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-import com.mega.sdk.UserList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -37,12 +25,21 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaUser;
 
 public class SharedWithMeFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -57,8 +54,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	MegaUser owner = null;
 	long initialParentHandle;
 	
-	ShareList outNodeList;
-	UserList uL;
+	ArrayList<MegaShare> outNodeList;
+	ArrayList<MegaUser> uL;
 	
 	boolean isList = true;
 	long parentHandle = -1;
@@ -247,12 +244,12 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 			for(int i=0; i<uL.size();i++){
 				MegaUser user=uL.get(i);
 				log("USER: " + user.getEmail());
-				NodeList inNodeList=megaApi.getInShares(user);
+				ArrayList<MegaNode> inNodeList=megaApi.getInShares(user);
 				if(inNodeList.size()>0){
 					MegaShareAndroidElement mSIn = new MegaShareAndroidElement(user, null);
 					megaShareInList.add(mSIn);
 					for(int j=0; j<inNodeList.size();j++){
-						MegaNode node = inNodeList.get(j).copy();
+						MegaNode node = inNodeList.get(j);
 						mSIn = new MegaShareAndroidElement(user, node);
 						log("node.getName() = " + node.getName());
 						megaShareInList.add(mSIn);
@@ -500,7 +497,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 							MegaNode parentNode = megaShareInList.get(position).getNode();
 							MegaUser user= megaShareInList.get(position).getUser();
 							owner=user;
-							NodeList childrenNodes;
+							ArrayList<MegaNode> childrenNodes;
 							
 							if(parentHandle==-1){						
 								initialParentHandle=megaShareInList.get(position).getNode().getHandle();
@@ -608,7 +605,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 								
 								MegaUser user= megaShareOutList.get(position).getUser();
 								owner=user;
-								NodeList childrenNodes;
+								ArrayList<MegaNode> childrenNodes;
 								
 								if(parentHandle==-1){						
 									initialParentHandle=megaShareOutList.get(position).getNode().getHandle();
@@ -829,7 +826,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 
-					NodeList childrenNodes;
+					ArrayList<MegaNode> childrenNodes;
 					childrenNodes=megaApi.getChildren(parentNode, orderGetChildren);
 
 					megaShareInList.clear();
@@ -866,12 +863,12 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 								for(int i=0; i<uL.size();i++){
 									MegaUser user=uL.get(i);
 									log("USER: " + user.getEmail());
-									NodeList inNodeList=megaApi.getInShares(user);
+									ArrayList<MegaNode> inNodeList=megaApi.getInShares(user);
 									if(inNodeList.size()>0){
 										MegaShareAndroidElement mSI = new MegaShareAndroidElement(user, null);
 										megaShareInList.add(mSI);
 										for(int j=0; j<inNodeList.size();j++){
-											MegaNode node = inNodeList.get(j).copy();
+											MegaNode node = inNodeList.get(j);
 											mSI = new MegaShareAndroidElement(user, node);
 											log("node.getName() = " + node.getName());
 											megaShareInList.add(mSI);

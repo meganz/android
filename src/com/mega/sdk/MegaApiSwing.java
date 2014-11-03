@@ -8,12 +8,6 @@ public class MegaApiSwing extends MegaApiJava
 	}
 	
 	@Override
-	boolean isRunCallbackThreaded()
-	{
-		return true;
-	}
-	
-	@Override
 	void runCallback(Runnable runnable)
 	{
 		SwingUtilities.invokeLater(runnable);		

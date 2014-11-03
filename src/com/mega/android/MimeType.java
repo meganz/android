@@ -2,13 +2,13 @@ package com.mega.android;
 
 import java.util.HashMap;
 
-import com.mega.android.utils.Util;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
+
+import com.mega.android.utils.Util;
 
 /*
  * Mime type for files

@@ -5,14 +5,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -21,23 +20,20 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaNode;
 
 public class ZipBrowserActivity extends PinActivity implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 	

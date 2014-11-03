@@ -1,17 +1,8 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.mega.android.pdfViewer.OpenPDFActivity;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -38,7 +29,10 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.mega.android.pdfViewer.OpenPDFActivity;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiJava;
 
 public class OfflineFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 

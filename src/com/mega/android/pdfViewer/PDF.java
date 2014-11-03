@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.util.List;
 
-import com.mega.android.pdfViewer.FindResult;
-
 // #ifdef pro
 // import java.util.ArrayList;
 // import java.util.Stack;

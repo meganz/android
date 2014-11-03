@@ -2,10 +2,6 @@ package com.mega.android;
 
 import java.util.List;
 
-import com.mega.android.FileStorageActivity.FileDocument;
-import com.mega.android.FileStorageActivity.Mode;
-import com.mega.android.utils.Util;
-
 import android.content.Context;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -16,6 +12,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.mega.android.FileStorageActivity.FileDocument;
+import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.utils.Util;
 
 /*
  * Adapter for FilestorageActivity list

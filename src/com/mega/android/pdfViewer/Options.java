@@ -1,7 +1,5 @@
 package com.mega.android.pdfViewer;
 
-import com.mega.android.R;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -13,6 +11,8 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.mega.android.R;
 
 public class Options extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 	private final static String TAG = "com.mega.android.pdfViewer.Options";

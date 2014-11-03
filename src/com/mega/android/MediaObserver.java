@@ -1,9 +1,9 @@
 package com.mega.android;
 
-import com.mega.android.utils.Util;
-
 import android.database.ContentObserver;
 import android.os.Handler;
+
+import com.mega.android.utils.Util;
 
 public class MediaObserver extends ContentObserver {
 

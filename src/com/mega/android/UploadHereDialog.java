@@ -3,8 +3,6 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,6 +18,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.mega.android.utils.Util;
 
 /*
  * Dialog for Upload here action

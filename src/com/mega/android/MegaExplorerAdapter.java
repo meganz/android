@@ -2,12 +2,6 @@ package com.mega.android;
 
 import java.util.ArrayList;
 
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -18,12 +12,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
 
 public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 
@@ -33,7 +30,7 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	int positionClicked;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	
 	private ArrayList<Long> disabledNodes;
 	
@@ -54,7 +51,7 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
     	public long document;
     }
 	
-	public MegaExplorerAdapter(Context _context, NodeList _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView){
+	public MegaExplorerAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView){
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -207,7 +204,7 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	}
 	
 	private String getInfoFolder (MegaNode n){
-		NodeList nL = megaApi.getChildren(n);
+		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 		
 		int numFolders = 0;
 		int numFiles = 0;
@@ -271,7 +268,7 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
     	positionClicked = p;
     }
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		positionClicked = -1;	
 		notifyDataSetChanged();

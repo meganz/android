@@ -5,18 +5,14 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.SearchManager;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -26,9 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -40,11 +34,9 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -55,8 +47,6 @@ import android.widget.Toast;
 
 import com.mega.android.PinActivity;
 import com.mega.android.R;
-import com.mega.android.pdfViewer.PDFPagesProvider;
-import com.mega.android.pdfViewer.BookmarkEntry;
 import com.mega.android.utils.Util;
 
 

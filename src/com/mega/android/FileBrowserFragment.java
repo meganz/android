@@ -6,15 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.NodeList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -41,6 +32,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
+
 public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	Context context;
@@ -58,7 +57,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	boolean isList = true;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
@@ -653,7 +652,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		return listView;
 	}
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		if (isList){
 			if (adapterList != null){

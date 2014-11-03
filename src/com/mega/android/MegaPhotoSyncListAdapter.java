@@ -2,14 +2,6 @@ package com.mega.android;
 
 import java.util.ArrayList;
 
-import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +26,13 @@ import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaNode;
+
 public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
@@ -41,7 +40,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 
 	int positionClicked;
 	ArrayList<PhotoSyncHolder> nodesArray;
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	
 	long photosyncHandle = -1;
 	
@@ -76,7 +75,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
     	public long document;
     }
 	
-	public MegaPhotoSyncListAdapter(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, NodeList _nodes) {
+	public MegaPhotoSyncListAdapter(Context _context, ArrayList<PhotoSyncHolder> _nodesArray, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes) {
 		this.context = _context;
 		this.nodesArray = _nodesArray;
 		this.photosyncHandle = _photosyncHandle;
@@ -94,7 +93,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		}
 	}
 	
-	public void setNodes(ArrayList<PhotoSyncHolder> nodesArray, NodeList nodes){
+	public void setNodes(ArrayList<PhotoSyncHolder> nodesArray, ArrayList<MegaNode> nodes){
 		this.nodesArray = nodesArray;
 		this.nodes = nodes;
 		positionClicked = -1;	

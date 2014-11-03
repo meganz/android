@@ -1,14 +1,5 @@
 package com.mega.android;
 
-import com.mega.android.ManagerActivity.DrawerItem;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaAccountDetails;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -25,6 +16,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.mega.android.ManagerActivity.DrawerItem;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaAccountDetails;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 
 public class MyAccountFragment extends Fragment implements MegaRequestListenerInterface {
 

@@ -2,10 +2,6 @@ package com.mega.android;
 
 import org.json.JSONArray;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
 
 public class UpgradePaymentActivity extends ActionBarActivity{
 	

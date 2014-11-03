@@ -2,19 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.io.IOException;
-
-import com.mega.android.MegaOfflineListAdapter.ViewHolderOfflineList;
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApi;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.TransferList;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -28,7 +16,6 @@ import android.support.v7.app.ActionBar;
 import android.text.TextUtils.TruncateAt;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
-import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -48,13 +35,22 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
 
 public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener, MegaRequestListenerInterface {
 	
 	Context context;
 //	SparseArray<TransfersHolder> transfersListArray;
-	TransferList tL = null;
+	ArrayList<MegaTransfer> tL = null;
 	MegaTransfer currentTransfer = null;
 	int positionClicked;
 	ActionBar aB;
@@ -129,7 +125,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 	}
 	
 	
-	public MegaTransfersAdapter(Context _context, TransferList _transfers, ActionBar aB) {
+	public MegaTransfersAdapter(Context _context, ArrayList<MegaTransfer> _transfers, ActionBar aB) {
 		this.context = _context;
 		this.tL = _transfers;
 		this.positionClicked = -1;
@@ -166,7 +162,7 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 //    	notifyDataSetChanged();
 //    }
     
-    public void setTransfers(TransferList transfers){
+    public void setTransfers(ArrayList<MegaTransfer> transfers){
     	this.tL = transfers;
     	notifyDataSetChanged();
     }

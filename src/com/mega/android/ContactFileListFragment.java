@@ -8,20 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
-import com.mega.android.utils.Util;
-import com.mega.components.RoundedImageView;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.TransferList;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -43,8 +29,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -53,6 +39,18 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaUser;
 
 public class ContactFileListFragment extends Fragment implements
 		OnItemClickListener,
@@ -76,7 +74,7 @@ public class ContactFileListFragment extends Fragment implements
 	TextView emptyTextView;
 
 	MegaUser contact;
-	NodeList contactNodes;
+	ArrayList<MegaNode> contactNodes;
 
 	MegaBrowserListAdapter adapter;
 
@@ -99,7 +97,7 @@ public class ContactFileListFragment extends Fragment implements
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 
-	TransferList tL;
+	ArrayList<MegaTransfer> tL;
 	HashMap<Long, MegaTransfer> mTHash = null;
 	long lastTimeOnTransferUpdate = -1;
 	
@@ -377,7 +375,7 @@ public class ContactFileListFragment extends Fragment implements
 		}
 	}
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.contactNodes = nodes;
 		if (adapter != null){
 			adapter.setNodes(contactNodes);
@@ -416,7 +414,7 @@ public class ContactFileListFragment extends Fragment implements
         aB = ((ActionBarActivity)activity).getSupportActionBar();
     }
 
-	public String getDescription(NodeList nodes) {
+	public String getDescription(ArrayList<MegaNode> nodes) {
 		int numFolders = 0;
 		int numFiles = 0;
 

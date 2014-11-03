@@ -1,6 +1,6 @@
 package com.mega.sdk;
 
-public class DelegateMegaGlobalListener extends MegaGlobalListener
+class DelegateMegaGlobalListener extends MegaGlobalListener
 {
 	MegaApiJava megaApi;
 	MegaGlobalListenerInterface listener;

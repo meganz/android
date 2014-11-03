@@ -1,34 +1,13 @@
 package com.mega.android;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mega.android.FileStorageActivity.Mode;
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.components.EditTextCursorWatcher;
-import com.mega.components.MySwitch;
-import com.mega.components.NestedListView;
-import com.mega.components.RoundedImageView;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaGlobalListenerInterface;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -41,21 +20,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.media.ExifInterface;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -63,17 +39,29 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.TableLayout;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.components.EditTextCursorWatcher;
+import com.mega.components.MySwitch;
+import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
 
 public class FilePropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
 	
@@ -101,7 +89,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	TextView publicLinkTextView;
 	TextView permissionLabel;
 	TextView permissionInfo;
-	ShareList sl;
+	ArrayList<MegaShare> sl;
 	MegaOffline mOffDelete;
 	
 	RelativeLayout nameLayout;
@@ -300,7 +288,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				
 				if(dbH.exists(node.getHandle())){
 					
-					NodeList childrenList=megaApi.getChildren(node);
+					ArrayList<MegaNode> childrenList=megaApi.getChildren(node);
 					if(childrenList.size()>0){
 						
 						result=checkChildrenStatus(childrenList);
@@ -462,10 +450,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		}
 	}
 		
-	private boolean checkChildrenStatus(NodeList childrenList){
+	private boolean checkChildrenStatus(ArrayList<MegaNode> childrenList){
 
 		boolean children = true;
-		NodeList childrenListRec;
+		ArrayList<MegaNode> childrenListRec;
 		
 		if(childrenList.size()>0){
 			for(int i=0;i<childrenList.size();i++){
@@ -1238,7 +1226,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				String link = request.getLink();
-				ShareList sl = megaApi.getOutShares(node);
+				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 				if (filePropertiesActivity != null){
 					if (shareIt){
 						Intent intent = new Intent(Intent.ACTION_SEND);
@@ -1352,7 +1340,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			catch (Exception ex) {}
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
-				ShareList sl = megaApi.getOutShares(node);
+				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			}
 			else{
 				Util.showErrorAlertDialog(e, this);
@@ -1547,7 +1535,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			return;
 		
 		folder.mkdir();
-		NodeList nodeList = megaApi.getChildren(parent);
+		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
 		for(int i=0; i<nodeList.size(); i++){
 			MegaNode document = nodeList.get(i);
 			if (document.getType() == MegaNode.TYPE_FOLDER) {
@@ -1571,7 +1559,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	}
 	
 	private String getInfoFolder (MegaNode n){
-		NodeList nL = megaApi.getChildren(n);
+		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 		
 		int numFolders = 0;
 		int numFiles = 0;

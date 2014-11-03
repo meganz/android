@@ -1,5 +1,7 @@
 package com.mega.android;
 
+import java.util.ArrayList;
+
 import android.util.Log;
 
 import com.mega.sdk.MegaApiAndroid;
@@ -8,7 +10,6 @@ import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.NodeList;
 
 public class MegaTest extends Thread implements MegaRequestListenerInterface
 {
@@ -70,7 +71,7 @@ public class MegaTest extends Thread implements MegaRequestListenerInterface
 		if(e.getErrorCode() != MegaError.API_OK) 
 			return;
 		
-		NodeList children = megaApi.getChildren(megaApi.getRootNode());
+		ArrayList<MegaNode> children = megaApi.getChildren(megaApi.getRootNode());
 		for(int i=0; i<children.size(); i++)
 		{
 			MegaNode node = children.get(i);

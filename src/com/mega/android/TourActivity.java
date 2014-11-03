@@ -1,18 +1,12 @@
 package com.mega.android;
 
-import com.mega.android.utils.Util;
-import com.mega.components.LoopViewPager;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Point;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.text.style.ParagraphStyle;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -21,10 +15,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
+
+import com.mega.android.utils.Util;
+import com.mega.components.LoopViewPager;
 
 public class TourActivity extends Activity implements OnClickListener {
 	

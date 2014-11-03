@@ -4,11 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.mega.android.utils.PreviewUtils;
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.components.TouchImageView;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,12 +18,15 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+
+import com.mega.android.utils.PreviewUtils;
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.components.TouchImageView;
 
 public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements OnClickListener {
 	

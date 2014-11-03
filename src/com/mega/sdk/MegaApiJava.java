@@ -1,5 +1,6 @@
 package com.mega.sdk;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -9,12 +10,7 @@ public class MegaApiJava
 {
 	MegaApi megaApi;
 	MegaGfxProcessor gfxProcessor;
-	static MegaLogger logger;
-	
-	boolean isRunCallbackThreaded()
-	{
-		return false;
-	}
+	static DelegateMegaLogger logger;
 	
 	void runCallback(Runnable runnable)
 	{
@@ -289,10 +285,11 @@ public class MegaApiJava
 		MegaApi.setLogLevel(logLevel);
 	}
 	
-	public static void setLoggerClass(MegaLogger megaLogger)
+	public static void setLoggerClass(MegaLoggerInterface megaLogger)
 	{
-		logger = megaLogger;
-		MegaApi.setLoggerClass(megaLogger);
+		DelegateMegaLogger newLogger = new DelegateMegaLogger(megaLogger);
+		MegaApi.setLoggerClass(newLogger);
+		logger = newLogger;
 	}
 	
 	public static void log(int logLevel, String message, String filename, int line)
@@ -683,9 +680,9 @@ public class MegaApiJava
 		megaApi.setUploadLimit(bpslimit);
 	}
 		  
-	public TransferList getTransfers()
+	public ArrayList<MegaTransfer> getTransfers()
 	{
-		return megaApi.getTransfers();
+		return transferListToArray(megaApi.getTransfers());
 	}
 	
 	public int getNumPendingDownloads()
@@ -726,14 +723,14 @@ public class MegaApiJava
 	/****************************************************************************************************/
 	//FILESYSTEM METHODS
 	/****************************************************************************************************/
-	public NodeList getChildren(MegaNode parent, int order)
+	public ArrayList<MegaNode> getChildren(MegaNode parent, int order)
 	{
-		return megaApi.getChildren(parent, order);
+		return nodeListToArray(megaApi.getChildren(parent, order));
 	}
 
-	public NodeList getChildren(MegaNode parent)
+	public ArrayList<MegaNode> getChildren(MegaNode parent)
 	{
-		return megaApi.getChildren(parent);
+		return nodeListToArray(megaApi.getChildren(parent));
 	}
 	
 	public int getNumChildren(MegaNode parent) 
@@ -781,9 +778,9 @@ public class MegaApiJava
 		return megaApi.getNodeByHandle(handle);
 	}
 	
-	public UserList getContacts() 
+	public ArrayList<MegaUser> getContacts() 
 	{
-		return megaApi.getContacts();
+		return userListToArray(megaApi.getContacts());
 	}
 
 	public MegaUser getContact(String email) 
@@ -791,14 +788,14 @@ public class MegaApiJava
 		return megaApi.getContact(email);
 	}
 	
-	public NodeList getInShares(MegaUser user)
+	public ArrayList<MegaNode> getInShares(MegaUser user)
 	{
-		return megaApi.getInShares(user);
+		return nodeListToArray(megaApi.getInShares(user));
 	}
 
-	public NodeList getInShares()
+	public ArrayList<MegaNode> getInShares()
 	{
-		return megaApi.getInShares();
+		return nodeListToArray(megaApi.getInShares());
 	}
 	
 	public boolean isShared(MegaNode node) 
@@ -806,14 +803,14 @@ public class MegaApiJava
 		return megaApi.isShared(node);
 	}
 	
-	public ShareList getOutShares()
+	public ArrayList<MegaShare> getOutShares()
 	{
-		return megaApi.getOutShares();
+		return shareListToArray(megaApi.getOutShares());
 	}
 	
-	public ShareList getOutShares(MegaNode node)
+	public ArrayList<MegaShare> getOutShares(MegaNode node)
 	{
-		return megaApi.getOutShares(node);		
+		return shareListToArray(megaApi.getOutShares(node));		
 	}
 	
 	public int getAccess(MegaNode node)
@@ -866,9 +863,9 @@ public class MegaApiJava
 		return megaApi.getRubbishNode();
 	}
 	
-	public NodeList search(MegaNode parent, String searchString, boolean recursive)
+	public ArrayList<MegaNode> search(MegaNode parent, String searchString, boolean recursive)
 	{
-		return megaApi.search(parent, searchString, recursive);
+		return nodeListToArray(megaApi.search(parent, searchString, recursive));
 	}
 	
 	public boolean processMegaTree(MegaNode parent, MegaTreeProcessorInterface processor, boolean recursive)
@@ -927,5 +924,49 @@ public class MegaApiJava
 	void privateFreeTransferListener(DelegateMegaTransferListener listener)
 	{
 		activeTransferListeners.remove(listener);
+	}
+	
+	ArrayList<MegaNode> nodeListToArray(NodeList nodeList)
+	{
+		ArrayList<MegaNode> result = new ArrayList<MegaNode>(nodeList.size());
+		for(int i=0; i<nodeList.size(); i++)
+		{
+			result.add(nodeList.get(i).copy());
+		}
+		
+		return result;
+	}
+	
+	ArrayList<MegaShare> shareListToArray(ShareList shareList)
+	{
+		ArrayList<MegaShare> result = new ArrayList<MegaShare>(shareList.size());
+		for(int i=0; i<shareList.size(); i++)
+		{
+			result.add(shareList.get(i).copy());
+		}
+		
+		return result;
+	}
+	
+	ArrayList<MegaTransfer> transferListToArray(TransferList transferList)
+	{
+		ArrayList<MegaTransfer> result = new ArrayList<MegaTransfer>(transferList.size());
+		for(int i=0; i<transferList.size(); i++)
+		{
+			result.add(transferList.get(i).copy());
+		}
+		
+		return result;
+	}
+	
+	ArrayList<MegaUser> userListToArray(UserList userList)
+	{
+		ArrayList<MegaUser> result = new ArrayList<MegaUser>(userList.size());
+		for(int i=0; i<userList.size(); i++)
+		{
+			result.add(userList.get(i).copy());
+		}
+		
+		return result;
 	}
 }

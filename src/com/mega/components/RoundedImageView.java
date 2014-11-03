@@ -1,6 +1,5 @@
 package com.mega.components;
 
-import com.mega.android.R;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -11,6 +10,8 @@ import android.graphics.drawable.LayerDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
+
+import com.mega.android.R;
 
 public class RoundedImageView extends ImageView {
 

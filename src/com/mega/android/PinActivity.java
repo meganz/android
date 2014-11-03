@@ -1,10 +1,10 @@
 package com.mega.android;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
 
 public class PinActivity extends ActionBarActivity{
 	

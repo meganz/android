@@ -2,8 +2,30 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
@@ -14,39 +36,6 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.UserList;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Build;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListener{
 	
@@ -435,7 +424,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				}
 			}
 			
-			NodeList nodes1 = megaApi.getInShares(contact1);
+			ArrayList<MegaNode> nodes1 = megaApi.getInShares(contact1);
 			holder.textViewContent1.setText(getDescription(nodes1));
 			
 			MegaUser contact2;
@@ -491,7 +480,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 					}
 				}
 				
-				NodeList nodes2 = megaApi.getInShares(contact2);
+				ArrayList<MegaNode> nodes2 = megaApi.getInShares(contact2);
 				holder.textViewContent2.setText(getDescription(nodes2));
 				
 				holder.itemLayout2.setVisibility(View.VISIBLE);
@@ -664,7 +653,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		notifyDataSetChanged();
 	}
 	
-	public String getDescription(NodeList nodes){
+	public String getDescription(ArrayList<MegaNode> nodes){
 		int numFolders = 0;
 		int numFiles = 0;
 		

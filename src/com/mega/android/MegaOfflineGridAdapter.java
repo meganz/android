@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -24,11 +21,10 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -36,6 +32,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 
 public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListener {
 	

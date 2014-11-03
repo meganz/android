@@ -3,17 +3,6 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-import com.mega.sdk.TransferList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -38,7 +27,14 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaTransfer;
 
 public class MegaBrowserListAdapter extends BaseAdapter implements
 		OnClickListener {
@@ -47,7 +43,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 	MegaApiAndroid megaApi;
 
 	int positionClicked;
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 
 	long parentHandle = -1;
 
@@ -84,7 +80,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 		public long document;
 	}
 
-	public MegaBrowserListAdapter(Context _context, NodeList _nodes,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
+	public MegaBrowserListAdapter(Context _context, ArrayList<MegaNode> _nodes,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -135,7 +131,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 		}
 	}
 
-	public void setNodes(NodeList nodes) {
+	public void setNodes(ArrayList<MegaNode> nodes) {
 		this.nodes = nodes;
 		positionClicked = -1;
 		notifyDataSetChanged();
@@ -230,7 +226,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 
 		if (node.isFolder()) {
 			holder.textViewFileSize.setText(getInfoFolder(node));
-			ShareList sl = megaApi.getOutShares(node);
+			ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			if (sl != null) {
 				if (sl.size() > 0) {
 					holder.imageView
@@ -531,7 +527,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 	}
 
 	private String getInfoFolder(MegaNode n) {
-		NodeList nL = megaApi.getChildren(n);
+		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 
 		int numFolders = 0;
 		int numFiles = 0;
@@ -629,7 +625,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			i.putExtra("handle", n.getHandle());
 
 			if (n.isFolder()) {
-				ShareList sl = megaApi.getOutShares(n);
+				ArrayList<MegaShare> sl = megaApi.getOutShares(n);
 
 				if (sl != null) {
 

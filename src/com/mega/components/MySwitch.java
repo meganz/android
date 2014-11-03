@@ -15,7 +15,6 @@
  */
 package com.mega.components;
 
-import com.mega.android.R;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -35,14 +34,13 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewConfiguration;
 import android.widget.CompoundButton;
-import android.graphics.drawable.ColorDrawable;
+
+import com.mega.android.R;
 
 
 /**

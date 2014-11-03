@@ -1,15 +1,14 @@
 package com.mega.android;
 
-import com.mega.sdk.MegaApiJava;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageButton;
+
+import com.mega.sdk.MegaApiJava;
 
 public class SortByDialogActivity extends Activity implements OnClickListener {
 

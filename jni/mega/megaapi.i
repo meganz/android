@@ -31,21 +31,48 @@
 //Use compilation-time constants in Java
 #ifdef SWIGJAVA
 %javaconst(1);
+%typemap(javaclassmodifiers) mega::MegaApi "class";
+%typemap(javaclassmodifiers) mega::MegaListener "class";
+%typemap(javaclassmodifiers) mega::MegaRequestListener "class";
+%typemap(javaclassmodifiers) mega::MegaTransferListener "class";
+%typemap(javaclassmodifiers) mega::MegaGlobalListener "class";
+%typemap(javaclassmodifiers) mega::MegaTreeProcessor "class";
+%typemap(javaclassmodifiers) mega::MegaLogger "class";
+%typemap(javaclassmodifiers) mega::NodeList "class";
+%typemap(javaclassmodifiers) mega::TransferList "class";
+%typemap(javaclassmodifiers) mega::ShareList "class";
+%typemap(javaclassmodifiers) mega::UserList "class";
+
+
+%typemap(javadestruct, methodname="delete", methodmodifiers="protected synchronized") SWIGTYPE 
+{   
+    if (swigCPtr != 0) {
+      if (swigCMemOwn) {
+        swigCMemOwn = false;
+        $jnicall;
+      }
+      swigCPtr = 0;
+    }
+}
+
+%javamethodmodifiers copy ""
+
 #endif
 
+
 //Generate inheritable wrappers for listener objects
-%feature("director") MegaRequestListener;
-%feature("director") MegaTransferListener;
-%feature("director") MegaLogger;
+%feature("director") mega::MegaRequestListener;
+%feature("director") mega::MegaTransferListener;
+%feature("director") mega::MegaLogger;
 
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
 %typemap(directorargout) (char *buffer, size_t size)
 %{ jenv->DeleteLocalRef($input); %}
 
-%feature("director") MegaGlobalListener;
-%feature("director") MegaListener;
-%feature("director") MegaTreeProcessor;
-%feature("director") MegaGfxProcessor;
+%feature("director") mega::MegaGlobalListener;
+%feature("director") mega::MegaListener;
+%feature("director") mega::MegaTreeProcessor;
+%feature("director") mega::MegaGfxProcessor;
 
 %apply (char *STRING, size_t LENGTH) {(char *bitmapData, size_t size)};
 %typemap(directorin, descriptor="[B") (char *bitmapData, size_t size)
@@ -60,7 +87,6 @@
 %}
 
 
-//Ignore sync features
 %ignore mega::MegaApi::syncPathState;
 %ignore mega::MegaApi::getSyncedNode;
 %ignore mega::MegaApi::syncFolder;
@@ -82,10 +108,20 @@
 %ignore mega::MegaNode::getLocalPath;
 %ignore mega::MegaListener::onSyncStateChanged;
 %ignore mega::MegaListener::onSyncFileStateChanged;
+%ignore mega::MegaRequest::getPublicNode;
+%ignore mega::MegaTransfer::getPublicNode;
+%ignore mega::MegaTransfer::getListener;
+%ignore mega::MegaRequest::getListener;
 
 %newobject mega::MegaError::copy;
 %newobject mega::MegaRequest::copy;
+%newobject mega::MegaTransfer::copy;
 %newobject mega::MegaNode::copy;
+%newobject mega::MegaShare::copy;
+%newobject mega::MegaUser::copy;
+
+%newobject mega::MegaRequest::getPublicMegaNode;
+%newobject mega::MegaTransfer::getPublicMegaNode;
 %newobject mega::MegaNode::getBase64Handle;
 %newobject mega::MegaApi::getChildren;
 %newobject mega::MegaApi::getChildNode;
@@ -118,5 +154,7 @@
 typedef long long time_t;
 typedef long long uint64_t;
 typedef long long int64_t;
+
+
 
 %include "megaapi.h"

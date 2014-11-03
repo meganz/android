@@ -9,28 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.mega.android.FileStorageActivity.Mode;
-import com.mega.components.EditTextCursorWatcher;
-import com.mega.components.RoundedImageView;
-import com.mega.sdk.MegaAccountDetails;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaGlobalListenerInterface;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaPricing;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.TransferList;
-import com.mega.sdk.UserList;
-
-import com.mega.android.pdfViewer.OpenPDFActivity;
-import com.mega.android.utils.Util;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -40,7 +18,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -70,7 +47,6 @@ import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.Display;
 import android.view.Gravity;
@@ -86,8 +62,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -96,6 +70,23 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
+import com.mega.android.FileStorageActivity.Mode;
+import com.mega.android.pdfViewer.OpenPDFActivity;
+import com.mega.android.utils.Util;
+import com.mega.components.EditTextCursorWatcher;
+import com.mega.components.RoundedImageView;
+import com.mega.sdk.MegaAccountDetails;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
+import com.mega.sdk.MegaUser;
 
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
@@ -259,10 +250,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	MegaPreferences prefs = null;
 	MegaAttributes attr = null;
 	
-	TransferList tL;
+	ArrayList<MegaTransfer> tL;
 	
 	String searchQuery = null;
-	NodeList searchNodes;
+	ArrayList<MegaNode> searchNodes;
 	int levelsSearch = -1;
 	
 	int swmFMode = MODE_IN;
@@ -506,7 +497,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log("rootNode != null");		
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
-			UserList contacts = megaApi.getContacts();
+			ArrayList<MegaUser> contacts = megaApi.getContacts();
 			for (int i=0; i < contacts.size(); i++){
 				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
 					contact = contacts.get(i);
@@ -970,7 +961,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						fbF.setParentHandle(parentHandleBrowser);
     					fbF.setIsList(isListCloudDrive);
     					fbF.setOrder(orderGetChildren);
-    					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
     					fbF.setNodes(nodes);
     					if (!fbF.isVisible()){
     						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
@@ -981,7 +972,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					fbF.setParentHandle(parentHandleBrowser);
     					fbF.setIsList(isListCloudDrive);
     					fbF.setOrder(orderGetChildren);
-    					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
     					fbF.setNodes(nodes);
     					if (!fbF.isVisible()){
     						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
@@ -1130,14 +1121,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 					fbF.setIsList(isListCloudDrive);
 					fbF.setOrder(orderGetChildren);
-					NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 					fbF.setNodes(nodes);
 				}
 				else{
 					fbF.setIsList(isListCloudDrive);
 					fbF.setParentHandle(parentHandleBrowser);
 					fbF.setOrder(orderGetChildren);
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
 					fbF.setNodes(nodes);
 				}
 				
@@ -1218,14 +1209,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
     				rbF.setIsList(isListRubbishBin);
     				rbF.setOrder(orderGetChildren);
-    				NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
     				rbF.setNodes(nodes);
     			}
     			else{
     				rbF.setIsList(isListRubbishBin);
     				rbF.setParentHandle(parentHandleRubbish);
     				rbF.setOrder(orderGetChildren);
-    				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
     				rbF.setNodes(nodes);
     			}
     			
@@ -1260,14 +1251,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
     				swmF.setIsList(isListSharedWithMe);
     				swmF.setOrder(orderGetChildren);
-//    				NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+//    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 //    				swmF.setNodes(nodes);
     			}
     			else{
     				swmF.setIsList(isListSharedWithMe);
     				swmF.setParentHandle(parentHandleSharedWithMe);
     				swmF.setOrder(orderGetChildren);
-//    				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
+//    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
 //    				swmF.setNodes(nodes);
     			}
     			
@@ -2565,14 +2556,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
 					if (fbF != null){
 						if (fbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 							fbF.setNodes(nodes);
 							fbF.getListView().invalidateViews();
 						}
 					}
 					if (rbF != null){
 						if (rbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
@@ -2589,14 +2580,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
 					if (fbF != null){
 						if (fbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 							fbF.setNodes(nodes);
 							fbF.getListView().invalidateViews();
 						}
 					}
 					if (rbF != null){
 						if (rbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
@@ -2604,7 +2595,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (swmF != null){
 						if (swmF.isVisible()){
 							//TODO: ojo con los hijos
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
 //							swmF.setNodes(nodes);
 //							swmF.getListView().invalidateViews();
 						}
@@ -2630,7 +2621,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				
 				if (fbF != null){
 					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 						fbF.setNodes(nodes);
 						fbF.getListView().invalidateViews();
 					}
@@ -2641,14 +2632,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							isClearRubbishBin = false;
 							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
 							rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-							NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 							aB.setTitle(getString(R.string.section_rubbish_bin));	
 							getmDrawerToggle().setDrawerIndicatorEnabled(true);
 						}
 						else{
-							NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
@@ -2656,7 +2647,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				if (swmF != null){
 					if (swmF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						swmF.setNodes(nodes);
 //						swmF.getListView().invalidateViews();
@@ -2699,21 +2690,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
 				if (fbF != null){
 					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 						fbF.setNodes(nodes);
 						fbF.getListView().invalidateViews();
 					}
 				}
 				if (rbF != null){
 					if (rbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 						rbF.setNodes(nodes);
 						rbF.getListView().invalidateViews();
 					}
 				}
 				if (swmF != null){
 					if (swmF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						swmF.setNodes(nodes);
 						swmF.getListView().invalidateViews();
@@ -2734,21 +2725,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
 				if (fbF != null){
 					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 						fbF.setNodes(nodes);
 						fbF.getListView().invalidateViews();
 					}
 				}
 				if (rbF != null){
 					if (rbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 						rbF.setNodes(nodes);
 						rbF.getListView().invalidateViews();
 					}
 				}
 				if (swmF != null){
 					if (swmF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						swmF.setNodes(nodes);
 //						swmF.getListView().invalidateViews();
@@ -2770,7 +2761,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
 				if (fbF != null){
 					if (fbF.isVisible()){
-						NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 						fbF.setNodes(nodes);
 						fbF.getListView().invalidateViews();
 					}
@@ -2869,7 +2860,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
 				if (cF.isVisible()){	
-					UserList contacts = megaApi.getContacts();
+					ArrayList<MegaUser> contacts = megaApi.getContacts();
 					cF.setContacts(contacts);
 					cF.getListView().invalidateViews();
 				}
@@ -3298,7 +3289,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private void clearRubbishBin(){
 		log("clearRubbishBin");
 		if (rbF != null){
-			NodeList rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+			ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 			
 			ProgressDialog temp = null;
 			try{
@@ -3368,7 +3359,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		boolean exists = false;
-		NodeList nL = megaApi.getChildren(parentNode);
+		ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 		for (int i=0;i<nL.size();i++){
 			if (title.compareTo(nL.get(i).getName()) == 0){
 				exists = true;
@@ -3674,7 +3665,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (parentNode != null){
 					if (fbF != null){
 						if (fbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							fbF.setNodes(nodes);
 							fbF.getListView().invalidateViews();
 						}
@@ -3683,7 +3674,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if (fbF != null){
 						if (fbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 							fbF.setNodes(nodes);
 							fbF.getListView().invalidateViews();
 						}
@@ -3696,7 +3687,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (parentNode != null){
 					if (rbF != null){
 						if (rbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
@@ -3705,7 +3696,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if (rbF != null){
 						if (rbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
 						}
@@ -3718,7 +3709,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (parentNode != null){
 					if (swmF != null){
 						if (swmF.isVisible()){
-							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							//TODO: ojo con los hijos
 //							swmF.setNodes(nodes);
 							swmF.getListView().invalidateViews();
@@ -3728,7 +3719,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if (swmF != null){
 						if (swmF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 							//TODO: ojo con los hijos
 //							swmF.setNodes(nodes);
 							swmF.getListView().invalidateViews();
@@ -3744,7 +3735,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (parentNode != null){
 					if (fbF != null){
 						if (fbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							fbF.setOrder(orderGetChildren);
 							fbF.setNodes(nodes);
 							fbF.getListView().invalidateViews();
@@ -3754,7 +3745,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if (fbF != null){
 						if (fbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 							fbF.setOrder(orderGetChildren);
 							fbF.setNodes(nodes);
 							fbF.getListView().invalidateViews();
@@ -3767,7 +3758,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (parentNode != null){
 					if (rbF != null){
 						if (rbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							rbF.setOrder(orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
@@ -3777,7 +3768,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if (rbF != null){
 						if (rbF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 							rbF.setOrder(orderGetChildren);
 							rbF.setNodes(nodes);
 							rbF.getListView().invalidateViews();
@@ -3790,7 +3781,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (parentNode != null){
 					if (swmF != null){
 						if (swmF.isVisible()){
-							NodeList nodes = megaApi.getChildren(parentNode, orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 							swmF.setOrder(orderGetChildren);
 							//TODO: ojo con los hijos
 //							swmF.setNodes(nodes);
@@ -3801,7 +3792,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if (swmF != null){
 						if (swmF.isVisible()){
-							NodeList nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 							swmF.setOrder(orderGetChildren);
 							//TODO: ojo con los hijos
 //							swmF.setNodes(nodes);
@@ -3822,7 +3813,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			return;
 		
 		folder.mkdir();
-		NodeList nodeList = megaApi.getChildren(parent, orderGetChildren);
+		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
 		for(int i=0; i<nodeList.size(); i++){
 			MegaNode document = nodeList.get(i);
 			if (document.getType() == MegaNode.TYPE_FOLDER) {
@@ -3907,7 +3898,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("onUsersUpdate");
 		if (cF != null){
 			if (cF.isVisible()){	
-				UserList contacts = megaApi.getContacts();
+				ArrayList<MegaUser> contacts = megaApi.getContacts();
 				cF.setContacts(contacts);
 				cF.getListView().invalidateViews();
 			}
@@ -3924,7 +3915,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (fbF != null){
 			if (fbF.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 				fbF.setNodes(nodes);
 				fbF.getListView().invalidateViews();
 			}
@@ -3935,14 +3926,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					isClearRubbishBin = false;
 					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
 					rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-					NodeList nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 					rbF.setNodes(nodes);
 					rbF.getListView().invalidateViews();
 					aB.setTitle(getString(R.string.section_rubbish_bin));	
 					getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				}
 				else{
-					NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 					rbF.setNodes(nodes);
 					rbF.getListView().invalidateViews();
 				}				
@@ -3950,7 +3941,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		if (swmF != null){
 			if (swmF.isVisible()){
-				NodeList nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
 //				swmF.setNodes(nodes);
 				swmF.getListView().invalidateViews();
 			}
@@ -3962,7 +3953,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				log("cameraUploadHandle: " + cameraUploadHandle);
 				if (nps != null){
 					log("nps != null");
-					NodeList nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 					psF.setNodes(nodes);
 					psF.getListView().invalidateViews();
 				}
@@ -3993,7 +3984,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (fbF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
@@ -4038,7 +4029,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
-	public void setTransfers(TransferList transfersList){
+	public void setTransfers(ArrayList<MegaTransfer> transfersList){
 		log("setTransfers");
 		if (tF != null){
 			tF.setTransfers(transfersList);
@@ -4087,7 +4078,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (fbF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
@@ -4107,7 +4098,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (swmF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					
@@ -4138,7 +4129,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (fbF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				long handleT = tempT.getNodeHandle();
 				MegaNode nodeT = megaApi.getNodeByHandle(handleT);
 				MegaNode parentT = megaApi.getParentNode(nodeT);
@@ -4155,7 +4146,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (swmF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 	

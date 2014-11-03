@@ -4,12 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.mega.android.pdfViewer.OpenPDFActivity;
-import com.mega.android.utils.ThumbnailUtils;
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.ShareList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +34,9 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.mega.android.utils.ThumbnailUtils;
+import com.mega.android.utils.Util;
 
 public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListener {
 	
