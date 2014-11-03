@@ -144,6 +144,22 @@
         	android:layout_marginTop="20dp"
         	android:text="@string/my_account_change_password" >
     	</Button>
+    	
+    	<Button
+        	style="@style/button_MEGA"
+        	android:id="@+id/export_master_key"
+        	android:layout_gravity="center"
+        	android:layout_marginTop="20dp"
+        	android:text="@string/action_export_master_key" >
+    	</Button>
+    	
+    	<Button
+        	style="@style/button_MEGA"
+        	android:id="@+id/logout"
+        	android:layout_gravity="center"
+        	android:layout_marginTop="20dp"
+        	android:text="@string/action_logout" >
+    	</Button>
     	     
     </LinearLayout>
 
