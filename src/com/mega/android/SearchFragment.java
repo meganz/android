@@ -5,14 +5,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.NodeList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +31,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
+
 public class SearchFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	Context context;
@@ -55,8 +54,8 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 	int levels = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	NodeList nodes;
-	NodeList searchNodes;
+	ArrayList<MegaNode> nodes;
+	ArrayList<MegaNode> searchNodes;
 	String searchQuery = null;
 	
 	private ActionMode actionMode;
@@ -568,11 +567,11 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		this.searchQuery = searchQuery;
 	}
 	
-	public void setSearchNodes (NodeList searchNodes){
+	public void setSearchNodes (ArrayList<MegaNode> searchNodes){
 		this.searchNodes = searchNodes;
 	}
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		
 		if (adapterList != null){

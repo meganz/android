@@ -19,10 +19,10 @@
 package com.mega.android.pdfViewer;
 
 import java.io.File;
-import java.util.Collections;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.content.ContentValues;
 import android.content.Context;

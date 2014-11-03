@@ -1,20 +1,12 @@
 package com.mega.android;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaUser;
-import com.mega.sdk.UserList;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
@@ -22,9 +14,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaUser;
 
 public class ContactsFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
@@ -38,7 +33,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	
 	boolean isList = true;
 	
-	UserList contacts;
+	ArrayList<MegaUser> contacts;
 	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
 	@Override
@@ -118,7 +113,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		}	
 	}
 	
-	public void setContacts(UserList contacts){
+	public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
 		
 		visibleContacts.clear();

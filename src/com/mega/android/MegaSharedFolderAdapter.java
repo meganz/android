@@ -2,7 +2,33 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
@@ -14,55 +40,12 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-import com.mega.sdk.UserList;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Shader.TileMode;
-import android.opengl.Visibility;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListener, MegaRequestListenerInterface {
 	
 	Context context;
 	int positionClicked;
-	ShareList shareList;
+	ArrayList<MegaShare> shareList;
 	MegaNode node;
 	ListView listViewActivity;
 	
@@ -149,7 +132,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		
 	}
 	
-	public MegaSharedFolderAdapter(Context _context, MegaNode node, ShareList _shareList, ListView _lv) {
+	public MegaSharedFolderAdapter(Context _context, MegaNode node, ArrayList<MegaShare> _shareList, ListView _lv) {
 		this.context = _context;
 		this.node = node;
 		this.shareList = _shareList;
@@ -504,7 +487,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		}
 	}
 	
-	public void setShareList (ShareList shareList){
+	public void setShareList (ArrayList<MegaShare> shareList){
 		this.shareList = shareList;
 		positionClicked = -1;
 		notifyDataSetChanged();
@@ -541,7 +524,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			if (removeShare){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(context, "Share correctly removed", Toast.LENGTH_LONG).show();
-					ShareList sl = megaApi.getOutShares(node);
+					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 					setShareList(sl);
 				}
 				else{
@@ -553,7 +536,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				permissionsDialog.dismiss();
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(context, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
-					ShareList sl = megaApi.getOutShares(node);
+					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 					Toast.makeText(context, sl.size() + "_", Toast.LENGTH_LONG).show();
 					setShareList(sl);
 				}

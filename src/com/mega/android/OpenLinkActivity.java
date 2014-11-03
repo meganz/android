@@ -3,14 +3,12 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
 
 public class OpenLinkActivity extends PinActivity {
 

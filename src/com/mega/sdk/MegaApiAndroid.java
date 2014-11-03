@@ -13,12 +13,6 @@ public class MegaApiAndroid extends MegaApiJava
 	}
 
 	@Override
-	boolean isRunCallbackThreaded()
-	{
-		return true;
-	}
-	
-	@Override
 	void runCallback(Runnable runnable)
 	{
 		handler.post(runnable);

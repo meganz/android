@@ -2,6 +2,7 @@ package com.mega.android.pdfViewer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import android.view.MotionEvent;
 
 // #ifdef pro

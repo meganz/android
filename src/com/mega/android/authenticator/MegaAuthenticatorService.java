@@ -1,10 +1,10 @@
 package com.mega.android.authenticator;
 
-import com.mega.android.utils.Util;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
+import com.mega.android.utils.Util;
 
 public class MegaAuthenticatorService extends Service{
 

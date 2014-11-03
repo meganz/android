@@ -11,11 +11,6 @@ import java.util.Map;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
-import com.mega.android.pdfViewer.OnImageRenderedListener;
-import com.mega.android.pdfViewer.PagesProvider;
-import com.mega.android.pdfViewer.RenderingException;
-import com.mega.android.pdfViewer.Tile;
-import com.mega.android.pdfViewer.PDF;
 
 /**
  * Provide rendered bitmaps of pages.

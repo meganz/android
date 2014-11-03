@@ -2,32 +2,16 @@ package com.mega.android;
 
 import java.util.Locale;
 
-import com.mega.android.utils.Util;
-import com.mega.components.MySwitch;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListener;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.NodeList;
-
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Rect;
-import android.net.Credentials;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -38,15 +22,23 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.EditText;
-import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.components.MySwitch;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
  
 public class LoginActivity extends AccountAuthenticatorActivity implements OnClickListener, MegaRequestListenerInterface{
 	
@@ -102,7 +94,6 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 	
 	static LoginActivity loginActivity;
     private MegaApiAndroid megaApi;
-    private MegaRequestListener requestListener;
     UserCredentials credentials;
     private boolean backWhileLogin;
     private boolean loginClicked = false;

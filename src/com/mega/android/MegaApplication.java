@@ -1,13 +1,13 @@
 package com.mega.android;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-
 import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
 
 public class MegaApplication extends Application
 {

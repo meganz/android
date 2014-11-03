@@ -1,9 +1,9 @@
 package com.mega.android;
 
-import com.mega.android.utils.Util;
-
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.mega.android.utils.Util;
 
 public class OfflineActivity extends PinActivity{
 	

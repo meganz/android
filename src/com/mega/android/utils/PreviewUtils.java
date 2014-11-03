@@ -1,35 +1,13 @@
 package com.mega.android.utils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.WifiLock;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.PowerManager;
-import android.os.StatFs;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import com.mega.android.PreviewCache;
-import com.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import com.mega.components.TouchImageView;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.MegaUtils;
 
 public class PreviewUtils {
 	

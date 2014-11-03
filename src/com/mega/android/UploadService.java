@@ -4,17 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.MegaTransfer;
-import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.NodeList;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -25,7 +14,6 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -34,6 +22,16 @@ import android.text.format.Formatter;
 import android.util.SparseArray;
 import android.widget.RemoteViews;
 import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaTransfer;
+import com.mega.sdk.MegaTransferListenerInterface;
 
 /*
  * Service to Upload files
@@ -453,12 +451,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				MegaNode parentNode = megaApi.getNodeByHandle(fC.parentFolderHandle);
 				log("CURRENT NODEPATH:" + nodePath);
 				if (parentNode != null){
-					NodeList nL = megaApi.search (parentNode, fC.folderName, false);
+					ArrayList<MegaNode> nL = megaApi.search (parentNode, fC.folderName, false);
 					if (nL.size() == 0){
 						megaApi.createFolder(fC.folderName, parentNode, this);
 					}
 					else{
-						MegaNode currentNode = nL.get(0).copy();
+						MegaNode currentNode = nL.get(0);
 						long currentNodeHandle = currentNode.getHandle();
 						File localFolder = new File(fC.localPath);
 						if (localFolder.isDirectory()){
@@ -564,7 +562,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		private void createFolder(String path){
 			if (foldersPath.size() > 0){
 				if (path.compareTo(folder.getAbsolutePath()) == 0){
-					NodeList nL = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
+					ArrayList<MegaNode> nL = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
 					MegaNode nFolder = null;
 					boolean folderExists = false;
 					for (int i=0;i<nL.size();i++){
@@ -661,11 +659,11 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			long tempHandle = firstFolderHandle;
 			if (parts.length > 1){
 				for (int i=1;i<parts.length;i++){
-					NodeList nL = megaApi.getChildren(megaApi.getNodeByHandle(tempHandle));
+					ArrayList<MegaNode> nL = megaApi.getChildren(megaApi.getNodeByHandle(tempHandle));
 					boolean folderExists = false;
 					int j = 0;
 					while (!folderExists && (j < nL.size()) ){
-						MegaNode n = nL.get(j).copy();
+						MegaNode n = nL.get(j);
 						if ( (n.getName().compareTo(parts[i]) == 0) && (n.isFolder()) ){
 							tempHandle = n.getHandle();
 							folderExists = true;

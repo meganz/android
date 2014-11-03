@@ -3,7 +3,6 @@ package com.mega.android.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Handler;
 
 import com.mega.android.CameraSyncService;

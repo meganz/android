@@ -1,13 +1,13 @@
 package com.mega.components;
 
-import com.mega.android.R;
-import com.mega.android.utils.Util;
-
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.CheckBox;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
+
+import com.mega.android.R;
+import com.mega.android.utils.Util;
 
 public class LinearLayoutCheckable extends LinearLayout implements Checkable {
 

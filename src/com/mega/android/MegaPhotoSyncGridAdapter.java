@@ -3,55 +3,40 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.v7.app.ActionBar;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mega.android.CameraUploadFragment.PhotoSyncGridHolder;
-import com.mega.android.CameraUploadFragment.PhotoSyncHolder;
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
-import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
-import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickListener {
 	
 	Context context;
 	
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	ArrayList<PhotoSyncGridHolder> nodesArrayGrid;
 	int positionClicked;
 	
@@ -66,7 +51,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
-	public MegaPhotoSyncGridAdapter(Context _context, ArrayList<PhotoSyncGridHolder> _nodesArrayGrid, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, NodeList _nodes) {
+	public MegaPhotoSyncGridAdapter(Context _context, ArrayList<PhotoSyncGridHolder> _nodesArrayGrid, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes) {
 		this.context = _context;
 		this.nodesArrayGrid = _nodesArrayGrid;
 		this.photoSyncHandle = _photosyncHandle;
@@ -84,7 +69,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 		}
 	}
 	
-	public void setNodes(ArrayList<PhotoSyncGridHolder> nodesArrayGrid, NodeList nodes){
+	public void setNodes(ArrayList<PhotoSyncGridHolder> nodesArrayGrid, ArrayList<MegaNode> nodes){
 		this.nodesArrayGrid = nodesArrayGrid;
 		this.nodes = nodes;
 		positionClicked = -1;	
@@ -333,7 +318,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	}
 	
 	private String getInfoFolder (MegaNode n){
-		NodeList nL = megaApi.getChildren(n);
+		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 		
 		int numFolders = 0;
 		int numFiles = 0;

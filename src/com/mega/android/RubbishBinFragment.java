@@ -3,14 +3,6 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaShare;
-import com.mega.sdk.NodeList;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -29,11 +21,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
 
 public class RubbishBinFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -48,7 +47,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -606,7 +605,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 		return listView;
 	}
 	
-	public void setNodes(NodeList nodes){
+	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		if (isList){
 			if (adapterList != null){

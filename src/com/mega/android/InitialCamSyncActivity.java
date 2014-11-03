@@ -2,9 +2,6 @@ package com.mega.android;
 
 import java.io.File;
 
-import com.mega.android.utils.Util;
-import com.mega.components.LoopViewPager;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -20,6 +17,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+
+import com.mega.android.utils.Util;
+import com.mega.components.LoopViewPager;
 
 public class InitialCamSyncActivity extends Activity implements OnClickListener {
 	

@@ -13,8 +13,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +20,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import com.mega.android.utils.Util;
 
 /*
  * Helper class to process shared files from other activities

@@ -3,17 +3,6 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mega.android.utils.Util;
-import com.mega.sdk.MegaApiAndroid;
-import com.mega.sdk.MegaApiJava;
-import com.mega.sdk.MegaError;
-import com.mega.sdk.MegaGlobalListenerInterface;
-import com.mega.sdk.MegaNode;
-import com.mega.sdk.MegaRequest;
-import com.mega.sdk.MegaRequestListenerInterface;
-import com.mega.sdk.NodeList;
-
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -22,20 +11,28 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.view.KeyEvent;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
+
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
+import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 
 public class FileExplorerActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
@@ -79,7 +76,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	private List<ShareInfo> filePreparedInfos;
 	
-	NodeList nodes;
+	ArrayList<MegaNode> nodes;
 	
 	/*
 	 * Background task to process files for uploading
@@ -435,7 +432,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	
 	boolean exists = false;
-	NodeList nL = megaApi.getChildren(parentNode);
+	ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
 	for (int i=0;i<nL.size();i++){
 		if (title.compareTo(nL.get(i).getName()) == 0){
 			exists = true;

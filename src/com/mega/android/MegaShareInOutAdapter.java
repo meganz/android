@@ -3,6 +3,24 @@ package com.mega.android;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.support.v7.app.ActionBar;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.components.RoundedImageView;
@@ -12,35 +30,6 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.ShareList;
-import com.mega.sdk.TransferList;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.support.v7.app.ActionBar;
-import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListener {
 
@@ -48,12 +37,12 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	MegaApiAndroid megaApi;
 
 	int positionClicked;
-	//NodeList nodes;
+	//ArrayList<MegaNode> nodes;
 
 	long parentHandle = -1;
 
 	ArrayList<MegaShareAndroidElement> megaShareInList;
-	ShareList megaShareOutList;
+	ArrayList<MegaShare> megaShareOutList;
 	
 	ListView listFragment;
 	ImageView emptyImageViewFragment;
@@ -176,7 +165,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 		
 		holder.currentPosition = position;
 
-//		HashMap<MegaUser,NodeList> _inSHash	
+//		HashMap<MegaUser,ArrayList<MegaNode>> _inSHash	
 		
 		if(type==MODE_IN){
 			log("type=MODE_IN");
@@ -594,7 +583,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 	}
 				
 	private String getInfoFolder(MegaNode n) {
-		NodeList nL = megaApi.getChildren(n);
+		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 
 		int numFolders = 0;
 		int numFiles = 0;
@@ -692,7 +681,7 @@ public class MegaShareInOutAdapter extends BaseAdapter implements OnClickListene
 			i.putExtra("handle", n.getHandle());
 
 			if (n.isFolder()) {
-				ShareList sl = megaApi.getOutShares(n);
+				ArrayList<MegaShare> sl = megaApi.getOutShares(n);
 
 				if (sl != null) {
 

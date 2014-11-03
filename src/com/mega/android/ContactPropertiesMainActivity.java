@@ -5,8 +5,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-import java.util.ResourceBundle.Control;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.StatFs;
+import android.support.v7.app.ActionBar;
+import android.text.format.Time;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.android.pdfViewer.OpenPDFActivity;
@@ -22,43 +49,6 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
-import com.mega.sdk.MegaUser;
-import com.mega.sdk.NodeList;
-import com.mega.sdk.TransferList;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.StatFs;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.text.format.Time;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.TextView.OnEditorActionListener;
 
 public class ContactPropertiesMainActivity extends PinActivity implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 	
@@ -106,7 +96,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	private AlertDialog renameDialog;
 	ProgressDialog statusDialog;
 	
-	TransferList tL;
+	ArrayList<MegaTransfer> tL;
 	long lastTimeOnTransferUpdate = -1;
 	
 	private List<ShareInfo> filePreparedInfos;
@@ -242,7 +232,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		}	    
 	}
 	
-	public String getDescription(NodeList nodes){
+	public String getDescription(ArrayList<MegaNode> nodes){
 		int numFolders = 0;
 		int numFiles = 0;
 		
@@ -498,7 +488,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			return;
 
 		folder.mkdir();
-		NodeList nodeList = megaApi.getChildren(parent, orderGetChildren);
+		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent, orderGetChildren);
 		for (int i = 0; i < nodeList.size(); i++) {
 			MegaNode document = nodeList.get(i);
 			if (document.getType() == MegaNode.TYPE_FOLDER) {
@@ -879,7 +869,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		if (cflF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
@@ -911,7 +901,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		if (cflF != null){
 			for(int i=0; i<tL.size(); i++){
 				
-				MegaTransfer tempT = tL.get(i).copy();
+				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					MegaNode nodeT = megaApi.getNodeByHandle(handleT);

@@ -26,12 +26,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 
-import com.mega.android.pdfViewer.BookmarkEntry;
-import com.mega.android.pdfViewer.Actions;
-import com.mega.android.pdfViewer.AndroidReflections;
-import com.mega.android.pdfViewer.Bookmark;
-import com.mega.android.pdfViewer.OpenPDFActivity;
-import com.mega.android.pdfViewer.Options;
 import com.mega.android.utils.Util;
 
 /**

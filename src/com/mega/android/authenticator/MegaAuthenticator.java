@@ -1,10 +1,6 @@
 package com.mega.android.authenticator;
 
 import static android.accounts.AccountManager.KEY_BOOLEAN_RESULT;
-
-import com.mega.android.LoginActivity;
-import com.mega.android.utils.Util;
-
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
@@ -13,7 +9,9 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+
+import com.mega.android.LoginActivity;
+import com.mega.android.utils.Util;
 
 public class MegaAuthenticator extends AbstractAccountAuthenticator{
 
