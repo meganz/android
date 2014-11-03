@@ -268,7 +268,6 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
     }
     
     ViewHolderContactsGrid holder = null;
-	int positionG;
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -276,7 +275,6 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		View v;
 	
 		final int _position = position;
-		positionG = position;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();

@@ -23,8 +23,8 @@ import com.mega.android.MegaPhotoSyncGridAdapter;
 import com.mega.android.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import com.mega.android.MegaPhotoSyncListAdapter;
 import com.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
-import com.mega.android.MegaShareInOutAdapter;
-import com.mega.android.MegaShareInOutAdapter.ViewHolderInOutShareList;
+import com.mega.android.MegaShareInOutListAdapter;
+import com.mega.android.MegaShareInOutListAdapter.ViewHolderInOutShareList;
 import com.mega.android.MegaTransfersAdapter;
 import com.mega.android.MegaTransfersAdapter.ViewHolderTransfer;
 import com.mega.android.MimeType;
@@ -289,9 +289,9 @@ public class ThumbnailUtils {
 	static class ThumbnailDownloadListenerListShare implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderInOutShareList holder;
-		MegaShareInOutAdapter adapter;
+		MegaShareInOutListAdapter adapter;
 		
-		ThumbnailDownloadListenerListShare(Context context, ViewHolderInOutShareList holder, MegaShareInOutAdapter adapter){
+		ThumbnailDownloadListenerListShare(Context context, ViewHolderInOutShareList holder, MegaShareInOutListAdapter adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -719,7 +719,7 @@ public class ThumbnailUtils {
 		
 	}
 	
-	public static Bitmap getThumbnailFromMegaListShare(MegaNode document, Context context, ViewHolderInOutShareList viewHolder, MegaApiAndroid megaApi, MegaShareInOutAdapter adapter){
+	public static Bitmap getThumbnailFromMegaListShare(MegaNode document, Context context, ViewHolderInOutShareList viewHolder, MegaApiAndroid megaApi, MegaShareInOutListAdapter adapter){
 		
 		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 			log("the thumbnail is already downloaded or added to the list");
@@ -1090,9 +1090,9 @@ public class ThumbnailUtils {
 		File thumbFile;
 		ResizerParams param;
 		ViewHolderInOutShareList holder;
-		MegaShareInOutAdapter adapter;
+		MegaShareInOutListAdapter adapter;
 		
-		AttachThumbnailTaskListShare(Context context, MegaApiAndroid megaApi, ViewHolderInOutShareList holder, MegaShareInOutAdapter adapter)
+		AttachThumbnailTaskListShare(Context context, MegaApiAndroid megaApi, ViewHolderInOutShareList holder, MegaShareInOutListAdapter adapter)
 		{
 			this.context = context;
 			this.megaApi = megaApi;
@@ -1135,7 +1135,7 @@ public class ThumbnailUtils {
 		log("AttachThumbnailTask end");		
 	}
 	
-	private static void onThumbnailGeneratedListShare(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderInOutShareList holder, MegaShareInOutAdapter adapter){
+	private static void onThumbnailGeneratedListShare(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderInOutShareList holder, MegaShareInOutListAdapter adapter){
 		log("onPreviewGenerated");
 		//Tengo que mostrarla
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1186,7 +1186,7 @@ public class ThumbnailUtils {
 		
 	}
 	
-	public static void createThumbnailListShare(Context context, MegaNode document, ViewHolderInOutShareList holder, MegaApiAndroid megaApi, MegaShareInOutAdapter adapter){
+	public static void createThumbnailListShare(Context context, MegaNode document, ViewHolderInOutShareList holder, MegaApiAndroid megaApi, MegaShareInOutListAdapter adapter){
 		
 		if (!MimeType.typeForName(document.getName()).isImage()) {
 			log("no image");
