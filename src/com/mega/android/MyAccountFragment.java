@@ -1,10 +1,28 @@
 package com.mega.android;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+import com.mega.android.ManagerActivity.DrawerItem;
+import com.mega.android.utils.Util;
+import com.mega.sdk.MegaAccountDetails;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -16,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mega.android.ManagerActivity.DrawerItem;
 import com.mega.android.utils.Util;
@@ -36,6 +55,8 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 	
 	private Button upgradeButton;
 	private Button passwordButton;
+	private Button masterKeyButton;
+	private Button logout;
 	
 	MegaApiAndroid megaApi;
 	
@@ -56,6 +77,8 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 		}
 		aB.setTitle(getString(R.string.section_account));
 		
+		//MegaApplication app = (MegaApplication)getApplication();
+		
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 		((ManagerActivity)context).supportInvalidateOptionsMenu();
 		
@@ -70,6 +93,8 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 		freeSpaceView = (TextView) view.findViewById(R.id.my_account_free_space);
 		upgradeButton = (Button) view.findViewById(R.id.my_account_upgrade);
 		passwordButton = (Button) view.findViewById(R.id.my_account_password);
+		masterKeyButton = (Button) view.findViewById(R.id.export_master_key);
+		logout = (Button) view.findViewById(R.id.logout);
 		
 		log("update");
 		
@@ -90,6 +115,45 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 				startActivity(intent);				
 			}
 		});
+		
+		
+		//Button logout
+		logout.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ManagerActivity.logout(context, (MegaApplication)((ManagerActivity)context).getApplication(), megaApi, false);
+			}
+		});	
+		
+		masterKeyButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+				log("onClickExportMasterKey");
+				
+				String key = megaApi.exportMasterKey();
+				
+				BufferedWriter out;         
+				try {
+					
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					log("Export in: "+path);
+					FileWriter fileWriter= new FileWriter(path);	
+					out = new BufferedWriter(fileWriter);	
+					out.write(key);	
+					out.close(); 
+					
+					String toastMessage = getString(R.string.toast_master_key) + path;
+					Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();					
+
+				}catch (FileNotFoundException e) {
+				 e.printStackTrace();
+				}catch (IOException e) {
+				 e.printStackTrace();
+				}
+			}			
+		});	
+		
 		return view;
 	}
 	
