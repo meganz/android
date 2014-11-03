@@ -1285,7 +1285,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
+	    			thumbViewMenuItem.setVisible(false);
 	    			
 	    			if(swmF.getModeShare()==MODE_IN){
 	    				modeShareOut.setVisible(true);	
@@ -1802,7 +1802,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(false);
     			
     			
     			if(swmF.getModeShare()==MODE_IN){
