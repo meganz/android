@@ -1102,6 +1102,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if(parts.length != 3) return null;
 		return new String[] { parts[1], parts[2] };
 	}
+	
+	public void cameraUploadsClicked(){
+		log("cameraUplaodsClicked");
+		drawerItem = DrawerItem.CAMERA_UPLOADS;
+		selectDrawerItem(drawerItem);
+	}
     
     public void selectDrawerItem(DrawerItem item){
     	log("selectDrawerItem");

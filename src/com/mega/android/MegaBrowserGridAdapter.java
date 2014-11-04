@@ -766,6 +766,12 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			case R.id.file_grid_thumbnail1:{
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				if (n.isFolder()){
+					
+					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+						((ManagerActivity)context).cameraUploadsClicked();
+						return;
+					}
+					
 					aB.setTitle(n.getName());
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -899,6 +905,12 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				if (n.isFolder()){
+					
+					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+						((ManagerActivity)context).cameraUploadsClicked();
+						return;
+					}
+					
 					aB.setTitle(n.getName());
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();

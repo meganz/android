@@ -143,7 +143,7 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 					out.write(key);	
 					out.close(); 
 					
-					String toastMessage = getString(R.string.toast_master_key) + path;
+					String toastMessage = getString(R.string.toast_master_key) + " " + path;
 					Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();					
 
 				}catch (FileNotFoundException e) {
