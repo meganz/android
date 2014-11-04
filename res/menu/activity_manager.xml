@@ -83,6 +83,14 @@
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
 	
+	<item
+	    android:id="@+id/action_rubbish_bin"
+	    android:orderInCategory="125"
+	    android:showAsAction="never"
+	    android:title="@string/section_rubbish_bin"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
 <!--  	
 	<item
 	    android:id="@+id/action_rubbish_bin"
@@ -94,7 +102,7 @@
 	
 	<item
 	    android:id="@+id/action_menu_refresh"
-	    android:orderInCategory="125"
+	    android:orderInCategory="130"
 	    android:showAsAction="never"
 	    android:title="@string/action_refresh"
 	    android:icon="@drawable/ic_action_bar_null"
@@ -102,7 +110,7 @@
 	
 	<item
 	    android:id="@+id/action_menu_help"
-	    android:orderInCategory="130"
+	    android:orderInCategory="135"
 	    android:showAsAction="never"
 	    android:title="@string/action_help"
 	    android:icon="@drawable/ic_action_bar_null"
@@ -110,7 +118,7 @@
     
 	<item
 	    android:id="@+id/action_menu_upgrade_account"
-	    android:orderInCategory="135"
+	    android:orderInCategory="140"
 	    android:showAsAction="never"
 	    android:title="@string/action_upgrade_account"
 	    android:icon="@drawable/ic_action_bar_null"
@@ -126,11 +134,20 @@
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />-->
 	
-		<item
+	<item
 	    android:id="@+id/action_menu_settings"
-	    android:orderInCategory="140"
+	    android:orderInCategory="145"
 	    android:showAsAction="never"
 	    android:title="@string/action_settings"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
+		
+	<item
+	    android:id="@+id/action_menu_clear_rubbish_bin"
+	    android:orderInCategory="150"
+	    android:showAsAction="never"
+	    android:title="@string/context_clear_rubbish"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+		
 </menu>
