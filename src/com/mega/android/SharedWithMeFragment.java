@@ -45,6 +45,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
+	
+	public boolean to_cloud = false;
 	Context context;
 	ActionBar aB;
 	ListView listView;
@@ -230,134 +232,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		
 		if(parentHandle==-1){
 			aB.setTitle(getString(R.string.section_shared_with_me));			
-		}
- 
-		/****************/
-//<<<<<<< Updated upstream
-//		if(modeShare==MODE_IN){
-//			if (adapterList != null){
-//				adapterList.setType(MODE_IN);
-//			}
-//			
-//			uL = megaApi.getContacts();
-//			megaShareInList.clear();
-//			megaShareOutList.clear();
-//			for(int i=0; i<uL.size();i++){
-//				MegaUser user=uL.get(i);
-//				log("USER: " + user.getEmail());
-//				ArrayList<MegaNode> inNodeList=megaApi.getInShares(user);
-//				if(inNodeList.size()>0){
-//					MegaShareAndroidElement mSIn = new MegaShareAndroidElement(user, null);
-//					megaShareInList.add(mSIn);
-//					for(int j=0; j<inNodeList.size();j++){
-//						MegaNode node = inNodeList.get(j);
-//						mSIn = new MegaShareAndroidElement(user, node);
-//						log("node.getName() = " + node.getName());
-//						megaShareInList.add(mSIn);
-//					}					
-//				}				
-//			}
-//		}
-//		else{
-//
-//			if (adapterList != null){
-//				adapterList.setType(MODE_OUT);
-//			}
-//			
-//			outNodeList = megaApi.getOutShares();
-//			//outNodeList = megaApi.getOutShares();
-//			log("outNodeList.size:" +outNodeList.size());
-//			
-//			long lastFolder=-1;
-//			megaShareInList.clear();
-//			megaShareOutList.clear();
-//			
-//			for(int k=0;k<outNodeList.size();k++){
-//				
-//				
-//				MegaShare mS = outNodeList.get(k);				
-//				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
-//				
-//				log("Node: "+node.getHandle());
-//				
-//				if(lastFolder!=node.getHandle()){
-//					log("Entro por distinto");
-//					if(mS.getUser()!=null){						
-//						MegaUser user=megaApi.getContact(mS.getUser());					
-//						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);					
-//						megaShareOutList.add(mSOut);	
-//								
-//					}	
-//					else{
-//						
-//						//Ojo el node que es public link
-//						log("Public link");
-//						
-//						MegaUser user=null;					
-//						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
-//						megaShareOutList.add(mSOut);
-//
-//					}
-//					lastFolder=node.getHandle();
-//				}
-//				else{
-//					log("Entro por igual");
-//					if(mS.getUser()!=null){
-//						
-//						MegaUser user=megaApi.getContact(mS.getUser());					
-//						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
-//						mSOut.setRepeat(true);
-//						megaShareOutList.add(mSOut);	
-//						lastFolder=node.getHandle();						
-//						
-//					}	
-//					else{						
-//						//Ojo el node que es public link
-//						log("Public link");						
-//						MegaUser user=null;					
-//						MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
-//						mSOut.setRepeat(true);
-//						megaShareOutList.add(mSOut);
-//
-//					}
-//				}
-//			}
-//		}
-//=======
-//		
-//>>>>>>> Stashed changes
-		
-		/********/
-			
-		//outNodeList.get(0).
-						
-//			//parentHandle = megaApi.getInboxNode().getHandle();
-//			((ManagerActivity)context).setParentHandleSharedWithMe(-1);
-//			//nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-//			aB.setTitle(getString(R.string.section_shared_with_me));	
-//			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			((ManagerActivity)context).supportInvalidateOptionsMenu();
-//		}
-//		else{
-//			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//			
-//			if (parentNode == null){
-//				parentNode = megaApi.getInboxNode();
-//				parentHandle = parentNode.getHandle();
-//				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-//			}
-//			nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//			
-//			if (parentNode.getHandle() == megaApi.getInboxNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_shared_with_me));	
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			}
-//			else{
-//				aB.setTitle(parentNode.getName());					
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//			}
-//			((ManagerActivity)context).supportInvalidateOptionsMenu();
-//		}
+		}		
 
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_sharedwithmelist, container, false);
@@ -439,7 +314,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					log("Node: "+node.getHandle());
 					
 					if(lastFolder!=node.getHandle()){
-						log("Entro por distinto");
+						 
 						if(mS.getUser()!=null){						
 							MegaUser user=megaApi.getContact(mS.getUser());					
 							MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);					
@@ -695,6 +570,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					 //MODE OUT
 						if(megaShareOutList.get(position).getNode()!=null){
 							if (megaShareOutList.get(position).getNode().isFolder()){
+								to_cloud=false;
 								MegaNode parentNode = megaShareOutList.get(position).getNode();
 								
 								MegaUser user= megaShareOutList.get(position).getUser();
@@ -888,7 +764,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	}
 	
 	public int onBackPressed(){
-
+				
 		if (isList){
 
 			parentHandle = adapterList.getParentHandle();
@@ -903,11 +779,10 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				return 1;
 			}
 			else{
-			
+
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 				if (parentNode != null){
 					if(parentNode.getType() != MegaNode.TYPE_ROOT){
-						log("Tipo ROOT");
 						listView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);	
@@ -931,9 +806,8 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	
 							MegaNode nodeChild = childrenNodes.get(i);
 							MegaShareAndroidElement msIn = new MegaShareAndroidElement(owner, nodeChild);
-							megaShareInList.add(msIn);
-	
-						}				
+							megaShareInList.add(msIn);	
+						}		
 	
 						adapterList.setNodes(megaShareInList);
 						listView.setSelection(0);
@@ -942,18 +816,18 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					
 					}					
 					else{
-						//MODE OUT
+						//MODE OUT						
+						if(to_cloud){
+							return 0;
+						}
 						
-						log("Mode OUT ultima ");
-						
+						to_cloud=true;
 						aB.setTitle(getString(R.string.section_shared_with_me));	
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);	
 						
-						outNodeList = megaApi.getOutShares();
-						
+						outNodeList = megaApi.getOutShares();						
 					
-						long lastFolder=-1;
-						
+						long lastFolder=-1;						
 						
 						megaShareInList.clear();
 						megaShareOutList.clear();
@@ -966,16 +840,14 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 							log("Node: "+node.getHandle());
 							
 							if(lastFolder!=node.getHandle()){
-								log("Entro por distinto");
+								 
 								if(mS.getUser()!=null){						
 									MegaUser user=megaApi.getContact(mS.getUser());					
 									MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);					
 									megaShareOutList.add(mSOut);	
 											
 								}	
-								else{
-									
-									//Ojo el node que es public link
+								else{									
 									log("Public link");
 									
 									MegaUser user=null;					
@@ -985,7 +857,6 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 								lastFolder=node.getHandle();
 							}
 							else{
-								log("Entro por igual");
 								if(mS.getUser()!=null){
 									
 									MegaUser user=megaApi.getContact(mS.getUser());					
@@ -1007,105 +878,18 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						}				
 						adapterList.setNodes(megaShareOutList);
 						return 2;	
-					}					
+					}	
 				}
-				else{
-					if(initialParentHandle!=-1){
+				else if(initialParentHandle!=-1){
+
 						if(parentHandle==initialParentHandle){		
-							log("Set Initial Screen IN: "+parentHandle);
 													
 							aB.setTitle(getString(R.string.section_shared_with_me));	
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);							
 		
 							megaShareInList.clear();
 							megaShareOutList.clear();
-		/***********************/
-//<<<<<<< Updated upstream
-//							if(modeShare==MODE_IN){
-//		
-//								uL = megaApi.getContacts();
-//		
-//								for(int i=0; i<uL.size();i++){
-//									MegaUser user=uL.get(i);
-//									log("USER: " + user.getEmail());
-//									ArrayList<MegaNode> inNodeList=megaApi.getInShares(user);
-//									if(inNodeList.size()>0){
-//										MegaShareAndroidElement mSI = new MegaShareAndroidElement(user, null);
-//										megaShareInList.add(mSI);
-//										for(int j=0; j<inNodeList.size();j++){
-//											MegaNode node = inNodeList.get(j);
-//											mSI = new MegaShareAndroidElement(user, node);
-//											log("node.getName() = " + node.getName());
-//											megaShareInList.add(mSI);
-//										}					
-//									}				
-//								}
-//							}
-//							else{
-//								//TODO: el modo out		
-//								
-//								outNodeList = megaApi.getOutShares();
-//								//outNodeList = megaApi.getOutShares();
-//								log("outNodeList.size:" +outNodeList.size());
-//								
-//								long lastFolder=-1;
-//								megaShareInList.clear();
-//								megaShareOutList.clear();
-//								
-//								for(int k=0;k<outNodeList.size();k++){
-//									
-//									
-//									MegaShare mS = outNodeList.get(k);				
-//									MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
-//									
-//									log("Node: "+node.getHandle());
-//									
-//									if(lastFolder!=node.getHandle()){
-//										log("Entro por distinto");
-//										if(mS.getUser()!=null){						
-//											MegaUser user=megaApi.getContact(mS.getUser());					
-//											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);					
-//											megaShareOutList.add(mSOut);	
-//													
-//										}	
-//										else{
-//											
-//											//Ojo el node que es public link
-//											log("Public link");
-//											
-//											MegaUser user=null;					
-//											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
-//											megaShareOutList.add(mSOut);
-//
-//										}
-//										lastFolder=node.getHandle();
-//									}
-//									else{
-//										log("Entro por igual");
-//										if(mS.getUser()!=null){
-//											
-//											MegaUser user=megaApi.getContact(mS.getUser());					
-//											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
-//											mSOut.setRepeat(true);
-//											megaShareOutList.add(mSOut);	
-//											lastFolder=node.getHandle();						
-//											
-//										}	
-//										else{						
-//											//Ojo el node que es public link
-//											log("Public link");						
-//											MegaUser user=null;					
-//											MegaShareAndroidElement mSOut = new MegaShareAndroidElement(user, node);
-//											mSOut.setRepeat(true);
-//											megaShareOutList.add(mSOut);
-//
-//										}
-//									}
-//								}											
-//								
-//=======
 							
-							/***********************/
 							uL = megaApi.getContacts();
 	
 							for(int i=0; i<uL.size();i++){
@@ -1146,7 +930,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						return 0;
 					}
 				}				
-			}
+			
 		}
 		else{
 			//GRID ADAPTER
