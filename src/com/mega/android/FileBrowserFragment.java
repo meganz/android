@@ -353,6 +353,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				if (nodes.get(position).isFolder()){
 					MegaNode n = nodes.get(position);
 					
+					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+						((ManagerActivity)context).cameraUploadsClicked();
+						return;
+					}
+					
 					aB.setTitle(n.getName());
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
