@@ -258,6 +258,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		}
 
 		holder.currentPosition = position;
+		holder.imageView.setImageBitmap(null);
+		holder.contactInitialLetter.setText("");
 		
 		MegaUser contact = (MegaUser) getItem(position);
 		holder.contactMail = contact.getEmail();

@@ -3,12 +3,16 @@ package com.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -71,7 +75,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
+//	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -95,8 +99,9 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			
 			log("onRequestFinish() "+request.getEmail());
 			if (e.getErrorCode() == MegaError.API_OK){
+				boolean avatarExists = false;
 				
-				pendingAvatars.remove(request.getEmail());
+//				pendingAvatars.remove(request.getEmail());
 				
 				if (holder.contactMail.compareTo(request.getEmail()) == 0){
 					File avatar = null;
@@ -117,16 +122,88 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 								avatar.delete();
 							}
 							else{
-								log("Establezco el avatar en su sitio");
-								holder.imageView.setImageBitmap(bitmap);
+								avatarExists = true;
+								holder.roundedImageView.setImageBitmap(bitmap);
 							}
 						}
+					}
+					
+					if (!avatarExists){
+						createDefaultAvatar();
 					}
 				}
 			}
 			else{
-				pendingAvatars.remove(request.getEmail());
+//				pendingAvatars.remove(request.getEmail());
+				
+				if (holder.contactMail.compareTo(request.getEmail()) == 0){
+					createDefaultAvatar();
+				}
 			}
+		}
+		
+		public void createDefaultAvatar(){
+			log("createDefaultAvatar()");
+			
+			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			
+			int radius; 
+	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+	        	radius = defaultAvatar.getWidth()/2;
+	        else
+	        	radius = defaultAvatar.getHeight()/2;
+	        
+			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+			holder.roundedImageView.setImageBitmap(defaultAvatar);
+			
+			
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = context.getResources().getDisplayMetrics().density;
+		    
+		    int avatarTextSize = getAvatarTextSize(density);
+		    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		    if (holder.contactMail != null){
+			    if (holder.contactMail.length() > 0){
+			    	log("TEXT: " + holder.contactMail);
+			    	log("TEXT AT 0: " + holder.contactMail.charAt(0));
+			    	String firstLetter = holder.contactMail.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.contactInitialLetter.setText(firstLetter);
+			    	holder.contactInitialLetter.setTextSize(32);
+			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
+			    }
+		    }
+		}
+		
+		private int getAvatarTextSize (float density){
+			float textSize = 0.0f;
+			
+			if (density > 3.0){
+				textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+			}
+			else if (density > 2.0){
+				textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+			}
+			else if (density > 1.5){
+				textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+			}
+			else if (density > 1.0){
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+			}
+			else if (density > 0.75){
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+			}
+			else{
+				textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+			}
+			
+			return (int)textSize;
 		}
 
 		@Override
@@ -146,6 +223,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 	public class ViewHolderInOutShareList {
 		public ImageView imageView;
 		public RoundedImageView roundedImageView;
+		public TextView contactInitialLetter;
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
 		public RelativeLayout itemLayoutFile;
@@ -225,7 +303,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			holder.contactName = (TextView) convertView.findViewById(R.id.shared_contact_name);
 //			holder.contactContent = (TextView) convertView.findViewById(R.id.shared_contact_content);
 			holder.roundedImageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail_share);
-
+			holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_list_initial_letter_share); 
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolderInOutShareList) convertView.getTag();
@@ -247,6 +325,8 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 //			}
 //		}
 		
+		holder.roundedImageView.setImageBitmap(null);
+		holder.contactInitialLetter.setText("");
 		holder.currentPosition = position;
 
 //		HashMap<MegaUser,ArrayList<MegaNode>> _inSHash	
@@ -717,15 +797,15 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			}
 		}	
 		else{
-			if (!pendingAvatars.contains(megaUser.getEmail())){
-				pendingAvatars.add(megaUser.getEmail());
+//			if (!pendingAvatars.contains(megaUser.getEmail())){
+//				pendingAvatars.add(megaUser.getEmail());
 				if (context.getExternalCacheDir() != null){
 					megaApi.getUserAvatar(megaUser, context.getExternalCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);
 				}
 				else{
 					megaApi.getUserAvatar(megaUser, context.getCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);
 				}
-			}
+//			}
 		}
 	}
 				

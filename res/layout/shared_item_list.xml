@@ -72,7 +72,33 @@
 	    android:longClickable="false"
 		android:clickable="false">
 	    
-	    <com.mega.components.RoundedImageView 
+        
+        <RelativeLayout
+			android:id="@+id/contact_list_relative_layout_avatar_share"
+			android:layout_width="54dp"
+			android:layout_height="54dp"
+			android:layout_marginLeft="5dp" 
+			android:paddingTop="3dp" >
+	         
+		    <com.mega.components.RoundedImageView 
+		         android:id="@+id/contact_list_thumbnail_share"
+		         android:layout_width="54dp"
+		         android:layout_height="54dp" 
+		         android:scaleType="fitCenter"         
+		         rounded:corner_radius="27dp" 
+		         rounded:border_width="2dp"
+		         rounded:border_color="@color/border_file_properties"/>
+		    
+		    <TextView
+		        android:id="@+id/contact_list_initial_letter_share"
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent" 
+		        android:layout_centerInParent="true"
+			    android:gravity="center_horizontal|center_vertical" />
+		    
+	    </RelativeLayout>
+    
+<!-- 	    <com.mega.components.RoundedImageView 
 	         android:id="@+id/contact_list_thumbnail_share"
 	         android:layout_width="54dp"
 	         android:layout_height="54dp"
@@ -83,12 +109,12 @@
 	         rounded:corner_radius="27dp" 
 	         rounded:border_width="2dp"
 	         rounded:border_color="@color/border_file_properties"/>
-	    
+ -->	    
 	    <TextView
 	        android:id="@+id/shared_contact_name"
 	        android:layout_width="wrap_content"
 	        android:layout_height="30dp"
-	        android:layout_toRightOf="@id/contact_list_thumbnail_share"
+	        android:layout_toRightOf="@id/contact_list_relative_layout_avatar_share"
 	        android:paddingTop="10dp"
 	        android:textColor="@color/white"/>  
 <!--      
