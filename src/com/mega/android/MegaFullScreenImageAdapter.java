@@ -173,7 +173,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		
 		@Override
 		protected void onPostExecute(Integer param){
-			if (param == 0){
+			if (param == 0 || param == 1){
 				int position = 0;
 				boolean holderIsVisible = false;
 				for(int i = 0; i < visibleImgs.size(); i++) {
@@ -186,7 +186,10 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 				}
 				
 				if (holderIsVisible){
-					visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+					if(param == 0)
+					{
+						visibleImgs.get(position).imgDisplay.setImageBitmap(preview);
+					}
 					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
 					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
 				}
@@ -228,27 +231,28 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			long handle = Long.parseLong(params[0]);
 			boolean previewCreated = Boolean.parseBoolean(params[1]);
 			
-			if (previewCreated){
-				int position = 0;
-				boolean holderIsVisible = false;
-				for(int i = 0; i < visibleImgs.size(); i++) {
-					position = visibleImgs.keyAt(i);
-					ViewHolderFullImage holder = visibleImgs.get(position);
-					if (holder.document == handle){
-						holderIsVisible = true;
-						break;
-					}
+			int position = 0;
+			boolean holderIsVisible = false;
+			for(int i = 0; i < visibleImgs.size(); i++) {
+				position = visibleImgs.keyAt(i);
+				ViewHolderFullImage holder = visibleImgs.get(position);
+				if (holder.document == handle){
+					holderIsVisible = true;
+					break;
 				}
-				
-				if (holderIsVisible){
+			}
+			
+			if (holderIsVisible) {
+				if(previewCreated) {
 					MegaNode node = megaApi.getNodeByHandle(handle);
 					File previewDir = PreviewUtils.getPreviewFolder(activity);
 					File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
 					Bitmap bitmap = PreviewUtils.getBitmapForCache(previewFile, activity);
 					visibleImgs.get(position).imgDisplay.setImageBitmap(bitmap);
-					visibleImgs.get(position).progressBar.setVisibility(View.GONE);
-					visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
 				}
+				
+				visibleImgs.get(position).progressBar.setVisibility(View.GONE);
+				visibleImgs.get(position).downloadProgressBar.setVisibility(View.GONE);
 			}
 		}
 	}
