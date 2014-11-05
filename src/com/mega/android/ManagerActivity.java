@@ -2385,7 +2385,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				break;
 			}
 			case R.id.top_control_bar:{
-				drawerItem = DrawerItem.ACCOUNT;
+				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItem(drawerItem);
 				break;
 			}
