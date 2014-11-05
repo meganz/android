@@ -70,6 +70,11 @@
         <item quantity="other">folders</item>
     </plurals>
     
+   <plurals name="general_num_shared_folders">
+        <item quantity="one">shared folder</item>
+        <item quantity="other">shared folders</item>
+    </plurals>
+    
     <plurals name="general_num_downloads">
         <item quantity="one">download</item>
         <item quantity="other">downloads</item>
@@ -134,6 +139,11 @@
 	<string name="section_shared_with_me">Shared with me</string>
 	<string name="section_rubbish_bin">Rubbish Bin</string>
 	<string name="section_contacts">Contacts</string>
+	<string name="tab_contacts">CONTACTS</string>
+	<string name="tab_sent_requests">SENT REQUESTS</string>
+	<string name="tab_received_requests">RECEIVED REQUESTS</string>
+	<string name="sent_requests_empty">No sent requests!</string>
+	<string name="received_requests_empty">No received requests!</string>
 	<string name="section_image_viewer">Camera Uploads</string>
 	<string name="section_transfers">Transfers</string>
 	<string name="section_account">My Account</string>
@@ -165,10 +175,7 @@
 	<string name="file_properties_shared_folder_select_contact">Share with</string>
 	<string name="file_properties_send_file_select_contact">Send to</string>
 	
-	<string name="contact_properties_activity">Contact</string>
-	<string name="contact_properties_content">Content:</string>
-	<string name="contact_properties_info_email">E-mail: </string>
-	<string name="contact_properties_info_added">Added: </string>
+	<string name="contact_properties_activity">Contact Info</string>
 	
 	<string name="contact_file_list_activity">Content</string>
 	<string name="file_contact_list_activity">Shared with</string>

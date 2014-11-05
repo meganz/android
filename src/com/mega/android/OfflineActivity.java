@@ -41,7 +41,7 @@ public class OfflineActivity extends PinActivity{
 			oF.setIsList(isListOffline);
 		}
 		
-		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, oF, "oF").commit();
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oF, "oF").commit();
 //		if (isListOffline){					
 //			customListGrid.setImageResource(R.drawable.ic_menu_gridview);
 //		}
