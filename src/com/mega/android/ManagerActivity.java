@@ -73,6 +73,7 @@ import android.widget.Toast;
 
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.android.pdfViewer.OpenPDFActivity;
+import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.components.EditTextCursorWatcher;
 import com.mega.components.RoundedImageView;
@@ -4164,6 +4165,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
 		log("onTransferFinish");
+		
+		ThumbnailUtils.pendingThumbnails.remove(transfer.getNodeHandle());
+		
+		
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
 		//Update transfer list

@@ -536,6 +536,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		long handle = transfer.getNodeHandle();
 		
 		pendingFullImages.remove(handle);
+		ThumbnailUtils.pendingThumbnails.remove(handle);
 		
 		if (e.getErrorCode() == MegaError.API_OK){
 			log ("Download finished OK: " + transfer.getFileName() + "_" + transfer.getTransferredBytes() + "/" + transfer.getTotalBytes());
