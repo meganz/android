@@ -9,5 +9,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
     </ListView>
-
+    
+    
+    <Button
+       	android:id="@+id/add_contact_button"
+       	android:layout_gravity="center"
+       	android:layout_height="wrap_content"
+       	android:layout_width="fill_parent"
+       	android:layout_alignParentBottom="true"
+       	android:background="@drawable/btn_default_holo_light_without_corners"
+       	android:textColor="@color/button_text"
+       	android:text="@string/menu_add_contact" >
+    </Button>
+    
 </RelativeLayout>

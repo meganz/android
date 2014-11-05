@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -34,20 +35,15 @@ import com.mega.sdk.MegaUser;
 
 public class ContactPropertiesFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
 	
-	TextView contentTextView;
 	RoundedImageView imageView;
 	RelativeLayout contentLayout;
-	TextView contentDetailedTextView;
+	TextView userNameTextView;
 	TextView infoEmail;
-	TextView infoAdded;
-	ImageButton eyeButton;
+	//TextView infoAdded;
+	//ImageButton eyeButton;
 	TableLayout contentTable;
-	
-	
-	String userEmail;
-	
-	
-	
+	Button sharedFoldersButton;	
+	String userEmail;	
 	Context context;
 	ActionBar aB;
 	
@@ -74,6 +70,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
+		aB.setTitle(R.string.contact_properties_activity);
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -90,19 +87,27 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_properties_image);
 			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
 			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
-			contentLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_content);
-			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_text);
-			contentDetailedTextView = (TextView) v.findViewById(R.id.contact_properties_content_detailed);
-			eyeButton = (ImageButton) v.findViewById(R.id.contact_properties_content_eye);
 			contentTable = (TableLayout) v.findViewById(R.id.contact_properties_content_table);
-			eyeButton.setOnClickListener(this);
-			contentTable.setOnClickListener(this);
+			userNameTextView = (TextView) v.findViewById(R.id.contact_properties_name);
+			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
+//			contentLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_content);
+//			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_text);
+//			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_detailed);
+//			eyeButton = (ImageButton) v.findViewById(R.id.contact_properties_content_eye);
+
+//			eyeButton.setOnClickListener(this);
+			sharedFoldersButton = (Button) v.findViewById(R.id.shared_folders_button);
+			sharedFoldersButton.setOnClickListener(this);
 			
-			infoEmail = (TextView) v.findViewById(R.id.contact_properties_info_data_email);
-			infoAdded = (TextView) v.findViewById(R.id.contact_properties_info_data_added);
+			
+			infoEmail.setText(userEmail);
+			userNameTextView.setText(userEmail);
+			
+//			infoAdded = (TextView) v.findViewById(R.id.contact_properties_info_data_added);
 			
 			MegaUser contact = megaApi.getContact(userEmail);
-			contentDetailedTextView.setText(getDescription(megaApi.getInShares(contact)));
+//			contentTextView.setText(getDescription(megaApi.getInShares(contact)));
+			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
 			
 			File avatar = null;
 			if (context.getExternalCacheDir() != null){
@@ -133,9 +138,8 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 					}
 				}
 			}
-			
-			infoEmail.setText(userEmail);
-			infoAdded.setText(contact.getTimestamp()+"");
+
+			//infoAdded.setText(contact.getTimestamp()+"");
 		}
 
 		return v;
@@ -160,8 +164,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
-			case R.id.contact_properties_content_eye:
-			case R.id.contact_properties_content_table:{
+			case R.id.shared_folders_button:{
 				((ContactPropertiesMainActivity)context).onContentClick(userEmail);
 //				Intent i = new Intent(context, ContactFileListActivity.class);
 //				i.putExtra("name", userEmail);
@@ -188,17 +191,17 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 		
 		String info = "";
 		if (numFolders > 0){
-			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
 			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
 			}
 		}
 		else {
 			if (numFiles == 0){
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
+				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
 			}
 			else{
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
+				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
 			}
 		}
 		

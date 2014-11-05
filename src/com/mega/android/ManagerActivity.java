@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -36,8 +35,12 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.app.ActionBar.TabListener;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.text.Spannable;
@@ -62,10 +65,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TabHost;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -213,6 +218,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private SearchFragment sF;
     private CameraUploadFragment psF;
     
+    //TODO 
+    //Tabs in Contacts
+    private TabHost mTabHost;
+    private Fragment contactTabFragment;	
+	TabsAdapter mTabsAdapter;
+    ViewPager viewPager;
+    
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
     
@@ -222,7 +234,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private AlertDialog newFolderDialog;
     private AlertDialog addContactDialog;
     private AlertDialog clearRubbishBinDialog;
-    
+
     private Handler handler;
     
     private boolean moveToRubbish = false;
@@ -268,11 +280,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	String pathNavigation = "/";
 	
 	long lastTimeOnTransferUpdate = -1;
-
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
-
+		
 //	    dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 
@@ -281,9 +293,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else{
 			dbH.setAttrOnline(false);
-		}
-		
-    	log("onCreate()");
+		}		
     	
 		super.onCreate(savedInstanceState);
 		managerActivity = this;
@@ -369,6 +379,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         usedSpaceBar = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
         usedSpaceBar.setProgress(0);
+        
+        //CONTACTS
+        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
+        mTabHost.setup();
+        
+        viewPager = (ViewPager) findViewById(R.id.contact_tabs_pager);  		
+        
+        
         
         if (!Util.isOnline(this)){
         	
@@ -752,6 +770,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     		}
     	}
+    	
+    	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
     	if (cF != null){
     		if (cF.isVisible()){
     			if (isListContacts){
@@ -1116,7 +1137,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		case CLOUD_DRIVE:{
 //    			
 //    			megaApi.getPricing(this);
-//    			
+    			    			
 				if (fbF == null){
 					fbF = new FileBrowserFragment();
 					if (parentHandleBrowser == -1){
@@ -1132,6 +1153,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					fbF.setNodes(nodes);
 				}
 				else{
+										
 					fbF.setIsList(isListCloudDrive);
 					fbF.setParentHandle(parentHandleBrowser);
 					fbF.setOrder(orderGetChildren);
@@ -1139,9 +1161,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					fbF.setNodes(nodes);
 				}
 				
-				
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
-				if (!firstTime){
+				mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, fbF, "fbF");
+    			ft.commit();
+    			
+    			if (!firstTime){
     				mDrawerLayout.closeDrawer(Gravity.LEFT);
     			}
     			else{
@@ -1149,7 +1175,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			
     			customSearch.setVisibility(View.VISIBLE);
-    			
+    			viewPager.setVisibility(View.GONE);
 
     			if (createFolderMenuItem != null){
 	    			createFolderMenuItem.setVisible(true);
@@ -1177,15 +1203,41 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case CONTACTS:{
     			
-    			if (cF == null){
-    				cF = new ContactsFragment();
-    				cF.setIsList(isListContacts);
+//    			if (cF == null){
+//    				cF = new ContactsFragment();
+//    				cF.setIsList(isListContacts);
+//    			}
+    			
+    			//TODO pager contacts    			
+   			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setTitle(getString(R.string.section_contacts));
+    			
+    			if (getmDrawerToggle() != null){
+    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
+    				supportInvalidateOptionsMenu();
     			}
     			
-    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, cF, "cF").commit();
+    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    			if (currentFragment != null){
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    			}
+				mTabHost.setVisibility(View.VISIBLE);    			
+    			viewPager.setVisibility(View.VISIBLE);
     			
-    			customSearch.setVisibility(View.VISIBLE);
-    			
+    			if (mTabsAdapter == null){
+    				mTabsAdapter = new TabsAdapter(this, mTabHost, viewPager);
+    				mTabsAdapter.addTab(mTabHost.newTabSpec("contactsFragment").setIndicator(getString(R.string.section_contacts)), ContactsFragment.class, null);
+    				mTabsAdapter.addTab(mTabHost.newTabSpec("sentRequests").setIndicator(getString(R.string.tab_sent_requests)), SentRequestsFragment.class, null);
+    				mTabsAdapter.addTab(mTabHost.newTabSpec("receivedRequests").setIndicator(getString(R.string.tab_received_requests)), ReceivedRequestsFragment.class, null);
+    			}
+    	        
+    			//frameLayout.setVisibility(View.GONE);     			
+   			
+    			customSearch.setVisibility(View.VISIBLE);   			
+    			    			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
     			if (createFolderMenuItem != null){
@@ -1201,7 +1253,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			thumbViewMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
-	    			addMenuItem.setEnabled(false);	    			
+	    			addMenuItem.setEnabled(false);	
+	    			
 	    			if (isListContacts){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -1232,8 +1285,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				rbF.setNodes(nodes);
     			}
     			
-    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, rbF, "rbF").commit();
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, rbF, "rbF");
+    			ft.commit();
+    			
     			customSearch.setVisibility(View.VISIBLE);
+    			viewPager.setVisibility(View.GONE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
@@ -1267,8 +1326,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		case SHARED_WITH_ME:{
     			
     			if (swmF == null){
-    				swmF = new SharedWithMeFragment();
-    				//TODO cuando llegas a esto?
+    				swmF = new SharedWithMeFragment();    				
 //    				swmF.setParentHandle(megaApi.getInboxNode().getHandle());
 //    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
     				swmF.setIsList(isListSharedWithMe);
@@ -1284,15 +1342,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //    				swmF.setNodes(nodes);
     			}
     			
-    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, swmF, "swmF").commit();
-//    			if (isListSharedWithMe){
-//    				customListGrid.setImageResource(R.drawable.ic_menu_gridview);
-//				}
-//				else{
-//    				customListGrid.setImageResource(R.drawable.ic_menu_listview);
-//    			}
-//    			
-//    			customListGrid.setVisibility(View.VISIBLE);
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, swmF, "swmF");
+    			ft.commit();
+    			
+
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
@@ -1336,10 +1392,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				maF = new MyAccountFragment();
     			}
     			
-    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, maF, "maF").commit();
-//    			customListGrid.setVisibility(View.GONE);
-    			customSearch.setVisibility(View.GONE);
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, maF, "maF");
+    			ft.commit();
     			
+    			customSearch.setVisibility(View.GONE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
@@ -1375,10 +1434,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			tF.setTransfers(megaApi.getTransfers());
     			tF.setPause(!downloadPlay);
-    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, tF).commit();
-//    			customListGrid.setVisibility(View.GONE);
+    			
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, tF, "tF");
+    			ft.commit();
+    			
     			customSearch.setVisibility(View.GONE);
-
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
@@ -1415,6 +1478,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case SAVED_FOR_OFFLINE:{
+    			
     			if (oF == null){
     				oF = new OfflineFragment();
     				oF.setIsList(isListOffline);
@@ -1425,10 +1489,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				oF.setIsList(isListOffline);
     			}
     			
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, oF, "oF").commit();
-
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, oF, "oF");
+    			ft.commit();
+    			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
-   			
     			customSearch.setVisibility(View.VISIBLE);
     			
 
@@ -1459,6 +1526,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case SEARCH:{
+    			
     			if (sF == null){
         			sF = new SearchFragment();
         		}
@@ -1471,7 +1539,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			sF.setParentHandle(parentHandleSearch);
     			sF.setLevels(levelsSearch);
     			
-    			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, sF, "sF").commit();
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, sF, "sF");
+    			ft.commit();
+    			
     			customSearch.setVisibility(View.GONE);
     			
 
@@ -1494,7 +1567,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case CAMERA_UPLOADS:{
-   			
+    			
     			if (psF == null){
     				psF = new CameraUploadFragment();
     				psF.setIsList(isListCameraUpload);
@@ -1504,10 +1577,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				
 				
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, psF, "psF").commit();
-    			    			
-   				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			mTabHost.setVisibility(View.GONE);    			
+    			viewPager.setVisibility(View.GONE); 
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, psF, "psF");
+    			ft.commit();
     			
+   				mDrawerLayout.closeDrawer(Gravity.LEFT);
     			customSearch.setVisibility(View.VISIBLE);
     			
     			if (createFolderMenuItem != null){
@@ -1558,6 +1634,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cF != null){
 			if (cF.isVisible()){
 				if (cF.onBackPressed() == 0){
@@ -1568,6 +1646,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 					return;
 				}
+				log("ContactFragment Visible");
+				log("onBackPress del ManagerActivity");
 			}
 		}
 		
@@ -1749,6 +1829,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cF != null){
 			if (cF.isVisible()){
 				createFolderMenuItem.setVisible(false);
@@ -2103,6 +2185,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
 	        	}
 
+	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+	    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 	        	if (cF != null){
 	        		if (cF.isVisible()){
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cF");
@@ -2908,10 +2992,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
-				if (cF.isVisible()){	
-					ArrayList<MegaUser> contacts = megaApi.getContacts();
-					cF.setContacts(contacts);
-					cF.getListView().invalidateViews();
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (cF != null){
+					if (cF.isVisible()){	
+						ArrayList<MegaUser> contacts = megaApi.getContacts();
+						cF.setContacts(contacts);
+						cF.getListView().invalidateViews();
+					}
 				}
 			}
 			log("add contact");
@@ -3163,6 +3251,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						return;
 					}
 				}
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (cF != null){
 					if (cF.isVisible()){
 						return;
@@ -3206,12 +3296,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		clearRubbishBinDialog.show();
 	}
 	
+	private String getFragmentTag(int viewPagerId, int fragmentPosition)
+	{
+	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
+	}
+	
 	public void showNewContactDialog(String editText){
 		log("showNewContactDialog");
-		if (cF.isVisible()){
-			cF.setPositionClicked(-1);
-			cF.notifyDataSetChanged();
+		
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cF != null){
+			if (cF.isVisible()){
+				cF.setPositionClicked(-1);
+				cF.notifyDataSetChanged();
+			}
 		}
+
 		
 		String text;
 		if ((editText == null) || editText.equals("")){
@@ -3229,8 +3330,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
@@ -3945,6 +4045,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onUsersUpdate(MegaApiJava api) {
 		log("onUsersUpdate");
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cF != null){
 			if (cF.isVisible()){	
 				ArrayList<MegaUser> contacts = megaApi.getContacts();
@@ -4323,9 +4425,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
 						}
 						catch(Exception e) {}
-						
-						//TODO: SI ES UN PDF --> ABRIR NUESTRO VISOR CON LOCALPATH
-						
+												
 						if(MimeType.typeForName(tempNode.getName()).isPdf()){
 							
 		    			    File pdfFile = new File(localPath);
@@ -4414,11 +4514,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 	}
-
+	
 	@Override
 	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer, byte[] buffer)
 	{
 		log("onTransferData");
 		return true;
-	}
+	}	
 }
