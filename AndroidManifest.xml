@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mega.android"
     android:installLocation="internalOnly"
-    android:versionCode="41"
-    android:versionName="0.38" >
+    android:versionCode="42"
+    android:versionName="0.39" >
 
     <uses-sdk
         android:minSdkVersion="9"
