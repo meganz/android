@@ -158,6 +158,15 @@
 		            android:src="@drawable/ic_share"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
+<!-- 		        
+		        <ImageView
+		            android:id="@+id/file_list_option_shared_disabled"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_share_grey"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" /> -->
+		        
 	        
 		        <ImageView
 		            android:id="@+id/file_list_option_delete"
