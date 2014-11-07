@@ -92,7 +92,7 @@
         android:id="@+id/transfers_list_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_three_dots"
+        android:src="@drawable/action_selector_ic"
 		android:background="@null" 
         android:layout_alignTop="@id/transfers_list_filename"
         android:layout_alignParentRight="true"

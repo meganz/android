@@ -159,7 +159,7 @@
 		        android:id="@+id/create_account_mega_logo"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:src="@drawable/login_mega_logo"
+		        android:src="@drawable/mega_ic"
 		        android:layout_marginTop="100dp"/>
 		    
 		    <TextView
