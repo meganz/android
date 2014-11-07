@@ -46,7 +46,7 @@ public class ThumbnailUtils {
 	private static int THUMBNAIL_SIZE = 120;
 	public static ThumbnailCache thumbnailCache = new ThumbnailCache();
 	public static ThumbnailCache thumbnailCachePath = new ThumbnailCache(1);
-	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
+//	public static ArrayList<Long> pendingThumbnails = new ArrayList<Long>();
 	
 	static HashMap<Long, ThumbnailDownloadListenerListBrowser> listenersList = new HashMap<Long, ThumbnailDownloadListenerListBrowser>();
 	static HashMap<Long, ThumbnailDownloadListenerListShare> listenersListShare = new HashMap<Long, ThumbnailDownloadListenerListShare>();
@@ -82,7 +82,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -152,7 +152,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -240,7 +240,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -310,7 +310,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -382,7 +382,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -461,7 +461,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -529,7 +529,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -597,7 +597,7 @@ public class ThumbnailUtils {
 			final long handle = request.getNodeHandle();
 			MegaNode node = api.getNodeByHandle(handle);
 			
-			pendingThumbnails.remove(handle);
+//			pendingThumbnails.remove(handle);
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Downloading thumbnail OK: " + handle);
@@ -699,16 +699,16 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromMegaList(MegaNode document, Context context, ViewHolderBrowserList viewHolder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
 		
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerListBrowser listener = new ThumbnailDownloadListenerListBrowser(context, viewHolder, adapter);
 		listenersList.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -721,16 +721,16 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromMegaListShare(MegaNode document, Context context, ViewHolderInOutShareList viewHolder, MegaApiAndroid megaApi, MegaShareInOutListAdapter adapter){
 		
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerListShare listener = new ThumbnailDownloadListenerListShare(context, viewHolder, adapter);
 		listenersListShare.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -743,16 +743,16 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromMegaPhotoSyncList(MegaNode document, Context context, ViewHolderPhotoSyncList viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapter adapter){
 		
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerPhotoSyncList listener = new ThumbnailDownloadListenerPhotoSyncList(context, viewHolder, adapter);
 		listenersPhotoSyncList.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -765,16 +765,16 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromMegaTransfer(MegaNode document, Context context, ViewHolderTransfer viewHolder, MegaApiAndroid megaApi, MegaTransfersAdapter adapter){
 		
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerTransfer listener = new ThumbnailDownloadListenerTransfer(context, viewHolder, adapter);
 		listenersTransfer.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -787,16 +787,16 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromMegaExplorer(MegaNode document, Context context, ViewHolderExplorer viewHolder, MegaApiAndroid megaApi, MegaExplorerAdapter adapter){
 		
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerExplorer listener = new ThumbnailDownloadListenerExplorer(context, viewHolder, adapter);
 		listenersExplorer.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -807,16 +807,16 @@ public class ThumbnailUtils {
 	}
 	
 	public static Bitmap getThumbnailFromMegaGrid(MegaNode document, Context context, ViewHolderBrowserGrid viewHolder, MegaApiAndroid megaApi, MegaBrowserGridAdapter adapter, int numView){
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerGrid listener = new ThumbnailDownloadListenerGrid(context, viewHolder, adapter, numView);
 		listenersGrid.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -826,16 +826,16 @@ public class ThumbnailUtils {
 	}
 	
 	public static Bitmap getThumbnailFromMegaPhotoSyncGrid(MegaNode document, Context context, ViewHolderPhotoSyncGrid viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapter adapter, int numView){
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerPhotoSyncGrid listener = new ThumbnailDownloadListenerPhotoSyncGrid(context, viewHolder, adapter, numView);
 		listenersPhotoSyncGrid.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");
@@ -846,16 +846,16 @@ public class ThumbnailUtils {
 	
 	public static Bitmap getThumbnailFromMegaFull(MegaNode document, Context context, ViewHolderFullImage viewHolder, MegaApiAndroid megaApi, MegaFullScreenImageAdapter adapter){
 		
-		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
-			log("the thumbnail is already downloaded or added to the list");
-			return thumbnailCache.get(document.getHandle());
-		}
+//		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
+//			log("the thumbnail is already downloaded or added to the list");
+//			return thumbnailCache.get(document.getHandle());
+//		}
 		
 		if (!Util.isOnline(context)){
 			return thumbnailCache.get(document.getHandle());
 		}
 		
-		pendingThumbnails.add(document.getHandle());
+//		pendingThumbnails.add(document.getHandle());
 		ThumbnailDownloadListenerFull listener = new ThumbnailDownloadListenerFull(context, viewHolder, adapter);
 		listenersFull.put(document.getHandle(), listener);
 		File thumbFile = new File(getThumbFolder(context), document.getBase64Handle()+".jpg");

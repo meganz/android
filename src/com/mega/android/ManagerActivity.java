@@ -4266,9 +4266,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer, MegaError e) {
-		log("onTransferFinish");
+		log("onTransferFinish"); 
 		
-		ThumbnailUtils.pendingThumbnails.remove(transfer.getNodeHandle());
+//		ThumbnailUtils.pendingThumbnails.remove(transfer.getNodeHandle());
 		
 		
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
