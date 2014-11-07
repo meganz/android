@@ -6,7 +6,7 @@
 	    android:orderInCategory="100"
 	    android:showAsAction="always"
 	    android:title="Change permissions"
-	    android:icon="@drawable/permissions_button_no_text_white"
+	    android:icon="@drawable/permissions_ic"
 	    MEGA:showAsAction="always" />
 	
 	<item
