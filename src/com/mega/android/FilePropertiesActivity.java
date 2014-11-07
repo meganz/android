@@ -333,17 +333,21 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							permissionLabel.setVisibility(View.VISIBLE);
 							permissionInfo.setVisibility(View.VISIBLE);
 							
-							int accessLevel= megaApi.getAccess(node);							
+							int accessLevel= megaApi.getAccess(node);
+							log("Node: "+node.getName());
 							
 							switch(accessLevel){
 								case MegaShare.ACCESS_FULL:{
 									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
+									break;
 								}
 								case MegaShare.ACCESS_READ:{
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));							
+									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+									break;
 								}						
 								case MegaShare.ACCESS_READWRITE:{								
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));	
+									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
+									break;
 								}
 							}
 						}
