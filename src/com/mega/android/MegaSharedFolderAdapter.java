@@ -325,7 +325,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				ListView list = (ListView) parent;
 				list.smoothScrollToPosition(_position);
 				
@@ -339,7 +339,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		}
 		else{
@@ -347,7 +347,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
-			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 		}
 		
 		if (share.getUser() != null){

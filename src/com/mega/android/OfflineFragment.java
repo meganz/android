@@ -293,7 +293,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 			}
 			else{
@@ -345,7 +345,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 			}
 			else{
@@ -753,7 +753,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
 				else{
@@ -770,7 +770,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 //					listView.setVisibility(View.GONE);
 //					emptyImageView.setVisibility(View.VISIBLE);
 //					emptyTextView.setVisibility(View.VISIBLE);
-//					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+//					emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 //					emptyTextView.setText(R.string.file_browser_empty_folder);
 //				}
 //				else{

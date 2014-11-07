@@ -141,7 +141,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			holder.transferProgressBar.setVisibility(View.GONE);
 			//holder.arrowSelection.setVisibility(View.GONE);
 			holder.checkbox.setVisibility(View.GONE);
