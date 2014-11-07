@@ -256,21 +256,21 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				listFragment.smoothScrollToPosition(_position);
 			}
 			else{
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		}
 		else{
 			LayoutParams params = holder.optionsLayout.getLayoutParams();
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 		}
 		
 		holder.optionDownload.setTag(holder);

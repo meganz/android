@@ -139,7 +139,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-
+		log("getView");
+		
 		listFragment = (ListView) parent;
 		final int _position = position;
 
@@ -323,13 +324,20 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 						TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources()
 								.getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.ic_three_dots);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				listFragment.smoothScrollToPosition(_position);
 
-				if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+				if (type == ManagerActivity.FILE_BROWSER_ADAPTER) {
+					
+					log("Ahora muestro estooo");
+				
+				}
+				else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
 
 					// Choose the buttons to show depending on the type of
 					// folder
+					
+					log("Ahora muestro lo otro");
 
 					MegaNode n = (MegaNode) getItem(positionClicked);
 					MegaNode folder = null;
@@ -497,7 +505,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageButtonThreeDots
-						.setImageResource(R.drawable.ic_three_dots);
+						.setImageResource(R.drawable.action_selector_ic);
 			}
 		} else {
 //			holder.arrowSelection.setVisibility(View.GONE);
@@ -505,7 +513,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements
 			params.height = 0;
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots
-					.setImageResource(R.drawable.ic_three_dots);
+					.setImageResource(R.drawable.action_selector_ic);
 		}
 
 		holder.optionDownload.setTag(holder);

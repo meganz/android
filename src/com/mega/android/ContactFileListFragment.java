@@ -258,8 +258,8 @@ public class ContactFileListFragment extends Fragment implements
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_file_list, container, false);
 			
-			aB.setTitle("");
-			
+			aB.setTitle(R.string.contact_shared_files);
+
 			nameView = (TextView) v.findViewById(R.id.contact_file_list_name);
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_file_list_thumbnail);
 			statusDot = (ImageView) v.findViewById(R.id.contact_file_list_status_dot);
