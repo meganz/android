@@ -3671,6 +3671,63 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		return list.size() > 0;
 	}
 	
+	/*
+	 * Background task to get files on a folder for uploading
+	 */
+	private class UploadServiceTask extends Thread {
+
+		String folderPath;
+		ArrayList<String> paths;
+		long parentHandle;
+		
+		UploadServiceTask(String folderPath, ArrayList<String> paths, long parentHandle){
+			this.folderPath = folderPath;
+			this.paths = paths;
+			this.parentHandle = parentHandle;
+		}
+		
+		@Override
+		public void run(){
+			
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if (parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+			
+			for (String path : paths) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+				Intent uploadServiceIntent = new Intent (managerActivity, UploadService.class);
+				File file = new File (path);
+				if (file.isDirectory()){
+					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
+					log("EXTRA_FILE_PATH_dir:" + file.getAbsolutePath());
+				}
+				else{
+					ShareInfo info = ShareInfo.infoFromFile(file);
+					if (info == null){
+						continue;
+					}
+					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+					log("EXTRA_FILE_PATH_file:" + info.getFileAbsolutePath());
+				}
+				
+				log("EXTRA_FOLDER_PATH:" + folderPath);
+				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
+				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				startService(uploadServiceIntent);				
+			}
+		}
+		
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		log("onActivityResult");
@@ -3707,38 +3764,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				return;
 			}
 			
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			if (parentNode == null){
-				parentNode = megaApi.getRootNode();
-			}
-			
-			for (String path : paths) {
-				Intent uploadServiceIntent = new Intent (this, UploadService.class);
-				File file = new File (path);
-				if (file.isDirectory()){
-					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
-					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, file.getName());
-					log("EXTRA_FILE_PATH_dir:" + file.getAbsolutePath());
-				}
-				else{
-					ShareInfo info = ShareInfo.infoFromFile(file);
-					if (info == null){
-						continue;
-					}
-					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					log("EXTRA_FILE_PATH_file:" + info.getFileAbsolutePath());
-				}
-				
-				log("EXTRA_FOLDER_PATH:" + folderPath);
-				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
-				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-				startService(uploadServiceIntent);				
-				
-				i++;
-			}
-			
+			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, parentHandle);
+			uploadServiceTask.start();			
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 		
