@@ -2187,28 +2187,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 	    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	        	if (cF != null){
-	        		if (cF.isVisible()){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cF");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
-
-	        			isListContacts = !isListContacts;
-	        			if (isListContacts){	
-		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-		    			}
-	        			cF.setIsList(isListContacts);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();	
-
-	        		}
-	        	}
+//	        	if (cF != null){
+//	        		if (cF.isVisible()){
+//	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(cFTag);
+//	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.detach(currentFragment);
+//	        			fragTransaction.commit();
+//
+//	        			isListContacts = !isListContacts;
+//	        			if (isListContacts){	
+//		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//						}
+//						else{
+//							thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//		    			}
+//	        			cF.setIsList(isListContacts);
+//
+//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.attach(currentFragment);
+//	        			fragTransaction.commit();	
+//
+//	        		}
+//	        	}
 
 	        	if (rbF != null){
 	        		if (rbF.isVisible()){
