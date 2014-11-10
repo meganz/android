@@ -465,7 +465,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 								}
 								
 								try {
-									Thread.sleep(100);
+									Thread.sleep(300);
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}								
@@ -613,7 +613,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 						}
 						
 						try {
-							Thread.sleep(1000);
+							Thread.sleep(300);
 						} catch (InterruptedException exc) {
 							exc.printStackTrace();
 						}
