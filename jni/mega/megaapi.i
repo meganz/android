@@ -83,6 +83,11 @@
 %feature("director") mega::MegaTreeProcessor;
 %feature("director") mega::MegaGfxProcessor;
 
+%typemap(directorargout) (const char* path)
+%{ 
+	jenv->DeleteLocalRef(jpath); 
+%}
+
 %apply (char *STRING, size_t LENGTH) {(char *bitmapData, size_t size)};
 %typemap(directorin, descriptor="[B") (char *bitmapData, size_t size)
 %{ 
