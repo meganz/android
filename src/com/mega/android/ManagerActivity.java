@@ -3828,39 +3828,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
-			final long folderHandle = intent.getLongExtra("SELECT", 0);
-			
+			final long folderHandle = intent.getLongExtra("SELECT", 0);			
 			
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
-						
-			log("Node: "+parent.getName());
-			
-			for(int i=0; i<selectedContacts.length;i++){
-				log("Contact: "+selectedContacts[i]);
-			}			
-//			
-//			ProgressDialog temp = null;
-//			try{
-//				temp = new ProgressDialog(this);
-//				temp.setMessage(getString(R.string.context_sharing));
-//				temp.show();
-//			}
-//			catch(Exception e){
-//				return;
-//			}
-//			statusDialog = temp;
-			
-			//TODO
-			//Bucle para compartir la carpeta folderHandle to selectedContacts
 			
 			if (parent.isFolder()){
-				log("Entro por folder");
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {
-						log("onClick-------------------------");
+
 						ProgressDialog temp = null;
 						try{
 							temp = new ProgressDialog(managerActivity);
@@ -3910,9 +3888,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 			}
-			
-			
-			
 		}		
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 			
@@ -3940,7 +3915,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
-			final int totalMoves = moveHandles.length;
+//			final int totalMoves = moveHandles.length;
 			
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
@@ -3987,13 +3962,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			log("local folder selected");
 			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
-			log("URL: " + url + "___SIZE: " + size);
-
 			
 			downloadTo (parentPath, url, size, hashes);
 			Util.showToast(this, R.string.download_began);

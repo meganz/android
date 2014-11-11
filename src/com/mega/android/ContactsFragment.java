@@ -193,17 +193,12 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			return;
 		}
 		List<MegaUser> users = getSelectedUsers();
-		int userNum = users.size();		
-		String title;
 		
-		if(userNum<2){
-			title=userNum+" contact selected";
-		}
-		else{
-			title=userNum+" contacts selected";
-		}					
+		Resources res = getResources();
+		String format = "%d %s";
 		
-		actionMode.setTitle(title);
+		actionMode.setTitle(String.format(format, users.size(),res.getQuantityString(R.plurals.general_num_contacts, contacts.size())+ " selected"));
+
 		try {
 			actionMode.invalidate();
 		} catch (NullPointerException e) {
@@ -211,12 +206,8 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			log("oninvalidate error");
 		}
 	}
-	
-	
-	
+		
 	//End Multiselect/////
-	
-	
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
