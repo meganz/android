@@ -559,7 +559,6 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		if (actionMode == null) {
 			return;
 		}
-		log("updateActionModeTitle");
 		List<MegaShare> contacts = getSelectedContacts();
 		
 		Resources res = getResources();
