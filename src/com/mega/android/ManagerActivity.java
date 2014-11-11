@@ -54,6 +54,7 @@ import android.util.SparseArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -71,6 +72,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -381,6 +383,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         usedSpaceBar.setProgress(0);
         
         //CONTACTS
+                
         mTabHost = (TabHost)findViewById(android.R.id.tabhost);
         mTabHost.setup();
         
@@ -1109,6 +1112,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		megaApi.getPublicNode(url, this);
 	}
 	
+	
+//	public void onCreate(Bundle savedInstanceState) {
+//		super.onCreate(savedInstanceState);
+//		setContentView(R.layout.main);
+//		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+//		setupTab(new TextView(this), "Tab 1");
+//		setupTab(new TextView(this), "Tab 2");
+//		setupTab(new TextView(this), "Tab 3");
+//	}
+	
 	/*
 	 * Check MEGA url and parse if valid
 	 */
@@ -1131,6 +1144,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		selectDrawerItem(drawerItem);
 	}
     
+	private View getTabIndicator(Context context, String title) {
+        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
+
+        TextView tv = (TextView) view.findViewById(R.id.textView);
+        tv.setText(title);
+        return view;
+    }
+	
     public void selectDrawerItem(DrawerItem item){
     	log("selectDrawerItem");
     	switch (item){
@@ -1227,12 +1248,45 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				mTabHost.setVisibility(View.VISIBLE);    			
     			viewPager.setVisibility(View.VISIBLE);
     			
+    			mTabHost.getTabWidget().setBackgroundColor(Color.BLACK);
+    			//mTabHost.getTabWidget().setTextAlignment(textAlignment)
+    			
+//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);    		    
+//    		    title1.setText(R.string.tab_contacts); 			
+    			
     			if (mTabsAdapter == null){
-    				mTabsAdapter = new TabsAdapter(this, mTabHost, viewPager);
-    				mTabsAdapter.addTab(mTabHost.newTabSpec("contactsFragment").setIndicator(getString(R.string.section_contacts)), ContactsFragment.class, null);
-    				mTabsAdapter.addTab(mTabHost.newTabSpec("sentRequests").setIndicator(getString(R.string.tab_sent_requests)), SentRequestsFragment.class, null);
-    				mTabsAdapter.addTab(mTabHost.newTabSpec("receivedRequests").setIndicator(getString(R.string.tab_received_requests)), ReceivedRequestsFragment.class, null);
+    				mTabsAdapter = new TabsAdapter(this, mTabHost, viewPager);   	
+    				
+        			TabHost.TabSpec tabSpec1 = mTabHost.newTabSpec("contactsFragment");
+        	        tabSpec1.setIndicator(getTabIndicator(mTabHost.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
+        	        //tabSpec.setContent(contentID);
+        	        //mTabHost.addTab(tabSpec);
+        	        TabHost.TabSpec tabSpec2 = mTabHost.newTabSpec("sentRequests");
+        	        tabSpec2.setIndicator(getTabIndicator(mTabHost.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
+        	        
+        	        TabHost.TabSpec tabSpec3 = mTabHost.newTabSpec("receivedRequests");
+        	        tabSpec3.setIndicator(getTabIndicator(mTabHost.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
+   				
+    				
+    				mTabsAdapter.addTab(tabSpec1, ContactsFragment.class, null);
+    				mTabsAdapter.addTab(tabSpec2, SentRequestsFragment.class, null);
+    				mTabsAdapter.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
     			}
+    			
+//    			View mIndicator = v.inflate(R.drawable.tab_indicator_ab_megaactionbar, mTabHost.getTabWidget(), false);
+//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);
+//
+//    		    title1.setText("TAB1");
+//
+//    		    mTabsAdapter.addTab(mTabHost.newTabSpec("TAB1").setIndicator( mIndicator), F_GetGames.class, null);
+//
+//    		    View mIndicator2 = inflater.inflate(R.layout.tab_indicator_holo,      mTabHost.getTabWidget(), false);
+//    		    TextView title2 = (TextView) mIndicator2.findViewById(android.R.id.title);
+//
+//    		    title2.setText("TAB2");
+//    		    mTabsAdapter.addTab(mTabHost.newTabSpec("TAB2").setIndicator(mIndicator2), F_MusicList.class, null);
+    			
+    			
     	        
     			//frameLayout.setVisibility(View.GONE);     			
    			

@@ -54,7 +54,7 @@
     </style>
 
     <style name="ActionBarTabStyle.Megaactionbar" parent="@style/Widget.AppCompat.Light.ActionBar.TabView">
-        <item name="android:background">@drawable/tab_indicator_ab_megaactionbar</item>
+        <item name="android:background">@drawable/tab_indicator</item>
     </style>
 	
     <style name="DropDownNav.Megaactionbar" parent="@style/Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
