@@ -44,7 +44,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	private ProgressDialog statusDialog;	
     private AlertDialog addContactDialog;
 	
-	MegaApiAndroid megaApi;
+	MegaApiAndroid megaApi;	
 	
 	Context context;
 	ActionBar aB;

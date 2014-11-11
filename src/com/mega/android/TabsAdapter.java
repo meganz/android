@@ -49,7 +49,7 @@ public class TabsAdapter extends FragmentPagerAdapter implements OnTabChangeList
 		{
 			View v = new View(mContext);
 			v.setMinimumWidth(0);
-			v.setMinimumHeight(0);
+			v.setMinimumHeight(0);			
 			return v;
 		}
 	}

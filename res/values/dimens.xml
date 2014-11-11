@@ -4,4 +4,5 @@
     <dimen name="standard_margin_double">20dp</dimen>
     <dimen name="standard_margin_half">5dp</dimen>
     <dimen name="thumb_size">60dp</dimen>
+    <dimen name="tab_host_default_height">48dp</dimen>
 </resources>
