@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -92,6 +93,7 @@ import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
 import com.mega.sdk.MegaUser;
@@ -129,6 +131,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_REFRESH = 1005;
 	public static int REQUEST_CODE_SORT_BY = 1006;
 	public static int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
+	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -197,7 +200,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	//ImageButton customListGrid;
 	LinearLayout customSearch;
-
+	AlertDialog permissionsDialog;
 	private boolean firstTime = true;
 	
 	long parentHandleBrowser;
@@ -2241,28 +2244,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 	    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-//	        	if (cF != null){
-//	        		if (cF.isVisible()){
-//	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(cFTag);
-//	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        			fragTransaction.detach(currentFragment);
-//	        			fragTransaction.commit();
-//
-//	        			isListContacts = !isListContacts;
-//	        			if (isListContacts){	
-//		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-//						}
-//						else{
-//							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-//		    			}
-//	        			cF.setIsList(isListContacts);
-//
-//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-//	        			fragTransaction.attach(currentFragment);
-//	        			fragTransaction.commit();	
-//
-//	        		}
-//	        	}
+	        	if (cF != null){
+	        		if (cF.isVisible()){
+	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(cFTag);
+	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(currentFragment);
+	        			fragTransaction.commit();
+
+	        			isListContacts = !isListContacts;
+	        			if (isListContacts){	
+		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+						}
+						else{
+							thumbViewMenuItem.setTitle(getString(R.string.action_list));
+		    			}
+	        			cF.setIsList(isListContacts);
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(currentFragment);
+	        			fragTransaction.commit();	
+
+	        		}
+	        	}
 
 	        	if (rbF != null){
 	        		if (rbF.isVisible()){
@@ -3425,6 +3428,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		addContactDialog.show();
 	}
 	
+	public void pickFolderToShare(List<MegaUser> users){
+		
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER);
+		String[] longArray = new String[users.size()];
+		for (int i=0; i<users.size(); i++){
+			longArray[i] = users.get(i).getEmail();
+		}
+		intent.putExtra("SELECTED_CONTACTS", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
+		
+	}
+	
 	public void showNewFolderDialog(String editText){
 		log("showNewFolderDialog");
 		if (fbF.isVisible()){
@@ -3803,7 +3819,101 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				return;
 			}
 			statusDialog = temp;
-		} 
+		}
+		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+			
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
+			final long folderHandle = intent.getLongExtra("SELECT", 0);
+			
+			
+			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
+						
+			log("Node: "+parent.getName());
+			
+			for(int i=0; i<selectedContacts.length;i++){
+				log("Contact: "+selectedContacts[i]);
+			}			
+//			
+//			ProgressDialog temp = null;
+//			try{
+//				temp = new ProgressDialog(this);
+//				temp.setMessage(getString(R.string.context_sharing));
+//				temp.show();
+//			}
+//			catch(Exception e){
+//				return;
+//			}
+//			statusDialog = temp;
+			
+			//TODO
+			//Bucle para compartir la carpeta folderHandle to selectedContacts
+			
+			if (parent.isFolder()){
+				log("Entro por folder");
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						log("onClick-------------------------");
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(managerActivity);
+							temp.setMessage(getString(R.string.context_sharing_folder));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+						permissionsDialog.dismiss();
+						
+						log("item "+item);
+						
+						switch(item) {
+						    case 0:{
+		                    	for (int i=0;i<selectedContacts.length;i++){
+		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
+		                    		megaApi.share(parent, user, MegaShare.ACCESS_READ,managerActivity);
+		                    	}
+		                    	break;
+		                    }
+		                    case 1:{	                    	
+		                    	for (int i=0;i<selectedContacts.length;i++){
+		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
+		                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,managerActivity);
+		                    	}
+		                        break;
+		                    }
+		                    case 2:{                   	
+		                    	for (int i=0;i<selectedContacts.length;i++){
+		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+		                    		megaApi.share(parent, user, MegaShare.ACCESS_FULL,managerActivity);
+		                    	}
+		                        break;
+		                    }
+		                }
+					}
+				});
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+				Resources resources = permissionsDialog.getContext().getResources();
+				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+		        alertTitle.setTextColor(resources.getColor(R.color.mega));
+				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+			}
+			
+			
+			
+		}		
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 			
 			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);

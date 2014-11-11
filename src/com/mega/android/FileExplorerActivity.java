@@ -41,7 +41,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public static String ACTION_PICK_MOVE_FOLDER = "ACTION_PICK_MOVE_FOLDER";
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
-	
+	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
+		
 	/*
 	 * Select modes:
 	 * UPLOAD - pick folder for upload
@@ -49,7 +50,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	 * CAMERA - pick folder for camera sync destination
 	 */
 	private enum Mode {
-		UPLOAD, MOVE, COPY, CAMERA, IMPORT;
+		UPLOAD, MOVE, COPY, CAMERA, IMPORT, SELECT;
 	}
 	
 	private Button uploadButton;
@@ -63,6 +64,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	private long[] moveFromHandles;
 	private long[] copyFromHandles;
+	private String[] selectedContacts;
 	
 	private boolean folderSelected = false;
 	
@@ -165,6 +167,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
 				mode = Mode.IMPORT;
 			}
+			else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
+				mode = Mode.SELECT;
+				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
+				
+			}
 		}
 		
 		uploadButton = (Button) findViewById(R.id.file_explorer_button);
@@ -188,6 +195,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		}
 		else if (mode == Mode.IMPORT){
 			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
+		}
+		else if (mode == Mode.SELECT){
+			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
 		}
 		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
@@ -340,6 +350,22 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					
 					Intent intent = new Intent();
 					intent.putExtra("IMPORT_TO", parentNode.getHandle());
+					setResult(RESULT_OK, intent);
+					log("finish!");
+					finish();
+				}
+				else if (mode == Mode.SELECT){
+					
+					log("Entro al select");
+					long parentHandle = fe.getParentHandle();
+					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+					if(parentNode == null){
+						parentNode = megaApi.getRootNode();
+					}
+
+					Intent intent = new Intent();
+					intent.putExtra("SELECT", parentNode.getHandle());
+					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
 					setResult(RESULT_OK, intent);
 					log("finish!");
 					finish();

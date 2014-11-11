@@ -8,9 +8,10 @@
     <string name="general_x_of_x"> of </string>
     <string name="general_yes">Yes</string>
     <string name="general_no">No</string>
-    <string name="general_move_to">Move</string>
-    <string name="general_copy_to">Copy</string>
-    <string name="general_import_to">Import</string>
+    <string name="general_move_to">Move to</string>
+    <string name="general_copy_to">Copy to</string>
+    <string name="general_import_to">Import to</string>
+    <string name="general_select">Select</string>
     <string name="general_create">Create</string>
     <string name="general_upload">File Upload</string>
     <string name="general_download">Download</string>
@@ -205,6 +206,7 @@
     <string name="context_download">Download</string>
     <string name="context_move">Move</string>
     <string name="context_moving">Moving document</string>
+    <string name="context_sharing">Sharing folder</string>
     <string name="context_copy">Copy</string>
     <string name="context_copying">Copying document</string>
     <string name="context_creating_link">Creating link</string>
@@ -224,6 +226,7 @@
     <string name="context_camera_folder">Camera folder: </string>
     <string name="context_mega_contacts">MEGA Contacts</string>
     <string name="context_phone_contacts">Phone Contacts</string>
+    <string name="context_delete">Delete</string>
   
     <string name="menu_new_folder">New folder</string>
     <string name="menu_add_contact">Add contact</string>

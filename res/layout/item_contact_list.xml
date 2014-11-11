@@ -5,12 +5,21 @@
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/contact_list_item_layout" >
     
+    <CheckBox
+        android:id="@+id/contact_list_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:checked="false"
+        android:focusable="false"
+        android:layout_centerVertical="true" />
+
     <RelativeLayout
 		android:id="@+id/contact_list_relative_layout_avatar"
 		android:layout_width="54dp"
 		android:layout_height="54dp"
 		android:layout_marginLeft="5dp" 
-		android:paddingTop="3dp" >
+		android:paddingTop="3dp"
+		android:layout_toRightOf="@id/contact_list_checkbox" >
          
 	    <com.mega.components.RoundedImageView 
 	         android:id="@+id/contact_list_thumbnail"
@@ -29,7 +38,7 @@
 		    android:gravity="center_horizontal|center_vertical" />
 	    
     </RelativeLayout>
-    
+        
     <TextView
         android:id="@+id/contact_list_name"
         android:layout_width="wrap_content"
