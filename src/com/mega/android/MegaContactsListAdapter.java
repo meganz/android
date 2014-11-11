@@ -13,6 +13,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -21,7 +22,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -41,8 +44,11 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	Context context;
 	int positionClicked;
 	ArrayList<MegaUser> contacts;
-	
+	ImageView emptyImageViewFragment;
+	TextView emptyTextViewFragment;
+	ListView listFragment;
 	MegaApiAndroid megaApi;
+	boolean multipleSelect;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -132,8 +138,6 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		    log("DENSITY: " + density + ":::: " + avatarTextSize);
 		    if (holder.contactMail != null){
 			    if (holder.contactMail.length() > 0){
-			    	log("TEXT: " + holder.contactMail);
-			    	log("TEXT AT 0: " + holder.contactMail.charAt(0));
 			    	String firstLetter = holder.contactMail.charAt(0) + "";
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
 			    	holder.contactInitialLetter.setText(firstLetter);
@@ -142,7 +146,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			    }
 		    }
 		}
-		
+			
 		private int getAvatarTextSize (float density){
 			float textSize = 0.0f;
 			
@@ -176,13 +180,12 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 
 		@Override
 		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
+			// TODO Auto-generated method stub			
 		}
 		
 	}
 	
-	public MegaContactsListAdapter(Context _context, ArrayList<MegaUser> _contacts) {
+	public MegaContactsListAdapter(Context _context, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView, ListView _listView) {
 		this.context = _context;
 		this.contacts = _contacts;
 		this.positionClicked = -1;
@@ -190,10 +193,15 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		emptyImageViewFragment = _emptyImageView;
+		emptyTextViewFragment = _emptyTextView;
+		listFragment = _listView;
 	}
 	
 	/*private view holder class*/
     private class ViewHolderContactsList {
+    	public CheckBox checkbox;
     	RoundedImageView imageView;
     	TextView contactInitialLetter;
 //        ImageView imageView;
@@ -224,11 +232,15 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
+	    
+	   
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_contact_list, parent, false);
 			holder = new ViewHolderContactsList();
+			holder.checkbox = (CheckBox) convertView.findViewById(R.id.contact_list_checkbox);
+			holder.checkbox.setClickable(false);
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_item_layout);
 			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail);	
 			holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_list_initial_letter);
@@ -256,6 +268,22 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		
 		MegaUser contact = (MegaUser) getItem(position);
 		holder.contactMail = contact.getEmail();
+		
+		if (!multipleSelect) {
+			holder.checkbox.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+		} else {
+			holder.checkbox.setVisibility(View.VISIBLE);
+//			holder.arrowSelection.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+
+			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true) {
+				holder.checkbox.setChecked(true);
+			} else {
+				holder.checkbox.setChecked(false);
+			}
+		}
 		
 //		ItemContact rowItem = (ItemContact) getItem(position);
 		
@@ -352,6 +380,30 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         return contacts.size();
     }
  
+	public boolean isMultipleSelect() {
+		return multipleSelect;
+	}
+
+	public void setMultipleSelect(boolean multipleSelect) {
+		if (this.multipleSelect != multipleSelect) {
+			this.multipleSelect = multipleSelect;
+			notifyDataSetChanged();
+		}
+	}
+	
+	/*
+	 * Get document at specified position
+	 */
+	public MegaUser getContactAt(int position) {
+		try {
+			if (contacts != null) {
+				return contacts.get(position);
+			}
+		} catch (IndexOutOfBoundsException e) {
+		}
+		return null;
+	}
+	
     @Override
     public Object getItem(int position) {
         return contacts.get(position);
