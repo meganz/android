@@ -194,7 +194,34 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				else{
 					wifi = getString(R.string.cam_sync_data);
 					cameraUploadHow.setValueIndex(0);
-				}				
+				}	
+				
+				if (camSyncLocalPath == null){
+					File cameraDownloadLocation = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+					}
+					
+					cameraDownloadLocation.mkdirs();
+					
+					dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
+					
+					camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
+				}
+				else{
+					if (camSyncLocalPath.compareTo("") == 0){
+						File cameraDownloadLocation = null;
+						if (Environment.getExternalStorageDirectory() != null){
+							cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+						}
+						
+						cameraDownloadLocation.mkdirs();
+						
+						dbH.setCamSyncLocalPath(cameraDownloadLocation.getAbsolutePath());
+						
+						camSyncLocalPath = cameraDownloadLocation.getAbsolutePath();
+					}
+				}
 			}
 			
 			if (prefs.getPinLockEnabled() == null){
@@ -250,6 +277,22 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				}
 				else{
 					downloadLocationPath = prefs.getStorageDownloadLocation();
+					
+					if (downloadLocationPath.compareTo("") == 0){
+						File defaultDownloadLocation = null;
+						if (Environment.getExternalStorageDirectory() != null){
+							defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+						}
+						else{
+							defaultDownloadLocation = getFilesDir();
+						}
+						
+						defaultDownloadLocation.mkdirs();
+						
+						dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+						
+						downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
+					}
 				}
 			}
 		}		

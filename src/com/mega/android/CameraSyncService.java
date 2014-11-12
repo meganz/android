@@ -193,10 +193,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 				else{
 					localPath = prefs.getCamSyncLocalPath();
-					if ((localPath == null) || ("".compareTo(localPath) == 0) ){
+					if (localPath == null){
 						log("Not defined, so not enabled");
 						finish();
 						return START_NOT_STICKY;
+					}
+					else{
+						if ("".compareTo(localPath) == 0){
+							log("Not defined, so not enabled");
+							finish();
+							return START_NOT_STICKY;	
+						}
 					}
 					
 					boolean isWifi = Util.isOnWifi(this);
