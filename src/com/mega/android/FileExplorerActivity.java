@@ -181,7 +181,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		newFolderButton.setOnClickListener(this);
 		
 		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-		String actionBarTitle = getString(R.string.manager_activity);
+		String actionBarTitle = getString(R.string.main_folder);
 		windowTitle.setText(actionBarTitle);
 		
 		if (mode == Mode.MOVE) {

@@ -4,14 +4,16 @@
     android:layout_height="match_parent"
     tools:context=".FileBrowserListFragment" >
 
-    <ListView
-        android:id="@+id/file_list_view_browser"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:choiceMode="multipleChoice">
-    </ListView>
+     <TextView
+	    android:id="@+id/content_text"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingLeft="8dp"
+	    android:textColor="@color/button_text"
+	    android:background="@color/dark_grey_cloud_drive"
+	    android:textSize="16sp"/>
     
-    <ImageView
+   <ImageView
 	    android:id="@+id/file_list_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
@@ -26,5 +28,40 @@
 	    android:layout_below="@id/file_list_empty_image"
 	    android:layout_marginTop="@dimen/standard_margin"
 	    android:layout_centerHorizontal="true"/>
+    
+     <LinearLayout
+         android:id="@+id/buttons_layout"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:orientation="horizontal">
 
+         <Button
+             android:id="@+id/btnLeft_new"
+             android:layout_width="fill_parent"
+       		android:layout_height="55dp"
+       		android:layout_weight="1"
+             android:background="@drawable/grey_btn_default_holo_light"
+             android:textColor="@color/button_text"
+             android:text="@string/menu_new_folder" />
+         
+         <Button
+             android:id="@+id/btnRight_upload"
+             android:layout_width="fill_parent"
+       		android:layout_height="55dp"
+       		android:layout_weight="1"
+             android:background="@drawable/btn_default_holo_light_without_corners"
+             android:textColor="@color/button_text"
+             android:text="@string/general_upload" />
+      </LinearLayout>    
+      
+      <ListView
+        android:id="@+id/file_list_view_browser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:choiceMode="multipleChoice"
+        android:layout_below="@id/content_text"
+        android:layout_above="@id/buttons_layout">
+    </ListView>
 </RelativeLayout>

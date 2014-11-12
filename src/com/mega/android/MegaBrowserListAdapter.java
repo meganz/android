@@ -52,7 +52,6 @@ OnClickListener {
 	TextView emptyTextViewFragment;
 	ActionBar aB;
 	HashMap<Long, MegaTransfer> mTHash = null;
-
 	MegaTransfer currentTransfer = null;
 
 	boolean multipleSelect;
@@ -85,6 +84,7 @@ OnClickListener {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
+		
 		switch (type) {
 		case ManagerActivity.FILE_BROWSER_ADAPTER: {
 			((ManagerActivity) context).setParentHandleBrowser(parentHandle);
@@ -123,6 +123,8 @@ OnClickListener {
 		this.aB = aB;
 		this.positionClicked = -1;
 		this.type = type;
+		
+		
 
 		if (megaApi == null) {
 			megaApi = ((MegaApplication) ((Activity) context).getApplication())
@@ -132,6 +134,7 @@ OnClickListener {
 
 	public void setNodes(ArrayList<MegaNode> nodes) {
 		this.nodes = nodes;
+//		contentTextFragment.setText(getInfoFolder(node));
 		positionClicked = -1;
 		notifyDataSetChanged();
 	}
@@ -141,8 +144,8 @@ OnClickListener {
 		log("getView");
 
 		listFragment = (ListView) parent;
-		final int _position = position;
-
+		final int _position = position;	
+		
 		ViewHolderBrowserList holder = null;
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -228,9 +231,9 @@ OnClickListener {
 		Bitmap thumb = null;
 
 		holder.textViewFileName.setText(node.getName());
-
+	
 		if (node.isFolder()) {
-			holder.textViewFileSize.setText(getInfoFolder(node));
+
 			ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			if (sl != null) {
 				if (sl.size() > 0) {

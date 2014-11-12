@@ -664,6 +664,7 @@ public class Util {
 		return photoSyncName;
 	}
 	
+
 	private static void log(String message) {
 		log("Util", message);
 	}

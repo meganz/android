@@ -750,7 +750,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			//INITIAL FRAGMENT
 			selectDrawerItem(drawerItem);
 		}
-	}
+	}	
     
     @Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -1203,6 +1203,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
     			if (createFolderMenuItem != null){
 	    			createFolderMenuItem.setVisible(true);
+	    			addContactMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(true);
 	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(true);
@@ -1211,7 +1212,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(true);	    			
+	    			addMenuItem.setEnabled(true);	  
+ 	    			
 	    			if (isListCloudDrive){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -1226,14 +1228,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case CONTACTS:{
-    			
-//    			if (cF == null){
-//    				cF = new ContactsFragment();
-//    				cF.setIsList(isListContacts);
-//    			}
-    			
-    			//TODO pager contacts    			
-   			
+  			
     			if (aB == null){
     				aB = getSupportActionBar();
     			}
@@ -1859,6 +1854,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		
+//		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		if (fbF != null){
 			if (fbF.isVisible()){
     			createFolderMenuItem.setVisible(true);
@@ -1882,7 +1878,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			rubbishBinMenuItem.setVisible(true);
     			rubbishBinMenuItem.setTitle(getString(R.string.section_rubbish_bin));
-    			clearRubbishBinMenuitem.setVisible(false);    			
+    			clearRubbishBinMenuitem.setVisible(false);  
+    			return super.onCreateOptionsMenu(menu);
 			}
 		}
 		
@@ -2207,8 +2204,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			megaApi.pauseTransfers(!downloadPlay, this);
 	        	}
 	        	else{
-		        	uploadDialog = new UploadHereDialog();
-					uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+		        	this.uploadFile();
 	        	}
 	        	return true;     	
 	        }
@@ -2513,6 +2509,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		selectDrawerItem(drawerItem);
 	}
 
+	public void uploadFile(){
+		uploadDialog = new UploadHereDialog();
+		uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+	}
+	
 	@Override
 	public void onClick(View v) {
 		log("onClick");
