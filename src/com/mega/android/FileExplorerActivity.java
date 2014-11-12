@@ -204,6 +204,27 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 	}
 	
+	public void changeNavigationTitle(String folder){
+		
+		windowTitle.setText(folder);
+		
+		if (mode == Mode.MOVE) {
+			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
+		}
+		else if (mode == Mode.COPY){
+			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
+		}
+		else if (mode == Mode.UPLOAD){
+			uploadButton.setText(getString(R.string.action_upload));
+		}
+		else if (mode == Mode.IMPORT){
+			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
+		}
+		else if (mode == Mode.SELECT){
+			uploadButton.setText(getString(R.string.general_select) + " " + folder);
+		}
+	}
+	
 	@Override
 	protected void onSaveInstanceState(Bundle bundle) {
 		bundle.putBoolean("folderSelected", folderSelected);
