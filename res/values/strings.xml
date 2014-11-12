@@ -25,6 +25,8 @@
     <string name="general_storage">Storage</string>
     <string name="general_bandwidth">Bandwidth</string>
     <string name="general_removing_offline">Removing files from device</string> 
+     <string name="remove_key_confirmation">You are going to remove the master key file</string>  
+     <string name="export_key_confirmation">Security Warning! High risk operation, continue?</string> 
     
     <string name="general_pro_1">Pro I</string>
     <string name="general_pro_2">Pro II</string>
@@ -183,6 +185,9 @@
 	<string name="file_contact_list_activity">Shared with</string>
 	
 	<string name="contact_shared_files">Shared Files with:</string>
+	
+	<string name="contacts_list_empty_text">You can easily add new contacts on the button below.</string>
+	
 	
 	
 	<string name="full_screen_image_viewer_label">Image Viewer</string>

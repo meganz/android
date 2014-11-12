@@ -341,7 +341,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 			
 						
-			if (adapterList.getCount() == 0){
+			if (adapterGrid.getCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
