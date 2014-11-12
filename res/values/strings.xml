@@ -13,7 +13,7 @@
     <string name="general_import_to">Import to</string>
     <string name="general_select">Select</string>
     <string name="general_create">Create</string>
-    <string name="general_upload">File Upload</string>
+    <string name="general_upload">Upload File</string>
     <string name="general_download">Download</string>
     <string name="general_sort_by">Sort by</string>
     <string name="general_add">Add</string>
@@ -54,7 +54,8 @@
     <string name="action_remove_master_key">Remove Master Key</string>
     <string name="toast_master_key">The master key has been exported into: </string>
     
-    <string name="manager_activity">CLOUD DRIVE</string>
+    <string name="manager_activity">MEGA_COM</string>
+    <string name="main_folder">CLOUD DRIVE</string>
     <string name="offline_activity">Saved for offline</string>
     
     <string name="search_files_and_folders">Search</string>
