@@ -46,6 +46,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	ImageView emptyImageViewFragment;
 	TextView emptyTextViewFragment;
 	MegaApiAndroid megaApi;
+	ListView listFragment;
 	
 	private class UserAvatarListenerGrid implements MegaRequestListenerInterface{
 		
@@ -230,7 +231,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		
 	}
 	
-	public MegaContactsGridAdapter(Context _context, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView) {
+	public MegaContactsGridAdapter(Context _context, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView, ListView _listView) {
 		this.context = _context;
 		this.contacts = _contacts;
 		this.positionClicked = -1;
@@ -241,6 +242,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		
 		emptyImageViewFragment = _emptyImageView;
 		emptyTextViewFragment = _emptyTextView;
+		listFragment = _listView;
 	}
 	
 	/*private view holder class*/
@@ -278,6 +280,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
 		View v;
+		
+		listFragment.setVisibility(View.GONE);
 	
 		final int _position = position;
 		
@@ -553,7 +557,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	}
 
 	@Override
-    public int getCount() {
+    public int getCount() {		
         return contacts.size();
     }
  

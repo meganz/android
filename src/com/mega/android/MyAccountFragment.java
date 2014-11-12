@@ -142,7 +142,7 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 			public void onClick(View v) {
 				log("onClickExportMasterKey");
 				
-				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 				final File f = new File(path);
 				
 				if(f.exists()){
@@ -165,30 +165,50 @@ public class MyAccountFragment extends Fragment implements MegaRequestListenerIn
 					};
 
 					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-					builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
-					    .setNegativeButton("No", dialogClickListener).show();
+					builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+					    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 					
 				}
 				else{
-					String key = megaApi.exportMasterKey();
 					
-					BufferedWriter out;         
-					try {						
-						
-						log("Export in: "+path);
-						FileWriter fileWriter= new FileWriter(path);	
-						out = new BufferedWriter(fileWriter);	
-						out.write(key);	
-						out.close(); 
-						masterKeyButton.setText(R.string.action_remove_master_key);	
-						String toastMessage = getString(R.string.toast_master_key) + " " + path;
-						Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();					
+					DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+					    @Override
+					    public void onClick(DialogInterface dialog, int which) {
+					        switch (which){
+					        case DialogInterface.BUTTON_POSITIVE:
+					        	String key = megaApi.exportMasterKey();
+								
+								BufferedWriter out;         
+								try {						
+									
+									log("Export in: "+path);
+									FileWriter fileWriter= new FileWriter(path);	
+									out = new BufferedWriter(fileWriter);	
+									out.write(key);	
+									out.close(); 
+									masterKeyButton.setText(R.string.action_remove_master_key);	
+									String toastMessage = getString(R.string.toast_master_key) + " " + path;
+									Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();					
 
-					}catch (FileNotFoundException e) {
-					 e.printStackTrace();
-					}catch (IOException e) {
-					 e.printStackTrace();
-					}
+								}catch (FileNotFoundException e) {
+								 e.printStackTrace();
+								}catch (IOException e) {
+								 e.printStackTrace();
+								}
+					        	
+					            break;
+
+					        case DialogInterface.BUTTON_NEGATIVE:
+					            //No button clicked
+					            break;
+					        }
+					    }
+					};
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+					builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+					    .setNegativeButton(R.string.general_no, dialogClickListener).show();		
+			
 				}	
 			}			
 		});	

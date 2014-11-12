@@ -290,6 +290,19 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				listView.setAdapter(adapterList);
 				
 				setNodes(megaShareInList);
+				
+				if (adapterList.getCount() == 0){
+					listView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					emptyImageView.setImageResource(R.drawable.ic_empty_shared);
+					emptyTextView.setText(R.string.file_browser_empty_shared_with_me);
+				}
+				else{
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}				
 			}	
 			else{
 
@@ -376,7 +389,20 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 //				adapterList.setMultipleSelect(false);
 
 				listView.setAdapter(adapterList);				
-				setNodes(megaShareOutList);
+				setNodes(megaShareOutList);				
+
+				if (adapterList.getCount() == 0){
+					listView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					emptyImageView.setImageResource(R.drawable.ic_empty_shared);
+					emptyTextView.setText(R.string.file_browser_empty_shared_with_me);
+				}
+				else{
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}					
 			}		
 	
 			return v;

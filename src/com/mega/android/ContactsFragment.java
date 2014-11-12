@@ -245,8 +245,8 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			
 			
-			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
 			
 			listView.setItemsCanFocus(false);
 			if (adapterList == null){
@@ -255,11 +255,24 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			else{
 				adapterList.setContacts(visibleContacts);
 			}
-			
+		
 			adapterList.setPositionClicked(-1);
 			listView.setAdapter(adapterList);
 			addContactButton = (Button) v.findViewById(R.id.add_contact_button);
 			addContactButton.setOnClickListener(this);
+						
+			if (adapterList.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				emptyTextView.setText(R.string.contacts_list_empty_text);
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}	
 			
 			return v;
 		}
@@ -271,16 +284,30 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	        listView.setItemsCanFocus(false);
 	        
 	        if (adapterGrid == null){
-	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, emptyImageView, emptyTextView);
+	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, emptyImageView, emptyTextView, listView);
 	        }
 	        else{
 	        	adapterGrid.setContacts(visibleContacts);
 	        }
 	        
-	        adapterGrid.setPositionClicked(-1);
+	        adapterGrid.setPositionClicked(-1);   
 			listView.setAdapter(adapterGrid);
 			addContactButton = (Button) v.findViewById(R.id.add_contact_button);
 			addContactButton.setOnClickListener(this);
+			
+			
+			if (adapterGrid.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				emptyTextView.setText(R.string.contacts_list_empty_text);
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}	
 			
 			return v;
 		}			

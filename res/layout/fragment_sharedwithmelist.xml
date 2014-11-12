@@ -11,7 +11,7 @@
         android:choiceMode="multipleChoice" >
     </ListView>
     
-    <ImageView
+     <ImageView
 	    android:id="@+id/sharedwithme_list_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"

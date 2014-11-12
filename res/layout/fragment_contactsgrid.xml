@@ -5,6 +5,24 @@
     tools:context=".FileBrowserListFragment"
     android:background="@color/grid_background" >
 
+    <ImageView
+	    android:id="@+id/contact_list_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="20dp"
+	    android:layout_centerHorizontal="true" 
+	    android:gravity="center_horizontal"/>
+    
+    <TextView
+	    android:id="@+id/contact_list_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/contact_list_empty_image"
+	    android:layout_centerHorizontal="true"
+	    android:gravity="center_horizontal"/>
+    
     <ListView 
         android:id="@+id/contact_grid_view_browser"
         android:layout_width="match_parent"
