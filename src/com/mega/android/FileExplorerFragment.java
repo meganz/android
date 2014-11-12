@@ -29,6 +29,8 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 	
 	MegaExplorerAdapter adapter;
 	
+	boolean first = false;
+	
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -53,11 +55,14 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
 		}
+		
+		first=true;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
+		
+		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);		
 		
 		listView = (ListView) v.findViewById(R.id.file_list_view_browser);
 		listView.setOnItemClickListener(this);
@@ -95,12 +100,26 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 
 		}
 	}
-	
+
+	@Override
+	public void onResume() {
+		first=false;
+		super.onResume();
+	}
+
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
 		
 		if (nodes.get(position).isFolder()){
-			MegaNode n = nodes.get(position);
+					
+			MegaNode n = nodes.get(position);			
+			
+			String path=n.getName();	
+			String[] temp;
+			temp = path.split("/");
+			String name = temp[temp.length-1];
+
+			((FileExplorerActivity)getActivity()).changeNavigationTitle(name);
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
@@ -135,6 +154,20 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		
 		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 		if (parentNode != null){
+			
+			if(parentNode.getType()==MegaNode.TYPE_ROOT){
+				
+				((FileExplorerActivity)getActivity()).changeNavigationTitle("CLOUD DRIVE");
+			}
+			else{
+				String path=parentNode.getName();	
+				String[] temp;
+				temp = path.split("/");
+				String name = temp[temp.length-1];
+
+				((FileExplorerActivity)getActivity()).changeNavigationTitle(name);
+			}
+			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
