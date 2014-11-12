@@ -361,6 +361,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_ON) == 0){
+			dbH.setCamSyncTimeStamp(0);
 			cameraUpload = !cameraUpload;
 			if (cameraUpload){
 				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
@@ -468,6 +469,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			String cameraPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			dbH.setCamSyncLocalPath(cameraPath);
 			cameraUploadFolder.setSummary(cameraPath);
+			dbH.setCamSyncTimeStamp(0);
 			
 			Intent photosVideosIntent = null;
 			photosVideosIntent = new Intent(getApplicationContext(), CameraSyncService.class);

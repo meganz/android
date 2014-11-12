@@ -664,6 +664,62 @@ public class Util {
 		return photoSyncName;
 	}
 	
+	public static String getPhotoSyncNameWithIndex (long timeStamp, String fileName, int photoIndex){
+		
+		if (photoIndex == 0){
+			return getPhotoSyncName(timeStamp, fileName);
+		}
+		
+		String photoSyncName = null;
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(timeStamp);
+		
+		String extension = "";
+		String[] s = fileName.split("\\.");
+		if (s != null){
+			if (s.length > 0){
+				extension = s[s.length-1];
+			}
+		}
+				
+		String year;
+		String month;
+		String day;
+		String hour;
+		String minute;
+		String second;
+		
+		year = cal.get(Calendar.YEAR) + "";
+		month = (cal.get(Calendar.MONTH)+1) + "";
+		if ((cal.get(Calendar.MONTH) + 1) < 10){
+			month = "0" + month;
+		}
+		
+		day = cal.get(Calendar.DAY_OF_MONTH) + "";
+		if (cal.get(Calendar.DAY_OF_MONTH) < 10){
+			day = "0" + day;
+		}
+		
+		hour = cal.get(Calendar.HOUR_OF_DAY) + "";
+		if (cal.get(Calendar.HOUR_OF_DAY) < 10){
+			hour = "0" + hour;
+		}
+		
+		minute = cal.get(Calendar.MINUTE) + "";
+		if (cal.get(Calendar.MINUTE) < 10){
+			minute = "0" + minute;
+		}
+		
+		second = cal.get(Calendar.SECOND) + "";
+		if (cal.get(Calendar.SECOND) < 10){
+			second = "0" + second;
+		}
+
+		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "_" + photoIndex + "." + extension;
+		
+		return photoSyncName;
+	}
 
 	private static void log(String message) {
 		log("Util", message);
