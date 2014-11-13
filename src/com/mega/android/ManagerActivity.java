@@ -2210,6 +2210,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        case R.id.action_select:{
 	        	//TODO: multiselect
+	        	
 				return true;
 	        }
 	        case R.id.action_grid:{	    			

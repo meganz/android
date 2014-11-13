@@ -13,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,11 +48,13 @@ import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
+import com.mega.sdk.MegaUser;
 
 public class ContactPropertiesMainActivity extends PinActivity implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
-	
+
 	TextView nameView;
 	TextView contentTextView;
 	RoundedImageView imageView;
@@ -63,179 +66,191 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	ImageButton eyeButton;
 	TableLayout contentTable;
 	ActionBar aB;
-	
+
 	String userEmail;
-	
+
 	MegaApiAndroid megaApi;
-	
+	AlertDialog permissionsDialog;
+
 	ContactPropertiesFragment cpF;
 	ContactFileListFragment cflF;
-	
-	MenuItem uploadButton;
-	
-	public UploadHereDialog uploadDialog;
-	
+
+	MenuItem shareMenuItem;
+	MenuItem viewSharedItem;
+
 	public static final int CONTACT_PROPERTIES = 1000;
 	public static final int CONTACT_FILE_LIST = 1001;
-	
+
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_GET_LOCAL = 1003;
 	public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
-	
+	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
+
+	static ContactPropertiesMainActivity contactPropertiesMainActivity;
+
 	private static int EDIT_TEXT_ID = 2;
-	
+
 	long parentHandle = -1;
-	
+
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
-	
+
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-	
+
 	private AlertDialog renameDialog;
 	ProgressDialog statusDialog;
-	
+
 	ArrayList<MegaTransfer> tL;
 	long lastTimeOnTransferUpdate = -1;
-	
+
 	private List<ShareInfo> filePreparedInfos;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) getApplication()).getMegaApi();
 		}
-		
+
 		megaApi.addGlobalListener(this);
 		megaApi.addTransferListener(this);
-		
+
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
 		aB.setLogo(R.drawable.ic_action_navigation_accept);
 
-		
+		contactPropertiesMainActivity=this;
+
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-		
+		display.getMetrics(outMetrics);
+		float density  = getResources().getDisplayMetrics().density;
+
+		float scaleW = Util.getScaleW(outMetrics, density);
+		float scaleH = Util.getScaleH(outMetrics, density);
+
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
 			userEmail = extras.getString("name");
 			aB.setTitle(userEmail);
 			setContentView(R.layout.activity_main_contact_properties);
-			
+
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
-    	log("onResume");
-    	super.onResume();
-    	
-    	Intent intent = getIntent(); 
-    	
-    	if (intent != null) { 
-    		if (intent.getAction() != null){ 
-    			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
+		log("onResume");
+		super.onResume();
 
-        			String pathZip=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_ZIP);    				
-        			
-        			log("Path: "+pathZip);
-        			
-        			//Lanzar nueva activity ZipBrowserActivity
-        			
-        			Intent intentZip = new Intent(this, ZipBrowserActivity.class);    				
-        			intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-        		    startActivity(intentZip);
-        			
-        			
-        		}
-        		else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){ 
-    				String pathPdf=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_PDF);
-    				
-    				File pdfFile = new File(pathPdf);
-    			    
-    			    Intent intentPdf = new Intent();
-    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-    			    intentPdf.setClass(this, OpenPDFActivity.class);
-    			    intentPdf.setAction("android.intent.action.VIEW");
-    				this.startActivity(intentPdf);
-    			}
-    		}
-    		intent.setAction(null);
-    		setIntent(null);
-    	}    	
+		Intent intent = getIntent(); 
+
+		if (intent != null) { 
+			if (intent.getAction() != null){ 
+				if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
+
+					String pathZip=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_ZIP);    				
+
+					log("Path: "+pathZip);
+
+					//Lanzar nueva activity ZipBrowserActivity
+
+					Intent intentZip = new Intent(this, ZipBrowserActivity.class);    				
+					intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
+					startActivity(intentZip);
+
+
+				}
+				else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){ 
+					String pathPdf=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_PDF);
+
+					File pdfFile = new File(pathPdf);
+
+					Intent intentPdf = new Intent();
+					intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+					intentPdf.setClass(this, OpenPDFActivity.class);
+					intentPdf.setAction("android.intent.action.VIEW");
+					this.startActivity(intentPdf);
+				}
+			}
+			intent.setAction(null);
+			setIntent(null);
+		}    	
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent){
-    	log("onNewIntent");
-    	super.onNewIntent(intent);
-    	setIntent(intent); 
+		log("onNewIntent");
+		super.onNewIntent(intent);
+		setIntent(intent); 
 	}
-	
+
 	public void selectContactFragment(int currentFragment){
 		switch(currentFragment){
-			case CONTACT_PROPERTIES:{
-				if (cpF == null){
-					cpF = new ContactPropertiesFragment();
-				}
-				cpF.setUserEmail(userEmail);
-				
-				if (aB != null){
-					aB.setTitle(userEmail);
-				}
-				
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
-				
-				break;
+		case CONTACT_PROPERTIES:{
+			if (cpF == null){
+				cpF = new ContactPropertiesFragment();
 			}
-			case CONTACT_FILE_LIST:{
-				if (cflF == null){
-					cflF = new ContactFileListFragment();
-				}
-				cflF.setUserEmail(userEmail);
-								
-				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
-				
-				break;
+			cpF.setUserEmail(userEmail);
+
+			if (aB != null){
+				aB.setTitle(userEmail);
 			}
+
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
+
+			break;
+		}
+		case CONTACT_FILE_LIST:{
+			if (cflF == null){
+				cflF = new ContactFileListFragment();
+			}
+			cflF.setUserEmail(userEmail);
+
+			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cflF, "cflF").commit();
+
+			break;
+		}
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
-	    // Respond to the action bar's Up/Home button
-		    case android.R.id.home: {
-				onBackPressed();
-				return true;
+		switch (item.getItemId()) {
+		// Respond to the action bar's Up/Home button
+		case android.R.id.home: {
+			onBackPressed();
+			return true;
+		}
+		case R.id.action_contact_file_list_share: {
+
+			MegaUser user = megaApi.getContact(cflF.getUserEmail());
+			this.pickFolderToShare(user);
+
+			return true;
+		}
+		case R.id.action_contact_file_list_view_share: {
+			if (userEmail.compareTo(this.userEmail) == 0){
+				selectContactFragment(CONTACT_FILE_LIST);
 			}
-			case R.id.action_contact_file_list_upload: {
-				uploadDialog = new UploadHereDialog();
-				uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
-				return true;
-			}
-			default: {
-				return super.onOptionsItemSelected(item);
-			}
+			return true;
+		}			
+		default: {
+			return super.onOptionsItemSelected(item);
+		}
 		}	    
 	}
-	
+
 	public String getDescription(ArrayList<MegaNode> nodes){
 		int numFolders = 0;
 		int numFiles = 0;
-		
+
 		for (int i=0;i<nodes.size();i++){
 			MegaNode c = nodes.get(i);
 			if (c.isFolder()){
@@ -245,7 +260,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				numFiles++;
 			}
 		}
-		
+
 		String info = "";
 		if (numFolders > 0){
 			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
@@ -261,50 +276,105 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_files, numFiles);
 			}
 		}
-		
+
 		return info;
 	}
-	
+
 	public void onContentClick(String userEmail){
 		if (userEmail.compareTo(this.userEmail) == 0){
 			selectContactFragment(CONTACT_FILE_LIST);
 		}
 	}
-	
-	 @Override
-    protected void onDestroy(){
-    	log("onDestroy()");
 
-    	super.onDestroy();    	    	
-    	
+	@Override
+	protected void onDestroy(){
+		log("onDestroy()");
+
+		super.onDestroy();    	    	
+
 		megaApi.removeGlobalListener(this);	
 		megaApi.removeTransferListener(this);
-    }
-	 
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		log("onPrepareOptionsMenu----------------------------------");
+
+		//		 if(contactPropertiesVisible){				
+		//				log("Es visible ContactProperties--------------");
+		//				
+		//		}
+		//		else{
+		//			log("Es visible ContacFileListProperties-----------------");
+		//			
+		//		}
+
+		if(cflF!=null){
+			if(cflF.isVisible()){
+				log("Es visible ContacFileListProperties");
+				shareMenuItem.setVisible(true);		
+				viewSharedItem.setVisible(false);
+				//					shareMenuItem.setVisible(true);		
+				//					viewSharedItem.setVisible(false);
+			}
+		}		
+		if(cpF!=null){
+			if(cpF.isVisible()){
+				log("Es visible ContactProperties");
+				shareMenuItem.setVisible(true);		
+				viewSharedItem.setVisible(true);
+				//					shareMenuItem.setVisible(true);		
+				//					viewSharedItem.setVisible(true);
+			}
+		}	
+
+		super.onPrepareOptionsMenu(menu);
+		return true;
+
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	
+		log("onCreateOptionsMenu-----------------------------------");		
+
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_contact_file_list, menu);
-		
-		uploadButton = menu.findItem(R.id.action_contact_file_list_upload);
-		uploadButton.setVisible(false);
-		if (cflF != null){
-			if (cflF.isVisible()){
-				if (cflF.showUpload()){
-					uploadButton.setVisible(true);		
-				}
+		shareMenuItem = menu.findItem(R.id.action_contact_file_list_share);
+		viewSharedItem = menu.findItem(R.id.action_contact_file_list_view_share);		
+
+		if(cflF!=null){
+			if(cflF.isVisible()){
+				shareMenuItem.setVisible(true);		
+				viewSharedItem.setVisible(false);
 			}
-		}
-	
+		}		
+		if(cpF!=null){
+			if(cpF.isVisible()){
+				shareMenuItem.setVisible(true);		
+				viewSharedItem.setVisible(true);
+			}
+		}	
 		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	public void setParentHandle(long parentHandle) {
 		this.parentHandle = parentHandle;
 	}
-	
+
+	public void pickFolderToShare(MegaUser user){
+
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER);
+		String[] longArray = new String[1];		
+		longArray[0] = user.getEmail();		
+		intent.putExtra("SELECTED_CONTACTS", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
+
+	}
+
+
+
 	public void onFileClick(ArrayList<Long> handleList) {
 		long size = 0;
 		long[] hashes = new long[handleList.size()];
@@ -315,7 +385,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 		if (dbH == null) {
 			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-//			dbH = new DatabaseHandler(getApplicationContext());
+			//			dbH = new DatabaseHandler(getApplicationContext());
 		}
 
 		boolean askMe = true;
@@ -346,7 +416,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			downloadTo(downloadLocationDefaultPath, null, size, hashes);
 		}
 	}
-	
+
 	public void downloadTo(String parentPath, String url, long size,
 			long[] hashes) {
 		double availableFreeSpace = Double.MAX_VALUE;
@@ -385,29 +455,29 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName()));
 						} catch (Exception e) {
 						}
-						
+
 						if(MimeType.typeForName(tempNode.getName()).isPdf()){
-							
-		    			    File pdfFile = new File(localPath);
-		    			    
-		    			    Intent intentPdf = new Intent();
-		    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-		    			    intentPdf.setClass(this, OpenPDFActivity.class);
-		    			    intentPdf.setAction("android.intent.action.VIEW");
-		    				this.startActivity(intentPdf);
-							
+
+							File pdfFile = new File(localPath);
+
+							Intent intentPdf = new Intent();
+							intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+							intentPdf.setClass(this, OpenPDFActivity.class);
+							intentPdf.setAction("android.intent.action.VIEW");
+							this.startActivity(intentPdf);
+
 						}
 						else if(MimeType.typeForName(tempNode.getName()).isZip()){
-							
-		    			    File zipFile = new File(localPath);
-		    			    
-		    			    Intent intentZip = new Intent();
-		    			    intentZip.setClass(this, ZipBrowserActivity.class);
-		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
-		    			    intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
 
-		    				this.startActivity(intentZip);
-							
+							File zipFile = new File(localPath);
+
+							Intent intentZip = new Intent();
+							intentZip.setClass(this, ZipBrowserActivity.class);
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, zipFile.getAbsolutePath());
+							intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, tempNode.getHandle());
+
+							this.startActivity(intentZip);
+
 						}
 						else{
 
@@ -477,7 +547,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			}
 		}
 	}
-	
+
 	/*
 	 * Get list of all child files
 	 */
@@ -500,7 +570,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			}
 		}
 	}
-	
+
 	/*
 	 * If there is an application that can manage the Intent, returns true.
 	 * Otherwise, false.
@@ -512,7 +582,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				PackageManager.MATCH_DEFAULT_ONLY);
 		return list.size() > 0;
 	}
-	
+
 	public void moveToTrash(ArrayList<Long> handleList) {
 
 		if (!Util.isOnline(this)) {
@@ -549,9 +619,9 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		}
 		statusDialog = temp;
 	}
-	
+
 	public void showRenameDialog(final MegaNode document, String text) {
-		
+
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
@@ -578,7 +648,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 									lastSelectedPos++;
 								}
 								lastSelectedPos--; // The last point should not
-													// be selected)
+								// be selected)
 								input.setSelection(0, lastSelectedPos);
 							}
 						}
@@ -590,14 +660,14 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " " + new String(document.getName()), null, input);
 		builder.setPositiveButton(getString(R.string.context_rename), new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int whichButton) {
-					String value = input.getText().toString().trim();
-					if (value.length() == 0) {
-						return;
-					}
-					rename(document, value);
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getText().toString().trim();
+				if (value.length() == 0) {
+					return;
 				}
-			});
+				rename(document, value);
+			}
+		});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		renameDialog = builder.create();
 		renameDialog.show();
@@ -619,7 +689,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			}
 		});
 	}
-	
+
 	private void rename(MegaNode document, String newName) {
 		if (newName.equals(document.getName())) {
 			return;
@@ -650,9 +720,9 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 		megaApi.renameNode(document, newName, this);
 	}
-	
+
 	public void showMove(ArrayList<Long> handleList){
-		
+
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -662,9 +732,9 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		intent.putExtra("MOVE_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
-	
+
 	public void showCopy(ArrayList<Long> handleList) {
-		
+
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
@@ -674,14 +744,14 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		intent.putExtra("COPY_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
 		if (intent == null) {
 			return;
 		}
-		
+
 		if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER	&& resultCode == RESULT_OK) {
 			log("local folder selected");
 			String parentPath = intent
@@ -738,7 +808,78 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				return;
 			}
 			statusDialog = temp;
-		} else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
+		} 
+		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+
+			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
+			final long folderHandle = intent.getLongExtra("SELECT", 0);			
+
+			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
+
+			if (parent.isFolder()){
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(contactPropertiesMainActivity);
+							temp.setMessage(getString(R.string.context_sharing_folder));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+						permissionsDialog.dismiss();
+
+						log("item "+item);
+
+						switch(item) {
+						case 0:{
+							for (int i=0;i<selectedContacts.length;i++){
+								MegaUser user= megaApi.getContact(selectedContacts[i]);
+								megaApi.share(parent, user, MegaShare.ACCESS_READ,contactPropertiesMainActivity);
+							}
+							break;
+						}
+						case 1:{	                    	
+							for (int i=0;i<selectedContacts.length;i++){
+								MegaUser user= megaApi.getContact(selectedContacts[i]);
+								megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,contactPropertiesMainActivity);
+							}
+							break;
+						}
+						case 2:{                   	
+							for (int i=0;i<selectedContacts.length;i++){
+								MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+								megaApi.share(parent, user, MegaShare.ACCESS_FULL,contactPropertiesMainActivity);
+							}
+							break;
+						}
+						}
+					}
+				});
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+				Resources resources = permissionsDialog.getContext().getResources();
+				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+				alertTitle.setTextColor(resources.getColor(R.color.mega));
+				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+			}
+		}		
+
+		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 
 			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
@@ -766,7 +907,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
 					uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-					
+
 					log("FILE: EXTRA_FILEPATH: " + info.getFileAbsolutePath());
 					log("FILE: EXTRA_NAME: " + info.getTitle());
 					log("FILE: EXTRA_SIZE: " + info.getSize());
@@ -775,19 +916,19 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
 				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
 				log("PARENTNODE: " + parentNode.getHandle() + "___" + parentNode.getName());
-								
+
 				startService(uploadServiceIntent);
 				i++;
 			}
 
 		}
 	}
-	
+
 	/*
 	 * Background task to process files for uploading
 	 */
 	private class FilePrepareTask extends
-			AsyncTask<Intent, Void, List<ShareInfo>> {
+	AsyncTask<Intent, Void, List<ShareInfo>> {
 		Context context;
 
 		FilePrepareTask(Context context) {
@@ -805,7 +946,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			onIntentProcessed();
 		}
 	}
-	
+
 	public void onIntentProcessed() {
 		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
@@ -838,7 +979,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			}
 		}
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		if (cflF != null){
@@ -849,7 +990,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				}
 			}
 		}
-		
+
 		if (cpF != null){
 			if (cpF.isVisible()){
 				super.onBackPressed();
@@ -861,20 +1002,20 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
 		log("onTransferStart");
-		
+
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
 		tL = megaApi.getTransfers();
 
 		if (cflF != null){
 			for(int i=0; i<tL.size(); i++){
-				
+
 				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
 					MegaNode parentT = megaApi.getParentNode(nodeT);
-					
+
 					if (parentT != null){
 						if(parentT.getHandle() == this.parentHandle){	
 							mTHash.put(handleT,tempT);						
@@ -882,10 +1023,10 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 					}
 				}
 			}
-			
+
 			cflF.setTransfers(mTHash);
 		}
-		
+
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
@@ -893,20 +1034,20 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
 		log("onTransferFinish");
-		
+
 		HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
 
 		tL = megaApi.getTransfers();
 
 		if (cflF != null){
 			for(int i=0; i<tL.size(); i++){
-				
+
 				MegaTransfer tempT = tL.get(i);
 				if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					long handleT = tempT.getNodeHandle();
 					MegaNode nodeT = megaApi.getNodeByHandle(handleT);
 					MegaNode parentT = megaApi.getParentNode(nodeT);
-					
+
 					if (parentT != null){
 						if(parentT.getHandle() == this.parentHandle){	
 							mTHash.put(handleT,tempT);						
@@ -914,10 +1055,10 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 					}
 				}
 			}
-			
+
 			cflF.setTransfers(mTHash);
 		}
-		
+
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
 	}
 
@@ -948,7 +1089,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -961,7 +1102,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	@Override
 	public void onUsersUpdate(MegaApiJava api) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -976,9 +1117,9 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	public static void log(String log) {
 		Util.log("ContactPropertiesMainActivity", log);
 	}
@@ -1012,13 +1153,13 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestFinish");
-		
+
 		if (request.getType() == MegaRequest.TYPE_RENAME){
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
-			
+
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
 			}
@@ -1045,7 +1186,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
-			
+
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
 			}
@@ -1053,6 +1194,18 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
 			}
 			log("move to rubbish request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_SHARE){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+
+			if (e.getErrorCode() == MegaError.API_OK){
+
+				Toast.makeText(this, "The file has been correctly shared", Toast.LENGTH_SHORT).show();
+
+			}
 		}
 	}
 

@@ -53,8 +53,8 @@ import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaUser;
 
 public class ContactFileListFragment extends Fragment implements
-		OnItemClickListener,
-		OnItemLongClickListener, OnClickListener, MegaRequestListenerInterface {
+OnItemClickListener,
+OnItemLongClickListener, OnClickListener, MegaRequestListenerInterface {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
@@ -100,7 +100,7 @@ public class ContactFileListFragment extends Fragment implements
 	ArrayList<MegaTransfer> tL;
 	HashMap<Long, MegaTransfer> mTHash = null;
 	long lastTimeOnTransferUpdate = -1;
-	
+
 	private class ActionBarCallBack implements ActionMode.Callback {
 
 		@Override
@@ -123,7 +123,7 @@ public class ContactFileListFragment extends Fragment implements
 				hideMultipleSelect();
 				if (documents.size() == 1) {
 					((ContactPropertiesMainActivity)context).showRenameDialog(documents.get(0),
-					 documents.get(0).getName());
+							documents.get(0).getName());
 				}
 				break;
 			}
@@ -197,11 +197,11 @@ public class ContactFileListFragment extends Fragment implements
 			boolean showTrash = false;
 
 			// Rename
-			 if(selected.size() == 1){
-				 if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
-					 showRename = true;
-				 }
-			 }
+			if(selected.size() == 1){
+				if ((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
+					showRename = true;
+				}
+			}
 
 			if (selected.size() > 0) {
 				showDownload = true;
@@ -223,28 +223,28 @@ public class ContactFileListFragment extends Fragment implements
 		}
 
 	}
-	
+
 	@Override
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
+
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
+
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
-		
+
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -252,12 +252,12 @@ public class ContactFileListFragment extends Fragment implements
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
-		
+
 		View v = null;
-		
+
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_file_list, container, false);
-			
+
 			aB.setTitle(R.string.contact_shared_files);
 
 			nameView = (TextView) v.findViewById(R.id.contact_file_list_name);
@@ -269,7 +269,7 @@ public class ContactFileListFragment extends Fragment implements
 
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
-			
+
 			File avatar = null;
 			if (context.getExternalCacheDir() != null) {
 				avatar = new File(context.getExternalCacheDir().getAbsolutePath(),
@@ -291,7 +291,7 @@ public class ContactFileListFragment extends Fragment implements
 						if (context.getExternalCacheDir() != null) {
 							megaApi.getUserAvatar(contact,
 									context.getExternalCacheDir().getAbsolutePath()
-											+ "/" + contact.getEmail(), this);
+									+ "/" + contact.getEmail(), this);
 						} else {
 							megaApi.getUserAvatar(contact,
 									context.getCacheDir().getAbsolutePath() + "/"
@@ -302,16 +302,16 @@ public class ContactFileListFragment extends Fragment implements
 					}
 				}
 			}
-			
+
 			contactNodes = megaApi.getInShares(contact);
 			textViewContent.setText(getDescription(contactNodes));
-			
+
 			listView = (ListView) v.findViewById(R.id.contact_file_list_view_browser);
 			listView.setOnItemClickListener(this);
 			listView.setOnItemLongClickListener(this);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
-			
+
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_file_list_empty_text);
 			if (contactNodes.size() != 0) {
@@ -325,7 +325,7 @@ public class ContactFileListFragment extends Fragment implements
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 			}
-			
+
 			if (adapter == null) {
 				adapter = new MegaBrowserListAdapter(context, contactNodes, -1,listView, emptyImageView, emptyTextView, aB,ManagerActivity.CONTACT_FILE_ADAPTER);
 				if (mTHash != null){
@@ -341,20 +341,20 @@ public class ContactFileListFragment extends Fragment implements
 
 			listView.setAdapter(adapter);
 		}
-		
+
 		return v;
 	}
-	
+
 	public boolean showUpload(){
 		if (!parentHandleStack.isEmpty()){
 			if ((megaApi.checkAccess(megaApi.getNodeByHandle(parentHandle), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK) || (megaApi.checkAccess(megaApi.getNodeByHandle(parentHandle), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public void setNodes(long parentHandle){
 		if (megaApi.getNodeByHandle(parentHandle) == null){
 			parentHandle = -1;
@@ -374,7 +374,7 @@ public class ContactFileListFragment extends Fragment implements
 			setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), orderGetChildren));
 		}
 	}
-	
+
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.contactNodes = nodes;
 		if (adapter != null){
@@ -398,21 +398,22 @@ public class ContactFileListFragment extends Fragment implements
 			}
 		}
 	}
-	
+
 	public void setUserEmail(String userEmail){
 		this.userEmail = userEmail;
 	}
-	
+
 	public String getUserEmail(){
 		return this.userEmail;
 	}
-	
+
 	@Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        context = activity;
-        aB = ((ActionBarActivity)activity).getSupportActionBar();
-    }
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		context = activity;
+		aB = ((ActionBarActivity)activity).getSupportActionBar();
+		aB.show();
+	}
 
 	public String getDescription(ArrayList<MegaNode> nodes) {
 		int numFolders = 0;
@@ -519,7 +520,7 @@ public class ContactFileListFragment extends Fragment implements
 			MegaError e) {
 		log("onRequestTemporaryError");
 	}
-	
+
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		log("onRequestUpdate");
@@ -619,7 +620,7 @@ public class ContactFileListFragment extends Fragment implements
 
 		parentHandle = adapter.getParentHandle();
 		((ContactPropertiesMainActivity)context).setParentHandle(parentHandle);
-		
+
 		if (adapter.getPositionClicked() != -1) {
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();
@@ -756,25 +757,25 @@ public class ContactFileListFragment extends Fragment implements
 
 	@Override
 	public void onClick(View v) {
-//		switch (v.getId()) {
-//		case R.id.contact_file_list_contact_layout: {
-//			Intent i = new Intent(this, ContactPropertiesMainActivity.class);
-//			i.putExtra("name", contact.getEmail());
-//			startActivity(i);
-//			finish();
-//			break;
-//		}
-//		}
+		//		switch (v.getId()) {
+		//		case R.id.contact_file_list_contact_layout: {
+		//			Intent i = new Intent(this, ContactPropertiesMainActivity.class);
+		//			i.putExtra("name", contact.getEmail());
+		//			startActivity(i);
+		//			finish();
+		//			break;
+		//		}
+		//		}
 	}
-	
+
 	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){
 		this.mTHash = _mTHash;
-		
+
 		if (adapter != null){
 			adapter.setTransfers(mTHash);
 		}
 	}
-	
+
 	public void setCurrentTransfer(MegaTransfer mT){
 		if (adapter != null){
 			adapter.setCurrentTransfer(mT);

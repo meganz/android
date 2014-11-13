@@ -45,7 +45,8 @@
     <string name="action_sort_by">Sort by&#8230;</string>
     <string name="action_help">Help</string>
     <string name="action_upgrade_account">Upgrade account</string>
-    <string name="action_select">Select</string>
+    <string name="action_select_all">Select All</string>
+    <string name="action_deselect_all">Deselect All</string>
     <string name="action_grid">Thumb view</string>
     <string name="action_list">List view</string>
     <string name="botonOcultarActionBar">Ocultar</string>
@@ -229,6 +230,7 @@
     <string name="context_send_link">Send link</string>
     <string name="context_remove">Remove</string>
     <string name="context_share_folder">Share folder</string>
+    <string name="context_view_shared_folders">View shared folders</string>
     <string name="context_sharing_folder">Sharing</string>
     <string name="context_camera_folder">Camera folder: </string>
     <string name="context_mega_contacts">MEGA Contacts</string>
