@@ -283,6 +283,9 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	        listView.setOnItemClickListener(null);
 	        listView.setItemsCanFocus(false);
 	        
+	        emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
+	        
 	        if (adapterGrid == null){
 	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, emptyImageView, emptyTextView, listView);
 	        }
