@@ -96,12 +96,18 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_properties"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
+	            
+	            <ImageButton
+		            android:id="@+id/contact_list_option_share"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_share"
+		            android:background="@null"
+		            android:layout_gravity="center_vertical" />
 	        
-		        <ImageButton
+		  <!--    <ImageButton
 		            android:id="@+id/contact_list_option_send"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -109,15 +115,13 @@
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null"
-		            android:layout_gravity="center_vertical" />
+		            android:layout_gravity="center_vertical" /> -->   
 	        
 		        <ImageButton
 		            android:id="@+id/contact_list_option_remove"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_delete"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical" />
 	        </TableRow>        

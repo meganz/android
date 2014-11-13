@@ -18,10 +18,18 @@
 	    MEGA:showAsAction="ifRoom" />
 	-->
 	<item
-	    android:id="@+id/action_contact_file_list_upload"
+	    android:id="@+id/action_contact_file_list_share"
 	    android:orderInCategory="110"
 	    android:showAsAction="never"
-	    android:title="@string/action_add"	    
+	    android:title="@string/context_share_folder"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_contact_file_list_view_share"
+	    android:orderInCategory="115"
+	    android:showAsAction="never"
+	    android:title="@string/context_view_shared_folders"	    
 	    android:icon="@drawable/ic_menu_upload_here_dark"
 	    MEGA:showAsAction="never" />
 </menu>

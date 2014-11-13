@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -34,6 +35,8 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
+	TextView contentText;
+	LinearLayout buttonsLayout;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -68,6 +71,11 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
+		
+		contentText = (TextView) v.findViewById(R.id.content_text);
+		contentText.setVisibility(View.GONE);
+		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+		buttonsLayout.setVisibility(View.GONE);
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);

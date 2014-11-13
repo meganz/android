@@ -6,7 +6,37 @@
     android:layout_height="fill_parent"
     android:background="@color/black"
     tools:context=".FilePropertiesFragment" >
-
+    
+    <!--  
+    <RelativeLayout 
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:id="@+id/contact_properties_layout_top"
+        android:background="#44000000"
+        android:layout_alignParentTop="true">
+        
+        <ImageView 
+            android:id="@+id/contact_properties_close_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_navigation_accept_white"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            style="@style/dialogActionButton"/>
+        
+        <ImageView 
+            android:id="@+id/contact_properties_overflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_action_core_overflow"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            style="@style/dialogActionButton"/>
+     
+    </RelativeLayout>-->
+    
     <com.mega.components.RoundedImageView
         android:id="@+id/contact_properties_image"
         android:layout_width="270dp"
@@ -65,5 +95,26 @@
         android:text="@string/menu_add_contact"
         android:textColor="@color/black" >
     </Button>
+    
+   <!--   
+   <RelativeLayout  
+			android:layout_width="200dp"
+			android:layout_height="wrap_content"
+			android:id="@+id/contact_properties_overflow_menu"
+			android:background="#ffffffff"
+	        android:layout_alignParentRight="true"
+	        android:layout_below="@+id/contact_properties_layout_top"
+	        android:layout_marginRight="5dp">
+        
+        <ListView
+            android:id="@+id/contact_properties_overflow_menu_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+			android:layout_marginLeft="0dp"
+			android:background="#00000000"
+			/>            
+	</RelativeLayout>-->
+    
 
 </RelativeLayout>

@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -212,7 +213,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 //        ImageView arrowSelection;
         RelativeLayout optionsLayout;
         ImageButton optionProperties;
-        ImageButton optionSend;
+//        ImageButton optionSend;
+        ImageButton optionShare;
         ImageButton optionRemove;
         int currentPosition;
         String contactMail;
@@ -249,13 +251,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_options);
 			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.contact_list_option_properties);
-			holder.optionProperties.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionSend = (ImageButton) convertView.findViewById(R.id.contact_list_option_send);
-			holder.optionSend.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+//			holder.optionSend = (ImageButton) convertView.findViewById(R.id.contact_list_option_send);
+//			holder.optionSend.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionShare = (ImageButton) convertView.findViewById(R.id.contact_list_option_share);
+			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			holder.optionRemove = (ImageButton) convertView.findViewById(R.id.contact_list_option_remove);
-			holder.optionRemove.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
-//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.contact_list_arrow_selection);
-//			holder.arrowSelection.setVisibility(View.GONE);
+			holder.optionRemove.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			convertView.setTag(holder);
 		}
 		else{
@@ -284,9 +286,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				holder.checkbox.setChecked(false);
 			}
 		}
-		
-//		ItemContact rowItem = (ItemContact) getItem(position);
-		
+
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
 		holder.textViewContactName.setText(contact.getEmail());
 		File avatar = null;
@@ -371,6 +371,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
+		holder.optionShare.setOnClickListener(this);
+		holder.optionShare.setTag(holder);
 		
 		return convertView;
 	}
@@ -434,6 +436,14 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				i.putExtra("name", c.getEmail());
 				context.startActivity(i);							
 				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_list_option_share:{
+				log("optionShareeee");
+				List<MegaUser> user = new ArrayList<MegaUser>();
+				user.add(c);
+				((ManagerActivity) context).pickFolderToShare(user);
 				notifyDataSetChanged();
 				break;
 			}
