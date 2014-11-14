@@ -43,7 +43,6 @@
 %typemap(javaclassmodifiers) mega::ShareList "class";
 %typemap(javaclassmodifiers) mega::UserList "class";
 
-
 %typemap(javadestruct, methodname="delete", methodmodifiers="protected synchronized") SWIGTYPE 
 {   
     if (swigCPtr != 0) {
@@ -58,7 +57,6 @@
 %javamethodmodifiers copy ""
 
 #endif
-
 
 //Generate inheritable wrappers for listener objects
 %feature("director") mega::MegaRequestListener;
@@ -100,32 +98,14 @@
 	jenv->DeleteLocalRef($input);
 %}
 
-
-%ignore mega::MegaApi::syncPathState;
-%ignore mega::MegaApi::getSyncedNode;
-%ignore mega::MegaApi::syncFolder;
-%ignore mega::MegaApi::removeSync;
-%ignore mega::MegaApi::resumeSync;
-%ignore mega::MegaApi::getNumActiveSyncs;
-%ignore mega::MegaApi::stopSyncs;
-%ignore mega::MegaApi::getLocalPath;
-%ignore mega::MegaApi::updateStatics;
-%ignore mega::MegaApi::update;
-%ignore mega::MegaApi::isIndexing;
-%ignore mega::MegaApi::isWaiting;
-%ignore mega::MegaApi::isSynced;
-%ignore mega::MegaApi::setExcludedNames;
-%ignore mega::MegaApi::moveToLocalDebris;
 %ignore mega::MegaApi::MEGA_DEBRIS_FOLDER;
 %ignore mega::MegaNode::getNodeKey;
 %ignore mega::MegaNode::getAttrString;
-%ignore mega::MegaNode::getLocalPath;
 %ignore mega::MegaListener::onSyncStateChanged;
 %ignore mega::MegaListener::onSyncFileStateChanged;
-%ignore mega::MegaRequest::getPublicNode;
-%ignore mega::MegaTransfer::getPublicNode;
 %ignore mega::MegaTransfer::getListener;
 %ignore mega::MegaRequest::getListener;
+%ignore mega::MegaHashSignature;
 
 %newobject mega::MegaError::copy;
 %newobject mega::MegaRequest::copy;
@@ -133,7 +113,6 @@
 %newobject mega::MegaNode::copy;
 %newobject mega::MegaShare::copy;
 %newobject mega::MegaUser::copy;
-
 %newobject mega::MegaRequest::getPublicMegaNode;
 %newobject mega::MegaTransfer::getPublicMegaNode;
 %newobject mega::MegaNode::getBase64Handle;
@@ -157,7 +136,6 @@
 %newobject mega::MegaApi::getInboxNode;
 %newobject mega::MegaApi::getRubbishNode;
 %newobject mega::MegaApi::getParentNode;
-%newobject mega::MegaApi::getMyEmail;
 %newobject mega::MegaApi::getFingerprint;
 %newobject mega::MegaApi::getNodeByFingerprint;
 %newobject mega::MegaApi::hasFingerprint;
@@ -168,7 +146,5 @@
 typedef long long time_t;
 typedef long long uint64_t;
 typedef long long int64_t;
-
-
 
 %include "megaapi.h"

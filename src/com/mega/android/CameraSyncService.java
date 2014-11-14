@@ -865,7 +865,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				retryLaterShortTime();
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_MKDIR){		
+		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){		
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Folder created");
 				retryLaterShortTime();

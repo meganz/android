@@ -588,7 +588,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		log ("TEMPORARY ERROR (" + transfer.getFileName() + "): " + e.getErrorCode() + "_" + e.getErrorString() + "_" + e.getNextAttempt());
+		log ("TEMPORARY ERROR (" + transfer.getFileName() + "): " + e.getErrorCode() + "_" + e.getErrorString());
 //		Util.showErrorAlertDialog("Temporary error: " + e.getErrorString(), true, activity);
 	}
 
