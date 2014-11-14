@@ -531,7 +531,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
 		log("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_MKDIR){
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try { 
 				statusDialog.dismiss();	
 			} 

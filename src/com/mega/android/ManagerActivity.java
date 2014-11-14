@@ -2696,7 +2696,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("copy request start");
 		}
-		else if (request.getType() == MegaRequest.TYPE_MKDIR){
+		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			log("create folder start");
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
@@ -2997,7 +2997,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			log("copy nodes request finished");
 		}
-		else if (request.getType() == MegaRequest.TYPE_MKDIR){
+		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try { 
 				statusDialog.dismiss();	
 			} 
@@ -3196,7 +3196,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			log("copy temporary error");
 		}
-		else if (request.getType() == MegaRequest.TYPE_MKDIR){
+		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			log("create folder temporary error");
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){

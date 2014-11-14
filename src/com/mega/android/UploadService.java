@@ -574,7 +574,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		@Override
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
-			if (request.getType() == MegaRequest.TYPE_MKDIR){
+			if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 				log("onRequestFinish: " + request.getRequestString() + "_" + foldersCreation.get(0).folderName);
 				if (e.getErrorCode() == MegaError.API_OK){					
 					long currentNodeHandle = request.getNodeHandle();

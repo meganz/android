@@ -1,5 +1,6 @@
 package com.mega.sdk;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -720,6 +721,18 @@ public class MegaApiJava
 		megaApi.startStreaming(node, startOffset, size, createDelegateTransferListener(listener));
 	}
 	
+	public void startUnbufferedDownload(MegaNode node, long startOffset, long size, OutputStream outputStream, MegaTransferListenerInterface listener)
+	{
+		DelegateMegaTransferListener delegateListener = new DelegateOutputMegaTransferListener(this, outputStream, listener, true);
+		activeTransferListeners.add(delegateListener);
+		megaApi.startStreaming(node, startOffset, size, delegateListener);
+	}
+	
+	public void startUnbufferedDownload(MegaNode node, OutputStream outputStream, MegaTransferListenerInterface listener)
+	{
+		startUnbufferedDownload(node, 0, node.getSize(), outputStream, listener);
+	}
+	
 	/****************************************************************************************************/
 	//FILESYSTEM METHODS
 	/****************************************************************************************************/
@@ -926,7 +939,7 @@ public class MegaApiJava
 		activeTransferListeners.remove(listener);
 	}
 	
-	ArrayList<MegaNode> nodeListToArray(NodeList nodeList)
+	ArrayList<MegaNode> nodeListToArray(MegaNodeList nodeList)
 	{
 		ArrayList<MegaNode> result = new ArrayList<MegaNode>(nodeList.size());
 		for(int i=0; i<nodeList.size(); i++)
@@ -937,7 +950,7 @@ public class MegaApiJava
 		return result;
 	}
 	
-	ArrayList<MegaShare> shareListToArray(ShareList shareList)
+	ArrayList<MegaShare> shareListToArray(MegaShareList shareList)
 	{
 		ArrayList<MegaShare> result = new ArrayList<MegaShare>(shareList.size());
 		for(int i=0; i<shareList.size(); i++)
@@ -948,7 +961,7 @@ public class MegaApiJava
 		return result;
 	}
 	
-	ArrayList<MegaTransfer> transferListToArray(TransferList transferList)
+	ArrayList<MegaTransfer> transferListToArray(MegaTransferList transferList)
 	{
 		ArrayList<MegaTransfer> result = new ArrayList<MegaTransfer>(transferList.size());
 		for(int i=0; i<transferList.size(); i++)
@@ -959,7 +972,7 @@ public class MegaApiJava
 		return result;
 	}
 	
-	ArrayList<MegaUser> userListToArray(UserList userList)
+	ArrayList<MegaUser> userListToArray(MegaUserList userList)
 	{
 		ArrayList<MegaUser> result = new ArrayList<MegaUser>(userList.size());
 		for(int i=0; i<userList.size(); i++)

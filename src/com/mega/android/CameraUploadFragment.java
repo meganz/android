@@ -1027,7 +1027,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		if (request.getType() == MegaRequest.TYPE_MKDIR){
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			log("create folder start");
 		}		
 	}
@@ -1041,7 +1041,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		if (request.getType() == MegaRequest.TYPE_MKDIR){
+		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			log("create folder finished");
 			try { 
 				statusDialog.dismiss();	
