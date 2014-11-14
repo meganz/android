@@ -36,7 +36,6 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.ListView;
-
 import com.mega.android.FileStorageActivity.Mode;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
@@ -78,7 +77,10 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	
 	/////Multiselect/////
 	private class ActionBarCallBack implements ActionMode.Callback {
-
+//		
+//		boolean selectAll = true;
+//		boolean unselectAll = false;
+		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaUser> users = getSelectedUsers();
@@ -102,14 +104,23 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 					hideMultipleSelect();
 					if (users.size()>0){
 						((ManagerActivity) context).pickFolderToShare(users);
-					}	
-									
+					}										
 					break;
 				}
 				case R.id.cab_menu_delete:{
 					Toast.makeText(getActivity(), "Delete not yet implemented", Toast.LENGTH_SHORT).show();
 					break;
 				}
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					actionMode.invalidate();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					actionMode.invalidate();
+					break;
+				}				
 			}
 			return false;
 		}
@@ -118,7 +129,6 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
 			inflater.inflate(R.menu.contact_fragment_action, menu);
-			
 			return true;
 		}
 
@@ -133,17 +143,29 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaUser> selected = getSelectedUsers();
 
-			if (selected.size() > 0) {
-			menu.findItem(R.id.cab_menu_delete).setVisible(true);
-			menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
-			menu.findItem(R.id.cab_menu_help).setVisible(true);
-			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(true);
-			menu.findItem(R.id.cab_menu_settings).setVisible(true);
+			if (selected.size() != 0) {
+				menu.findItem(R.id.cab_menu_delete).setVisible(true);
+				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
+				menu.findItem(R.id.cab_menu_help).setVisible(true);
+				menu.findItem(R.id.cab_menu_upgrade_account).setVisible(true);
+				menu.findItem(R.id.cab_menu_settings).setVisible(true);
+				
+				if(selected.size()==adapterList.getCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}			
+								
+			}	
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
 			}
-			
 			return false;
-		}
-		
+		}		
 	}
 	
 	/*
@@ -172,6 +194,17 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+	}
+	
+	public void selectAll(){
+		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+		adapterList.setMultipleSelect(true);
+		for ( int i=0; i< adapterList.getCount(); i++ ) {
+			listView.setItemChecked(i, true);
+		}
+		updateActionModeTitle();
+		listView.setOnItemLongClickListener(null);
 	}
 	
 	/*
@@ -593,6 +626,4 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		}
 		return true;
 	}
-	
-
 }

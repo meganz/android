@@ -70,6 +70,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	private ActionMode actionMode;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
+		
+		boolean showDownload = false;
+		boolean showRename = false;
+		boolean showCopy = false;
+		boolean showMove = false;
+		boolean showLink = false;
+		boolean showTrash = false;
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -132,6 +139,14 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity) context).moveToTrash(handleList);
 					break;
 				}
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}
 			}
 			return false;
 		}
@@ -153,13 +168,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = getSelectedDocuments();
-			boolean showDownload = false;
-			boolean showRename = false;
-			boolean showCopy = false;
-			boolean showMove = false;
-			boolean showLink = false;
-			boolean showTrash = false;
-			
+		
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
@@ -170,11 +179,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				showLink = true;
 			}
 			
-			if (selected.size() > 0) {
+			if (selected.size() != 0) {
 				showDownload = true;
 				showTrash = true;
 				showMove = true;
 				showCopy = true;
+				
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -182,6 +192,19 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 						break;
 					}
 				}
+				
+				if(selected.size()==adapterList.getCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
@@ -520,6 +543,17 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			listView.setOnItemLongClickListener(null);
 		}
 		return true;
+	}
+	
+	public void selectAll(){
+		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+		adapterList.setMultipleSelect(true);
+		for ( int i=0; i< adapterList.getCount(); i++ ) {
+			listView.setItemChecked(i, true);
+		}
+		updateActionModeTitle();
+		listView.setOnItemLongClickListener(null);
 	}
 	
 	/*

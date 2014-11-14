@@ -1,15 +1,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
     
+   <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_select_all"
+        MEGA:showAsAction="never" />   
+        
+   <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_unselect_all"
+        MEGA:showAsAction="never" /> 
+    
     <item
         android:id="@+id/cab_menu_delete"
-        android:orderInCategory="100"
+        android:orderInCategory="105"
         android:title="@string/context_delete"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_share_folder"
-        android:orderInCategory="105"
+        android:orderInCategory="110"
         android:title="@string/context_share_folder"
         MEGA:showAsAction="never" />
     

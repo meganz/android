@@ -31,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
@@ -141,7 +140,15 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 					hideMultipleSelect();
 					((ManagerActivity) context).moveToTrash(handleList);
 					break;
-				}				
+				}	
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}
 			}
 			return false;
 		}
@@ -185,6 +192,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				showTrash = true;
 				showMove = false;
 				showCopy = true;
+				
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getInboxNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
@@ -192,6 +200,18 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 						break;
 					}
 				}
+				if(selected.size()==adapterList.getCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
@@ -455,6 +475,17 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 		switch(v.getId()){
 
 		}
+	}
+	
+	public void selectAll(){
+		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+		adapterList.setMultipleSelect(true);
+		for ( int i=0; i< adapterList.getCount(); i++ ) {
+			listView.setItemChecked(i, true);
+		}
+		updateActionModeTitle();
+		listView.setOnItemLongClickListener(null);
 	}
 	
 	@Override
