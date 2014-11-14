@@ -138,7 +138,6 @@ OnClickListener {
 		positionClicked = -1;
 		notifyDataSetChanged();
 	}
-
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		log("getView");
@@ -232,7 +231,10 @@ OnClickListener {
 
 		holder.textViewFileName.setText(node.getName());
 	
+		holder.textViewFileSize.setText("");
 		if (node.isFolder()) {
+			
+			holder.textViewFileSize.setText(getInfoFolder(node));
 
 			ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			if (sl != null) {
@@ -517,7 +519,7 @@ OnClickListener {
 
 		return convertView;
 	}
-
+	
 	private String getInfoFolder(MegaNode n) {
 		ArrayList<MegaNode> nL = megaApi.getChildren(n);
 
@@ -800,7 +802,6 @@ OnClickListener {
 			notifyDataSetChanged();
 		}
 	}   
-
 
 	private static void log(String log) {
 		Util.log("MegaBrowserListAdapter", log);

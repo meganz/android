@@ -176,6 +176,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem upgradeAccountMenuItem;
 	private MenuItem settingsMenuItem;
 	private MenuItem selectMenuItem;
+	private MenuItem unSelectMenuItem;
 	private MenuItem thumbViewMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem modeShareIn;
@@ -1211,6 +1212,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 	    			addMenuItem.setEnabled(true);	  
  	    			
@@ -1302,6 +1304,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
@@ -1356,6 +1359,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(false);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
@@ -1415,6 +1419,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
 	    			
 	    			if(swmF.getModeShare()==MODE_IN){
@@ -1463,6 +1468,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
@@ -1505,6 +1511,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
 	    			modeShareIn.setVisible(false);
@@ -1560,6 +1567,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
@@ -1609,6 +1617,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			upgradeAccountMenuItem.setVisible(true);
         			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
@@ -1647,6 +1656,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(false);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
 	    			modeShareOut.setVisible(false);
@@ -1842,6 +1852,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		addMenuItem = menu.findItem(R.id.action_add);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
 		selectMenuItem = menu.findItem(R.id.action_select);
+		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		thumbViewMenuItem= menu.findItem(R.id.action_grid);
 		
 		refreshMenuItem = menu.findItem(R.id.action_menu_refresh);
@@ -1866,6 +1877,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
     			modeShareOut.setVisible(false);
@@ -1896,6 +1908,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
     			modeShareOut.setVisible(false);
@@ -1922,6 +1935,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(false);
     			settingsMenuItem.setVisible(false);
     			selectMenuItem.setVisible(true);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
     			modeShareOut.setVisible(false);
@@ -1952,6 +1966,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(false);
     			
     			
@@ -1989,6 +2004,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
@@ -2016,6 +2032,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
@@ -2054,6 +2071,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
     			modeShareOut.setVisible(false);
@@ -2083,6 +2101,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
 	    			modeShareIn.setVisible(false);
@@ -2110,6 +2129,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
+    			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			modeShareIn.setVisible(false);
     			modeShareOut.setVisible(false);
@@ -2210,8 +2230,42 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        case R.id.action_select:{
 	        	//TODO: multiselect
+	        	if (fbF != null){
+	        		if (fbF.isVisible()){	        			
+	        			fbF.selectAll();
+	        			selectMenuItem.setVisible(false);
+	        			unSelectMenuItem.setVisible(true);
+	        			return true;
+	        		}
+	        	}
+
+	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+	        	cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+	        	if (cF != null){
+	        		if (cF.isVisible()){
+	        			cF.selectAll();
+	        			selectMenuItem.setVisible(false);
+	        			unSelectMenuItem.setVisible(true);	        			
+	        		}
+	        	}
 	        	
-				return true;
+	        	if (swmF != null){
+	        		if (swmF.isVisible()){
+	        			cF.selectAll();
+	        			selectMenuItem.setVisible(false);
+	        			unSelectMenuItem.setVisible(true);	  
+	        		}
+	        	}
+	        	
+	        	if (oF != null){
+        			if (oF.isVisible()){
+        				oF.selectAll();
+        				selectMenuItem.setVisible(false);
+	        			unSelectMenuItem.setVisible(true);
+        			}
+	        	}
+	        	
+	        	return true;
 	        }
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView

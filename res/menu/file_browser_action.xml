@@ -1,54 +1,69 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
     
+        <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_select_all"
+        MEGA:showAsAction="never" />   
+        
+   <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_unselect_all"
+        MEGA:showAsAction="never" /> 
+    
     <item
         android:id="@+id/cab_menu_download"
         android:icon="@drawable/ic_menu_download_dark"
-        android:orderInCategory="100"
-        android:showAsAction="always"
+        android:orderInCategory="105"
+        android:showAsAction="never"
         android:title="@string/general_download"
-        MEGA:showAsAction="ifRoom" />
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_rename"
         android:icon="@drawable/ic_menu_rename_dark"
-        android:orderInCategory="105"
-        android:showAsAction="always"
+        android:orderInCategory="110"
+        android:showAsAction="never"
         android:title="@string/context_rename"
-        MEGA:showAsAction="ifRoom" />
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_copy"
-        android:orderInCategory="110"
-        android:showAsAction="always"
+        android:orderInCategory="115"
+        android:showAsAction="never"
         android:icon="@drawable/ic_menu_copy_dark"
         android:title="@string/general_copy_to"
-        MEGA:showAsAction="ifRoom" />
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_move"
-        android:orderInCategory="115"
-        android:showAsAction="always"
+        android:orderInCategory="120"
+        android:showAsAction="never"
         android:icon="@drawable/ic_menu_move_dark"
         android:title="@string/general_move_to"
-        MEGA:showAsAction="ifRoom" />
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_share_link"
-        android:orderInCategory="120"
-        android:showAsAction="always"
+        android:orderInCategory="125"
+        android:showAsAction="never"
         android:icon="@drawable/ic_menu_download_link_dark"
         android:title="@string/context_get_link"
-        MEGA:showAsAction="ifRoom" />
+        MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_trash"
         android:icon="@drawable/ic_delete"
-        android:orderInCategory="125"
-        android:showAsAction="always"
+        android:orderInCategory="130"
+        android:showAsAction="never"
         android:title="@string/context_move_to_trash"
-        MEGA:showAsAction="ifRoom" />   
+        MEGA:showAsAction="never" />   
         
+
     
 
 </menu>

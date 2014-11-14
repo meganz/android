@@ -29,10 +29,10 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
 
 public class OfflineFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -80,7 +80,14 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					refreshPaths(documents.get(0));
 					break;
 				}	
-				
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}				
 			}
 			return false;
 		}
@@ -143,7 +150,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				log("EXCEPTION: deleteOffline - adapter");
 			};		
 			
-			log("Delete in DB: "+node.getId());
 			dbH.removeById(node.getId());		
 			
 			return 1;		
@@ -170,7 +176,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}		
 		}
 		
-
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			log("ActionBarCallBack::onCreateActionMode");
@@ -198,10 +203,27 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			boolean showLink = false;
 			boolean showTrash = false;
 			
-			if (selected.size() > 0) {
+			if (selected.size() != 0) {
+				showDownload = true;
 				showTrash = true;
-			}
+				showMove = true;
+				showCopy = true;
+				showTrash = true;
 			
+				if(selected.size()==adapterList.getCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
@@ -212,6 +234,17 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			return false;
 		}
 		
+	}
+	
+	public void selectAll(){
+		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+		adapterList.setMultipleSelect(true);
+		for ( int i=0; i< adapterList.getCount(); i++ ) {
+			listView.setItemChecked(i, true);
+		}
+		updateActionModeTitle();
+		listView.setOnItemLongClickListener(null);
 	}
 		
 	@Override

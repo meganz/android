@@ -46,7 +46,7 @@
     <string name="action_help">Help</string>
     <string name="action_upgrade_account">Upgrade account</string>
     <string name="action_select_all">Select All</string>
-    <string name="action_deselect_all">Deselect All</string>
+    <string name="action_unselect_all">Unselect All</string>
     <string name="action_grid">Thumb view</string>
     <string name="action_list">List view</string>
     <string name="botonOcultarActionBar">Ocultar</string>
