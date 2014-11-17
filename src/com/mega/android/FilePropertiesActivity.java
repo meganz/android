@@ -62,6 +62,7 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaShare;
+import com.mega.sdk.MegaUser;
 
 public class FilePropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
 	
@@ -1626,12 +1627,12 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	}
 	
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");		
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
 		
 		if (node.isFolder()){

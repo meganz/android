@@ -39,6 +39,7 @@ import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaGlobalListenerInterface;
+import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
@@ -565,7 +566,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	}
 
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");
 		
 		contacts = megaApi.getContacts();
@@ -590,10 +591,10 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
 	}
-
+	
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
 		log("onReloadNeeded");

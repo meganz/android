@@ -731,13 +731,13 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	}
 	
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 
 		log("onNodesUpdate");
 

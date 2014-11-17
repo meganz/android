@@ -173,11 +173,6 @@ public class MegaApiJava
 		return MegaApi.base64ToHandle(base64Handle);
 	}
 
-	public static String ebcEncryptKey(String encryptionKey, String plainKey)
-	{
-		return MegaApi.ebcEncryptKey(encryptionKey, plainKey);
-	}
-
 	public void retryPendingConnections()
 	{
 		megaApi.retryPendingConnections();
@@ -286,10 +281,10 @@ public class MegaApiJava
 		MegaApi.setLogLevel(logLevel);
 	}
 	
-	public static void setLoggerClass(MegaLoggerInterface megaLogger)
+	public static void setLoggerObject(MegaLoggerInterface megaLogger)
 	{
 		DelegateMegaLogger newLogger = new DelegateMegaLogger(megaLogger);
-		MegaApi.setLoggerClass(newLogger);
+		MegaApi.setLoggerObject(newLogger);
 		logger = newLogger;
 	}
 	
@@ -939,7 +934,7 @@ public class MegaApiJava
 		activeTransferListeners.remove(listener);
 	}
 	
-	ArrayList<MegaNode> nodeListToArray(MegaNodeList nodeList)
+	static ArrayList<MegaNode> nodeListToArray(MegaNodeList nodeList)
 	{
 		ArrayList<MegaNode> result = new ArrayList<MegaNode>(nodeList.size());
 		for(int i=0; i<nodeList.size(); i++)
@@ -950,7 +945,7 @@ public class MegaApiJava
 		return result;
 	}
 	
-	ArrayList<MegaShare> shareListToArray(MegaShareList shareList)
+	static ArrayList<MegaShare> shareListToArray(MegaShareList shareList)
 	{
 		ArrayList<MegaShare> result = new ArrayList<MegaShare>(shareList.size());
 		for(int i=0; i<shareList.size(); i++)
@@ -961,7 +956,7 @@ public class MegaApiJava
 		return result;
 	}
 	
-	ArrayList<MegaTransfer> transferListToArray(MegaTransferList transferList)
+	static ArrayList<MegaTransfer> transferListToArray(MegaTransferList transferList)
 	{
 		ArrayList<MegaTransfer> result = new ArrayList<MegaTransfer>(transferList.size());
 		for(int i=0; i<transferList.size(); i++)
@@ -972,7 +967,7 @@ public class MegaApiJava
 		return result;
 	}
 	
-	ArrayList<MegaUser> userListToArray(MegaUserList userList)
+	static ArrayList<MegaUser> userListToArray(MegaUserList userList)
 	{
 		ArrayList<MegaUser> result = new ArrayList<MegaUser>(userList.size());
 		for(int i=0; i<userList.size(); i++)
