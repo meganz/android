@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mega.android.CameraUploadFragment.PhotoSyncGridHolder;
+import com.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
@@ -108,7 +109,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		
-		View v;
+//		View v;
 		
 		listFragment = (ListView) parent;
 		final int _position = position;
@@ -123,70 +124,77 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	    float scaleH = Util.getScaleH(outMetrics, density);
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		v = inflater.inflate(R.layout.item_photo_sync_grid, parent, false);
-		holder = new ViewHolderPhotoSyncGrid();
-		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.photo_sync_grid_item_layout);
-		holder.imageView1 = (ImageButton) v.findViewById(R.id.photo_sync_grid_thumbnail1);
-		holder.imageView2 = (ImageButton) v.findViewById(R.id.photo_sync_grid_thumbnail2);
-		holder.imageView3 = (ImageButton) v.findViewById(R.id.photo_sync_grid_thumbnail3);
 		
-		RelativeLayout.LayoutParams paramsIL = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-		paramsIL.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		paramsIL.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		paramsIL.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-		holder.itemLayout.setLayoutParams(paramsIL);
-		
-		RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
-		holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-		paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
-		paramsIV1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		holder.imageView1.setLayoutParams(paramsIV1);
-		
-		RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
-		holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-		paramsIV2.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
-		paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-		holder.imageView2.setLayoutParams(paramsIV2);
-		
-		RelativeLayout.LayoutParams paramsIV3 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
-		holder.imageView3.setScaleType(ImageView.ScaleType.FIT_CENTER);
-		paramsIV3.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
-		paramsIV3.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		holder.imageView3.setLayoutParams(paramsIV3);
-		
-		holder.imageView1.setTag(holder);
-		holder.imageView1.setOnClickListener(this);
-		
-		holder.imageView2.setTag(holder);
-		holder.imageView2.setOnClickListener(this);
-		
-		holder.imageView3.setTag(holder);
-		holder.imageView3.setOnClickListener(this);
-		
-		
-		
-		holder.monthLayout = (RelativeLayout) v.findViewById(R.id.photo_sync_grid_month_layout);
-		holder.monthTextView = (TextView) v.findViewById(R.id.photo_sync_grid_month_name);
+		if (convertView == null){
+			convertView = inflater.inflate(R.layout.item_photo_sync_grid, parent, false);
+			holder = new ViewHolderPhotoSyncGrid();
+			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_grid_item_layout);
+			holder.imageView1 = (ImageButton) convertView.findViewById(R.id.photo_sync_grid_thumbnail1);
+			holder.imageView2 = (ImageButton) convertView.findViewById(R.id.photo_sync_grid_thumbnail2);
+			holder.imageView3 = (ImageButton) convertView.findViewById(R.id.photo_sync_grid_thumbnail3);
 			
-			//Set width and height itemLayout1
-//			RelativeLayout.LayoutParams paramsIL1 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-//			paramsIL1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-//			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-//			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-//			holder.itemLayout1.setLayoutParams(paramsIL1);
+			RelativeLayout.LayoutParams paramsIL = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+			paramsIL.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+			paramsIL.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+			paramsIL.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+			holder.itemLayout.setLayoutParams(paramsIL);
 			
-//			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-//			paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-//			holder.imageView1.setLayoutParams(paramsIV1);
-//			
-//			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-//			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-//			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-//			paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-//			holder.imageView2.setLayoutParams(paramsIV2);
-
+			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
+			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
+			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
+			paramsIV1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+			holder.imageView1.setLayoutParams(paramsIV1);
+			
+			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
+			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
+			paramsIV2.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
+			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+			holder.imageView2.setLayoutParams(paramsIV2);
+			
+			RelativeLayout.LayoutParams paramsIV3 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
+			holder.imageView3.setScaleType(ImageView.ScaleType.FIT_CENTER);
+			paramsIV3.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
+			paramsIV3.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+			holder.imageView3.setLayoutParams(paramsIV3);
+			
+			holder.imageView1.setTag(holder);
+			holder.imageView1.setOnClickListener(this);
+			
+			holder.imageView2.setTag(holder);
+			holder.imageView2.setOnClickListener(this);
+			
+			holder.imageView3.setTag(holder);
+			holder.imageView3.setOnClickListener(this);			
+			
+			holder.monthLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_grid_month_layout);
+			holder.monthTextView = (TextView) convertView.findViewById(R.id.photo_sync_grid_month_name);
+				
+				//Set width and height itemLayout1
+	//			RelativeLayout.LayoutParams paramsIL1 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
+	//			paramsIL1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+	//			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+	//			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+	//			holder.itemLayout1.setLayoutParams(paramsIL1);
+				
+	//			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
+	//			paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
+	//			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	//			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
+	//			holder.imageView1.setLayoutParams(paramsIV1);
+	//			
+	//			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
+	//			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
+	//			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	//			paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
+	//			holder.imageView2.setLayoutParams(paramsIV2);
+			
+			convertView.setTag(holder);
+		}
+		
+		else{
+			holder = (ViewHolderPhotoSyncGrid) convertView.getTag();
+		}
+		
 		holder.currentPosition = position;
 		
 		PhotoSyncGridHolder psGH = (PhotoSyncGridHolder) getItem(position);
@@ -313,7 +321,9 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 			}
 		}
 		
-		return v;
+//		return v;
+		
+		return convertView;
 
 	}
 	
