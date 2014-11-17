@@ -4262,7 +4262,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
@@ -4276,7 +4276,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
 		try { 
 			statusDialog.dismiss();	

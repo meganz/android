@@ -33,6 +33,7 @@ import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
+import com.mega.sdk.MegaUser;
 
 public class FileExplorerActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
@@ -560,13 +561,13 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	}
 
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
 		if (fe != null){
 			nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));

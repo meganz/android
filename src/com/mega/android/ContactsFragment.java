@@ -591,7 +591,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,MegaError e) {}
 
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		this.setContacts(contacts);
 		this.getListView().invalidateViews();
@@ -599,7 +599,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {}
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {}
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {}

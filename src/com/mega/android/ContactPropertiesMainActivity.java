@@ -1100,13 +1100,13 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	}
 
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		if (cflF != null){
 			if (cflF.isVisible()){
 				cflF.setNodes(parentHandle);

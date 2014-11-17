@@ -42,6 +42,7 @@ import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaTransferListenerInterface;
+import com.mega.sdk.MegaUser;
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface{
 
@@ -1141,13 +1142,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 
 	@Override
-	public void onUsersUpdate(MegaApiJava api) {
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api) {
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
 		if (waitForOnNodesUpdate){
 			waitForOnNodesUpdate = false;
