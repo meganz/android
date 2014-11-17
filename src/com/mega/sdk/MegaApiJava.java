@@ -936,6 +936,11 @@ public class MegaApiJava
 	
 	static ArrayList<MegaNode> nodeListToArray(MegaNodeList nodeList)
 	{
+		if (nodeList == null)
+		{
+			return null;
+		}
+		
 		ArrayList<MegaNode> result = new ArrayList<MegaNode>(nodeList.size());
 		for(int i=0; i<nodeList.size(); i++)
 		{
@@ -947,6 +952,11 @@ public class MegaApiJava
 	
 	static ArrayList<MegaShare> shareListToArray(MegaShareList shareList)
 	{
+		if (shareList == null)
+		{
+			return null;
+		}
+		
 		ArrayList<MegaShare> result = new ArrayList<MegaShare>(shareList.size());
 		for(int i=0; i<shareList.size(); i++)
 		{
@@ -958,6 +968,11 @@ public class MegaApiJava
 	
 	static ArrayList<MegaTransfer> transferListToArray(MegaTransferList transferList)
 	{
+		if (transferList == null)
+		{
+			return null;
+		}
+		
 		ArrayList<MegaTransfer> result = new ArrayList<MegaTransfer>(transferList.size());
 		for(int i=0; i<transferList.size(); i++)
 		{
@@ -969,6 +984,12 @@ public class MegaApiJava
 	
 	static ArrayList<MegaUser> userListToArray(MegaUserList userList)
 	{
+		
+		if (userList == null)
+		{
+			return null;
+		}
+		
 		ArrayList<MegaUser> result = new ArrayList<MegaUser>(userList.size());
 		for(int i=0; i<userList.size(); i++)
 		{
