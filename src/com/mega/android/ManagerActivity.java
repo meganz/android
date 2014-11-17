@@ -2003,7 +2003,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
@@ -2031,7 +2031,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
 //    			logoutMenuItem.setVisible(true);
@@ -2100,7 +2100,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
+	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
 //	    			logoutMenuItem.setVisible(true);
