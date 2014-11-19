@@ -126,8 +126,33 @@
 		            android:src="@drawable/ic_properties"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
-		        
+	            
 		        <ImageView
+		            android:id="@+id/file_list_option_public_link"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/link"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" />
+
+		        <ImageView
+		            android:id="@+id/file_list_option_delete"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_delete"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" />
+		        
+		         <ImageView 
+		            android:id="@+id/file_list_option_overflow"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_action_core_overflow"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton"/>
+		         	         
+		         
+		          <ImageView
 		            android:id="@+id/file_list_option_rename"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -135,7 +160,17 @@
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		        
-<!-- 		        <ImageView
+<!-- 		        
+
+				<ImageView
+		            android:id="@+id/file_list_option_share"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_share"
+		            android:layout_gravity="center_vertical"
+		            style="@style/dialogActionButton" />
+
+				<ImageView
 		            android:id="@+id/file_list_option_copy"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -150,34 +185,9 @@
 		            android:src="@drawable/ic_menu_move"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" /> -->
-	            
-		        <ImageView
-		            android:id="@+id/file_list_option_public_link"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_share"
-		            android:layout_gravity="center_vertical" 
-		            style="@style/dialogActionButton" />
-<!-- 		        
-		        <ImageView
-		            android:id="@+id/file_list_option_shared_disabled"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_share_grey"
-		            android:layout_gravity="center_vertical" 
-		            style="@style/dialogActionButton" /> -->
-		        
-	        
-		        <ImageView
-		            android:id="@+id/file_list_option_delete"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
-		            android:layout_gravity="center_vertical" 
-		            style="@style/dialogActionButton" />
+		         
 	        </TableRow>        
         </TableLayout>
-    </RelativeLayout>
-    
+    </RelativeLayout>    
 </RelativeLayout>
 

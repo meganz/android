@@ -55,6 +55,7 @@ OnClickListener {
 	MegaTransfer currentTransfer = null;
 
 	boolean multipleSelect;
+	boolean overflowMenu = false;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
 
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -71,6 +72,7 @@ OnClickListener {
 		public RelativeLayout optionsLayout;
 		public ImageView optionDownload;
 		public ImageView optionProperties;
+		public ImageView optionMore;		
 		public ProgressBar transferProgressBar;
 		public ImageView optionRename;
 		public ImageView optionPublicLink;
@@ -179,10 +181,6 @@ OnClickListener {
 			holder.optionProperties.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((10 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
-			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
-			holder.optionRename.getLayoutParams().width = Util.px2dp((40 * scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
 			holder.optionPublicLink = (ImageView) convertView.findViewById(R.id.file_list_option_public_link);
 			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
 			((TableRow.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -196,12 +194,25 @@ OnClickListener {
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
 
-			//holder.arrowSelection = (ImageView) convertView.findViewById(R.id.file_list_arrow_selection);
-			//holder.arrowSelection.setVisibility(View.GONE);
-
+			holder.optionMore = (ImageView) convertView.findViewById(R.id.file_list_option_overflow);
+			holder.optionMore.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
+			((TableRow.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
+						
+			
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolderBrowserList) convertView.getTag();
+		}
+		
+		if(!overflowMenu){
+			//TODO show later
+			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
+			holder.optionRename.getLayoutParams().width = Util.px2dp((40 * scaleW), outMetrics);
+			((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+			holder.optionRename.setVisibility(View.GONE);
+			
+		}else{
+			
 		}
 
 		if (!multipleSelect) {
@@ -508,8 +519,9 @@ OnClickListener {
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
 
-		holder.optionRename.setTag(holder);
-		holder.optionRename.setOnClickListener(this);
+		//TODO
+//		holder.optionRename.setTag(holder);
+//		holder.optionRename.setOnClickListener(this);
 
 		holder.optionDelete.setTag(holder);
 		holder.optionDelete.setOnClickListener(this);
