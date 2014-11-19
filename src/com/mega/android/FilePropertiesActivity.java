@@ -41,7 +41,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -66,11 +68,10 @@ import com.mega.sdk.MegaUser;
 
 public class FilePropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
 	
-	ImageView iconView;
+//	ImageView iconView;
 	TextView nameView;
 	TextView availableOfflineView;
-	RoundedImageView imageView;
-	RelativeLayout availableOfflineLayout;
+	ImageView imageView;	
 	MySwitch availableSwitchOnline;
 	MySwitch availableSwitchOffline;
 	ActionBar aB;
@@ -80,20 +81,22 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	TextView addedTextView;
 	TextView modifiedTextView;
 	
-	TableLayout infoTable;
+	LinearLayout availableOfflineLayout;	
+	TableLayout filePropertiesLayout;
+	RelativeLayout titleLayout;	
 	
-	RelativeLayout sharedWith;
-	TableLayout contactTable;	
-	TableLayout sharedLayout;
-	TextView contentDetailedTextView;
-	TextView sharedWithTextView;
-	TextView publicLinkTextView;
+//	RelativeLayout sharedWith;
+//	TableLayout contactTable;	
+//	TableLayout sharedLayout;
+//	TextView contentDetailedTextView;
+//	TextView sharedWithTextView;
+//	TextView publicLinkTextView;
 	TextView permissionLabel;
 	TextView permissionInfo;
 	ArrayList<MegaShare> sl;
 	MegaOffline mOffDelete;
-	
-	RelativeLayout nameLayout;
+	Button sharedWithButton;	
+;
 	ArrayList<MegaNode> dTreeList = null;
 	
 	MegaNode node;
@@ -185,25 +188,28 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			name = node.getName();
 					
 			setContentView(R.layout.activity_file_properties);
-			iconView = (ImageView) findViewById(R.id.file_properties_icon);
+//			iconView = (ImageView) findViewById(R.id.file_properties_icon);
+			titleLayout = (RelativeLayout) findViewById(R.id.file_title_layout);
+			titleLayout.setVisibility(View.VISIBLE);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
-			imageView = (RoundedImageView) findViewById(R.id.file_properties_image);
-			imageView.getLayoutParams().width = Util.px2dp((300*scaleW), outMetrics);
-			imageView.getLayoutParams().height = Util.px2dp((300*scaleH), outMetrics);
-			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((9*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((9*scaleH), outMetrics));
-							
-			nameLayout = (RelativeLayout) findViewById(R.id.file_properties_name_layout);
+			imageView = (ImageView) findViewById(R.id.file_properties_image);
+			imageView.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
+			imageView.getLayoutParams().height = Util.px2dp((250*scaleH), outMetrics);
+			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
 //			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((-30*scaleH), outMetrics));
 			
-			availableOfflineLayout = (RelativeLayout) findViewById(R.id.file_properties_available_offline);
+			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
+			availableOfflineLayout.setVisibility(View.VISIBLE);	
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
 			availableSwitchOnline = (MySwitch) findViewById(R.id.file_properties_switch_online);
 			availableSwitchOnline.setChecked(true);
 			availableSwitchOffline = (MySwitch) findViewById(R.id.file_properties_switch_offline);
 			availableSwitchOffline.setChecked(false);
 			availableSwitchOnline.setOnCheckedChangeListener(this);			
-			availableSwitchOffline.setOnCheckedChangeListener(this);			
+			availableSwitchOffline.setOnCheckedChangeListener(this);		
 			
+			filePropertiesLayout = (TableLayout) findViewById(R.id.file_properties_layout);
+			filePropertiesLayout.setVisibility(View.VISIBLE);			
 			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
 			sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
 			addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
@@ -214,43 +220,41 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 			nameView.setSingleLine();
 			nameView.setTypeface(null, Typeface.BOLD);
+
 			
-			iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
-			iconView.setImageResource(imageId);
-			((RelativeLayout.LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
-			
-			sharedWith = (RelativeLayout) findViewById(R.id.contacts_shared_with_eye);
-			sharedLayout= (TableLayout) findViewById(R.id.file_properties_content_table);
-			sharedLayout.setOnClickListener(this);			
+//			sharedWith = (RelativeLayout) findViewById(R.id.contacts_shared_with_eye);
+//			sharedLayout= (TableLayout) findViewById(R.id.file_properties_content_table);
+//			sharedLayout.setOnClickListener(this);			
 			
 //			((RelativeLayout.LayoutParams)sharedWith.getLayoutParams()).setMargins(0, Util.px2dp((-40*scaleH), outMetrics), 0, 0);
 			//sharedWithText = (TextView) findViewById(R.id.public_link);
 			//((RelativeLayout.LayoutParams)sharedWithText.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, Util.px2dp((15*scaleH), outMetrics));
 			//sharedWithList = (NestedListView) findViewById(R.id.file_properties_shared_folder_shared_with_list);
 			
-			publicLinkTextView = (TextView) findViewById(R.id.file_properties_public_link);								
-			sharedWithTextView = (TextView) findViewById(R.id.shared_with_detailed);
+			//TODO que hago con public link
+//			publicLinkTextView = (TextView) findViewById(R.id.file_properties_public_link);		
+			
+			//sharedWithTextView = (TextView) findViewById(R.id.shared_with_detailed);
+			
+			sharedWithButton = (Button) findViewById(R.id.shared_with_button);
+			sharedWithButton.setOnClickListener(this);
 			
 			permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);				
 			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
 			permissionLabel.setVisibility(View.GONE);
 			permissionInfo.setVisibility(View.GONE);
-									
-			infoTable = (TableLayout) findViewById(R.id.file_properties_info_table);
 
 			File offlineFile = null;
 			
-			availableOfflineLayout.setVisibility(View.VISIBLE);	
-			((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_available_offline);
-			
 			if (node.isFile()){				
 				
-				sharedWith.setVisibility(View.GONE);				
+				sharedWithButton.setVisibility(View.GONE);				
 				
 				sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
 				
 				sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
 				
+				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 				
 				//Choose the button availableSwitch
 				
@@ -265,7 +269,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					availableSwitchOnline.setVisibility(View.VISIBLE);
 				}		
 				
-				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
+//				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 				
 				if (node.getCreationTime() != 0){
 					try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
@@ -321,7 +325,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				if (sl != null){
 
 					if (sl.size() == 0){						
-						sharedWith.setVisibility(View.GONE);
+//						sharedWith.setVisibility(View.GONE);
 						
 						if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 							
@@ -368,20 +372,20 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							}
 						}
 						if(publicLink){
-							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-
-							publicLinkTextView.setVisibility(View.VISIBLE);
-							sharedWith.setVisibility(View.VISIBLE);
-							sharedWithTextView.setText(sl.size()-1+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
+//
+//							publicLinkTextView.setVisibility(View.VISIBLE);
+							sharedWithButton.setVisibility(View.VISIBLE);
+							sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
-							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));		
-							sharedWith.setVisibility(View.VISIBLE);
-							sharedWithTextView.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));		
+							sharedWithButton.setVisibility(View.VISIBLE);
+							sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
 
 						imageView.setImageResource(imageId);
-						iconView.setImageResource(imageId);
+//						iconView.setImageResource(imageId);
 						sizeTitleTextView.setText(getString(R.string.file_properties_info_size_folder));
 
 						sizeTextView.setText(getInfoFolder(node));
@@ -497,21 +501,21 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
-			case R.id.file_properties_shared_folder_shared_with_text:{
+			case R.id.shared_with_button:{
 				Intent i = new Intent(this, FileContactListActivity.class);
 				i.putExtra("name", node.getHandle());
 				startActivity(i);
 				finish();
 				break;
 			}
-			case R.id.file_properties_content_table:{			
-				Intent i = new Intent(this, FileContactListActivity.class);
-				i.putExtra("name", node.getHandle());
-				startActivity(i);
-				finish();
-				break;
-			}
-			
+//			case R.id.file_properties_content_table:{			
+//				Intent i = new Intent(this, FileContactListActivity.class);
+//				i.putExtra("name", node.getHandle());
+//				startActivity(i);
+//				finish();
+//				break;
+//			}
+//			
 		}
 	}	
 
@@ -1642,8 +1646,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			if (sl != null){
 
 				if (sl.size() == 0){						
-					sharedWith.setVisibility(View.GONE);
-					((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
+//					sharedWith.setVisibility(View.GONE);
+//					((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
 					
 					permissionLabel.setVisibility(View.VISIBLE);
 					permissionInfo.setVisibility(View.VISIBLE);
@@ -1676,23 +1680,23 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						}
 					}
 					if(publicLink){
-						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
+//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
 
-						publicLinkTextView.setVisibility(View.VISIBLE);
-						sharedWith.setVisibility(View.VISIBLE);
-						sharedWithTextView.setText(sl.size()-1+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.contacts_shared_with_eye);
+//						publicLinkTextView.setVisibility(View.VISIBLE);
+//						sharedWith.setVisibility(View.VISIBLE);
+						sharedWithButton.setText(sl.size()-1+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+//						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.contacts_shared_with_eye);
 					}
 					else{
-						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));		
-						sharedWith.setVisibility(View.VISIBLE);
-						sharedWithTextView.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.contacts_shared_with_eye);		
+//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));		
+//						sharedWith.setVisibility(View.VISIBLE);
+						sharedWithButton.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+//						((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.contacts_shared_with_eye);		
 
 					}
 
 					imageView.setImageResource(imageId);
-					iconView.setImageResource(imageId);
+//					iconView.setImageResource(imageId);
 					sizeTitleTextView.setText(getString(R.string.file_properties_info_size_folder));
 
 					sizeTextView.setText(getInfoFolder(node));
@@ -1715,7 +1719,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				}
 			}
 			imageView.setImageResource(imageId);
-			iconView.setImageResource(imageId);
+//			iconView.setImageResource(imageId);
 		}
 	}
 

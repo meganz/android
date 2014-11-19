@@ -79,7 +79,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					hideMultipleSelect();
 					refreshPaths(documents.get(0));
 					break;
-				}	
+				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
 					break;
@@ -204,10 +204,9 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			boolean showTrash = false;
 			
 			if (selected.size() != 0) {
-				showDownload = true;
-				showTrash = true;
-				showMove = true;
-				showCopy = true;
+				showDownload = false;
+				showMove = false;
+				showCopy = false;
 				showTrash = true;
 			
 				if(selected.size()==adapterList.getCount()){

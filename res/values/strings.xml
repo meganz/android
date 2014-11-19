@@ -177,6 +177,7 @@
 	<string name="file_properties_shared_folder_read_only">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions">Permissions:</string>
+	<string name="file_properties_shared_folder_change_permissions">Change permissions</string>
 	<string name="file_properties_owner">My Folder </string>
 	<string name="file_properties_shared_folder_select_contact">Share with</string>
 	<string name="file_properties_send_file_select_contact">Send to</string>
@@ -188,9 +189,7 @@
 	
 	<string name="contact_shared_files">Shared Files with:</string>
 	
-	<string name="contacts_list_empty_text">You can easily add new contacts on the button below.</string>
-	
-	
+	<string name="contacts_list_empty_text">You can easily add new contacts on the button below.</string>	
 	
 	<string name="full_screen_image_viewer_label">Image Viewer</string>
 	
