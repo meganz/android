@@ -134,7 +134,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 											log("Tamaño array----- "+contacts.size());	
 											for(int j=0;j<contacts.size();j++){
 												log("Numero: "+j);	
-												megaApi.share(node, contacts.get(j).getUser(), MegaShare.ACCESS_READ, fileContactListActivity);							
+												MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+												megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);							
 											}
 										}
 									}		                        	
@@ -146,7 +147,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 											log("Tamaño array----- "+contacts.size());		
 											for(int j=0;j<contacts.size();j++){										
 												log("Numero: "+j);
-												megaApi.share(node, contacts.get(j).getUser(), MegaShare.ACCESS_READWRITE, fileContactListActivity);								
+												MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+												megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);								
 											}
 										}
 									}	
@@ -159,8 +161,9 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 										if(contacts.size()!=0){
 											log("Tamaño array----- "+contacts.size());		
 											for(int j=0;j<contacts.size();j++){										
-												log("Numero: "+j);		
-												megaApi.share(node, contacts.get(j).getUser(), MegaShare.ACCESS_FULL, fileContactListActivity);								
+												log("Numero: "+j);	
+												MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+												megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);								
 											}
 										}
 									}
@@ -213,8 +216,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 					if(contacts.size()!=0){
 
 						for(int j=0;j<contacts.size();j++){									
-
-							megaApi.share(node, contacts.get(j).getUser(), MegaShare.ACCESS_UNKNOWN, fileContactListActivity);								
+							MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+							megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivity);								
 						}
 
 					}
@@ -690,19 +693,22 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 						switch(item) {
 		                    case 0:{
 		                    	for (int i=0;i<emails.size();i++){
-		                    		megaApi.share(node, emails.get(i), MegaShare.ACCESS_READ, fileContactListActivity);
+		                    		MegaUser u = megaApi.getContact(emails.get(i));
+		                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);
 		                    	}
 		                    	break;
 		                    }
 		                    case 1:{
 		                    	for (int i=0;i<emails.size();i++){
-		                    		megaApi.share(node, emails.get(i), MegaShare.ACCESS_READWRITE, fileContactListActivity);
+		                    		MegaUser u = megaApi.getContact(emails.get(i));
+		                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);
 		                    	}
 		                        break;
 		                    }
 		                    case 2:{
 		                    	for (int i=0;i<emails.size();i++){
-		                    		megaApi.share(node, emails.get(i), MegaShare.ACCESS_FULL, fileContactListActivity);
+		                    		MegaUser u = megaApi.getContact(emails.get(i));
+		                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);
 		                    	}		                    	
 		                        break;
 		                    }
@@ -721,7 +727,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 			}
 			else{ 
 				for (int i=0;i<emails.size();i++){
-					megaApi.sendFileToUser(node, emails.get(i), fileContactListActivity);
+					MegaUser u = megaApi.getContact(emails.get(i));
+					megaApi.sendFileToUser(node, u, fileContactListActivity);
 				}
 			}
 			

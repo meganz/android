@@ -363,16 +363,6 @@ public class MegaApiJava
 		megaApi.sendFileToUser(node, user);
 	}
 
-	public void sendFileToUser(MegaNode node, String email, MegaRequestListenerInterface listener)
-	{
-		megaApi.sendFileToUser(node, email, createDelegateRequestListener(listener));
-	}
-
-	public void sendFileToUser(MegaNode node, String email)
-	{
-		megaApi.sendFileToUser(node, email);
-	}
-
 	public void share(MegaNode node, MegaUser user, int level, MegaRequestListenerInterface listener)
 	{
 		megaApi.share(node, user, level, createDelegateRequestListener(listener));
@@ -383,24 +373,14 @@ public class MegaApiJava
 		megaApi.share(node, user, level);
 	}
 
-	public void share(MegaNode node, String email, int level, MegaRequestListenerInterface listener)
+	public void loginToFolder(String megaFolderLink, MegaRequestListenerInterface listener)
 	{
-		megaApi.share(node, email, level, createDelegateRequestListener(listener));
+		megaApi.loginToFolder(megaFolderLink, createDelegateRequestListener(listener));
 	}
 
-	public void share(MegaNode node, String email, int level)
+	public void loginToFolder(String megaFolderLink)
 	{
-		megaApi.share(node, email, level);
-	}
-
-	public void folderAccess(String megaFolderLink, MegaRequestListenerInterface listener)
-	{
-		megaApi.folderAccess(megaFolderLink, createDelegateRequestListener(listener));
-	}
-
-	public void folderAccess(String megaFolderLink)
-	{
-		megaApi.folderAccess(megaFolderLink);
+		megaApi.loginToFolder(megaFolderLink);
 	}
 
 	public void importFileLink(String megaFileLink, MegaNode parent, MegaRequestListenerInterface listener)
@@ -411,16 +391,6 @@ public class MegaApiJava
 	public void importFileLink(String megaFileLink, MegaNode parent)
 	{
 		megaApi.importFileLink(megaFileLink, parent);
-	}
-
-	public void importPublicNode(MegaNode publicNode, MegaNode parent, MegaRequestListenerInterface listener)
-	{
-		megaApi.importPublicNode(publicNode, parent, createDelegateRequestListener(listener));
-	}
-
-	public void importPublicNode(MegaNode publicNode, MegaNode parent)
-	{
-		megaApi.importPublicNode(publicNode, parent);
 	}
 
 	public void getPublicNode(String megaFileLink, MegaRequestListenerInterface listener)
@@ -629,16 +599,6 @@ public class MegaApiJava
 	public void startDownload(MegaNode node, String localFolder)
 	{
 		megaApi.startDownload(node, localFolder);
-	}
-
-	public void startPublicDownload(MegaNode node, String localFolder, MegaTransferListenerInterface listener)
-	{
-		megaApi.startPublicDownload(node, localFolder, createDelegateTransferListener(listener));
-	}
-
-	public void startPublicDownload(MegaNode node, String localFolder)
-	{
-		megaApi.startPublicDownload(node, localFolder);
 	}
 	
 	public void cancelTransfer(MegaTransfer transfer, MegaRequestListenerInterface listener)

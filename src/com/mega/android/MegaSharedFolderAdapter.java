@@ -423,15 +423,18 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 						statusDialog = temp;
 						switch(item) {
 	                        case 0:{
-	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READ, megaSharedFolderAdapter);
+	                        	MegaUser u = megaApi.getContact(s.getUser());
+	                        	megaApi.share(node, u, MegaShare.ACCESS_READ, megaSharedFolderAdapter);
 	                        	break;
 	                        }
 	                        case 1:{
-	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_READWRITE, megaSharedFolderAdapter);
+	                        	MegaUser u = megaApi.getContact(s.getUser());
+	                        	megaApi.share(node, u, MegaShare.ACCESS_READWRITE, megaSharedFolderAdapter);
                                 break;
 	                        }
 	                        case 2:{
-	                        	megaApi.share(node, s.getUser(), MegaShare.ACCESS_FULL, megaSharedFolderAdapter);
+	                        	MegaUser u = megaApi.getContact(s.getUser());
+	                        	megaApi.share(node, u, MegaShare.ACCESS_FULL, megaSharedFolderAdapter);
                                 break;
 	                        }
 	                    }
@@ -465,7 +468,8 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				statusDialog = temp;
 				if (c != null){
 					removeShare = true;
-					megaApi.share(node, s.getUser(), MegaShare.ACCESS_UNKNOWN, this);
+					MegaUser u = megaApi.getContact(s.getUser());
+					megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, this);
 				}
 				else{
 					megaApi.disableExport(node, this);

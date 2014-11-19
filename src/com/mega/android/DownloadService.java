@@ -725,7 +725,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				if(!lock.isHeld()) lock.acquire();
 				if (currentDir.isDirectory()){
 					log("To downloadPublic(dir): " + currentDir.getAbsolutePath() + "/");
-					megaApi.startPublicDownload(node, currentDir.getAbsolutePath() + "/", this);
+					megaApi.startDownload(node, currentDir.getAbsolutePath() + "/", this);
 				}
 			}
 		}

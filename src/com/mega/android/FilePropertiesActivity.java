@@ -1469,19 +1469,22 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							switch(item) {
 			                    case 0:{
 			                    	for (int i=0;i<contactsData.size();i++){
-			                    		megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READ, filePropertiesActivity);
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, filePropertiesActivity);
 			                    	}
 			                    	break;
 			                    }
 			                    case 1:{
 			                    	for (int i=0;i<contactsData.size();i++){
-			                    		megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_READWRITE, filePropertiesActivity);
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, filePropertiesActivity);
 			                    	}
 			                        break;
 			                    }
 			                    case 2:{
 			                    	for (int i=0;i<contactsData.size();i++){
-			                    		megaApi.share(node, contactsData.get(i), MegaShare.ACCESS_FULL, filePropertiesActivity);
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, filePropertiesActivity);
 			                    	}		                    	
 			                        break;
 			                    }
@@ -1500,7 +1503,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				}
 				else{ 
 					for (int i=0;i<contactsData.size();i++){
-						megaApi.sendFileToUser(node, contactsData.get(i), filePropertiesActivity);
+						MegaUser u = megaApi.getContact(contactsData.get(i));
+						megaApi.sendFileToUser(node, u, filePropertiesActivity);
 					}
 				}
 			}
