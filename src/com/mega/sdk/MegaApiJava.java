@@ -324,6 +324,32 @@ public class MegaApiJava
 	{
 		return MegaApi.base64ToHandle(base64Handle);
 	}
+	
+	/**
+     * Converts a MegaHandle to a Base64-encoded string
+     *
+     * You take the ownership of the returned value
+     * You can revert this operation using MegaApi::base64ToHandle
+     *
+     * @param handle to be converted
+     * @return Base64-encoded node handle
+     */
+	public static String handleToBase64(long handle){
+		return MegaApi.handleToBase64(handle);
+	}
+	
+	/**
+     * Add entropy to internal random number generators
+     *
+     * It's recommended to call this function with random data specially to
+     * enhance security,
+     *
+     * @param data Byte array with random data
+     * @param size Size of the byte array (in bytes)
+     */
+	public static void addEntropy(String data, long size){
+		MegaApi.addEntropy(data, size);
+	}
 
 	/**
      * Retry all pending requests
@@ -611,6 +637,33 @@ public class MegaApiJava
 	public void fastConfirmAccount(String link, String base64pwkey)
 	{
 		megaApi.fastConfirmAccount(link, base64pwkey);
+	}
+	
+	/**
+     * Set proxy settings
+     *
+     * The SDK will start using the provided proxy settings as soon as this function returns.
+     *
+     * @param Proxy settings
+     * @see MegaProxy
+     */
+	public void setProxySettings(MegaProxy proxySettings){
+		megaApi.setProxySettings(proxySettings);
+	}
+	
+	/**
+     * Try to detect the system's proxy settings
+     *
+     * Automatic proxy detection is currently supported on Windows only.
+     * On other platforms, this fuction will return a MegaProxy object
+     * of type MegaProxy::PROXY_NONE
+     *
+     * You take the ownership of the returned value.
+     *
+     * @return MegaProxy object with the detected proxy settings
+     */
+	public MegaProxy getAutoProxySettings(){
+		return megaApi.getAutoProxySettings();
 	}
 
 	/**
@@ -1700,7 +1753,7 @@ public class MegaApiJava
 	{
 		megaApi.startUpload(localPath, parent);
 	}
-
+	
 	/**
      * Upload a file with a custom name
      * 
@@ -1724,6 +1777,55 @@ public class MegaApiJava
 	public void startUpload(String localPath, MegaNode parent, String fileName)
 	{
 		megaApi.startUpload(localPath, parent, fileName);
+	}
+	
+	
+	/**
+     * Upload a file with a custom modification time
+     * 
+     * @param localPath Local path of the file
+     * @param parent Parent node for the file in the MEGA account
+     * @param mtime Custom modification time for the file in MEGA (in seconds since the epoch)
+     * @param listener MegaTransferListener to track this transfer
+     */
+	public void startUpload(String localPath, MegaNode parent, long mtime, MegaTransferListenerInterface listener) {
+		megaApi.startUpload(localPath, parent, mtime, createDelegateTransferListener(listener));
+	}
+	
+	/**
+     * Upload a file with a custom modification time
+     * 
+     * @param localPath Local path of the file
+     * @param parent Parent node for the file in the MEGA account
+     * @param mtime Custom modification time for the file in MEGA (in seconds since the epoch)
+     */
+	public void startUpload(String localPath, MegaNode parent, long mtime) {
+		megaApi.startUpload(localPath, parent, mtime);
+	}
+	
+	/**
+     * Upload a file with a custom name and a custom modification time
+     * 
+     * @param localPath Local path of the file
+     * @param parent Parent node for the file in the MEGA account
+     * @param fileName Custom file name for the file in MEGA
+     * @param mtime Custom modification time for the file in MEGA (in seconds since the epoch)
+     * @param listener MegaTransferListener to track this transfer
+     */
+	public void startUpload(String localPath, MegaNode parent, String fileName, long mtime, MegaTransferListenerInterface listener) {
+		megaApi.startUpload(localPath, parent, fileName, mtime, createDelegateTransferListener(listener));
+	}
+	
+	/**
+     * Upload a file with a custom name and a custom modification time
+     * 
+     * @param localPath Local path of the file
+     * @param parent Parent node for the file in the MEGA account
+     * @param fileName Custom file name for the file in MEGA
+     * @param mtime Custom modification time for the file in MEGA (in seconds since the epoch)
+     */
+	public void startUpload(String localPath, MegaNode parent, String fileName, long mtime) {
+		megaApi.startUpload(localPath, parent, fileName, mtime);
 	}
 
 	/**
@@ -1873,6 +1975,25 @@ public class MegaApiJava
 	}
 	
 	/**
+     * Force a loop of the SDK thread
+     * 
+     * @deprecated This function is only here for debugging purposes. It will probably
+     * be removed in future updates
+     */
+	public void update(){
+		megaApi.update();
+	}
+	
+	/**
+     * Check if the SDK is waiting for the server
+     * 
+     * @return true if the SDK is waiting for the server to complete a request
+     */
+    public boolean isWaiting(){
+    	return megaApi.isWaiting();
+    }
+	
+	/**
      * Get the number of pending downloads
      * 
      * @return Pending downloads
@@ -1948,6 +2069,48 @@ public class MegaApiJava
 	{
 		megaApi.resetTotalUploads();
 	}
+	
+	/**
+     * Get the total downloaded bytes since the creation of the MegaApi object
+     * 
+     * @return Total downloaded bytes since the creation of the MegaApi object
+     *
+     * @deprecated Function related to statistics will be reviewed in future updates to
+     * provide more data and avoid race conditions. They could change or be removed in the current form.
+     */
+	public long getTotalDownloadedBytes(){
+		return megaApi.getTotalDownloadedBytes();
+	}
+	
+	/**
+     * Get the total uploaded bytes since the creation of the MegaApi object
+     * 
+     * @return Total uploaded bytes since the creation of the MegaApi object
+     *
+     * @deprecated Function related to statistics will be reviewed in future updates to
+     * provide more data and avoid race conditions. They could change or be removed in the current form.
+     *
+     */
+	public long getTotalUploadedBytes(){
+		return megaApi.getTotalUploadedBytes();
+	}
+	
+	
+	/**
+     * Update the number of pending downloads/uploads
+     *
+     * This function forces a count of the pending downloads/uploads. It could
+     * affect the return value of MegaApi::getNumPendingDownloads and
+     * MegaApi::getNumPendingUploads.
+     *
+     * @deprecated Function related to statistics will be reviewed in future updates to
+     * provide more data and avoid race conditions. They could change or be removed in the current form.
+     *
+     */
+	public void updateStats(){
+		megaApi.updateStats();
+	}
+	
 	
 	/**
      * Start an streaming download
@@ -2101,6 +2264,34 @@ public class MegaApiJava
 	public int getNumChildFolders(MegaNode parent) 
 	{
 	  return megaApi.getNumChildFolders(parent);
+	}
+	
+	/**
+     * Get the current index of the node in the parent folder for a specific sorting order
+     *
+     * If the node doesn't exist or it doesn't have a parent node (because it's a root node)
+     * this function returns -1
+     *
+     * @param node Node to check
+     * @param order Sorting order to use
+     * @return Index of the node in its parent folder
+     */
+	public int getIndex(MegaNode node, int order){
+		return megaApi.getIndex(node, order);
+	}
+	
+	/**
+     * Get the current index of the node in the parent folder
+     *
+     * If the node doesn't exist or it doesn't have a parent node (because it's a root node)
+     * this function returns -1
+     *
+     * @param node Node to check
+     * 
+     * @return Index of the node in its parent folder
+     */
+	public int getIndex(MegaNode node){
+		return megaApi.getIndex(node);
 	}
 	
 	/**
@@ -2302,6 +2493,20 @@ public class MegaApiJava
 	public ArrayList<MegaShare> getOutShares(MegaNode node)
 	{
 		return shareListToArray(megaApi.getOutShares(node));		
+	}
+	
+	/**
+     * Get the size of a node tree
+     *
+     * If the MegaNode is a file, this function returns the size of the file.
+     * If it's a folder, this fuction returns the sum of the sizes of all nodes
+     * in the node tree.
+     *
+     * @param node Parent node
+     * @return Size of the node tree
+     */
+	public long getSize(MegaNode node){
+		return megaApi.getSize(node);
 	}
 	
 	/**
@@ -2509,13 +2714,6 @@ public class MegaApiJava
 	/****************************************************************************************************/
 	//INTERNAL METHODS
 	/****************************************************************************************************/
-	
-	/**
-	 * Create the MegaRequestListener needed as parameter for MegaApi methods
-	 * 
-	 * @param listener MegaRequestListenerInterface used for MegaApiJava methods
-	 * @return The MegaRequestListener needed as parameter for MegaApi methods
-	 */
 	private MegaRequestListener createDelegateRequestListener(MegaRequestListenerInterface listener)
 	{
 		DelegateMegaRequestListener delegateListener = new DelegateMegaRequestListener(this, listener);
@@ -2523,12 +2721,6 @@ public class MegaApiJava
 		return delegateListener;
 	}
 	
-	/**
-	 * Create the MegaTransferListener needed as parameter for MegaApi methods
-	 * 
-	 * @param listener MegaTransferListenerInterface used for MegaApiJava methods
-	 * @return The MegaTransferListener needed as parameter for MegaApi methods
-	 */
 	private MegaTransferListener createDelegateTransferListener(MegaTransferListenerInterface listener)
 	{
 		DelegateMegaTransferListener delegateListener = new DelegateMegaTransferListener(this, listener, true);
@@ -2543,12 +2735,6 @@ public class MegaApiJava
 		return delegateListener;
 	}
 	
-	/**
-	 * Create the MegaGlobalListener needed as parameter for MegaApi methods
-	 * 
-	 * @param listener MegaGlobalListenerInterface used for MegaApiJava methods
-	 * @return The MegaGlobalListener needed as parameter for MegaApi methods
-	 */
 	private MegaGlobalListener createDelegateGlobalListener(MegaGlobalListenerInterface listener)
 	{
 		DelegateMegaGlobalListener delegateListener = new DelegateMegaGlobalListener(this, listener);
@@ -2556,12 +2742,6 @@ public class MegaApiJava
 		return delegateListener;
 	}
 	
-	/**
-	 * Create the MegaListener needed as parameter for MegaApi methods
-	 * 
-	 * @param listener MegaListenerInterface used for MegaApiJava methods
-	 * @return The MegaListener needed as parameter for MegaApi methods
-	 */
 	private MegaListener createDelegateMegaListener(MegaListenerInterface listener)
 	{
 		DelegateMegaListener delegateListener = new DelegateMegaListener(this, listener);
@@ -2579,12 +2759,6 @@ public class MegaApiJava
 		activeTransferListeners.remove(listener);
 	}
 	
-	/**
-	 * Transform from MegaNodeList to an ArrayList of MegaNodes
-	 * 
-	 * @param nodeList the MegaNodeList to be transformed
-	 * @return list The ArrayList<MegaNode> obtained from the MegaNodeList
-	 */
 	static ArrayList<MegaNode> nodeListToArray(MegaNodeList nodeList)
 	{
 		if (nodeList == null)
@@ -2601,12 +2775,6 @@ public class MegaApiJava
 		return result;
 	}
 	
-	/**
-	 * Transform from MegaShareList to an ArrayList of MegaShares
-	 * 
-	 * @param shareList the MegaShareList to be transformed
-	 * @return list The ArrayList<MegaShare> obtained from the MegaShareList
-	 */
 	static ArrayList<MegaShare> shareListToArray(MegaShareList shareList)
 	{
 		if (shareList == null)
@@ -2623,12 +2791,6 @@ public class MegaApiJava
 		return result;
 	}
 	
-	/**
-	 * Transform from MegaTransferList to an ArrayList of MegaTransfers
-	 * 
-	 * @param transferList the MegaTransferList to be transformed
-	 * @return list The ArrayList<MegaTransfer> obtained from the MegaTransferList
-	 */
 	static ArrayList<MegaTransfer> transferListToArray(MegaTransferList transferList)
 	{
 		if (transferList == null)
@@ -2645,12 +2807,6 @@ public class MegaApiJava
 		return result;
 	}
 	
-	/**
-	 * Transform from MegaUserList to an ArrayList of MegaUsers
-	 * 
-	 * @param userList the MegaUserList to be transformed
-	 * @return list The ArrayList<MegaUser> obtained from the MegaUserList
-	 */
 	static ArrayList<MegaUser> userListToArray(MegaUserList userList)
 	{
 		
