@@ -847,7 +847,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
-		if (request.getType() == MegaRequest.TYPE_FAST_LOGIN){
+		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Fast login OK");
 				

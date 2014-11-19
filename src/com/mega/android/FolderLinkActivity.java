@@ -169,7 +169,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
     		if (intent.getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK)){
     			if (parentHandle == -1){
     				url = intent.getDataString();
-    				megaApiFolder.folderAccess(url, this);
+    				megaApiFolder.loginToFolder(url, this);
     			}
     		}
     	}
@@ -410,25 +410,31 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
-		MegaNode rootNode = megaApiFolder.getRootNode();
-		if (rootNode != null){
-			parentHandle = rootNode.getHandle();
-			nodes = megaApiFolder.getChildren(rootNode);
-			aB.setTitle(megaApiFolder.getRootNode().getName());
-			supportInvalidateOptionsMenu();
-			
-			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
+		if (request.getType() == MegaRequest.TYPE_LOGIN){
+			megaApiFolder.fetchNodes(this);	
+		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+				
+			MegaNode rootNode = megaApiFolder.getRootNode();
+			if (rootNode != null){
+				parentHandle = rootNode.getHandle();
+				nodes = megaApiFolder.getChildren(rootNode);
+				aB.setTitle(megaApiFolder.getRootNode().getName());
+				supportInvalidateOptionsMenu();
+				
+				if (adapterList == null){
+					adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
+				}
+				else{
+					adapterList.setParentHandle(parentHandle);
+					adapterList.setNodes(nodes);
+				}
+				
+				adapterList.setPositionClicked(-1);
+				adapterList.setMultipleSelect(false);
+				
+				listView.setAdapter(adapterList);
 			}
-			else{
-				adapterList.setParentHandle(parentHandle);
-				adapterList.setNodes(nodes);
-			}
-			
-			adapterList.setPositionClicked(-1);
-			adapterList.setMultipleSelect(false);
-			
-			listView.setAdapter(adapterList);
 		}
 	}
 

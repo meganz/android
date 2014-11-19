@@ -234,7 +234,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				iconView.setImageResource(MimeType.typeForName(document.getName()).getIconResourceId());
 			}
 		 }
-		else if (request.getType() == MegaRequest.TYPE_IMPORT_NODE){
+		else if (request.getType() == MegaRequest.TYPE_COPY){
 			try{
 				statusDialog.dismiss(); 
 			} catch(Exception ex){};
@@ -385,7 +385,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 			if(target == null){
 				target = megaApi.getRootNode();
 			}
-			megaApi.importPublicNode(document, target, this);
+			megaApi.copyNode(document, target, this);
 		}
 	}
 	

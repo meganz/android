@@ -665,7 +665,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		
 		log("onRequestFinish: " + request.getRequestString());
-		if (request.getType() == MegaRequest.TYPE_FAST_LOGIN){
+		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (error.getErrorCode() != MegaError.API_OK) {
 				String errorMessage;
 				if (error.getErrorCode() == MegaError.API_ENOENT) {
@@ -844,7 +844,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 				confirmLink = null;
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_FAST_CONFIRM_ACCOUNT){
+		else if (request.getType() == MegaRequest.TYPE_CONFIRM_ACCOUNT){
 			if (error.getErrorCode() == MegaError.API_OK){
 				log("fastConfirm finished - OK");
 				onKeysGeneratedLogin(gPrivateKey, gPublicKey);
