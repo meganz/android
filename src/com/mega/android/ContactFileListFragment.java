@@ -52,9 +52,7 @@ import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaUser;
 
-public class ContactFileListFragment extends Fragment implements
-OnItemClickListener,
-OnItemLongClickListener, OnClickListener, MegaRequestListenerInterface {
+public class ContactFileListFragment extends Fragment implements OnItemClickListener, OnItemLongClickListener, OnClickListener, MegaRequestListenerInterface {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;

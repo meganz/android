@@ -1,20 +1,28 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
     
+   <item
+        android:id="@+id/cab_menu_select_all"
+        android:orderInCategory="100"
+        android:title="@string/action_select_all"
+        MEGA:showAsAction="never" />   
+        
+   <item
+        android:id="@+id/cab_menu_unselect_all"
+        android:orderInCategory="100"
+        android:title="@string/action_unselect_all"
+        MEGA:showAsAction="never" />      
+    
     <item
 	    android:id="@+id/action_file_contact_list_permissions"
-	    android:orderInCategory="100"
-	    android:showAsAction="always"
-	    android:title="Change permissions"
-	    android:icon="@drawable/permissions_ic"
-	    MEGA:showAsAction="always" />
+	    android:orderInCategory="110"
+	    android:title="@string/file_properties_shared_folder_change_permissions"
+	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_contact_list_delete"
 	    android:orderInCategory="120"
-	    android:showAsAction="always"
-	    android:title="Delete"
-	    android:icon="@drawable/ic_delete"
-	    MEGA:showAsAction="always" />
-
+	    android:title="@string/context_remove"
+	    MEGA:showAsAction="never" />	
+	
 </menu>

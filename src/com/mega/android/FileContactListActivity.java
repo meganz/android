@@ -418,12 +418,12 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		if (request.getType() == MegaRequest.TYPE_SHARE) {
 			log("onRequestStart - Share");
 		}
-	}
+	}	
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestFinish");
+		log("onRequestFinish Activity");
 		if (request.getType() == MegaRequest.TYPE_SHARE){
 			try { 
 				statusDialog.dismiss();	
@@ -431,35 +431,34 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-
 				if(removeShare){
-					Toast.makeText(this, "The contacts have been removed", Toast.LENGTH_SHORT).show();
+					log("onRequestFinish remove");
+					Toast.makeText(this, "The contact have been removed", Toast.LENGTH_SHORT).show();
 					removeShare=false;
+					adapter.setShareList(listContacts);
+					listView.invalidateViews();
 
 				}
-				else{
-					if(changeShare){
-						permissionsDialog.dismiss();
-						Toast.makeText(this, "The permissions have been changed", Toast.LENGTH_SHORT).show();
-						changeShare=false;
-					}
-				}
+				if(changeShare){
+					log("onRequestFinish change");
+					permissionsDialog.dismiss();
+					Toast.makeText(this, "The permissions have been changed", Toast.LENGTH_SHORT).show();
+					changeShare=false;
+					adapter.setShareList(listContacts);
+					listView.invalidateViews();
 				
+				}				
 			}
-
-			adapter.setShareList(listContacts);
-			listView.invalidateViews();
-		}
-		else{
-			if(removeShare){
-				Toast.makeText(this, "The contacts have not been removed", Toast.LENGTH_SHORT).show();
-				removeShare=false;
-
+			else{
+				if(removeShare){
+					Toast.makeText(this, "The contacts have not been removed", Toast.LENGTH_SHORT).show();
+					removeShare=false;	
+				}
+				if(changeShare)
+					Toast.makeText(this, "The permissions have not been changed", Toast.LENGTH_SHORT).show();
 			}
-			if(changeShare)
-				Toast.makeText(this, "The permissions have not been changed", Toast.LENGTH_SHORT).show();
+			log("Finish onRequestFinish");
 		}
-		log("Finish onRequestFinish");
 	}
 
 
@@ -732,8 +731,9 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		// TODO Auto-generated method stub
-		
+		log("onUserupdate");
+				
+		this.refreshView();
 	}
 
 	@Override
@@ -767,6 +767,38 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		}
 
 		listView.invalidateViews();
+	}
+	
+	public void refreshView (){
+		log("refreshView");
+		
+		if (node.isFolder()){
+
+			listContacts = megaApi.getOutShares(node);
+			if (listContacts != null){
+				if (listContacts.size() > 0){
+					fileContactLayout.setVisibility(View.VISIBLE);
+
+					if (adapter != null){
+						adapter.setNode(node);
+						adapter.setContext(this);
+						adapter.setShareList(listContacts);
+						adapter.setListViewActivity(listView);
+					}
+					else{
+						adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
+					}
+
+				}
+				else{
+					fileContactLayout.setVisibility(View.GONE);
+					//((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
+				}
+			}			
+		}
+
+		listView.invalidateViews();
+		
 	}
 
 	@Override

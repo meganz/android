@@ -35,6 +35,7 @@ import com.mega.components.RoundedImageView;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaGlobalListenerInterface;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
@@ -175,9 +176,11 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		log("getView");
 		
 		//log("Position: " + position + "_TOTAL: " + getCount());
 	
+		listViewActivity = (ListView) parent;
 		final int _position = position;
 		
 		ViewHolderShareList holder = new ViewHolderShareList();
@@ -390,6 +393,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
     
 	@Override
 	public void onClick(View v) {
+		log("onClick");
 		ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		final MegaShare s = (MegaShare) getItem(currentPosition);
@@ -399,7 +403,8 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		}
 				
 		switch (v.getId()){
-			case R.id.shared_folder_permissions_option:{				
+			case R.id.shared_folder_permissions_option:{
+				log("En el adapter - change");
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 				dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
@@ -440,14 +445,14 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		        alertTitle.setTextColor(resources.getColor(R.color.mega));
 				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-				
+				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));				
 				
 				positionClicked = -1;
-				notifyDataSetChanged();
+				((FileContactListActivity)context).refreshView();
 				break;
 			}
 			case R.id.shared_folder_remove_share_option:{
+				log("En el adapter - remove");
 				ProgressDialog temp = null;
 				try{
 					temp = new ProgressDialog(context);
@@ -465,6 +470,9 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				else{
 					megaApi.disableExport(node, this);
 				}
+				
+				positionClicked = -1;
+//				((FileContactListActivity)context).refreshView();
 				break;
 			}
 			case R.id.shared_folder_contact_three_dots:{
@@ -488,6 +496,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 	}
 	
 	public void setShareList (ArrayList<MegaShare> shareList){
+		log("setShareList");
 		this.shareList = shareList;
 		positionClicked = -1;
 		notifyDataSetChanged();
@@ -523,8 +532,15 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
 			if (removeShare){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(context, "Share correctly removed", Toast.LENGTH_LONG).show();
 					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
+					Toast.makeText(context, "Share correctly removed: " +sl.size(), Toast.LENGTH_LONG).show();
+					for(int i=0;i<sl.size();i++){
+						MegaShare sh = sl.get(i);
+						if (sh.getAccess() == MegaShare.ACCESS_UNKNOWN){
+							sl.remove(i);
+						}
+					}
+					Toast.makeText(context, "Share correctly after: " +sl.size(), Toast.LENGTH_LONG).show();
 					setShareList(sl);
 				}
 				else{
@@ -537,7 +553,6 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(context, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
 					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-					Toast.makeText(context, sl.size() + "_", Toast.LENGTH_LONG).show();
 					setShareList(sl);
 				}
 				else{

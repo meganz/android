@@ -1,298 +1,212 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".FilePropertiesActivity" >
     
     <RelativeLayout 
 	    android:layout_width="match_parent"
-	    android:layout_height="match_parent"
-	    android:id="@+id/file_properties_layout">
-
-        
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/file_properties_name_layout">
-			
-	        <ImageView
-	            android:id="@+id/file_properties_icon"
-	            android:layout_width="wrap_content"
-	            android:layout_height="30dp"
-	            android:layout_marginTop="15dp"
-	            android:layout_marginLeft="30dp"/>
-	        
-	        <TextView
-		        android:id="@+id/file_properties_name"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:paddingTop="5dp"
-		        android:layout_toRightOf="@id/file_properties_icon"
-		        android:layout_alignBottom="@id/file_properties_icon" />
-        </RelativeLayout>
+	    android:layout_height="wrap_content"
+	    android:background="@color/black"
+	    android:id="@+id/file_title_layout">
+		      
+        <TextView
+	        android:id="@+id/file_properties_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="10dp"
+	        android:textColor="@color/white"/>
     
-	     <com.mega.components.RoundedImageView 
+	     <ImageView 
 	         android:id="@+id/file_properties_image"
 	         android:layout_width="wrap_content"
 	         android:layout_height="200dp"
 	         android:layout_centerHorizontal="true"
-	         android:layout_below="@id/file_properties_name_layout"
-	         android:paddingLeft="30dp"
-	         android:paddingRight="30dp"
-	         rounded:corner_radius="10dp" 
-	         rounded:border_width="2dp"
-	         rounded:border_color="@color/border_file_properties"/>
+	         android:layout_below="@id/file_properties_name"/>
 	     
-	      <RelativeLayout
-	         android:id="@+id/contacts_shared_with_eye"
-	         android:layout_width="fill_parent"
-	         android:layout_height="wrap_content"
-	         android:background="@color/contact_properties_content_layout"
-	         android:orientation="horizontal"
-	         android:layout_below="@id/file_properties_image">
-	         
-	         <TableLayout       		
-	             	android:id="@+id/file_properties_content_table"
-	       		    android:layout_width="fill_parent"
-	       		    android:layout_height="wrap_content"
-	       		    android:layout_gravity="center"
-	       		    android:background="@drawable/selectable_background_mega" >
-	       		    
-	             <TableRow>
-	                    <TextView
-			             android:id="@+id/file_properties_public_link"
-			             android:layout_width="wrap_content"
-			             android:layout_height="30dp"		             
-			             android:paddingLeft="30dp"
-			             android:paddingRight="5dp"
-			             android:paddingTop="10dp"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:textColor="@color/contact_properties_text_content" />  
-	             
-				 </TableRow>
-					       	    
-	             <TableRow>  
-	                 
-	                 <TextView
-			             android:id="@+id/file_properties_shared_folder_shared_with_text"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_shared_folder_shared_with"
-			             android:paddingLeft="30dp"
-			             android:paddingRight="5dp"
-			             android:paddingTop="10dp"
-			             android:paddingBottom="10dp"
-			             android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:textColor="@color/contact_properties_text_content" />        
-	                 
-	                 <TextView
-			             android:id="@+id/shared_with_detailed"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:paddingTop="10dp"
-			             android:paddingBottom="10dp"
-						 android:layout_gravity="center_vertical|right"
-						 android:textColor="@color/contact_properties_content_detailed"
-						 android:paddingRight="100dp" />                 
-	                 
-	             	<ImageButton 
-	             	    android:id="@+id/contact_properties_content_eye"
-	             	    android:layout_width="wrap_content"
-	             	    android:layout_height="wrap_content"
-	             	    android:src="@drawable/contact_properties_content_eye"
-	             	    android:paddingTop="15dp"
-	             	    android:paddingBottom="10dp"
-	             	    android:background="@null" />
-	             	
-	             </TableRow>
-	       		    
-	         </TableLayout>
-	         
-	     </RelativeLayout>    
-     
-	     <RelativeLayout
-	         android:id="@+id/file_properties_available_offline"
-	         android:layout_width="fill_parent"
-	         android:layout_height="wrap_content"
-	         android:background="@color/file_properties_available_layout"
-	         android:orientation="horizontal"
-	         android:layout_below="@+id/contacts_shared_with_eye">
-	         
-	         <TableLayout       		
-	       		    android:layout_width="wrap_content"
-	       		    android:layout_height="wrap_content" 
-	       		    android:layout_gravity="center" >
-	       		    
-	             <TableRow>
-	                 
-	                 <TextView
-			             android:id="@+id/file_properties_available_offline_text"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_available_offline"
-			             android:paddingLeft="30dp"
-			             android:paddingRight="50dp"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:textColor="@color/file_properties_text_available" />
-	                 
-	                 <TextView
-			             android:id="@+id/file_properties_available_offline_on"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_available_offline_off"
-						 android:layout_gravity="center_vertical|right"
-						 android:textStyle="bold"
-						 android:textColor="@color/file_properties_text_available" />
-	                 
-	             	<com.mega.components.MySwitch
-				        android:id="@+id/file_properties_switch_online"
-				        style="@style/mySwitchStyle"
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:layout_marginBottom="0dp"
-				        android:layout_marginRight="5dp"
-				        android:layout_marginTop="10dp"
-				        android:layout_marginLeft="5dp"
-				        android:layout_gravity="center_vertical|center_horizontal"
-				        mySwitch:textOff=""
-				        mySwitch:textOn=""
-				        mySwitch:textOnThumb="false"
-				        mySwitch:thumb="@drawable/switch_thumb"
-				        mySwitch:track="@drawable/switch_track_online" />
-	             	
-	             	<com.mega.components.MySwitch
-				        android:id="@+id/file_properties_switch_offline"
-				        style="@style/mySwitchStyle"
-				        android:layout_width="wrap_content"
-				        android:layout_height="wrap_content"
-				        android:layout_marginBottom="0dp"
-				        android:layout_marginRight="5dp"
-				        android:layout_marginTop="10dp"
-				        android:layout_marginLeft="5dp"
-				        android:layout_gravity="center_vertical|center_horizontal"
-				        mySwitch:textOff=""
-				        mySwitch:textOn=""
-				        mySwitch:textOnThumb="false"
-				        mySwitch:thumb="@drawable/switch_thumb"
-				        mySwitch:track="@drawable/switch_track_offline" />
-	                 
-	                 <TextView
-			             android:id="@+id/file_properties_available_offline_off"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_available_offline_on"
-			             android:textColor="@color/file_properties_text_available"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold" />
-	             	
-	             </TableRow>
-	       		    
-	         </TableLayout>
-	         
-	     </RelativeLayout>
+	     <TextView
+             android:id="@+id/file_properties_permission_label"
+             android:layout_below="@id/file_properties_image"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/file_properties_shared_folder_permissions"
+             android:textColor="@color/file_properties_info_menu"
+			 android:layout_gravity="left"
+			 android:textStyle="bold"
+			 android:paddingLeft="30dp"
+			 android:paddingTop="7dp" />   
+             
+        <TextView
+             android:id="@+id/file_properties_permission_info"
+             android:layout_below="@id/file_properties_image"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="@color/white"
+			 android:layout_gravity="center_horizontal" 
+			 android:paddingLeft="4dp"
+			 android:paddingTop="7dp"/>
+	
+	  </RelativeLayout>
+         
+      <LinearLayout       		
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content" 
+	    android:orientation="horizontal"
+	    android:id="@+id/available_offline_layout"
+	    android:background="@color/dark_grey_cloud_drive"
+      	android:layout_below="@+id/file_title_layout" >    		    
+             
+           <TextView
+             android:id="@+id/file_properties_available_offline_text"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/file_properties_available_offline"
+			 android:layout_gravity="left|center_vertical"
+			 android:textStyle="bold"
+			 android:textColor="@color/white" />
+               
+           <TextView
+             android:id="@+id/file_properties_available_offline_on"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/file_properties_available_offline_off"
+			 android:layout_gravity="left|center_vertical"
+			 android:textStyle="bold"
+			 android:textColor="@color/white" />
+               
+           	<com.mega.components.MySwitch
+	        android:id="@+id/file_properties_switch_online"
+	        style="@style/mySwitchStyle"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="left|center_vertical"
+	        android:layout_marginRight="5dp"
+	        android:layout_marginLeft="5dp"	
+			android:layout_marginTop="10dp"      
+	        mySwitch:textOff=""
+	        mySwitch:textOn=""
+	        mySwitch:textOnThumb="false"
+	        mySwitch:thumb="@drawable/switch_thumb"
+	        mySwitch:track="@drawable/switch_track_online" />
+           	
+           	<com.mega.components.MySwitch
+	        android:id="@+id/file_properties_switch_offline"
+	        style="@style/mySwitchStyle"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="left|center_vertical"
+	        android:layout_marginRight="10dp"
+	        android:layout_marginLeft="5dp"
+	        android:layout_marginTop="5dp"    
+	        mySwitch:textOff=""
+	        mySwitch:textOn=""
+	        mySwitch:textOnThumb="false"
+	        mySwitch:thumb="@drawable/switch_thumb"
+	        mySwitch:track="@drawable/switch_track_offline" />
+               
+         <TextView
+             android:id="@+id/file_properties_available_offline_off"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="left|center_vertical"
+             android:text="@string/file_properties_available_offline_on"
+             android:textColor="@color/white"
+			 android:textStyle="bold" />
+ 	
+   		    
+       </LinearLayout>         
 
      
-	     <TableLayout 
-	         android:id="@+id/file_properties_info_table"
-	         android:layout_width="wrap_content"
-	       	 android:layout_height="wrap_content" 
-	       	 android:layout_gravity="center"
-	       	 android:layout_below="@id/file_properties_available_offline" >
-	         
-	         <TableRow>
-	             <TextView
-			             android:id="@+id/file_properties_permission_label"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_shared_folder_permissions"
-			             android:textColor="@color/file_properties_info_menu"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:paddingLeft="30dp"
-						 android:paddingTop="7dp" />   
-	             
-	             <TextView
-			             android:id="@+id/file_properties_permission_info"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:textColor="@color/file_properties_info_data"
-						 android:layout_gravity="center_vertical|left" 
-						 android:paddingLeft="4dp"
-						 android:paddingTop="7dp"/>
-	         </TableRow>
-	                  
-	         <TableRow>
-	             <TextView
-			             android:id="@+id/file_properties_info_menu_size"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_info_size_file"
-			             android:textColor="@color/file_properties_info_menu"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:paddingLeft="30dp"
-						 android:paddingTop="7dp" />                        
-	             
-	             <TextView
-			             android:id="@+id/file_properties_info_data_size"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:textColor="@color/file_properties_info_data"
-						 android:layout_gravity="center_vertical|left" 
-						 android:paddingLeft="4dp"
-						 android:paddingTop="7dp"/>
-	         </TableRow>                    
-	         
-	         <TableRow>
-	             <TextView
-			             android:id="@+id/file_properties_info_menu_added"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_info_added"
-			             android:textColor="@color/file_properties_info_menu"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:paddingLeft="30dp"
-						 android:paddingTop="7dp" />
-	             
-	             <TextView
-			             android:id="@+id/file_properties_info_data_added"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:textColor="@color/file_properties_info_data"
-						 android:layout_gravity="center_vertical|left"
-						 android:paddingLeft="4dp"
-						 android:paddingTop="7dp" />
-	         </TableRow>
-	         
-	         <TableRow>
-	             <TextView
-			             android:id="@+id/file_properties_info_menu_modified"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:text="@string/file_properties_info_modified"
-			             android:textColor="@color/file_properties_info_menu"
-						 android:layout_gravity="center_vertical|left"
-						 android:textStyle="bold"
-						 android:paddingLeft="30dp"
-						 android:paddingTop="7dp"
-						 android:paddingBottom="15dp" />
-	             
-	             <TextView
-			             android:id="@+id/file_properties_info_data_modified"
-			             android:layout_width="wrap_content"
-			             android:layout_height="wrap_content"
-			             android:textColor="@color/file_properties_info_data"
-						 android:layout_gravity="center_vertical|left"
-						 android:paddingLeft="4dp"
-						 android:paddingTop="7dp"
-						 android:paddingBottom="15dp" />
-	         </TableRow>
-	     </TableLayout>
-	</RelativeLayout>
-</ScrollView>
+     <TableLayout 
+         android:id="@+id/file_properties_layout"
+         android:layout_width="wrap_content"
+       	 android:layout_height="wrap_content" 
+       	 android:layout_gravity="center"
+       	 android:background="@color/black"
+       	 android:layout_below="@id/available_offline_layout" >
+                  
+         <TableRow>
+             <TextView
+		             android:id="@+id/file_properties_info_menu_size"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/file_properties_info_size_file"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="7dp" />                        
+             
+             <TextView
+		             android:id="@+id/file_properties_info_data_size"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:textColor="@color/white"
+					 android:layout_gravity="center_vertical|left" 
+					 android:paddingLeft="4dp"
+					 android:paddingTop="7dp"/>
+         </TableRow>            
+          
+         
+         <TableRow>
+             <TextView
+		             android:id="@+id/file_properties_info_menu_added"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/file_properties_info_added"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="7dp" />
+             
+             <TextView
+		             android:id="@+id/file_properties_info_data_added"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:textColor="@color/white"
+					 android:layout_gravity="center_vertical|left"
+					 android:paddingLeft="4dp"
+					 android:paddingTop="7dp" />
+         </TableRow>
+         
+         <TableRow>
+             <TextView
+		             android:id="@+id/file_properties_info_menu_modified"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/file_properties_info_modified"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="7dp"
+					 android:paddingBottom="15dp" />
+             
+             <TextView
+		             android:id="@+id/file_properties_info_data_modified"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:textColor="@color/white"
+					 android:layout_gravity="center_vertical|left"
+					 android:paddingLeft="4dp"
+					 android:paddingTop="7dp"
+					 android:paddingBottom="15dp" />
+         </TableRow>
+     </TableLayout>
+	
+    <Button
+        android:id="@+id/shared_with_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/btn_shared_folder_holo_light"
+        android:textColor="@color/black" >
+    </Button>
+    
+</RelativeLayout>
