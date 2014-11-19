@@ -319,43 +319,47 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				}
 				
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
-				
+				imageView.setImageResource(imageId);
 				sl = megaApi.getOutShares(node);		
 
 				if (sl != null){
 
 					if (sl.size() == 0){						
-//						sharedWith.setVisibility(View.GONE);
+						sharedWithButton.setVisibility(View.GONE);
 						
-						if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-							
-							permissionLabel.setVisibility(View.GONE);
-							permissionInfo.setVisibility(View.GONE);
-							//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
-							
-						}
-						else{	
-							permissionLabel.setVisibility(View.VISIBLE);
-							permissionInfo.setVisibility(View.VISIBLE);
-							
-							int accessLevel= megaApi.getAccess(node);
-							log("Node: "+node.getName());
-							
-							switch(accessLevel){
-								case MegaShare.ACCESS_FULL:{
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
-									break;
-								}
-								case MegaShare.ACCESS_READ:{
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
-									break;
-								}						
-								case MegaShare.ACCESS_READWRITE:{								
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
-									break;
-								}
-							}
-						}
+						//If I am the owner
+						//TODO copiar al swm Fragment
+//						if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+//							
+//							permissionLabel.setVisibility(View.GONE);
+//							permissionInfo.setVisibility(View.GONE);
+//							//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
+//							
+//						}
+//						else{	
+//							
+//							//If I am not the owner
+//							permissionLabel.setVisibility(View.VISIBLE);
+//							permissionInfo.setVisibility(View.VISIBLE);
+//							
+//							int accessLevel= megaApi.getAccess(node);
+//							log("Node: "+node.getName());
+//							
+//							switch(accessLevel){
+//								case MegaShare.ACCESS_FULL:{
+//									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
+//									break;
+//								}
+//								case MegaShare.ACCESS_READ:{
+//									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+//									break;
+//								}						
+//								case MegaShare.ACCESS_READWRITE:{								
+//									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
+//									break;
+//								}
+//							}
+//						}
 						
 					}
 					else{		
@@ -373,21 +377,34 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						}
 						if(publicLink){
 //							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-//
+//	
 //							publicLinkTextView.setVisibility(View.VISIBLE);
-							sharedWithButton.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+							
+							if(sl.size()>1){
+								//It is public and shared
+								imageView.setImageResource(R.drawable.mime_folder_public_shared);
+								sharedWithButton.setVisibility(View.VISIBLE);
+								sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+							}
+							else{
+								//It is just public
+								imageView.setImageResource(R.drawable.mime_folder_public);
+								sharedWithButton.setVisibility(View.VISIBLE);
+								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
+							}
+							
 						}
 						else{
-//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));		
+//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
+							//It is private and shared
+							imageView.setImageResource(R.drawable.mime_folder_shared);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
 
-						imageView.setImageResource(imageId);
+						
 //						iconView.setImageResource(imageId);
 						sizeTitleTextView.setText(getString(R.string.file_properties_info_size_folder));
-
 						sizeTextView.setText(getInfoFolder(node));
 					}
 					
@@ -407,6 +424,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						modifiedTextView.setText("");
 					}
 				}
+				else{
+					sharedWithButton.setVisibility(View.GONE);
+				}
+				
 				Bitmap thumb = null;
 				Bitmap preview = null;
 				//If image
@@ -504,8 +525,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			case R.id.shared_with_button:{
 				Intent i = new Intent(this, FileContactListActivity.class);
 				i.putExtra("name", node.getHandle());
-				startActivity(i);
-				finish();
+				startActivity(i);				
 				break;
 			}
 //			case R.id.file_properties_content_table:{			
