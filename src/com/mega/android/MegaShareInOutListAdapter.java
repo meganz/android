@@ -953,7 +953,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			}
 			break;
 		}
-		case R.id.file_list_option_rename: {
+		/*case R.id.file_list_option_rename: {
 			setPositionClicked(-1);
 			notifyDataSetChanged();
 			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
@@ -964,7 +964,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			}
 
 			break;
-		}/*
+		}
 		case R.id.file_list_option_move: {
 			setPositionClicked(-1);
 			notifyDataSetChanged();

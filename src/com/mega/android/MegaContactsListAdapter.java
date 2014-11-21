@@ -447,6 +447,10 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				notifyDataSetChanged();
 				break;
 			}
+			//TODO remove contact
+			case R.id.contact_list_option_remove:{
+				
+			}			
 			case R.id.contact_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;

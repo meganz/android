@@ -48,14 +48,14 @@ OnClickListener {
 	long parentHandle = -1;
 
 	ListView listFragment;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
+//	ImageView emptyImageViewFragment;
+//	TextView emptyTextViewFragment;
 	ActionBar aB;
 	HashMap<Long, MegaTransfer> mTHash = null;
 	MegaTransfer currentTransfer = null;
 
 	boolean multipleSelect;
-	boolean overflowMenu = false;
+//	boolean overflowMenu = false;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
 
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -82,7 +82,7 @@ OnClickListener {
 		public long document;
 	}
 
-	public MegaBrowserListAdapter(Context _context, ArrayList<MegaNode> _nodes,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
+	public MegaBrowserListAdapter(Context _context, ArrayList<MegaNode> _nodes,long _parentHandle, ListView listView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -120,8 +120,8 @@ OnClickListener {
 		}
 
 		this.listFragment = listView;
-		this.emptyImageViewFragment = emptyImageView;
-		this.emptyTextViewFragment = emptyTextView;
+//		this.emptyImageViewFragment = emptyImageView;
+//		this.emptyTextViewFragment = emptyTextView;
 		this.aB = aB;
 		this.positionClicked = -1;
 		this.type = type;
@@ -202,17 +202,6 @@ OnClickListener {
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolderBrowserList) convertView.getTag();
-		}
-		
-		if(!overflowMenu){
-			//TODO show later
-			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
-			holder.optionRename.getLayoutParams().width = Util.px2dp((40 * scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			holder.optionRename.setVisibility(View.GONE);
-			
-		}else{
-			
 		}
 
 		if (!multipleSelect) {
@@ -528,6 +517,9 @@ OnClickListener {
 
 		holder.optionPublicLink.setTag(holder);
 		holder.optionPublicLink.setOnClickListener(this);
+		
+		holder.optionMore.setTag(holder);
+		holder.optionMore.setOnClickListener(this);
 
 		return convertView;
 	}
@@ -676,18 +668,16 @@ OnClickListener {
 			}
 			break;
 		}
-		case R.id.file_list_option_rename: {
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ManagerActivity) context).showRenameDialog(n, n.getName());
-			}
-			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactPropertiesMainActivity) context).showRenameDialog(n,	n.getName());
-			}
+		
+		case R.id.file_list_option_overflow: {
 
+			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER)) {
+				((ManagerActivity) context).showOverflowMenu(n);
+			}
 			break;
-		}/*
+		}	
+		
+		/*
 		case R.id.file_list_option_move: {
 			setPositionClicked(-1);
 			notifyDataSetChanged();
@@ -712,7 +702,8 @@ OnClickListener {
 			}
 			break;
 		}*/
-		case R.id.file_list_three_dots: {
+		case R.id.file_list_three_dots: {			
+
 			if (positionClicked == -1) {
 				positionClicked = currentPosition;
 				notifyDataSetChanged();

@@ -108,6 +108,10 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 					break;
 				}
 				case R.id.cab_menu_delete:{
+					
+					//TODO
+					
+					
 					Toast.makeText(getActivity(), "Delete not yet implemented", Toast.LENGTH_SHORT).show();
 					break;
 				}
@@ -265,8 +269,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
 				visibleContacts.add(contacts.get(i));
 			}
-		}
-		
+		}		
 		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
@@ -294,8 +297,10 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			addContactButton = (Button) v.findViewById(R.id.add_contact_button);
 			addContactButton.setOnClickListener(this);
 						
-			if (adapterList.getCount() == 0){
+			if (adapterList.getCount() == 0){				
+		
 				listView.setVisibility(View.GONE);
+				addContactButton.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
@@ -303,6 +308,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
+				addContactButton.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
@@ -320,7 +326,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
 	        
 	        if (adapterGrid == null){
-	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, emptyImageView, emptyTextView, listView);
+	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, listView);
 	        }
 	        else{
 	        	adapterGrid.setContacts(visibleContacts);
@@ -329,8 +335,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	        adapterGrid.setPositionClicked(-1);   
 			listView.setAdapter(adapterGrid);
 			addContactButton = (Button) v.findViewById(R.id.add_contact_button);
-			addContactButton.setOnClickListener(this);
-			
+			addContactButton.setOnClickListener(this);			
 			
 			if (adapterGrid.getCount() == 0){
 				listView.setVisibility(View.GONE);
@@ -338,11 +343,13 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 				emptyTextView.setVisibility(View.VISIBLE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				emptyTextView.setText(R.string.contacts_list_empty_text);
+				addContactButton.setVisibility(View.VISIBLE);
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+				addContactButton.setVisibility(View.GONE);
 			}	
 			
 			return v;
@@ -457,12 +464,9 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			return;
 		}
 		
-		megaApi.addContact(contactEmail, this);
+		megaApi.addContact(contactEmail, this);	
+		log("Anado tendría que volver un onUsersUpdate");
 	}
-	
-	
-	
-	
 	
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
@@ -592,6 +596,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+		log("onUsersUpdate");
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		this.setContacts(contacts);
 		this.getListView().invalidateViews();
@@ -599,7 +604,11 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	}
 
 	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {}
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
+		
+		notifyDataSetChanged();
+		
+	}
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {}

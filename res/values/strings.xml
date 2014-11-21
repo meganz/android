@@ -27,6 +27,8 @@
     <string name="general_removing_offline">Removing files from device</string> 
      <string name="remove_key_confirmation">You are going to remove the master key file</string>  
      <string name="export_key_confirmation">Security Warning! High risk operation, continue?</string> 
+     
+     <string name="more_options_overflow">More options&#8230;</string> 
     
     <string name="general_pro_1">Pro I</string>
     <string name="general_pro_2">Pro II</string>
