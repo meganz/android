@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-     <PreferenceCategory 
+     <com.mega.components.MEGAPreferenceCategory 
         android:key="settings_pin_lock"
-        android:title="@string/settings_pin_lock">
+        android:title="@string/settings_pin_lock"
+        android:textColor="@color/pressed_mega">
         
          <Preference
 	        android:key="settings_pin_lock_enable"
@@ -13,11 +14,12 @@
 	        android:title="@string/settings_pin_lock_code"
 	        android:password="true"
 	        android:inputType="numberPassword" />
-    </PreferenceCategory>
+    </com.mega.components.MEGAPreferenceCategory>
     
     <PreferenceCategory 
         android:key="settings_camera_upload"
-        android:title="@string/settings_camera_upload">
+        android:title="@string/settings_camera_upload"
+        android:textColor="@color/pressed_mega">
         
 		<Preference
 	        android:key="settings_camera_upload_on"
@@ -42,7 +44,8 @@
 	
     <PreferenceCategory 
         android:key="settings_storage"
-        android:title="@string/settings_storage">
+        android:title="@string/settings_storage"
+        android:textColor="@color/pressed_mega">
 		
         <CheckBoxPreference
             android:key="settings_storage_ask_me_always"
@@ -55,7 +58,8 @@
 	
     <PreferenceCategory 
         android:key="settings_about"
-        android:title="@string/settings_about">
+        android:title="@string/settings_about"
+        android:textColor="@color/pressed_mega">
 		
         <Preference
             android:key="settings_about_app_version"

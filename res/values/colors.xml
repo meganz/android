@@ -38,6 +38,7 @@
     <color name="color_default_avatar_mega">#d90007</color>
     <color name="color_default_avatar_phone">#777777</color>
     
+    <color name="color_navigation_drawer_selected">#cccc0000</color>  
     
     <color name="dark_grey_cloud_drive">#6d6f70</color>
     

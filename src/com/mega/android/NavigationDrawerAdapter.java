@@ -92,7 +92,7 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 		}
 		
 		if (positionClicked == position){
-			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_selected));
+			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.color_navigation_drawer_selected));
 		}
 		else{
 			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));

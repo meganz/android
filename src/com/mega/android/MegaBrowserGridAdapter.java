@@ -52,8 +52,6 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	long parentHandle;
 	
 	ListView listFragment;
-	ImageView emptyImageViewFragment;
-	TextView emptyTextViewFragment;
 	ActionBar aB;
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
@@ -63,7 +61,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	public MegaBrowserGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int type) {
+	public MegaBrowserGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -77,8 +75,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 		}
 		this.listFragment = listView;
-		this.emptyImageViewFragment = emptyImageView;
-		this.emptyTextViewFragment = emptyTextView;
+
 		this.aB = aB;
 		this.type = type;
 		
@@ -791,43 +788,43 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					listFragment.setSelection(0);
 					
 					//If folder has no files
-					if (nodes.size() == 0){
-						listFragment.setVisibility(View.GONE);
-						emptyImageViewFragment.setVisibility(View.VISIBLE);
-						emptyTextViewFragment.setVisibility(View.VISIBLE);
-						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
-							if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
-							} else {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-							}
-						}
-						else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
-							if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_rubbish_bin);
-							} else {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-							}
-						}
-						else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-							if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_shared_with_me);
-							} else {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-							}
-						}
-					}
-					else{
-						listFragment.setVisibility(View.VISIBLE);
-						emptyImageViewFragment.setVisibility(View.GONE);
-						emptyTextViewFragment.setVisibility(View.GONE);
-					}
+//					if (nodes.size() == 0){
+//						listFragment.setVisibility(View.GONE);
+//						emptyImageViewFragment.setVisibility(View.VISIBLE);
+//						emptyTextViewFragment.setVisibility(View.VISIBLE);
+//						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
+//							if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+//							} else {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//							}
+//						}
+//						else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+//							if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_rubbish_bin);
+//							} else {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//							}
+//						}
+//						else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+//							if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_shared_with_me);
+//							} else {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//							}
+//						}
+//					}
+//					else{
+//						listFragment.setVisibility(View.VISIBLE);
+//						emptyImageViewFragment.setVisibility(View.GONE);
+//						emptyTextViewFragment.setVisibility(View.GONE);
+//					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){
@@ -930,43 +927,43 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					listFragment.setSelection(0);
 					
 					//If folder has no files
-					if (nodes.size() == 0){
-						listFragment.setVisibility(View.GONE);
-						emptyImageViewFragment.setVisibility(View.VISIBLE);
-						emptyTextViewFragment.setVisibility(View.VISIBLE);
-						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
-							if (megaApi.getRootNode().getHandle()==n.getHandle()) {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
-							} else {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-							}
-						}
-						else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
-							if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_rubbish_bin);
-							} else {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-							}
-						}
-						else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-							if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_shared_with_me);
-							} else {
-								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
-								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
-							}
-						}
-					}
-					else{
-						listFragment.setVisibility(View.VISIBLE);
-						emptyImageViewFragment.setVisibility(View.GONE);
-						emptyTextViewFragment.setVisibility(View.GONE);
-					}
+//					if (nodes.size() == 0){
+//						listFragment.setVisibility(View.GONE);
+//						emptyImageViewFragment.setVisibility(View.VISIBLE);
+//						emptyTextViewFragment.setVisibility(View.VISIBLE);
+//						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
+//							if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_cloud_drive);
+//							} else {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//							}
+//						}
+//						else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+//							if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_rubbish_bin);
+//							} else {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//							}
+//						}
+//						else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+//							if (megaApi.getInboxNode().getHandle()==n.getHandle()) {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_cloud_drive);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_shared_with_me);
+//							} else {
+//								emptyImageViewFragment.setImageResource(R.drawable.ic_empty_folder);
+//								emptyTextViewFragment.setText(R.string.file_browser_empty_folder);
+//							}
+//						}
+//					}
+//					else{
+//						listFragment.setVisibility(View.VISIBLE);
+//						emptyImageViewFragment.setVisibility(View.GONE);
+//						emptyTextViewFragment.setVisibility(View.GONE);
+//					}
 				}
 				else{
 					if (MimeType.typeForName(n.getName()).isImage()){

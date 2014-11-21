@@ -151,7 +151,7 @@
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton"/>
 		         	         
-		         
+	<!--	         
 		          <ImageView
 		            android:id="@+id/file_list_option_rename"
 		            android:layout_width="wrap_content"
@@ -160,7 +160,7 @@
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		        
-<!-- 		        
+ 		        
 
 				<ImageView
 		            android:id="@+id/file_list_option_share"

@@ -423,7 +423,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				supportInvalidateOptionsMenu();
 				
 				if (adapterList == null){
-					adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
+					adapterList = new MegaBrowserListAdapter(this, nodes, parentHandle, listView, aB, ManagerActivity.FOLDER_LINK_ADAPTER);
 				}
 				else{
 					adapterList.setParentHandle(parentHandle);

@@ -245,7 +245,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
+				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -280,7 +280,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			
 			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
+				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
@@ -298,6 +298,8 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			listView.setAdapter(adapterGrid);
 			
 			setNodes(nodes);
+			
+			//TODO comprobar la vista vacía
 			
 			return v;
 		}

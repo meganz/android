@@ -248,7 +248,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
 		if (adapterList == null){
-			adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SEARCH_ADAPTER);
+			adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.SEARCH_ADAPTER);
 		}
 		else{
 			adapterList.setParentHandle(parentHandle);

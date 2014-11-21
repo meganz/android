@@ -4717,5 +4717,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	{
 		log("onTransferData");
 		return true;
-	}	
+	}
+	
+	
+	public void showOverflowMenu(MegaNode n){
+		log("EnManagershowOverflow");
+		
+		fbF.overflowMenu=true;		
+		fbF.setOverFlowMenu(n);		
+
+//			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
+			
+		
+		
+	}
 }

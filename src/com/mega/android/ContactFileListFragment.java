@@ -325,7 +325,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 			}
 
 			if (adapter == null) {
-				adapter = new MegaBrowserListAdapter(context, contactNodes, -1,listView, emptyImageView, emptyTextView, aB,ManagerActivity.CONTACT_FILE_ADAPTER);
+				adapter = new MegaBrowserListAdapter(context, contactNodes, -1,listView, aB,ManagerActivity.CONTACT_FILE_ADAPTER);
 				if (mTHash != null){
 					adapter.setTransfers(mTHash);
 				}
