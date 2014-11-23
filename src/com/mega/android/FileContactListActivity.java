@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -776,6 +777,27 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		listView.invalidateViews();
 	}
 	
+	public void removeShare (MegaUser c)
+	{
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.context_sharing_folder)); 
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		if (c != null){
+			removeShare = true;			
+			megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, this);
+		}
+		else{
+			megaApi.disableExport(node, this);
+		}
+		
+	}
 	public void refreshView (){
 		log("refreshView");
 		

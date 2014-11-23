@@ -373,6 +373,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		holder.optionProperties.setOnClickListener(this);
 		holder.optionShare.setOnClickListener(this);
 		holder.optionShare.setTag(holder);
+		holder.optionRemove.setOnClickListener(this);
+		holder.optionRemove.setTag(holder);
 		
 		return convertView;
 	}
@@ -448,8 +450,10 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				break;
 			}
 			//TODO remove contact
-			case R.id.contact_list_option_remove:{
-				
+			case R.id.contact_list_option_remove:{				
+				((ManagerActivity) context).removeContact(c);
+				notifyDataSetChanged();	
+				break;
 			}			
 			case R.id.contact_list_three_dots:{
 				if (positionClicked == -1){
