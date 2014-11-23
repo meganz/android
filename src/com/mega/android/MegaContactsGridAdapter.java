@@ -2,6 +2,7 @@ package com.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -258,12 +259,12 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 //        ImageView arrowSelection1;
         RelativeLayout optionsLayout1;
         ImageButton optionProperties1;
-        ImageButton optionSend1;
+        ImageButton optionShare1;
         ImageButton optionRemove1;
 //        ImageView arrowSelection2;
         RelativeLayout optionsLayout2;
         ImageButton optionProperties2;
-        ImageButton optionSend2;
+        ImageButton optionShare2;
         ImageButton optionRemove2;
         int currentPosition;
         String contactMail1;
@@ -359,21 +360,21 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			
 			holder.optionsLayout1 = (RelativeLayout) v.findViewById(R.id.contact_grid_options1);
 			holder.optionProperties1 = (ImageButton) v.findViewById(R.id.contact_grid_option_properties1);
-			holder.optionProperties1.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionSend1 = (ImageButton) v.findViewById(R.id.contact_grid_option_send1);
-			holder.optionSend1.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionProperties1.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
+			holder.optionShare1 = (ImageButton) v.findViewById(R.id.contact_grid_option_share1);
+			holder.optionShare1.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
 			holder.optionRemove1 = (ImageButton) v.findViewById(R.id.contact_grid_option_remove1);
-			holder.optionRemove1.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
+			holder.optionRemove1.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
 //			holder.arrowSelection1 = (ImageView) v.findViewById(R.id.contact_grid_arrow_selection1);
 //			holder.arrowSelection1.setVisibility(View.GONE);
 
 			holder.optionsLayout2 = (RelativeLayout) v.findViewById(R.id.contact_grid_options2);
 			holder.optionProperties2 = (ImageButton) v.findViewById(R.id.contact_grid_option_properties2);
-			holder.optionProperties2.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionSend2 = (ImageButton) v.findViewById(R.id.contact_grid_option_send2);
-			holder.optionSend2.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+			holder.optionProperties2.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
+			holder.optionShare2 = (ImageButton) v.findViewById(R.id.contact_grid_option_share2);
+			holder.optionShare2.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
 			holder.optionRemove2 = (ImageButton) v.findViewById(R.id.contact_grid_option_remove2);
-			holder.optionRemove2.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
+			holder.optionRemove2.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), Util.px2dp((50*scaleW), outMetrics), 0);
 //			holder.arrowSelection2 = (ImageView) v.findViewById(R.id.contact_grid_arrow_selection2);
 //			holder.arrowSelection2.setVisibility(View.GONE);
 			
@@ -540,10 +541,19 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			}
 			
 			holder.optionProperties1.setTag(holder);
-			holder.optionProperties1.setOnClickListener(this);
-			
+			holder.optionProperties1.setOnClickListener(this);			
 			holder.optionProperties2.setTag(holder);
 			holder.optionProperties2.setOnClickListener(this);
+			
+			holder.optionShare1.setTag(holder);
+			holder.optionShare1.setOnClickListener(this);	
+			holder.optionShare2.setTag(holder);
+			holder.optionShare2.setOnClickListener(this);	
+			
+			holder.optionRemove1.setTag(holder);
+			holder.optionRemove1.setOnClickListener(this);	
+			holder.optionRemove2.setTag(holder);
+			holder.optionRemove2.setOnClickListener(this);
 		}
 		else{
 			v = inflater.inflate(R.layout.item_file_empty_grid, parent, false);
@@ -597,6 +607,34 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				context.startActivity(i);							
 				positionClicked = -1;
 				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_grid_option_share1:{
+				MegaUser c = (MegaUser) getItem(currentPosition);
+				List<MegaUser> user = new ArrayList<MegaUser>();
+				user.add(c);
+				((ManagerActivity) context).pickFolderToShare(user);
+				notifyDataSetChanged();				
+				break;
+			}
+			case R.id.contact_grid_option_share2:{
+				MegaUser c = (MegaUser) getItem(currentPosition+1);
+				List<MegaUser> user = new ArrayList<MegaUser>();
+				user.add(c);
+				((ManagerActivity) context).pickFolderToShare(user);
+				notifyDataSetChanged();				
+				break;
+			}
+			case R.id.contact_grid_option_remove1:{
+				MegaUser c = (MegaUser) getItem(currentPosition);
+				((ManagerActivity) context).removeContact(c);
+				notifyDataSetChanged();	
+				break;
+			}
+			case R.id.contact_grid_option_remove2:{
+				MegaUser c = (MegaUser) getItem(currentPosition+1);
+				((ManagerActivity) context).removeContact(c);
+				notifyDataSetChanged();			
 				break;
 			}
 			case R.id.contact_grid_three_dots1:{

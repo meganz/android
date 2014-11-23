@@ -451,7 +451,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));				
 				
 				positionClicked = -1;
-				((FileContactListActivity)context).refreshView();
+//				((FileContactListActivity)context).refreshView();
 				break;
 			}
 			case R.id.shared_folder_remove_share_option:{

@@ -2672,7 +2672,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart");
+		log("onRequestStart: "  + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log("account_details request start");
 		}
@@ -2707,7 +2707,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish");
+		log("onRequestFinish: "  + request.getRequestString());
 //		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 //			MegaPricing p = request.getPricing();
 //			log("P.SIZE(): " + p.getNumProducts());
@@ -3115,15 +3115,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
-				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cF != null){
-					if (drawerItem == DrawerItem.CONTACTS){	
-						ArrayList<MegaUser> contacts = megaApi.getContacts();
-						cF.setContacts(contacts);
-						cF.getListView().invalidateViews();
-					}
-				}
+//				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+//				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+//				if (cF != null){
+//					if (drawerItem == DrawerItem.CONTACTS){	
+//						ArrayList<MegaUser> contacts = megaApi.getContacts();
+//						cF.setContacts(contacts);
+//						cF.getListView().invalidateViews();
+//					}
+//				}
 			}
 			log("add contact");
 		}
@@ -3155,6 +3155,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_SHARE){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK MegaRequest.TYPE_SHARE");
+			}
+			else{
+				log("ERROR MegaRequest.TYPE_SHARE");
+			}
+		}
 	}
 
 	private int getAvatarTextSize (float density){
@@ -3184,7 +3192,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,MegaError e) {
-		log("onRequestTemporaryError");
+		log("onRequestTemporaryError: "  + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout temporary error");
 		}	
@@ -3594,7 +3602,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
-	private void addContact(String contactEmail){
+	public void addContact(String contactEmail){
 		log("addContact");
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -3915,21 +3923,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							return;
 						}
 						statusDialog = temp;
-						permissionsDialog.dismiss();
-						
-						log("item "+item);
+						permissionsDialog.dismiss();						
 						
 						switch(item) {
 						    case 0:{
 		                    	for (int i=0;i<selectedContacts.length;i++){
-		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
+		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
 		                    		megaApi.share(parent, user, MegaShare.ACCESS_READ,managerActivity);
 		                    	}
 		                    	break;
 		                    }
 		                    case 1:{	                    	
 		                    	for (int i=0;i<selectedContacts.length;i++){
-		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);
+		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
 		                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,managerActivity);
 		                    	}
 		                        break;
@@ -4255,9 +4261,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cF != null){
 			if (drawerItem == DrawerItem.CONTACTS){	
-				ArrayList<MegaUser> contacts = megaApi.getContacts();
-				cF.setContacts(contacts);
-				cF.getListView().invalidateViews();
+				cF.updateView();
 			}
 		}
 	}
@@ -4274,6 +4278,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 				fbF.setNodes(nodes);
+				fbF.setContentText();
 				fbF.getListView().invalidateViews();
 			}
 		}
@@ -4314,6 +4319,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					psF.setNodes(nodes);
 					psF.getListView().invalidateViews();
 				}
+			}
+		}
+		if (cF != null){
+			if (drawerItem == DrawerItem.CONTACTS){
+				log("Share finish");
+				cF.updateView();
 			}
 		}
 	}
@@ -4594,7 +4605,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate");		
+		log("onRequestUpdate: "  + request.getRequestString());		
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
@@ -4736,17 +4747,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void removeContact(final MegaUser c){
-		log("User--------------------------------: "+c.getEmail());
 		
 		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)
 		
-		if(megaApi.getInShares(c).size() != 0)
+		final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
+		
+		if(inShares.size() != 0)
 		{
 			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {
 			        switch (which){
 			        case DialogInterface.BUTTON_POSITIVE:
+			        	
+			        	for(int i=0; i<inShares.size();i++){
+			        		MegaNode removeNode = inShares.get(i);
+			        		megaApi.remove(removeNode);			        		
+			        	}
 			        	megaApi.removeContact(c, managerActivity);			        	
 			            break;
 
@@ -4758,11 +4775,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+			builder.setMessage(R.string.confirmation_remove_contact+" "+c.getEmail()+"?").setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
-			//It has incoming shares
+			//NO incoming shares
 			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
 			    @Override
 			    public void onClick(DialogInterface dialog, int which) {
@@ -4782,10 +4799,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
-			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
-			
-			
+			String message= getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?";
+			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    .setNegativeButton(R.string.general_no, dialogClickListener).show();			
 			
 		}	
 		

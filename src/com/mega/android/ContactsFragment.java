@@ -48,7 +48,7 @@ import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaUser;
 
-public class ContactsFragment extends Fragment implements OnClickListener, OnItemClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, OnItemLongClickListener{
+public class ContactsFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	public static final String ARG_OBJECT = "object";
 	
@@ -253,9 +253,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-		
-		megaApi.addGlobalListener(this);
+		}		
 	}
 	
 	@Override
@@ -299,12 +297,12 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 						
 			if (adapterList.getCount() == 0){				
 		
+				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				emptyTextView.setText(R.string.contacts_list_empty_text);
 				listView.setVisibility(View.GONE);
 				addContactButton.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				emptyTextView.setText(R.string.contacts_list_empty_text);
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
@@ -350,7 +348,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				addContactButton.setVisibility(View.GONE);
-			}	
+			}			
 			
 			return v;
 		}			
@@ -387,87 +385,12 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	public void onClick(View v) {
 
 		switch(v.getId()){
-			case R.id.add_contact_button:
-				
-				String text;
-				
-				text = getString(R.string.context_new_contact_name);
-
-				final EditText input = new EditText(context);
-//				input.setId(EDIT_TEXT_ID);
-				input.setSingleLine();
-				input.setSelectAllOnFocus(true);
-				input.setImeOptions(EditorInfo.IME_ACTION_DONE);
-				input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-				input.setOnEditorActionListener(new OnEditorActionListener() {
-					@Override
-					public boolean onEditorAction(TextView v, int actionId,
-							KeyEvent event) {
-						if (actionId == EditorInfo.IME_ACTION_DONE) {
-							String value = v.getText().toString().trim();
-							if (value.length() == 0) {
-								return true;
-							}
-							addContact(value);
-							addContactDialog.dismiss();
-							return true;
-						}
-						return false;
-					}
-				});
-				input.setImeActionLabel(getString(R.string.general_add),
-						KeyEvent.KEYCODE_ENTER);
-				input.setText(text);
-//				input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//					@Override
-//					public void onFocusChange(View v, boolean hasFocus) {
-//						if (hasFocus) {
-//							showKeyboardDelayed(v);
-//						}
-//					}
-//				});
-				AlertDialog.Builder builder = Util.getCustomAlertBuilder(getActivity(), getString(R.string.menu_add_contact),
-						null, input);
-				builder.setPositiveButton(getString(R.string.general_add),
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog, int whichButton) {
-								String value = input.getText().toString().trim();
-								if (value.length() == 0) {
-									return;
-								}
-								addContact(value);
-							}
-						});
-				builder.setNegativeButton(getString(android.R.string.cancel), null);
-				addContactDialog = builder.create();
-				addContactDialog.show();
-				
+			case R.id.add_contact_button:				
+				((ManagerActivity)context).showNewContactDialog(null);				
 				break;
 		}
 	}
-	
-	
-	private void addContact(String contactEmail){
-		log("addContact");
-		if (!Util.isOnline(context)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, getActivity());
-			return;
-		}		
-
-		statusDialog = null;
-		try {
-			statusDialog = new ProgressDialog(context);
-			statusDialog.setMessage(getString(R.string.context_adding_contact));
-			statusDialog.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		
-		megaApi.addContact(contactEmail, this);	
-		log("Anado tendría que volver un onUsersUpdate");
-	}
-	
+			
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
@@ -560,68 +483,29 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		Util.log("ContactsFragment", log);
 	}
 
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-
-		if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
-			
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(context, "Contact added", Toast.LENGTH_LONG).show();
-							
-				if (this.isVisible()){	
-					ArrayList<MegaUser> contacts = megaApi.getContacts();
-					setContacts(contacts);
-					getListView().invalidateViews();
-				}
-				}
-			
-			log("Contact Added");
-		}
-		
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,MegaError e) {}
-
-	@Override
-	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		log("onUsersUpdate");
+	public void updateView () {
+		log("updateView");
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		this.setContacts(contacts);
-		this.getListView().invalidateViews();
+
+		if (visibleContacts.size() == 0){
+			log("CONTACTS SIZE == 0");
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+			emptyTextView.setText(R.string.contacts_list_empty_text);
+			addContactButton.setVisibility(View.VISIBLE);
+		}
+		else{
+			log("CONTACTS SIZE != 0");
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			addContactButton.setVisibility(View.GONE);
+		}	
 		
 	}
-
-	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		
-		notifyDataSetChanged();
-		
-	}
-
-	@Override
-	public void onReloadNeeded(MegaApiJava api) {}
-	
-	@Override
-	public void onDestroy(){
-    	log("onDestroy()");
-    	super.onDestroy();    	    	
-    	
-    	if (megaApi != null){
-    		megaApi.removeGlobalListener(this); 
-    	}
-    }
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

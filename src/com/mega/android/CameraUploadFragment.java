@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	TextView emptyTextView;
 	LinearLayout buttonsLayout;
 	TextView contentText;
+	RelativeLayout menuOverflowLayout;
 	MegaPhotoSyncListAdapter adapterList;
 	MegaPhotoSyncGridAdapter adapterGrid;
 	CameraUploadFragment fileBrowserFragment = this;
@@ -255,9 +257,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+			menuOverflowLayout = (RelativeLayout) v.findViewById(R.id.file_browser_overflow_menu);
 			
 			contentText.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
+			menuOverflowLayout.setVisibility(View.GONE);
 			
 			listView = (ListView) v.findViewById(R.id.file_list_view_browser);
 			listView.setOnItemClickListener(this);

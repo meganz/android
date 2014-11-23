@@ -740,8 +740,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	@Override
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUserupdate");
-				
-		this.refreshView();
+
 	}
 
 	@Override
@@ -798,37 +797,37 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		}
 		
 	}
-	public void refreshView (){
-		log("refreshView");
-		
-		if (node.isFolder()){
-
-			listContacts = megaApi.getOutShares(node);
-			if (listContacts != null){
-				if (listContacts.size() > 0){
-					fileContactLayout.setVisibility(View.VISIBLE);
-
-					if (adapter != null){
-						adapter.setNode(node);
-						adapter.setContext(this);
-						adapter.setShareList(listContacts);
-						adapter.setListViewActivity(listView);
-					}
-					else{
-						adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
-					}
-
-				}
-				else{
-					fileContactLayout.setVisibility(View.GONE);
-					//((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
-				}
-			}			
-		}
-
-		listView.invalidateViews();
-		
-	}
+//	public void refreshView (){
+//		log("refreshView");
+//		
+//		if (node.isFolder()){
+//
+//			listContacts = megaApi.getOutShares(node);
+//			if (listContacts != null){
+//				if (listContacts.size() > 0){
+//					fileContactLayout.setVisibility(View.VISIBLE);
+//
+//					if (adapter != null){
+//						adapter.setNode(node);
+//						adapter.setContext(this);
+//						adapter.setShareList(listContacts);
+//						adapter.setListViewActivity(listView);
+//					}
+//					else{
+//						adapter = new MegaSharedFolderAdapter(this, node, listContacts, listView);
+//					}
+//
+//				}
+//				else{
+//					fileContactLayout.setVisibility(View.GONE);
+//					//((RelativeLayout.LayoutParams)infoTable.getLayoutParams()).addRule(RelativeLayout.BELOW, R.id.file_properties_image);
+//				}
+//			}			
+//		}
+//
+//		listView.invalidateViews();
+//		
+//	}
 
 	@Override
 	public void onReloadNeeded(MegaApiJava api) {
