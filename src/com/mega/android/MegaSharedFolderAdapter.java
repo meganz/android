@@ -456,25 +456,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			}
 			case R.id.shared_folder_remove_share_option:{
 				log("En el adapter - remove");
-				ProgressDialog temp = null;
-				try{
-					temp = new ProgressDialog(context);
-					temp.setMessage(((Activity)context).getString(R.string.context_sharing_folder)); 
-					temp.show();
-				}
-				catch(Exception e){
-					return;
-				}
-				statusDialog = temp;
-				if (c != null){
-					removeShare = true;
-					MegaUser u = megaApi.getContact(s.getUser());
-					megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, this);
-				}
-				else{
-					megaApi.disableExport(node, this);
-				}
-				
+				((FileContactListActivity)context).removeShare(c);
 				positionClicked = -1;
 //				((FileContactListActivity)context).refreshView();
 				break;

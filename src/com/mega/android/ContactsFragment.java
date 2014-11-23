@@ -109,7 +109,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 				}
 				case R.id.cab_menu_delete:{
 					
-					//TODO
+					//TODO remove contact
 					
 					
 					Toast.makeText(getActivity(), "Delete not yet implemented", Toast.LENGTH_SHORT).show();

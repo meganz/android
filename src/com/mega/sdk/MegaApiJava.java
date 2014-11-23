@@ -1587,7 +1587,7 @@ public class MegaApiJava
      * @param email Email of the contact
      * @param listener MegaRequestListener to track this request
      */
-	void removeContact (MegaUser user, MegaRequestListenerInterface listener){
+	public void removeContact (MegaUser user, MegaRequestListenerInterface listener){
 		megaApi.removeContact(user, createDelegateRequestListener(listener));
 	}
 	
@@ -1596,7 +1596,7 @@ public class MegaApiJava
      *
      * @param email Email of the contact
      */
-	void removeContact (MegaUser user){
+	public void removeContact (MegaUser user){
 		megaApi.removeContact(user);
 	}
 

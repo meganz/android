@@ -2774,10 +2774,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));    
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        }
-		        usedSpaceBar.setProgress(usedPerc);
-		        
-		                
-				
+		        usedSpaceBar.setProgress(usedPerc);      
 		        
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -2791,6 +2788,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+			
+				if(drawerItem==DrawerItem.CONTACTS){
+					cF.notifyDataSetChanged();
+				}	
+			}
+			else{
+				log("Termino con error");
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
 			try { 
@@ -4721,14 +4730,64 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	
 	public void showOverflowMenu(MegaNode n){
-		log("EnManagershowOverflow");
-		
+		log("showOverflowMenu");		
 		fbF.overflowMenu=true;		
 		fbF.setOverFlowMenu(n);		
-
-//			getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
-			
+	}
+	
+	public void removeContact(final MegaUser c){
+		log("User--------------------------------: "+c.getEmail());
 		
+		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)
+		
+		if(megaApi.getInShares(c).size() != 0)
+		{
+			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        switch (which){
+			        case DialogInterface.BUTTON_POSITIVE:
+			        	megaApi.removeContact(c, managerActivity);			        	
+			            break;
+
+			        case DialogInterface.BUTTON_NEGATIVE:
+			            //No button clicked
+			            break;
+			        }
+			    }
+			};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
+			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+		}
+		else{
+			//It has incoming shares
+			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        switch (which){
+			        case DialogInterface.BUTTON_POSITIVE:
+			        	//TODO remove the outgoing shares
+			        	
+			        	megaApi.removeContact(c, managerActivity);
+			        	
+			            break;
+
+			        case DialogInterface.BUTTON_NEGATIVE:
+			            //No button clicked
+			            break;
+			        }
+			    }
+			};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
+			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+			
+			
+			
+		}	
 		
 	}
 }
