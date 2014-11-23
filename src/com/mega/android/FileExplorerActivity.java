@@ -100,9 +100,10 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 
 		@Override
 		protected void onPostExecute(List<ShareInfo> info) {
-			filePreparedInfos = info;
+			filePreparedInfos = info;			
 			onIntentProcessed();
-		}
+		}	
+		
 	}
 	
 	@Override
@@ -382,8 +383,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					finish();
 				}
 				else if (mode == Mode.SELECT){
-					
-					log("Entro al select");
+
 					long parentHandle = fe.getParentHandle();
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 					if(parentNode == null){
@@ -394,7 +394,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					intent.putExtra("SELECT", parentNode.getHandle());
 					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
 					setResult(RESULT_OK, intent);
-					log("finish!");
 					finish();
 				}
 				break;

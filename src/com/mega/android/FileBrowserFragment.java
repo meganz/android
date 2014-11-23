@@ -46,7 +46,7 @@ import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaUser;
 
-public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, MegaGlobalListenerInterface, OnItemLongClickListener{
+public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	Context context;
 	ActionBar aB;
@@ -232,7 +232,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		megaApi.addGlobalListener(this);
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -1111,34 +1110,22 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	private static void log(String log) {
 		Util.log("FileBrowserFragment", log);
 	}
-
-	@Override
-	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
-		// TODO Auto-generated method stub
+	
+	public void setContentText(){
 		
-	}
-
-	@Override
-	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
-		log("onNodesUpdate");
 		if (parentHandle == megaApi.getRootNode().getHandle()){
 			MegaNode infoNode = megaApi.getRootNode();
-			contentText.setText(getInfoFolder(infoNode));
-			aB.setTitle(getString(R.string.section_cloud_drive));
+			if (infoNode !=  null){
+				contentText.setText(getInfoFolder(infoNode));
+				aB.setTitle(getString(R.string.section_cloud_drive));
+			}
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			contentText.setText(getInfoFolder(infoNode));
-			aB.setTitle(infoNode.getName());
+			if (infoNode !=  null){
+				contentText.setText(getInfoFolder(infoNode));
+				aB.setTitle(infoNode.getName());
+			}
 		}
-		
-		//notifyDataSetChanged();
-		
-	}
-
-	@Override
-	public void onReloadNeeded(MegaApiJava api) {
-		// TODO Auto-generated method stub
-		
 	}
 }
