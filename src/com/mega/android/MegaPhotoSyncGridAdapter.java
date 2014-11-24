@@ -87,6 +87,11 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 //		list.smoothScrollToPosition(0);
 	}
 	
+	public void setPhotoSyncHandle(long photoSyncHandle){
+		this.photoSyncHandle = photoSyncHandle;
+		notifyDataSetChanged();
+	}
+	
 	/*private view holder class*/
     public class ViewHolderPhotoSyncGrid {
     	public RelativeLayout itemLayout;

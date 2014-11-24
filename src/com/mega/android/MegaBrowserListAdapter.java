@@ -74,7 +74,6 @@ OnClickListener {
 		public ImageView optionProperties;
 		public ImageView optionMore;		
 		public ProgressBar transferProgressBar;
-		public ImageView optionRename;
 		public ImageView optionPublicLink;
 		public ImageView shareDisabled;
 		public ImageView optionDelete;
@@ -360,7 +359,6 @@ OnClickListener {
 						holder.optionProperties.setVisibility(View.VISIBLE);
 						//holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
@@ -369,9 +367,6 @@ OnClickListener {
 						holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
-						holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
-								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -384,7 +379,6 @@ OnClickListener {
 						holder.optionProperties.setVisibility(View.VISIBLE);	
 						//						holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.GONE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
@@ -400,7 +394,6 @@ OnClickListener {
 						holder.optionProperties.setVisibility(View.VISIBLE);
 						//						holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.GONE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((70 * scaleW), outMetrics);
@@ -408,8 +401,6 @@ OnClickListener {
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						holder.optionProperties.getLayoutParams().width = Util.px2dp((70 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
-								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						break;
 					}
@@ -419,7 +410,6 @@ OnClickListener {
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.VISIBLE);
 					holder.optionDelete.setVisibility(View.VISIBLE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
@@ -428,10 +418,6 @@ OnClickListener {
 					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-					holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionRename
-							.getLayoutParams()).setMargins(	Util.px2dp((17 * scaleW), outMetrics),
-									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 					holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -443,7 +429,6 @@ OnClickListener {
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.VISIBLE);
 					holder.optionDelete.setVisibility(View.VISIBLE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((55 * scaleW), outMetrics);
@@ -454,12 +439,6 @@ OnClickListener {
 					holder.optionProperties.getLayoutParams().width = Util
 							.px2dp((55 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionProperties
-							.getLayoutParams()).setMargins(
-									Util.px2dp((17 * scaleW), outMetrics),
-									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-					holder.optionRename.getLayoutParams().width = Util.px2dp(
-							(55 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionRename
 							.getLayoutParams()).setMargins(
 									Util.px2dp((17 * scaleW), outMetrics),
 									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -475,7 +454,6 @@ OnClickListener {
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.GONE);
 					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.GONE);
 					holder.optionDelete.setVisibility(View.GONE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp(

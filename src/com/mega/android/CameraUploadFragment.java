@@ -63,6 +63,8 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	LinearLayout buttonsLayout;
 	TextView contentText;
 	RelativeLayout menuOverflowLayout;
+	Button turnOnOff;
+	
 	MegaPhotoSyncListAdapter adapterList;
 	MegaPhotoSyncGridAdapter adapterGrid;
 	CameraUploadFragment fileBrowserFragment = this;
@@ -339,6 +341,8 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
+			turnOnOff = (Button) v.findViewById(R.id.file_browser_camera_upload_on_off);
+			
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			menuOverflowLayout = (RelativeLayout) v.findViewById(R.id.file_browser_overflow_menu);
@@ -397,26 +401,26 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					}
 				}
 				
-				if (photosyncHandle == -1){
-					log("must create the folder");
-					statusDialog = null;
-					try {
-						statusDialog = new ProgressDialog(context);
-						statusDialog.setMessage(getString(R.string.context_creating_folder));
-						statusDialog.show();
-					}
-					catch(Exception e){}
-					
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					listView.setVisibility(View.GONE);
-					
-					megaApi.createFolder(CameraSyncService.CAMERA_UPLOADS, megaApi.getRootNode(), this);
-					
-					return v;
-				}
+//				if (photosyncHandle == -1){
+//					log("must create the folder");
+//					statusDialog = null;
+//					try {
+//						statusDialog = new ProgressDialog(context);
+//						statusDialog.setMessage(getString(R.string.context_creating_folder));
+//						statusDialog.show();
+//					}
+//					catch(Exception e){}
+//					
+//					emptyImageView.setVisibility(View.GONE);
+//					emptyTextView.setVisibility(View.GONE);
+//					listView.setVisibility(View.GONE);
+//					
+//					megaApi.createFolder(CameraSyncService.CAMERA_UPLOADS, megaApi.getRootNode(), this);
+//					
+//					return v;
+//				}
 			}
-
+			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -424,39 +428,46 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			if (nodesArray != null){
 				nodesArray.clear();
 			}
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-			int month = 0;
-			int year = 0;
-			for (int i=0;i<nodes.size();i++){
-				if (nodes.get(i).isFolder()){
-					continue;
-				}
-				PhotoSyncHolder psh = new PhotoSyncHolder();
-				Date d = new Date(nodes.get(i).getModificationTime()*1000);
-				if ((month == d.getMonth()) && (year == d.getYear())){
-					psh.isNode = true;
-					psh.handle = nodes.get(i).getHandle();
-					nodesArray.add(psh);
-				}
-				else{
-					month = d.getMonth();
-					year = d.getYear();
-					psh.isNode = false;
-					psh.monthYear = getImageDateString(month, year);
-					nodesArray.add(psh);
-					psh = new PhotoSyncHolder();
-					psh.isNode = true;
-					psh.handle = nodes.get(i).getHandle();
-					nodesArray.add(psh);
-					log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
-				}
-			}	
 			
-			if (nodes.size() == 0){
+			if (megaApi.getNodeByHandle(photosyncHandle) != null){
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
+				int month = 0;
+				int year = 0;
+				for (int i=0;i<nodes.size();i++){
+					if (nodes.get(i).isFolder()){
+						continue;
+					}
+					PhotoSyncHolder psh = new PhotoSyncHolder();
+					Date d = new Date(nodes.get(i).getModificationTime()*1000);
+					if ((month == d.getMonth()) && (year == d.getYear())){
+						psh.isNode = true;
+						psh.handle = nodes.get(i).getHandle();
+						nodesArray.add(psh);
+					}
+					else{
+						month = d.getMonth();
+						year = d.getYear();
+						psh.isNode = false;
+						psh.monthYear = getImageDateString(month, year);
+						nodesArray.add(psh);
+						psh = new PhotoSyncHolder();
+						psh.isNode = true;
+						psh.handle = nodes.get(i).getHandle();
+						nodesArray.add(psh);
+						log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
+					}
+				}	
+				
+				if (nodes.size() == 0){
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.GONE);
+					emptyTextView.setText("Click to turn on Camera Upload");
+					emptyImageView.setOnClickListener(this);
+					listView.setVisibility(View.GONE);
+				}
+			}
+			else{
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.GONE);
-				emptyTextView.setText("Click to turn on Camera Upload");
-				emptyImageView.setOnClickListener(this);
 				listView.setVisibility(View.GONE);
 			}
 			
@@ -476,7 +487,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
-			
 			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
@@ -734,9 +744,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 //				break;
 //			}
 			case R.id.cam_sync_button_ok:{
+				firstTimeCam = false;
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 				dbH.setCamSyncEnabled(true);
-				String localPath = Environment.getExternalStorageDirectory() + "/DCIM/Camera/";
+				File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+				String localPath = localFile.getAbsolutePath();
 				dbH.setCamSyncLocalPath(localPath);
 				if (camSyncData.isChecked()){
 					dbH.setCamSyncWifi(false);
@@ -748,10 +760,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				
 				context.startService(new Intent(context, CameraSyncService.class));
 				
-//				((ManagerActivity)context).setInitialCameraUpload();
+				((ManagerActivity)context).setInitialCameraUpload();
 				break;
 			}
 			case R.id.cam_sync_button_skip:{
+				firstTimeCam = false;
 				((ManagerActivity)context).setInitialCloudDrive();
 				break;
 			}
@@ -1025,22 +1038,73 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	}
 	
 	public long getPhotoSyncHandle(){
-		if (isList){
-			if (adapterList != null){
-				return adapterList.getPhotoSyncHandle();
+		
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		MegaPreferences prefs = dbH.getPreferences();
+		if (prefs == null){
+			photosyncHandle = -1;
+		}
+		else{
+			//The "PhotoSync" folder exists?
+			if (prefs.getCamSyncHandle() == null){
+				photosyncHandle = -1;
 			}
 			else{
-				return -1;
+				photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+				if (megaApi.getNodeByHandle(photosyncHandle) == null){
+					photosyncHandle = -1;
+				}
+				else{
+					if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+						photosyncHandle = -1;
+					}
+				}
+			}
+		}
+		
+		if (photosyncHandle == -1){
+			ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+			for (int i=0;i<nl.size();i++){
+				if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+					photosyncHandle = nl.get(i).getHandle();
+					dbH.setCamSyncHandle(photosyncHandle);
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					break;
+				}
+			}
+		}
+		
+		if (isList){
+			if (adapterList != null){
+				adapterList.setPhotoSyncHandle(photosyncHandle);
 			}
 		}
 		else{
 			if (adapterGrid != null){
-				return adapterGrid.getPhotoSyncHandle();
-			}
-			else{
-				return -1;
+				adapterGrid.setPhotoSyncHandle(photosyncHandle);
 			}
 		}
+		
+		return photosyncHandle;
+		
+//		if (isList){
+//			if (adapterList != null){
+//				return adapterList.getPhotoSyncHandle();
+//			}
+//			else{
+//				return -1;
+//			}
+//		}
+//		else{
+//			if (adapterGrid != null){
+//				return adapterGrid.getPhotoSyncHandle();
+//			}
+//			else{
+//				return -1;
+//			}
+//		}
 	}
 	
 	
@@ -1077,6 +1141,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				log("MONTH: " + d.getMonth() + "YEAR: " + d.getYear());
 			}
 		}
+		
 		if (isList){
 			if (adapterList != null){
 				adapterList.setNodes(nodesArray, nodes);

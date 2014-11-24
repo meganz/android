@@ -1235,6 +1235,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public void setInitialCameraUpload(){
+		drawerItem = DrawerItem.CAMERA_UPLOADS;
+		nDA.setPositionClicked(POS_CAMERA_UPLOADS);
+		
+		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("psF");
+		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		fragTransaction.detach(currentFragment);
+		fragTransaction.commit();
+
+		fragTransaction = getSupportFragmentManager().beginTransaction();
+		fragTransaction.attach(currentFragment);
+		fragTransaction.commit();
+	}
+	
     public void selectDrawerItem(DrawerItem item){
     	log("selectDrawerItem");
     	switch (item){
@@ -4366,10 +4380,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (fbF != null){
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-				fbF.setNodes(nodes);
-				fbF.setContentText();
-				fbF.getListView().invalidateViews();
+				if (fbF.isVisible()){
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+					fbF.setNodes(nodes);
+					fbF.setContentText();
+					fbF.getListView().invalidateViews();
+				}
 			}
 		}
 		if (rbF != null){
@@ -4407,7 +4423,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					log("nps != null");
 					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
 					psF.setNodes(nodes);
-					psF.getListView().invalidateViews();
 				}
 			}
 		}
