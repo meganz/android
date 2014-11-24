@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 
 import com.mega.android.utils.Util;
 import com.mega.components.LoopViewPager;
@@ -26,10 +27,10 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	
 	private TourImageAdapter adapter;
 	private LoopViewPager viewPager;
-	private ImageView bar;
+//	private ImageView bar;
 	private Button bOK;
 	private Button bSkip;
-	private LinearLayout camSyncWifiLayout;
+//	private LinearLayout camSyncWifiLayout;
 	private RadioGroup camSyncRadioGroup;
 	private RadioButton camSyncData;
 	private RadioButton camSyncWifi;
@@ -48,7 +49,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_cam_sync_initial);
 		viewPager = (LoopViewPager) findViewById(R.id.cam_sync_pager);
-		bar = (ImageView) findViewById(R.id.cam_sync_bar);
+//		bar = (ImageView) findViewById(R.id.cam_sync_bar);
 		bOK = (Button) findViewById(R.id.cam_sync_button_ok);
 		bSkip = (Button) findViewById(R.id.cam_sync_button_skip);
 		
@@ -63,10 +64,10 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
 		
-	    ((LinearLayout.LayoutParams)bOK.getLayoutParams()).width = Util.px2dp((150*scaleW), outMetrics);
-	    ((LinearLayout.LayoutParams)bSkip.getLayoutParams()).width = Util.px2dp((150*scaleW), outMetrics);
-		((LinearLayout.LayoutParams)bOK.getLayoutParams()).setMargins(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((20*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-		((LinearLayout.LayoutParams)bSkip.getLayoutParams()).setMargins(Util.px2dp((0*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((20*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+//	    ((LinearLayout.LayoutParams)bOK.getLayoutParams()).width = Util.px2dp((150*scaleW), outMetrics);
+//	    ((LinearLayout.LayoutParams)bSkip.getLayoutParams()).width = Util.px2dp((150*scaleW), outMetrics);
+//		((LinearLayout.LayoutParams)bOK.getLayoutParams()).setMargins(Util.px2dp((20*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((20*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
+//		((LinearLayout.LayoutParams)bSkip.getLayoutParams()).setMargins(Util.px2dp((0*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((20*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
 		
 		adapter = new TourImageAdapter(this);
 		viewPager.setAdapter(adapter);
@@ -100,7 +101,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 														        R.drawable.tour03_bar,
 														        R.drawable.tour04_bar
 														    };
-														bar.setImageResource(barImages[position]);
+//														bar.setImageResource(barImages[position]);
 													}
 												});
 	    
@@ -112,11 +113,11 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 		camSyncData = (RadioButton) findViewById(R.id.cam_sync_data);
 		camSyncWifi = (RadioButton) findViewById(R.id.cam_sync_wifi);
 		
-		((LinearLayout.LayoutParams)camSyncRadioGroup.getLayoutParams()).setMargins(Util.px2dp((20*scaleW), outMetrics), 0, 0, Util.px2dp((20*scaleH), outMetrics));
-		((LinearLayout.LayoutParams)camSyncData.getLayoutParams()).setMargins(0, Util.px2dp((10*scaleH), outMetrics), 0, Util.px2dp((15*scaleH), outMetrics));
+//		((RadioGroup.LayoutParams)camSyncRadioGroup.getLayoutParams()).setMargins(Util.px2dp((20*scaleW), outMetrics), 0, 0, Util.px2dp((20*scaleH), outMetrics));
+//		((RadioGroup.LayoutParams)camSyncData.getLayoutParams()).setMargins(0, Util.px2dp((10*scaleH), outMetrics), 0, Util.px2dp((15*scaleH), outMetrics));
 		
-		camSyncWifiLayout = (LinearLayout) findViewById(R.id.cam_sync_wifi_layout);
-		camSyncWifiLayout.setPadding(0, Util.px2dp((10*scaleH), outMetrics), 0, Util.px2dp((20*scaleH), outMetrics));
+//		camSyncWifiLayout = (LinearLayout) findViewById(R.id.cam_sync_wifi_layout);
+//		camSyncWifiLayout.setPadding(0, Util.px2dp((10*scaleH), outMetrics), 0, Util.px2dp((20*scaleH), outMetrics));
 	}	
 	
 	@Override
@@ -190,6 +191,6 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	}
 
 	public static void log(String message) {
-		Util.log("TourActivity", message);
+		Util.log("InitialCamSyncActivity", message);
 	}
 }

@@ -1,5 +1,6 @@
 package com.mega.android;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -13,11 +14,15 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,14 +33,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mega.android.utils.Util;
+import com.mega.components.LoopViewPager;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
@@ -62,6 +71,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		
 //	long parentHandle = -1;
 	boolean isList = true;
+	boolean firstTimeCam = false;
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
 	ArrayList<MegaNode> nodes;
@@ -86,6 +96,21 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		long handle2;
 		long handle3;
 	}
+	
+	private TourImageAdapter adapter;
+	private LoopViewPager viewPager;
+//	private ImageView bar;
+	private Button bOK;
+	private Button bSkip;	
+	private RadioGroup camSyncRadioGroup;
+	private RadioButton camSyncData;
+	private RadioButton camSyncWifi;
+	private RelativeLayout layoutRadioGroup;
+	
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -242,7 +267,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		
 		if (megaApi.getRootNode() == null){
 			return null;
-		}
+		} 
 		
 		aB.setTitle(getString(R.string.section_photo_sync));	
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -251,6 +276,65 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 //		DatabaseHandler dbH = new DatabaseHandler(context);
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
+		
+		if (firstTimeCam){
+			setInitialPreferences();
+			View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
+			
+			viewPager = (LoopViewPager) v.findViewById(R.id.cam_sync_pager);
+//			bar = (ImageView) v.findViewById(R.id.cam_sync_bar);
+			bOK = (Button) v.findViewById(R.id.cam_sync_button_ok);
+			bSkip = (Button) v.findViewById(R.id.cam_sync_button_skip);
+			camSyncRadioGroup = (RadioGroup) v.findViewById(R.id.cam_sync_radio_group);
+			camSyncData = (RadioButton) v.findViewById(R.id.cam_sync_data);
+			camSyncWifi = (RadioButton) v.findViewById(R.id.cam_sync_wifi);
+			layoutRadioGroup = (RelativeLayout) v.findViewById(R.id.cam_sync_relative_radio);
+			buttonsLayout = (LinearLayout) v.findViewById(R.id.cam_buttons_layout);
+			
+			bOK.setOnClickListener(this);
+			bSkip.setOnClickListener(this);
+			
+			display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    density  = getResources().getDisplayMetrics().density;
+			
+		    scaleW = Util.getScaleW(outMetrics, density);
+		    scaleH = Util.getScaleH(outMetrics, density);
+		    
+		    adapter = new TourImageAdapter((Activity)context);
+			viewPager.setAdapter(adapter);
+			viewPager.setCurrentItem(0);
+																		
+			viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+				
+				@Override
+				public void onPageSelected (int position){
+					int[] barImages = new int[] {
+					        R.drawable.tour01_bar,
+					        R.drawable.tour02_bar,
+					        R.drawable.tour03_bar,
+					        R.drawable.tour04_bar
+					    };
+//					bar.setImageResource(barImages[position]);
+				}
+			});
+			
+//			int totalPixels = outMetrics.heightPixels;
+////			int viewPagerHeight = ((RelativeLayout.LayoutParams)viewPager.getLayoutParams()).height;
+////			int buttonsHeight = ((RelativeLayout.LayoutParams)buttonsLayout.getLayoutParams()).height;
+////			int radioLayoutHeight = totalPixels - viewPagerHeight - buttonsHeight;
+//			viewPager.measure(viewPager.getWidth(), viewPager.getHeight());
+//			int viewPagerHeight = viewPager.getMeasuredHeight();
+//			int buttonsHeight = buttonsLayout.getMeasuredHeight();
+//			int radioLayoutHeight = totalPixels - viewPagerHeight - buttonsHeight;
+//			
+//			Toast.makeText(context, "VI: " + viewPagerHeight + "__" + buttonsHeight + "___ " + totalPixels, Toast.LENGTH_LONG).show();
+//			
+//			((RelativeLayout.LayoutParams)layoutRadioGroup.getLayoutParams()).height = radioLayoutHeight;
+			
+			return v;
+		}
 		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -276,7 +360,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.GONE);
 			listView.setVisibility(View.GONE);
 			
 			if (prefs == null){
@@ -370,7 +454,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			
 			if (nodes.size() == 0){
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.GONE);
 				emptyTextView.setText("Click to turn on Camera Upload");
 				emptyImageView.setOnClickListener(this);
 				listView.setVisibility(View.GONE);
@@ -555,6 +639,27 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		}
 	}
 	
+	public void setInitialPreferences(){
+//		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+		dbH.setFirstTime(false);
+		dbH.setCamSyncEnabled(false);
+		dbH.setStorageAskAlways(false);
+		File defaultDownloadLocation = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
+		}
+		else{
+			defaultDownloadLocation = context.getFilesDir();
+		}
+		
+		defaultDownloadLocation.mkdirs();
+		
+		dbH.setStorageDownloadLocation(defaultDownloadLocation.getAbsolutePath());
+		dbH.setPinLockEnabled(false);
+		dbH.setPinLockCode("");
+	}
+	
 	public String getImageDateString(int month, int year){
 		String ret = "";
 		year = year + 1900;
@@ -623,9 +728,31 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	public void onClick(View v) {
 
 		switch(v.getId()){
-			case R.id.file_list_empty_image:{
-				Intent intent = new Intent(context, SettingsActivity.class);
-				context.startActivity(intent);
+//			case R.id.file_list_empty_image:{
+//				Intent intent = new Intent(context, SettingsActivity.class);
+//				context.startActivity(intent);
+//				break;
+//			}
+			case R.id.cam_sync_button_ok:{
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
+				dbH.setCamSyncEnabled(true);
+				String localPath = Environment.getExternalStorageDirectory() + "/DCIM/Camera/";
+				dbH.setCamSyncLocalPath(localPath);
+				if (camSyncData.isChecked()){
+					dbH.setCamSyncWifi(false);
+				}
+				else{
+					dbH.setCamSyncWifi(true);
+				}
+				dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
+				
+				context.startService(new Intent(context, CameraSyncService.class));
+				
+//				((ManagerActivity)context).setInitialCameraUpload();
+				break;
+			}
+			case R.id.cam_sync_button_skip:{
+				((ManagerActivity)context).setInitialCloudDrive();
 				break;
 			}
 		}
@@ -956,7 +1083,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
@@ -973,7 +1100,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				if (adapterGrid.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.GONE);
 					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
 					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
@@ -1018,6 +1145,14 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	
 	public boolean getIsList(){
 		return isList;
+	}
+	
+	public void setFirstTimeCam(boolean firstTimeCam){
+		this.firstTimeCam = firstTimeCam;
+	}
+	
+	public boolean getFirstTimeCam(){
+		return firstTimeCam;
 	}
 	
 	public void setOrder(int orderGetChildren){
@@ -1065,7 +1200,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				Toast.makeText(context, "PhotoSync Folder created", Toast.LENGTH_LONG).show();
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyImageView.setOnClickListener(this);
-				emptyTextView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
 				emptyTextView.setText("Click to turn on Camera Upload");
 			}

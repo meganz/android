@@ -121,6 +121,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public static int POS_CAMERA_UPLOADS = 4;
+	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
 	public static int REQUEST_CODE_GET = 1000;
@@ -286,6 +288,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	String pathNavigation = "/";
 	
 	long lastTimeOnTransferUpdate = -1;
+	
+	boolean firstTimeCam = false;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -474,7 +478,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         
         MegaNode rootNode = megaApi.getRootNode();
 		if (rootNode == null){
-			if (getIntent() != null){
+			 if (getIntent() != null){
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
 						Intent intent = new Intent(managerActivity, LoginActivity.class);
@@ -743,6 +747,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (drawerItem == null) {
 				drawerItem = DrawerItem.CLOUD_DRIVE;
+				Intent intent = getIntent();
+				if (intent != null){
+					firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", false);
+					if (firstTimeCam){
+						firstTimeCam = true;
+						drawerItem = DrawerItem.CAMERA_UPLOADS;
+						setIntent(null);
+					}
+				}
+				
 			}
 			else{
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -1155,6 +1169,71 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         tv.setText(title);
         return view;
     }
+	
+	public void setInitialCloudDrive (){
+		drawerItem = DrawerItem.CLOUD_DRIVE;
+		nDA.setPositionClicked(0);
+
+		if (fbF == null){
+			fbF = new FileBrowserFragment();
+			if (parentHandleBrowser == -1){
+				fbF.setParentHandle(megaApi.getRootNode().getHandle());
+				parentHandleBrowser = megaApi.getRootNode().getHandle();
+			}
+			else{
+				fbF.setParentHandle(parentHandleBrowser);
+			}
+			fbF.setIsList(isListCloudDrive);
+			fbF.setOrder(orderGetChildren);
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+			fbF.setNodes(nodes);
+		}
+		else{
+								
+			fbF.setIsList(isListCloudDrive);
+			fbF.setParentHandle(parentHandleBrowser);
+			fbF.setOrder(orderGetChildren);
+			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+			fbF.setNodes(nodes);
+		}
+		
+		mTabHost.setVisibility(View.GONE);    			
+		viewPager.setVisibility(View.GONE); 
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.fragment_container, fbF, "fbF");
+		ft.commit();
+		
+		mDrawerLayout.openDrawer(Gravity.LEFT);
+		firstTime = false;
+		
+		customSearch.setVisibility(View.VISIBLE);
+		viewPager.setVisibility(View.GONE);
+
+		if (createFolderMenuItem != null){
+			createFolderMenuItem.setVisible(true);
+			addContactMenuItem.setVisible(false);
+			addMenuItem.setVisible(true);
+			refreshMenuItem.setVisible(true);
+			sortByMenuItem.setVisible(true);
+			helpMenuItem.setVisible(true);
+			upgradeAccountMenuItem.setVisible(true);
+			settingsMenuItem.setVisible(true);
+			selectMenuItem.setVisible(true);
+			unSelectMenuItem.setVisible(false);
+			thumbViewMenuItem.setVisible(true);
+			addMenuItem.setEnabled(true);	  
+ 			
+			if (isListCloudDrive){	
+				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+			}
+			else{
+				thumbViewMenuItem.setTitle(getString(R.string.action_list));
+			}
+			rubbishBinMenuItem.setVisible(true);
+			rubbishBinMenuItem.setTitle(getString(R.string.section_rubbish_bin));
+			clearRubbishBinMenuitem.setVisible(false);
+		}
+	}
 	
     public void selectDrawerItem(DrawerItem item){
     	log("selectDrawerItem");
@@ -1629,12 +1708,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case CAMERA_UPLOADS:{
     			
+    			if (nDA != null){
+    				nDA.setPositionClicked(POS_CAMERA_UPLOADS);
+    			}
+    			
     			if (psF == null){
     				psF = new CameraUploadFragment();
     				psF.setIsList(isListCameraUpload);
+   					psF.setFirstTimeCam(firstTimeCam);
 				}
 				else{
 					psF.setIsList(isListCameraUpload);
+					psF.setFirstTimeCam(firstTimeCam);
 				}
 				
 				
@@ -1644,7 +1729,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				ft.replace(R.id.fragment_container, psF, "psF");
     			ft.commit();
     			
-   				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			firstTimeCam = false;
+    			
+    			
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
     			customSearch.setVisibility(View.VISIBLE);
     			
     			if (createFolderMenuItem != null){
