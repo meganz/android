@@ -271,6 +271,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					running = true;
 					megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
 				}
+				else{
+					if (megaApi != null){
+						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						return START_NOT_STICKY;
+					}
+				}
 				return START_NOT_STICKY;
 			}
 		}

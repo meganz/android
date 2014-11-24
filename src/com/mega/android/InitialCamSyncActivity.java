@@ -138,7 +138,8 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 			case R.id.cam_sync_button_ok:{
 				setInitialPreferences();
 				dbH.setCamSyncEnabled(true);
-				String localPath = Environment.getExternalStorageDirectory() + "/DCIM/Camera/";
+				File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+				String localPath = localFile.getAbsolutePath();
 				dbH.setCamSyncLocalPath(localPath);
 				if (camSyncData.isChecked()){
 					dbH.setCamSyncWifi(false);

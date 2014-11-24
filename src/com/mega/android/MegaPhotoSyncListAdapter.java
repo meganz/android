@@ -99,6 +99,11 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
+	
+	public void setPhotoSyncHandle(long photoSyncHandle){
+		this.photosyncHandle = photoSyncHandle;
+		notifyDataSetChanged();
+	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
