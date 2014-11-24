@@ -1,3 +1,80 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InitialCamSyncActivity" >
+    
+    <com.mega.components.LoopViewPager
+	    android:id="@+id/cam_sync_pager"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentTop="true"
+	    android:layout_centerHorizontal="true" />
+    
+    <LinearLayout
+         android:id="@+id/cam_buttons_layout"
+    	 android:layout_width="match_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/cam_sync_button_skip"
+            android:layout_width="fill_parent"
+      		android:layout_height="48dp"
+      		android:layout_weight="1"
+            android:background="@drawable/grey_btn_default_holo_light"
+            android:textColor="@color/button_text"
+            android:text="@string/cam_sync_skip" />
+        
+        <Button
+            android:id="@+id/cam_sync_button_ok"
+            android:layout_width="fill_parent"
+      		android:layout_height="48dp"
+      		android:layout_weight="1"
+            android:background="@drawable/btn_default_holo_light_without_corners"
+            android:textColor="@color/button_text"
+            android:text="@string/cam_sync_ok" />
+     </LinearLayout>
+    
+    
+    <RelativeLayout
+        android:id="@+id/cam_sync_relative_radio"
+        android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:layout_above="@id/cam_buttons_layout">
+        
+	        <RadioGroup 
+		    android:id="@+id/cam_sync_radio_group" 
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content" 
+		    android:layout_gravity="left"
+		    android:layout_marginLeft="40dp"
+		    android:layout_marginBottom="20dp">
+	             
+			<RadioButton 
+			    android:id="@+id/cam_sync_wifi" 
+			    android:layout_width="wrap_content" 
+			    android:layout_height="wrap_content" 
+			    android:text="@string/cam_sync_wifi"
+			    android:checked="true"
+			    style="@style/radio_MEGA"
+			    android:layout_marginBottom="5dp" />
+			
+			<RadioButton 
+			    android:id="@+id/cam_sync_data" 
+			    android:layout_width="wrap_content" 
+			    android:layout_height="wrap_content" 
+			    android:text="@string/cam_sync_data"
+			    style="@style/radio_MEGA" />
+		</RadioGroup>
+	</RelativeLayout>
+</RelativeLayout>
+
+
+
+<!-- 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
@@ -102,3 +179,5 @@
 	</LinearLayout>
 	
 </ScrollView>
+
+ -->

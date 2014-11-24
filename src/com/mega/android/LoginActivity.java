@@ -772,7 +772,9 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					else{
 						Intent intent = null;
 						if (firstTime){
-							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+//							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+							intent = new Intent(loginActivity,ManagerActivity.class);
+							intent.putExtra("firstTimeCam", true);
 						}
 						else{
 							boolean initialCam = false;
@@ -794,9 +796,10 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 								}
 							}
 							else{
-								intent = new Intent(loginActivity, InitialCamSyncActivity.class);
-								initialCam = true;
-								
+//								intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+								intent = new Intent(loginActivity,ManagerActivity.class);
+								intent.putExtra("firstTimeCam", true);
+								initialCam = true;								
 							}
 
 							if (!initialCam){
