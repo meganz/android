@@ -158,6 +158,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int PHOTO_SYNC_ADAPTER = 2007;
 	final public static int ZIP_ADAPTER = 2008;
 	final public static int OUTGOING_SHARES_ADAPTER = 2009;
+	final public static int INCOMING_SHARES_ADAPTER = 2010;
 	
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
@@ -1535,8 +1536,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			
-    			log("Llego aqui");
-    			
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
@@ -1877,12 +1876,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					return;
 				}
 			}
-		}
+		}	
 		
-		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){
-			if (drawerItem == DrawerItem.CONTACTS){
+		if (drawerItem == DrawerItem.CONTACTS){
+			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+			cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+			if (cF != null){			
 				if (cF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
@@ -1891,29 +1890,44 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 					return;
 				}
-				log("ContactFragment Visible");
-				log("onBackPress del ManagerActivity");
 			}
 		}
 		
-		cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (outSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				if (outSF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
+		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==1){				
+				//OUTGOING				
+				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				log("Tag: "+ cFTag2);
+				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSF != null){					
+					if (outSF.onBackPressed() == 0){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
+						return;
+					}					
 				}
 			}
+			else{			
+				//InCOMING
+				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+				log("Tag: "+ cFTag1);
+				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSF != null){					
+					if (inSF.onBackPressed() == 0){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
+						return;
+					}					
+				}				
+			}	
 		}
-		
-		
-		
-		
 		if (rbF != null){
 			if (drawerItem == DrawerItem.RUBBISH_BIN){
 				if (rbF.onBackPressed() == 0){
@@ -1926,20 +1940,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}
-		
-		if (inSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				if (inSF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
-				}
-			}
-		}
-		
 		if (tF != null){
 			if (drawerItem == DrawerItem.TRANSFERS){
 				if (tF.onBackPressed() == 0){
@@ -2169,17 +2169,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-    			
-    			
-    			if(inSF.getModeShare()==MODE_IN){
-    				modeShareOut.setVisible(true);	
-    				modeShareIn.setVisible(false);	
-    			}
-    			else{
-    				modeShareIn.setVisible(true);
-    				modeShareOut.setVisible(false);
-    			}	    			   			
+    			thumbViewMenuItem.setVisible(false);   			
+    				    			   			
     			
 //    			logoutMenuItem.setVisible(true);
     			
@@ -2613,51 +2604,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         		}
            	
 	        	return true;
-	        }
-	        case R.id.action_change_mode_in:{
-	        	log("Change mode in");
-	        	if (inSF != null){
-        			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
-
-	        			inSF.setModeShare(MODE_IN);
-	        			this.swmFMode=MODE_IN;
-	        			modeShareIn.setVisible(false);
-	        			modeShareOut.setVisible(true);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();        				        				
-        			}
-	        	}
-	        	
-	        	return true;
-	        }
-	        case R.id.action_change_mode_out:{
-	        	log("Change mode out");
-	        	if (inSF != null){
-        			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
-
-	        			inSF.setModeShare(MODE_OUT);
-	        			this.swmFMode=MODE_OUT;
-	        			modeShareIn.setVisible(true);
-	        			modeShareOut.setVisible(false);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();         				
-        			}
-	        	}        	
-	        	
-	        	return true;
-	        }
+	        }	        
 	        case R.id.action_rubbish_bin:{
 	        	if (drawerItem == DrawerItem.RUBBISH_BIN){
 	        		drawerItem = DrawerItem.CLOUD_DRIVE;

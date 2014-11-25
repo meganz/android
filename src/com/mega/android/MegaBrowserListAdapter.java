@@ -78,6 +78,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public ImageView optionShare;
 		public ImageView optionPermissions;
 		public ImageView optionDelete;
+		public ImageView optionLeaveShare;
 		public int currentPosition;
 		public long document;
 	}
@@ -114,6 +115,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
+			//TODO necesito algo?
+			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			break;
+		}
+		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
 			//TODO necesito algo?
 			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
 			break;
@@ -177,6 +183,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
+			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
+			holder.optionRename.setVisibility(View.GONE);
+			holder.optionLeaveShare = (ImageView) convertView.findViewById(R.id.file_list_option_leave_share);
+			holder.optionLeaveShare.setVisibility(View.GONE);
 
 			holder.optionDownload = (ImageView) convertView.findViewById(R.id.file_list_option_download);
 			holder.optionDownload.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);	
@@ -352,7 +362,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				listFragment.smoothScrollToPosition(_position);
 
-				if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+				if ((type == ManagerActivity.CONTACT_FILE_ADAPTER) || (type == ManagerActivity.INCOMING_SHARES_ADAPTER)) {
 
 					// Choose the buttons to show depending on the type of
 					// folder
@@ -374,22 +384,26 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 						holder.optionDownload.setVisibility(View.VISIBLE);
 						holder.optionProperties.setVisibility(View.VISIBLE);
-						//holder.shareDisabled.setVisibility(View.VISIBLE);
+						holder.optionLeaveShare.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.VISIBLE);
+						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
+						holder.optionMore.setVisibility(View.VISIBLE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((40 * scaleW), outMetrics),
+						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
-								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
-						holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);	
+						holder.optionLeaveShare.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionLeaveShare.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+						((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((25), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
+						holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						// holder.textViewPermissions.setText(context.getString(R.string.file_properties_shared_folder_full_access));
 						break;
@@ -398,15 +412,19 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						log("read");
 						holder.optionDownload.setVisibility(View.VISIBLE);
 						holder.optionProperties.setVisibility(View.VISIBLE);	
-						//						holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.GONE);
+						holder.optionMore.setVisibility(View.GONE);
+						holder.optionLeaveShare.setVisibility(View.VISIBLE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((55 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						holder.optionProperties.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+						holder.optionLeaveShare.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionLeaveShare.getLayoutParams()).setMargins(Util.px2dp((20), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						break;
 					}
@@ -418,14 +436,23 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.GONE);
+						holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						holder.optionMore.setVisibility(View.VISIBLE);
 
-						holder.optionDownload.getLayoutParams().width = Util.px2dp((70 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((50 * scaleW), outMetrics),
+						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-						holder.optionProperties.getLayoutParams().width = Util.px2dp((70 * scaleW), outMetrics);
-						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+						holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);	
+						holder.optionLeaveShare.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionLeaveShare.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+						holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((25), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
+						holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						break;
 					}

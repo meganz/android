@@ -173,7 +173,7 @@
 	<string name="file_properties_available_offline_on">ON</string>
 	<string name="file_properties_available_offline_off">OFF</string>
 	<string name="file_properties_info_size_file">Size: </string>
-	<string name="file_properties_info_size_folder">Content: </string>
+	<string name="file_properties_info_content">Content: </string>
 	<string name="file_properties_info_added">Added: </string>
 	<string name="file_properties_info_modified">Modified: </string>
 	<string name="file_properties_shared_folder_private_folder">No public link</string>

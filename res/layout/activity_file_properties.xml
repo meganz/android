@@ -11,7 +11,8 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:background="@color/black"
-	    android:id="@+id/file_title_layout">
+	    android:id="@+id/file_title_layout">      	     
+	    
 		      
         <TextView
 	        android:id="@+id/file_properties_name"
@@ -27,28 +28,7 @@
 	         android:layout_height="200dp"
 	         android:layout_centerHorizontal="true"
 	         android:layout_below="@id/file_properties_name"/>
-	     
-	     <TextView
-             android:id="@+id/file_properties_permission_label"
-             android:layout_below="@id/file_properties_image"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/file_properties_shared_folder_permissions"
-             android:textColor="@color/file_properties_info_menu"
-			 android:layout_gravity="left"
-			 android:textStyle="bold"
-			 android:paddingLeft="30dp"
-			 android:paddingTop="7dp" />   
-             
-        <TextView
-             android:id="@+id/file_properties_permission_info"
-             android:layout_below="@id/file_properties_image"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:textColor="@color/white"
-			 android:layout_gravity="center_horizontal" 
-			 android:paddingLeft="4dp"
-			 android:paddingTop="7dp"/>
+
 	
 	  </RelativeLayout>
          
@@ -128,6 +108,32 @@
        	 android:layout_gravity="center"
        	 android:background="@color/black"
        	 android:layout_below="@id/available_offline_layout" >
+         
+         <TableRow >
+             
+              <TextView
+             android:id="@+id/file_properties_permission_label"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:text="@string/file_properties_shared_folder_permissions"
+             android:textColor="@color/file_properties_info_menu"
+			 android:layout_gravity="center_vertical|left"
+			 android:textStyle="bold"
+			 android:paddingLeft="30dp"
+			 android:paddingTop="7dp" />   
+             
+        	<TextView
+             android:id="@+id/file_properties_permission_info"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="@color/white"
+			 android:layout_gravity="center_vertical|left" 
+			 android:paddingLeft="4dp"
+			 android:paddingTop="7dp"/>         
+                         
+             
+         </TableRow>
+                
                   
          <TableRow>
              <TextView
@@ -151,6 +157,28 @@
 					 android:paddingTop="7dp"/>
          </TableRow>            
           
+         <TableRow>
+             <TextView
+		             android:id="@+id/file_properties_info_menu_content"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/file_properties_info_content"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:layout_gravity="center_vertical|left"
+					 android:textStyle="bold"
+					 android:paddingLeft="30dp"
+					 android:paddingTop="7dp" />                        
+             
+             <TextView
+		             android:id="@+id/file_properties_info_data_content"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:textColor="@color/white"
+					 android:layout_gravity="center_vertical|left" 
+					 android:paddingLeft="4dp"
+					 android:paddingTop="7dp"/>
+         </TableRow>      
+         
          
          <TableRow>
              <TextView
