@@ -7,7 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -46,7 +49,7 @@ import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaUser;
 
-public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
+public class OutgoingSharesFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	Context context;
 	ActionBar aB;
@@ -55,7 +58,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	TextView emptyTextView;
 	MegaBrowserListAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
-	FileBrowserFragment fileBrowserFragment = this;
+	OutgoingSharesFragment fileBrowserFragment = this;
 	LinearLayout buttonsLayout=null;
 	Button leftNewFolder;
 	Button rightUploadButton;
@@ -67,6 +70,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
+	int deepBrowserTree = 0;
 	boolean isList = true;
 	boolean overflowMenu = false;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -232,6 +236,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		nodes = new ArrayList<MegaNode>();
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -254,10 +260,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-
-			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-			aB.setTitle(getString(R.string.section_cloud_drive));	
+			((ManagerActivity)context).setParentHandleBrowser(parentHandle);					
+			findNodes();			
+			aB.setTitle(getString(R.string.section_shared_with_me));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
@@ -267,14 +272,15 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-				aB.setTitle(getString(R.string.section_cloud_drive));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			}
-			else{
-				aB.setTitle(parentNode.getName());					
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			}
+			aB.setTitle(getString(R.string.section_shared_with_me));	
+//			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+//				aB.setTitle(getString(R.string.section_shared_with_me));	
+//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+//			}
+//			else{
+//				aB.setTitle(parentNode.getName());					
+//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+//			}
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}	
 		
@@ -293,42 +299,28 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			menuOverflowList = (ListView) v.findViewById(R.id.file_browser_overflow_menu_list);	
 			titleOverflowList = (TextView) v.findViewById(R.id.file_browser_overflow_title);	
 
-			if (overflowMenu){
-				
-				listView.setVisibility(View.GONE);
-				String menuOptions[] = new String[4];
-				menuOptions[0] = getString(R.string.context_rename);
-				menuOptions[1] = getString(R.string.context_move);
-				menuOptions[2] = getString(R.string.context_copy);
-				menuOptions[3] = getString(R.string.context_send_link);
-				
-				ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-//				ArrayAdapter<String> arrayAdapter = new ArrayAdapter
-				menuOverflowList.setAdapter(arrayAdapter);
-				menuOverflowList.setOnItemClickListener(this);
-				menuOverflowLayout.setVisibility(View.VISIBLE);	
-				menuOverflowList.setVisibility(View.VISIBLE);	
-				titleOverflowList.setVisibility(View.VISIBLE);	
-			}
-			else{
-				menuOverflowLayout.setVisibility(View.GONE);	
-				menuOverflowList.setVisibility(View.GONE);
-				titleOverflowList.setVisibility(View.GONE);	
-			}
+			menuOverflowLayout.setVisibility(View.GONE);	
+			menuOverflowList.setVisibility(View.GONE);
+			titleOverflowList.setVisibility(View.GONE);	
+
 					
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
+			contentText.setVisibility(View.GONE);
+			
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);			
+			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
+			leftNewFolder.setVisibility(View.GONE);
+			rightUploadButton.setVisibility(View.GONE);
 			
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
 			
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
+				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.OUTGOING_SHARES_ADAPTER);
 				if (mTHash != null){
 					adapterList.setTransfers(mTHash);
 				}
@@ -338,10 +330,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				adapterList.setNodes(nodes);
 			}
 			
-			if (parentHandle == megaApi.getRootNode().getHandle()){
+			if (parentHandle == -1){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_cloud_drive));
+				aB.setTitle(getString(R.string.section_shared_with_me));
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
@@ -351,7 +343,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			
 			adapterList.setPositionClicked(-1);
 			adapterList.setMultipleSelect(false);
-
+			
 			listView.setAdapter(adapterList);			
 			
 			setNodes(nodes);
@@ -361,15 +353,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);				
 			}					
 			
 			return v;
@@ -408,7 +396,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			if (parentHandle == megaApi.getRootNode().getHandle()){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_cloud_drive));
+				aB.setTitle(getString(R.string.section_shared_with_me));
 			}
 			else{
 				MegaNode infoNode = megaApi.getRootNode();
@@ -437,9 +425,42 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				emptyTextView.setVisibility(View.GONE);
 				leftNewFolder.setVisibility(View.GONE);
 				rightUploadButton.setVisibility(View.GONE);
-			}				
+			}		
 			
 			return v;
+		}		
+	}
+	
+
+	public void refresh(){
+		log("refresh");
+		findNodes();	
+		if(adapterList!=null){
+			adapterList.setNodes(nodes);
+		}
+	}
+		
+	public void findNodes(){	
+		log("findNodes");
+		deepBrowserTree=0;
+		ArrayList<MegaShare> outNodeList = megaApi.getOutShares();
+		nodes.clear();
+		long lastFolder=-1;		
+		
+		for(int k=0;k<outNodeList.size();k++){
+			
+			MegaShare mS = outNodeList.get(k);				
+			MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
+			
+			log("Node: "+node.getHandle());
+			
+			if(lastFolder!=node.getHandle()){			
+							
+				lastFolder=node.getHandle();
+						
+				nodes.add(node);				
+			}
+		
 		}		
 	}
 		
@@ -449,9 +470,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
         context = activity;
         aB = ((ActionBarActivity)activity).getSupportActionBar();
     }
-	
-	
-	
 	
 	@Override
 	public void onClick(View v) {
@@ -515,10 +533,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		
-		if(overflowMenu){
-			overflowMenu=false;
-		}
 	
 		if (isList){
 			if (adapterList.isMultipleSelect()){
@@ -534,6 +548,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			}
 			else{
 				if (nodes.get(position).isFolder()){
+					
+					deepBrowserTree = deepBrowserTree+1;
+					
 					MegaNode n = nodes.get(position);
 					
 					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
@@ -638,20 +655,18 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 			contentText.setText(getInfoFolder(infoNode));
 			
-			if (adapterGrid.getCount() == 0){				
+			if (adapterGrid.getCount() == 0){			
 
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
+
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
+
 			}			
 		}
 	}
@@ -679,98 +694,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		updateActionModeTitle();
 		listView.setOnItemLongClickListener(null);
 	}
-	
-	public void setOverFlowMenu(final MegaNode n){
-		log("setOverFlowMenu");
-		
-		if (overflowMenu){
-
-			//listView.setVisibility(View.GONE);
-			String menuOptions[] = new String[5];
-			menuOptions[0] = getString(R.string.context_share_folder);
-			menuOptions[1] = getString(R.string.context_rename);
-			menuOptions[2] = getString(R.string.context_move);
-			menuOptions[3] = getString(R.string.context_copy);
-			menuOptions[4] = getString(R.string.context_send_link);
 			
-			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-			menuOverflowList.setAdapter(arrayAdapter);
-			menuOverflowList.setOnItemClickListener(
-					new OnItemClickListener() {
-						@Override
-						public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-							log("onItemClick");
-							log("id: "+v.getId());
-							switch (position) {	
-								case 0: {
-									//Rename
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);	
-									titleOverflowList.setVisibility(View.GONE);										
-									((ManagerActivity) context).shareFolder(n);
-									break;
-								}
-								case 1: {
-									//Rename
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);	
-									titleOverflowList.setVisibility(View.GONE);	
-									((ManagerActivity) context).showRenameDialog(n, n.getName());	
-									break;
-								}
-								case 2: {
-									//Move
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);
-									titleOverflowList.setVisibility(View.GONE);		
-									ArrayList<Long> handleList = new ArrayList<Long>();
-									handleList.add(n.getHandle());									
-									((ManagerActivity) context).showMove(handleList);									
-									break;
-									
-								}
-								case 3: {
-									//Copy
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);
-									titleOverflowList.setVisibility(View.GONE);		
-									ArrayList<Long> handleList = new ArrayList<Long>();
-									handleList.add(n.getHandle());									
-									((ManagerActivity) context).showCopy(handleList);									
-									break;
-								}
-								case 4: {
-									//Send link
-									
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);
-									titleOverflowList.setVisibility(View.GONE);		
-									break;
-								}
-							}							
-						}
-					});		
-			menuOverflowLayout.setVisibility(View.VISIBLE);	
-			menuOverflowList.setVisibility(View.VISIBLE);	
-			titleOverflowList.setVisibility(View.VISIBLE);		
-		
-		}
-		else{
-			menuOverflowLayout.setVisibility(View.GONE);	
-			menuOverflowList.setVisibility(View.GONE);
-			titleOverflowList.setVisibility(View.GONE);	
-		}
-		
-	}
-	
 	/*
 	 * Clear all selected items
 	 */
@@ -854,24 +778,22 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	public int onBackPressed(){
 
+		log("onBackPressed");
+		deepBrowserTree = deepBrowserTree-1;
+		
 		if (isList){
-			parentHandle = adapterList.getParentHandle();
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 			
-			if(overflowMenu){
-				menuOverflowLayout.setVisibility(View.GONE);	
-				menuOverflowList.setVisibility(View.GONE);
-				titleOverflowList.setVisibility(View.GONE);	
-				overflowMenu=false;
-				return 1;
+			if(deepBrowserTree==0){
+				//In the beginning of the navigation
+				aB.setTitle(getString(R.string.section_shared_with_me));	
+				findNodes();
+				adapterList.setNodes(nodes);
+				return 3;
 			}
-			
-			if (adapterList.getPositionClicked() != -1){
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-				return 1;
-			}
-			else{
+			else if (deepBrowserTree>0){
+				parentHandle = adapterList.getParentHandle();
+				//((ManagerActivity)context).setParentHandleBrowser(parentHandle);			
+				
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 				contentText.setText(getInfoFolder(parentNode));
 				if (parentNode != null){
@@ -881,7 +803,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_cloud_drive));	
+						aB.setTitle(getString(R.string.section_shared_with_me));	
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					}
 					else{
@@ -898,11 +820,15 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					listView.setSelection(0);
 					adapterList.setParentHandle(parentHandle);
 					return 2;
-				}
-				else{
-					return 0;
-				}
+				}	
+				return 2;
 			}
+			else{
+				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
+				deepBrowserTree=0;
+				return 0;
+			}
+			
 		}
 		else{
 			parentHandle = adapterGrid.getParentHandle();
@@ -923,10 +849,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_cloud_drive));	
+						aB.setTitle(getString(R.string.section_shared_with_me));	
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					}
 					else{
+						log("Otra opcion");
 						aB.setTitle(parentNode.getName());					
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					}
@@ -994,8 +921,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					leftNewFolder.setVisibility(View.VISIBLE);
-					rightUploadButton.setVisibility(View.VISIBLE);
 					if (megaApi.getRootNode().getHandle()==parentHandle) {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
@@ -1008,8 +933,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 				}			
 			}	
 		}
@@ -1020,8 +943,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					leftNewFolder.setVisibility(View.VISIBLE);
-					rightUploadButton.setVisibility(View.VISIBLE);
 					if (megaApi.getRootNode().getHandle()==parentHandle) {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
@@ -1034,8 +955,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
+
 				}			
 			}
 		}
@@ -1101,8 +1021,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			if (adapterGrid != null){
 				adapterGrid.setTransfers(mTHash);
 			}
-		}	
-	
+		}		
 	}
 	
 	public void setCurrentTransfer(MegaTransfer mT){
@@ -1123,22 +1042,5 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	private static void log(String log) {
 		Util.log("FileBrowserFragment", log);
 	}
-	
-	public void setContentText(){
-		
-		if (parentHandle == megaApi.getRootNode().getHandle()){
-			MegaNode infoNode = megaApi.getRootNode();
-			if (infoNode !=  null){
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_cloud_drive));
-			}
-		}
-		else{
-			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-			if (infoNode !=  null){
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(infoNode.getName());
-			}
-		}
-	}
+
 }

@@ -37,11 +37,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBar.Tab;
-import android.support.v7.app.ActionBar.TabListener;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.text.Spannable;
@@ -134,6 +131,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SORT_BY = 1006;
 	public static int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
+	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -159,6 +157,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int SEARCH_ADAPTER = 2006;
 	final public static int PHOTO_SYNC_ADAPTER = 2007;
 	final public static int ZIP_ADAPTER = 2008;
+	final public static int OUTGOING_SHARES_ADAPTER = 2009;
 	
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
@@ -219,19 +218,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
-	private SharedWithMeFragment swmF;
+	private IncomingSharesFragment inSF;
+	private OutgoingSharesFragment outSF;
     private TransfersFragment tF; 
     private MyAccountFragment maF;
     private OfflineFragment oF;
     private SearchFragment sF;
     private CameraUploadFragment psF;
     
-    //TODO 
     //Tabs in Contacts
-    private TabHost mTabHost;
-    private Fragment contactTabFragment;	
-	TabsAdapter mTabsAdapter;
-    ViewPager viewPager;
+    private TabHost mTabHostContacts;
+    //private Fragment contactTabFragment;	
+	TabsAdapter mTabsAdapterContacts;
+    ViewPager viewPagerContacts;
+    
+    private TabHost mTabHostShares;
+	TabsAdapter mTabsAdapterShares;
+    ViewPager viewPagerShares;
     
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
@@ -388,15 +391,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         usedSpaceText = (TextView) findViewById(R.id.used_space_text);
         usedSpaceBar = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
-        usedSpaceBar.setProgress(0);
+        usedSpaceBar.setProgress(0);        
+                      
+        mTabHostContacts = (TabHost)findViewById(R.id.tabhost_contacts);
+        mTabHostContacts.setup();
         
-        //CONTACTS
-                
-        mTabHost = (TabHost)findViewById(android.R.id.tabhost);
-        mTabHost.setup();
+        mTabHostShares = (TabHost)findViewById(R.id.tabhost_shares);
+        mTabHostShares.setup();
         
-        viewPager = (ViewPager) findViewById(R.id.contact_tabs_pager);  		
-        
+        viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);  
+        viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);   
         
         
         if (!Util.isOnline(this)){
@@ -817,8 +821,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
     	
-    	if (swmF != null){
-    		pHSharedWithMe = swmF.getParentHandle();
+    	if (inSF != null){
+    		pHSharedWithMe = inSF.getParentHandle();
     		if (drawerItem == DrawerItem.SHARED_WITH_ME){
     			if (isListSharedWithMe){
     				visibleFragment = 8;
@@ -1134,7 +1138,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //	public void onCreate(Bundle savedInstanceState) {
 //		super.onCreate(savedInstanceState);
 //		setContentView(R.layout.main);
-//		mTabHost = (TabHost) findViewById(android.R.id.tabhost);
+//		mTabHostContacts = (TabHost) findViewById(android.R.id.tabhost);
 //		setupTab(new TextView(this), "Tab 1");
 //		setupTab(new TextView(this), "Tab 2");
 //		setupTab(new TextView(this), "Tab 3");
@@ -1197,8 +1201,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			fbF.setNodes(nodes);
 		}
 		
-		mTabHost.setVisibility(View.GONE);    			
-		viewPager.setVisibility(View.GONE); 
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		viewPagerShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.replace(R.id.fragment_container, fbF, "fbF");
 		ft.commit();
@@ -1207,7 +1213,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		firstTime = false;
 		
 		customSearch.setVisibility(View.VISIBLE);
-		viewPager.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		viewPagerContacts.setVisibility(View.GONE);
 
 		if (createFolderMenuItem != null){
 			createFolderMenuItem.setVisible(true);
@@ -1279,8 +1286,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					fbF.setNodes(nodes);
 				}
 				
-				mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+				mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, fbF, "fbF");
     			ft.commit();
@@ -1293,7 +1302,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			
     			customSearch.setVisibility(View.VISIBLE);
-    			viewPager.setVisibility(View.GONE);
+    			viewPagerContacts.setVisibility(View.GONE);
 
     			if (createFolderMenuItem != null){
 	    			createFolderMenuItem.setVisible(true);
@@ -1334,50 +1343,53 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				supportInvalidateOptionsMenu();
     			}
     			
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+    			
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
     			}
-				mTabHost.setVisibility(View.VISIBLE);    			
-    			viewPager.setVisibility(View.VISIBLE);
+    			mTabHostContacts.setVisibility(View.VISIBLE);    			
+    			viewPagerContacts.setVisibility(View.VISIBLE);
     			
-    			mTabHost.getTabWidget().setBackgroundColor(Color.BLACK);
-    			//mTabHost.getTabWidget().setTextAlignment(textAlignment)
+    			mTabHostContacts.getTabWidget().setBackgroundColor(Color.BLACK);
+    			//mTabHostContacts.getTabWidget().setTextAlignment(textAlignment)
     			
 //    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);    		    
 //    		    title1.setText(R.string.tab_contacts); 			
     			
-    			if (mTabsAdapter == null){
-    				mTabsAdapter = new TabsAdapter(this, mTabHost, viewPager);   	
+    			if (mTabsAdapterContacts == null){
+    				mTabsAdapterContacts = new TabsAdapter(this, mTabHostContacts, viewPagerContacts);   	
     				
-        			TabHost.TabSpec tabSpec1 = mTabHost.newTabSpec("contactsFragment");
-        	        tabSpec1.setIndicator(getTabIndicator(mTabHost.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
+        			TabHost.TabSpec tabSpec1 = mTabHostContacts.newTabSpec("contactsFragment");
+        	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
         	        //tabSpec.setContent(contentID);
-        	        //mTabHost.addTab(tabSpec);
-        	        TabHost.TabSpec tabSpec2 = mTabHost.newTabSpec("sentRequests");
-        	        tabSpec2.setIndicator(getTabIndicator(mTabHost.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
+        	        //mTabHostContacts.addTab(tabSpec);
+        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
+        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
         	        
-        	        TabHost.TabSpec tabSpec3 = mTabHost.newTabSpec("receivedRequests");
-        	        tabSpec3.setIndicator(getTabIndicator(mTabHost.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
+        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
+        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
    				
     				
-    				mTabsAdapter.addTab(tabSpec1, ContactsFragment.class, null);
-    				mTabsAdapter.addTab(tabSpec2, SentRequestsFragment.class, null);
-    				mTabsAdapter.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
     			}
     			
-//    			View mIndicator = v.inflate(R.drawable.tab_indicator_ab_megaactionbar, mTabHost.getTabWidget(), false);
+//    			View mIndicator = v.inflate(R.drawable.tab_indicator_ab_megaactionbar, mTabHostContacts.getTabWidget(), false);
 //    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);
 //
 //    		    title1.setText("TAB1");
 //
-//    		    mTabsAdapter.addTab(mTabHost.newTabSpec("TAB1").setIndicator( mIndicator), F_GetGames.class, null);
+//    		    mTabsAdapterContacts.addTab(mTabHostContacts.newTabSpec("TAB1").setIndicator( mIndicator), F_GetGames.class, null);
 //
-//    		    View mIndicator2 = inflater.inflate(R.layout.tab_indicator_holo,      mTabHost.getTabWidget(), false);
+//    		    View mIndicator2 = inflater.inflate(R.layout.tab_indicator_holo,      mTabHostContacts.getTabWidget(), false);
 //    		    TextView title2 = (TextView) mIndicator2.findViewById(android.R.id.title);
 //
 //    		    title2.setText("TAB2");
-//    		    mTabsAdapter.addTab(mTabHost.newTabSpec("TAB2").setIndicator(mIndicator2), F_MusicList.class, null);
+//    		    mTabsAdapterContacts.addTab(mTabHostContacts.newTabSpec("TAB2").setIndicator(mIndicator2), F_MusicList.class, null);
     			
     			
     	        
@@ -1433,14 +1445,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				rbF.setNodes(nodes);
     			}
     			
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, rbF, "rbF");
     			ft.commit();
     			
     			customSearch.setVisibility(View.VISIBLE);
-    			viewPager.setVisibility(View.GONE);
+    			viewPagerContacts.setVisibility(View.GONE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
@@ -1474,30 +1488,85 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SHARED_WITH_ME:{
     			
-    			if (swmF == null){
-    				swmF = new SharedWithMeFragment();    				
-//    				swmF.setParentHandle(megaApi.getInboxNode().getHandle());
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setTitle(getString(R.string.section_shared_with_me));
+    			
+    			if (getmDrawerToggle() != null){
+    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
+    				supportInvalidateOptionsMenu();
+    			}
+    			/*
+    			if (inSF == null){
+    				inSF = new IncomingSharesFragment();    				
+//    				inSF.setParentHandle(megaApi.getInboxNode().getHandle());
 //    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
-    				swmF.setIsList(isListSharedWithMe);
-    				swmF.setOrder(orderGetChildren);
+    				inSF.setIsList(isListSharedWithMe);
+    				inSF.setOrder(orderGetChildren);
 //    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-//    				swmF.setNodes(nodes);
+//    				inSF.setNodes(nodes);
     			}
     			else{
-    				swmF.setIsList(isListSharedWithMe);
-    				swmF.setParentHandle(parentHandleSharedWithMe);
-    				swmF.setOrder(orderGetChildren);
+    				inSF.setIsList(isListSharedWithMe);
+    				inSF.setParentHandle(parentHandleSharedWithMe);
+    				inSF.setOrder(orderGetChildren);
 //    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
-//    				swmF.setNodes(nodes);
+//    				inSF.setNodes(nodes);
     			}
     			
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, swmF, "swmF");
-    			ft.commit();
+    			if (outSF == null){
+    				outSF = new OutgoingSharesFragment();    				
+//    				outSF.setParentHandle(megaApi.getInboxNode().getHandle());
+//    				parentHandleSharedWithMe = megaApi.getInboxNode().getHandle();
+    				outSF.setIsList(isListSharedWithMe);
+    				outSF.setOrder(orderGetChildren);
+//    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+//    				outSF.setNodes(nodes);
+    			}
+    			else{
+    				outSF.setIsList(isListSharedWithMe);
+    				outSF.setParentHandle(parentHandleSharedWithMe);
+    				outSF.setOrder(orderGetChildren);
+//    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleSharedWithMe), orderGetChildren);
+//    				outSF.setNodes(nodes);
+    			}*/
     			
-
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			
+    			log("Llego aqui");
+    			
+    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    			if (currentFragment != null){
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    			}
+    			
+    			mTabHostShares.getTabWidget().setBackgroundColor(Color.BLACK);
+    			
+    			mTabHostShares.setVisibility(View.VISIBLE);    			
+    			mTabHostShares.setVisibility(View.VISIBLE);
+    			//mTabHostContacts.getTabWidget().setTextAlignment(textAlignment)
+    			
+//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);    		    
+//    		    title1.setText(R.string.tab_contacts); 			
+    			
+    			if (mTabsAdapterShares == null){
+    				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
+    				
+        			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
+        			tabSpec3.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_incoming_shares))); // new function to inject our own tab layout
+        	        //tabSpec.setContent(contentID);
+        	        //mTabHostContacts.addTab(tabSpec);
+        	        TabHost.TabSpec tabSpec4 = mTabHostShares.newTabSpec("outgoingSharesFragment");
+        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_outgoing_shares))); // new function to inject our own tab layout
+        	        
+        	          				
+    				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragment.class, null);
+    				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragment.class, null);
+    				
+    			}
+   			
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
@@ -1514,8 +1583,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
-	    			
-	    			if(swmF.getModeShare()==MODE_IN){
+	    			/*
+	    			if(inSF.getModeShare()==MODE_IN){
 	    				modeShareOut.setVisible(true);	
 	    				modeShareIn.setVisible(false);	    				
 	    			}
@@ -1523,7 +1592,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    				modeShareOut.setVisible(false);	
 	    				modeShareIn.setVisible(true);	
 	    			}	    			   			
-	    			
+	    			*/
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
 //	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -1542,8 +1611,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				maF = new MyAccountFragment();
     			}
     			
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, maF, "maF");
     			ft.commit();
@@ -1586,8 +1657,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			tF.setTransfers(megaApi.getTransfers());
     			tF.setPause(!downloadPlay);
     			
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, tF, "tF");
     			ft.commit();
@@ -1641,8 +1714,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				oF.setIsList(isListOffline);
     			}
     			
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, oF, "oF");
     			ft.commit();
@@ -1692,8 +1767,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			sF.setParentHandle(parentHandleSearch);
     			sF.setLevels(levelsSearch);
     			
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, sF, "sF");
     			ft.commit();
@@ -1737,8 +1814,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				
 				
-    			mTabHost.setVisibility(View.GONE);    			
-    			viewPager.setVisibility(View.GONE); 
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, psF, "psF");
     			ft.commit();
@@ -1817,6 +1896,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
+		cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (outSF != null){
+			if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				if (outSF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
+					return;
+				}
+			}
+		}
+		
+		
+		
+		
 		if (rbF != null){
 			if (drawerItem == DrawerItem.RUBBISH_BIN){
 				if (rbF.onBackPressed() == 0){
@@ -1830,9 +1927,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (swmF != null){
+		if (inSF != null){
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				if (swmF.onBackPressed() == 0){
+				if (inSF.onBackPressed() == 0){
 					drawerItem = DrawerItem.CLOUD_DRIVE;
 					selectDrawerItem(drawerItem);
 					if(nDA!=null){
@@ -2059,7 +2156,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (swmF != null){
+		if (inSF != null){
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				createFolderMenuItem.setVisible(false);
 //				rubbishBinMenuItem.setVisible(false);
@@ -2075,7 +2172,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			thumbViewMenuItem.setVisible(false);
     			
     			
-    			if(swmF.getModeShare()==MODE_IN){
+    			if(inSF.getModeShare()==MODE_IN){
     				modeShareOut.setVisible(true);	
     				modeShareIn.setVisible(false);	
     			}
@@ -2279,9 +2376,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    				return true;
 		    			}
 		    		}
-		    		if (swmF != null){
+		    		if (inSF != null){
 		    			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-		    				swmF.onBackPressed();
+		    				inSF.onBackPressed();
 		    		    	return true;
 		    			}
 		    		}
@@ -2354,7 +2451,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
 	        	}
 	        	
-	        	if (swmF != null){
+	        	if (inSF != null){
 	        		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 	        			cF.selectAll();
 	        			selectMenuItem.setVisible(false);
@@ -2447,16 +2544,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
 	        	}
 
-	        	if (swmF != null){
+	        	if (inSF != null){
 	        		if (drawerItem == DrawerItem.SHARED_WITH_ME){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("swmF");
+	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commit();
 
 	        			isListSharedWithMe = !isListSharedWithMe;
-	        			swmF.setIsList(isListSharedWithMe);
-	        			swmF.setParentHandle(parentHandleSharedWithMe);
+	        			inSF.setIsList(isListSharedWithMe);
+	        			inSF.setParentHandle(parentHandleSharedWithMe);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -2519,14 +2616,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        case R.id.action_change_mode_in:{
 	        	log("Change mode in");
-	        	if (swmF != null){
+	        	if (inSF != null){
         			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("swmF");
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commit();
 
-	        			swmF.setModeShare(MODE_IN);
+	        			inSF.setModeShare(MODE_IN);
 	        			this.swmFMode=MODE_IN;
 	        			modeShareIn.setVisible(false);
 	        			modeShareOut.setVisible(true);
@@ -2541,14 +2638,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        case R.id.action_change_mode_out:{
 	        	log("Change mode out");
-	        	if (swmF != null){
+	        	if (inSF != null){
         			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("swmF");
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
 	        			fragTransaction.commit();
 
-	        			swmF.setModeShare(MODE_OUT);
+	        			inSF.setModeShare(MODE_OUT);
 	        			this.swmFMode=MODE_OUT;
 	        			modeShareIn.setVisible(true);
 	        			modeShareOut.setVisible(false);
@@ -2952,12 +3049,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							rbF.getListView().invalidateViews();
 						}
 					}
-					if (swmF != null){
+					if (inSF != null){
 						if (drawerItem == DrawerItem.SHARED_WITH_ME){
 							//TODO: ojo con los hijos
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-//							swmF.setNodes(nodes);
-//							swmF.getListView().invalidateViews();
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+//							inSF.setNodes(nodes);
+//							inSF.getListView().invalidateViews();
 						}
 					}
 				}
@@ -3005,12 +3102,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 					}
 				}
-				if (swmF != null){
+				if (inSF != null){
 					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
-//						swmF.setNodes(nodes);
-//						swmF.getListView().invalidateViews();
+//						inSF.setNodes(nodes);
+//						inSF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -3062,12 +3159,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						rbF.getListView().invalidateViews();
 					}
 				}
-				if (swmF != null){
+				if (inSF != null){
 					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
-//						swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();
+//						inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -3097,12 +3194,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						rbF.getListView().invalidateViews();
 					}
 				}
-				if (swmF != null){
+				if (inSF != null){
 					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
-//						swmF.setNodes(nodes);
-//						swmF.getListView().invalidateViews();
+//						inSF.setNodes(nodes);
+//						inSF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -3493,7 +3590,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						return;
 					}
 				}
-				if (swmF != null){
+				if (inSF != null){
 					if (drawerItem == DrawerItem.SHARED_WITH_ME){
 						return;
 					}
@@ -4064,6 +4161,88 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 			}
+		}	
+		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);
+			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+			final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
+			final boolean megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
+			
+			if (megaContacts){
+
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							ProgressDialog temp = null;
+							try{
+								temp = new ProgressDialog(managerActivity);
+								temp.setMessage(getString(R.string.context_sharing_folder));
+								temp.show();
+							}
+							catch(Exception e){
+								return;
+							}
+							statusDialog = temp;
+							permissionsDialog.dismiss();
+							
+							switch(item) {
+			                    case 0:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
+			                    	}
+			                    	break;
+			                    }
+			                    case 1:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+			                    	}
+			                        break;
+			                    }
+			                    case 2:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+			                    	}		                    	
+			                        break;
+			                    }
+			                }
+						}
+					});
+					permissionsDialog = dialogBuilder.create();
+					permissionsDialog.show();
+					Resources resources = permissionsDialog.getContext().getResources();
+					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+			        alertTitle.setTextColor(resources.getColor(R.color.mega));
+					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+
+			}
+			else{
+
+				for (int i=0; i < contactsData.size();i++){
+					String type = contactsData.get(i);
+					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
+						i++;
+						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+					}
+					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
+						i++;
+						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+					}
+				}
+
+			}			
 		}		
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 			
@@ -4188,19 +4367,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				parentHandleSharedWithMe = intent.getLongExtra("PARENT_HANDLE", -1);
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSharedWithMe);
 				if (parentNode != null){
-					if (swmF != null){					
+					if (inSF != null){					
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						//TODO: ojo con los hijos
-//							swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();						
+//							inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();						
 					}
 				}
 				else{
-					if (swmF != null){						
+					if (inSF != null){						
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 						//TODO: ojo con los hijos
-//							swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();						
+//							inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();						
 					}
 				}
 			}
@@ -4248,21 +4427,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSharedWithMe);
 				if (parentNode != null){
-					if (swmF != null){
+					if (inSF != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-						swmF.setOrder(orderGetChildren);
+						inSF.setOrder(orderGetChildren);
 						//TODO: ojo con los hijos
-//							swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();
+//							inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();
 					}
 				}
 				else{
-					if (swmF != null){
+					if (inSF != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-						swmF.setOrder(orderGetChildren);
+						inSF.setOrder(orderGetChildren);
 						//TODO: ojo con los hijos
-//							swmF.setNodes(nodes);
-						swmF.getListView().invalidateViews();
+//							inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();
 					}
 				}
 			}
@@ -4407,11 +4586,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}				
 			}
 		}
-		if (swmF != null){
+		
+		String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (inSF != null){
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(swmF.getParentHandle()), orderGetChildren);
-//				swmF.setNodes(nodes);
-				swmF.getListView().invalidateViews();
+				//ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+//				inSF.setNodes(nodes);
+				aB.setTitle(getString(R.string.section_shared_with_me));	
+				inSF.getListView().invalidateViews();				
+			}
+		}
+		
+		cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (outSF != null){
+			if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				aB.setTitle(getString(R.string.section_shared_with_me));				
+				outSF.refresh();
 			}
 		}
 		if (psF != null){
@@ -4568,7 +4760,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			fbF.setTransfers(mTHash);
 		}
 		
-		if (swmF != null){
+		if (inSF != null){
 			for(int i=0; i<tL.size(); i++){
 				
 				MegaTransfer tempT = tL.get(i);
@@ -4579,7 +4771,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			
-			swmF.setTransfers(mTHash);
+			inSF.setTransfers(mTHash);
 		}
 		
 		log("onTransferStart: " + transfer.getFileName() + " - " + transfer.getTag());
@@ -4620,7 +4812,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			fbF.setTransfers(mTHash);	
 		}
 		
-		if (swmF != null){
+		if (inSF != null){
 			for(int i=0; i<tL.size(); i++){
 				
 				MegaTransfer tempT = tL.get(i);
@@ -4631,7 +4823,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			
-			swmF.setTransfers(mTHash);
+			inSF.setTransfers(mTHash);
 		}
 
 		log("onTransferFinish: " + transfer.getFileName() + " - " + transfer.getTag());
@@ -4678,7 +4870,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (swmF != null){
+		if (inSF != null){
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				if (transfer.getType() == MegaTransfer.TYPE_DOWNLOAD){
 					Time now = new Time();
@@ -4686,11 +4878,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					long nowMillis = now.toMillis(false);
 					if (lastTimeOnTransferUpdate < 0){
 						lastTimeOnTransferUpdate = now.toMillis(false);
-						swmF.setCurrentTransfer(transfer);
+						inSF.setCurrentTransfer(transfer);
 					}
 					else if ((nowMillis - lastTimeOnTransferUpdate) > Util.ONTRANSFERUPDATE_REFRESH_MILLIS){
 						lastTimeOnTransferUpdate = nowMillis;
-						swmF.setCurrentTransfer(transfer);
+						inSF.setCurrentTransfer(transfer);
 					}			
 				}		
 			}
@@ -4847,8 +5039,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void showOverflowMenu(MegaNode n){
 		log("showOverflowMenu");		
-		fbF.overflowMenu=true;		
-		fbF.setOverFlowMenu(n);		
+		
+		if(fbF.overflowMenu){
+			fbF.overflowMenu=false;	
+		}
+		else{
+			fbF.overflowMenu=true;		
+			fbF.setOverFlowMenu(n);	
+		}			
 	}
 	
 	public void removeContact(final MegaUser c){
@@ -4911,4 +5109,48 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}	
 		
 	}
+	
+	public void shareFolder(MegaNode node){
+
+		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+									
+			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
+	    	intent.setClass(this, ContactsExplorerActivity.class);
+	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
+	}
+		
+	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node)
+	{
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.remove_all_sharing)); 
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		
+		for(int j=0; j<listContacts.size();j++){
+			String cMail = listContacts.get(j).getUser();
+			if(cMail!=null){
+				MegaUser c = megaApi.getContact(cMail);
+				if (c != null){							
+					megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, this);
+				}
+				else{
+					megaApi.disableExport(node, this);
+				}
+			}
+			else{
+				megaApi.disableExport(node, this);
+			}
+		}
+		
+		
+	}
+	
 }

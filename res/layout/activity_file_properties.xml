@@ -57,7 +57,7 @@
 	    android:layout_height="wrap_content" 
 	    android:orientation="horizontal"
 	    android:id="@+id/available_offline_layout"
-	    android:background="@color/dark_grey_cloud_drive"
+	    android:background="@color/switch_selector_layout"
       	android:layout_below="@+id/file_title_layout" >    		    
              
            <TextView

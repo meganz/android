@@ -568,6 +568,11 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		return null;
 	}
 	
+	public void setNodes(ArrayList <MegaShare> _shareList){
+		this.shareList = _shareList;
+		notifyDataSetChanged();
+	}
+	
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {

@@ -133,23 +133,40 @@
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/link"
 		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" />		               
+		        
+		          <ImageView
+		            android:id="@+id/file_list_option_share"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_share"
+		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
-
-		        <ImageView
+		          
+		           <ImageView
+		            android:id="@+id/file_list_option_permissions"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/permissions_ic"
+		            android:layout_gravity="center_vertical"
+		            style="@style/dialogActionButton" />
+		           
+		            <ImageView
 		            android:id="@+id/file_list_option_delete"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_delete"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
-		        
-		         <ImageView 
+		            
+		             <ImageView 
 		            android:id="@+id/file_list_option_overflow"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_action_core_overflow"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton"/>
+		         
 		         	         
 	<!--	         
 		          <ImageView

@@ -40,7 +40,7 @@ import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 import com.mega.sdk.MegaUser;
 
-public class SharedWithMeFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
+public class IncomingSharesFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
@@ -51,7 +51,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 	ListView listView;
 	MegaShareInOutListAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
-	public SharedWithMeFragment sharedWithMeFragment = this;
+	public IncomingSharesFragment sharedWithMeFragment = this;
 	MegaUser owner = null;
 	long initialParentHandle;
 	
@@ -293,7 +293,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 				}
 					
 				if (adapterList == null){
-					adapterList = new MegaShareInOutListAdapter(context, megaShareInList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_IN);
+					adapterList = new MegaShareInOutListAdapter(context, megaShareInList, parentHandle, listView, aB, MODE_IN);
 					//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
 					if (mTHash != null){
 						adapterList.setTransfers(mTHash);
@@ -393,7 +393,7 @@ public class SharedWithMeFragment extends Fragment implements OnClickListener, O
 
 				if (adapterList == null){
 					
-					adapterList = new MegaShareInOutListAdapter(context, megaShareOutList, parentHandle, listView, emptyImageView, emptyTextView, aB, MODE_OUT);
+					adapterList = new MegaShareInOutListAdapter(context, megaShareOutList, parentHandle, listView, aB, MODE_OUT);
 					//adapterList = new MegaBrowserListAdapter(context, inNodeList, parentHandle, listView, emptyImageView, emptyTextView, aB, ManagerActivity.SHARED_WITH_ME_ADAPTER);
 					if (mTHash != null){
 						adapterList.setTransfers(mTHash);
