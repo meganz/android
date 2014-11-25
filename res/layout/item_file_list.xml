@@ -133,7 +133,15 @@
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/link"
 		            android:layout_gravity="center_vertical" 
-		            style="@style/dialogActionButton" />		               
+		            style="@style/dialogActionButton" />	
+		            
+		         <ImageView
+		            android:id="@+id/file_list_option_leave_share"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_leave_share"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" />		   	               
 		        
 		          <ImageView
 		            android:id="@+id/file_list_option_share"
@@ -148,6 +156,14 @@
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/permissions_ic"
+		            android:layout_gravity="center_vertical"
+		            style="@style/dialogActionButton" />
+		           
+		            <ImageView
+		            android:id="@+id/file_list_option_rename"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_rename"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		           
@@ -167,17 +183,10 @@
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton"/>
 		         
+		               
 		         	         
-	<!--	         
-		          <ImageView
-		            android:id="@+id/file_list_option_rename"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_rename"
-		            android:layout_gravity="center_vertical"
-		            style="@style/dialogActionButton" />
 		        
- 		        
+ 		<!--        
 
 				<ImageView
 		            android:id="@+id/file_list_option_share"

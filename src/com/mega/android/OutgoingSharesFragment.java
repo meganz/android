@@ -58,7 +58,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 	TextView emptyTextView;
 	MegaBrowserListAdapter adapterList;
 	MegaBrowserGridAdapter adapterGrid;
-	OutgoingSharesFragment fileBrowserFragment = this;
+	OutgoingSharesFragment outgoingSharesFragment = this;
 	LinearLayout buttonsLayout=null;
 	Button leftNewFolder;
 	Button rightUploadButton;
@@ -173,7 +173,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapterList.setMultipleSelect(false);
-			listView.setOnItemLongClickListener(fileBrowserFragment);
+			listView.setOnItemLongClickListener(outgoingSharesFragment);
 			clearSelections();
 		}
 
@@ -346,19 +346,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			
 			listView.setAdapter(adapterList);			
 			
-			setNodes(nodes);
-			
-			if (adapterList.getCount() == 0){				
-				
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);				
-			}					
+			setNodes(nodes);						
 			
 			return v;
 		}
@@ -371,8 +359,8 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			listView.setOnItemClickListener(null);
 			listView.setItemsCanFocus(false);
 	        
-	        emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
+	        emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
@@ -408,24 +396,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			
 			listView.setAdapter(adapterGrid);
 			
-			setNodes(nodes);
-			
-			if (adapterGrid.getCount() == 0){				
-				
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
-			}		
+			setNodes(nodes);			
 			
 			return v;
 		}		
@@ -791,6 +762,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				return 3;
 			}
 			else if (deepBrowserTree>0){
+				log("Keep navigation");
 				parentHandle = adapterList.getParentHandle();
 				//((ManagerActivity)context).setParentHandleBrowser(parentHandle);			
 				
@@ -824,6 +796,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				return 2;
 			}
 			else{
+				log("Back to Cloud");
 				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 				deepBrowserTree=0;
 				return 0;
@@ -920,19 +893,12 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRootNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+					emptyTextView.setVisibility(View.VISIBLE);					
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
+					//emptyImageView.setVisibility(View.GONE);
+					//emptyTextView.setVisibility(View.GONE);
 				}			
 			}	
 		}
@@ -942,14 +908,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				if (adapterGrid.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRootNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+					emptyTextView.setVisibility(View.VISIBLE);					
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);
@@ -1034,13 +993,11 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			if (adapterGrid != null){
 				adapterGrid.setCurrentTransfer(mT);
 			}
-		}	
-		
-		
+		}		
 	}
 	
 	private static void log(String log) {
-		Util.log("FileBrowserFragment", log);
+		Util.log("OutgoingSharesFragment", log);
 	}
 
 }
