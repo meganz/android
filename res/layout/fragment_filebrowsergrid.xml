@@ -66,5 +66,18 @@
 		android:layout_below="@id/content_grid_text"
         android:layout_above="@id/buttons_grid_layout">
     </ListView>
+    
+     	
+      <Button
+       	android:id="@+id/file_grid_browser_camera_upload_on_off"
+       	android:layout_gravity="center"
+       	android:layout_height="48dp"
+       	android:layout_width="fill_parent"
+       	android:layout_alignParentBottom="true"
+       	android:background="@drawable/btn_default_holo_light_without_corners"
+       	android:textColor="@color/button_text"
+       	android:text="@string/settings_camera_upload_on"
+       	android:visibility="gone">
+    </Button>
 
 </RelativeLayout>

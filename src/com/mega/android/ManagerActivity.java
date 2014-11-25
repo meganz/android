@@ -1235,7 +1235,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
-	public void setInitialCameraUpload(){
+	public void refreshCameraUpload(){
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
 		nDA.setPositionClicked(POS_CAMERA_UPLOADS);
 		
