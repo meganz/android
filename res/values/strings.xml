@@ -160,6 +160,8 @@
 	<string name="section_photo_sync">Camera Uploads</string>
 	<string name="used_space_text">Used Space</string>
 	<string name="used_space">%1$s of %2$s</string>
+	<string name="tab_incoming_shares">INCOMING</string>
+	<string name="tab_outgoing_shares">OUTGOING</string>
 	
 	<string name="file_browser_empty_cloud_drive">No files in your Cloud Drive</string>
 	<string name="file_browser_empty_rubbish_bin">Empty Rubbish Bin</string>
@@ -235,6 +237,7 @@
     <string name="context_share_folder">Share folder</string>
     <string name="context_view_shared_folders">View shared folders</string>
     <string name="context_sharing_folder">Sharing</string>
+    <string name="remove_all_sharing">Removing all sharing contacts</string>
     <string name="context_camera_folder">Camera folder: </string>
     <string name="context_mega_contacts">MEGA Contacts</string>
     <string name="context_phone_contacts">Phone Contacts</string>

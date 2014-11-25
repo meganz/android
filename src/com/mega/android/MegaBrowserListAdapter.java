@@ -36,8 +36,7 @@ import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
 
-public class MegaBrowserListAdapter extends BaseAdapter implements
-OnClickListener {
+public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -74,8 +73,10 @@ OnClickListener {
 		public ImageView optionProperties;
 		public ImageView optionMore;		
 		public ProgressBar transferProgressBar;
+		public ImageView optionRename;
 		public ImageView optionPublicLink;
-		public ImageView shareDisabled;
+		public ImageView optionShare;
+		public ImageView optionPermissions;
 		public ImageView optionDelete;
 		public int currentPosition;
 		public long document;
@@ -110,6 +111,11 @@ OnClickListener {
 		}
 		case ManagerActivity.SEARCH_ADAPTER: {
 			((ManagerActivity) context).setParentHandleSearch(parentHandle);
+			break;
+		}
+		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
+			//TODO necesito algo?
+			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
 			break;
 		}
 		default: {
@@ -189,6 +195,9 @@ OnClickListener {
 			//			((TableRow.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 			//			
 
+			holder.optionShare = (ImageView) convertView.findViewById(R.id.file_list_option_share);
+			holder.optionPermissions = (ImageView) convertView.findViewById(R.id.file_list_option_permissions) ;
+			
 			holder.optionDelete = (ImageView) convertView.findViewById(R.id.file_list_option_delete);
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
@@ -218,6 +227,9 @@ OnClickListener {
 				holder.checkbox.setChecked(false);
 			}
 		}
+		
+		holder.optionShare.setVisibility(View.GONE);
+		holder.optionPermissions.setVisibility(View.GONE);		
 
 		holder.transferProgressBar.setVisibility(View.GONE);
 		holder.textViewFileSize.setVisibility(View.VISIBLE);
@@ -246,7 +258,8 @@ OnClickListener {
 			} else {
 				holder.imageView.setImageResource(R.drawable.mime_folder);
 			}
-		} else {
+		} 
+		else {
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));	
 
@@ -324,6 +337,10 @@ OnClickListener {
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
 
+
+		holder.optionPermissions.setTag(holder);
+		holder.optionPermissions.setOnClickListener(this);
+		
 		if (positionClicked != -1) {
 			if (positionClicked == position) {
 				//				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -359,6 +376,7 @@ OnClickListener {
 						holder.optionProperties.setVisibility(View.VISIBLE);
 						//holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
+						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
@@ -367,6 +385,9 @@ OnClickListener {
 						holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
+						holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -379,6 +400,7 @@ OnClickListener {
 						holder.optionProperties.setVisibility(View.VISIBLE);	
 						//						holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
+						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.GONE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
@@ -394,6 +416,7 @@ OnClickListener {
 						holder.optionProperties.setVisibility(View.VISIBLE);
 						//						holder.shareDisabled.setVisibility(View.VISIBLE);
 						holder.optionPublicLink.setVisibility(View.GONE);
+						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.GONE);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((70 * scaleW), outMetrics);
@@ -402,14 +425,46 @@ OnClickListener {
 						holder.optionProperties.getLayoutParams().width = Util.px2dp((70 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
 								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+						((TableRow.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((29 * scaleW), outMetrics),
+								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						break;
 					}
 					}
-				} else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER) {
+				} 
+				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.VISIBLE);
+					//holder.shareDisabled.setVisibility(View.VISIBLE);
+					holder.optionShare.setVisibility(View.VISIBLE);
+					holder.optionPermissions.setVisibility(View.VISIBLE);
+					holder.optionPublicLink.setVisibility(View.GONE);					
+					holder.optionDelete.setVisibility(View.VISIBLE);
+					holder.optionMore.setVisibility(View.GONE);
+
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
+					holder.optionShare.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionShare.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionPermissions.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionPermissions.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);					
+					holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					
+					
+				}
+				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER) {
 
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRename.setVisibility(View.VISIBLE);
 					holder.optionDelete.setVisibility(View.VISIBLE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
@@ -418,6 +473,10 @@ OnClickListener {
 					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionRename
+							.getLayoutParams()).setMargins(	Util.px2dp((17 * scaleW), outMetrics),
+									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 					holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -429,6 +488,7 @@ OnClickListener {
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRename.setVisibility(View.VISIBLE);
 					holder.optionDelete.setVisibility(View.VISIBLE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((55 * scaleW), outMetrics);
@@ -439,6 +499,12 @@ OnClickListener {
 					holder.optionProperties.getLayoutParams().width = Util
 							.px2dp((55 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionProperties
+							.getLayoutParams()).setMargins(
+									Util.px2dp((17 * scaleW), outMetrics),
+									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionRename.getLayoutParams().width = Util.px2dp(
+							(55 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionRename
 							.getLayoutParams()).setMargins(
 									Util.px2dp((17 * scaleW), outMetrics),
 									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -454,6 +520,7 @@ OnClickListener {
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.GONE);
 					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRename.setVisibility(View.GONE);
 					holder.optionDelete.setVisibility(View.GONE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp(
@@ -482,6 +549,9 @@ OnClickListener {
 
 		holder.optionDownload.setTag(holder);
 		holder.optionDownload.setOnClickListener(this);
+		
+		holder.optionShare.setTag(holder);
+		holder.optionShare.setOnClickListener(this);
 
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
@@ -498,7 +568,7 @@ OnClickListener {
 		
 		holder.optionMore.setTag(holder);
 		holder.optionMore.setOnClickListener(this);
-
+		
 		return convertView;
 	}
 	
@@ -630,10 +700,18 @@ OnClickListener {
 			handleList.add(n.getHandle());
 			setPositionClicked(-1);
 			notifyDataSetChanged();
-			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
+			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
+				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
+				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
+				//break;
+			}
+			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
 				((ManagerActivity) context).moveToTrash(handleList);
-			} else {
+				//break;
+			} 
+			else {
 				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
+				//break;
 			}
 			break;
 		}
@@ -652,6 +730,23 @@ OnClickListener {
 			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER)) {
 				((ManagerActivity) context).showOverflowMenu(n);
 			}
+			break;
+		}	
+		
+		case R.id.file_list_option_permissions: {
+			Intent i = new Intent(context, FileContactListActivity.class);
+			i.putExtra("name", n.getHandle());
+			context.startActivity(i);			
+			break;
+		}	
+		
+		case R.id.file_list_option_share: {			
+			
+			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
+				if(n.isFolder()){
+					((ManagerActivity) context).shareFolder(n);
+				}
+			}			
 			break;
 		}	
 		

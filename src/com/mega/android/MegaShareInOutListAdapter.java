@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -75,181 +76,36 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-//	public static ArrayList<String> pendingAvatars = new ArrayList<String>();
+//	public static ArrayList<String> pendingAvatars = new ArrayList<String>();	
 	
-	private class UserAvatarListenerList implements MegaRequestListenerInterface{
-
-		Context context;
-		ViewHolderInOutShareList holder;
-		MegaShareInOutListAdapter adapter;
-		
-		public UserAvatarListenerList(Context context, ViewHolderInOutShareList holder, MegaShareInOutListAdapter adapter) {
-			this.context = context;
-			this.holder = holder;
-			this.adapter = adapter;
-		}
-		
-		@Override
-		public void onRequestStart(MegaApiJava api, MegaRequest request) {
-			log("onRequestStart()");
-		}
-
-		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-			
-			log("onRequestFinish() "+request.getEmail());
-			if (e.getErrorCode() == MegaError.API_OK){
-				boolean avatarExists = false;
-				
-//				pendingAvatars.remove(request.getEmail());
-				
-				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = null;
-					if (context.getExternalCacheDir() != null){
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					else{
-						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					Bitmap bitmap = null;
-					if (avatar.exists()){
-						if (avatar.length() > 0){
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (bitmap == null) {
-								avatar.delete();
-							}
-							else{
-								avatarExists = true;
-								holder.roundedImageView.setImageBitmap(bitmap);
-							}
-						}
-					}
-					
-					if (!avatarExists){
-						createDefaultAvatar();
-					}
-				}
-			}
-			else{
-//				pendingAvatars.remove(request.getEmail());
-				
-				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					createDefaultAvatar();
-				}
-			}
-		}
-		
-		public void createDefaultAvatar(){
-			log("createDefaultAvatar()");
-			
-			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-			Canvas c = new Canvas(defaultAvatar);
-			Paint p = new Paint();
-			p.setAntiAlias(true);
-			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
-			
-			int radius; 
-	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-	        	radius = defaultAvatar.getWidth()/2;
-	        else
-	        	radius = defaultAvatar.getHeight()/2;
-	        
-			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-			holder.roundedImageView.setImageBitmap(defaultAvatar);
-			
-			
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = context.getResources().getDisplayMetrics().density;
-		    
-		    int avatarTextSize = getAvatarTextSize(density);
-		    log("DENSITY: " + density + ":::: " + avatarTextSize);
-		    if (holder.contactMail != null){
-			    if (holder.contactMail.length() > 0){
-			    	log("TEXT: " + holder.contactMail);
-			    	log("TEXT AT 0: " + holder.contactMail.charAt(0));
-			    	String firstLetter = holder.contactMail.charAt(0) + "";
-			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			    	holder.contactInitialLetter.setText(firstLetter);
-			    	holder.contactInitialLetter.setTextSize(32);
-			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
-			    }
-		    }
-		}
-		
-		private int getAvatarTextSize (float density){
-			float textSize = 0.0f;
-			
-			if (density > 3.0){
-				textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-			}
-			else if (density > 2.0){
-				textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-			}
-			else if (density > 1.5){
-				textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-			}
-			else if (density > 1.0){
-				textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-			}
-			else if (density > 0.75){
-				textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-			}
-			else{
-				textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-			}
-			
-			return (int)textSize;
-		}
-
-		@Override
-		public void onRequestTemporaryError(MegaApiJava api,MegaRequest request, MegaError e) {
-			log("onRequestTemporaryError");
-		}
-
-		@Override
-		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}	
-
 	/* public static view holder class */
 	public class ViewHolderInOutShareList {
 		public ImageView imageView;
-		public RoundedImageView roundedImageView;
-		public TextView contactInitialLetter;
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
 		public RelativeLayout itemLayoutFile;
-		public RelativeLayout itemLayoutContact;
+		public ImageButton imageButtonThreeDots;
+		public RelativeLayout itemLayout;
+		//public ImageView arrowSelection;
+		public ImageView optionShare;
+		public ImageView optionDelete;
 		//public ImageView arrowSelection;
 		public RelativeLayout optionsLayout;
 		public ImageView optionDownload;
 		public ImageView optionProperties;
 		public ProgressBar transferProgressBar;
 		public int currentPosition;
-		public RoundedImageView contactThumbnail;
-		public TextView contactName;
 //		public TextView contactContent;		
 		public long document;
-		String contactMail;
 		//public TextView textViewOwner;
 	}
 
-	public MegaShareInOutListAdapter(Context _context, ArrayList<MegaShareAndroidElement> _megaShareInList,long _parentHandle, ListView listView, ImageView emptyImageView,TextView emptyTextView, ActionBar aB, int type) {
+	public MegaShareInOutListAdapter(Context _context, ArrayList<MegaShareAndroidElement> _megaShareInList,long _parentHandle, ListView listView, ActionBar aB, int type) {
 		this.context = _context;
 		this.megaShareInList = _megaShareInList;		
 		this.parentHandle = _parentHandle;
 
 		this.listFragment = listView;
-		this.emptyImageViewFragment = emptyImageView;
-		this.emptyTextViewFragment = emptyTextView;
 		this.aB = aB;
 
 		this.positionClicked = -1;
@@ -297,13 +153,14 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize_share);
-			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_bar_share);		
-					
-			holder.itemLayoutContact = (RelativeLayout) convertView.findViewById(R.id.contact_share_item_layout);
-			holder.contactName = (TextView) convertView.findViewById(R.id.shared_contact_name);
-//			holder.contactContent = (TextView) convertView.findViewById(R.id.shared_contact_content);
-			holder.roundedImageView = (RoundedImageView) convertView.findViewById(R.id.contact_list_thumbnail_share);
-			holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_list_initial_letter_share); 
+			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_bar_share);	
+			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots_share);
+			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.share_list_options);
+			holder.optionShare = (ImageView) convertView.findViewById(R.id.share_list_option_share);
+			holder.optionDelete = (ImageView) convertView.findViewById(R.id.share_list_option_delete);
+			holder.optionDownload = (ImageView) convertView.findViewById(R.id.share_list_option_download);
+			holder.optionProperties = (ImageView) convertView.findViewById(R.id.share_list_option_properties);		
+			
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolderInOutShareList) convertView.getTag();
@@ -324,9 +181,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 //				holder.checkbox.setChecked(false);
 //			}
 //		}
-		
-		holder.roundedImageView.setImageBitmap(null);
-		holder.contactInitialLetter.setText("");
+
 		holder.currentPosition = position;
 
 //		HashMap<MegaUser,ArrayList<MegaNode>> _inSHash	
@@ -342,7 +197,6 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 			if(node==null){
 				//It is a contact
 				
-				getAvatar(megaUser, holder);
 				
 				//End thumb			
 				
@@ -354,10 +208,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 				holder.textViewFileSize.setVisibility(View.GONE);
 				
 				holder.transferProgressBar.setVisibility(View.GONE);				
-				
-				holder.roundedImageView.setVisibility(View.VISIBLE);				
-				holder.itemLayoutContact.setVisibility(View.VISIBLE);
-				holder.contactName.setVisibility(View.VISIBLE);
+				holder.imageButtonThreeDots.setVisibility(View.VISIBLE)	;
 //				holder.contactContent.setVisibility(View.VISIBLE);	
 				
 			}
@@ -451,11 +302,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 				holder.textViewFileSize.setVisibility(View.VISIBLE);
 				
 				holder.transferProgressBar.setVisibility(View.GONE);	
-				
-				holder.itemLayoutContact.setVisibility(View.GONE);
-				holder.contactName.setVisibility(View.GONE);
-//				holder.contactContent.setVisibility(View.GONE);
-				holder.roundedImageView.setVisibility(View.GONE);
+
 			}
 		}
 		else{
@@ -475,10 +322,6 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 					if(megaUser!=null){
 						//Contact
 						
-						holder.contactName.setText(megaUser.getEmail());
-						holder.contactMail=megaUser.getEmail();
-						
-						getAvatar(megaUser, holder);
 						
 						holder.itemLayoutFile.setVisibility(View.GONE);
 						holder.imageView.setVisibility(View.GONE);
@@ -486,18 +329,11 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 						holder.textViewFileSize.setVisibility(View.GONE);
 						
 						holder.transferProgressBar.setVisibility(View.GONE);	
-						
-						holder.roundedImageView.setVisibility(View.VISIBLE);
-						holder.itemLayoutContact.setVisibility(View.VISIBLE);
-						holder.contactName.setVisibility(View.VISIBLE);
-//						holder.contactContent.setVisibility(View.VISIBLE);
-						holder.roundedImageView.setVisibility(View.VISIBLE);
+
 					}
 					else{
 						//pongo el public link
-						
-						holder.contactName.setText(R.string.file_properties_shared_folder_public_link);
-						holder.contactMail=null;
+
 						
 						holder.itemLayoutFile.setVisibility(View.GONE);
 						holder.imageView.setVisibility(View.GONE);
@@ -505,31 +341,18 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 						holder.textViewFileSize.setVisibility(View.GONE);
 						
 						holder.transferProgressBar.setVisibility(View.GONE);
-						
-						holder.roundedImageView.setVisibility(View.GONE);
-						holder.itemLayoutContact.setVisibility(View.VISIBLE);
-						holder.contactName.setVisibility(View.VISIBLE);
-//						holder.contactContent.setVisibility(View.VISIBLE);
-						holder.roundedImageView.setVisibility(View.VISIBLE);
+
 					}	
 					
 				}
 				else{
 					
 					if(megaUser!=null){
-						//Contact
-						getAvatar(megaUser, holder);						
-						//End thumb								
-						
-						holder.contactName.setText(megaUser.getEmail());
-						holder.contactMail=megaUser.getEmail();
 
 					}
 					else{
 						//Public link
-						
-						holder.contactName.setText(R.string.file_properties_shared_folder_public_link);
-						holder.contactMail=null;
+
 					}		
 					
 					holder.textViewFileName.setText(node.getName());
@@ -545,10 +368,6 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 					
 					holder.transferProgressBar.setVisibility(View.GONE);	
 					
-					holder.itemLayoutContact.setVisibility(View.VISIBLE);
-					holder.contactName.setVisibility(View.VISIBLE);
-//					holder.contactContent.setVisibility(View.VISIBLE);
-					holder.roundedImageView.setVisibility(View.VISIBLE);
 				}				
 					
 			} else {
@@ -628,11 +447,6 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 				holder.textViewFileSize.setVisibility(View.VISIBLE);
 				
 				holder.transferProgressBar.setVisibility(View.GONE);	
-				
-				holder.itemLayoutContact.setVisibility(View.GONE);
-				holder.contactName.setVisibility(View.GONE);
-//				holder.contactContent.setVisibility(View.GONE);
-				holder.roundedImageView.setVisibility(View.GONE);
 			}
 
 		}
@@ -751,63 +565,21 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 				}
 			}
 		}*/
+		
+		holder.optionDownload.setTag(holder);
+		holder.optionDownload.setOnClickListener(this);
+
+		holder.optionProperties.setTag(holder);
+		holder.optionProperties.setOnClickListener(this);
+
+		holder.optionShare.setTag(holder);
+		holder.optionShare.setOnClickListener(this);
+
+		holder.optionDelete.setTag(holder);
+		holder.optionDelete.setOnClickListener(this);		
 			
 		return convertView;
-	}
-	
-	private void getAvatar(MegaUser megaUser, ViewHolderInOutShareList holder){
-		
-		UserAvatarListenerList listener = new UserAvatarListenerList(context,holder,this);
-		holder.contactName.setText(megaUser.getEmail());
-		holder.contactMail=megaUser.getEmail();
-		File avatar = null;
-		if (context.getExternalCacheDir() != null){
-			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), megaUser.getEmail() + ".jpg");
-		}
-		else{
-			avatar = new File(context.getCacheDir().getAbsolutePath(), megaUser.getEmail() + ".jpg");
-		}
-		Bitmap bitmap = null;
-		if (avatar.exists()){
-			if (avatar.length() > 0){
-				BitmapFactory.Options bOpts = new BitmapFactory.Options();
-				bOpts.inPurgeable = true;
-				bOpts.inInputShareable = true;
-				bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-				if (bitmap == null) {
-					avatar.delete();
-					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(megaUser, context.getExternalCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);
-					}
-					else{
-						megaApi.getUserAvatar(megaUser, context.getCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);
-					}
-				}
-				else{
-					holder.roundedImageView.setImageBitmap(bitmap);
-				}
-			}
-			else{
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(megaUser, context.getExternalCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);	
-				}
-				else{
-					megaApi.getUserAvatar(megaUser, context.getCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);	
-				}			
-			}
-		}	
-		else{
-//			if (!pendingAvatars.contains(megaUser.getEmail())){
-//				pendingAvatars.add(megaUser.getEmail());
-				if (context.getExternalCacheDir() != null){
-					megaApi.getUserAvatar(megaUser, context.getExternalCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);
-				}
-				else{
-					megaApi.getUserAvatar(megaUser, context.getCacheDir().getAbsolutePath() + "/" + megaUser.getEmail() + ".jpg", listener);
-				}
-//			}
-		}
-	}
+	}	
 				
 	private String getInfoFolder(MegaNode n) {
 		ArrayList<MegaNode> nL = megaApi.getChildren(n);
