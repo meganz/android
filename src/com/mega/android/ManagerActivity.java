@@ -1492,6 +1492,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (aB == null){
     				aB = getSupportActionBar();
     			}
+    			log("pongo la sección");
     			aB.setTitle(getString(R.string.section_shared_with_me));
     			
     			if (getmDrawerToggle() != null){

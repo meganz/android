@@ -235,6 +235,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		}
 		
 		nodes = new ArrayList<MegaNode>();
+		parentHandle=-1;
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -257,7 +258,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);					
+			((ManagerActivity)context).setParentHandleSharedWithMe(-1);					
 			findNodes();		
 			aB.setTitle(getString(R.string.section_shared_with_me));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -265,7 +266,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
@@ -327,13 +328,14 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				adapterList.setParentHandle(parentHandle);
 				adapterList.setNodes(nodes);
 			}
-			
+			log("Elparenthandle es "+parentHandle);
 			if (parentHandle == -1){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(getString(R.string.section_shared_with_me));
 			}
 			else{
+				log("Otra opcion");
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(infoNode.getName());
@@ -391,17 +393,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				adapterGrid.setNodes(nodes);
 			}
 			
-			if (parentHandle == megaApi.getRootNode().getHandle()){
-				MegaNode infoNode = megaApi.getRootNode();
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_shared_with_me));
-			}
-			else{
-				MegaNode infoNode = megaApi.getRootNode();
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-			}
-			
+						
 			adapterGrid.setPositionClicked(-1);
 			
 			listView.setAdapter(adapterGrid);
@@ -539,7 +531,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					parentHandle = nodes.get(position).getHandle();
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 					contentText.setText(getInfoFolder(infoNode));
-					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 					adapterList.setNodes(nodes);
@@ -781,7 +773,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			}
 			else if (deepBrowserTree>0){
 				parentHandle = adapterList.getParentHandle();
-				//((ManagerActivity)context).setParentHandleBrowser(parentHandle);			
+				//((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);			
 				
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 				contentText.setText(getInfoFolder(parentNode));
@@ -791,19 +783,14 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					emptyTextView.setVisibility(View.GONE);
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_shared_with_me));	
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					}
-					else{
+
 						aB.setTitle(parentNode.getName());					
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					}
-					
+
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
@@ -821,7 +808,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		}
 		else{
 			parentHandle = adapterGrid.getParentHandle();
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);
@@ -837,20 +824,15 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					emptyTextView.setVisibility(View.GONE);
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_shared_with_me));	
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					}
-					else{
-						log("Otra opcion");
+					
 						aB.setTitle(parentNode.getName());					
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					}
+					
 					
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);

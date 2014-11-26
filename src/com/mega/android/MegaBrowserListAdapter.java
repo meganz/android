@@ -116,12 +116,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
 			//TODO necesito algo?
-			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			((ManagerActivity) context).setParentHandleSharedWithMe(-1);
 			break;
 		}
 		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
 			//TODO necesito algo?
-			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			((ManagerActivity) context).setParentHandleSharedWithMe(-1);
 			break;
 		}
 		default: {
@@ -854,8 +854,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.SHARED_WITH_ME_ADAPTER: {
-			((ManagerActivity) context)
-			.setParentHandleSharedWithMe(parentHandle);
+			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
 			break;
 		}
 		case ManagerActivity.FOLDER_LINK_ADAPTER: {
