@@ -100,7 +100,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	ArrayList<MegaShare> sl;
 	MegaOffline mOffDelete;
 	Button sharedWithButton;	
-;
+
 	ArrayList<MegaNode> dTreeList = null;
 	
 	MegaNode node;
@@ -300,10 +300,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				contentTextView.setVisibility(View.VISIBLE);
 				contentTitleTextView.setVisibility(View.VISIBLE);
 				
-				contentTextView.setText(getInfoFolder(node));
+				contentTextView.setText(getInfoFolder(node));				
 				
-				
-				sizeTextView.setText(getInfoFolder(node));
+				sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
 				
 				
 				//Choose the button availableSwitch
