@@ -640,7 +640,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 	
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		log("onRequestUpdate: " + request.getRequestString());
+//		log("onRequestUpdate: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (firstRequestUpdate){
 				loginProgressBar.setVisibility(View.GONE);
@@ -655,7 +655,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 					prepareNodesText.setVisibility(View.VISIBLE);
 					loginProgressBar.setVisibility(View.VISIBLE);
 				}
-				log("progressValue = " + (int)progressValue);
+//				log("progressValue = " + (int)progressValue);
 				loginFetchNodesProgressBar.setProgress((int)progressValue);				
 			}
 		}
