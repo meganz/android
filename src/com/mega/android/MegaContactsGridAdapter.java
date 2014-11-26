@@ -309,7 +309,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			RelativeLayout.LayoutParams paramsIL2 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
 			paramsIL2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
 			paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-			paramsIL2.addRule(RelativeLayout.RIGHT_OF, R.id.file_grid_item_layout1);
+			paramsIL2.addRule(RelativeLayout.RIGHT_OF, R.id.contact_grid_item_layout1);
 			paramsIL2.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 
 			holder.itemLayout2.setLayoutParams(paramsIL2);
