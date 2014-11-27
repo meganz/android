@@ -415,10 +415,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				numberOfCells = 2;
 			}
 			
-		    Toast.makeText(context, totalWidth + "x" + totalHeight + "= " + numberOfCells, Toast.LENGTH_LONG).show();
+//		    Toast.makeText(context, totalWidth + "x" + totalHeight + "= " + numberOfCells, Toast.LENGTH_LONG).show();
 			
 		    if (adapterGrid == null){
-				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.FILE_BROWSER_ADAPTER);
+				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.FILE_BROWSER_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, leftNewFolder, rightUploadButton, contentText);
 				if (mTHash != null){
 					adapterGrid.setTransfers(mTHash);
 				}
@@ -896,7 +896,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			}
 			else{
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
-				contentText.setText(getInfoFolder(parentNode));
 				if (parentNode != null){
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
@@ -920,6 +919,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					adapterList.setParentHandle(parentHandle);
+					contentText.setText(getInfoFolder(parentNode));
 					return 2;
 				}
 				else{
@@ -938,7 +938,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			}
 			else{
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-				contentText.setText(getInfoFolder(parentNode));
 				if (parentNode != null){
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
@@ -962,6 +961,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);
 					adapterGrid.setParentHandle(parentHandle);
+					contentText.setText(getInfoFolder(parentNode));
 					return 2;
 				}
 				else{
