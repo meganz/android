@@ -21,7 +21,8 @@
 	        android:layout_height="157dp"
 	        android:layout_centerHorizontal="true"
 	        android:scaleType="fitCenter"
-	        android:background="@null" />
+	        android:background="@null"
+	        android:padding="7dp"/>
         
         <View
 	        android:id="@+id/cell_separator"

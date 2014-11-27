@@ -139,42 +139,42 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 	}
 	
 	/*private view holder class*/
-    public class ViewHolderBrowserGrid {
-    	public ImageButton imageView1;
-    	public TextView textViewFileName1;
-    	public RelativeLayout itemLayout1;
-    	public ImageButton imageView2;
-    	public TextView textViewFileName2;
-    	public RelativeLayout itemLayout2;
-    	public TextView textViewFileSize1;
-    	public TextView textViewFileSize2;
-    	public ImageButton imageButtonThreeDots1;
-    	public ImageButton imageButtonThreeDots2;
-//    	public ImageView arrowSelection1;
-    	public RelativeLayout optionsLayout1;
-//        ImageButton optionOpen1;
-    	public ProgressBar transferProgressBar1;
-    	public ProgressBar transferProgressBar2;
-    	public ImageView optionProperties1;
-    	public ImageView optionDownload1;
-    	public ImageView optionRename1;
-    	public ImageView optionCopy1;
-    	public ImageView optionMove1;
-    	public ImageView optionPublicLink1;
-    	public ImageView optionDelete1;
-//    	public ImageView arrowSelection2;
-    	public RelativeLayout optionsLayout2;
-//        ImageButton optionOpen2;
-    	public ImageView optionProperties2;
-    	public ImageView optionDownload2;
-    	public ImageView optionRename2;
-    	public ImageView optionCopy2;
-    	public ImageView optionMove2;
-    	public ImageView optionPublicLink2;
-    	public ImageView optionDelete2;
-    	public int currentPosition;
-    	public long document1;
-    	public long document2;
+    public class ViewHolderBrowserNewGrid {
+//    	public ImageButton imageView1;
+//    	public TextView textViewFileName1;
+//    	public RelativeLayout itemLayout1;
+//    	public ImageButton imageView2;
+//    	public TextView textViewFileName2;
+//    	public RelativeLayout itemLayout2;
+//    	public TextView textViewFileSize1;
+//    	public TextView textViewFileSize2;
+//    	public ImageButton imageButtonThreeDots1;
+//    	public ImageButton imageButtonThreeDots2;
+////    	public ImageView arrowSelection1;
+//    	public RelativeLayout optionsLayout1;
+////        ImageButton optionOpen1;
+//    	public ProgressBar transferProgressBar1;
+//    	public ProgressBar transferProgressBar2;
+//    	public ImageView optionProperties1;
+//    	public ImageView optionDownload1;
+//    	public ImageView optionRename1;
+//    	public ImageView optionCopy1;
+//    	public ImageView optionMove1;
+//    	public ImageView optionPublicLink1;
+//    	public ImageView optionDelete1;
+////    	public ImageView arrowSelection2;
+//    	public RelativeLayout optionsLayout2;
+////        ImageButton optionOpen2;
+//    	public ImageView optionProperties2;
+//    	public ImageView optionDownload2;
+//    	public ImageView optionRename2;
+//    	public ImageView optionCopy2;
+//    	public ImageView optionMove2;
+//    	public ImageView optionPublicLink2;
+//    	public ImageView optionDelete2;
+//    	public int currentPosition;
+//    	public long document1;
+//    	public long document2;
     	
     	
     	
@@ -189,7 +189,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
     	public ArrayList<Long> documents;
     }
     
-    ViewHolderBrowserGrid holder = null;
+    ViewHolderBrowserNewGrid holder = null;
 	int positionG;
 
 	@Override
@@ -198,7 +198,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
 		if (convertView == null){
-			holder = new ViewHolderBrowserGrid();
+			holder = new ViewHolderBrowserNewGrid();
 			holder.relativeLayoutsThumbnail = new ArrayList<RelativeLayout>();
 			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
 			holder.imageViews = new ArrayList<ImageView>();
@@ -244,7 +244,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 			convertView.setTag(holder);
 		}
 		else{
-			holder = (ViewHolderBrowserGrid) convertView.getTag();
+			holder = (ViewHolderBrowserNewGrid) convertView.getTag();
 		}
 		
 		for (int i=0;i<numberOfCells;i++){
@@ -274,6 +274,78 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 				else{
 					holder.imageViews.get(i).setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 					holder.fileSizeViews.get(i).setText(Util.getSizeString(node.getSize()));
+					
+					if(mTHash!=null){
+						
+						MegaTransfer tempT = mTHash.get(node.getHandle());
+						
+						if (tempT!=null){
+							holder.progressBars.get(i).setVisibility(View.VISIBLE);		
+							holder.fileSizeViews.get(i).setVisibility(View.GONE);	
+							
+							double progressValue = 100.0 * tempT.getTransferredBytes() / tempT.getTotalBytes();
+							holder.progressBars.get(i).setProgress((int)progressValue);
+						}
+						
+						if (currentTransfer != null){
+							if (node.getHandle() == currentTransfer.getNodeHandle()){
+								holder.progressBars.get(i).setVisibility(View.VISIBLE);		
+								holder.fileSizeViews.get(i).setVisibility(View.GONE);	
+								double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
+								holder.progressBars.get(i).setProgress((int)progressValue);
+							}
+						}
+						
+						if(mTHash.size() == 0){
+							holder.progressBars.get(i).setVisibility(View.GONE);		
+							holder.fileSizeViews.get(i).setVisibility(View.VISIBLE);	
+						}
+					}
+					
+					Bitmap thumb = null;
+					if (node.hasThumbnail()){
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null){
+							holder.imageViews.get(i).setImageBitmap(thumb);
+						}
+						else{
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+							if (thumb != null){
+								holder.imageViews.get(i).setImageBitmap(thumb);
+							}
+							else{ 
+								try{
+									thumb = ThumbnailUtils.getThumbnailFromMegaNewGrid(node, context, holder, megaApi, this, i);
+								}
+								catch(Exception e) {}
+								
+								if (thumb != null){
+									holder.imageViews.get(i).setImageBitmap(thumb);
+								}
+								else{
+									holder.imageViews.get(i).setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+								}
+							}
+						}
+					}
+					else{
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null){
+							holder.imageViews.get(i).setImageBitmap(thumb);
+						}
+						else{
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+							if (thumb != null){
+								holder.imageViews.get(i).setImageBitmap(thumb);
+							}
+							else{ 
+								try{
+									ThumbnailUtils.createThumbnailNewGrid(context, node, holder, megaApi, this, i);
+								}
+								catch(Exception e){} //Too many AsyncTasks
+							}
+						}
+					}
 				}
 			}
 		}
@@ -287,7 +359,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 				
 				@Override
 				public void onClick(View v) {
-					ViewHolderBrowserGrid holder= (ViewHolderBrowserGrid) v.getTag();
+					ViewHolderBrowserNewGrid holder= (ViewHolderBrowserNewGrid) v.getTag();
 					
 					long handle = holder.documents.get(index);
 					MegaNode n = megaApi.getNodeByHandle(handle);
@@ -300,7 +372,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 				
 				@Override
 				public boolean onLongClick(View v) {
-					ViewHolderBrowserGrid holder= (ViewHolderBrowserGrid) v.getTag();
+					ViewHolderBrowserNewGrid holder= (ViewHolderBrowserNewGrid) v.getTag();
 					
 					long handle = holder.documents.get(index);
 //					RelativeLayout rL = holder.relativeLayoutsThumbnail.get(index);
@@ -1067,7 +1139,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 	@Override
 	public void onClick(View v) {
 		
-		ViewHolderBrowserGrid holder = (ViewHolderBrowserGrid) v.getTag();
+		ViewHolderBrowserNewGrid holder = (ViewHolderBrowserNewGrid) v.getTag();
 
 //		ViewHolderBrowserGrid holder = (ViewHolderBrowserGrid) v.getTag();
 //		int currentPosition = holder.currentPosition;
