@@ -16,7 +16,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,13 +50,15 @@ import com.mega.sdk.MegaUser;
 
 public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
+	public static int GRID_WIDTH =400;
+	
 	Context context;
 	ActionBar aB;
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserListAdapter adapterList;
-	MegaBrowserGridAdapter adapterGrid;
+	MegaBrowserNewGridAdapter adapterGrid;
 	FileBrowserFragment fileBrowserFragment = this;
 	LinearLayout buttonsLayout=null;
 	Button leftNewFolder;
@@ -379,11 +383,24 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
-			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+			
+		    float scaleW = Util.getScaleW(outMetrics, density);
+		    float scaleH = Util.getScaleH(outMetrics, density);
+		    
+		    int totalWidth = outMetrics.widthPixels;
+		    int totalHeight = outMetrics.heightPixels;
+		    
+		    int numberOfCells = totalWidth / GRID_WIDTH;
+		    
+		    listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			listView.setOnItemClickListener(null);
 			listView.setItemsCanFocus(false);
-	        
-	        emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
+		    
+			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 			
@@ -393,9 +410,15 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
-	        
-			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
+			
+			if (numberOfCells < 2){
+				numberOfCells = 2;
+			}
+			
+		    Toast.makeText(context, totalWidth + "x" + totalHeight + "= " + numberOfCells, Toast.LENGTH_LONG).show();
+			
+		    if (adapterGrid == null){
+				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.FILE_BROWSER_ADAPTER);
 				if (mTHash != null){
 					adapterGrid.setTransfers(mTHash);
 				}
@@ -404,7 +427,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				adapterGrid.setParentHandle(parentHandle);
 				adapterGrid.setNodes(nodes);
 			}
-			
+		    
 			if (parentHandle == megaApi.getRootNode().getHandle()){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
