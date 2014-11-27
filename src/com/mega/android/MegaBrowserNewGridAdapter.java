@@ -23,6 +23,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,6 +47,14 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 	Context context;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
+
+	ImageView emptyImageView;
+	TextView emptyTextView;
+	
+	Button leftNewFolder;
+	Button rightUploadButton;
+	
+	TextView contentText;
 	
 	int numberOfCells;
 	
@@ -66,34 +75,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 	
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	public MegaBrowserNewGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ActionBar aB, int type) {
-		this.context = _context;
-		this.nodes = _nodes;
-		this.parentHandle = _parentHandle;
-		if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-		}
-		else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
-			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-		}
-		else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-		}
-		this.listFragment = listView;
-
-		this.aB = aB;
-		this.type = type;
-		
-		this.positionClicked = -1;
-		this.imageIds = new ArrayList<Integer>();
-		this.names = new ArrayList<String>();
-		
-		if (megaApi == null){
-			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
-		}
-	}
-	
-	public MegaBrowserNewGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ActionBar aB, int numberOfCells, int type) {
+	public MegaBrowserNewGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ActionBar aB, int numberOfCells, int type, int orderGetChildren, ImageView emptyImageView, TextView emptyTextView, Button leftNewFolder, Button rightUploadButton, TextView contentText) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
@@ -109,9 +91,15 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 		}
 		this.listFragment = listView;
-
+		this.emptyImageView = emptyImageView;
+		this.emptyTextView = emptyTextView;
+		this.leftNewFolder = leftNewFolder;
+		this.rightUploadButton = rightUploadButton;
+		this.contentText = contentText;
+		
 		this.aB = aB;
 		this.type = type;
+		this.orderGetChildren = orderGetChildren;		
 		
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
@@ -124,8 +112,33 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-		positionClicked = -1;	
-		notifyDataSetChanged();
+		positionClicked = -1;
+		
+		contentText.setText(getInfoFolder(megaApi.getNodeByHandle(parentHandle)));
+		
+		if (getCount() == 0){
+			listFragment.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			leftNewFolder.setVisibility(View.VISIBLE);
+			rightUploadButton.setVisibility(View.VISIBLE);
+
+			if (megaApi.getRootNode().getHandle()==parentHandle) {
+				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+		}
+		else{
+			listFragment.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			leftNewFolder.setVisibility(View.GONE);
+			rightUploadButton.setVisibility(View.GONE);
+		}
+		
 //		listFragment.clearFocus();
 //		if (listFragment != null){
 //			listFragment.post(new Runnable() {
@@ -364,7 +377,6 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 					long handle = holder.documents.get(index);
 					MegaNode n = megaApi.getNodeByHandle(handle);
 					nodeClicked(handle, totalPosition);
-					Toast.makeText(context, "NAME CLICKED: " + n.getName(), Toast.LENGTH_LONG).show();
 				}
 			} );
 			
@@ -379,7 +391,6 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 //					rL.setBackgroundColor(Color.parseColor("#000000"));
 					MegaNode n = megaApi.getNodeByHandle(handle);
 //					nodeClicked(handle, totalPosition);
-					Toast.makeText(context, "NAME LONGCLICKED: " + n.getName(), Toast.LENGTH_LONG).show();
 					return true;
 				}
 			});
@@ -1021,7 +1032,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter implements OnClickLis
 			else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
 				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 			}
-			nodes = megaApi.getChildren(n);
+			nodes = megaApi.getChildren(n, orderGetChildren);
 			setNodes(nodes);
 			listFragment.setSelection(0);
 			
