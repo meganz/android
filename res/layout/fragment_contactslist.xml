@@ -8,7 +8,7 @@
 	    android:id="@+id/contact_list_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_marginTop="20dp"
+	    android:layout_marginTop="25dp"
 	    android:layout_centerHorizontal="true" 
 	    android:gravity="center_horizontal"/>
     

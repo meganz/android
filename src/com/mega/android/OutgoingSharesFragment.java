@@ -309,6 +309,8 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			contentText.setVisibility(View.GONE);
 			
+			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
+			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);			
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);

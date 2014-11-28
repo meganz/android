@@ -17,7 +17,9 @@
 	    android:id="@+id/file_list_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
-	    android:layout_centerInParent="true" />
+	    android:layout_marginTop="30dp"
+	    android:layout_centerHorizontal="true" 
+	    android:gravity="center_horizontal"/>
     
     <TextView
 	    android:id="@+id/file_list_empty_text"
@@ -27,7 +29,8 @@
 	    android:textSize="16sp"
 	    android:layout_below="@id/file_list_empty_image"
 	    android:layout_marginTop="@dimen/standard_margin"
-	    android:layout_centerHorizontal="true"/>
+	    android:layout_centerHorizontal="true"/>  
+    
     
      <LinearLayout
          android:id="@+id/buttons_layout"

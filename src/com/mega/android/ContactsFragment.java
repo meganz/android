@@ -52,9 +52,6 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 
 	public static final String ARG_OBJECT = "object";
 	
-	private ProgressDialog statusDialog;	
-    private AlertDialog addContactDialog;
-	
 	MegaApiAndroid megaApi;	
 	
 	Context context;
