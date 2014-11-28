@@ -373,7 +373,11 @@
     <string name="pdf_file_viewer_activity">MEGA PDF Viewer</string>
     <string name="zip_browser_activity">ZIP Browser</string>
     
-    
+    <string name="my_account_title">Account Type:</string>
+    <string name="free_account">FREE</string>
+    <string name="pro1_account">PRO I</string>
+    <string name="pro2_account">PRO II</string>
+    <string name="pro3_account">PRO III</string>
     
     <!-- Insertado -->
     
@@ -399,7 +403,7 @@
 	<string name="searching_for">Searching for "%1$s"</string>
 	<string name="page_of">Page %1$d of %2$d</string>
 	<string name="open_pdf_action_options">Settings</string>
-		<string name="options">Settings</string>
+	<string name="options">Settings</string>
 	<string name="zoom_animation">Zoom buttons</string>
 	<string-array name="zoom_animations">
 		<item>100</item>

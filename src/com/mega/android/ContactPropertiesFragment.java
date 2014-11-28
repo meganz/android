@@ -44,11 +44,6 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 	RelativeLayout contentLayout;
 	TextView userNameTextView;
 	TextView infoEmail;
-	//	RelativeLayout layoutTop;
-	//	ImageView closeImage;
-	//	ImageView overflowImage;
-	//TextView infoAdded;
-	//ImageButton eyeButton;
 	TableLayout contentTable;
 	Button sharedFoldersButton;	
 	String userEmail;	

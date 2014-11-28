@@ -42,6 +42,8 @@
     
     <color name="dark_grey_cloud_drive">#6d6f70</color>
     
+    <color name="green_free_account">#31B404</color>
+     
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>
