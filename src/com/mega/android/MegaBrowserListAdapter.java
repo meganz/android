@@ -27,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
@@ -347,10 +348,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
 
-
 		holder.optionPermissions.setTag(holder);
 		holder.optionPermissions.setOnClickListener(this);
 		
+		holder.optionLeaveShare.setTag(holder);
+		holder.optionLeaveShare.setOnClickListener(this);
+				
 		if (positionClicked != -1) {
 			if (positionClicked == position) {
 				//				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -389,6 +392,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 						holder.optionMore.setVisibility(View.VISIBLE);
+						holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -417,6 +421,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionDelete.setVisibility(View.GONE);
 						holder.optionMore.setVisibility(View.GONE);
 						holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -438,6 +443,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionDelete.setVisibility(View.GONE);
 						holder.optionLeaveShare.setVisibility(View.VISIBLE);
 						holder.optionMore.setVisibility(View.VISIBLE);
+						holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -467,6 +473,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionPublicLink.setVisibility(View.GONE);					
 					holder.optionDelete.setVisibility(View.VISIBLE);
 					holder.optionMore.setVisibility(View.GONE);
+					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -691,6 +698,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			} else {
 				((ManagerActivity) context).onFileClick(handleList);
 			}
+			break;
+		}
+		case R.id.file_list_option_leave_share: {
+			positionClicked = -1;
+			log("En option leave share");
+			//((ManagerActivity) context).leaveIncomingShare(n);
+			Toast toast = Toast.makeText(context, "Feature not implemented yet", Toast.LENGTH_LONG);
+			toast.show();
 			break;
 		}
 		case R.id.file_list_option_properties: {

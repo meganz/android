@@ -2477,22 +2477,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
 	        	}
 
-	        	if (inSF != null){
-	        		if (drawerItem == DrawerItem.SHARED_WITH_ME){
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
+	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
+	        		
+	    			Toast toast = Toast.makeText(this, "Feature not implemented yet", Toast.LENGTH_LONG);
+	    			toast.show();
+//	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
+//	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.detach(currentFragment);
+//	        			fragTransaction.commit();
+//
+//	        			isListSharedWithMe = !isListSharedWithMe;
+//	        			inSF.setIsList(isListSharedWithMe);
+//	        			inSF.setParentHandle(parentHandleSharedWithMe);
+//
+//	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+//	        			fragTransaction.attach(currentFragment);
+//	        			fragTransaction.commit();
 
-	        			isListSharedWithMe = !isListSharedWithMe;
-	        			inSF.setIsList(isListSharedWithMe);
-	        			inSF.setParentHandle(parentHandleSharedWithMe);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();
-
-	        		}
+	        		
 	        	}
 
         		if (oF != null){
@@ -2955,7 +2957,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			
-			
+			log("requestFinish "+MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (statusDialog.isShowing()){
 					try { 
@@ -2991,14 +2993,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 					}
 				}
-				if (inSF != null){
-					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSF.setNodes(nodes);
-//						inSF.getListView().invalidateViews();
-					}
-				}
+	
 			}
 			else{
 				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
@@ -4483,10 +4478,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 //				inSF.setNodes(nodes);
 				aB.setTitle(getString(R.string.section_shared_with_me));	
-				inSF.getListView().invalidateViews();				
+				inSF.refresh();			
 			}
-		}
-		
+		}		
 		cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
 		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (outSF != null){
@@ -5008,6 +5002,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
+	}
+	
+	public void leaveIncomingShare (MegaNode n){
+		log("leaveIncomingShare");
+		
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(this);
+			temp.setMessage(getString(R.string.leave_incoming_share)); 
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+		megaApi.remove(n);
 	}
 		
 	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node)

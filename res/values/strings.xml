@@ -239,6 +239,7 @@
     <string name="context_view_shared_folders">View shared folders</string>
     <string name="context_sharing_folder">Sharing</string>
     <string name="remove_all_sharing">Removing all sharing contacts</string>
+	<string name="leave_incoming_share">Leaving shared folder</string>
     <string name="context_camera_folder">Camera folder: </string>
     <string name="context_mega_contacts">MEGA Contacts</string>
     <string name="context_phone_contacts">Phone Contacts</string>

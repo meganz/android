@@ -256,8 +256,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			return null;
 		}
 		
-		if (parentHandle == -1){
-			parentHandle = megaApi.getRootNode().getHandle();
+		if (parentHandle == -1){			
 			((ManagerActivity)context).setParentHandleSharedWithMe(-1);					
 			findNodes();		
 			aB.setTitle(getString(R.string.section_shared_with_me));	
@@ -271,14 +270,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 			aB.setTitle(getString(R.string.section_shared_with_me));	
-//			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_shared_with_me));	
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//			}
-//			else{
-//				aB.setTitle(parentNode.getName());					
-//				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//			}
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}	
 		
@@ -304,7 +295,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
-			contentText.setVisibility(View.GONE);
 			
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
@@ -330,9 +320,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				adapterList.setNodes(nodes);
 			}
 
-			if (parentHandle == -1){
-				MegaNode infoNode = megaApi.getRootNode();
-				contentText.setText(getInfoFolder(infoNode));
+			if (deepBrowserTree == 0){
+				contentText.setText(getInfoNode());
 				aB.setTitle(getString(R.string.section_shared_with_me));
 			}
 			else{
@@ -347,18 +336,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			listView.setAdapter(adapterList);		
 			
 			setNodes(nodes);
-			
-			if (adapterList.getCount() == 0){	
-				
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-			}
-			else{
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);				
-			}					
+	
 			
 			return v;
 		}
@@ -405,16 +383,14 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
+
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
 				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
+
 			}		
 			
 			return v;
@@ -456,6 +432,20 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				((ManagerActivity)getActivity()).uploadFile();
 				break;
 		}
+	}
+	
+	private String getInfoNode() {
+		int numFolders = nodes.size();
+		
+		String info = "";
+		if (numFolders > 0) {
+			info = numFolders
+					+ " "
+					+ context.getResources().getQuantityString(
+							R.plurals.general_num_folders, numFolders);
+			
+		} 
+		return info;			
 	}
 	
 	private String getInfoFolder(MegaNode n) {
@@ -530,6 +520,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					
 					parentHandle = nodes.get(position).getHandle();
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+															
 					contentText.setText(getInfoFolder(infoNode));
 					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					adapterList.setParentHandle(parentHandle);
@@ -652,7 +643,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	
 	public void findNodes(){
 		deepBrowserTree=0;
-		long lastFolder=-1;	
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		nodes.clear();
 		for (int i=0;i<contacts.size();i++){			
@@ -769,6 +759,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				aB.setTitle(getString(R.string.section_shared_with_me));	
 				findNodes();
 				adapterList.setNodes(nodes);
+				contentText.setText(getInfoNode());
 				return 3;
 			}
 			else if (deepBrowserTree>0){
@@ -825,9 +816,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 					
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					
+					aB.setTitle(parentNode.getName());					
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);					
 					
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
@@ -891,12 +881,15 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);					
+					emptyTextView.setVisibility(View.VISIBLE);	
+					contentText.setVisibility(View.GONE);
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
+					aB.setTitle(getInfoNode());
+					contentText.setVisibility(View.VISIBLE);
 				}			
 			}	
 		}
