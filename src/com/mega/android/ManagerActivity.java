@@ -531,6 +531,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
 			ArrayList<MegaUser> contacts = megaApi.getContacts();
+			
 			for (int i=0; i < contacts.size(); i++){
 				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
 					contact = contacts.get(i);
@@ -660,7 +661,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        
 	        customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
 	        customSearch.setOnClickListener(this);
-			
+
 //			customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
 //			customListGrid.setOnClickListener(this);
 			
@@ -1375,25 +1376,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragment.class, null);
     				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
     				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
-    			}
+    			}			
     			
-//    			View mIndicator = v.inflate(R.drawable.tab_indicator_ab_megaactionbar, mTabHostContacts.getTabWidget(), false);
-//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);
-//
-//    		    title1.setText("TAB1");
-//
-//    		    mTabsAdapterContacts.addTab(mTabHostContacts.newTabSpec("TAB1").setIndicator( mIndicator), F_GetGames.class, null);
-//
-//    		    View mIndicator2 = inflater.inflate(R.layout.tab_indicator_holo,      mTabHostContacts.getTabWidget(), false);
-//    		    TextView title2 = (TextView) mIndicator2.findViewById(android.R.id.title);
-//
-//    		    title2.setText("TAB2");
-//    		    mTabsAdapterContacts.addTab(mTabHostContacts.newTabSpec("TAB2").setIndicator(mIndicator2), F_MusicList.class, null);
-    			
-    			
-    	        
-    			//frameLayout.setVisibility(View.GONE);     			
-   			
     			customSearch.setVisibility(View.VISIBLE);   			
     			    			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -1888,14 +1872,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (maF != null){
 			if (drawerItem == DrawerItem.ACCOUNT){
-				if (maF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
+				
+				drawerItem = DrawerItem.ACCOUNT;
+				selectDrawerItem(drawerItem);
+				if(nDA!=null){
+					nDA.setPositionClicked(0);
 				}
+				return;
+				
+//				if (maF.onBackPressed() == 0){
+//					drawerItem = DrawerItem.CLOUD_DRIVE;
+//					selectDrawerItem(drawerItem);
+//					if(nDA!=null){
+//						nDA.setPositionClicked(0);
+//					}
+//					return;
+//				}
 			}
 		}
 		
@@ -2676,7 +2668,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				break;
 			}
 			case R.id.top_control_bar:{
-				drawerItem = DrawerItem.CLOUD_DRIVE;
+				drawerItem = DrawerItem.ACCOUNT;
 				selectDrawerItem(drawerItem);
 				break;
 			}
@@ -2871,8 +2863,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 4, used.length() + 4 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        usedSpace.setText(wordtoSpan);
-		        
+		        usedSpace.setText(wordtoSpan);	  
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
@@ -3153,7 +3144,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			if (!avatarExists){
-				log("No existe el AVATAR");
+				log("AVATAR does not exist");
 				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 				Canvas c = new Canvas(defaultAvatar);
 				Paint p = new Paint();
