@@ -300,13 +300,14 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			menuOverflowLayout.setVisibility(View.GONE);	
 			menuOverflowList.setVisibility(View.GONE);
 			titleOverflowList.setVisibility(View.GONE);	
-
 					
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			contentText.setVisibility(View.GONE);
 			
+			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
+			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
@@ -328,14 +329,13 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				adapterList.setParentHandle(parentHandle);
 				adapterList.setNodes(nodes);
 			}
-			log("Elparenthandle es "+parentHandle);
+
 			if (parentHandle == -1){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(getString(R.string.section_shared_with_me));
 			}
 			else{
-				log("Otra opcion");
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				contentText.setText(getInfoFolder(infoNode));
 				aB.setTitle(infoNode.getName());
@@ -348,7 +348,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			
 			setNodes(nodes);
 			
-			if (adapterList.getCount() == 0){					
+			if (adapterList.getCount() == 0){	
 				
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
