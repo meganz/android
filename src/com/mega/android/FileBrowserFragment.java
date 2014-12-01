@@ -918,7 +918,19 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterList.setNodes(nodes);
-					listView.setSelection(0);
+					listView.post(new Runnable() 
+				    {
+				        @Override
+				        public void run() 
+				        {
+				        	listView.setSelection(0);
+				            View v = listView.getChildAt(0);
+				            if (v != null) 
+				            {
+				                v.requestFocus();
+				            }
+				        }
+				    });
 					adapterList.setParentHandle(parentHandle);
 					contentText.setText(getInfoFolder(parentNode));
 					return 2;
@@ -960,7 +972,19 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterGrid.setNodes(nodes);
-					listView.setSelection(0);
+					listView.post(new Runnable() 
+				    {
+				        @Override
+				        public void run() 
+				        {
+				        	listView.setSelection(0);
+				            View v = listView.getChildAt(0);
+				            if (v != null) 
+				            {
+				                v.requestFocus();
+				            }
+				        }
+				    });
 					adapterGrid.setParentHandle(parentHandle);
 					contentText.setText(getInfoFolder(parentNode));
 					return 2;

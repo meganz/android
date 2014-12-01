@@ -121,7 +121,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
-	public static int POS_CAMERA_UPLOADS = 4;
+	public static int POS_CAMERA_UPLOADS = 5;
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
@@ -175,6 +175,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	private MenuItem createFolderMenuItem;
 	private MenuItem addMenuItem;
+	private MenuItem pauseRestartTransfersItem;
 	private MenuItem refreshMenuItem;
 	private MenuItem sortByMenuItem;
 	private MenuItem helpMenuItem;
@@ -621,7 +622,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        
 	        List<String> items = new ArrayList<String>();
 			for (DrawerItem item : DrawerItem.values()) {
-				if (!item.equals(DrawerItem.RUBBISH_BIN) && (!item.equals(DrawerItem.SEARCH))){
+				if (!item.equals(DrawerItem.SEARCH)){
 					items.add(item.getTitle(this));
 				}
 			}
@@ -1628,34 +1629,37 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(true);
-	    			addMenuItem.setVisible(true);
-	    			refreshMenuItem.setVisible(true);
-	    			sortByMenuItem.setVisible(true);
-	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
-	    			settingsMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(false);
-	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
-	    			
-	    			if (downloadPlay){
-	    				addMenuItem.setIcon(R.drawable.ic_pause);
-	    			}
-	    			else{
-	    				addMenuItem.setIcon(R.drawable.ic_play);
-	    			}
-	    			createFolderMenuItem.setEnabled(false);
-	    			
-	    			if (megaApi.getTransfers().size() == 0){
-	    				createFolderMenuItem.setVisible(false);
-	    				addMenuItem.setVisible(false);
-	    				downloadPlay = true;
-	    			}
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
+    				//Show
+    				pauseRestartTransfersItem.setVisible(true);
+        			refreshMenuItem.setVisible(true);
+        			helpMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(true);
+        			settingsMenuItem.setVisible(true);
+        			
+    				//Hide
+    				createFolderMenuItem.setVisible(false);
+    				addContactMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			sortByMenuItem.setVisible(false);
+        			selectMenuItem.setVisible(false);
+        			unSelectMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+        			rubbishBinMenuItem.setVisible(false);
+        			clearRubbishBinMenuitem.setVisible(false);
+        			
+//        			if (downloadPlay){
+//        				addMenuItem.setIcon(R.drawable.ic_pause);
+//        			}
+//        			else{
+//        				addMenuItem.setIcon(R.drawable.ic_play);
+//        			}
+        			
+        			if (megaApi.getTransfers().size() == 0){
+        				downloadPlay = true;
+        			}
     			}
     			
     			break;
@@ -2022,6 +2026,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		addContactMenuItem =menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
+		pauseRestartTransfersItem = menu.findItem(R.id.action_pause_restart_transfers);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
@@ -2056,6 +2061,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
 				
 				//Hide
+    			pauseRestartTransfersItem.setVisible(false);
     			addContactMenuItem.setVisible(false);    			
     			unSelectMenuItem.setVisible(false); 
     			clearRubbishBinMenuitem.setVisible(false); 
@@ -2088,7 +2094,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			
-    			//Hide				
+    			//Hide	
+    			pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);				
     			addMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);    			
@@ -2110,17 +2117,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (rbF != null){
 			if (drawerItem == DrawerItem.RUBBISH_BIN){
+				
+				//Show
+				refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(true);
+    			
+				//Hide
+				pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-    			refreshMenuItem.setVisible(true);
-    			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(false);
     			upgradeAccountMenuItem.setVisible(false);
     			settingsMenuItem.setVisible(false);
-    			selectMenuItem.setVisible(true);
     			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(true);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
@@ -2152,6 +2164,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
 				
     			//Hide
+    			pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);   			
@@ -2181,6 +2194,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
 				
     			//Hide
+    			pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);   			
@@ -2198,27 +2212,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (maF != null){
 			if (drawerItem == DrawerItem.ACCOUNT){
+				
+				//Show
+				refreshMenuItem.setVisible(true);
+				helpMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(true);
+				settingsMenuItem.setVisible(true);
+				changePass.setVisible(true); 
+				
+				//Hide
+				pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
-//				rubbishBinMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
-    			refreshMenuItem.setVisible(true);
     			sortByMenuItem.setVisible(false);
-    			helpMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(false);
-//    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
-//    			rubbishBinMenuItem.setEnabled(false);
-//    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			addMenuItem.setEnabled(false);
-//    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
     			createFolderMenuItem.setEnabled(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
-    			changePass.setVisible(true); 
     			
     			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
     			log("Export in: "+path);
@@ -2237,97 +2251,99 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (tF != null){
 			if (drawerItem == DrawerItem.TRANSFERS){
-				createFolderMenuItem.setVisible(true);
-				addContactMenuItem.setVisible(false);
-//				rubbishBinMenuItem.setVisible(false);
-    			addMenuItem.setVisible(true);
+				//Show
+				pauseRestartTransfersItem.setVisible(true);
     			refreshMenuItem.setVisible(true);
-    			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
+    			
+				//Hide
+				createFolderMenuItem.setVisible(false);
+				addContactMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			sortByMenuItem.setVisible(false);
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(false);
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
-    			
-    			if (downloadPlay){
-    				addMenuItem.setIcon(R.drawable.ic_pause);
-    			}
-    			else{
-    				addMenuItem.setIcon(R.drawable.ic_play);
-    			}
-//    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
-//    			rubbishBinMenuItem.setEnabled(false);
-//    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
-    			createFolderMenuItem.setEnabled(false);
-    			
-    			if (megaApi.getTransfers().size() == 0){
-    				createFolderMenuItem.setVisible(false);
-//    				rubbishBinMenuItem.setVisible(false);
-    				addMenuItem.setVisible(false);
-    				downloadPlay = true;
-    			}
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			
+//    			if (downloadPlay){
+//    				addMenuItem.setIcon(R.drawable.ic_pause);
+//    			}
+//    			else{
+//    				addMenuItem.setIcon(R.drawable.ic_play);
+//    			}
+    			
+    			if (megaApi.getTransfers().size() == 0){
+    				downloadPlay = true;
+    			}
 			}
 		}
 		
 		if (oF != null){
 			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+				
+				//Show
+				refreshMenuItem.setVisible(true);
+    			sortByMenuItem.setVisible(true);
+    			helpMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
+    			
+				//Hide
+    			pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
-    			refreshMenuItem.setVisible(true);
-    			sortByMenuItem.setVisible(true);
-    			helpMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			settingsMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
     			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(true);
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
+    			rubbishBinMenuItem.setVisible(false);
+    			clearRubbishBinMenuitem.setVisible(false);
+    			
     			if (isListOffline){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 				}
 				else{
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
     			}
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
+    			
 			}
 		}
 		
 		if (sF != null){
 			if (drawerItem == DrawerItem.SEARCH){
 				if (createFolderMenuItem != null){
-	    			createFolderMenuItem.setVisible(false);
-	    			addContactMenuItem.setVisible(false);
-//	    			rubbishBinMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
+					
+					//Show
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
+	    			thumbViewMenuItem.setVisible(true);
+
+					//Hide
+					pauseRestartTransfersItem.setVisible(false);
+	    			createFolderMenuItem.setVisible(false);
+	    			addContactMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
 	    			changePass.setVisible(false); 
 	    			exportMK.setVisible(false); 
 	    			removeMK.setVisible(false); 
-//	    			logoutMenuItem.setVisible(true);
-//	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
-//	    			rubbishBinMenuItem.setEnabled(false);
-//	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			addMenuItem.setEnabled(false);
-//	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
@@ -2337,14 +2353,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		if (psF != null){
 			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+				
+				//Show
+    			helpMenuItem.setVisible(true);
+    			settingsMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(true);
+
+				//Hide
+				pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			refreshMenuItem.setVisible(false);
     			sortByMenuItem.setVisible(false);
-    			helpMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
@@ -2353,14 +2374,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
+    			rubbishBinMenuItem.setVisible(false);
+    			clearRubbishBinMenuitem.setVisible(false);
+
     			if (isListCameraUpload){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 				}
 				else{
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
     			}
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
 			}
 		}
 	    	    
@@ -2432,19 +2454,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	return true;
 	        }
 	        case R.id.action_add:{
+	        	this.uploadFile();
+	        	return true;     	
+	        }
+	        case R.id.action_pause_restart_transfers:{
 	        	if (drawerItem == DrawerItem.TRANSFERS){	    			
 	    			if (downloadPlay){
 	    				downloadPlay = false;
+	    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_restart_transfers));
 	    			}
 	    			else{
 	    				downloadPlay = true;
+	    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_pause_transfers));
 	    			}
 	    			megaApi.pauseTransfers(!downloadPlay, this);
 	        	}
-	        	else{
-		        	this.uploadFile();
-	        	}
-	        	return true;     	
+	        	
+	        	return true;
 	        }
 	        case R.id.action_select:{
 	        	//TODO: multiselect
@@ -2816,9 +2842,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			nDA.setPositionClicked(position);
 		}
 		
-		if (position >= 3){
-			position++;
-		}
+//		if (position >= 3){
+//			position++;
+//		}
 		drawerItem = DrawerItem.values()[position];
 		selectDrawerItem(drawerItem);
 	}
@@ -3382,11 +3408,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (tF != null){
 					if (drawerItem == DrawerItem.TRANSFERS){
 						if (!downloadPlay){
-							addMenuItem.setIcon(R.drawable.ic_play);
+		    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_restart_transfers));
 							tF.setPause(true);
 						}
 						else{
-							addMenuItem.setIcon(R.drawable.ic_pause);
+		    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_pause_transfers));
 							tF.setPause(false);
 						}		
 					}
@@ -4737,8 +4763,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void setPauseIconVisible(boolean visible){
 		log("setPauseIconVisible");
 		pauseIconVisible = visible;
-		if (addMenuItem != null){
-			addMenuItem.setVisible(visible);
+		if (pauseRestartTransfersItem != null){
+			pauseRestartTransfersItem.setVisible(visible);
 		}
 	}
 	

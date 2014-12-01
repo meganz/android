@@ -34,6 +34,14 @@
 	    android:title="@string/menu_add_contact"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_pause_restart_transfers"
+	    android:orderInCategory="100"
+	    android:showAsAction="never"
+	    android:title="@string/menu_pause_transfers"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
 
 	<item
 	    android:id="@+id/action_new_folder"

@@ -78,15 +78,18 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shared_with_me,0,0,0);
 				break;
 			case 3:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_rubbish_light,0,0,0);
 				break;
 			case 4:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
 				break;
 			case 5:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_transfers,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
 				break;
 			case 6:
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_transfers,0,0,0);
+				break;
+			case 7:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_my_account,0,0,0);
 				break;
 		}
