@@ -276,8 +276,11 @@
     <string name="my_account_total_space">Storage Space</string>
     <string name="my_account_free_space">Free Space</string>
     <string name="my_account_used_space">Used space</string>
-    <string name="my_account_upgrade_pro">Upgrade to Pro</string>
+    <string name="my_account_upgrade_pro">Upgrade now!</string>
     <string name="my_account_change_password">Change password</string>
+    
+    <string name="my_account_last_session">Last session:</string>
+    <string name="my_account_connections">Connections:</string>
     
     <string name="my_account_changing_password">Changing password</string>
     <string name="my_account_change_password_oldPassword">Current password</string>

@@ -1,6 +1,9 @@
 package com.mega.android;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -183,6 +186,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem addContactMenuItem;
 	private MenuItem rubbishBinMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
+	private MenuItem changePass;
+	private MenuItem exportMK;
+	private MenuItem removeMK;
 	
 	private static DrawerItem drawerItem;
 	
@@ -1303,8 +1309,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			customSearch.setVisibility(View.VISIBLE);
     			viewPagerContacts.setVisibility(View.GONE);
-
+    			
     			if (createFolderMenuItem != null){
+    				changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
 	    			createFolderMenuItem.setVisible(true);
 	    			addContactMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(true);
@@ -1378,11 +1387,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
     			}			
     			
-    			customSearch.setVisibility(View.VISIBLE);   			
-    			    			
+    			customSearch.setVisibility(View.VISIBLE);     			
+			    			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
 
     			if (createFolderMenuItem != null){
+    				changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
     				createFolderMenuItem.setVisible(false);
     				addContactMenuItem.setVisible(true);
 	    			addMenuItem.setVisible(false);
@@ -1450,6 +1462,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			unSelectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
 	    			addMenuItem.setEnabled(false);
+	    			changePass.setVisible(false);
+	    			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+    			
         			if (isListRubbishBin){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -1529,6 +1545,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			createFolderMenuItem.setVisible(false);
         			rubbishBinMenuItem.setVisible(false);
         			clearRubbishBinMenuitem.setVisible(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
 	    		}
     			
     			break;
@@ -1554,14 +1573,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				createFolderMenuItem.setVisible(false);
 //    				rubbishBinMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
+	    			thumbViewMenuItem.setVisible(false);
+	    			changePass.setVisible(true); 
+	    			
+	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+	    			log("Export in: "+path);
+	    			File file= new File(path);
+	    			if(file.exists()){
+	    				exportMK.setVisible(false); 
+		    			removeMK.setVisible(true); 
+	    			}
+	    			else{
+	    				exportMK.setVisible(true); 
+		    			removeMK.setVisible(false); 		
+	    			}
+	    			
 //	    			logoutMenuItem.setVisible(true);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
@@ -1604,6 +1637,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			settingsMenuItem.setVisible(true);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
+	    			changePass.setVisible(false); 
+	    			exportMK.setVisible(false); 
+	    			removeMK.setVisible(false); 
 	    			
 	    			if (downloadPlay){
 	    				addMenuItem.setIcon(R.drawable.ic_pause);
@@ -1661,6 +1697,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			thumbViewMenuItem.setVisible(true);
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
+	    			changePass.setVisible(false); 
+	    			exportMK.setVisible(false); 
+	    			removeMK.setVisible(false); 
 	    			if (isListOffline){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -1712,6 +1751,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			addMenuItem.setEnabled(true);
         			rubbishBinMenuItem.setVisible(false); 
         			clearRubbishBinMenuitem.setVisible(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
     			}
     			break;
     		}
@@ -1761,6 +1803,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			thumbViewMenuItem.setVisible(true);
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
+	    			changePass.setVisible(false); 
+	    			exportMK.setVisible(false); 
+	    			removeMK.setVisible(false); 
 	    			if (isListCameraUpload){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -1873,7 +1918,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (maF != null){
 			if (drawerItem == DrawerItem.ACCOUNT){
 				
-				drawerItem = DrawerItem.ACCOUNT;
+				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItem(drawerItem);
 				if(nDA!=null){
 					nDA.setPositionClicked(0);
@@ -1990,6 +2035,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		
+		changePass = menu.findItem(R.id.action_menu_change_pass);
+		exportMK = menu.findItem(R.id.action_menu_export_MK);
+		removeMK = menu.findItem(R.id.action_menu_remove_MK);
+		
 //		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		if (fbF != null){
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -2009,7 +2058,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//Hide
     			addContactMenuItem.setVisible(false);    			
     			unSelectMenuItem.setVisible(false); 
-    			clearRubbishBinMenuitem.setVisible(false);  
+    			clearRubbishBinMenuitem.setVisible(false); 
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     			
     			if (isListCloudDrive){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2041,6 +2093,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			addMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);    			
     			addMenuItem.setEnabled(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     			
     			if (isListContacts){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2067,6 +2122,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			addMenuItem.setEnabled(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
+    			
     			if (isListRubbishBin){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 				}
@@ -2103,6 +2162,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			createFolderMenuItem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     		}
 		}
 		
@@ -2128,6 +2190,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			createFolderMenuItem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     		}
 		}
 		
@@ -2137,14 +2202,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //				rubbishBinMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
-    			refreshMenuItem.setVisible(false);
+    			refreshMenuItem.setVisible(true);
     			sortByMenuItem.setVisible(false);
     			helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(false);
 //    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //    			rubbishBinMenuItem.setEnabled(false);
 //    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
@@ -2153,6 +2218,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			createFolderMenuItem.setEnabled(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			changePass.setVisible(true); 
+    			
+    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+    			log("Export in: "+path);
+    			File file= new File(path);
+    			if(file.exists()){
+    				exportMK.setVisible(false); 
+	    			removeMK.setVisible(true); 
+    			}
+    			else{
+    				exportMK.setVisible(true); 
+	    			removeMK.setVisible(false); 		
+    			}
+ 
 			}
 		}
 		
@@ -2170,6 +2249,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     			
     			if (downloadPlay){
     				addMenuItem.setIcon(R.drawable.ic_pause);
@@ -2208,6 +2290,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			thumbViewMenuItem.setVisible(true);
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setEnabled(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     			if (isListOffline){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 				}
@@ -2234,6 +2319,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
+	    			changePass.setVisible(false); 
+	    			exportMK.setVisible(false); 
+	    			removeMK.setVisible(false); 
 //	    			logoutMenuItem.setVisible(true);
 //	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
 //	    			rubbishBinMenuItem.setEnabled(false);
@@ -2262,6 +2350,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			thumbViewMenuItem.setVisible(true);
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setEnabled(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
     			if (isListCameraUpload){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 				}
@@ -2588,6 +2679,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 			    		break;
 		        	}
+		        	case ACCOUNT:{
+		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
+			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+			    		intent.putExtra("PARENT_HANDLE", parentHandleSharedWithMe);
+			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+			    		break;
+		        	}
 	        	}
 	        	return true;
 	        }
@@ -2622,6 +2720,82 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //				else {
 //					startActivity(new Intent(this, SettingsActivityHC.class));
 //				}
+	        	return true;
+	        }
+	        
+	        case R.id.action_menu_change_pass:{
+	        	Intent intent = new Intent(this, ChangePasswordActivity.class);
+				startActivity(intent);
+				return true;
+	        }
+	        case R.id.action_menu_remove_MK:{
+	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        switch (which){
+				        case DialogInterface.BUTTON_POSITIVE:
+
+							final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+							final File f = new File(path);
+				        	f.delete();	
+				        	removeMK.setVisible(false);
+				        	exportMK.setVisible(true);
+				            break;
+
+				        case DialogInterface.BUTTON_NEGATIVE:
+				            //No button clicked
+				            break;
+				        }
+				    }
+				};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+				    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+				return true;
+	        }
+	        case R.id.action_menu_export_MK:{
+	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        switch (which){
+				        case DialogInterface.BUTTON_POSITIVE:
+				        	String key = megaApi.exportMasterKey();
+							
+							BufferedWriter out;         
+							try {						
+
+								final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+								final File f = new File(path);
+								log("Export in: "+path);
+								FileWriter fileWriter= new FileWriter(path);	
+								out = new BufferedWriter(fileWriter);	
+								out.write(key);	
+								out.close(); 								
+								String toastMessage = getString(R.string.toast_master_key) + " " + path;
+								Toast.makeText(getBaseContext(), toastMessage, Toast.LENGTH_LONG).show();	
+								removeMK.setVisible(true);
+					        	exportMK.setVisible(false);
+
+							}catch (FileNotFoundException e) {
+							 e.printStackTrace();
+							}catch (IOException e) {
+							 e.printStackTrace();
+							}
+				        	
+				            break;
+
+				        case DialogInterface.BUTTON_NEGATIVE:
+				            //No button clicked
+				            break;
+				        }
+				    }
+				};
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+				    .setNegativeButton(R.string.general_no, dialogClickListener).show();		
+	        	
 	        	return true;
 	        }
 //	        case R.id.action_menu_logout:{
