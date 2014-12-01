@@ -590,15 +590,16 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		try
-				  		{
-				  			startActivity(mediaIntent);
+				  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
+				  			context.startActivity(mediaIntent);
 				  		}
-				  		catch(Exception e)
-				  		{
-				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-				  			
-				  			
+				  		else{
+				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+				  			adapterList.setPositionClicked(-1);
+							adapterList.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(nodes.get(position).getHandle());
+							((ManagerActivity) context).onFileClick(handleList);
 				  		}						
 					}
 					else{

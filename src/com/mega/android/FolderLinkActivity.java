@@ -279,12 +279,12 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-						if (isIntentAvailable(this, viewIntent))
+						if (ManagerActivity.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, intentShare))
+							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
 							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
@@ -364,16 +364,6 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				dlFiles.put(document, folder.getAbsolutePath());
 			}
 		}
-	}
-	
-	/*
-	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
-	 */
-	public static boolean isIntentAvailable(Context ctx, Intent intent) {
-
-		final PackageManager mgr = ctx.getPackageManager();
-		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-		return list.size() > 0;
 	}
 	
 	@Override
@@ -622,14 +612,17 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-			  		try
-			  		{
+			  		if (ManagerActivity.isIntentAvailable(this, mediaIntent)){
 			  			startActivity(mediaIntent);
 			  		}
-			  		catch(Exception e)
-			  		{
-			  			Toast.makeText(this, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-			  		}						
+			  		else{
+			  			Toast.makeText(this, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+			  			adapterList.setPositionClicked(-1);
+						adapterList.notifyDataSetChanged();
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(nodes.get(position).getHandle());
+						onFileClick(handleList);
+			  		}					
 				}
 				else{
 					adapterList.setPositionClicked(-1);

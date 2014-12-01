@@ -1097,16 +1097,6 @@ public void moveToTrash(){
 			}
 		}
 	}
-	
-	/*
-	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
-	 */
-	public static boolean isIntentAvailable(Context ctx, Intent intent) {
-
-		final PackageManager mgr = ctx.getPackageManager();
-		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-		return list.size() > 0;
-	}
 
 	@Override
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
@@ -1152,12 +1142,12 @@ public void moveToTrash(){
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-						if (isIntentAvailable(this, viewIntent))
+						if (ManagerActivity.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, intentShare))
+							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
 							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
