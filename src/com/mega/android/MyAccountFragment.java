@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -53,6 +54,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	TextView infoEmail;
 	TableLayout contentTable;
 	Button logoutButton;	
+	Button upgradeButton;
 //	String userEmail;	
 	Context context;
 	ActionBar aB;
@@ -62,6 +64,10 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	ProgressBar usedSpaceBar;  
 	TextView titleTypeAccount;
 	TextView typeAccount;
+	TextView titleLastSession;
+	TextView lastSession;
+	TextView titleConnections;
+	TextView connections;
 	//	private ListView overflowMenuList;
 	private boolean overflowVisible = false; 
 	MegaApiAndroid megaApi;
@@ -90,7 +96,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 
-		aB.setTitle(R.string.contact_properties_activity);
+		aB.setTitle(R.string.section_account);
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -101,17 +107,10 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
-
-		//			layoutTop = (RelativeLayout) v.findViewById(R.id.contact_properties_layout_top);
-		//			closeImage = (ImageView) v.findViewById(R.id.contact_properties_close_icon);
-		//			overflowImage = (ImageView) v.findViewById(R.id.contact_properties_overflow);
-		//			
-		//			overflowImage.setOnClickListener(this);
-		//			closeImage.setOnClickListener(this);
-		//			
+	
 		imageView = (RoundedImageView) v.findViewById(R.id.my_avatar_image);
-		imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
-		imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
+		imageView.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
+		imageView.getLayoutParams().height = Util.px2dp((200*scaleW), outMetrics);
 		contentTable = (TableLayout) v.findViewById(R.id.my_content_table);
 		userNameTextView = (TextView) v.findViewById(R.id.my_name);
 		infoEmail = (TextView) v.findViewById(R.id.my_email);
@@ -122,11 +121,19 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	    usedSpaceBar.setProgress(0);    
 	    
 		titleTypeAccount = (TextView) v.findViewById(R.id.my_account_title);	  
-		typeAccount = (TextView) v.findViewById(R.id.my_account_type_account);	  
+		typeAccount = (TextView) v.findViewById(R.id.my_account_type_account);	 
+		titleLastSession = (TextView) v.findViewById(R.id.my_last_session_title);	
+		lastSession= (TextView) v.findViewById(R.id.my_last_session);	
+		titleConnections = (TextView) v.findViewById(R.id.my_connections_title);	
+		connections = (TextView) v.findViewById(R.id.my_connections);	
+		
 	
+		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
+		upgradeButton.setOnClickListener(this); 
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
 
+		
 		myEmail=megaApi.getMyEmail();
 		infoEmail.setText(myEmail);
 		userNameTextView.setText(myEmail);
@@ -134,7 +141,19 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		myUser = megaApi.getContact(myEmail);
 
 		logoutButton.setText(R.string.action_logout);
+		lastSession.setText("Not implemented yet");
+		
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
 
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}		
+		connections.setText(visibleContacts.size()+" Contacts");
+		
 		megaApi.getAccountDetails(this);
 		
 		File avatar = null;
@@ -183,8 +202,13 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-			case R.id.logout:{
+			case R.id.my_account_logout:{
 				ManagerActivity.logout(context, (MegaApplication)((ManagerActivity)context).getApplication(), megaApi, false);
+				break;
+			}
+			case R.id.btn_upgrade:{
+				Intent intent = new Intent(getActivity(), UpgradeActivity.class);
+				startActivity(intent);
 				break;
 			}
 		}
@@ -274,22 +298,25 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 					}
 						
 					case 1:{
+						typeAccount.setText(R.string.pro1_account);
 						break;
 					}
 					
 					case 2:{
+						typeAccount.setText(R.string.pro2_account);
 						break;
 					}
 					
 					case 3:{
+						typeAccount.setText(R.string.pro3_account);
 						break;
 					}
 					
 				}
 						
 				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();
-				
+				long usedStorage = accountInfo.getStorageUsed();				
+							
 				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 				String total = "";
 				if (totalStorage >= 1024){

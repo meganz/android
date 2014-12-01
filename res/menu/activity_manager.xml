@@ -141,5 +141,28 @@
 	    android:title="@string/context_clear_rubbish"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_menu_change_pass"
+	    android:orderInCategory="110"
+	    android:showAsAction="never"
+	    android:title="@string/change_password_activity"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_menu_export_MK"
+	    android:orderInCategory="115"
+	    android:showAsAction="never"
+	    android:title="@string/action_export_master_key"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
 		
+	<item
+	    android:id="@+id/action_menu_remove_MK"
+	    android:orderInCategory="115"
+	    android:showAsAction="never"
+	    android:title="@string/action_remove_master_key"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />		
 </menu>

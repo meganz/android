@@ -1,114 +1,229 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".UpgradeActivity" >
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <!-- Choose your package -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="@color/mega"
-            >
-            <ImageView 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/pro_1"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:text="@string/upgrade_choose_package"
-                />
-        </LinearLayout>
-        
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"  
+    android:weightSum="3"
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent" >
+  
         
          <!-- Pro 1 -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:background="@drawable/list_selector_holo_light"
             android:onClick="onUpgrade1Click"
-            >
+            android:layout_weight="1">
             <ImageView 
+                android:id="@+id/pro1_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/standard_margin"
                 android:src="@drawable/ic_pro_1"
                 />
             <TextView
+                android:id="@+id/pro1_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:text="@string/general_pro_1"
-                />
-        </LinearLayout>
+                android:layout_below="@id/pro1_image"/>
+            
+            <TextView
+                android:id="@+id/pro1_storage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/settings_storage"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro1_image"/>
+            
+            <TextView
+                android:id="@+id/pro1_bandwidth_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro1_image"
+                android:layout_below="@id/pro1_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro1_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro1_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro1_bandwidth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro1_image"
+                android:layout_below="@id/pro1_bandwidth_title"/>
+            
+            <TextView
+                android:id="@+id/pricing1_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro1_title"
+                android:layout_below="@id/pro1_bandwidth_title"/>
+            
+        </RelativeLayout>
         
         <include layout="@layout/delimiter" />
         
         <!-- Pro 2 -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:onClick="onUpgrade2Click"
             android:background="@drawable/list_selector_holo_light"
-            >
+            android:layout_weight="1">
             <ImageView 
+                android:id="@+id/pro2_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/standard_margin"
                 android:src="@drawable/ic_pro_2"
                 />
             <TextView
+                android:id="@+id/pro2_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:text="@string/general_pro_2"
-                />
-        </LinearLayout>
+                android:layout_below="@id/pro2_image"/>
+            
+            <TextView
+                android:id="@+id/pro2_storage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/settings_storage"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro2_image"/>
+            
+            <TextView
+                android:id="@+id/pro2_bandwidth_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro2_image"
+                android:layout_below="@id/pro2_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro2_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro2_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro2_bandwidth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro2_image"
+                android:layout_below="@id/pro2_bandwidth_title"/>
+            
+            <TextView
+                android:id="@+id/pricing2_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro2_title"
+                android:layout_below="@id/pro2_bandwidth_title"/>
+        </RelativeLayout>
         
         <include layout="@layout/delimiter" />
         
         <!-- Pro 3 -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:background="@drawable/list_selector_holo_light"
             android:onClick="onUpgrade3Click"
-            >
+            android:layout_weight="1">
             <ImageView 
+                android:id="@+id/pro3_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/standard_margin"
                 android:src="@drawable/ic_pro_3"
                 />
-            <TextView
+             <TextView
+                android:id="@+id/pro3_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:text="@string/general_pro_3"
-                />
-        </LinearLayout>
+                android:layout_below="@id/pro3_image"/>
+            
+            <TextView
+                android:id="@+id/pro3_storage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/settings_storage"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro3_image"/>
+            
+            <TextView
+                android:id="@+id/pro3_bandwidth_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro3_image"
+                android:layout_below="@id/pro3_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro3_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro3_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro3_bandwidth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro3_image"
+                android:layout_below="@id/pro3_bandwidth_title"/>
+            
+            <TextView
+                android:id="@+id/pricing3_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro3_title"
+                android:layout_below="@id/pro3_bandwidth_title"/>
+        </RelativeLayout>
         
         <include layout="@layout/delimiter" />
         
         
     </LinearLayout>
-
-</ScrollView>
