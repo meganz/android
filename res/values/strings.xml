@@ -308,6 +308,8 @@
     
     <string name="transfers_empty">No active transfers</string>
     <string name="transfers_pause">All transfers are paused</string>
+    <string name="menu_pause_transfers">Pause transfers</string>
+    <string name="menu_restart_transfers">Restart transfers</string>
     
     <string name="cam_sync_initial_activity">Camera Sync</string>
     <string name="cam_sync_wifi">Wi-Fi only</string>
