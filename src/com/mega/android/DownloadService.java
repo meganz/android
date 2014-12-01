@@ -418,7 +418,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
 				viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				if (isIntentAvailable(this, viewIntent))
+				if (ManagerActivity.isIntentAvailable(this, viewIntent))
 					startActivity(viewIntent);
 				else{
 					Intent intentShare = new Intent(Intent.ACTION_SEND);
@@ -432,7 +432,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			intent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName())
 					.getType());
 			
-			if (!isIntentAvailable(DownloadService.this, intent)){
+			if (!ManagerActivity.isIntentAvailable(DownloadService.this, intent)){
 				intent.setAction(Intent.ACTION_SEND);
 				intent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName())
 						.getType());
@@ -536,16 +536,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
-	}
-	
-	/*
-	 * If there is an application that can manage the Intent, returns true. Otherwise, false.
-	 */
-	public boolean isIntentAvailable(Context ctx, Intent intent) {
-
-		final PackageManager mgr = ctx.getPackageManager();
-		List<ResolveInfo> list = mgr.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-		return list.size() > 0;
 	}
 	
 	@Override

@@ -598,11 +598,17 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 
 					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 					mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					try {
-						startActivity(mediaIntent);
-					} catch (Exception e) {
-						Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-					}
+					if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
+			  			startActivity(mediaIntent);
+			  		}
+			  		else{
+			  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+			  			adapter.setPositionClicked(-1);
+						adapter.notifyDataSetChanged();
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(contactNodes.get(position).getHandle());
+						((ContactPropertiesMainActivity)context).onFileClick(handleList);
+			  		}
 				} else {
 					adapter.setPositionClicked(-1);
 					adapter.notifyDataSetChanged();

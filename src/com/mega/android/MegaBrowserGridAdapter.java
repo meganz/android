@@ -879,14 +879,15 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		try
-				  		{
+				  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
 				  			context.startActivity(mediaIntent);
 				  		}
-				  		catch(Exception e)
-				  		{
-				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-				  		}						
+				  		else{
+				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+				  			ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(n.getHandle());
+							((ManagerActivity) context).onFileClick(handleList);
+				  		}					
 					}
 					else{
 						ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1016,13 +1017,14 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
 				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-				  		try
-				  		{
+				  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
 				  			context.startActivity(mediaIntent);
 				  		}
-				  		catch(Exception e)
-				  		{
-				  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+				  		else{
+				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+				  			ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(n.getHandle());
+							((ManagerActivity) context).onFileClick(handleList);
 				  		}						
 					}
 					else{
