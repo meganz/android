@@ -8,8 +8,9 @@ public class MegaMonthPic {
 	
 	String monthYearString;
 	ArrayList<Long> nodeHandles;
+	int numRows;
 
-	MegaMonthPic(String monthYearString, ArrayList<Long> nodes){
+	MegaMonthPic(String monthYearString, ArrayList<Long> nodeHandles){
 		this.monthYearString = monthYearString;
 		this.nodeHandles = nodeHandles;
 	}

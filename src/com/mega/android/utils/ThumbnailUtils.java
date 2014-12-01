@@ -170,33 +170,14 @@ public class ThumbnailUtils {
 							final Bitmap bitmap = getBitmapForCache(thumb, context);
 							if (bitmap != null) {
 								thumbnailCache.put(handle, bitmap);
-								if (numView == 1){
-									if ((holder.document1 == handle)){
-										holder.imageView1.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										holder.imageView1.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
-									}
-								}
-								else if (numView == 2){
-									if ((holder.document2 == handle)){
-										holder.imageView2.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										holder.imageView2.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
-									}
-								}
-								else if (numView == 3){
-									if ((holder.document3 == handle)){
-										holder.imageView3.setImageBitmap(bitmap);
-										Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
-										holder.imageView3.startAnimation(fadeInAnimation);
-										adapter.notifyDataSetChanged();
-										log("Thumbnail update");
-									}
-								}
+								
+								if ((holder.documents.get(numView) == handle)){
+									holder.imageViews.get(numView).setImageBitmap(bitmap);
+									Animation fadeInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_in);
+									holder.imageViews.get(numView).startAnimation(fadeInAnimation);
+									adapter.notifyDataSetChanged();
+									log("Thumbnail update");
+								}								
 							}
 						}
 					}
