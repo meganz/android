@@ -10,35 +10,30 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mega.android.CameraUploadFragment.PhotoSyncGridHolder;
-import com.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaNode;
 
-public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickListener {
+public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 	
 	Context context;
 	
 	ArrayList<MegaNode> nodes;
-	ArrayList<PhotoSyncGridHolder> nodesArrayGrid;
+	ArrayList<MegaMonthPic> monthPics;
 	int positionClicked;
 	
 	MegaApiAndroid megaApi;
@@ -50,11 +45,13 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	TextView emptyTextViewFragment;
 	ActionBar aB;
 	
+	int numberOfCells;
+	
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
-	public MegaPhotoSyncGridAdapter(Context _context, ArrayList<PhotoSyncGridHolder> _nodesArrayGrid, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes) {
+	public MegaPhotoSyncGridAdapter(Context _context, ArrayList<MegaMonthPic> _monthPics, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells) {
 		this.context = _context;
-		this.nodesArrayGrid = _nodesArrayGrid;
+		this.monthPics = _monthPics;
 		this.photoSyncHandle = _photosyncHandle;
 		this.nodes = _nodes;
 		
@@ -63,6 +60,8 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 		this.emptyTextViewFragment = emptyTextView;
 		this.aB = aB;
 		
+		this.numberOfCells = numberOfCells;
+		
 		this.positionClicked = -1;
 		
 		if (megaApi == null){
@@ -70,8 +69,8 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 		}
 	}
 	
-	public void setNodes(ArrayList<PhotoSyncGridHolder> nodesArrayGrid, ArrayList<MegaNode> nodes){
-		this.nodesArrayGrid = nodesArrayGrid;
+	public void setNodes(ArrayList<MegaMonthPic> monthPics, ArrayList<MegaNode> nodes){
+		this.monthPics = monthPics;
 		this.nodes = nodes;
 		positionClicked = -1;	
 		notifyDataSetChanged();
@@ -94,18 +93,15 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	
 	/*private view holder class*/
     public class ViewHolderPhotoSyncGrid {
-    	public RelativeLayout itemLayout;
-    	public ImageButton imageView1;
-    	public ImageButton imageView2;
-    	public ImageButton imageView3;
-        
-    	public RelativeLayout monthLayout;
-    	public TextView monthTextView;
-
-    	public int currentPosition;
-    	public long document1;
-    	public long document2;
-    	public long document3;
+    	
+    	public LinearLayout cellLayout;
+    	public ArrayList<RelativeLayout> relativeLayoutsComplete;
+    	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
+    	public ArrayList<ImageView> imageViews;
+    	public TextView textView;
+    	public RelativeLayout textRelativeLayout;
+    	
+    	public ArrayList<Long> documents;
     }
     
     ViewHolderPhotoSyncGrid holder = null;
@@ -113,263 +109,265 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		
-//		View v;
-		
-		listFragment = (ListView) parent;
-		final int _position = position;
-		positionG = position;
-		
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-		
+
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
 		if (convertView == null){
-			convertView = inflater.inflate(R.layout.item_photo_sync_grid, parent, false);
 			holder = new ViewHolderPhotoSyncGrid();
-			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_grid_item_layout);
-			holder.imageView1 = (ImageButton) convertView.findViewById(R.id.photo_sync_grid_thumbnail1);
-			holder.imageView2 = (ImageButton) convertView.findViewById(R.id.photo_sync_grid_thumbnail2);
-			holder.imageView3 = (ImageButton) convertView.findViewById(R.id.photo_sync_grid_thumbnail3);
+			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
+			holder.relativeLayoutsComplete = new ArrayList<RelativeLayout>();
+			holder.imageViews = new ArrayList<ImageView>();
 			
-			RelativeLayout.LayoutParams paramsIL = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-			paramsIL.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-			paramsIL.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-			paramsIL.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-			holder.itemLayout.setLayoutParams(paramsIL);
+			holder.documents = new ArrayList<Long>();
+
+			convertView = inflater.inflate(R.layout.item_photo_sync_grid, parent, false);
+
+			holder.cellLayout = (LinearLayout) convertView.findViewById(R.id.cell_photosync_layout);
 			
-			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
-			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
-			paramsIV1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-			holder.imageView1.setLayoutParams(paramsIV1);
-			
-			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
-			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			paramsIV2.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
-			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-			holder.imageView2.setLayoutParams(paramsIV2);
-			
-			RelativeLayout.LayoutParams paramsIV3 = new RelativeLayout.LayoutParams(Util.px2dp(110*scaleW, outMetrics),Util.px2dp(110*scaleH, outMetrics));
-			holder.imageView3.setScaleType(ImageView.ScaleType.FIT_CENTER);
-			paramsIV3.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), 0, 0);
-			paramsIV3.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-			holder.imageView3.setLayoutParams(paramsIV3);
-			
-			holder.imageView1.setTag(holder);
-			holder.imageView1.setOnClickListener(this);
-			
-			holder.imageView2.setTag(holder);
-			holder.imageView2.setOnClickListener(this);
-			
-			holder.imageView3.setTag(holder);
-			holder.imageView3.setOnClickListener(this);			
-			
-			holder.monthLayout = (RelativeLayout) convertView.findViewById(R.id.photo_sync_grid_month_layout);
-			holder.monthTextView = (TextView) convertView.findViewById(R.id.photo_sync_grid_month_name);
+			for (int i=0;i<numberOfCells;i++){
+				View rLView = inflater.inflate(R.layout.cell_photosync_grid_fill, holder.cellLayout, false);
 				
-				//Set width and height itemLayout1
-	//			RelativeLayout.LayoutParams paramsIL1 = new RelativeLayout.LayoutParams(Util.px2dp(172*scaleW, outMetrics),LayoutParams.WRAP_CONTENT);
-	//			paramsIL1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-	//			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-	//			paramsIL1.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-	//			holder.itemLayout1.setLayoutParams(paramsIL1);
+				RelativeLayout rL = (RelativeLayout) rLView.findViewById(R.id.cell_photosync_grid_item_complete_layout);
+				rL.setLayoutParams(new LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+				holder.cellLayout.addView(rL);
+				holder.relativeLayoutsComplete.add(rL);
 				
-	//			RelativeLayout.LayoutParams paramsIV1 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-	//			paramsIV1.addRule(RelativeLayout.CENTER_HORIZONTAL);
-	//			holder.imageView1.setScaleType(ImageView.ScaleType.FIT_CENTER);
-	//			paramsIV1.setMargins(Util.px2dp(5*scaleW, outMetrics), Util.px2dp(5*scaleH, outMetrics), Util.px2dp(5*scaleW, outMetrics), 0);
-	//			holder.imageView1.setLayoutParams(paramsIV1);
-	//			
-	//			RelativeLayout.LayoutParams paramsIV2 = new RelativeLayout.LayoutParams(Util.px2dp(157*scaleW, outMetrics),Util.px2dp(157*scaleH, outMetrics));
-	//			paramsIV2.addRule(RelativeLayout.CENTER_HORIZONTAL);
-	//			holder.imageView2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-	//			paramsIV2.setMargins(0, Util.px2dp(5*scaleH, outMetrics), 0, 0);
-	//			holder.imageView2.setLayoutParams(paramsIV2);
+				RelativeLayout rLE = (RelativeLayout) rLView.findViewById(R.id.cell_photosync_item_layout_empty);
+				holder.relativeLayoutsEmpty.add(rLE);
+				
+				ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
+				holder.imageViews.add(iV);
+			}
+			
+			holder.textRelativeLayout = (RelativeLayout) convertView.findViewById(R.id.cell_photosync_grid_month_layout);
+			
+			holder.textView = (TextView) convertView.findViewById(R.id.cell_photosync_grid_month_name);
 			
 			convertView.setTag(holder);
 		}
-		
 		else{
 			holder = (ViewHolderPhotoSyncGrid) convertView.getTag();
 		}
 		
-		holder.currentPosition = position;
+		MegaMonthPic monthPic = (MegaMonthPic) getItem(position);
 		
-		PhotoSyncGridHolder psGH = (PhotoSyncGridHolder) getItem(position);
-		
-		if (!psGH.isNode){
-			holder.itemLayout.setVisibility(View.GONE);
-			holder.monthLayout.setVisibility(View.VISIBLE);
-			holder.monthTextView.setText(psGH.monthYear);
-		}
+		if (monthPic.monthYearString != null){
+			if (monthPic.monthYearString.compareTo("") != 0){
+				holder.textRelativeLayout.setVisibility(View.VISIBLE);
+				holder.textView.setText(monthPic.monthYearString);
+				for (int i=0;i<numberOfCells;i++){
+					holder.relativeLayoutsComplete.get(i).setVisibility(View.GONE);
+					holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
+				}
+			}
+			else{
+				holder.textRelativeLayout.setVisibility(View.GONE);
+				for (int i=0;i<numberOfCells;i++){
+					if (monthPic.nodeHandles.size() > i){
+						MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
+						
+						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
+						holder.imageViews.get(i).setVisibility(View.VISIBLE);
+						holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
+						if (holder.documents.size() > i){
+							holder.documents.set(i, n.getHandle());
+						}
+						else{
+							holder.documents.add(i, n.getHandle());
+						}
+						
+						Bitmap thumb = null;						
+						holder.imageViews.get(i).setImageResource(MimeType.typeForName(n.getName()).getIconResourceId());	
+						if (n.hasThumbnail()){
+							thumb = ThumbnailUtils.getThumbnailFromCache(n);
+							if (thumb != null){
+								holder.imageViews.get(i).setImageBitmap(thumb);
+							}
+							else{
+								thumb = ThumbnailUtils.getThumbnailFromFolder(n, context);
+								if (thumb != null){
+									holder.imageViews.get(i).setImageBitmap(thumb);
+								}
+								else{ 
+									try{
+										thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
+									}
+									catch(Exception e){} //Too many AsyncTasks
+									
+									if (thumb != null){
+										holder.imageViews.get(i).setImageBitmap(thumb);
+									}
+									else{
+										holder.imageViews.get(i).setImageResource(MimeType.typeForName(n.getName()).getIconResourceId());
+									}
+								}
+							}
+						}
+					}
+					else{
+						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
+						holder.imageViews.get(i).setVisibility(View.GONE);
+						holder.relativeLayoutsEmpty.get(i).setVisibility(View.VISIBLE);
+						if (holder.documents.size() > i){
+							holder.documents.set(i,  -1l);
+						}
+						else{
+							holder.documents.add(i, -1l);
+						}
+					}
+				}
+			}
+				
+		}		
 		else{
-			holder.itemLayout.setVisibility(View.VISIBLE);
-			holder.monthLayout.setVisibility(View.GONE);
-			
-			holder.document1 = psGH.handle1;
-			holder.document2 = psGH.handle2;
-			holder.document3 = psGH.handle3;
-			
-			MegaNode node1 = megaApi.getNodeByHandle(psGH.handle1);
-			if (node1 != null){					
-				Bitmap thumb1 = null;
-				if (!node1.isFolder()){
-					holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
-					if (node1.hasThumbnail()){
-						thumb1 = ThumbnailUtils.getThumbnailFromCache(node1);
-						if (thumb1 != null){
-							holder.imageView1.setImageBitmap(thumb1);
+			holder.textRelativeLayout.setVisibility(View.GONE);
+			for (int i=0;i<numberOfCells;i++){
+				
+				if (monthPic.nodeHandles.size() > i){
+					MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
+					
+					holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
+					holder.imageViews.get(i).setVisibility(View.VISIBLE);
+					holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
+					if (holder.documents.size() > i){
+						holder.documents.set(i, n.getHandle());
+					}
+					else{
+						holder.documents.add(i, n.getHandle());
+					}
+					
+					Bitmap thumb = null;					
+					holder.imageViews.get(i).setImageResource(MimeType.typeForName(n.getName()).getIconResourceId());
+					if (n.hasThumbnail()){
+						thumb = ThumbnailUtils.getThumbnailFromCache(n);
+						if (thumb != null){
+							holder.imageViews.get(i).setImageBitmap(thumb);
 						}
 						else{
-							thumb1 = ThumbnailUtils.getThumbnailFromFolder(node1, context);
-							if (thumb1 != null){
-								holder.imageView1.setImageBitmap(thumb1);
+							thumb = ThumbnailUtils.getThumbnailFromFolder(n, context);
+							if (thumb != null){
+								holder.imageViews.get(i).setImageBitmap(thumb);
 							}
 							else{ 
 								try{
-									thumb1 = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(node1, context, holder, megaApi, this, 1);
+									thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
 								}
 								catch(Exception e){} //Too many AsyncTasks
 								
-								if (thumb1 != null){
-									holder.imageView1.setImageBitmap(thumb1);
+								if (thumb != null){
+									holder.imageViews.get(i).setImageBitmap(thumb);
 								}
 								else{
-									holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+									holder.imageViews.get(i).setImageResource(MimeType.typeForName(n.getName()).getIconResourceId());
 								}
 							}
 						}
 					}
 				}
-			}
-			else{
-				holder.imageView1.setImageResource(android.R.color.transparent);
-			}
-			
-			MegaNode node2 = megaApi.getNodeByHandle(psGH.handle2);
-			if (node2 != null){
-				Bitmap thumb2 = null;
-				if (!node2.isFolder()){
-					holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
-					if (node2.hasThumbnail()){
-						thumb2 = ThumbnailUtils.getThumbnailFromCache(node2);
-						if (thumb2 != null){
-							holder.imageView2.setImageBitmap(thumb2);
-						}
-						else{
-							thumb2 = ThumbnailUtils.getThumbnailFromFolder(node2, context);
-							if (thumb2 != null){
-								holder.imageView2.setImageBitmap(thumb2);
-							}
-							else{ 
-								try{
-									thumb2 = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(node2, context, holder, megaApi, this, 2);
-								}
-								catch(Exception e){} //Too many AsyncTasks
-								
-								if (thumb2 != null){
-									holder.imageView2.setImageBitmap(thumb2);
-								}
-								else{
-									holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
-								}
-							}
-						}
+				else{
+					holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
+					holder.imageViews.get(i).setVisibility(View.GONE);
+					holder.relativeLayoutsEmpty.get(i).setVisibility(View.VISIBLE);
+					if (holder.documents.size() > i){
+						holder.documents.set(i,  -1l);
 					}
-				}
-			}
-			else{
-				holder.imageView2.setImageResource(android.R.color.transparent);
-			}
-			
-			MegaNode node3 = megaApi.getNodeByHandle(psGH.handle3);
-			if (node3 != null){
-				Bitmap thumb3 = null;
-				if (!node3.isFolder()){
-					holder.imageView3.setImageResource(MimeType.typeForName(node3.getName()).getIconResourceId());
-					if (node3.hasThumbnail()){
-						thumb3 = ThumbnailUtils.getThumbnailFromCache(node3);
-						if (thumb3 != null){
-							holder.imageView3.setImageBitmap(thumb3);
-						}
-						else{
-							thumb3 = ThumbnailUtils.getThumbnailFromFolder(node3, context);
-							if (thumb3 != null){
-								holder.imageView3.setImageBitmap(thumb3);
-							}
-							else{ 
-								try{
-									thumb3 = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(node3, context, holder, megaApi, this, 3);
-								}
-								catch(Exception e){} //Too many AsyncTasks
-								
-								if (thumb3 != null){
-									holder.imageView3.setImageBitmap(thumb3);
-								}
-								else{
-									holder.imageView3.setImageResource(MimeType.typeForName(node3.getName()).getIconResourceId());
-								}
-							}
-						}
+					else{
+						holder.documents.add(i, -1l);
 					}
-				}
-			}
-			else{
-				holder.imageView3.setImageResource(android.R.color.transparent);
+				}				
 			}
 		}
 		
-//		return v;
+		
+		for (int i=0; i< holder.imageViews.size(); i++){
+			final int index = i;
+			ImageView iV = holder.imageViews.get(i);
+			iV.setTag(holder);
+			iV.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					ViewHolderPhotoSyncGrid holder= (ViewHolderPhotoSyncGrid) v.getTag();
+					
+					long handle = holder.documents.get(index);
+//					MegaNode n = megaApi.getNodeByHandle(handle);
+					nodeClicked(handle);
+				}
+			} );
+		}
+		
 		
 		return convertView;
-
-	}
+	}	
 	
-	private String getInfoFolder (MegaNode n){
-		ArrayList<MegaNode> nL = megaApi.getChildren(n);
+	public void nodeClicked(long handle){
 		
-		int numFolders = 0;
-		int numFiles = 0;
-		
-		for (int i=0;i<nL.size();i++){
-			MegaNode c = nL.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
+		MegaNode n = megaApi.getNodeByHandle(handle);
+		if (n != null){
+			if (!n.isFolder()){
+				if (MimeType.typeForName(n.getName()).isImage()){
+					int positionInNodes = 0;
+					for (int i=0;i<nodes.size();i++){
+						if(nodes.get(i).getHandle() == n.getHandle()){
+							positionInNodes = i;
+							break;
+						}
+					}
+					
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", positionInNodes);
+					intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+					intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
+					intent.putExtra("orderGetChildren", orderGetChildren);
+					context.startActivity(intent);
+				}
+				else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+					MegaNode file = n;
+					Intent service = new Intent(context, MegaStreamingService.class);
+			  		context.startService(service);
+			  		String fileName = file.getName();
+					try {
+						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+					} 
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+			  		String mimeType = MimeType.typeForName(file.getName()).getType();
+			  		System.out.println("FILENAME: " + fileName);
+			  		
+			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			  		try
+			  		{
+			  			context.startActivity(mediaIntent);
+			  		}
+			  		catch(Exception e)
+			  		{
+			  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
+			  		}						
+				}
+				else{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(n.getHandle());
+					((ManagerActivity) context).onFileClick(handleList);
+				}	
+				positionClicked = -1;
+				notifyDataSetChanged();
 			}
 		}
 		
-		String info = "";
-		if (numFolders > 0){
-			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, numFolders);
-			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-			}
-		}
-		else {
-			info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, numFiles);
-		}
-		
-		return info;
 	}
 
 	@Override
     public int getCount() {
-        return nodesArrayGrid.size();
+		return monthPics.size();
     }
  
     @Override
     public Object getItem(int position) {
-        return nodesArrayGrid.get(position);
+        return monthPics.get(position);
     }
  
     @Override
@@ -384,188 +382,6 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
     public void setPositionClicked(int p){
     	positionClicked = p;
     }
-
-	@Override
-	public void onClick(View v) {
-
-		ViewHolderPhotoSyncGrid holder = (ViewHolderPhotoSyncGrid) v.getTag();
-		int currentPosition = holder.currentPosition;
-		
-		switch (v.getId()){
-			case R.id.photo_sync_grid_thumbnail1:{
-				
-				MegaNode n = megaApi.getNodeByHandle(holder.document1);
-				if (n != null){
-					if (!n.isFolder()){
-						if (MimeType.typeForName(n.getName()).isImage()){
-							int positionInNodes = 0;
-							for (int i=0;i<nodes.size();i++){
-								if(nodes.get(i).getHandle() == n.getHandle()){
-									positionInNodes = i;
-								}
-							}
-							
-							Intent intent = new Intent(context, FullScreenImageViewer.class);
-							intent.putExtra("position", positionInNodes);
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-							intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
-							intent.putExtra("orderGetChildren", orderGetChildren);
-							context.startActivity(intent);
-						}
-						else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
-							MegaNode file = n;
-							Intent service = new Intent(context, MegaStreamingService.class);
-					  		context.startService(service);
-					  		String fileName = file.getName();
-							try {
-								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-							} 
-							catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-							
-					  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeType.typeForName(file.getName()).getType();
-					  		System.out.println("FILENAME: " + fileName);
-					  		
-					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					  		try
-					  		{
-					  			context.startActivity(mediaIntent);
-					  		}
-					  		catch(Exception e)
-					  		{
-					  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-					  		}						
-						}
-						else{
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(n.getHandle());
-							((ManagerActivity) context).onFileClick(handleList);
-						}	
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-				}
-				break;
-			}
-			case R.id.photo_sync_grid_thumbnail2:{
-				MegaNode n = megaApi.getNodeByHandle(holder.document2);
-				if (n != null){
-					if (!n.isFolder()){
-						if (MimeType.typeForName(n.getName()).isImage()){
-							int positionInNodes = 0;
-							for (int i=0;i<nodes.size();i++){
-								if(nodes.get(i).getHandle() == n.getHandle()){
-									positionInNodes = i;
-								}
-							}
-							
-							Intent intent = new Intent(context, FullScreenImageViewer.class);
-							intent.putExtra("position", positionInNodes);
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-							intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
-							intent.putExtra("orderGetChildren", orderGetChildren);
-							context.startActivity(intent);
-						}
-						else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
-							MegaNode file = n;
-							Intent service = new Intent(context, MegaStreamingService.class);
-					  		context.startService(service);
-					  		String fileName = file.getName();
-							try {
-								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-							} 
-							catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-							
-					  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeType.typeForName(file.getName()).getType();
-					  		System.out.println("FILENAME: " + fileName);
-					  		
-					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					  		try
-					  		{
-					  			context.startActivity(mediaIntent);
-					  		}
-					  		catch(Exception e)
-					  		{
-					  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-					  		}						
-						}
-						else{
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(n.getHandle());
-							((ManagerActivity) context).onFileClick(handleList);
-						}	
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-				}
-				break;
-			}
-			case R.id.photo_sync_grid_thumbnail3:{
-				MegaNode n = megaApi.getNodeByHandle(holder.document3);
-				if (n != null){
-					if (!n.isFolder()){
-						if (MimeType.typeForName(n.getName()).isImage()){
-							int positionInNodes = 0;
-							for (int i=0;i<nodes.size();i++){
-								if(nodes.get(i).getHandle() == n.getHandle()){
-									positionInNodes = i;
-								}
-							}
-							
-							Intent intent = new Intent(context, FullScreenImageViewer.class);
-							intent.putExtra("position", positionInNodes);
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-							intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
-							intent.putExtra("orderGetChildren", orderGetChildren);
-							context.startActivity(intent);
-						}
-						else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
-							MegaNode file = n;
-							Intent service = new Intent(context, MegaStreamingService.class);
-					  		context.startService(service);
-					  		String fileName = file.getName();
-							try {
-								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-							} 
-							catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-							
-					  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeType.typeForName(file.getName()).getType();
-					  		System.out.println("FILENAME: " + fileName);
-					  		
-					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					  		try
-					  		{
-					  			context.startActivity(mediaIntent);
-					  		}
-					  		catch(Exception e)
-					  		{
-					  			Toast.makeText(context, "NOOOOOOOO", Toast.LENGTH_LONG).show();
-					  		}						
-						}
-						else{
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(n.getHandle());
-							((ManagerActivity) context).onFileClick(handleList);
-						}	
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-				}
-				break;
-			}
-		}
-	}
 	
 	public long getPhotoSyncHandle(){
 		return photoSyncHandle;
@@ -576,6 +392,6 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter implements OnClickList
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaBrowserGridAdapter", log);
+		Util.log("MegaPhotoSyncGridAdapter", log);
 	}
 }

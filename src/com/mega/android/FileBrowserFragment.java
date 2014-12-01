@@ -395,6 +395,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		    int totalHeight = outMetrics.heightPixels;
 		    
 		    int numberOfCells = totalWidth / GRID_WIDTH;
+		    if (numberOfCells < 2){
+				numberOfCells = 2;
+			}
 		    
 		    listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			listView.setOnItemClickListener(null);
@@ -411,9 +414,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
 			
-			if (numberOfCells < 2){
-				numberOfCells = 2;
-			}
 			
 //		    Toast.makeText(context, totalWidth + "x" + totalHeight + "= " + numberOfCells, Toast.LENGTH_LONG).show();
 			
