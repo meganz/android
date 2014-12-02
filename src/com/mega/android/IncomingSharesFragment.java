@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
@@ -284,8 +285,14 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
-			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 			
+			//TODO scale
+			MarginLayoutParams marginParams = (MarginLayoutParams) emptyImageView.getLayoutParams();			
+			marginParams.topMargin = 300;			
+			emptyImageView.setLayoutParams(marginParams);
+			
+			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+						
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
 			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
@@ -747,7 +754,12 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				aB.setTitle(getString(R.string.section_shared_with_me));	
 				findNodes();
 				adapterList.setNodes(nodes);
+				listView.setVisibility(View.VISIBLE);
 				contentText.setText(getInfoNode());
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				leftNewFolder.setVisibility(View.GONE);
+				rightUploadButton.setVisibility(View.GONE);
 				return 3;
 			}
 			else if (deepBrowserTree>0){
