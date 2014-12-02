@@ -292,10 +292,14 @@
     <string name="change_password_activity">Change password</string>
     
     <string name="upgrade_activity">Pro Membership</string>
-    <string name="upgrade_choose_package">Choose your Package</string>
-    <string name="upgrade_select_pricing">Select pricing</string>
-    <string name="upgrade_per_month">per month</string>
-    <string name="upgrade_per_year">per year</string>
+    <string name="upgrade_select_pricing">Select membership</string>
+    <string name="select_membership_1">Monthly or annual recruiting</string>
+    <string name="select_membership_2">Paypal subscription</string>
+    
+    <string name="upgrade_per_month">Monthly*</string>
+    <string name="upgrade_per_year">Annually*</string>
+    
+    <string name="upgrade_comment">* recurring subscription can be cancelled any time before renewal date.</string>
     
     <string name="error_entity_not_found">Entity not found</string>
     <string name="error_user_blocked">Owner of this file is blocked</string>
