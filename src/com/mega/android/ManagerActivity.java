@@ -102,7 +102,7 @@ import com.mega.sdk.MegaUser;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, CAMERA_UPLOADS, TRANSFERS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, CAMERA_UPLOADS, TRANSFERS, SETTINGS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -114,8 +114,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case CONTACTS: return context.getString(R.string.section_contacts);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_image_viewer);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
-				case ACCOUNT: return context.getString(R.string.section_account);
+				case ACCOUNT: return context.getString(R.string.section_account);				
 				case SEARCH: return context.getString(R.string.search_files_and_folders);
+				case SETTINGS: return context.getString(R.string.action_settings);
 			}
 			return null;
 			
@@ -632,7 +633,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        
 	        List<String> items = new ArrayList<String>();
 			for (DrawerItem item : DrawerItem.values()) {
-				if (!item.equals(DrawerItem.SEARCH)){
+				if (!(item.equals(DrawerItem.SEARCH)||(item.equals(DrawerItem.ACCOUNT)))){					
 					items.add(item.getTitle(this));
 				}
 			}
@@ -1578,8 +1579,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			break;
     		}
+    		case SETTINGS:{
+    			
+    			log("Entro por settings");
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			startActivity(new Intent(this, SettingsActivity.class));
+    			
+    			break;
+    		}
     		case ACCOUNT:{
 
+    			log("Entro por account");
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
     			if (maF == null){
