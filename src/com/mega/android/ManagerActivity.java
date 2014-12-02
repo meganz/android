@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1286,6 +1287,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		case CLOUD_DRIVE:{
 //    			
 //    			megaApi.getPricing(this);
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			    			
 				if (fbF == null){
 					fbF = new FileBrowserFragment();
@@ -1360,6 +1362,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case CONTACTS:{
   			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
     			if (aB == null){
     				aB = getSupportActionBar();
     			}
@@ -1439,6 +1443,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case RUBBISH_BIN:{
     			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
     			if (rbF == null){
     				rbF = new RubbishBinFragment();
     				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
@@ -1500,6 +1506,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case SHARED_WITH_ME:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (aB == null){
     				aB = getSupportActionBar();
@@ -1571,6 +1579,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case ACCOUNT:{
+
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
     			if (maF == null){
     				maF = new MyAccountFragment();
@@ -1628,6 +1638,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case TRANSFERS:{
     			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
     			if (tF == null){
     				tF = new TransfersFragment();
     			}
@@ -1683,6 +1695,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SAVED_FOR_OFFLINE:{
     			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
     			if (oF == null){
     				oF = new OfflineFragment();
     				oF.setIsList(isListOffline);
@@ -1735,11 +1749,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SEARCH:{
     			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
     			if (sF == null){
         			sF = new SearchFragment();
         		}
     			
     			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
+    			
+    			drawerItem = DrawerItem.SEARCH;
     			
     			sF.setSearchNodes(searchNodes);
     			sF.setNodes(searchNodes);
@@ -1755,8 +1773,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				ft.replace(R.id.fragment_container, sF, "sF");
     			ft.commit();
     			
-    			customSearch.setVisibility(View.GONE);
-    			
+    			customSearch.setVisibility(View.GONE);    			
 
     			if (createFolderMenuItem != null){
         			createFolderMenuItem.setVisible(false);
@@ -1779,6 +1796,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case CAMERA_UPLOADS:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (nDA != null){
     				nDA.setPositionClicked(POS_CAMERA_UPLOADS);
@@ -1868,6 +1887,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}	
+		
+		if (drawerItem == DrawerItem.SEARCH){
+			if (sF != null){
+    			if (sF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
+					return;
+				}
+    		}
+    	}
 		
 		if (drawerItem == DrawerItem.CONTACTS){
 			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
@@ -2925,11 +2957,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				break;
 			}
 			case R.id.top_control_bar:{
+				if (nDA != null){
+					nDA.setPositionClicked(-1);
+				}
 				drawerItem = DrawerItem.ACCOUNT;
 				selectDrawerItem(drawerItem);
 				break;
 			}
 			case R.id.bottom_control_bar:{
+				if (nDA != null){
+					nDA.setPositionClicked(-1);
+				}
 				drawerItem = DrawerItem.ACCOUNT;
 				selectDrawerItem(drawerItem);
 				break;
