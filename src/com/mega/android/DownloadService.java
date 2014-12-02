@@ -309,7 +309,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(currentFile.exists() && (document.getSize() == currentFile.length())){
 			
 			currentFile.setReadable(true, false);
-			Toast.makeText(getApplicationContext(), document.getName() + " already downloaded", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), document.getName() + " " +  getString(R.string.general_already_downloaded), Toast.LENGTH_SHORT).show();
 			
 			return false;
 		}

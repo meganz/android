@@ -97,7 +97,7 @@
 		        android:id="@+id/used_space_text_my_account"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:text="@string/used_space_text" 
+	            android:text="@string/my_account_used_space" 
 	            android:textColor="@color/navigation_drawer_text"
 	            android:paddingTop="10dp"
 	            android:layout_marginLeft="10dp"

@@ -399,7 +399,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 								//It is public and shared
 								imageView.setImageResource(R.drawable.mime_folder_public_shared);
 								sharedWithButton.setVisibility(View.VISIBLE);
-								sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 							}
 							else{
 								//It is just public
@@ -414,7 +414,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							//It is private and shared
 							imageView.setImageResource(R.drawable.mime_folder_shared);
 							sharedWithButton.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(getResources().getString(R.string.file_contact_list_activity)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
 						
 					}
@@ -905,7 +905,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						startActivity(intent);
 					}
 					else{
-						Toast.makeText(this, "There is not any app installed in the device to open this file", Toast.LENGTH_LONG).show();
+						Toast.makeText(this, getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
 					}
 		    	}
 				return true;
@@ -1289,7 +1289,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				}
 			}
 			else{
-				Toast.makeText(this, "Impossible to get the link", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
 			}
 			log("export request finished");
 		}
@@ -1301,11 +1301,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
 				nameView.setText(megaApi.getNodeByHandle(request.getNodeHandle()).getName());
 			}			
 			else{
-				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -1316,22 +1316,22 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 					finish();
 				}
 				else{
-					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 					finish();
 				}
 				else{
-					Toast.makeText(this, "The file has not been moved", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
 				}
 				log("move nodes request finished");
 			}
@@ -1345,12 +1345,12 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						statusDialog.dismiss();	
 					} 
 					catch (Exception ex) {}
-					Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
 				}
 				finish();
 			}
 			else{
-				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
 			}
 			log("remove request finished");
 		}
@@ -1362,14 +1362,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (request.getEmail() != null){
-					Toast.makeText(this, "File sent to: " + request.getEmail(), Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.context_correctly_copied_contact) + " " + request.getEmail(), Toast.LENGTH_LONG).show();
 				}
 				else{
-					Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
 				}
 			}
 			else{
-				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
 			}
 			log("copy nodes request finished");
 		}
@@ -1379,11 +1379,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			} 
 			catch (Exception ex) {}
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_LONG).show();
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			}
 			else{
-				Util.showErrorAlertDialog(e, this);
+				Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -1545,11 +1545,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						String type = contactsData.get(i);
 						if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
 							i++;
-							Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+//							Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 						}
 						else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
 							i++;
-							Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+//							Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
 						}
 					}
 				}
@@ -1558,11 +1560,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						String type = contactsData.get(i);
 						if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
 							i++;
-							Toast.makeText(this, "Sending a file: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+//							Toast.makeText(this, "Sending a file: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 						}
 						else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
 							i++;
-							Toast.makeText(this, "Sending a file: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+//							Toast.makeText(this, "Sending a file: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
 						}
 					}
 				}
@@ -1812,7 +1816,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
-							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 						}								
 						return;

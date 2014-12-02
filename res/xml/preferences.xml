@@ -18,7 +18,7 @@
     
     <PreferenceCategory 
         android:key="settings_camera_upload"
-        android:title="@string/settings_camera_upload"
+        android:title="@string/section_photo_sync"
         android:textColor="@color/pressed_mega">
         
 		<Preference

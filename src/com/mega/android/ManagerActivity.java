@@ -112,10 +112,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case SHARED_WITH_ME: return context.getString(R.string.section_shared_with_me);
 				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
 				case CONTACTS: return context.getString(R.string.section_contacts);
-				case CAMERA_UPLOADS: return context.getString(R.string.section_image_viewer);
+				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
 				case ACCOUNT: return context.getString(R.string.section_account);				
-				case SEARCH: return context.getString(R.string.search_files_and_folders);
+				case SEARCH: return context.getString(R.string.action_search);
 				case SETTINGS: return context.getString(R.string.action_settings);
 			}
 			return null;
@@ -2682,7 +2682,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
 	        		
-	    			Toast toast = Toast.makeText(this, "Feature not implemented yet", Toast.LENGTH_LONG);
+	    			Toast toast = Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG);
 	    			toast.show();
 //	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSF");
 //	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -2812,7 +2812,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        case R.id.action_menu_sort_by:{
 	        	switch(drawerItem){
 		        	case CONTACTS:{
-		        		Toast.makeText(managerActivity, "Sort by (in contacts) not yet implemented (it's implemented on CLOUD_DRIVE)", Toast.LENGTH_LONG).show();
+		        		Toast.makeText(managerActivity, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 			    		break;
 		        	}
 		        	default:{
@@ -2825,7 +2825,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	return true;
 	        }
 	        case R.id.action_menu_help:{
-	        	Toast.makeText(managerActivity, "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+	        	Toast.makeText(managerActivity, getString(R.string.general_not_yet_implemented), Toast.LENGTH_SHORT).show();
 	    		return true;
 	    	}
 	        case R.id.action_menu_upgrade_account:{
@@ -2965,7 +2965,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					MenuItemCompat.expandActionView(searchMenuItem);
 				}
 				else{
-					Toast.makeText(this, "searchMenuItem == null", Toast.LENGTH_LONG).show();
+					log("searchMenuItem == null");
 				}
 				break;
 			}
@@ -3200,7 +3200,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 					if (fbF != null){
 						if (drawerItem == DrawerItem.CLOUD_DRIVE){
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -3217,14 +3217,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}										
 				}
 				else{
-					Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, "Correctly moved", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 					if (fbF != null){
 						if (drawerItem == DrawerItem.CLOUD_DRIVE){
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -3249,7 +3249,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 				else{
-					Toast.makeText(this, "The file has not been moved", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
 				}
 				log("move nodes request finished");
 			}
@@ -3263,7 +3263,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						statusDialog.dismiss();	
 					} 
 					catch (Exception ex) {}
-					Toast.makeText(this, "Correctly deleted from MEGA", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
 				}
 				
 				if (fbF != null){
@@ -3295,7 +3295,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 			}
 			else{
-				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
 			}
 			log("remove request finished");
 		}
@@ -3315,7 +3315,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			else{
-				Toast.makeText(this, "Impossible to get the link", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
 			}
 			log("export request finished");
 		}
@@ -3327,7 +3327,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
 				if (fbF != null){
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -3352,7 +3352,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			else{
-				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
 			}
 		} 
 		else if (request.getType() == MegaRequest.TYPE_COPY){
@@ -3362,7 +3362,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
 				if (fbF != null){
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -3387,7 +3387,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			else{
-				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
 			}
 			log("copy nodes request finished");
 		}
@@ -3398,7 +3398,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
 				if (fbF != null){
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
@@ -3498,7 +3498,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();
 //				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 //				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 //				if (cF != null){
@@ -4057,7 +4057,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			megaApi.createFolder(title, parentNode, this);
 		}
 		else{
-			Toast.makeText(this, "Folder already exists", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
 		}		
 	}
 	
@@ -4417,11 +4417,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					String type = contactsData.get(i);
 					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
 						i++;
-						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+						Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+//						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 					}
 					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
 						i++;
-						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+						Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+//						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
 					}
 				}
 
@@ -5155,7 +5157,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
 								if (isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
-								String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 							}								
 						}

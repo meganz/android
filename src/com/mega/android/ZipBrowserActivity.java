@@ -397,7 +397,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeType.typeForName(absolutePath).getType());
 				if (ManagerActivity.isIntentAvailable(this, intentShare))
 					startActivity(intentShare);
-				String toastMessage = getString(R.string.already_downloaded) + ": " + absolutePath;
+				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;
 				Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 			}								
 			return;

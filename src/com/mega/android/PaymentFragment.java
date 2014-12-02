@@ -29,9 +29,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	public enum AccountType {
 		
 		FREE(0, R.drawable.ic_free),
-		PRO_1(1, R.drawable.ic_pro_1, R.string.general_pro_1),
-		PRO_2(2, R.drawable.ic_pro_2, R.string.general_pro_2),
-		PRO_3(3, R.drawable.ic_pro_3, R.string.general_pro_3);
+		PRO_1(1, R.drawable.ic_pro_1, R.string.pro1_account),
+		PRO_2(2, R.drawable.ic_pro_2, R.string.pro2_account),
+		PRO_3(3, R.drawable.ic_pro_3, R.string.pro3_account);
 		
 		private int id;
 		private int resource;

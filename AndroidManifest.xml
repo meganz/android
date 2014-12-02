@@ -50,7 +50,7 @@
         
         <activity
             android:name="InitialCamSyncActivity"
-            android:label="@string/cam_sync_initial_activity"
+            android:label="@string/section_photo_sync"
             android:launchMode="singleTop" 
             android:theme="@style/login_activity"
             android:configChanges="orientation|screenSize"
@@ -60,14 +60,14 @@
         <activity
             android:name="LoginActivity"
             android:theme="@style/login_activity"
-            android:label="@string/login_activity" 
+            android:label="@string/login_text" 
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden" >            
         </activity>    
 
         <activity
             android:name="CreateAccountActivity"
-            android:label="@string/create_account_activity"
+            android:label="@string/create_account_text"
             android:theme="@style/login_activity"
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden" >
@@ -75,7 +75,7 @@
         
         <activity
             android:name="ManagerActivity"
-            android:label="@string/manager_activity"
+            android:label="@string/app_name"
             android:launchMode="singleTop" > 
             
             <intent-filter>
@@ -93,7 +93,7 @@
         
         <activity 
             android:name="OfflineActivity"
-            android:label="@string/offline_activity"
+            android:label="@string/section_saved_for_offline"
             android:launchMode="singleTop" >            
         </activity>
         
@@ -143,7 +143,7 @@
         
          <activity
             android:name="FileContactListActivity"
-            android:label="@string/file_contact_list_activity"
+            android:label="@string/file_properties_shared_folder_select_contact"
             android:launchMode="singleTop"
             android:configChanges="orientation|screenSize">            
         </activity>
@@ -194,13 +194,13 @@
         
         <activity
             android:name="SortByDialogActivity"
-            android:label="@string/general_sort_by"
+            android:label="@string/action_sort_by"
             android:theme="@android:style/Theme.Dialog">
         </activity>
         
         <activity
             android:name="ChangePasswordActivity"
-            android:label="@string/change_password_activity" >
+            android:label="@string/my_account_change_password" >
         </activity>
         
         <activity

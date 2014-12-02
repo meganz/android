@@ -92,7 +92,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 					break;
 				}
 				case R.id.cab_menu_help:{
-					Toast.makeText(getActivity(), "Help not yet implemented (refresh, sort by and logout are implemented)", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_SHORT).show();
 					break;
 				}	
 				case R.id.cab_menu_share_folder:{
@@ -108,7 +108,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 					//TODO remove contact
 					
 					
-					Toast.makeText(getActivity(), "Delete not yet implemented", Toast.LENGTH_SHORT).show();
+					Toast.makeText(getActivity(), context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_SHORT).show();
 					break;
 				}
 				case R.id.cab_menu_select_all:{

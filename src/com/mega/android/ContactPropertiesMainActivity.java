@@ -497,7 +497,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 										MimeType.typeForName(tempNode.getName()).getType());
 								if (ManagerActivity.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
-								String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 							}
 						}
@@ -1154,10 +1154,10 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly renamed", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
 			}
 			else{
-				Toast.makeText(this, "The file has not been renamed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
 			}
 			log("rename nodes request finished");			
 		}
@@ -1168,9 +1168,9 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			}
 
 			if (e.getErrorCode() == MegaError.API_OK) {
-				Toast.makeText(this, "Correctly copied", Toast.LENGTH_SHORT).show();				
+				Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();				
 			} else {
-				Toast.makeText(this, "The file has not been copied", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
 			}
 			log("copy nodes request finished");
 		}
@@ -1181,10 +1181,10 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Correctly moved to Rubbish bin", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 			}
 			else{
-				Toast.makeText(this, "The file has not been removed", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
 			}
 			log("move to rubbish request finished");
 		}
@@ -1195,9 +1195,10 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			catch (Exception ex) {}
 
 			if (e.getErrorCode() == MegaError.API_OK){
-
-				Toast.makeText(this, "The file has been correctly shared", Toast.LENGTH_SHORT).show();
-
+				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_SHORT).show();
+			}
+			else{
+				Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
 			}
 		}
 	}

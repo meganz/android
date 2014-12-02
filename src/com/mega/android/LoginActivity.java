@@ -190,7 +190,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		
-		loginTitle.setText(R.string.login_activity);
+		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(28*scaleH);
 		
 		loginLogin.setVisibility(View.VISIBLE);

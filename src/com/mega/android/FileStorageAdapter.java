@@ -101,7 +101,7 @@ public class FileStorageAdapter extends BaseAdapter implements OnClickListener {
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if (position == 0 && currentFiles.size() == 0) {
 			TextView textView = (TextView) inflater.inflate(R.layout.file_list_empty, parentView, false);
-			int resId = R.string.manager_folder_is_empty;
+			int resId = R.string.file_browser_empty_folder;
 			textView.setText(mContext.getString(resId));
 			return textView;
 		}
