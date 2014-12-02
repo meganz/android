@@ -293,7 +293,7 @@
     
     <string name="upgrade_activity">Pro Membership</string>
     <string name="upgrade_select_pricing">Select membership</string>
-    <string name="select_membership_1">Monthly or annual recruiting</string>
+    <string name="select_membership_1">Monthly or annual recurring</string>
     <string name="select_membership_2">Paypal subscription</string>
     
     <string name="upgrade_per_month">Monthly*</string>

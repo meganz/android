@@ -229,10 +229,15 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 			return true;
 		}
 		case R.id.action_contact_file_list_share: {
-
-			MegaUser user = megaApi.getContact(cflF.getUserEmail());
-			this.pickFolderToShare(user);
-
+			
+    		cpF = (ContactPropertiesFragment) getSupportFragmentManager().findFragmentByTag("cpF");
+        	if (cpF != null){
+        		MegaUser user = megaApi.getContact(cpF.getUserEmail());
+    			this.pickFolderToShare(user);
+        	}
+        	else{
+        		MegaUser user = megaApi.getContact(cflF.getUserEmail());
+    			this.pickFolderToShare(user);   	}
 			return true;
 		}
 		case R.id.action_contact_file_list_view_share: {
