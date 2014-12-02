@@ -27,6 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,7 +47,9 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserListAdapter adapterList;
+	LinearLayout buttonsLayout;
 	SearchFragment searchFragment = this;
+	TextView contentText;
 	
 	MegaApiAndroid megaApi;
 		
@@ -57,7 +60,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 	ArrayList<MegaNode> nodes;
 	ArrayList<MegaNode> searchNodes;
 	String searchQuery = null;
-	
+		
 	private ActionMode actionMode;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
@@ -242,8 +245,12 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		listView.setOnItemClickListener(this);
 		listView.setOnItemLongClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-		listView.setItemsCanFocus(false);
 		
+		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
+		buttonsLayout.setVisibility(View.GONE);
+				
+		listView.setItemsCanFocus(false);
+		contentText = (TextView) v.findViewById(R.id.content_text);
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
@@ -262,7 +269,24 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		
 		setNodes(nodes);
 		
+		contentText.setText(getInfoNode());
+		
+		
 		return v;
+	}
+	
+	private String getInfoNode() {
+		int numFolders = nodes.size();
+		
+		String info = "";
+		if (numFolders > 0) {
+			info = numFolders
+					+ " "
+					+ context.getResources().getQuantityString(
+							R.plurals.general_num_folders, numFolders);
+			
+		} 
+		return info;			
 	}
 		
 	@Override
@@ -315,6 +339,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 				//If folder has no files
 				if (adapterList.getCount() == 0){
 					listView.setVisibility(View.GONE);
+					contentText.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
 					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
@@ -327,6 +352,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);
+					contentText.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
@@ -495,6 +521,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		}
 		else{
 			if (levels > 0){
+				
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 				if (parentNode != null){
 					listView.setVisibility(View.VISIBLE);
@@ -582,6 +609,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 			adapterList.setNodes(nodes);
 			if (adapterList.getCount() == 0){
 				listView.setVisibility(View.GONE);
+				contentText.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 				if (megaApi.getRootNode().getHandle()==parentHandle) {
