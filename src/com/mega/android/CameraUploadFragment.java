@@ -34,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -73,7 +74,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	TextView emptyTextView;
 	LinearLayout buttonsLayout;
 	TextView contentText;
-	Button turnOnOff;
+//	Button turnOnOff;
 	
 	MegaPhotoSyncListAdapter adapterList;
 	MegaPhotoSyncGridAdapter adapterGrid;
@@ -290,6 +291,14 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
 		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
+		
 		if (firstTimeCam){
 			setInitialPreferences();
 			View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
@@ -306,15 +315,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			bOK.setOnClickListener(this);
 			bSkip.setOnClickListener(this);
 			
-			display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    density  = getResources().getDisplayMetrics().density;
-			
-		    scaleW = Util.getScaleW(outMetrics, density);
-		    scaleH = Util.getScaleH(outMetrics, density);
-		    
-		    adapter = new TourImageAdapter((Activity)context);
+			adapter = new TourImageAdapter((Activity)context);
 			viewPager.setAdapter(adapter);
 			viewPager.setCurrentItem(0);
 																		
@@ -338,17 +339,31 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
-			turnOnOff = (Button) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
+			final Button turnOnOff = (Button) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_on));
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-						turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_off));
+						turnOnOff.setVisibility(View.GONE);
+//						turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_off));
 					}
 				}
 			}
 			turnOnOff.setOnClickListener(this);
+			Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				
+									@Override
+									public void run() {
+										log("BUTTON DISAPPEAR");
+										TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+										animTop.setDuration(1000);
+										animTop.setFillAfter( true );
+										turnOnOff.setAnimation(animTop);
+										turnOnOff.setVisibility(View.GONE);
+									}
+								}, 30 * 1000);
 			
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
@@ -489,17 +504,31 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			contentText.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
 			
-			turnOnOff = (Button) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
+			final Button turnOnOff = (Button) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_on));
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+						turnOnOff.setVisibility(View.GONE);
 						turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_off));
 					}
 				}
 			}
 			turnOnOff.setOnClickListener(this);
+			Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {
+				
+									@Override
+									public void run() {
+										log("BUTTON DISAPPEAR");
+										TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+										animTop.setDuration(1000);
+										animTop.setFillAfter( true );
+										turnOnOff.setAnimation(animTop);
+										turnOnOff.setVisibility(View.GONE);
+									}
+								}, 30 * 1000);
 			
 			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			
