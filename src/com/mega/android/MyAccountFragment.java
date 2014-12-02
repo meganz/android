@@ -69,7 +69,6 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	TextView titleConnections;
 	TextView connections;
 	//	private ListView overflowMenuList;
-	private boolean overflowVisible = false; 
 	MegaApiAndroid megaApi;
 	//MegaUser contact;
 	String myEmail;
@@ -207,8 +206,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				break;
 			}
 			case R.id.btn_upgrade:{
-				Intent intent = new Intent(getActivity(), UpgradeActivity.class);
-				startActivity(intent);
+				
+				((ManagerActivity)context).showUpAF();
+				
+//				Intent intent = new Intent(getActivity(), UpgradeActivity.class);
+//				startActivity(intent);
 				break;
 			}
 		}

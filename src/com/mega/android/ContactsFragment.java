@@ -88,8 +88,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 					break;
 				}
 				case R.id.cab_menu_upgrade_account:{
-					Intent intent = new Intent(getActivity(), UpgradeActivity.class);
-					startActivity(intent);
+					((ManagerActivity) context).showUpAF();
 					break;
 				}
 				case R.id.cab_menu_help:{

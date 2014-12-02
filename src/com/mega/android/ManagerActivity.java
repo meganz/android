@@ -233,6 +233,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private OfflineFragment oF;
     private SearchFragment sF;
     private CameraUploadFragment psF;
+    private UpgradeAccountFragment upAF;
+    private PaymentFragment pF;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -2827,8 +2829,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    		return true;
 	    	}
 	        case R.id.action_menu_upgrade_account:{
-	        	Intent intent = new Intent(managerActivity, UpgradeActivity.class);
-				startActivity(intent);
+	        	showUpAF();
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
@@ -5332,9 +5333,79 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				megaApi.disableExport(node, this);
 			}
-		}
-		
-		
+		}		
 	}
 	
+	public void showUpAF(){
+		
+//		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
+//        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+//        fragTransaction.detach(currentFragment);
+//        fragTransaction.commit();
+//
+//        fragTransaction = getSupportFragmentManager().beginTransaction();
+//        fragTransaction.attach(currentFragment);
+//        fragTransaction.commit();
+		
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if(upAF==null){
+			upAF = new UpgradeAccountFragment();
+			ft.replace(R.id.fragment_container, upAF, "upAF");
+			ft.commit();
+		}
+		else{			
+			ft.replace(R.id.fragment_container, upAF, "upAF");
+			ft.commit();
+		}
+	}
+	
+	public void showpF(int type){
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if(pF==null){
+			Bundle bundle = new Bundle();	        
+	        bundle.putInt("type", type);
+			pF = new PaymentFragment();
+			pF.setArguments(bundle);			
+			ft.replace(R.id.fragment_container, pF, "pF");
+			ft.commit();
+		}
+		else{			
+			Bundle bundle = new Bundle();	        
+	        bundle.putInt("type", type);
+			pF.setArguments(bundle);			
+			ft.replace(R.id.fragment_container, pF, "pF");
+			ft.commit();
+		}
+	}
+	
+	public void onUpgrade1Click(View view) {
+		showpF(1);
+	}
+
+	public void onUpgrade2Click(View view) {
+		showpF(2);
+	}
+
+	public void onUpgrade3Click(View view) {
+		showpF(3);
+	}
+	
+	public void onYearlyClick(View view) {
+		log("yearly");
+		pF.payYear();		
+	}
+	
+	public void onMonthlyClick(View view) {
+		log("monthly");
+		pF.payMonth();		
+	}
 }
