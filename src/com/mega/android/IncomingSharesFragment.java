@@ -266,7 +266,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-			aB.setTitle(getString(R.string.section_shared_with_me));	
+			aB.setTitle(getString(R.string.section_shared_with_me));
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}	
 		
@@ -285,11 +286,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
-			
-			//TODO scale
-			MarginLayoutParams marginParams = (MarginLayoutParams) emptyImageView.getLayoutParams();			
-			marginParams.topMargin = 300;			
-			emptyImageView.setLayoutParams(marginParams);
 			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
 						
@@ -317,6 +313,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			if (deepBrowserTree == 0){
 				contentText.setText(getInfoNode());
 				aB.setTitle(getString(R.string.section_shared_with_me));
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
@@ -751,7 +748,9 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			
 			if(deepBrowserTree==0){
 				//In the beginning of the navigation
+				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 				aB.setTitle(getString(R.string.section_shared_with_me));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
 				adapterList.setNodes(nodes);
 				listView.setVisibility(View.VISIBLE);
@@ -792,6 +791,11 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			}
 			else{
 				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				leftNewFolder.setVisibility(View.GONE);
+				rightUploadButton.setVisibility(View.GONE);
 				deepBrowserTree=0;
 				return 0;
 			}
