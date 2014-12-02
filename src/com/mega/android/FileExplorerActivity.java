@@ -184,7 +184,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		newFolderButton.setOnClickListener(this);
 		
 		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-		String actionBarTitle = getString(R.string.main_folder);
+		String actionBarTitle = getString(R.string.section_cloud_drive);
 		windowTitle.setText(actionBarTitle);
 		
 		if (mode == Mode.MOVE) {
@@ -501,7 +501,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		megaApi.createFolder(title, parentNode, this);
 	}
 	else{
-		Toast.makeText(this, "Folder already exists", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
 	}
 	
 }
@@ -539,7 +539,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Folder created", Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
 				fe.setNodes(nodes);
 				fe.getListView().invalidateViews();

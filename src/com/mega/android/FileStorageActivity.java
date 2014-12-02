@@ -446,7 +446,7 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 	
 	public void onNewFolderClick(){
 		log("file storage activity ne FOLDER!!");
-		String text = getString(R.string.manager_new_folder_name);
+		String text = getString(R.string.context_new_folder_name);
 		final EditText input = new EditText(this);
 		input.setSingleLine();
 		input.setSelectAllOnFocus(true);

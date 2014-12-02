@@ -104,7 +104,7 @@ public class Util {
 		}
 		
 		try{ 
-			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, "Error", message, null);
+			AlertDialog.Builder dialogBuilder = getCustomAlertBuilder(activity, activity.getString(R.string.general_error_word), message, null);
 			dialogBuilder.setPositiveButton(
 				activity.getString(android.R.string.ok),
 				new DialogInterface.OnClickListener() {

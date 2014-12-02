@@ -433,7 +433,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
-							String toastMessage = getString(R.string.already_downloaded) + ": " + localPath;
+							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 						}
 						finish();

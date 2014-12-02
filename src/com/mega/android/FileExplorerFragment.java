@@ -165,7 +165,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				
-				((FileExplorerActivity)getActivity()).changeNavigationTitle("CLOUD DRIVE");
+				((FileExplorerActivity)getActivity()).changeNavigationTitle(context.getString(R.string.section_cloud_drive));
 			}
 			else{
 				String path=parentNode.getName();	

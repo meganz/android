@@ -953,7 +953,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						}
 					});
 					
-					builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+					builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -1317,9 +1317,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 					photosyncHandle = nl.get(i).getHandle();
 					dbH.setCamSyncHandle(photosyncHandle);
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
+					if (listView != null){
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+					}
 					break;
 				}
 			}
@@ -1571,12 +1573,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(context, "PhotoSync Folder created", Toast.LENGTH_LONG).show();
+				Toast.makeText(context, context.getString(R.string.camera_uploads_created), Toast.LENGTH_LONG).show();
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyImageView.setOnClickListener(this);
 				emptyTextView.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
-				emptyTextView.setText("Click to turn on Camera Upload");
 			}
 		}
 	}

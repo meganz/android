@@ -712,8 +712,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			positionClicked = -1;
 			log("En option leave share");
 			//((ManagerActivity) context).leaveIncomingShare(n);
-			Toast toast = Toast.makeText(context, "Feature not implemented yet", Toast.LENGTH_LONG);
-			toast.show();
+			Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 			break;
 		}
 		case R.id.file_list_option_properties: {

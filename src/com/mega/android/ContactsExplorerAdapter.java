@@ -204,7 +204,7 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			if (position == 0 && contactsFromMEGA.size() == 0) {
 				TextView textView = (TextView) inflater.inflate(R.layout.file_list_empty, parentView, false);
-				int resId = R.string.manager_folder_is_empty;
+				int resId = R.string.file_browser_empty_folder;
 				textView.setText(mContext.getString(resId));
 				return textView;
 			}
@@ -296,7 +296,7 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			
 			if (position == 0 && contactsFromPhone.size() == 0) {
                 TextView textView = (TextView) inflater.inflate(R.layout.file_list_empty, parentView, false);
-                int resId = R.string.manager_folder_is_empty;
+                int resId = R.string.file_browser_empty_folder;
                 textView.setText(mContext.getString(resId));
                 return textView;
             }	

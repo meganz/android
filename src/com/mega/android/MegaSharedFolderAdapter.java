@@ -509,7 +509,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		
 		if (request.getType() == MegaRequest.TYPE_EXPORT){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(context, "The node is now private", Toast.LENGTH_LONG).show();
+				Toast.makeText(context, context.getString(R.string.context_node_private), Toast.LENGTH_LONG).show();
 			}
 			else{
 				Util.showErrorAlertDialog(e, (Activity)context);
@@ -519,14 +519,13 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			if (removeShare){
 				if (e.getErrorCode() == MegaError.API_OK){
 					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-					Toast.makeText(context, "Share correctly removed: " +sl.size(), Toast.LENGTH_LONG).show();
+					Toast.makeText(context, context.getString(R.string.context_share_correctly_removed), Toast.LENGTH_LONG).show();
 					for(int i=0;i<sl.size();i++){
 						MegaShare sh = sl.get(i);
 						if (sh.getAccess() == MegaShare.ACCESS_UNKNOWN){
 							sl.remove(i);
 						}
 					}
-					Toast.makeText(context, "Share correctly after: " +sl.size(), Toast.LENGTH_LONG).show();
 					setShareList(sl);
 				}
 				else{
@@ -537,7 +536,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			else{
 				permissionsDialog.dismiss();
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(context, "The folder has been shared correctly", Toast.LENGTH_LONG).show();
+					Toast.makeText(context, context.getString(R.string.context_correctly_shared), Toast.LENGTH_LONG).show();
 					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 					setShareList(sl);
 				}

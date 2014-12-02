@@ -285,7 +285,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
 		aB.setLogo(R.drawable.ic_action_navigation_accept);
-		aB.setTitle(getString(R.string.file_contact_list_activity));
+		aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -437,7 +437,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 			if (e.getErrorCode() == MegaError.API_OK){
 				if(removeShare){
 					log("onRequestFinish remove");
-					Toast.makeText(this, "The contact have been removed", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_contact_removed), Toast.LENGTH_SHORT).show();
 					removeShare=false;
 					adapter.setShareList(listContacts);
 					listView.invalidateViews();
@@ -446,7 +446,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 				if(changeShare){
 					log("onRequestFinish change");
 					permissionsDialog.dismiss();
-					Toast.makeText(this, "The permissions have been changed", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_permissions_changed), Toast.LENGTH_SHORT).show();
 					changeShare=false;
 					adapter.setShareList(listContacts);
 					listView.invalidateViews();
@@ -455,11 +455,11 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 			}
 			else{
 				if(removeShare){
-					Toast.makeText(this, "The contacts have not been removed", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_contact_not_removed), Toast.LENGTH_SHORT).show();
 					removeShare=false;	
 				}
 				if(changeShare)
-					Toast.makeText(this, "The permissions have not been changed", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getString(R.string.context_permissions_not_changed), Toast.LENGTH_SHORT).show();
 			}
 			log("Finish onRequestFinish");
 		}
@@ -511,7 +511,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				if (parentHandle == -1){
-					aB.setTitle(getString(R.string.file_contact_list_activity));
+					aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
 					aB.setLogo(R.drawable.ic_action_navigation_accept);
 					supportInvalidateOptionsMenu();
 					adapter.setShareList(listContacts);

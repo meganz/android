@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
-                android:text="@string/general_pro_1"
+                android:text="@string/pro1_account"
                 android:layout_below="@id/pro_image"/>
             
             <TextView
