@@ -81,7 +81,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	private List<ShareInfo> filePreparedInfos;
 	
 	ArrayList<MegaNode> nodes;
-	RelativeLayout menuOverflowLayout;
 	
 	/*
 	 * Background task to process files for uploading
@@ -180,9 +179,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		
 		uploadButton = (Button) findViewById(R.id.file_explorer_button);
 		uploadButton.setOnClickListener(this);
-		
-		menuOverflowLayout = (RelativeLayout) findViewById(R.id.file_browser_overflow_menu);
-		menuOverflowLayout.setVisibility(View.GONE);
 		
 		newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
 		newFolderButton.setOnClickListener(this);

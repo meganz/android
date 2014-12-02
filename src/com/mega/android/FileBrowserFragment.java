@@ -64,15 +64,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	Button leftNewFolder;
 	Button rightUploadButton;
 	TextView contentText;
-	RelativeLayout menuOverflowLayout;
-	ListView menuOverflowList;
-	TextView titleOverflowList;
 	
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
 	boolean isList = true;
-	boolean overflowMenu = false;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	ArrayList<MegaNode> nodes;
@@ -292,34 +288,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			
-			//Menu overflow three dots
-			menuOverflowLayout = (RelativeLayout) v.findViewById(R.id.file_browser_overflow_menu);
-			menuOverflowList = (ListView) v.findViewById(R.id.file_browser_overflow_menu_list);	
-			titleOverflowList = (TextView) v.findViewById(R.id.file_browser_overflow_title);	
-
-			if (overflowMenu){
-				
-				listView.setVisibility(View.GONE);
-				String menuOptions[] = new String[4];
-				menuOptions[0] = getString(R.string.context_rename);
-				menuOptions[1] = getString(R.string.context_move);
-				menuOptions[2] = getString(R.string.context_copy);
-				menuOptions[3] = getString(R.string.context_send_link);
-				
-				ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-//				ArrayAdapter<String> arrayAdapter = new ArrayAdapter
-				menuOverflowList.setAdapter(arrayAdapter);
-				menuOverflowList.setOnItemClickListener(this);
-				menuOverflowLayout.setVisibility(View.VISIBLE);	
-				menuOverflowList.setVisibility(View.VISIBLE);	
-				titleOverflowList.setVisibility(View.VISIBLE);	
-			}
-			else{
-				menuOverflowLayout.setVisibility(View.GONE);	
-				menuOverflowList.setVisibility(View.GONE);
-				titleOverflowList.setVisibility(View.GONE);	
-			}
-					
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
@@ -539,10 +507,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		
-		if(overflowMenu){
-			overflowMenu=false;
-		}
-	
 		if (isList){
 			if (adapterList.isMultipleSelect()){
 				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
@@ -704,97 +668,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		listView.setOnItemLongClickListener(null);
 	}
 	
-	public void setOverFlowMenu(final MegaNode n){
-		log("setOverFlowMenu");
-		
-		if (overflowMenu){
-
-			//listView.setVisibility(View.GONE);
-			String menuOptions[] = new String[5];
-			menuOptions[0] = getString(R.string.context_share_folder);
-			menuOptions[1] = getString(R.string.context_rename);
-			menuOptions[2] = getString(R.string.context_move);
-			menuOptions[3] = getString(R.string.context_copy);
-			menuOptions[4] = getString(R.string.context_send_link);
-			
-			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-			menuOverflowList.setAdapter(arrayAdapter);
-			menuOverflowList.setOnItemClickListener(
-					new OnItemClickListener() {
-						@Override
-						public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-							log("onItemClick");
-							log("id: "+v.getId());
-							switch (position) {	
-								case 0: {
-									//Rename
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);	
-									titleOverflowList.setVisibility(View.GONE);										
-									((ManagerActivity) context).shareFolder(n);
-									break;
-								}
-								case 1: {
-									//Rename
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);	
-									titleOverflowList.setVisibility(View.GONE);	
-									((ManagerActivity) context).showRenameDialog(n, n.getName());	
-									break;
-								}
-								case 2: {
-									//Move
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);
-									titleOverflowList.setVisibility(View.GONE);		
-									ArrayList<Long> handleList = new ArrayList<Long>();
-									handleList.add(n.getHandle());									
-									((ManagerActivity) context).showMove(handleList);									
-									break;
-									
-								}
-								case 3: {
-									//Copy
-									setPositionClicked(-1);
-									notifyDataSetChanged();
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);
-									titleOverflowList.setVisibility(View.GONE);		
-									ArrayList<Long> handleList = new ArrayList<Long>();
-									handleList.add(n.getHandle());									
-									((ManagerActivity) context).showCopy(handleList);									
-									break;
-								}
-								case 4: {
-									//Send link
-									
-									menuOverflowLayout.setVisibility(View.GONE);	
-									menuOverflowList.setVisibility(View.GONE);
-									titleOverflowList.setVisibility(View.GONE);		
-									break;
-								}
-							}							
-						}
-					});		
-			menuOverflowLayout.setVisibility(View.VISIBLE);	
-			menuOverflowList.setVisibility(View.VISIBLE);	
-			titleOverflowList.setVisibility(View.VISIBLE);		
-		
-		}
-		else{
-			menuOverflowLayout.setVisibility(View.GONE);	
-			menuOverflowList.setVisibility(View.GONE);
-			titleOverflowList.setVisibility(View.GONE);	
-		}
-		
-	}
-	
 	/*
 	 * Clear all selected items
 	 */
@@ -881,14 +754,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		if (isList){
 			parentHandle = adapterList.getParentHandle();
 			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			
-			if(overflowMenu){
-				menuOverflowLayout.setVisibility(View.GONE);	
-				menuOverflowList.setVisibility(View.GONE);
-				titleOverflowList.setVisibility(View.GONE);	
-				overflowMenu=false;
-				return 1;
-			}
 			
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);

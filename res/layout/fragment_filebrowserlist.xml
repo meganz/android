@@ -67,42 +67,6 @@
         android:layout_below="@id/content_text"
         android:layout_above="@id/buttons_layout">
     </ListView>
-    
-      
-      <RelativeLayout  
-			android:layout_width="200dp"
-			android:layout_height="wrap_content"
-			android:id="@+id/file_browser_overflow_menu"
-			android:background="#f2f2f2"
-	        android:layout_centerInParent="true">
-                    
-        <TextView
-		    android:id="@+id/file_browser_overflow_title"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:textColor="@color/color_navigation_drawer_selected"
-		    android:textSize="22sp"
-		    android:layout_marginTop="5dp"
-		    android:layout_marginBottom="5dp"
-		    android:text="@string/more_options_overflow"
-		    android:layout_centerHorizontal="true" />       
-		    
-        <View
-		    android:id="@+id/delimiter_red_overflow"
-		    android:layout_width="match_parent"
-		    android:layout_height="1dp"
-		    android:background="#cccc0000"
-		    android:layout_below="@id/file_browser_overflow_title" />
-                 
-        <ListView
-            android:id="@+id/file_browser_overflow_menu_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-			android:background="#f2f2f2"
-			android:layout_below="@id/delimiter_red_overflow"/>          
-       
-        
-	</RelativeLayout>
 	
       <Button
        	android:id="@+id/file_list_browser_camera_upload_on_off"

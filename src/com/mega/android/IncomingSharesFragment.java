@@ -60,10 +60,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	Button leftNewFolder;
 	Button rightUploadButton;
 	TextView contentText;
-	RelativeLayout menuOverflowLayout;
-	ListView menuOverflowList;
-	TextView titleOverflowList;
-	
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
@@ -283,15 +279,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			
-			//Menu overflow three dots
-			menuOverflowLayout = (RelativeLayout) v.findViewById(R.id.file_browser_overflow_menu);
-			menuOverflowList = (ListView) v.findViewById(R.id.file_browser_overflow_menu_list);	
-			titleOverflowList = (TextView) v.findViewById(R.id.file_browser_overflow_title);	
-
-			menuOverflowLayout.setVisibility(View.GONE);	
-			menuOverflowList.setVisibility(View.GONE);
-			titleOverflowList.setVisibility(View.GONE);	
-					
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
