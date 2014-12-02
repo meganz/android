@@ -948,6 +948,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.parentHandle = parentHandle;
 		switch (type) {
 		case ManagerActivity.FILE_BROWSER_ADAPTER: {
+			log("setParentHandleBrowser -FILE_BROWSER_ADAPTER");
 			((ManagerActivity) context).setParentHandleBrowser(parentHandle);
 			break;
 		}
@@ -960,6 +961,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.SHARED_WITH_ME_ADAPTER: {
+			log("setParentHandleSharedWithMe -SHARED_WITH_ME_ADAPTER");
 			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
 			break;
 		}
@@ -970,7 +972,19 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			((ManagerActivity) context).setParentHandleSearch(parentHandle);
 			break;
 		}
+		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
+			//TODO necesito algo?
+			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			break;
+		}
+		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
+			log("setParentHandleBrowser -ManagerActivity.OUTGOING_SHARES_ADAPTER");
+			//TODO necesito algo?
+			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			break;
+		}
 		default: {
+			log("setParentHandleBrowser -default");
 			((ManagerActivity) context).setParentHandleBrowser(parentHandle);
 			break;
 		}

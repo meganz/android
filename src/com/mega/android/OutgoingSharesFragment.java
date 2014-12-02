@@ -256,7 +256,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		}
 		
 		if (parentHandle == -1){			
-			((ManagerActivity)context).setParentHandleBrowser(-1);					
+			((ManagerActivity)context).setParentHandleSharedWithMe(-1);					
 			findNodes();			
 			aB.setTitle(getString(R.string.section_shared_with_me));	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -264,9 +264,10 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);			
 			aB.setTitle(getString(R.string.section_shared_with_me));
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}	
 		
@@ -512,7 +513,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 					parentHandle = nodes.get(position).getHandle();
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 					contentText.setText(getInfoFolder(infoNode));
-					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 					adapterList.setNodes(nodes);
@@ -734,11 +735,18 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			
 			if(deepBrowserTree==0){
 				//In the beginning of the navigation
+				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 				log("Shared With Me");
-				aB.setTitle(getString(R.string.section_shared_with_me));	
+				aB.setTitle(getString(R.string.section_shared_with_me));
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
 				adapterList.setNodes(nodes);
 				contentText.setText(getInfoNode());
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				leftNewFolder.setVisibility(View.GONE);
+				rightUploadButton.setVisibility(View.GONE);
 				return 3;
 			}
 			else if (deepBrowserTree>0){
@@ -772,6 +780,11 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			}
 			else{
 				log("Back to Cloud");
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				leftNewFolder.setVisibility(View.GONE);
+				rightUploadButton.setVisibility(View.GONE);
 				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 				deepBrowserTree=0;
 				return 0;

@@ -2447,11 +2447,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    				return true;
 		    			}
 		    		}
-		    		if (inSF != null){
-		    			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-		    				inSF.onBackPressed();
-		    		    	return true;
+		    		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+		    			int index = viewPagerShares.getCurrentItem();
+		    			if(index==1){				
+		    				//OUTGOING				
+		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+		    				log("Tag: "+ cFTag2);
+		    				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		    				if (outSF != null){					
+		    					outSF.onBackPressed();				
+		    				}
 		    			}
+		    			else{			
+		    				//InCOMING
+		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+		    				log("Tag: "+ cFTag1);
+		    				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+		    				if (inSF != null){					
+		    					inSF.onBackPressed();					
+		    				}				
+		    			}	
 		    		}
 		    		if (sF != null){
 		    			if (drawerItem == DrawerItem.SEARCH){
