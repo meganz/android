@@ -24,8 +24,8 @@
                 android:id="@+id/pro1_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
                 android:text="@string/general_pro_1"
                 android:layout_below="@id/pro1_image"/>
             
@@ -35,6 +35,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/settings_storage"
+                android:layout_alignTop="@id/pro1_image"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro1_image"/>
             
@@ -52,6 +53,7 @@
                 android:id="@+id/pro1_storage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignTop="@id/pro1_image"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro1_storage_title"/>
@@ -62,8 +64,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_image"
-                android:layout_below="@id/pro1_bandwidth_title"/>
+                android:layout_toRightOf="@id/pro1_bandwidth_title"
+                android:layout_below="@id/pro1_storage"/>
             
             <TextView
                 android:id="@+id/pricing1_from"
@@ -71,9 +73,10 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro1_title"
-                android:layout_below="@id/pro1_bandwidth_title"/>
+                android:textColor="@color/color_navigation_drawer_selected"
+                android:layout_toRightOf="@id/pro1_title"  
+                android:layout_alignLeft="@id/pro1_bandwidth_title"            
+                android:layout_below="@id/pro1_image"/>
             
         </RelativeLayout>
         
@@ -98,8 +101,8 @@
                 android:id="@+id/pro2_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp" 
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
                 android:text="@string/general_pro_2"
                 android:layout_below="@id/pro2_image"/>
             
@@ -109,6 +112,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/settings_storage"
+                android:layout_alignTop="@id/pro2_image"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro2_image"/>
             
@@ -127,6 +131,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:layout_alignTop="@id/pro2_image"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro2_storage_title"/>
             
@@ -136,18 +141,19 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro2_image"
-                android:layout_below="@id/pro2_bandwidth_title"/>
+                android:layout_toRightOf="@id/pro2_bandwidth_title"
+                android:layout_below="@id/pro2_storage"/>
             
             <TextView
                 android:id="@+id/pricing2_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:textColor="@color/color_navigation_drawer_selected"
                 android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
+                android:layout_alignLeft="@id/pro2_bandwidth_title" 
                 android:layout_toRightOf="@id/pro2_title"
-                android:layout_below="@id/pro2_bandwidth_title"/>
+                android:layout_below="@id/pro2_image"/>
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
@@ -172,7 +178,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
+                android:layout_marginLeft="35dp"                
                 android:text="@string/general_pro_3"
                 android:layout_below="@id/pro3_image"/>
             
@@ -181,6 +187,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:layout_alignTop="@id/pro3_image"
                 android:text="@string/settings_storage"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro3_image"/>
@@ -200,6 +207,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:layout_alignTop="@id/pro3_image"
                 android:layout_margin="@dimen/standard_margin"
                 android:layout_toRightOf="@id/pro3_storage_title"/>
             
@@ -209,18 +217,19 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/pro3_image"
-                android:layout_below="@id/pro3_bandwidth_title"/>
+                android:layout_toRightOf="@id/pro3_bandwidth_title"
+                android:layout_below="@id/pro3_storage"/>
             
             <TextView
                 android:id="@+id/pricing3_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
+                android:textColor="@color/color_navigation_drawer_selected"
                 android:text="@string/general_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
+                android:layout_alignLeft="@id/pro3_bandwidth_title" 
                 android:layout_toRightOf="@id/pro3_title"
-                android:layout_below="@id/pro3_bandwidth_title"/>
+                android:layout_below="@id/pro3_image"/>
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />

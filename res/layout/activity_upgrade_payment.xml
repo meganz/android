@@ -1,165 +1,208 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".UpgradePaymentActivity" >
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
+
+   <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"  
+    android:weightSum="15"
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent" >
         
         <!-- Account type -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/background_secondary"
             android:gravity="center_vertical"
-            >
+            android:background="@drawable/list_selector_holo_light"
+            android:onClick="onUpgrade1Click"
+            android:layout_weight="6">
             <ImageView 
-                android:id="@+id/package_icon"
+                android:id="@+id/pro_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/pro_2"
+                android:src="@drawable/ic_pro_1"
                 />
             <TextView
-                android:id="@+id/package_name"
+                android:id="@+id/pro_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp" 
+                android:textSize="20sp"
+                android:text="@string/general_pro_1"
+                android:layout_below="@id/pro_image"/>
+            
+            <TextView
+                android:id="@+id/pro_storage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/settings_storage"
+                android:layout_alignTop="@id/pro_image"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro_image"/>
+            
+            <TextView
+                android:id="@+id/pro_bandwidth_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro_image"
+                android:layout_below="@id/pro_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/pro_image"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/pro_storage_title"/>
+            
+            <TextView
+                android:id="@+id/pro_bandwidth"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                />
-        </LinearLayout>
+                android:layout_toRightOf="@id/pro_bandwidth_title"
+                android:layout_below="@id/pro_storage"/>
+            
+            <TextView
+                android:id="@+id/pricing_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/color_navigation_drawer_selected"
+                android:layout_toRightOf="@id/pro_title"  
+                android:layout_alignLeft="@id/pro_bandwidth_title"            
+                android:layout_below="@id/pro_image"/>
+            
+        </RelativeLayout>
         
         <include layout="@layout/delimiter" />
         
-        <!-- Storage -->
-        <LinearLayout
+         <!-- Select Membership -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            >
-            <ImageView 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/ic_storage"
-                />
-            <TextView
-                android:id="@+id/storage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginLeft="@dimen/standard_margin"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:layout_marginLeft="@dimen/standard_margin_half"
-                android:text="@string/general_storage"
-                />
-        </LinearLayout>
-        
-        <!-- Bandwidth -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            >
-            <ImageView 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/ic_bandwidth"
-                />
-            <TextView
-                android:id="@+id/bandwidth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginLeft="@dimen/standard_margin"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginLeft="@dimen/standard_margin_half"
-                android:textColor="@color/mega"
-                android:text="@string/general_bandwidth"
-                />
-        </LinearLayout>
+            android:layout_weight="4"
+            android:background="@color/mega">
 
-        <!-- Select Pricing -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="@color/mega"
-            >
-            <ImageView 
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/standard_margin"
-                android:src="@drawable/pro_2"
-                />
             <TextView
+                 android:id="@+id/select_membership"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:layout_margin="@dimen/standard_margin"
-                android:text="@string/upgrade_select_pricing"
-                />
-        </LinearLayout>
+                android:text="@string/upgrade_select_pricing"/>
+            
+            <TextView
+                 android:id="@+id/select_recurring"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_alignLeft="@id/select_membership"
+                android:text="@string/select_membership_1"
+                android:layout_below="@id/select_membership"/>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_alignLeft="@id/select_membership"
+                android:text="@string/select_membership_2"
+                 android:layout_below="@id/select_recurring"/>
+        </RelativeLayout>
         
         
          <!-- Per month -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:layout_weight="2"
             android:background="@drawable/list_selector_holo_light"
-            android:onClick="onMonthlyClick"
-            >
+            android:onClick="onMonthlyClick">
+            
             <TextView
                 android:id="@+id/per_month"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin_double"
-                />
-        </LinearLayout>
+                android:layout_marginLeft="30dp"
+                android:layout_margin="@dimen/standard_margin"
+                android:text="@string/upgrade_per_month"/>
+            
+            <TextView
+                android:id="@+id/per_month_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/per_month"/>
+            
+            
+        </RelativeLayout>
         
         <include layout="@layout/delimiter" />
         
         <!-- Per year -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:layout_weight="2"
             android:background="@drawable/list_selector_holo_light"
-            android:onClick="onYearlyClick"
-            >
+            android:onClick="onYearlyClick">
+            
+             <ImageView 
+                android:id="@+id/save_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_save_17"/>
+            
             <TextView
                 android:id="@+id/per_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="@color/mega"
-                android:layout_margin="@dimen/standard_margin_double"
-                />
-            <ImageView 
+                 android:text="@string/upgrade_per_year"
+                 android:layout_toRightOf="@id/save_image"
+                android:layout_margin="@dimen/standard_margin_double"/>            
+           
+            
+             <TextView
+                android:id="@+id/per_year_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_save_17"
-                />
-        </LinearLayout>
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin_double"
+                android:layout_toRightOf="@id/per_year"/>
+        </RelativeLayout>
         
         <include layout="@layout/delimiter" />
         
+        <!-- Comment -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_weight="2"
+            android:background="@drawable/list_selector_holo_light">
+            <TextView
+                android:id="@+id/comment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:text="@string/upgrade_comment"
+                android:layout_margin="@dimen/standard_margin_double" />
+            
+        </RelativeLayout>
+        
     </LinearLayout>
 
-</ScrollView>

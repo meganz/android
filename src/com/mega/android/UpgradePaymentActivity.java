@@ -2,9 +2,13 @@ package com.mega.android;
 
 import org.json.JSONArray;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,8 +16,12 @@ import android.widget.TextView;
 
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaRequest;
+import com.mega.sdk.MegaRequestListenerInterface;
 
-public class UpgradePaymentActivity extends ActionBarActivity{
+public class UpgradePaymentActivity extends ActionBarActivity implements MegaRequestListenerInterface{
 	
 	/*
 	 * Account type enum
@@ -52,7 +60,7 @@ public class UpgradePaymentActivity extends ActionBarActivity{
 			return resource;
 		}
 		
-		public int getNameResouce() {
+		public int getNameResource() {
 			return nameResource;
 		}
 	}
@@ -63,12 +71,15 @@ public class UpgradePaymentActivity extends ActionBarActivity{
 
 	private AccountType accountType;
 
-	private ImageView packageIconView;
-	private TextView packageNameView;
-	private TextView storageView;
-	private TextView bandwidthView;
-	private TextView perMonthView;
-	private TextView perYearView;
+	private ImageView packageIcon;
+	private TextView packageName;
+	private TextView storage;
+	private TextView bandwidth;
+	private TextView perMonth;
+	private TextView perYear;
+	private TextView pricingFrom;
+//	private TextView perMonthTitle;
+	int typeAccount;
 	
 	private double monthlyPrice, yearlyPrice;
 	private String monthlyHash, yearlyHash;
@@ -86,21 +97,70 @@ public class UpgradePaymentActivity extends ActionBarActivity{
 		aB.setHomeButtonEnabled(true);
 		aB.setLogo(R.drawable.ic_action_navigation_accept);
 		
-		packageIconView = (ImageView) findViewById(R.id.package_icon);
-		packageNameView = (TextView) findViewById(R.id.package_name);
-		storageView = (TextView) findViewById(R.id.storage);
-		bandwidthView = (TextView) findViewById(R.id.bandwidth);
-		perMonthView = (TextView) findViewById(R.id.per_month);
-		perYearView = (TextView) findViewById(R.id.per_year);
+		packageIcon = (ImageView) findViewById(R.id.pro_image);
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		float density = getResources().getDisplayMetrics().density;
+		
+		float scaleW = Util.getScaleW(outMetrics, density);
+		float scaleH = Util.getScaleH(outMetrics, density);
+		
+		packageIcon.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
+		packageIcon.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
+		
+		packageName = (TextView) findViewById(R.id.pro_title);
+		storage = (TextView) findViewById(R.id.pro_storage);
+		bandwidth = (TextView) findViewById(R.id.pro_bandwidth);
+		pricingFrom = (TextView) findViewById(R.id.pricing_from);
+		
+//		perMonthTitle = (TextView) findViewById(R.id.per_month);
+		perMonth = (TextView) findViewById(R.id.per_month_price);
+		perYear = (TextView) findViewById(R.id.per_year_price);
 
-		accountType = AccountType.getById(getIntent().getIntExtra(
-				ACCOUNT_TYPE_EXTRA, 0));
+		accountType = AccountType.getById(getIntent().getIntExtra(ACCOUNT_TYPE_EXTRA, 0));
+		typeAccount = getIntent().getIntExtra(ACCOUNT_TYPE_EXTRA, 0);
 
-		packageIconView.setImageResource(accountType.getImageResource());
-		packageNameView.setText(accountType.getNameResouce());
+		packageIcon.setImageResource(accountType.getImageResource());
+		packageName.setText(accountType.getNameResource());
+		
+		switch(typeAccount){
+		
+			case 1:{
+				storage.setText("500 GB");
+				bandwidth.setText("12 TB");
+				pricingFrom.setText("from 8,33€ per month");
+		            
+				perMonth.setText("9.99€");
+				perYear.setText("99.99€");
+				break;
+			}
+			
+			case 2:{
+				storage.setText("2 TB");
+				bandwidth.setText("48 TB");
+				pricingFrom.setText("from 16.50€ per month");
+	           
+				perMonth.setText("19.99€");
+				perYear.setText("199.99€");
+				break;
+			}
+			
+			case 3:{
+				storage.setText("4 TB");
+				bandwidth.setText("96 TB");
+				pricingFrom.setText("from 25€ per month");
+				perMonth.setText("29.99€");
+				perYear.setText("299.99€");
+				break;
+			}
+			
+		}
 		
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		updatePricing();
+//		updatePricing();
+//		megaApi.getPaymentUrl(p.getHandle(1), this);
 	}
 	
 	/*
@@ -125,56 +185,52 @@ public class UpgradePaymentActivity extends ActionBarActivity{
 //		});
 	}
 	
-	/*
-	 * Parse pricing information
-	 */
-	private void parseJson(JSONArray obj) {
-//		String priceFormat = "\u20ac %s %s";
-//		try {
-//			for (int i = 0; i < obj.length(); i++) {
-//				JSONArray item = obj.getJSONArray(i);
-//				String hash = item.getString(0);
-//				int type = item.getInt(1);
-//				long storage = item.getLong(2) * 1024 * 1024 * 1024;
-//				long bandwidth = item.getLong(3) * 1024 * 1024 * 1024;
-//				int months = item.getInt(4);
-//				double price = item.getDouble(5);
-//				//String currency = item.getString(6);
-//				if (AccountType.getById(type) != accountType) {
-//					continue;
-//				}
-//
-//				if (months == 1) {
-//					monthlyPrice = price;
-//					monthlyHash = hash;
-//					storageView.setText(Formatter.formatShortFileSize(this,
-//							storage));
-//					bandwidthView.setText(Formatter.formatShortFileSize(this,
-//							bandwidth));
-//					perMonthView.setText(String.format(priceFormat, price,
-//							getString(R.string.upgrade_per_month)));
-//
-//				} else {
-//					yearlyPrice = price;
-//					yearlyHash = hash;
-//					perYearView.setText(String.format(priceFormat, price,
-//							getString(R.string.upgrade_per_year)));
-//				}
-//			}
-//		} catch (JSONException e) {
-//			Util.showErrorAlertDialogFinish(OLD_MegaError.RESPONSE_ENCODING_ERROR,
-//					UpgradePaymentActivity.this);
-//		}
-	}
-	
 	public void onYearlyClick(View view) {
 		log("yearly");
-		requestUrl(yearlyHash, yearlyPrice);
+		
+		switch(typeAccount){
+		
+			case 1:{
+				String handle = "7472683699866478542";
+				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				break;
+			}
+			case 2:{
+				String handle = "370834413380951543";
+				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				break;
+			}
+			case 3:{
+				String handle = "7225413476571973499";
+				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				break;
+			}
+			
+		}
 	}
 	
 	public void onMonthlyClick(View view) {
 		log("monthly");
-		requestUrl(monthlyHash, monthlyPrice);
+
+		switch(typeAccount){
+		
+			case 1:{
+				String handle = "1560943707714440503";
+				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				break;
+			}
+			case 2:{
+				String handle = "7974113413762509455";
+				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				break;
+			}
+			case 3:{
+				String handle = "-2499193043825823892";
+				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				break;
+			}
+			
+		}
 	}
 	
 	/*
@@ -218,6 +274,37 @@ public class UpgradePaymentActivity extends ActionBarActivity{
 
 	public static void log(String message) {
 		Util.log("UpgradePaymentActivity", message);
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
+            log("PAYMENT URL: " + request.getLink());
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
+            startActivity(browserIntent);
+            
+        }
+		
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	
