@@ -323,6 +323,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
 		
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
+		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -781,6 +790,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     @Override
 	protected void onSaveInstanceState(Bundle outState) {
     	log("onSaveInstaceState");
+    	if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
     	super.onSaveInstanceState(outState);
     	
     	long pHBrowser = -1;
@@ -1830,6 +1847,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
 		try { 
 			statusDialog.dismiss();	
 		} 
@@ -2392,6 +2417,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
 		// Handle presses on the action bar items
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
@@ -2838,6 +2871,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		log("onItemClick");
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
+			
 		if (nDA != null){
 			nDA.setPositionClicked(position);
 		}
