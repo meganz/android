@@ -5110,19 +5110,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		return true;
 	}
 	
-	
-	public void showOverflowMenu(MegaNode n){
-		log("showOverflowMenu");		
-		
-		if(fbF.overflowMenu){
-			fbF.overflowMenu=false;	
-		}
-		else{
-			fbF.overflowMenu=true;		
-			fbF.setOverFlowMenu(n);	
-		}			
-	}
-	
 	public void removeContact(final MegaUser c){
 		
 		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)

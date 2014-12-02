@@ -1,13 +1,19 @@
 package com.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -18,10 +24,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -683,7 +691,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	public void onClick(View v) {
 		ViewHolderBrowserList holder = (ViewHolderBrowserList) v.getTag();
 		int currentPosition = holder.currentPosition;
-		MegaNode n = (MegaNode) getItem(currentPosition);
+		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {
 		case R.id.file_list_option_download: {
@@ -770,7 +778,68 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		case R.id.file_list_option_overflow: {
 
 			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER)) {
-				((ManagerActivity) context).showOverflowMenu(n);
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)});
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("More options");
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which){
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();									
+								((ManagerActivity) context).shareFolder(n);
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).showRenameDialog(n, n.getName());
+								break;
+							}
+							case 2:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showMove(handleList);
+								break;
+							}
+							case 3:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showCopy(handleList);
+								break;
+							}
+							case 4:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).getPublicLinkAndShareIt(n);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				brandAlertDialog(moreOptionsDialog);
 			}
 			break;
 		}	
@@ -834,6 +903,28 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		}
+	}
+	
+	public static void brandAlertDialog(AlertDialog dialog) {
+	    try {
+	        Resources resources = dialog.getContext().getResources();
+
+	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+
+	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
+	        if (alertTitle != null){	        	
+	        	alertTitle.setTextColor(dialog.getContext().getResources().getColor(R.color.mega)); // change title text color
+	        }
+
+	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
+	        if (titleDivider != null){
+	        	titleDivider.setBackgroundColor(dialog.getContext().getResources().getColor(R.color.mega)); // change divider color
+	        }
+	    } catch (Exception ex) {
+	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+	        ex.printStackTrace();
+	    }
 	}
 
 	/*
