@@ -5279,6 +5279,33 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 	}
 	
+	public void removeMultipleContacts(final List<MegaUser> contacts){
+		
+		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)
+		for(int j=0; j<contacts.size();j++){
+			
+			final MegaUser c= contacts.get(j);
+			
+			final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
+			
+			if(inShares.size() != 0)
+			{			
+			        	
+	        	for(int i=0; i<inShares.size();i++){
+	        		MegaNode removeNode = inShares.get(i);
+	        		megaApi.remove(removeNode);			        		
+	        	}
+	        	megaApi.removeContact(c, managerActivity);		        	
+				
+			}
+			else{
+				//NO incoming shares				
+				        	
+	        	megaApi.removeContact(c, managerActivity);
+			}	
+		}		
+	}
+	
 	public void shareFolder(MegaNode node){
 
 		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
