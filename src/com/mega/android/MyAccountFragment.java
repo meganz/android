@@ -47,6 +47,10 @@ import com.mega.sdk.MegaRequestListenerInterface;
 import com.mega.sdk.MegaUser;
 
 public class MyAccountFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
+	
+	public static int MY_ACCOUNT_FRAGMENT = 5000;
+	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
+	public static int PAYMENT_FRAGMENT = 5002;
 
 	RoundedImageView imageView;
 	RelativeLayout contentLayout;

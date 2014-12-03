@@ -395,12 +395,17 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 						holder.optionDownload.setVisibility(View.VISIBLE);
 						holder.optionProperties.setVisibility(View.VISIBLE);
-						holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						
+						if(node.isFile()){
+							holder.optionLeaveShare.setVisibility(View.GONE);
+						}
+						else {
+							holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						}
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 						holder.optionMore.setVisibility(View.VISIBLE);
-						holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -428,8 +433,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.GONE);
 						holder.optionMore.setVisibility(View.GONE);
-						holder.optionLeaveShare.setVisibility(View.VISIBLE);
-						holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+						
+						if(node.isFile()){
+							holder.optionLeaveShare.setVisibility(View.GONE);
+						}
+						else {
+							holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						}
+						
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -449,9 +460,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.GONE);
-						holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						if(node.isFile()){
+							holder.optionLeaveShare.setVisibility(View.GONE);
+						}
+						else {
+							holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						}
+						
 						holder.optionMore.setVisibility(View.VISIBLE);
-						holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
 						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 						((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),

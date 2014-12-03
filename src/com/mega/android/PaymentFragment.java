@@ -1,6 +1,7 @@
 package com.mega.android;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,6 +22,7 @@ import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaPricing;
 import com.mega.sdk.MegaRequest;
 import com.mega.sdk.MegaRequestListenerInterface;
 
@@ -65,6 +67,10 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		}
 	}
 	
+	public static int MY_ACCOUNT_FRAGMENT = 5000;
+	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
+	public static int PAYMENT_FRAGMENT = 5002;
+	
 	private ActionBar aB;
 	private AccountType accountType;
 	private ImageView packageIcon;
@@ -74,6 +80,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	private TextView perMonth;
 	private TextView perYear;
 	private TextView pricingFrom;
+	private ArrayList<Long> handleUrl;
 //	private TextView perMonthTitle;
 	int parameterType;	
 	MegaApiAndroid megaApi;
@@ -84,6 +91,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		handleUrl=new ArrayList<Long>();
 
 		super.onCreate(savedInstanceState);
 		log("onCreate");
@@ -134,38 +143,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		packageIcon.setImageResource(accountType.getImageResource());
 		packageName.setText(accountType.getNameResource());
 		
-		switch(parameterType){
-		
-			case 1:{
-				storage.setText("500 GB");
-				bandwidth.setText("12 TB");
-				pricingFrom.setText("from 8,33€ per month");
-		            
-				perMonth.setText("9.99€");
-				perYear.setText("99.99€");
-				break;
-			}
-			
-			case 2:{
-				storage.setText("2 TB");
-				bandwidth.setText("48 TB");
-				pricingFrom.setText("from 16.50€ per month");
-	           
-				perMonth.setText("19.99€");
-				perYear.setText("199.99€");
-				break;
-			}
-			
-			case 3:{
-				storage.setText("4 TB");
-				bandwidth.setText("96 TB");
-				pricingFrom.setText("from 25€ per month");
-				perMonth.setText("29.99€");
-				perYear.setText("299.99€");
-				break;
-			}
-			
-		}
+		megaApi.getPricing(this);	
 		
 		return v;
 	}	
@@ -176,18 +154,18 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		switch(parameterType){
 		
 			case 1:{
-				String handle = "7472683699866478542";
-				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				Long handle = handleUrl.get(1);
+				megaApi.getPaymentUrl(handle,this);		
 				break;
 			}
 			case 2:{
-				String handle = "370834413380951543";
-				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				Long handle = handleUrl.get(3);
+				megaApi.getPaymentUrl(handle,this);			
 				break;
 			}
 			case 3:{
-				String handle = "7225413476571973499";
-				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				Long handle = handleUrl.get(5);
+				megaApi.getPaymentUrl(handle,this);			
 				break;
 			}
 			
@@ -200,18 +178,18 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		switch(parameterType){
 		
 			case 1:{
-				String handle = "1560943707714440503";
-				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				Long handle = handleUrl.get(0);
+				megaApi.getPaymentUrl(handle,this);		
 				break;
 			}
 			case 2:{
-				String handle = "7974113413762509455";
-				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				Long handle = handleUrl.get(2);
+				megaApi.getPaymentUrl(handle,this);			
 				break;
 			}
 			case 3:{
-				String handle = "-2499193043825823892";
-				megaApi.getPaymentUrl(Long.valueOf(handle),this);		
+				Long handle = handleUrl.get(4);
+				megaApi.getPaymentUrl(handle,this);	
 				break;
 			}
 			
@@ -233,13 +211,94 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		 
+
+		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+			MegaPricing p = request.getPricing();
+
+			switch(parameterType){
+
+				case 1:{
+	
+					storage.setText(p.getGBStorage(parameterType)+"GB");		            
+					bandwidth.setText(sizeTranslation(p.getGBTransfer(parameterType)*12,0));
+					
+					DecimalFormat df = new DecimalFormat("#.##");  
+					double saving3 = p.getAmount(1)/12.00/100.00;
+					String saving3String =df.format(saving3);
+	
+					pricingFrom.setText("from " + saving3String +" € per month");
+	
+					double perMonthF=p.getAmount(0)/100.00;
+			        String perMonthString =df.format(perMonthF);
+			        double perYearF=p.getAmount(1)/100.00;
+					String perYearString =df.format(perYearF);
+					
+					perMonth.setText(perMonthString+" €");
+					perYear.setText(perYearString+" €");
+					
+					for(int i=0; i<p.getNumProducts();i++){
+						handleUrl.add(p.getHandle(i));
+					}
+					break;
+				}
+				case 2:{
+					storage.setText(sizeTranslation(p.getGBStorage(parameterType),0));
+		             
+					bandwidth.setText(sizeTranslation(p.getGBTransfer(parameterType)*12,0));
+			           
+					DecimalFormat df = new DecimalFormat("#.##");  
+					double saving3 = p.getAmount(3)/12.00/100.00;
+			        String saving3String =df.format(saving3);
+			            
+			        pricingFrom.setText("from " + saving3String +" € per month");
+	
+			        double perMonthF=p.getAmount(2)/100.00;
+			        String perMonthString =df.format(perMonthF);
+			        double perYearF=p.getAmount(3)/100.00;
+					String perYearString =df.format(perYearF);
+					
+					perMonth.setText(perMonthString+" €");
+					perYear.setText(perYearString+" €");					
+
+					for(int i=0; i<p.getNumProducts();i++){
+						handleUrl.add(p.getHandle(i));
+					}
+					break;
+				}
+				case 3:{
+					storage.setText(sizeTranslation(p.getGBStorage(5),0));
+					
+					bandwidth.setText(sizeTranslation(p.getGBTransfer(4)*12,0));
+					
+					DecimalFormat df = new DecimalFormat("#.##");  
+					double saving3 = p.getAmount(5)/12.00/100.00;
+			        String saving3String =df.format(saving3);
+			            
+			        pricingFrom.setText("from " + saving3String +" € per month");
+			        
+			        double perMonthF=p.getAmount(4)/100.00;
+			        String perMonthString =df.format(perMonthF);
+			        double perYearF=p.getAmount(5)/100.00;
+					String perYearString =df.format(perYearF);
+					
+					perMonth.setText(perMonthString+" €");
+					perYear.setText(perYearString+" €");					
+
+					for(int i=0; i<p.getNumProducts();i++){
+						handleUrl.add(p.getHandle(i));
+					}
+					break;
+				}
+
+			}
+		}
+
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
-	            log("PAYMENT URL: " + request.getLink());
-	            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
-	            startActivity(browserIntent);
-	            
-	        }
+			log("PAYMENT URL: " + request.getLink());
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
+			startActivity(browserIntent);
+
+		}
 	}
 	
 	public String sizeTranslation(long size, int type) {
@@ -263,6 +322,11 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			MegaError e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public int onBackPressed(){
+		((ManagerActivity)context).showUpAF();
+		return 3;
 	}
 	
 	@Override
