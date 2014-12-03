@@ -302,10 +302,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				contentTextView.setVisibility(View.VISIBLE);
 				contentTitleTextView.setVisibility(View.VISIBLE);
 				
-				contentTextView.setText(getInfoFolder(node));				
+				contentTextView.setText(getInfoFolder(node));
 				
-				sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
-				
+				long sizeFile=megaApi.getSize(node);				
+				sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));				
 				
 				//Choose the button availableSwitch
 				
