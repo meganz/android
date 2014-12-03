@@ -204,20 +204,8 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	}
 	
 	private String getInfoFolder (MegaNode n){
-		ArrayList<MegaNode> nL = megaApi.getChildren(n);
-		
-		int numFolders = 0;
-		int numFiles = 0;
-		
-		for (int i=0;i<nL.size();i++){
-			MegaNode c = nL.get(i);
-			if (c.isFolder()){
-				numFolders++;
-			}
-			else{
-				numFiles++;
-			}
-		}
+		int numFolders = megaApi.getNumChildFolders(n);
+		int numFiles = megaApi.getNumChildFiles(n);
 		
 		String info = "";
 		if (numFolders > 0){

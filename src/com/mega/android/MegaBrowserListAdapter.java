@@ -615,19 +615,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	}
 	
 	private String getInfoFolder(MegaNode n) {
-		ArrayList<MegaNode> nL = megaApi.getChildren(n);
-
-		int numFolders = 0;
-		int numFiles = 0;
-
-		for (int i = 0; i < nL.size(); i++) {
-			MegaNode c = nL.get(i);
-			if (c.isFolder()) {
-				numFolders++;
-			} else {
-				numFiles++;
-			}
-		}
+		int numFolders = megaApi.getNumChildFolders(n);
+		int numFiles = megaApi.getNumChildFiles(n);
 
 		String info = "";
 		if (numFolders > 0) {
@@ -720,23 +709,16 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			i.putExtra("handle", n.getHandle());
 
 			if (n.isFolder()) {
-				ArrayList<MegaShare> sl = megaApi.getOutShares(n);
-
-				if (sl != null) {
-
-					if (sl.size() > 0) {
-
-						i.putExtra("imageId", R.drawable.mime_folder_shared);
-					} else {
-						i.putExtra("imageId", R.drawable.mime_folder);
-					}
-				} else {
+				if (megaApi.isShared(n)){
+					i.putExtra("imageId", R.drawable.mime_folder_shared);	
+				}
+				else{
 					i.putExtra("imageId", R.drawable.mime_folder);
 				}
 
-			} else {
-				i.putExtra("imageId", MimeType.typeForName(n.getName())
-						.getIconResourceId());
+			} 
+			else {
+				i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());
 			}
 			i.putExtra("name", n.getName());
 			context.startActivity(i);
