@@ -285,7 +285,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
 		aB.setLogo(R.drawable.ic_action_navigation_accept);
-		aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
+		aB.setTitle(getString(R.string.file_properties_shared_folder_list_shares));
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -511,7 +511,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				if (parentHandle == -1){
-					aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
+					aB.setTitle(getString(R.string.file_properties_shared_folder_list_shares));
 					aB.setLogo(R.drawable.ic_action_navigation_accept);
 					supportInvalidateOptionsMenu();
 					adapter.setShareList(listContacts);

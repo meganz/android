@@ -399,7 +399,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 								//It is public and shared
 								imageView.setImageResource(R.drawable.mime_folder_public_shared);
 								sharedWithButton.setVisibility(View.VISIBLE);
-								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 							}
 							else{
 								//It is just public
@@ -414,7 +414,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							//It is private and shared
 							imageView.setImageResource(R.drawable.mime_folder_shared);
 							sharedWithButton.setVisibility(View.VISIBLE);
-							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
 						
 					}

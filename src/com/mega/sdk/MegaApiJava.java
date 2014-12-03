@@ -350,6 +350,15 @@ public class MegaApiJava
 	public static void addEntropy(String data, long size){
 		MegaApi.addEntropy(data, size);
 	}
+	
+	/**
+     * Reconnect and retry also transfers
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+	public void reconnect(){
+		megaApi.retryPendingConnections(true, true);
+	}
 
 	/**
      * Retry all pending requests
