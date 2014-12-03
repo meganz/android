@@ -15,6 +15,15 @@
         android:layout_marginTop="5dp"
         android:descendantFocusability="blocksDescendants" >
         
+        <ImageButton
+	        android:id="@+id/cell_thumbnail"
+	        android:layout_width="157dp"
+	        android:layout_height="157dp"
+	        android:layout_centerHorizontal="true"
+	        android:scaleType="fitCenter"
+	        android:background="@null"
+	        android:padding="7dp"/>
+        
         <LinearLayout 
             android:id="@+id/cell_menu_layout"
             android:layout_width="172dp"
@@ -71,39 +80,7 @@
 		            style="@style/dialogActionButton" 
 		            android:layout_weight="1"/>
             </LinearLayout>
-            
-<!--             <ImageView
-	            android:id="@+id/grid_menu_layout_option_download"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:src="@drawable/ic_download"
-	            android:layout_marginLeft="10dp"
-	            android:layout_marginTop="10dp"
-	            android:layout_alignParentLeft="true"
-	            android:layout_alignParentTop="true"
-	            style="@style/dialogActionButton" />
-            
-            <ImageView
-	            android:id="@+id/grid_menu_layout_option_properties"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:src="@drawable/ic_properties"
-	            android:layout_marginRight="10dp"
-	            android:layout_marginTop="10dp"
-	            android:layout_alignParentRight="true"
-	            android:layout_alignParentTop="true"
-	            style="@style/dialogActionButton" />
-      -->       
         </LinearLayout>
-        
-        <ImageButton
-	        android:id="@+id/cell_thumbnail"
-	        android:layout_width="157dp"
-	        android:layout_height="157dp"
-	        android:layout_centerHorizontal="true"
-	        android:scaleType="fitCenter"
-	        android:background="@null"
-	        android:padding="7dp"/>
         
         <View
 	        android:id="@+id/cell_separator"

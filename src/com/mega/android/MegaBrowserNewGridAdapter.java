@@ -269,7 +269,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				holder.progressBars.get(i).setVisibility(View.GONE);
 				
 				if (totalPosition == positionClicked){
-					holder.imageViews.get(i).setVisibility(View.GONE);
+//					holder.imageViews.get(i).setVisibility(View.GONE);
 					holder.menuLayouts.get(i).setVisibility(View.VISIBLE);
 					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.separators.get(i).getLayoutParams();
 					params.addRule(RelativeLayout.BELOW, holder.menuLayouts.get(i).getId());
@@ -647,7 +647,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			notifyDataSetChanged();
 		}
 		else{
-			holder.imageViews.get(index).setVisibility(View.GONE);
+//			holder.imageViews.get(index).setVisibility(View.GONE);
 			holder.menuLayouts.get(index).setVisibility(View.VISIBLE);
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.separators.get(index).getLayoutParams();
 			params.addRule(RelativeLayout.BELOW, holder.menuLayouts.get(index).getId());

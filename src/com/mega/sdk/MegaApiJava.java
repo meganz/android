@@ -1975,6 +1975,17 @@ public class MegaApiJava
 	}
 	
 	/**
+	 * Get all active transfers based on the type
+	 * 
+	 * @param type MegaTransfer.TYPE_DOWNLOAD || MegaTransfer.TYPE_UPLOAD 
+	 * 
+	 * @return List with all active download or upload transfers
+	 */
+	public ArrayList<MegaTransfer> getTransfers(int type){
+		return transferListToArray(megaApi.getTransfers(type));
+	}
+	
+	/**
      * Force a loop of the SDK thread
      * 
      * @deprecated This function is only here for debugging purposes. It will probably
