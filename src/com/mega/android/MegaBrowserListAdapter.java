@@ -714,10 +714,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case R.id.file_list_option_leave_share: {
-			positionClicked = -1;
-			log("En option leave share");
-			//((ManagerActivity) context).leaveIncomingShare(n);
-			Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+			positionClicked = -1;			
+			((ManagerActivity) context).leaveIncomingShare(n);
+			//Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 			break;
 		}
 		case R.id.file_list_option_properties: {

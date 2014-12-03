@@ -4726,7 +4726,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (cF != null){
-			if (drawerItem == DrawerItem.CONTACTS){	
+			if (drawerItem == DrawerItem.CONTACTS){					
 				cF.updateView();
 			}
 		}
@@ -5247,7 +5247,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-			builder.setMessage(R.string.confirmation_remove_contact+" "+c.getEmail()+"?").setPositiveButton(R.string.general_yes, dialogClickListener)
+			builder.setMessage(getResources().getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?").setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
@@ -5271,7 +5271,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-			String message= getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?";
+			String message= getResources().getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?";
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();			
 			

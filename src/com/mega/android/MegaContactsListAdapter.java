@@ -450,7 +450,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				break;
 			}
 			//TODO remove contact
-			case R.id.contact_list_option_remove:{				
+			case R.id.contact_list_option_remove:{
+				log("Remove contact");
 				((ManagerActivity) context).removeContact(c);
 				notifyDataSetChanged();	
 				break;
