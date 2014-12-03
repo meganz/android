@@ -81,6 +81,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaUser> users = getSelectedUsers();
+			final List<MegaUser> multipleContacts = users;;
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_settings:{
@@ -104,11 +105,31 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 					break;
 				}
 				case R.id.cab_menu_delete:{
-					
+					clearSelections();
+					hideMultipleSelect();
+					if (users.size()>0){
+						DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+						    @Override
+						    public void onClick(DialogInterface dialog, int which) {
+						        switch (which){
+						        case DialogInterface.BUTTON_POSITIVE:						        	
+						        	((ManagerActivity) context).removeMultipleContacts(multipleContacts);		        	
+						            break;
+			
+						        case DialogInterface.BUTTON_NEGATIVE:
+						            //No button clicked
+						            break;
+						        }
+						    }
+						};
+			
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setMessage(getResources().getString(R.string.confirmation_remove_multiple_contacts)).setPositiveButton(R.string.general_yes, dialogClickListener)
+						    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+						
+					}	
 					//TODO remove contact
 					
-					
-					Toast.makeText(getActivity(), context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_SHORT).show();
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -253,8 +274,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
@@ -483,7 +503,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		log("updateView");
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		this.setContacts(contacts);
-
+		
 		if (visibleContacts.size() == 0){
 			log("CONTACTS SIZE == 0");
 			listView.setVisibility(View.GONE);
@@ -501,6 +521,15 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			addContactButton.setVisibility(View.GONE);
 		}	
 		
+	}
+	
+	public void sortByNameDescending(){
+		for(int i = 0, j = visibleContacts.size() - 1; i < j; i++) {
+			visibleContacts.add(i, visibleContacts.remove(j));
+		}
+	}
+	public void sortByNameAscending(){
+		updateView();
 	}
 
 	@Override
