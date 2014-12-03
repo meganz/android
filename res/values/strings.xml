@@ -171,6 +171,7 @@
 	<string name="file_properties_shared_folder_permissions" context="menu that show the permission of a user on a folder">Permissions:</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Share with</string>
+	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
 	
 	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
