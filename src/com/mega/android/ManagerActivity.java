@@ -3537,8 +3537,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_SHARE){
+			statusDialog.dismiss();
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("OK MegaRequest.TYPE_SHARE");
+				log("OK MegaRequest.TYPE_SHARE");				
 			}
 			else{
 				log("ERROR MegaRequest.TYPE_SHARE");
