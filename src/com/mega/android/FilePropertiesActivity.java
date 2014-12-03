@@ -37,6 +37,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CompoundButton;
@@ -136,6 +137,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	ImageView statusImageView;
 
 	boolean shareIt = true;
+	int imageId;
 	
 	MegaSharedFolderAdapter adapter;
 	
@@ -180,7 +182,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
-			int imageId = extras.getInt("imageId");
+			imageId = extras.getInt("imageId");
 			String name = extras.getString("name");
 			handle = extras.getLong("handle", -1);
 			node = megaApi.getNodeByHandle(handle);
@@ -488,6 +490,151 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				}
 			}
 
+		}
+	}
+	
+	
+	private void refresh(){		
+	
+		File offlineFile = null;
+		
+		if (node.isFolder()){ //Folder			
+
+			imageView.setImageResource(imageId);
+			sl = megaApi.getOutShares(node);		
+
+			if (sl != null){
+
+				if (sl.size() == 0){						
+					sharedWithButton.setVisibility(View.GONE);
+					
+//					If I am the owner
+					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+						
+						permissionLabel.setVisibility(View.GONE);
+						permissionInfo.setVisibility(View.GONE);
+						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
+						
+					}
+					else{	
+						
+						//If I am not the owner
+						permissionLabel.setVisibility(View.VISIBLE);
+						permissionInfo.setVisibility(View.VISIBLE);
+						
+						int accessLevel= megaApi.getAccess(node);
+						log("Node: "+node.getName());
+						
+						switch(accessLevel){
+							case MegaShare.ACCESS_FULL:{
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
+								break;
+							}
+							case MegaShare.ACCESS_READ:{
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+								break;
+							}						
+							case MegaShare.ACCESS_READWRITE:{								
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
+								break;
+							}
+						}
+					}
+					
+				}
+				else{		
+					publicLink=false;
+					for(int i=0; i<sl.size();i++){
+
+						//Check if one of the ShareNodes is the public link
+
+						if(sl.get(i).getUser()==null){
+							//Public link + users								
+							publicLink=true;
+							break;
+
+						}
+					}
+					if(publicLink){
+//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
+//
+//						publicLinkTextView.setVisibility(View.VISIBLE);
+						
+						if(sl.size()>1){
+							//It is public and shared
+							imageView.setImageResource(R.drawable.mime_folder_public_shared);
+							sharedWithButton.setVisibility(View.VISIBLE);
+							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+						}
+						else{
+							//It is just public
+							imageView.setImageResource(R.drawable.mime_folder_public);
+							sharedWithButton.setVisibility(View.VISIBLE);
+							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
+						}
+						
+					}
+					else{
+//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
+						//It is private and shared
+						imageView.setImageResource(R.drawable.mime_folder_shared);
+						sharedWithButton.setVisibility(View.VISIBLE);
+						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+					}
+					
+				}
+			}
+			else{
+				sharedWithButton.setVisibility(View.GONE);
+			}
+			
+			Bitmap thumb = null;
+			Bitmap preview = null;
+			//If image
+			if (node.isFile()){
+				if (node.hasThumbnail()){
+					if (availableOfflineBoolean){
+						if (offlineFile != null){
+
+							BitmapFactory.Options options = new BitmapFactory.Options();
+							options.inJustDecodeBounds = true;
+							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+
+							ExifInterface exif;
+							int orientation = ExifInterface.ORIENTATION_NORMAL;
+							try {
+								exif = new ExifInterface(offlineFile.getAbsolutePath());
+								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+							} catch (IOException e) {}  
+
+							// Calculate inSampleSize
+							options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
+
+							// Decode bitmap with inSampleSize set
+							options.inJustDecodeBounds = false;
+
+							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
+							if (thumb != null){
+								thumb = Util.rotateBitmap(thumb, orientation);
+
+								imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+					else{
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null){
+							imageView.setImageBitmap(thumb);
+						}
+						else{
+							thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
+							if (thumb != null){
+								imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 		
@@ -1758,6 +1905,15 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+
+	@Override
+	protected void onResume() {
+		log("onResume-FilePropertiesActivity");
+		super.onResume();		
+		
+		refresh();
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){

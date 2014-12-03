@@ -425,14 +425,16 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	}	
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestFinish Activity");
-		if (request.getType() == MegaRequest.TYPE_SHARE){
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
+		log("onRequestFinish Activity" + request.getType());
+		if (request.getType() == MegaRequest.TYPE_SHARE){		
+
 			try { 
 				statusDialog.dismiss();	
 			} 
-			catch (Exception ex) {}
+			catch (Exception ex) {
+				log("Error dismiss status dialog");
+			}
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				if(removeShare){
@@ -462,6 +464,14 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 					Toast.makeText(this, getString(R.string.context_permissions_not_changed), Toast.LENGTH_SHORT).show();
 			}
 			log("Finish onRequestFinish");
+		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {
+				log("Error dismiss status dialog");
+			}
 		}
 	}
 
