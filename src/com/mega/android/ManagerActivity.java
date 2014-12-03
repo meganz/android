@@ -127,6 +127,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
+	final public static int MY_ACCOUNT_FRAGMENT = 5000;
+	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
+	final public static int PAYMENT_FRAGMENT = 5002;	
+	
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
@@ -193,6 +197,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem exportMK;
 	private MenuItem removeMK;
 	
+	public int accountFragment;
+	
 	private static DrawerItem drawerItem;
 	
 	private TableLayout topControlBar;
@@ -240,68 +246,45 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private TabHost mTabHostContacts;
     //private Fragment contactTabFragment;	
 	TabsAdapter mTabsAdapterContacts;
-    ViewPager viewPagerContacts;
-    
+    ViewPager viewPagerContacts;    
     private TabHost mTabHostShares;
 	TabsAdapter mTabsAdapterShares;
-    ViewPager viewPagerShares;
-    
+    ViewPager viewPagerShares;    
     static ManagerActivity managerActivity;
     private MegaApiAndroid megaApi;
     
-    private static int EDIT_TEXT_ID = 1;
-    
+    private static int EDIT_TEXT_ID = 1;  
     private AlertDialog renameDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog addContactDialog;
     private AlertDialog clearRubbishBinDialog;
-
-    private Handler handler;
-    
-    private boolean moveToRubbish = false;
-    
+    private Handler handler;    
+    private boolean moveToRubbish = false;    
     private boolean isClearRubbishBin = false;
     
     ProgressDialog statusDialog;
     
-	public UploadHereDialog uploadDialog;
-	
-	private List<ShareInfo> filePreparedInfos;
-	
+	public UploadHereDialog uploadDialog;	
+	private List<ShareInfo> filePreparedInfos;	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	
-	ActionBar aB;
-	
-	String urlLink = "";
-		
-	SparseArray<TransfersHolder> transfersListArray = null;
-	
-	boolean downloadPlay = true;
-	
-	boolean pauseIconVisible = false;
-	
+	ActionBar aB;	
+	String urlLink = "";		
+	SparseArray<TransfersHolder> transfersListArray = null;	
+	boolean downloadPlay = true;	
+	boolean pauseIconVisible = false;	
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
-	MegaAttributes attr = null;
-	
-	ArrayList<MegaTransfer> tL;
-	
+	MegaAttributes attr = null;	
+	ArrayList<MegaTransfer> tL;	
 	String searchQuery = null;
 	ArrayList<MegaNode> searchNodes;
 	int levelsSearch = -1;
-	
-	int swmFMode = MODE_IN;
-	
-	private boolean openLink = false;
-	
-	MegaApplication app;
-	
-	NavigationDrawerAdapter nDA;
-	
-	String pathNavigation = "/";
-	
-	long lastTimeOnTransferUpdate = -1;
-	
+	private boolean openLink = false;	
+	MegaApplication app;	
+	NavigationDrawerAdapter nDA;	
+	String pathNavigation = "/";	
+	long lastTimeOnTransferUpdate = -1;	
 	boolean firstTimeCam = false;
     
 	@Override
@@ -1593,6 +1576,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case ACCOUNT:{
 
+    			accountFragment=MY_ACCOUNT_FRAGMENT;
+    			
     			log("Entro por account");
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
@@ -1990,30 +1975,42 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (maF != null){
-			if (drawerItem == DrawerItem.ACCOUNT){
-				
-				drawerItem = DrawerItem.CLOUD_DRIVE;
-				selectDrawerItem(drawerItem);
-				if(nDA!=null){
-					nDA.setPositionClicked(0);
+		
+		if (drawerItem == DrawerItem.ACCOUNT){
+			
+			switch(accountFragment){
+			
+				case MY_ACCOUNT_FRAGMENT:{
+					if (maF != null){						
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+							
+						}					
+					}
+					return;
 				}
-				return;
-				
-//				if (maF.onBackPressed() == 0){
-//					drawerItem = DrawerItem.CLOUD_DRIVE;
-//					selectDrawerItem(drawerItem);
-//					if(nDA!=null){
-//						nDA.setPositionClicked(0);
-//					}
-//					return;
-//				}
+				case UPGRADE_ACCOUNT_FRAGMENT:{
+					if (upAF != null){						
+						drawerItem = DrawerItem.ACCOUNT;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+							
+						}					
+					}
+					return;
+				}
+				case PAYMENT_FRAGMENT:{
+					showUpAF();
+					return;					
+				}			
 			}
 		}
 		
 		if (oF != null){
 			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-				log("Entroooo");
 				if (oF.onBackPressed() == 0){
 					attr = dbH.getAttributes();
 					if (attr != null){
@@ -5349,6 +5346,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //        fragTransaction.attach(currentFragment);
 //        fragTransaction.commit();
 		
+		accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
+		
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
@@ -5367,6 +5366,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showpF(int type){
+		
+		accountFragment=PAYMENT_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			

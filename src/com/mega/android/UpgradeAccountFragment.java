@@ -30,6 +30,10 @@ import com.mega.sdk.MegaUser;
 
 public class UpgradeAccountFragment extends Fragment implements MegaRequestListenerInterface{
 	
+	public static int MY_ACCOUNT_FRAGMENT = 5000;
+	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
+	public static int PAYMENT_FRAGMENT = 5002;
+	
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
 	private TextView storage1;
@@ -156,8 +160,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	                       	            
 	            storage1.setText(p.getGBStorage(1)+"GB");
 	            storage2.setText(sizeTranslation(p.getGBStorage(3),0));
-	            storage3.setText(sizeTranslation(p.getGBStorage(5),0));   
-        
+	            storage3.setText(sizeTranslation(p.getGBStorage(5),0));           
 	            	            	            
 	            bandwidth1.setText(sizeTranslation(p.getGBTransfer(0)*12,0));
 	            bandwidth2.setText(sizeTranslation(p.getGBTransfer(2)*12,0));
