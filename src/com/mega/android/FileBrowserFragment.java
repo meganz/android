@@ -646,6 +646,21 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		return true;
 	}
 	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
+	}
+	
 	public void selectAll(){
 		if (isList){
 			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
