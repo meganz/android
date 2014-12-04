@@ -1162,6 +1162,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		this.orderGetChildren = orderGetChildren;
 	}
 	
+	public boolean isMultipleSelect(){
+		return multipleSelect;
+	}
+	
 	private static void log(String log) {
 		Util.log("MegaBrowserNewGridAdapter", log);
 	}

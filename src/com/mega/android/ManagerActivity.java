@@ -1605,7 +1605,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
-	    			selectMenuItem.setVisible(true);
+	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
 	    			changePass.setVisible(true); 
@@ -2568,8 +2568,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	if (fbF != null){
 	        		if (drawerItem == DrawerItem.CLOUD_DRIVE){	        			
 	        			fbF.selectAll();
-	        			selectMenuItem.setVisible(false);
-	        			unSelectMenuItem.setVisible(true);
+	        			if (fbF.showSelectMenuItem()){
+	        				selectMenuItem.setVisible(true);
+	        				unSelectMenuItem.setVisible(false);
+	        			}
+	        			else{
+	        				selectMenuItem.setVisible(false);
+	        				unSelectMenuItem.setVisible(true);
+	        			}
 	        			return true;
 	        		}
 	        	}
