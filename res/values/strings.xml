@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It&apos;s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
@@ -18,7 +18,7 @@
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Select</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Create</string>
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
-    <string name="general_download" context="Item menu option upon clicking on one or multiple files.">Download</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="general_add" context="button">Add</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     <string name="general_loading" context="state previous to import a file">Loading&#8230;</string>
@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
     <string name="name_text" context="Refers to the name of a folder or file.">name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA&apos;s &lt;a href=&amp;quot;https://mega.co.nz/mobile_privacy.html&amp;quot;&gt;Terms of Service&lt;/a&gt;</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s &lt;a href=&amp;quot;https://mega.co.nz/mobile_privacy.html&amp;quot;&gt;Terms of Service&lt;/a&gt;</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
     
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service.</string>
@@ -133,8 +133,8 @@
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
     <string name="create_account_confirm" context="">Please check your e-mail and click the link to login and confirm your account</string>
     <string name="create_account_creating_account">Connecting to the server: creating account</string>
-    
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term &apos;cloud&apos; is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
@@ -145,7 +145,8 @@
 	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
-	<string name="section_account" context="button to the settings of the user&apos;s account">My Account</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">My Account</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
@@ -194,19 +195,19 @@
     <string name="download_began" context="message when the download starts">Download has started</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Touch to cancel download</string>
-    <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can&apos;t download files greater than 4GB. Your download will probably fail.</string>
-    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn&apos;t any app that open that file. Example: a user downloads a pdf but doesn&apos;t have any app to read a pdf">There isn&apos;t any available app to execute this file on your device</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can\'t download files greater than 4GB. Your download will probably fail.</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">There isn\'t any available app to execute this file on your device</string>
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
-    <string name="context_get_link_menu" context="Item menu option upon clicking on one or multiple files.">Get link</string>
-    <string name="context_rename" context="Item menu option upon clicking on one or multiple files.">Rename</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
-    <string name="context_download" context="Item menu option upon clicking on one or multiple files.">Download</string>
-    <string name="context_move" context="Item menu option upon clicking on one or multiple files.">Move</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Move</string>
     <string name="context_moving" context="while moving a file or folder">Moving</string>
     <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
-    <string name="context_copy" context="Item menu option upon clicking on one or multiple files.">Copy</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copy</string>
     <string name="context_copying" context="while copying a file or folder">Copying</string>
     <string name="context_creating_link" context="status text">Creating link</string>
     <string name="context_moving_to_trash" context="status text">Moving to trash</string>
