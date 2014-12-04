@@ -4,11 +4,11 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It&apos;s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
-    <string name="general_x_of_x" context="Everytime there are two elements parcial of total"> of </string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> of </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Yes</string>
     <string name="general_no" context="Answer for confirmation dialog.">No</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Cancel</string>
@@ -59,8 +59,8 @@
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
-        <item quantity="one">file</item>
-        <item quantity="other">files</item>
+        <item context="Singular of file. 1 file" quantity="one">file</item>
+        <item context="Plural of file. 2 files" quantity="other">files</item>
     </plurals>
     
      <plurals name="general_num_contacts">
@@ -69,32 +69,32 @@
     </plurals>
     
     <plurals name="general_num_folders">
-        <item quantity="one" context="Folder or Directory">folder</item>
-        <item quantity="other">folders</item>
+        <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">folders</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
-        <item quantity="one">shared folder</item>
-        <item quantity="other" context="Title of the incoming shared folders of a user.">shared folders</item>
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">shared folder</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">shared folders</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one">download</item>
-        <item quantity="other">downloads</item>
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
     </plurals>
     
     <plurals name="general_num_uploads">
-        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download.">upload</item>
-        <item quantity="other">uploads</item>
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one">user</item>
-        <item quantity="other">users</item>
+        <item quantity="one" context="used for example when a folder is shared with 1 user">user</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">users</item>
     </plurals>
     
     
-    <string name="login_text" context="Login label">Login</string>
+    <string name="login_text" context="Login button">Login</string>
     <string name="email_text" context="email label">e-mail</string>
     <string name="password_text" context="password label">password</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirm password</string>
@@ -119,12 +119,12 @@
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     
     
-    <string name="create_account_text" context="label that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the terms of service">I agree with MEGA\'s &lt;a href="https://mega.co.nz/mobile_privacy.html"&gt;terms of service&lt;/a&gt;</string>
+    <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
+    <string name="name_text" context="Refers to the name of a folder or file.">name</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA&apos;s &lt;a href=&amp;quot;https://mega.co.nz/mobile_privacy.html&amp;quot;&gt;Terms of Service&lt;/a&gt;</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
     
-    <string name="create_account_no_terms" context="warning dialog">You have to accept our terms of service.</string>
+    <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service.</string>
 	<string name="error_enter_username" context="Warning dialog">Please enter your name.</string>
     <string name="error_short_password" context="when creating the account">Password is too short</string>
     <string name="error_passwords_dont_match" context="when creating the account">Passwords do not match</string>
@@ -134,7 +134,7 @@
     <string name="create_account_confirm" context="">Please check your e-mail and click the link to login and confirm your account</string>
     <string name="create_account_creating_account">Connecting to the server: creating account</string>
     
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term cloud is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term &apos;cloud&apos; is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
@@ -145,7 +145,7 @@
 	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transfers</string>
-	<string name="section_account" context="button to the settings of the account">My Account</string>
+	<string name="section_account" context="button to the settings of the user&apos;s account">My Account</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s of %2$s</string>
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
@@ -165,13 +165,13 @@
 	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Content: </string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">Added: </string>
 	<string name="file_properties_info_modified" context="when was the file modified">Modified: </string>
-	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can't access the folder">No public link</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can&apos;t access the folder">No public link</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don't use the symbol itself. Use &amp;)">Read &amp; write</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don&apos;t use the symbol itself. Use &amp;)">Read &amp; write</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
-	<string name="file_properties_shared_folder_permissions" context="Refers to the permissions of a file folder in the file manager.">Permissions:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Share with</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>
@@ -194,8 +194,8 @@
     <string name="download_began" context="message when the download starts">Download has started</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Do you want to cancel the download?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Touch to cancel download</string>
-    <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can\'t download files greater than 4GB. Your download will probably fail.</string>
-    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn't any app that open that file. Example: a user downloads a pdf but doesn't have any app to read a pdf">There isn\'t any available app to execute this file on your device</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">Most devices can&apos;t download files greater than 4GB. Your download will probably fail.</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn&apos;t any app that open that file. Example: a user downloads a pdf but doesn&apos;t have any app to read a pdf">There isn&apos;t any available app to execute this file on your device</string>
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
@@ -221,7 +221,7 @@
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
-    <string name="context_view_shared_folders">View shared folders</string>
+    <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
 	<string name="leave_incoming_share" context="status text">Leaving shared folder</string>
@@ -265,7 +265,7 @@
 	<string name="upload_uploading" context="status text">Uploading</string>
 	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Touch to cancel upload</string>
 	<string name="upload_failed" context="error message">Upload failed</string>
-	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">uploaded</string>
+	<string name="upload_uploaded" context=" Label for the upload date of a file. For example &quot;Uploaded: 2012-09-09  17:00&quot; (no need to put the colon punctuation in the translation)">uploaded</string>
 	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
 	<string name="upload_prepare" context="Status text at the beginning of an upload">Processing file</string>
 	<string name="error_temporary_unavaible" context="error message when downloading a file">Resource temporarily not available, please try again later</string>
@@ -306,7 +306,7 @@
     
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled any time before renewal date.</string>
     
-    <string name="file_properties_get_link" context="the user can get the link and it's copied to the clipboard">The link has been copied to the clipboard</string>
+    <string name="file_properties_get_link" context="the user can get the link and it&apos;s copied to the clipboard">The link has been copied to the clipboard</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait.</string>
     
@@ -321,7 +321,7 @@
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
-    <string name="cam_sync_syncing" context="The upload of the user's photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
+    <string name="cam_sync_syncing" context="The upload of the user&apos;s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera Uploads?</string>
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading camera images</string>
@@ -346,9 +346,9 @@
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">File Upload</string>
     
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
-        <item>Photos only</item>
-        <item>Videos only</item>
-        <item>Photos and videos</item>
+        <item context="the options of what to upload.">Photos only</item>
+        <item context="the options of what to upload.">Videos only</item>
+        <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
     
     <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Camera folder</string>
@@ -392,6 +392,6 @@
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Camera Uploads folder created</string>
     
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The zip file will be downloaded and unzipped</string>
-    <string name="ZIP_unzip_permission">The zip file will be unzipped </string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The zip file will be unzipped </string>
     
 </resources>
