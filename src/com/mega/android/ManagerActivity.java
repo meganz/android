@@ -41,7 +41,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -402,55 +401,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         mTabHostShares.setup();
         
         viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);  
-        viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager); 
-        
-        viewPagerShares.setAdapter(mTabsAdapterShares);
-        
-
-        ViewPager.OnPageChangeListener mPageChangeListener = new ViewPager.OnPageChangeListener() {
-
-
-            @Override
-            public void onPageSelected(int position) {
-//                onTabChanged(viewPagerShares.getAdapter(), mCurrentTabPosition, position);
-//                position = mCurrentTabPosition;
-//                int oldPos = viewPager.getCurrentItem();
-                
-            	log("onPageSelected");
-            	viewPagerShares.setOnPageChangeListener(mTabsAdapterShares);
-            }
-
-            private void onTabChanged(TabsAdapter adapter,int mCurrentTabPosition, int position) {
-                // TODO Auto-generated method stub
-            	log("onTabChanged");
-
-            }
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-				// TODO Auto-generated method stub
-				
-			}
-        };
-        
-        viewPagerShares.setOnPageChangeListener(mPageChangeListener);
-        
-        
-                        
-        viewPagerShares.setOnPageChangeListener(new OnPageChangeListener() {
-            public void onPageScrollStateChanged(int state) {}
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
-
-            public void onPageSelected(int position) {
-                log("Al cambiar de pagina");
-            }
-        });
+        viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);   
         
         
         if (!Util.isOnline(this)){
@@ -1615,7 +1566,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if (inSF != null){
     				aB.setTitle(getString(R.string.section_shared_with_me));	
-    				inSF.refresh();    				
+    				inSF.refresh();
+    				
     			}    			
     			if (outSF != null){    				
 					aB.setTitle(getString(R.string.section_shared_with_me));				
