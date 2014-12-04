@@ -238,17 +238,6 @@
             android:label="@string/pdf_file_viewer_activity" >
         </activity>
         
-<!-- Pegado del visor -->
-		<activity android:name=".pdfViewer.OpenPDFActivity" android:label="@string/pdf_file_viewer_activity"
-			android:configChanges="orientation|keyboardHidden"
-			android:uiOptions="splitActionBarWhenNarrow">
-
-		</activity>
-
-		<activity android:name=".pdfViewer.Options" android:label="@string/options" />
-		
-		<!-- Pegado del visor -->
-        
         <service
             android:name="CameraSyncService"
             android:exported="false" >
