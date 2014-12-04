@@ -1188,69 +1188,72 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void setInitialCloudDrive (){
 		drawerItem = DrawerItem.CLOUD_DRIVE;
 		nDA.setPositionClicked(0);
-
-		if (fbF == null){
-			fbF = new FileBrowserFragment();
-			if (parentHandleBrowser == -1){
-				fbF.setParentHandle(megaApi.getRootNode().getHandle());
-				parentHandleBrowser = megaApi.getRootNode().getHandle();
-			}
-			else{
-				fbF.setParentHandle(parentHandleBrowser);
-			}
-			fbF.setIsList(isListCloudDrive);
-			fbF.setOrder(orderGetChildren);
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-			fbF.setNodes(nodes);
-		}
-		else{
-								
-			fbF.setIsList(isListCloudDrive);
-			fbF.setParentHandle(parentHandleBrowser);
-			fbF.setOrder(orderGetChildren);
-			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
-			fbF.setNodes(nodes);
-		}
-		
-		mTabHostContacts.setVisibility(View.GONE);    			
-		viewPagerContacts.setVisibility(View.GONE); 
-		mTabHostShares.setVisibility(View.GONE);    			
-		viewPagerShares.setVisibility(View.GONE);
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.fragment_container, fbF, "fbF");
-		ft.commit();
-		
 		mDrawerLayout.openDrawer(Gravity.LEFT);
-		firstTime = false;
-		
-		customSearch.setVisibility(View.VISIBLE);
-		viewPagerShares.setVisibility(View.GONE);
-		viewPagerContacts.setVisibility(View.GONE);
+		firstTime = true;
+		selectDrawerItem(drawerItem);
 
-		if (createFolderMenuItem != null){
-			createFolderMenuItem.setVisible(true);
-			addContactMenuItem.setVisible(false);
-			addMenuItem.setVisible(true);
-			refreshMenuItem.setVisible(true);
-			sortByMenuItem.setVisible(true);
-			helpMenuItem.setVisible(true);
-			upgradeAccountMenuItem.setVisible(true);
-			settingsMenuItem.setVisible(true);
-			selectMenuItem.setVisible(true);
-			unSelectMenuItem.setVisible(false);
-			thumbViewMenuItem.setVisible(true);
-			addMenuItem.setEnabled(true);	  
- 			
-			if (isListCloudDrive){	
-				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-			}
-			else{
-				thumbViewMenuItem.setTitle(getString(R.string.action_list));
-			}
-			rubbishBinMenuItem.setVisible(true);
-			rubbishBinMenuItem.setTitle(getString(R.string.section_rubbish_bin));
-			clearRubbishBinMenuitem.setVisible(false);
-		}
+//		if (fbF == null){
+//			fbF = new FileBrowserFragment();
+//			if (parentHandleBrowser == -1){
+//				fbF.setParentHandle(megaApi.getRootNode().getHandle());
+//				parentHandleBrowser = megaApi.getRootNode().getHandle();
+//			}
+//			else{
+//				fbF.setParentHandle(parentHandleBrowser);
+//			}
+//			fbF.setIsList(isListCloudDrive);
+//			fbF.setOrder(orderGetChildren);
+//			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+//			fbF.setNodes(nodes);
+//		}
+//		else{
+//								
+//			fbF.setIsList(isListCloudDrive);
+//			fbF.setParentHandle(parentHandleBrowser);
+//			fbF.setOrder(orderGetChildren);
+//			ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+//			fbF.setNodes(nodes);
+//		}
+//		
+//		mTabHostContacts.setVisibility(View.GONE);    			
+//		viewPagerContacts.setVisibility(View.GONE); 
+//		mTabHostShares.setVisibility(View.GONE);    			
+//		viewPagerShares.setVisibility(View.GONE);
+//		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//		ft.replace(R.id.fragment_container, fbF, "fbF");
+//		ft.commit();
+//		
+//		mDrawerLayout.openDrawer(Gravity.LEFT);
+//		firstTime = false;
+//		
+//		customSearch.setVisibility(View.VISIBLE);
+//		viewPagerShares.setVisibility(View.GONE);
+//		viewPagerContacts.setVisibility(View.GONE);
+//
+//		if (createFolderMenuItem != null){
+//			createFolderMenuItem.setVisible(true);
+//			addContactMenuItem.setVisible(false);
+//			addMenuItem.setVisible(true);
+//			refreshMenuItem.setVisible(true);
+//			sortByMenuItem.setVisible(true);
+//			helpMenuItem.setVisible(true);
+//			upgradeAccountMenuItem.setVisible(true);
+//			settingsMenuItem.setVisible(true);
+//			selectMenuItem.setVisible(true);
+//			unSelectMenuItem.setVisible(false);
+//			thumbViewMenuItem.setVisible(true);
+//			addMenuItem.setEnabled(true);	  
+// 			
+//			if (isListCloudDrive){	
+//				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//			}
+//			else{
+//				thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//			}
+//			rubbishBinMenuItem.setVisible(true);
+//			rubbishBinMenuItem.setTitle(getString(R.string.section_rubbish_bin));
+//			clearRubbishBinMenuitem.setVisible(false);
+//		}
 	}
 	
 	public void refreshCameraUpload(){
