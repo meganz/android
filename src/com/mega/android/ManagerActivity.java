@@ -81,7 +81,6 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import com.mega.android.FileStorageActivity.Mode;
-import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.components.EditTextCursorWatcher;
@@ -970,19 +969,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
    				
     				
     			}
-    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
-
-    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
-    			    
-    			    File pdfFile = new File(pathPdf);
-    			    
-    			    Intent intentPdf = new Intent();
-    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-    			    intentPdf.setClass(this, OpenPDFActivity.class);
-    			    intentPdf.setAction("android.intent.action.VIEW");
-    				this.startActivity(intentPdf);	
-    				
-    			}    			
+//    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
+//
+//    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
+//    			    
+//    			    File pdfFile = new File(pathPdf);
+//    			    
+//    			    Intent intentPdf = new Intent();
+//    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+//    			    intentPdf.setClass(this, OpenPDFActivity.class);
+//    			    intentPdf.setAction("android.intent.action.VIEW");
+//    				this.startActivity(intentPdf);	
+//    				
+//    			}    			
     			else if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
 					Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -5131,18 +5130,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 						catch(Exception e) {}
 												
-						if(MimeType.typeForName(tempNode.getName()).isPdf()){
-							
-		    			    File pdfFile = new File(localPath);
-		    			    
-		    			    Intent intentPdf = new Intent();
-		    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-		    			    intentPdf.setClass(this, OpenPDFActivity.class);
-		    			    intentPdf.setAction("android.intent.action.VIEW");
-		    				this.startActivity(intentPdf);
-							
-						}
-						else if(MimeType.typeForName(tempNode.getName()).isZip()){
+//						if(MimeType.typeForName(tempNode.getName()).isPdf()){
+//							
+//		    			    File pdfFile = new File(localPath);
+//		    			    
+//		    			    Intent intentPdf = new Intent();
+//		    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+//		    			    intentPdf.setClass(this, OpenPDFActivity.class);
+//		    			    intentPdf.setAction("android.intent.action.VIEW");
+//		    				this.startActivity(intentPdf);
+//							
+//						}
+//						else
+						if(MimeType.typeForName(tempNode.getName()).isZip()){
 							
 		    			    File zipFile = new File(localPath);
 		    			    

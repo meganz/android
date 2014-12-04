@@ -31,7 +31,6 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.mega.android.pdfViewer.OpenPDFActivity;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiJava;
 
@@ -376,17 +375,17 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			startActivity(intent);
 					
 		}
-		else if(MimeType.typeForName(absolutePath).isPdf()){
-			
-		    File pdfFile = new File(absolutePath);
-		    
-		    Intent intentPdf = new Intent();
-		    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-		    intentPdf.setClass(this, OpenPDFActivity.class);
-		    intentPdf.setAction("android.intent.action.VIEW");
-			this.startActivity(intentPdf);
-			
-		}
+//		else if(MimeType.typeForName(absolutePath).isPdf()){
+//			
+//		    File pdfFile = new File(absolutePath);
+//		    
+//		    Intent intentPdf = new Intent();
+//		    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+//		    intentPdf.setClass(this, OpenPDFActivity.class);
+//		    intentPdf.setAction("android.intent.action.VIEW");
+//			this.startActivity(intentPdf);
+//			
+//		}
 		else{							
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeType.typeForName(absolutePath).getType());
