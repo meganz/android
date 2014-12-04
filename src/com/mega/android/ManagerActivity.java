@@ -1566,7 +1566,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if (inSF != null){
     				aB.setTitle(getString(R.string.section_shared_with_me));	
-    				inSF.refresh();
+    				inSF.refresh();			
     				
     			}    			
     			if (outSF != null){    				
