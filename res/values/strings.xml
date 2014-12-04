@@ -59,8 +59,8 @@
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
-        <item quantity="one">file</item>
-        <item quantity="other">files</item>
+        <item context="Singular of file. 1 file" quantity="one">file</item>
+        <item context="Plural of file. 2 files" quantity="other">files</item>
     </plurals>
     
      <plurals name="general_num_contacts">
@@ -69,28 +69,28 @@
     </plurals>
     
     <plurals name="general_num_folders">
-        <item quantity="one" context="Folder or Directory">folder</item>
-        <item quantity="other">folders</item>
+        <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">folders</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
-        <item quantity="one">shared folder</item>
-        <item quantity="other" context="Title of the incoming shared folders of a user.">shared folders</item>
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">shared folder</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">shared folders</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one" context="Item menu option upon clicking on one or multiple files.">download</item>
-        <item quantity="other">downloads</item>
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
     </plurals>
     
     <plurals name="general_num_uploads">
-        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download.">upload</item>
-        <item quantity="other">uploads</item>
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one">user</item>
-        <item quantity="other">users</item>
+        <item quantity="one" context="used for example when a folder is shared with 1 user">user</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">users</item>
     </plurals>
     
     
@@ -221,7 +221,7 @@
     <string name="context_send_link" context="get the link and send it">Send link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
-    <string name="context_view_shared_folders">View shared folders</string>
+    <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
 	<string name="leave_incoming_share" context="status text">Leaving shared folder</string>
@@ -346,9 +346,9 @@
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">File Upload</string>
     
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
-        <item>Photos only</item>
-        <item>Videos only</item>
-        <item>Photos and videos</item>
+        <item context="the options of what to upload.">Photos only</item>
+        <item context="the options of what to upload.">Videos only</item>
+        <item context="the options of what to upload.">Photos and videos</item>
     </string-array>
     
     <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Camera folder</string>
@@ -392,6 +392,6 @@
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Camera Uploads folder created</string>
     
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The zip file will be downloaded and unzipped</string>
-    <string name="ZIP_unzip_permission">The zip file will be unzipped </string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The zip file will be unzipped </string>
     
 </resources>
