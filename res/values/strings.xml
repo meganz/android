@@ -18,7 +18,7 @@
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Select</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Create</string>
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
-    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="general_download" context="Item menu option upon clicking on one or multiple files.">Download</string>
     <string name="general_add" context="button">Add</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Empty</string>
     <string name="general_loading" context="state previous to import a file">Loading&#8230;</string>
@@ -79,7 +79,7 @@
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one" context="Item menu option upon right click on one or multiple files.">download</item>
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files.">download</item>
         <item quantity="other">downloads</item>
     </plurals>
     
@@ -171,7 +171,7 @@
 	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don&apos;t use the symbol itself. Use &amp;)">Read &amp; write</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
-	<string name="file_properties_shared_folder_permissions" context="Item menu option upon right click on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Share with</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>
@@ -199,14 +199,14 @@
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
-    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
+    <string name="context_get_link_menu" context="Item menu option upon clicking on one or multiple files.">Get link</string>
+    <string name="context_rename" context="Item menu option upon clicking on one or multiple files.">Rename</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
-    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
-    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Move</string>
+    <string name="context_download" context="Item menu option upon clicking on one or multiple files.">Download</string>
+    <string name="context_move" context="Item menu option upon clicking on one or multiple files.">Move</string>
     <string name="context_moving" context="while moving a file or folder">Moving</string>
     <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
-    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copy</string>
+    <string name="context_copy" context="Item menu option upon clicking on one or multiple files.">Copy</string>
     <string name="context_copying" context="while copying a file or folder">Copying</string>
     <string name="context_creating_link" context="status text">Creating link</string>
     <string name="context_moving_to_trash" context="status text">Moving to trash</string>
@@ -222,7 +222,7 @@
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
     <string name="context_view_shared_folders">View shared folders</string>
-    <string name="context_sharing_folder" context="Item menu option upon right click on one or multiple files.">Sharing</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
 	<string name="leave_incoming_share" context="status text">Leaving shared folder</string>
     <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Camera folder</string>
