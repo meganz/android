@@ -490,9 +490,11 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 					
 					MegaNode n = nodes.get(position);
 					
-					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
-						((ManagerActivity)context).cameraUploadsClicked();
-						return;
+					if (megaApi.getParentNode(n) != null){
+						if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+							((ManagerActivity)context).cameraUploadsClicked();
+							return;
+						}
 					}
 					
 					aB.setTitle(n.getName());
