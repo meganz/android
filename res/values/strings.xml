@@ -120,7 +120,7 @@
     
     
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Refers to the name of a folder or file.">name</string>
+    <string name="name_text" context="Name of the user">name</string>
     <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s &lt;a href=&amp;quot;https://mega.co.nz/mobile_privacy.html&amp;quot;&gt;Terms of Service&lt;/a&gt;</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
     
@@ -266,7 +266,7 @@
 	<string name="upload_uploading" context="status text">Uploading</string>
 	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Touch to cancel upload</string>
 	<string name="upload_failed" context="error message">Upload failed</string>
-	<string name="upload_uploaded" context=" Label for the upload date of a file. For example &quot;Uploaded: 2012-09-09  17:00&quot; (no need to put the colon punctuation in the translation)">uploaded</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">uploaded</string>
 	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Do you want to cancel the upload?</string>
 	<string name="upload_prepare" context="Status text at the beginning of an upload">Processing file</string>
 	<string name="error_temporary_unavaible" context="error message when downloading a file">Resource temporarily not available, please try again later</string>
