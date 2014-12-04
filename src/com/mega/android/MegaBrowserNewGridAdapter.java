@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,11 +16,17 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
@@ -43,6 +50,7 @@ import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
 import com.mega.sdk.MegaShare;
 import com.mega.sdk.MegaTransfer;
@@ -79,6 +87,163 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
 	
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
+	SparseBooleanArray checkedItems = new SparseBooleanArray();
+	private ActionMode actionMode;
+	boolean multipleSelect = false;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item){
+			log("onActionItemClicked");
+			List<MegaNode> documents = getSelectedDocuments();
+			
+			switch(item.getItemId()){
+				case R.id.cab_menu_download:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).onFileClick(handleList);
+					break;
+				}
+				case R.id.cab_menu_rename:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						((ManagerActivity) context).showRenameDialog(documents.get(0), documents.get(0).getName());
+					}
+					break;
+				}
+				case R.id.cab_menu_copy:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showCopy(handleList);
+					break;
+				}	
+				case R.id.cab_menu_move:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showMove(handleList);
+					break;
+				}
+				case R.id.cab_menu_share_link:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
+					}
+					break;
+				}
+				case R.id.cab_menu_trash:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).moveToTrash(handleList);
+					break;
+				}
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			log("onCreateActionMode");
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_browser_action, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode arg0) {
+			log("onDestroyActionMode");			
+			multipleSelect = false;
+			clearSelections();
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			log("onPrepareActionMode");
+			List<MegaNode> selected = getSelectedDocuments();
+			
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
+			
+			// Rename
+			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
+				showRename = true;
+			}
+			
+			// Link
+			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+				showLink = true;
+			}
+			
+			if (selected.size() != 0) {
+				showDownload = true;
+				showTrash = true;
+				showMove = true;
+				showCopy = true;
+				
+				for(int i=0; i<selected.size();i++)	{
+					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+						showTrash = false;
+						showMove = false;
+						break;
+					}
+				}
+				
+				if(selected.size() == nodes.size()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+			
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			
+			return false;
+		}
+		
+	}
 	
 	public MegaBrowserNewGridAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ActionBar aB, int numberOfCells, int type, int orderGetChildren, ImageView emptyImageView, TextView emptyTextView, Button leftNewFolder, Button rightUploadButton, TextView contentText) {
 		this.context = _context;
@@ -152,7 +317,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
     	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
     	public ArrayList<ImageView> imageViews;
     	public ArrayList<LinearLayout> menuLayouts;
-    	public ArrayList<View> separators;
+    	public ArrayList<LinearLayout> longClickLayouts;
     	public ArrayList<TextView> fileNameViews;
     	public ArrayList<TextView> fileSizeViews;
     	public ArrayList<ProgressBar> progressBars;
@@ -180,7 +345,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
 			holder.imageViews = new ArrayList<ImageView>();
 			holder.menuLayouts = new ArrayList<LinearLayout>();
-			holder.separators = new ArrayList<View>();
+			holder.longClickLayouts = new ArrayList<LinearLayout>();
 			holder.threeDots = new ArrayList<ImageButton>();
 			holder.fileNameViews = new ArrayList<TextView>();
 			holder.fileSizeViews = new ArrayList<TextView>();
@@ -212,6 +377,9 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				LinearLayout mL = (LinearLayout) rLView.findViewById(R.id.cell_menu_layout);
 				holder.menuLayouts.add(mL);
 				
+				LinearLayout lcL = (LinearLayout) rLView.findViewById(R.id.cell_menu_long_click);
+				holder.longClickLayouts.add(lcL);
+				
 				ImageView oDo = (ImageView) rLView.findViewById(R.id.grid_menu_layout_option_download);
 				holder.optionsDownload.add(oDo);
 				
@@ -223,10 +391,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				
 				ImageView oO = (ImageView) rLView.findViewById(R.id.grid_menu_layout_option_overflow);
 				holder.optionsOverflow.add(oO);
-				
-				View s = (View) rLView.findViewById(R.id.cell_separator);
-				holder.separators.add(s);
-				
+								
 				ImageButton tD = (ImageButton) rLView.findViewById(R.id.cell_three_dots);
 				holder.threeDots.add(tD);
 				
@@ -268,17 +433,23 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
 				holder.progressBars.get(i).setVisibility(View.GONE);
 				
-				if (totalPosition == positionClicked){
-//					holder.imageViews.get(i).setVisibility(View.GONE);
-					holder.menuLayouts.get(i).setVisibility(View.VISIBLE);
-					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.separators.get(i).getLayoutParams();
-					params.addRule(RelativeLayout.BELOW, holder.menuLayouts.get(i).getId());
+				if (multipleSelect){
+					if (isChecked(totalPosition)){
+						holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
+					}
+					else{
+						holder.longClickLayouts.get(i).setVisibility(View.GONE);
+					}
 				}
 				else{
-					holder.imageViews.get(i).setVisibility(View.VISIBLE);
+					holder.longClickLayouts.get(i).setVisibility(View.GONE);
+				}
+				
+				if (totalPosition == positionClicked){
+					holder.menuLayouts.get(i).setVisibility(View.VISIBLE);
+				}
+				else{
 					holder.menuLayouts.get(i).setVisibility(View.GONE);
-					RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.separators.get(i).getLayoutParams();
-					params.addRule(RelativeLayout.BELOW, holder.imageViews.get(i).getId());
 				}
 				
 				MegaNode node = nodes.get(totalPosition);
@@ -390,8 +561,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					ViewHolderBrowserNewGrid holder= (ViewHolderBrowserNewGrid) v.getTag();
 					
 					long handle = holder.documents.get(index);
-					MegaNode n = megaApi.getNodeByHandle(handle);
-					nodeClicked(handle, totalPosition);
+					onNodeClick(holder, positionFinal, index, totalPosition);
 				}
 			} );
 			
@@ -404,8 +574,11 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					long handle = holder.documents.get(index);
 //					RelativeLayout rL = holder.relativeLayoutsThumbnail.get(index);
 //					rL.setBackgroundColor(Color.parseColor("#000000"));
-					MegaNode n = megaApi.getNodeByHandle(handle);
+//					MegaNode n = megaApi.getNodeByHandle(handle);
 //					nodeClicked(handle, totalPosition);
+					
+					onNodeLongClick(holder, positionFinal, index, totalPosition);
+					
 					return true;
 				}
 			});
@@ -419,7 +592,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					log("POSITION: " + positionFinal + "___" + index);
 					ViewHolderBrowserNewGrid holder = (ViewHolderBrowserNewGrid) v.getTag();
 					
-					threeDotsClicked(holder, positionFinal, index, totalPosition);
+					onThreeDotsClick(holder, positionFinal, index, totalPosition);
 				}
 			});
 			
@@ -431,7 +604,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					ViewHolderBrowserNewGrid holder = (ViewHolderBrowserNewGrid) v.getTag();
 					
-					onClickDownload(holder, positionFinal, index, totalPosition);
+					onDownloadClick(holder, positionFinal, index, totalPosition);
 				}
 			});
 			
@@ -443,7 +616,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					ViewHolderBrowserNewGrid holder = (ViewHolderBrowserNewGrid) v.getTag();
 					
-					onClickProperties(holder, positionFinal, index, totalPosition);
+					onPropertiesClick(holder, positionFinal, index, totalPosition);
 				}
 			});
 			
@@ -455,7 +628,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					ViewHolderBrowserNewGrid holder = (ViewHolderBrowserNewGrid) v.getTag();
 					
-					onClickDelete(holder, positionFinal, index, totalPosition);
+					onDeleteClick(holder, positionFinal, index, totalPosition);
 				}
 			});
 			
@@ -467,7 +640,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					ViewHolderBrowserNewGrid holder = (ViewHolderBrowserNewGrid) v.getTag();
 					
-					onClickOverflow(holder, positionFinal, index, totalPosition);
+					onOverflowClick(holder, positionFinal, index, totalPosition);
 				}
 			});
 
@@ -476,7 +649,22 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		return convertView;
 	}
 	
-	public void onClickOverflow(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+	public boolean isChecked(int totalPosition){
+		
+		if (!multipleSelect){
+			return false;
+		}
+		else{
+			if (checkedItems.get(totalPosition, false) == false){
+				return false;
+			}
+			else{
+				return true;
+			}	
+		}
+	}
+	
+	public void onOverflowClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
 		final MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 		
 		if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER)) {
@@ -578,7 +766,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 	    }
 	}
 	
-	public void onClickDelete(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+	public void onDeleteClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
 		MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
@@ -597,7 +785,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 	
-	public void onClickProperties(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+	public void onPropertiesClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
 		MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 		
 		Intent i = new Intent(context, FilePropertiesActivity.class);
@@ -621,7 +809,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 	
-	public void onClickDownload(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+	public void onDownloadClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
 		MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
@@ -637,22 +825,18 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 	
-	public void threeDotsClicked(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
-		if (positionClicked == totalPosition){
-			holder.imageViews.get(index).setVisibility(View.VISIBLE);
-			holder.menuLayouts.get(index).setVisibility(View.GONE);
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.separators.get(index).getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, holder.imageViews.get(index).getId());
-			this.positionClicked = -1;
-			notifyDataSetChanged();
-		}
-		else{
-//			holder.imageViews.get(index).setVisibility(View.GONE);
-			holder.menuLayouts.get(index).setVisibility(View.VISIBLE);
-			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) holder.separators.get(index).getLayoutParams();
-			params.addRule(RelativeLayout.BELOW, holder.menuLayouts.get(index).getId());
-			this.positionClicked = totalPosition;
-			notifyDataSetChanged();
+	public void onThreeDotsClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+		if (!multipleSelect){
+			if (positionClicked == totalPosition){
+				holder.menuLayouts.get(index).setVisibility(View.GONE);
+				this.positionClicked = -1;
+				notifyDataSetChanged();
+			}
+			else{
+				holder.menuLayouts.get(index).setVisibility(View.VISIBLE);
+				this.positionClicked = totalPosition;
+				notifyDataSetChanged();
+			}
 		}
 	}
 	
@@ -702,105 +886,244 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
     	positionClicked = p;
     }
     
-    public void nodeClicked (long handle, int totalPosition){
-    	MegaNode n = megaApi.getNodeByHandle(handle);
-    	
-    	if (n.isFolder()){
-			
-			if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
-				((ManagerActivity)context).cameraUploadsClicked();
-				return;
-			}
-			
-			aB.setTitle(n.getName());
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-
-			parentHandle = n.getHandle();
-			if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
-				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			}
-			else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
-				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-			}
-			else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-				((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-			}
-			nodes = megaApi.getChildren(n, orderGetChildren);
-			setNodes(nodes);
-			listFragment.setSelection(0);
+    public void onNodeLongClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+    	log("onNodeLongClick");
+    	if (!multipleSelect){
+	    	if (positionClicked == -1){
+	        	clearSelections();
+	        	actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+	        	checkedItems.append(totalPosition, true);
+	        	this.multipleSelect = true;
+				updateActionModeTitle();
+				notifyDataSetChanged();
+	    	}
+    	}
+    	else{
+    		onNodeClick(holder, position, index, totalPosition);
+    	}
+    }
+    
+    /*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		this.multipleSelect = false;
+		if (actionMode != null) {
+			actionMode.finish();
 		}
-		else{
-			if (MimeType.typeForName(n.getName()).isImage()){
-				Intent intent = new Intent(context, FullScreenImageViewer.class);
-				intent.putExtra("position", totalPosition);
-				if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
-					intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
-					if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-					}
-					intent.putExtra("orderGetChildren", orderGetChildren);
-				}
-				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
-					intent.putExtra("adapterType", ManagerActivity.RUBBISH_BIN_ADAPTER);
-					if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_RUBBISH){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-					}
-					intent.putExtra("orderGetChildren", orderGetChildren);
-				}
-				else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-					intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
-					if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_INCOMING){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-					}
-				}
-				context.startActivity(intent);
+	}
+	
+	public void selectAll(){
+		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+		this.multipleSelect = true;
+		for ( int i=0; i< nodes.size(); i++ ) {
+			checkedItems.append(i, true);
+		}
+		updateActionModeTitle();
+		notifyDataSetChanged();
+	}
+    
+    /*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		log("clearSelections");
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				checkedItems.append(checkedPosition, false);
 			}
-			else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
-				MegaNode file = n;
-				Intent service = new Intent(context, MegaStreamingService.class);
-		  		context.startService(service);
-		  		String fileName = file.getName();
+		}
+		updateActionModeTitle();
+		notifyDataSetChanged();
+	}
+	
+	private void updateActionModeTitle() {
+		log("updateActionModeTitle");
+		if (actionMode == null){
+			log("actionMode null");
+			return;
+		}
+		
+		if (context == null){
+			log("context null");
+			return;
+		}
+		
+		List<MegaNode> documents = getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
+		Resources res = context.getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = "";
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
+	
+	/*
+	 * Get list of all selected documents
+	 */
+	private List<MegaNode> getSelectedDocuments() {
+		log("getSelectedDocuments");
+		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				MegaNode document = null;
 				try {
-					fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-				} 
-				catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
+					if (nodes != null) {
+						document = nodes.get(checkedItems.keyAt(i));
+					}
+				}
+				catch (IndexOutOfBoundsException e) {}
+				
+				if (document != null){
+					documents.add(document);
+				}
+			}
+		}
+		
+		return documents;
+	}
+    
+    public void onNodeClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
+    	
+    	if (!multipleSelect){
+	    	MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
+	    	
+	    	if (n.isFolder()){
+				
+				if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+					((ManagerActivity)context).cameraUploadsClicked();
+					return;
 				}
 				
-		  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-		  		String mimeType = MimeType.typeForName(file.getName()).getType();
-		  		System.out.println("FILENAME: " + fileName);
-		  		
-		  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-		  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-		  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
-		  			context.startActivity(mediaIntent);
-		  		}
-		  		else{
-		  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-		  			ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(n.getHandle());
-					((ManagerActivity) context).onFileClick(handleList);
-		  		}						
+				aB.setTitle(n.getName());
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+	
+				parentHandle = n.getHandle();
+				if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
+					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				}
+				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+				}
+				else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+				}
+				nodes = megaApi.getChildren(n, orderGetChildren);
+				setNodes(nodes);
+				listFragment.setSelection(0);
 			}
 			else{
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(n.getHandle());
-				((ManagerActivity) context).onFileClick(handleList);
-			}	
-			positionClicked = -1;
+				if (MimeType.typeForName(n.getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", totalPosition);
+					if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
+						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+						intent.putExtra("orderGetChildren", orderGetChildren);
+					}
+					else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+						intent.putExtra("adapterType", ManagerActivity.RUBBISH_BIN_ADAPTER);
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_RUBBISH){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+						intent.putExtra("orderGetChildren", orderGetChildren);
+					}
+					else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
+						intent.putExtra("adapterType", ManagerActivity.SHARED_WITH_ME_ADAPTER);
+						if (megaApi.getParentNode(n).getType() == MegaNode.TYPE_INCOMING){
+							intent.putExtra("parentNodeHandle", -1L);
+						}
+						else{
+							intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						}
+					}
+					context.startActivity(intent);
+				}
+				else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+					MegaNode file = n;
+					Intent service = new Intent(context, MegaStreamingService.class);
+			  		context.startService(service);
+			  		String fileName = file.getName();
+					try {
+						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+					} 
+					catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
+					}
+					
+			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+			  		String mimeType = MimeType.typeForName(file.getName()).getType();
+			  		System.out.println("FILENAME: " + fileName);
+			  		
+			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+			  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
+			  			context.startActivity(mediaIntent);
+			  		}
+			  		else{
+			  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+			  			ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(n.getHandle());
+						((ManagerActivity) context).onFileClick(handleList);
+			  		}						
+				}
+				else{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(n.getHandle());
+					((ManagerActivity) context).onFileClick(handleList);
+				}	
+				positionClicked = -1;
+				notifyDataSetChanged();
+			}
+    	}
+    	else{
+			if (checkedItems.get(totalPosition, false) == false){
+				checkedItems.append(totalPosition, true);
+			}
+			else{
+				checkedItems.append(totalPosition, false);
+			}				
+			updateActionModeTitle();
 			notifyDataSetChanged();
-		}
+    	}
     }
 	
 	public long getParentHandle(){

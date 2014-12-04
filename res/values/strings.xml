@@ -28,12 +28,11 @@
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Already downloaded</string>
     
-     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
-     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security Warning! High risk operation, continue?</string> 
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security Warning! High risk operation, continue?</string> 
      
-     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options&#8230;</string> 
-     
-    <string name="confirmation_remove_contact" context="confirmation message before removing a contact">Do you want to remove the contact</string>  
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options&#8230;</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Incoming Shares</string>

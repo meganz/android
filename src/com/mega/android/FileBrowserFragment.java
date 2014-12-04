@@ -79,13 +79,6 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
-		boolean showDownload = false;
-		boolean showRename = false;
-		boolean showCopy = false;
-		boolean showMove = false;
-		boolean showLink = false;
-		boolean showTrash = false;
-
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			List<MegaNode> documents = getSelectedDocuments();
@@ -176,6 +169,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = getSelectedDocuments();
+			
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
 		
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
@@ -647,14 +647,21 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	}
 	
 	public void selectAll(){
-		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-
-		adapterList.setMultipleSelect(true);
-		for ( int i=0; i< adapterList.getCount(); i++ ) {
-			listView.setItemChecked(i, true);
+		if (isList){
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+	
+			adapterList.setMultipleSelect(true);
+			for ( int i=0; i< adapterList.getCount(); i++ ) {
+				listView.setItemChecked(i, true);
+			}
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
 		}
-		updateActionModeTitle();
-		listView.setOnItemLongClickListener(null);
+		else{
+			if (adapterGrid != null){
+				adapterGrid.selectAll();
+			}
+		}
 	}
 	
 	/*
