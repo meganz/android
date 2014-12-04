@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA_COM</string>
-    <string name="app_version" context="Not translate">0.42</string>
+    <string name="app_version" context="Not translate">0.43</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total size</string>
     <string name="general_x_of_x" context="Everytime there are two elements parcial of total"> of </string>
