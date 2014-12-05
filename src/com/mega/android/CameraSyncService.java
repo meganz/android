@@ -1145,11 +1145,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		//Sleep so the SDK keeps alive
 		//TODO: Must create a method to know if the SDK is waiting for any operation
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Thread.sleep(5000);
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
 		
 		if (totalUploaded == 0) {
 			log("stopping service!2");
