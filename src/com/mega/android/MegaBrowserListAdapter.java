@@ -109,11 +109,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		case ManagerActivity.RUBBISH_BIN_ADAPTER: {
 			((ManagerActivity) context).setParentHandleRubbish(parentHandle);
 			break;
-		}
-		case ManagerActivity.SHARED_WITH_ME_ADAPTER: {
-			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
-			break;
-		}
+		}		
 		case ManagerActivity.FOLDER_LINK_ADAPTER: {
 			megaApi = ((MegaApplication) ((Activity) context).getApplication())
 					.getMegaApiFolder();
@@ -125,12 +121,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
 			//TODO necesito algo?
-			((ManagerActivity) context).setParentHandleSharedWithMe(-1);
+			((ManagerActivity) context).setParentHandleOutgoing(-1);
 			break;
 		}
 		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
 			//TODO necesito algo?
-			((ManagerActivity) context).setParentHandleSharedWithMe(-1);
+			((ManagerActivity) context).setParentHandleIncoming(-1);
 			break;
 		}
 		default: {
@@ -489,6 +485,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					}
 				} 
 				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
+					
+					//TODO Tengo que comprobar el parentHandle
+
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					//holder.shareDisabled.setVisibility(View.VISIBLE);
@@ -539,41 +538,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
-				} else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER) {
-
-					log("ManagerActivity.SHARED_WITH_ME_ADAPTER");
-
-					holder.optionDownload.setVisibility(View.VISIBLE);
-					holder.optionProperties.setVisibility(View.VISIBLE);
-					holder.optionPublicLink.setVisibility(View.GONE);
-					holder.optionRename.setVisibility(View.VISIBLE);
-					holder.optionDelete.setVisibility(View.VISIBLE);
-
-					holder.optionDownload.getLayoutParams().width = Util.px2dp((55 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDownload
-							.getLayoutParams()).setMargins(
-									Util.px2dp((9 * scaleW), outMetrics),
-									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-					holder.optionProperties.getLayoutParams().width = Util
-							.px2dp((55 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionProperties
-							.getLayoutParams()).setMargins(
-									Util.px2dp((17 * scaleW), outMetrics),
-									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-					holder.optionRename.getLayoutParams().width = Util.px2dp(
-							(55 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionRename
-							.getLayoutParams()).setMargins(
-									Util.px2dp((17 * scaleW), outMetrics),
-									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-					holder.optionDelete.getLayoutParams().width = Util.px2dp(
-							(55 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDelete
-							.getLayoutParams()).setMargins(
-									Util.px2dp((17 * scaleW), outMetrics),
-									Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
-				} else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
+				} 
+				else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
 
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.GONE);
@@ -956,11 +922,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			((ManagerActivity) context).setParentHandleRubbish(parentHandle);
 			break;
 		}
-		case ManagerActivity.SHARED_WITH_ME_ADAPTER: {
-			log("setParentHandleSharedWithMe -SHARED_WITH_ME_ADAPTER");
-			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
-			break;
-		}
 		case ManagerActivity.FOLDER_LINK_ADAPTER: {
 			break;
 		}
@@ -970,13 +931,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
 			//TODO necesito algo?
-			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			((ManagerActivity) context).setParentHandleIncoming(parentHandle);
 			break;
 		}
 		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
 			log("setParentHandleBrowser -ManagerActivity.OUTGOING_SHARES_ADAPTER");
 			//TODO necesito algo?
-			((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+			((ManagerActivity) context).setParentHandleOutgoing(parentHandle);
 			break;
 		}
 		default: {

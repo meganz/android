@@ -253,24 +253,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			return null;
 		}
 		
-		if (parentHandle == -1){			
-			((ManagerActivity)context).setParentHandleSharedWithMe(-1);					
-			findNodes();		
-			aB.setTitle(getString(R.string.section_shared_with_me));	
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
-			
-			aB.setTitle(getString(R.string.section_shared_with_me));
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-		}	
-		
+				
 				
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -309,6 +292,26 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				adapterList.setParentHandle(parentHandle);
 				adapterList.setNodes(nodes);
 			}
+			
+			if (parentHandle == -1){			
+				((ManagerActivity)context).setParentHandleIncoming(-1);					
+				findNodes();		
+				aB.setTitle(getString(R.string.section_shared_with_me));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				adapterList.parentHandle=-1;
+			}
+			else{
+				adapterList.parentHandle=parentHandle;
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+				((ManagerActivity)context).setParentHandleIncoming(parentHandle);
+
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				
+				aB.setTitle(parentNode.getName());
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}	
 
 			if (deepBrowserTree == 0){
 				contentText.setText(getInfoNode());
@@ -497,7 +500,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 															
 					contentText.setText(getInfoFolder(infoNode));
-					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+					((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 					adapterList.setNodes(nodes);
@@ -732,7 +735,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			
 			if(deepBrowserTree==0){
 				//In the beginning of the navigation
-				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
+				((ManagerActivity)context).setParentHandleIncoming(-1);
+				parentHandle=-1;
 				aB.setTitle(getString(R.string.section_shared_with_me));	
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
@@ -764,7 +768,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+					((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
@@ -787,7 +791,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		}
 		else{
 			parentHandle = adapterGrid.getParentHandle();
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+			((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);
@@ -810,7 +814,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
+					((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);
