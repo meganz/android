@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -74,6 +73,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TableLayout;
 import android.widget.TextView;
@@ -220,7 +220,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	long parentHandleBrowser;
 	long parentHandleRubbish;
-	long parentHandleSharedWithMe;
+	long parentHandleIncoming;
+	long parentHandleOutgoing;
 	long parentHandleSearch;
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
@@ -669,7 +670,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			parentHandleBrowser = -1;
 			parentHandleRubbish = -1;
-			parentHandleSharedWithMe = -1;
+			parentHandleIncoming = -1;
+			parentHandleIncoming = -1;
 			parentHandleSearch = -1;
 			orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 			if (savedInstanceState != null){
@@ -678,7 +680,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				orderGetChildren = savedInstanceState.getInt("orderGetChildren");
 				parentHandleBrowser = savedInstanceState.getLong("parentHandleBrowser");
 				parentHandleRubbish = savedInstanceState.getLong("parentHandleRubbish");
-				parentHandleSharedWithMe = savedInstanceState.getLong("parentHandleSharedWithMe");
+				parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming");
+				parentHandleOutgoing = savedInstanceState.getLong("parentHandleIncoming");
 				parentHandleSearch = savedInstanceState.getLong("parentHandleSearch");
 				switch (visibleFragment){
 					case 1:{
@@ -1535,6 +1538,39 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragment.class, null);
     				
     			}
+    			
+    			mTabHostShares.setOnTabChangedListener(new OnTabChangeListener(){
+                    @Override
+                    public void onTabChanged(String tabId) {
+                    	log("TabId :"+ tabId);
+                        if(tabId.equals("outgoingSharesFragment")){                         	
+                			if (outSF != null){                 				
+                				if(parentHandleOutgoing!=-1){
+	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+	            					aB.setTitle(node.getName());
+            					}
+                				else{
+                					aB.setTitle(getResources().getString(R.string.section_shared_with_me));
+                					outSF.refresh(); 
+                				}            					   				
+                			}
+                        }
+                        else if(tabId.equals("incomingSharesFragment")){                        	
+                        	if (inSF != null){                        		
+                        		if(parentHandleIncoming!=-1){
+                        			
+                        			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+                					aB.setTitle(node.getName());	
+            					}
+                				else{
+                					
+                					aB.setTitle(getResources().getString(R.string.section_shared_with_me));
+                					inSF.refresh(); 
+                				}   				
+                			}                           	
+                        }
+                     }
+               });
    			
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -2805,16 +2841,39 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			    		break;
 		        	}
 		        	case SHARED_WITH_ME:{
-		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
-			    		intent.setAction(LoginActivity.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleSharedWithMe);
-			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
-			    		break;
+		        		
+		        		int index = viewPagerShares.getCurrentItem();
+		    			if(index==1){				
+		    				//OUTGOING				
+		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+		    				log("Tag: "+ cFTag2);
+		    				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		    				if (outSF != null){					
+		    					Intent intent = new Intent(managerActivity, LoginActivity.class);
+					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+					    		intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
+					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		break;
+		    				}
+		    			}
+		    			else{			
+		    				//InCOMING
+		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+		    				log("Tag: "+ cFTag1);
+		    				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+		    				if (inSF != null){					
+		    					Intent intent = new Intent(managerActivity, LoginActivity.class);
+					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+					    		intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
+					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
+					    		break;
+		    				}				
+		    			}	
 		        	}
 		        	case ACCOUNT:{
 		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
 			    		intent.setAction(LoginActivity.ACTION_REFRESH);
-			    		intent.putExtra("PARENT_HANDLE", parentHandleSharedWithMe);
+			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 			    		break;
 		        	}
@@ -4562,8 +4621,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				parentHandleSharedWithMe = intent.getLongExtra("PARENT_HANDLE", -1);
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSharedWithMe);
+				parentHandleIncoming = intent.getLongExtra("PARENT_HANDLE", -1);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
 				if (parentNode != null){
 					if (inSF != null){					
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
@@ -4623,7 +4682,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			else if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleSharedWithMe);
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
 				if (parentNode != null){
 					if (inSF != null){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
@@ -4869,9 +4928,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		this.parentHandleRubbish = parentHandleRubbish;
 	}
 	
-	public void setParentHandleSharedWithMe(long parentHandleSharedWithMe){
+	public void setParentHandleIncoming(long parentHandleSharedWithMe){
 		log("setParentHandleSharedWithMe");
-		this.parentHandleSharedWithMe = parentHandleSharedWithMe;
+		this.parentHandleIncoming = parentHandleSharedWithMe;
+	}
+	
+	public void setParentHandleOutgoing(long parentHandleSharedWithMe){
+		log("setParentHandleSharedWithMe");
+		this.parentHandleOutgoing = parentHandleSharedWithMe;
 	}
 	
 	public void setParentHandleSearch(long parentHandleSearch){
