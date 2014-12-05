@@ -166,10 +166,10 @@
 	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Content: </string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">Added: </string>
 	<string name="file_properties_info_modified" context="when was the file modified">Modified: </string>
-	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can&apos;t access the folder">No public link</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Public link</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full access</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don&apos;t use the symbol itself. Use &amp;)">Read &amp; write</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
@@ -307,7 +307,7 @@
     
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled any time before renewal date.</string>
     
-    <string name="file_properties_get_link" context="the user can get the link and it&apos;s copied to the clipboard">The link has been copied to the clipboard</string>
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">The link has been copied to the clipboard</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait.</string>
     
@@ -322,7 +322,7 @@
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Skip</string>
-    <string name="cam_sync_syncing" context="The upload of the user&apos;s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera Uploads?</string>
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Destination folder is unavailable</string>
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading camera images</string>
