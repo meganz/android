@@ -15,16 +15,20 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -117,7 +121,24 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		handler = new Handler();
 		fullScreenImageViewer = this;
 		
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+		    requestWindowFeature(Window.FEATURE_NO_TITLE); 
+		    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		}
+		
 		setContentView(R.layout.activity_full_screen_image_viewer);
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+		    ActionBar actionBar = getSupportActionBar();
+		    if (actionBar != null){
+		    	actionBar.hide();
+		    }
+
+		}
+		
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
+	        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+	    }
 		
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();

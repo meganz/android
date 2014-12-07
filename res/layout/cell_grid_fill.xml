@@ -2,7 +2,8 @@
     android:id="@+id/cell_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@color/grid_background">
+    android:background="@color/grid_background"
+    android:layout_centerHorizontal="true">
     
     <RelativeLayout 
         android:layout_width="172dp"
