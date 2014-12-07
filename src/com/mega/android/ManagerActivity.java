@@ -5481,18 +5481,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if(pF==null){
-			Bundle bundle = new Bundle();	        
-	        bundle.putInt("type", type);
+		if(pF==null){			
 			pF = new PaymentFragment();
-			pF.setArguments(bundle);			
+			pF.setParameterType(type);
 			ft.replace(R.id.fragment_container, pF, "pF");
 			ft.commit();
 		}
 		else{			
-			Bundle bundle = new Bundle();	        
-	        bundle.putInt("type", type);
-			pF.setArguments(bundle);			
+			pF.setParameterType(type);			
 			ft.replace(R.id.fragment_container, pF, "pF");
 			ft.commit();
 		}
