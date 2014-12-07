@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
@@ -595,11 +596,20 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		    
 		    int totalWidth = outMetrics.widthPixels;
 		    int totalHeight = outMetrics.heightPixels;
-		    
+		    float dpWidth  = outMetrics.widthPixels / density;
+		    		    
 		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if (numberOfCells < 2){
-				numberOfCells = 2;
-			}
+		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    	if (numberOfCells < 4){
+					numberOfCells = 4;
+				}	
+		    }
+		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		    	if (numberOfCells < 3){
+					numberOfCells = 3;
+				}	
+		    }
+		    
 			
 			if (monthPics != null){
 				monthPics.clear();

@@ -9,6 +9,7 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -363,9 +364,16 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		    int totalHeight = outMetrics.heightPixels;
 		    
 		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if (numberOfCells < 2){
-				numberOfCells = 2;
-			}
+		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    	if (numberOfCells < 3){
+					numberOfCells = 3;
+				}	
+		    }
+		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		    	if (numberOfCells < 2){
+					numberOfCells = 2;
+				}	
+		    }
 		    
 		    listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			listView.setOnItemClickListener(null);

@@ -11,7 +11,7 @@
      android:layout_height="110dp"
      android:scaleType="fitCenter"
      android:layout_margin="3dp"
-     android:background="@drawable/background_item_grid"
+     android:background="@color/grid_background"
      android:layout_centerHorizontal="true"/>	
 	
     <RelativeLayout
