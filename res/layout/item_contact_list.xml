@@ -78,25 +78,23 @@
         android:layout_alignParentRight="true"
         android:paddingRight="15dp" />-->
     
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/contact_list_options"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/contact_list_content"
+        android:orientation="horizontal"
         android:padding="0dp"
         android:background="#2a2a2a">
         
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            
-            <TableRow>
+       
 	            <ImageButton
 		            android:id="@+id/contact_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_properties"
+		            android:src="@drawable/info_ic"
 		            android:background="@null" 
+		            android:layout_weight="1"
 		            android:layout_gravity="center_vertical"/>
 	            
 	            <ImageButton
@@ -105,6 +103,7 @@
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_share"
 		            android:background="@null"
+		            android:layout_weight="1"
 		            android:layout_gravity="center_vertical" />
 	        
 		  <!--    <ImageButton
@@ -123,10 +122,10 @@
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_delete"
 		            android:background="@null" 
+		            android:layout_weight="1"
 		            android:layout_gravity="center_vertical" />
-	        </TableRow>        
-        </TableLayout>
-    </RelativeLayout>
+
+    </LinearLayout>
     
 </RelativeLayout>
 

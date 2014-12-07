@@ -87,6 +87,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public ImageView optionShare;
 		public ImageView optionPermissions;
 		public ImageView optionDelete;
+		public ImageView optionClearShares;
 		public ImageView optionLeaveShare;
 		public int currentPosition;
 		public long document;
@@ -211,12 +212,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			//			
 
 			holder.optionShare = (ImageView) convertView.findViewById(R.id.file_list_option_share);
-			holder.optionPermissions = (ImageView) convertView.findViewById(R.id.file_list_option_permissions) ;
+			holder.optionPermissions = (ImageView) convertView.findViewById(R.id.file_list_option_permissions);
 			
 			holder.optionDelete = (ImageView) convertView.findViewById(R.id.file_list_option_delete);
 			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
 
+			holder.optionClearShares = (ImageView) convertView.findViewById(R.id.file_list_option_clear_share);				
+			
 			holder.optionMore = (ImageView) convertView.findViewById(R.id.file_list_option_overflow);
 			holder.optionMore.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
@@ -368,12 +371,43 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				listFragment.smoothScrollToPosition(_position);
+				
+				if (type == ManagerActivity.FILE_BROWSER_ADAPTER) {
+					//Visible
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.VISIBLE);				
+					holder.optionDelete.setVisibility(View.VISIBLE);
+					holder.optionPublicLink.setVisibility(View.VISIBLE);
+					holder.optionMore.setVisibility(View.VISIBLE);
+					//Hide
+					holder.optionClearShares.setVisibility(View.GONE);
+					holder.optionShare.setVisibility(View.GONE);
+					holder.optionPermissions.setVisibility(View.GONE);
+					
+					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
-				if ((type == ManagerActivity.CONTACT_FILE_ADAPTER) || (type == ManagerActivity.INCOMING_SHARES_ADAPTER)) {
+					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
+					holder.optionPublicLink.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);					
+					holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					
+				}		
+				else if ((type == ManagerActivity.CONTACT_FILE_ADAPTER) || (type == ManagerActivity.INCOMING_SHARES_ADAPTER)) {
 
 					// Choose the buttons to show depending on the type of
 					// folder
-
+					
 					MegaNode n = (MegaNode) getItem(positionClicked);
 					MegaNode folder = null;
 
@@ -399,6 +433,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							holder.optionLeaveShare.setVisibility(View.VISIBLE);
 						}
 						holder.optionPublicLink.setVisibility(View.GONE);
+						holder.optionClearShares.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 						holder.optionMore.setVisibility(View.VISIBLE);
@@ -428,6 +463,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.GONE);
+						holder.optionClearShares.setVisibility(View.GONE);
 						holder.optionMore.setVisibility(View.GONE);
 						
 						if(node.isFile()){
@@ -456,6 +492,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.GONE);
+						holder.optionClearShares.setVisibility(View.GONE);
 						if(node.isFile()){
 							holder.optionLeaveShare.setVisibility(View.GONE);
 						}
@@ -486,17 +523,22 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				} 
 				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
 					
+					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					
 					//TODO Tengo que comprobar el parentHandle
-
+					//Visible
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
-					//holder.shareDisabled.setVisibility(View.VISIBLE);
-					holder.optionShare.setVisibility(View.VISIBLE);
+					//holder.shareDisabled.setVisibility(View.VISIBLE);					
 					holder.optionPermissions.setVisibility(View.VISIBLE);
+					holder.optionClearShares.setVisibility(View.VISIBLE);
+					holder.optionMore.setVisibility(View.VISIBLE);
+					
+					//HIDE
+					holder.optionShare.setVisibility(View.GONE);
 					holder.optionPublicLink.setVisibility(View.GONE);					
-					holder.optionDelete.setVisibility(View.VISIBLE);
-					holder.optionMore.setVisibility(View.GONE);
-					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					holder.optionDelete.setVisibility(View.GONE);				
+					holder.optionRename.setVisibility(View.GONE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -504,14 +546,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
-					holder.optionShare.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionShare.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 					holder.optionPermissions.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionPermissions.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+					holder.optionClearShares.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionClearShares.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);					
-					holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-					((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
+					holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+					((TableRow.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 					
 					
@@ -521,6 +563,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);
 					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionClearShares.setVisibility(View.GONE);
 					holder.optionRename.setVisibility(View.VISIBLE);
 					holder.optionDelete.setVisibility(View.VISIBLE);
 
@@ -546,6 +589,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionPublicLink.setVisibility(View.GONE);
 					holder.optionRename.setVisibility(View.GONE);
 					holder.optionDelete.setVisibility(View.GONE);
+					holder.optionClearShares.setVisibility(View.GONE);
 
 					holder.optionDownload.getLayoutParams().width = Util.px2dp(
 							(335 * scaleW), outMetrics);

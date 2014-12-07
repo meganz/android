@@ -113,7 +113,7 @@
 		            android:id="@+id/offline_grid_option_delete1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete" 
+		            android:src="@drawable/ic_rubbish_bin" 
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 	        </TableRow>        
@@ -224,7 +224,7 @@
 		            android:id="@+id/offline_grid_option_delete2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete" 
+		            android:src="@drawable/ic_rubbish_bin" 
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
 	        </TableRow>        

@@ -384,7 +384,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyImageView.setImageResource(R.drawable.media_empty_image);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			emptyImageView.setVisibility(View.VISIBLE);

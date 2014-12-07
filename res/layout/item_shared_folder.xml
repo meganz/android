@@ -92,7 +92,7 @@
 		            android:id="@+id/shared_folder_remove_share_option"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ic_rubbish_bin"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null"
