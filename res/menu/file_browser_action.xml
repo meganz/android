@@ -57,7 +57,7 @@
     
     <item
         android:id="@+id/cab_menu_trash"
-        android:icon="@drawable/ic_delete"
+        android:icon="@drawable/ic_rubbish_bin"
         android:orderInCategory="130"
         android:showAsAction="never"
         android:title="@string/context_move_to_trash"

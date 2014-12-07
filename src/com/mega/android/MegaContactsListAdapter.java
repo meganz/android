@@ -26,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -211,7 +212,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
-        RelativeLayout optionsLayout;
+        LinearLayout optionsLayout;
         ImageButton optionProperties;
 //        ImageButton optionSend;
         ImageButton optionShare;
@@ -249,15 +250,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_list_name);
 			holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_list_content);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots);
-			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.contact_list_options);
+			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.contact_list_options);
 			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.contact_list_option_properties);
-			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-//			holder.optionSend = (ImageButton) convertView.findViewById(R.id.contact_list_option_send);
-//			holder.optionSend.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+//			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			holder.optionShare = (ImageButton) convertView.findViewById(R.id.contact_list_option_share);
-			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+//			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			holder.optionRemove = (ImageButton) convertView.findViewById(R.id.contact_list_option_remove);
-			holder.optionRemove.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+//			holder.optionRemove.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			convertView.setTag(holder);
 		}
 		else{
