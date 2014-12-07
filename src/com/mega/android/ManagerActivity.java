@@ -2895,7 +2895,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
 		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		        		builder.setView(dialoglayout);
-		        		builder.setTitle("Sort By...");
+		        		builder.setTitle(getString(R.string.action_sort_by));
 		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
 							
 							@Override
@@ -2909,25 +2909,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		Util.brandAlertDialog(sortByDialog);
 		        		
 		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
-		        		byNameTextView.setText("By name");
+		        		byNameTextView.setText(getString(R.string.sortby_name));
 		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
-		        		ascendingCheck.setText("ascending");
+		        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
 		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
-		        		descendingCheck.setText("descending");
+		        		descendingCheck.setText(getString(R.string.sortby_name_descending));
 		        		
 		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
-		        		byDateTextView.setText("By date");
+		        		byDateTextView.setText(getString(R.string.sortby_date));
 		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
-		        		newestCheck.setText("newest");
+		        		newestCheck.setText(getString(R.string.sortby_date_newest));
 		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
-		        		oldestCheck.setText("oldest");
+		        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
 		        		
 		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
-		        		bySizeTextView.setText("By size");
+		        		bySizeTextView.setText(getString(R.string.sortby_size));
 		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
-		        		largestCheck.setText("largest first");
+		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
 		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
-		        		smallestCheck.setText("smallest first");
+		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
 		        		
 		        		switch(orderGetChildren){
 			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
