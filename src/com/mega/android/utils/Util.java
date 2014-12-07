@@ -21,6 +21,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.res.Resources;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -383,6 +384,28 @@ public class Util {
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
 //			Log.e(origin, message + "");
 		}
+	}
+	
+	public static void brandAlertDialog(AlertDialog dialog) {
+	    try {
+	        Resources resources = dialog.getContext().getResources();
+
+	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+
+	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
+	        if (alertTitle != null){	        	
+	        	alertTitle.setTextColor(dialog.getContext().getResources().getColor(R.color.mega)); // change title text color
+	        }
+
+	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
+	        if (titleDivider != null){
+	        	titleDivider.setBackgroundColor(dialog.getContext().getResources().getColor(R.color.mega)); // change divider color
+	        }
+	    } catch (Exception ex) {
+	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+	        ex.printStackTrace();
+	    }
 	}
 	
 	public static String getLocalFile(Context context, String fileName, long fileSize,

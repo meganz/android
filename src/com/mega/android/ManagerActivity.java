@@ -66,9 +66,12 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -2886,6 +2889,209 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		Toast.makeText(managerActivity, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 			    		break;
 		        	}
+		        	case CLOUD_DRIVE:{
+		        		AlertDialog sortByDialog;		        		
+		        		LayoutInflater inflater = getLayoutInflater();
+		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
+		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		        		builder.setView(dialoglayout);
+		        		builder.setTitle("Sort By...");
+		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+		        		
+		        		sortByDialog = builder.create();
+		        		sortByDialog.show();
+		        		Util.brandAlertDialog(sortByDialog);
+		        		
+		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
+		        		byNameTextView.setText("By name");
+		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
+		        		ascendingCheck.setText("ascending");
+		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
+		        		descendingCheck.setText("descending");
+		        		
+		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
+		        		byDateTextView.setText("By date");
+		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
+		        		newestCheck.setText("newest");
+		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
+		        		oldestCheck.setText("oldest");
+		        		
+		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
+		        		bySizeTextView.setText("By size");
+		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
+		        		largestCheck.setText("largest first");
+		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
+		        		smallestCheck.setText("smallest first");
+		        		
+		        		switch(orderGetChildren){
+			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+			        			ascendingCheck.setChecked(true);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			break;
+			        		}
+			        		case MegaApiJava.ORDER_DEFAULT_DESC:{
+			        			ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(true);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			break;
+			        		}
+			        		case MegaApiJava.ORDER_CREATION_DESC:{
+			        			ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(true);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			break;
+			        		}
+			        		case MegaApiJava.ORDER_CREATION_ASC:{
+			        			ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(true);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			break;
+			        		}
+			        		case MegaApiJava.ORDER_SIZE_ASC:{
+			        			ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(true);
+			        			break;
+			        		}
+			        		case MegaApiJava.ORDER_SIZE_DESC:{
+			        			ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(true);
+			        			smallestCheck.setChecked(false);
+			        			break;
+			        		}
+		        		}
+		        		
+		        		final AlertDialog dialog = sortByDialog;
+		        		
+		        		ascendingCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(true);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			selectSortByCloudDrive(MegaApiJava.ORDER_DEFAULT_ASC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		descendingCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(true);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			selectSortByCloudDrive(MegaApiJava.ORDER_DEFAULT_DESC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		newestCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(true);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_DESC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		oldestCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(true);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(false);
+			        			selectSortByCloudDrive(MegaApiJava.ORDER_CREATION_ASC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		largestCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(true);
+			        			smallestCheck.setChecked(false);
+			        			selectSortByCloudDrive(MegaApiJava.ORDER_SIZE_DESC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		smallestCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(false);
+			        			newestCheck.setChecked(false);
+			        			oldestCheck.setChecked(false);
+			        			largestCheck.setChecked(false);
+			        			smallestCheck.setChecked(true);
+			        			selectSortByCloudDrive(MegaApiJava.ORDER_SIZE_ASC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		break;
+	        		}
 		        	default:{
 		        		Intent intent = new Intent(managerActivity, SortByDialogActivity.class);
 			    		intent.setAction(SortByDialogActivity.ACTION_SORT_BY);
@@ -2996,6 +3202,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	            return super.onOptionsItemSelected(item);
             }
 	    }
+	}
+	
+	public void selectSortByCloudDrive(int _orderGetChildren){
+		this.orderGetChildren = _orderGetChildren;
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+		if (parentNode != null){
+			if (fbF != null){						
+				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				fbF.setOrder(orderGetChildren);
+				fbF.setNodes(nodes);
+				fbF.getListView().invalidateViews();						
+			}
+		}
+		else{
+			if (fbF != null){						
+				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+				fbF.setOrder(orderGetChildren);
+				fbF.setNodes(nodes);
+				fbF.getListView().invalidateViews();					
+			}
+		}
 	}
 
 	@Override

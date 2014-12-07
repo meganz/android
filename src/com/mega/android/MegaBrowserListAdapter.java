@@ -801,7 +801,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 				moreOptionsDialog = builder.create();
 				moreOptionsDialog.show();
-				brandAlertDialog(moreOptionsDialog);
+				Util.brandAlertDialog(moreOptionsDialog);
 			}
 			break;
 		}	
@@ -865,28 +865,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		}
-	}
-	
-	public static void brandAlertDialog(AlertDialog dialog) {
-	    try {
-	        Resources resources = dialog.getContext().getResources();
-
-	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-
-	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
-	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(dialog.getContext().getResources().getColor(R.color.mega)); // change title text color
-	        }
-
-	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
-	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(dialog.getContext().getResources().getColor(R.color.mega)); // change divider color
-	        }
-	    } catch (Exception ex) {
-	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
-	        ex.printStackTrace();
-	    }
 	}
 
 	/*
