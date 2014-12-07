@@ -270,6 +270,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public UploadHereDialog uploadDialog;	
 	private List<ShareInfo> filePreparedInfos;	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	private int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
 	
 	ActionBar aB;	
 	String urlLink = "";		
@@ -2886,8 +2887,107 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        case R.id.action_menu_sort_by:{
 	        	switch(drawerItem){
 		        	case CONTACTS:{
-		        		Toast.makeText(managerActivity, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-			    		break;
+		        		AlertDialog sortByDialog;		        		
+		        		LayoutInflater inflater = getLayoutInflater();
+		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
+		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		        		builder.setView(dialoglayout);
+		        		builder.setTitle(getString(R.string.action_sort_by));
+		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+		        		
+		        		sortByDialog = builder.create();
+		        		sortByDialog.show();
+		        		Util.brandAlertDialog(sortByDialog);
+		        		
+		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
+		        		byNameTextView.setText(getString(R.string.sortby_name));
+		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
+		        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
+		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
+		        		descendingCheck.setText(getString(R.string.sortby_name_descending));
+		        		
+		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
+		        		byDateTextView.setText(getString(R.string.sortby_date));
+		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
+		        		newestCheck.setText(getString(R.string.sortby_date_newest));
+		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
+		        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
+		        		
+		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
+		        		bySizeTextView.setText(getString(R.string.sortby_size));
+		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
+		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
+		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
+		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
+		        		
+		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
+		        		separator4.setVisibility(View.GONE);
+		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
+		        		separator5.setVisibility(View.GONE);
+		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
+		        		separator6.setVisibility(View.GONE);
+		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
+		        		separator7.setVisibility(View.GONE);
+		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
+		        		separator8.setVisibility(View.GONE);
+		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
+		        		separator9.setVisibility(View.GONE);
+		        		
+		        		byDateTextView.setVisibility(View.GONE);
+		        		newestCheck.setVisibility(View.GONE);
+		        		oldestCheck.setVisibility(View.GONE);
+		        		bySizeTextView.setVisibility(View.GONE);
+		        		largestCheck.setVisibility(View.GONE);
+		        		smallestCheck.setVisibility(View.GONE);
+		        		
+		        		switch(orderContacts){
+			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+			        			ascendingCheck.setChecked(true);
+			        			descendingCheck.setChecked(false);
+			        			break;
+			        		}
+			        		case MegaApiJava.ORDER_DEFAULT_DESC:{
+			        			ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(true);
+			        			break;
+			        		}
+		        		}
+		        		
+		        		final AlertDialog dialog = sortByDialog;
+		        		
+		        		ascendingCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(true);
+			        			descendingCheck.setChecked(false);
+			        			selectSortByContacts(MegaApiJava.ORDER_DEFAULT_ASC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		descendingCheck.setOnClickListener(new OnClickListener() {
+							
+							@Override
+							public void onClick(View v) {
+								ascendingCheck.setChecked(false);
+			        			descendingCheck.setChecked(true);
+			        			selectSortByContacts(MegaApiJava.ORDER_DEFAULT_DESC);
+			        			if (dialog != null){
+			        				dialog.dismiss();
+			        			}
+							}
+						});
+		        		
+		        		break;
 		        	}
 		        	case CLOUD_DRIVE:{
 		        		AlertDialog sortByDialog;		        		
@@ -3202,6 +3302,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	            return super.onOptionsItemSelected(item);
             }
 	    }
+	}
+	
+	public void selectSortByContacts(int _orderContacts){
+		this.orderContacts = _orderContacts;
+		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cF != null){	
+			cF.setOrder(orderContacts);
+			if (orderContacts == MegaApiJava.ORDER_DEFAULT_ASC){
+				cF.sortByNameAscending();
+			}
+			else{
+				cF.sortByNameDescending();
+			}
+		}
 	}
 	
 	public void selectSortByCloudDrive(int _orderGetChildren){
