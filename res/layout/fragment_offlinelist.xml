@@ -3,11 +3,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".OfflineFragment" >
+    
+    <TextView
+	    android:id="@+id/offline_content_text"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingLeft="8dp"
+	    android:textColor="@color/button_text"
+	    android:background="@color/dark_grey_cloud_drive"
+	    android:textSize="16sp"/>
 
     <ListView
         android:id="@+id/offline_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
+        android:layout_below="@id/offline_content_text"
         android:choiceMode="multipleChoice">
     </ListView>
     

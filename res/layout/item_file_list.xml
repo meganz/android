@@ -76,7 +76,17 @@
 		android:background="@null" 
         android:layout_centerVertical="true"
         android:paddingRight="15dp" 
-        android:layout_toLeftOf="@id/file_list_three_dots"/>        
+        android:layout_toLeftOf="@id/file_list_three_dots"/> 
+        
+    <ImageView
+        android:id="@+id/file_list_saved_offline_multiselect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cloud_saved_offline"
+		android:background="@null" 
+        android:layout_centerVertical="true"
+        android:paddingRight="15dp" 
+       	android:layout_alignParentRight="true"/> 
            
     
      <ProgressBar
