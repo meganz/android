@@ -350,7 +350,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				ListView list = (ListView) parent;
-				list.smoothScrollToPosition(_position);
+//				list.smoothScrollToPosition(_position);
 			}
 			else{
 //				holder.arrowSelection.setVisibility(View.GONE);
