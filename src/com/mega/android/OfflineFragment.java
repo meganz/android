@@ -70,14 +70,71 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			List<MegaOffline> documents = getSelectedDocuments();
 			
 			switch(item.getItemId()){
-				case R.id.cab_menu_trash:{
+				case R.id.cab_menu_download:{
 					
+					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
-						
-						deleteOffline(context, documents.get(i));
-
+						String path = documents.get(i).getPath() + documents.get(i).getName();
+						MegaNode n = megaApi.getNodeByPath(path);						
+						handleList.add(n.getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).onFileClick(handleList);
+					
+					break;
+				}
+				case R.id.cab_menu_rename:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						String path = documents.get(0).getPath() + documents.get(0).getName();
+						MegaNode n = megaApi.getNodeByPath(path);	
+						((ManagerActivity) context).showRenameDialog(n, n.getName());
+					}
+					break;
+				}
+				case R.id.cab_menu_share_folder:{
+				
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						String path = documents.get(0).getPath() + documents.get(0).getName();
+						MegaNode n = megaApi.getNodeByPath(path);	
+						((ManagerActivity) context).getPublicLinkAndShareIt(n);
 					}
 					
+					break;
+				}
+				case R.id.cab_menu_move:{					
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						String path = documents.get(i).getPath() + documents.get(i).getName();
+						MegaNode n = megaApi.getNodeByPath(path);						
+						handleList.add(n.getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showMove(handleList);
+					break;
+				}
+				case R.id.cab_menu_copy:{
+					ArrayList<Long> handleList = new ArrayList<Long>();					
+					for (int i=0;i<documents.size();i++){
+						String path = documents.get(i).getPath() + documents.get(i).getName();
+						MegaNode n = megaApi.getNodeByPath(path);						
+						handleList.add(n.getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showCopy(handleList);
+					break;
+				}
+				case R.id.cab_menu_trash:{
+					
+					for (int i=0;i<documents.size();i++){						
+						deleteOffline(context, documents.get(i));
+					}					
 					clearSelections();
 					hideMultipleSelect();
 					refreshPaths(documents.get(0));
@@ -199,39 +256,68 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			log("ActionBarCallBack::onPrepareActionMode");
 			List<MegaOffline> selected = getSelectedDocuments();
-			boolean showDownload = false;
-			boolean showRename = false;
-			boolean showCopy = false;
-			boolean showMove = false;
-			boolean showLink = false;
-			boolean showTrash = false;
 			
-			if (selected.size() != 0) {
-				showDownload = false;
-				showMove = false;
-				showCopy = false;
-				showTrash = true;
-			
-				if(selected.size()==adapterList.getCount()){
-					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+			if (Util.isOnline(context)){
+				if (selected.size() != 0) {
+					
+					if(selected.size()==adapterList.getCount()){
+						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					}
+					else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+					}	
 				}
 				else{
 					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
-				}	
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				}
+				
+				if (selected.size() == 1) {
+					menu.findItem(R.id.cab_menu_share_link).setVisible(true);
+					menu.findItem(R.id.cab_menu_rename).setVisible(true);
+				}
+				else{
+					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
+					menu.findItem(R.id.cab_menu_rename).setVisible(false);
+				}
+
+				menu.findItem(R.id.cab_menu_download).setVisible(true);				
+				menu.findItem(R.id.cab_menu_copy).setVisible(true);
+				menu.findItem(R.id.cab_menu_move).setVisible(true);				
+				menu.findItem(R.id.cab_menu_trash).setVisible(true);
 			}
 			else{
-				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
-				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
-			}
+				if (selected.size() != 0) {
+				
+					if(selected.size()==adapterList.getCount()){
+						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+					}
+					else{
+						menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+					}	
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				}
+				
+				if (selected.size() == 1) {
+					menu.findItem(R.id.cab_menu_rename).setVisible(true);
+				}
+				else{
+					menu.findItem(R.id.cab_menu_rename).setVisible(false);
+				}
 
-			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
-			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+				menu.findItem(R.id.cab_menu_download).setVisible(false);			
+				menu.findItem(R.id.cab_menu_copy).setVisible(false);
+				menu.findItem(R.id.cab_menu_move).setVisible(false);
+				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
+				menu.findItem(R.id.cab_menu_trash).setVisible(true);
+			}			
 			
 			return false;
 		}
