@@ -11,7 +11,8 @@
         android:layout_height="match_parent"
         android:checked="false"
         android:focusable="false"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:button="@drawable/btn_check_holo_light" />
 
     <RelativeLayout
 		android:id="@+id/contact_list_relative_layout_avatar"
