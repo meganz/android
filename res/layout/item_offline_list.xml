@@ -60,55 +60,89 @@
         android:layout_alignParentRight="true"
         android:paddingRight="15dp" />-->
     
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/offline_list_options"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/offline_list_filesize"
         android:padding="0dp"
         android:background="#2a2a2a">
-        
-        <TableLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-            
-            <TableRow>
-<!-- 	            <ImageButton
-		            android:id="@+id/file_list_option_open"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_action_collections_collection"
-		            android:paddingLeft="30dp"
-		            android:paddingTop="10dp"
-		            android:background="@null" 
-		            android:layout_gravity="center_vertical"/>
--->	        
+    
 				<ImageView
-		            android:id="@+id/offline_list_option_open"
+		            android:id="@+id/offline_list_option_download"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_action_collections_collection"
+		            android:src="@drawable/ic_download"
+		            android:layout_weight="1"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 
-<!-- 		        <ImageView
+		        <ImageView
 		            android:id="@+id/offline_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_menu_properties"
+		            android:src="@drawable/info_ic"
+		            android:layout_weight="1"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
--->	        
+	            
+		        <ImageView
+		            android:id="@+id/offline_list_option_public_link"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/link_ic"
+		            android:layout_weight="1"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" />	
+		              
 		        <ImageView
 		            android:id="@+id/offline_list_option_delete"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_rubbish_bin"
+		            android:layout_weight="1"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
-	        </TableRow>        
-        </TableLayout>
-    </RelativeLayout>
+		        
+		         <ImageView 
+		            android:id="@+id/offline_list_option_overflow"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_action_core_overflow"
+		            android:layout_weight="1"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton"/>
+	        
+    </LinearLayout>
+    
+        <LinearLayout
+        android:id="@+id/offline_list_options_no_connection"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/offline_list_filesize"
+        android:padding="0dp"
+        android:background="#2a2a2a">
+    
+				<TextView
+		            android:id="@+id/offline_list_option_no_connection"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"		            
+		            android:layout_weight="1"
+		            android:textColor="@color/file_list_second_row"
+		            android:layout_gravity="center_vertical"
+		            style="@style/dialogActionButton" />		        
+		              
+		        <ImageView
+		            android:id="@+id/offline_list_option_delete_no_connection"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_rubbish_bin"
+		            android:layout_weight="1"
+		            android:layout_gravity="center_vertical" 
+		            style="@style/dialogActionButton" />
+		        
+	        
+    </LinearLayout>
     
 </RelativeLayout>
 

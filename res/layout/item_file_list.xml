@@ -29,8 +29,7 @@
         android:paddingLeft="3dp"
         android:paddingTop="7dp"
         android:ellipsize="end"
-        android:maxLines="2"
-        />
+        android:maxLines="2"/>
     
     <TextView
         android:id="@+id/file_list_filesize"
@@ -56,7 +55,7 @@
         android:textSize="12sp"
         android:ellipsize="end"
         android:maxLines="1"/> --> 
-    
+       	
     <ImageButton 
         android:id="@+id/file_list_three_dots"
         android:layout_width="wrap_content"
@@ -67,6 +66,17 @@
         android:layout_alignParentRight="true"
 		android:paddingTop="12dp"
         android:paddingRight="15dp" />
+    
+    <ImageView
+        android:id="@+id/file_list_saved_offline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cloud_saved_offline"
+		android:background="@null" 
+        android:layout_centerVertical="true"
+        android:paddingRight="15dp" 
+        android:layout_toLeftOf="@id/file_list_three_dots"/>        
+           
     
      <ProgressBar
 	    android:id="@+id/transfers_list__browser_bar"
@@ -190,9 +200,6 @@
 		            android:src="@drawable/ic_action_core_overflow"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton"/>
-		         
-		               
-		         	         
 		        
  		<!--        
 

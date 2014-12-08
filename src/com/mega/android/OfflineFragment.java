@@ -288,7 +288,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 //				setPathNavigation("/");
 //				mOffList=dbH.findByPath(pathNavigation);				
 //			}
-			log("Ahora la navigation es: "+pathNavigation);
 			mOffList=dbH.findByPath(pathNavigation);
 									
 			for(int i=0; i<mOffList.size();i++){

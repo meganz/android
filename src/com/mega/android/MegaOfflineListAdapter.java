@@ -30,6 +30,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -67,11 +68,18 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
         TextView textViewFileSize;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-//        ImageView arrowSelection;
-        RelativeLayout optionsLayout;
-        ImageView optionOpen;
-//        ImageView optionProperties;
+
+        LinearLayout optionsLayout;
+        ImageView optionDownload;
+		ImageView optionProperties;
+		ImageView optionMore;		
+		ImageView optionPublicLink;
         ImageView optionDelete;
+        
+        LinearLayout optionsLayoutOffline;
+        ImageView optionDeleteOffline;
+        TextView offlineText;
+        
         int currentPosition;
         String currentPath;
         String currentHandle;
@@ -174,7 +182,9 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
 		
-		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);	
+		
+		
 		if (convertView == null) {
 			convertView = inflater.inflate(R.layout.item_offline_list, parent, false);
 			holder = new ViewHolderOfflineList();
@@ -187,16 +197,19 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.offline_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.offline_list_three_dots);
-			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.offline_list_options);
-			holder.optionOpen = (ImageView) convertView.findViewById(R.id.offline_list_option_open);
-			holder.optionOpen.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionOpen.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-			holder.optionDelete = (ImageView) convertView.findViewById(R.id.offline_list_option_delete);
-			holder.optionDelete.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
-			((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.offline_list_arrow_selection);
-//			holder.arrowSelection.setVisibility(View.GONE);
 			
+			
+			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.offline_list_options);			
+			holder.optionDownload = (ImageView) convertView.findViewById(R.id.offline_list_option_download);
+			holder.optionProperties = (ImageView) convertView.findViewById(R.id.offline_list_option_properties);
+			holder.optionPublicLink = (ImageView) convertView.findViewById(R.id.offline_list_option_public_link);
+			holder.optionDelete = (ImageView) convertView.findViewById(R.id.offline_list_option_delete);
+			holder.optionMore = (ImageView) convertView.findViewById(R.id.offline_list_option_overflow);
+			
+	        holder.optionsLayoutOffline = (LinearLayout) convertView.findViewById(R.id.offline_list_options_no_connection);	
+	        holder.optionDeleteOffline = (ImageView) convertView.findViewById(R.id.offline_list_option_delete_no_connection);
+	        holder.offlineText = (TextView) convertView.findViewById(R.id.offline_list_option_no_connection);
+		
 			convertView.setTag(holder);
 		}
 		else{
@@ -301,42 +314,88 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		if (positionClicked != -1){
 			if (positionClicked == position){
 //				holder.arrowSelection.setVisibility(View.VISIBLE);
-				LayoutParams params = holder.optionsLayout.getLayoutParams();
-				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-				listFragment.smoothScrollToPosition(_position);
 				
-				holder.optionOpen.getLayoutParams().width = Util.px2dp((165*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionOpen.getLayoutParams()).setMargins(Util.px2dp((9*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				holder.optionDelete.getLayoutParams().width = Util.px2dp((165*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
+				if (Util.isOnline(context)){
+					//With connection
+					LayoutParams params = holder.optionsLayout.getLayoutParams();
+					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					listFragment.smoothScrollToPosition(_position);
+					
+				}
+				else{
+					//No connection
+					LayoutParams params = holder.optionsLayoutOffline.getLayoutParams();
+					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					listFragment.smoothScrollToPosition(_position);
+				}
+				
 			}
 			else{
-//				holder.arrowSelection.setVisibility(View.GONE);
+//				
+				if (Util.isOnline(context)){
+					//With connection
+					LayoutParams params = holder.optionsLayout.getLayoutParams();
+					params.height = 0;
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				}
+				else{
+					//No connection
+					LayoutParams params = holder.optionsLayoutOffline.getLayoutParams();
+					params.height = 0;
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				}	
+			}
+		}
+		else{
+			if (Util.isOnline(context)){
+				//With connection
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = 0;
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
-		}
-		else{
-//			holder.arrowSelection.setVisibility(View.GONE);
-			LayoutParams params = holder.optionsLayout.getLayoutParams();
-			params.height = 0;
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+			else{
+				//No connection
+				LayoutParams params = holder.optionsLayoutOffline.getLayoutParams();
+				params.height = 0;
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+			}	
 		}
 		
-		holder.optionOpen.setTag(holder);
-		holder.optionOpen.setOnClickListener(this);
+		holder.optionDownload.setTag(holder);
+		holder.optionDownload.setOnClickListener(this);
 		
-//		holder.optionProperties.setTag(holder);
-//		holder.optionProperties.setOnClickListener(this);
+		holder.optionMore.setTag(holder);
+		holder.optionMore.setOnClickListener(this);
+		
+		holder.optionProperties.setTag(holder);
+		holder.optionProperties.setOnClickListener(this);
 		
 		holder.optionDelete.setTag(holder);
 		holder.optionDelete.setOnClickListener(this);
 		
+		holder.optionDeleteOffline.setTag(holder);
+		holder.optionDeleteOffline.setOnClickListener(this);
+		
+		if (Util.isOnline(context)){
+			//With connection
+			holder.optionsLayout.setVisibility(View.VISIBLE);
+			holder.optionsLayoutOffline.setVisibility(View.GONE);
+			
+		}
+		else{
+			//No connection
+			holder.optionsLayout.setVisibility(View.GONE);
+			holder.optionsLayoutOffline.setVisibility(View.VISIBLE);
+			holder.offlineText.setText("No connection");
+		}
 		return convertView;
 	}
 
@@ -385,25 +444,12 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		File currentFile = new File(currentPath);
 		
 		switch (v.getId()){
-			case R.id.offline_list_option_open:{
-				positionClicked = -1;
-				notifyDataSetChanged();
-								
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-					context.startActivity(viewIntent);
-				}
-				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, intentShare)){
-						context.startActivity(intentShare);
-					}
-				}
+			case R.id.offline_list_option_download:{
+				
+				
 				break;
 			}
-//			case R.id.offline_list_option_properties:{
+			case R.id.offline_list_option_properties:{
 //				Intent i = new Intent(context, FilePropertiesActivity.class);
 //				i.putExtra("handle", n.getHandle());
 //			
@@ -417,9 +463,19 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 //				context.startActivity(i);							
 //				positionClicked = -1;
 //				notifyDataSetChanged();
-//				break;
-//			}
+				break;
+			}
 			case R.id.offline_list_option_delete:{
+				setPositionClicked(-1);
+				notifyDataSetChanged();				
+									
+				deleteOffline(context, mOff);
+								
+				fragment.refreshPaths(mOff);
+				
+				break;
+			}
+			case R.id.offline_list_option_delete_no_connection:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();				
 									

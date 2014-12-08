@@ -74,6 +74,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public ImageView imageView;
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
+		public ImageView savedOffline;
 		public ImageButton imageButtonThreeDots;
 		public RelativeLayout itemLayout;
 		//public ImageView arrowSelection;
@@ -187,13 +188,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
+			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
 			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
 			holder.optionRename.setVisibility(View.GONE);
 			holder.optionLeaveShare = (ImageView) convertView.findViewById(R.id.file_list_option_leave_share);
 			holder.optionLeaveShare.setVisibility(View.GONE);
-
+			
 			holder.optionDownload = (ImageView) convertView.findViewById(R.id.file_list_option_download);
 			holder.optionDownload.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);	
 			((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((11 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
@@ -247,7 +249,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		
 		holder.optionShare.setVisibility(View.GONE);
-		holder.optionPermissions.setVisibility(View.GONE);		
+		holder.optionPermissions.setVisibility(View.GONE);
+		holder.savedOffline.setVisibility(View.GONE);
 
 		holder.transferProgressBar.setVisibility(View.GONE);
 		holder.textViewFileSize.setVisibility(View.VISIBLE);
@@ -307,7 +310,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.transferProgressBar.setVisibility(View.GONE);		
 					holder.textViewFileSize.setVisibility(View.VISIBLE);	
 				}
-			}			
+			}					
 
 			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
 
@@ -350,7 +353,20 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					}
 				}
 			}
+		}		
+		
+		File offlineDirectory = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +node.getName());
 		}
+		else{
+			offlineDirectory = context.getFilesDir();
+		}
+		
+		if (offlineDirectory.exists()){
+			holder.savedOffline.setVisibility(View.VISIBLE);
+			
+		}	
 
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
@@ -374,6 +390,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				
 				if (type == ManagerActivity.FILE_BROWSER_ADAPTER) {
 					//Visible
+					log("ManagerActivity.FILE_BROWSER_ADAPTER");
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);				
 					holder.optionDelete.setVisibility(View.VISIBLE);
@@ -382,7 +399,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					//Hide
 					holder.optionClearShares.setVisibility(View.GONE);
 					holder.optionShare.setVisibility(View.GONE);
-					holder.optionPermissions.setVisibility(View.GONE);
+					holder.optionPermissions.setVisibility(View.GONE);					
 					
 					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
 
