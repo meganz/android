@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
@@ -383,7 +384,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyImageView.setImageResource(R.drawable.media_empty_image);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			emptyImageView.setVisibility(View.VISIBLE);
@@ -595,11 +596,20 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		    
 		    int totalWidth = outMetrics.widthPixels;
 		    int totalHeight = outMetrics.heightPixels;
-		    
+		    float dpWidth  = outMetrics.widthPixels / density;
+		    		    
 		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if (numberOfCells < 2){
-				numberOfCells = 2;
-			}
+		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    	if (numberOfCells < 4){
+					numberOfCells = 4;
+				}	
+		    }
+		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		    	if (numberOfCells < 3){
+					numberOfCells = 3;
+				}	
+		    }
+		    
 			
 			if (monthPics != null){
 				monthPics.clear();
@@ -963,7 +973,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 
 					wifiDialog = builder.create();
 					wifiDialog.show();
-					brandAlertDialog(wifiDialog);
+					Util.brandAlertDialog(wifiDialog);
 				}
 				break;
 			}
@@ -993,28 +1003,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				break;
 			}
 		}
-	}
-	
-	public static void brandAlertDialog(AlertDialog dialog) {
-	    try {
-	        Resources resources = dialog.getContext().getResources();
-
-	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-
-	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
-	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(dialog.getContext().getResources().getColor(R.color.mega)); // change title text color
-	        }
-
-	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
-	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(dialog.getContext().getResources().getColor(R.color.mega)); // change divider color
-	        }
-	    } catch (Exception ex) {
-	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
-	        ex.printStackTrace();
-	    }
 	}
 	
 	@Override

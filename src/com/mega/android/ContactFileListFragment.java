@@ -256,7 +256,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_file_list, container, false);
 
-			aB.setTitle(R.string.contact_shared_files);
+			if (aB != null){
+				aB.setTitle(R.string.contact_shared_files);
+				aB.setLogo(R.drawable.ic_action_navigation_accept);
+			}
 
 			nameView = (TextView) v.findViewById(R.id.contact_file_list_name);
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_file_list_thumbnail);
@@ -360,7 +363,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 			((ContactPropertiesMainActivity)context).setParentHandle(parentHandle);
 			adapter.setParentHandle(parentHandle);
 			if (aB != null){
-				aB.setTitle("");
+				aB.setTitle(R.string.contact_shared_files);
 				aB.setLogo(R.drawable.ic_action_navigation_accept);
 			}
 			setNodes(megaApi.getInShares(contact));
@@ -410,7 +413,9 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 		super.onAttach(activity);
 		context = activity;
 		aB = ((ActionBarActivity)activity).getSupportActionBar();
-		aB.show();
+		if (aB != null){
+			aB.show();
+		}
 	}
 
 	public String getDescription(ArrayList<MegaNode> nodes) {
@@ -544,8 +549,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 			if (contactNodes.get(position).isFolder()) {
 				MegaNode n = contactNodes.get(position);
 
-				aB.setTitle(n.getName());
-				aB.setLogo(R.drawable.ic_action_navigation_previous_item);
+				if (aB != null){
+					aB.setTitle(n.getName());
+					aB.setLogo(R.drawable.ic_action_navigation_previous_item);
+				}
 				((ContactPropertiesMainActivity)context).supportInvalidateOptionsMenu();
 
 				parentHandleStack.push(parentHandle);
@@ -639,8 +646,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 				emptyTextView.setVisibility(View.GONE);
 				if (parentHandle == -1) {
 					contactNodes = megaApi.getInShares(contact);
-					aB.setTitle("");
-					aB.setLogo(R.drawable.ic_action_navigation_accept);
+					if (aB != null){
+						aB.setTitle(R.string.contact_shared_files);
+						aB.setLogo(R.drawable.ic_action_navigation_accept);
+					}
 					((ContactPropertiesMainActivity)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);
 					listView.setSelection(0);
@@ -649,8 +658,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 					return 2;
 				} else {
 					contactNodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandle));
-					aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-					aB.setLogo(R.drawable.ic_action_navigation_previous_item);
+					if (aB != null){
+						aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+						aB.setLogo(R.drawable.ic_action_navigation_previous_item);
+					}
 					((ContactPropertiesMainActivity)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);
 					listView.setSelection(0);

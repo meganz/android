@@ -11,7 +11,8 @@
         android:layout_height="match_parent"
         android:checked="false"
         android:focusable="false"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:button="@drawable/btn_check_holo_light" />
          
     <com.mega.components.RoundedImageView 
          android:id="@+id/shared_folder_contact_thumbnail"
@@ -92,7 +93,7 @@
 		            android:id="@+id/shared_folder_remove_share_option"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ic_rubbish_bin"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null"

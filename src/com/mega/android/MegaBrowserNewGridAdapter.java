@@ -257,9 +257,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 		}
-		else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-		}
+
 		this.listFragment = listView;
 		this.emptyImageView = emptyImageView;
 		this.emptyTextView = emptyTextView;
@@ -740,30 +738,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 
 			moreOptionsDialog = builder.create();
 			moreOptionsDialog.show();
-			brandAlertDialog(moreOptionsDialog);
+			Util.brandAlertDialog(moreOptionsDialog);
 		}
-	}
-	
-	public static void brandAlertDialog(AlertDialog dialog) {
-	    try {
-	        Resources resources = dialog.getContext().getResources();
-
-	        int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-
-	        TextView alertTitle = (TextView) dialog.getWindow().getDecorView().findViewById(alertTitleId);
-	        if (alertTitle != null){	        	
-	        	alertTitle.setTextColor(dialog.getContext().getResources().getColor(R.color.mega)); // change title text color
-	        }
-
-	        int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-	        View titleDivider = dialog.getWindow().getDecorView().findViewById(titleDividerId);
-	        if (titleDivider != null){
-	        	titleDivider.setBackgroundColor(dialog.getContext().getResources().getColor(R.color.mega)); // change divider color
-	        }
-	    } catch (Exception ex) {
-	    	Toast.makeText(dialog.getContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
-	        ex.printStackTrace();
-	    }
 	}
 	
 	public void onDeleteClick(ViewHolderBrowserNewGrid holder, int position, int index, int totalPosition){
@@ -1035,9 +1011,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 				}
-				else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-					((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-				}
+
 				nodes = megaApi.getChildren(n, orderGetChildren);
 				setNodes(nodes);
 				listFragment.setSelection(0);
@@ -1138,9 +1112,6 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 		}	
-		else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-		}
 	}
 	
     public void setTransfers(HashMap<Long, MegaTransfer> _mTHash)

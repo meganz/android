@@ -71,9 +71,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 		}
-		else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-		}
+
 		this.listFragment = listView;
 
 		this.aB = aB;
@@ -768,9 +766,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 						((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 					}
-					else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-						((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-					}
+
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
 					listFragment.setSelection(0);
@@ -908,9 +904,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 						((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 					}
-					else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-						((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-					}
+
 					nodes = megaApi.getChildren(n);
 					setNodes(nodes);
 					listFragment.setSelection(0);
@@ -1192,9 +1186,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 		else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 		}	
-		else if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
-			((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);
-		}
+
 	}
 	
     public void setTransfers(HashMap<Long, MegaTransfer> _mTHash)

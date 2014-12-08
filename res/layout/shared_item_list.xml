@@ -107,7 +107,7 @@
 		            android:id="@+id/share_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_properties"
+		            android:src="@drawable/info_ic"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 	            
@@ -126,7 +126,7 @@
 		            android:id="@+id/share_list_option_delete"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ic_rubbish_bin"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
 		        
