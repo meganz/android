@@ -2684,22 +2684,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			unSelectMenuItem.setVisible(true);	        			
 	        		}
 	        	}
-	        	
-	        	if (inSF != null){
-	        		if (drawerItem == DrawerItem.SHARED_WITH_ME){
-	        			cF.selectAll();
+	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
+	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+	        		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);
+	        		if (inSF != null){	        		
+	        			inSF.selectAll();
 	        			selectMenuItem.setVisible(false);
 	        			unSelectMenuItem.setVisible(true);	  
 	        		}
-	        	}
-	        	
-	        	if (oF != null){
-        			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-        				oF.selectAll();
+	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+	        		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);	        	
+	        		if (outSF != null){        			
+	        			outSF.selectAll();
         				selectMenuItem.setVisible(false);
 	        			unSelectMenuItem.setVisible(true);
         			}
 	        	}
+	        	if (oF != null){ 
+	        		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+	    				oF.selectAll();
+	    				selectMenuItem.setVisible(false);
+	        			unSelectMenuItem.setVisible(true);
+	        		}
+    			}
 	        	
 	        	return true;
 	        }
@@ -5772,6 +5779,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	megaApi.removeContact(c, managerActivity);
 			}	
 		}		
+	}
+	
+	public void shareFolder(ArrayList<Long> handleList){
+		
+		//TODO shareMultipleFolders
+
+		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+									
+			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
+	    	intent.setClass(this, ContactsExplorerActivity.class);
+	    	//intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
 	}
 	
 	public void shareFolder(MegaNode node){
