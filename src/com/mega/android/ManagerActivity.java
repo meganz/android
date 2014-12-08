@@ -4087,7 +4087,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
-		}
+		}		
 		
 		if(isFinishing()){
 			return;	
