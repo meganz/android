@@ -117,7 +117,7 @@
             android:name="FullScreenImageViewer"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
-            android:theme="@style/login_activity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         

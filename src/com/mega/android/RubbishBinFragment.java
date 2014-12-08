@@ -244,6 +244,8 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
+			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
 			}
@@ -277,7 +279,8 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 
 	        emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
-			
+			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);

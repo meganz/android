@@ -787,7 +787,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 
 	public void setParentHandle(long parentHandle) {
 		this.parentHandle = parentHandle;
-		((ManagerActivity) context).setParentHandleSharedWithMe(parentHandle);
+		((ManagerActivity) context).setParentHandleIncoming(parentHandle);
 		
 	}
 	

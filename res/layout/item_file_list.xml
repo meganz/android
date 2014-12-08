@@ -10,7 +10,8 @@
         android:layout_height="match_parent"
         android:checked="false"
         android:focusable="false"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:button="@drawable/btn_check_holo_light" />
     
     <ImageView
         android:id="@+id/file_list_thumbnail"
@@ -29,8 +30,7 @@
         android:paddingLeft="3dp"
         android:paddingTop="7dp"
         android:ellipsize="end"
-        android:maxLines="2"
-        />
+        android:maxLines="2"/>
     
     <TextView
         android:id="@+id/file_list_filesize"
@@ -56,7 +56,7 @@
         android:textSize="12sp"
         android:ellipsize="end"
         android:maxLines="1"/> --> 
-    
+       	
     <ImageButton 
         android:id="@+id/file_list_three_dots"
         android:layout_width="wrap_content"
@@ -67,6 +67,27 @@
         android:layout_alignParentRight="true"
 		android:paddingTop="12dp"
         android:paddingRight="15dp" />
+    
+    <ImageView
+        android:id="@+id/file_list_saved_offline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cloud_saved_offline"
+		android:background="@null" 
+        android:layout_centerVertical="true"
+        android:paddingRight="15dp" 
+        android:layout_toLeftOf="@id/file_list_three_dots"/> 
+        
+    <ImageView
+        android:id="@+id/file_list_saved_offline_multiselect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cloud_saved_offline"
+		android:background="@null" 
+        android:layout_centerVertical="true"
+        android:paddingRight="15dp" 
+       	android:layout_alignParentRight="true"/> 
+           
     
      <ProgressBar
 	    android:id="@+id/transfers_list__browser_bar"
@@ -123,7 +144,7 @@
 		            android:id="@+id/file_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_properties"
+		            android:src="@drawable/info_ic"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 	            
@@ -131,7 +152,7 @@
 		            android:id="@+id/file_list_option_public_link"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/link"
+		            android:src="@drawable/link_ic"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />	
 		            
@@ -139,7 +160,7 @@
 		            android:id="@+id/file_list_option_leave_share"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_leave_share"
+		            android:src="@drawable/leave_share_ic"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />		   	               
 		        
@@ -159,6 +180,14 @@
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton" />
 		           
+		           	<ImageView
+		            android:id="@+id/file_list_option_clear_share"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_clear_shares"
+		            android:layout_gravity="center_vertical"
+		            style="@style/dialogActionButton" />
+		           
 		            <ImageView
 		            android:id="@+id/file_list_option_rename"
 		            android:layout_width="wrap_content"
@@ -171,7 +200,7 @@
 		            android:id="@+id/file_list_option_delete"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ic_rubbish_bin"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton" />
 		            
@@ -182,9 +211,6 @@
 		            android:src="@drawable/ic_action_core_overflow"
 		            android:layout_gravity="center_vertical" 
 		            style="@style/dialogActionButton"/>
-		         
-		               
-		         	         
 		        
  		<!--        
 

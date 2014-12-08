@@ -72,6 +72,8 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	ArrayList<MegaUser> contacts;
 	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
 	
+	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
+	
 	/////Multiselect/////
 	private class ActionBarCallBack implements ActionMode.Callback {
 //		
@@ -527,6 +529,13 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		for(int i = 0, j = visibleContacts.size() - 1; i < j; i++) {
 			visibleContacts.add(i, visibleContacts.remove(j));
 		}
+		
+		if (isList){
+			adapterList.setContacts(visibleContacts);
+		}
+		else{
+			adapterGrid.setContacts(visibleContacts);
+		}
 	}
 	public void sortByNameAscending(){
 		updateView();
@@ -543,5 +552,9 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			listView.setOnItemLongClickListener(null);
 		}
 		return true;
+	}
+	
+	public void setOrder(int orderContacts){
+		this.orderContacts = orderContacts;
 	}
 }

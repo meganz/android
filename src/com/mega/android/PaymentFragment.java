@@ -101,9 +101,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		
-		parameterType = this.getArguments().getInt("type");
-
+				
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -194,6 +192,10 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			}
 			
 		}
+	}
+	
+	public void setParameterType (int type){
+		this.parameterType = type;
 	}
 	
 
