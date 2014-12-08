@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,11 +28,13 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -38,6 +42,8 @@ import android.widget.TextView;
 
 import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
+import com.mega.sdk.MegaNode;
 
 public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListener {
 	
@@ -378,6 +384,9 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
 		
+		holder.optionPublicLink.setTag(holder);
+		holder.optionPublicLink.setOnClickListener(this);
+		
 		holder.optionDelete.setTag(holder);
 		holder.optionDelete.setOnClickListener(this);
 		
@@ -439,30 +448,26 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		ViewHolderOfflineList holder = (ViewHolderOfflineList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
-//		String currentPath = mOff.getPath()+mOff.getName(); 
-		String currentPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOff.getPath() + mOff.getName();
-		File currentFile = new File(currentPath);
 		
 		switch (v.getId()){
 			case R.id.offline_list_option_download:{
-				
-				
+				positionClicked = -1;
+				notifyDataSetChanged();				
+				if (Util.isOnline(context)){
+					String path = mOff.getPath() + mOff.getName();
+					fragment.download(path);	
+				}
 				break;
 			}
 			case R.id.offline_list_option_properties:{
-//				Intent i = new Intent(context, FilePropertiesActivity.class);
-//				i.putExtra("handle", n.getHandle());
-//			
-//				if (n.isFolder()){
-//					i.putExtra("imageId", R.drawable.mime_folder);
-//				}
-//				else{
-//					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
-//				}				
-//				i.putExtra("name", n.getName());
-//				context.startActivity(i);							
-//				positionClicked = -1;
-//				notifyDataSetChanged();
+				
+				positionClicked = -1;
+				notifyDataSetChanged();
+				if (Util.isOnline(context)){
+					String path = mOff.getPath() + mOff.getName();
+					fragment.showProperties(path);
+				}
+
 				break;
 			}
 			case R.id.offline_list_option_delete:{
@@ -475,15 +480,35 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				
 				break;
 			}
+			case R.id.offline_list_option_public_link:{
+				setPositionClicked(-1);
+				notifyDataSetChanged();	
+				if (Util.isOnline(context)){
+					String path = mOff.getPath() + mOff.getName();
+					fragment.getLink(path);
+				}					
+				break;
+			}
 			case R.id.offline_list_option_delete_no_connection:{
 				setPositionClicked(-1);
-				notifyDataSetChanged();				
-									
-				deleteOffline(context, mOff);
-								
+				notifyDataSetChanged();										
+				deleteOffline(context, mOff);								
 				fragment.refreshPaths(mOff);
 				
 				break;
+			}
+			case R.id.offline_list_option_overflow:{
+				
+				if (Util.isOnline(context)){
+					String path = mOff.getPath() + mOff.getName();
+					if(fragment.isFolder(path))
+					{
+						showOverflowFolder(mOff);
+					}
+					else{
+						showOverflowFile(mOff);
+					}
+				}		
 			}
 			case R.id.offline_list_three_dots:{
 				if (positionClicked == -1){
@@ -503,6 +528,132 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				break;
 			}
 		}		
+	}
+	
+	private void showOverflowFolder(MegaOffline mOff){
+		final MegaOffline mOffFinal = mOff;
+		AlertDialog moreOptionsDialog;
+		
+		final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle("More options");
+		builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case 0:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();	
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.shareFolder(path);
+						}
+						
+						break;
+					}
+					case 1:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.rename(path);
+						}
+						break;
+					}
+					case 2:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.move(path);
+						}
+						break;
+					}
+					case 3:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.copy(path);
+						}
+						break;
+					}
+				}
+
+				dialog.dismiss();
+			}
+		});
+		
+		builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		moreOptionsDialog = builder.create();
+		moreOptionsDialog.show();
+		Util.brandAlertDialog(moreOptionsDialog);
+	}
+	
+	private void showOverflowFile(MegaOffline mOff){
+		final MegaOffline mOffFinal = mOff;
+		AlertDialog moreOptionsDialog;
+		
+		final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle("More options");
+		builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				switch (which){
+					case 0:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.rename(path);
+						}
+						break;
+					}
+					case 1:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.move(path);
+						}
+						break;
+					}
+					case 2:{
+						setPositionClicked(-1);
+						notifyDataSetChanged();
+						if (Util.isOnline(context)){
+							String path = mOffFinal.getPath() + mOffFinal.getName();
+							fragment.copy(path);
+						}
+						break;
+					}
+				}
+
+				dialog.dismiss();
+			}
+		});
+		
+		builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+
+		moreOptionsDialog = builder.create();
+		moreOptionsDialog.show();
+		Util.brandAlertDialog(moreOptionsDialog);
 	}
 	
 	/*

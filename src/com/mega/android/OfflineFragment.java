@@ -30,8 +30,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import com.mega.android.utils.Util;
+import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
 import com.mega.sdk.MegaError;
+import com.mega.sdk.MegaNode;
 
 public class OfflineFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
@@ -46,13 +48,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	DatabaseHandler dbH = null;
 	ArrayList<MegaOffline> mOffList= null;
 	String pathNavigation = null;
-	
+	TextView contentText;
 	long parentHandle = -1;
 	boolean isList = true;
 	boolean gridNavigation=false;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
+	
+	MegaApiAndroid megaApi;
 	
 	//ArrayList<String> paths = null;
 	
@@ -250,6 +254,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 		
+		if (Util.isOnline(context)){
+			if (megaApi == null){
+				megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
+			}
+		}
+		else{
+			megaApi=null;
+		}			
+		
 //		dbH = new DatabaseHandler(context);
 		dbH = DatabaseHandler.getDbHandler(context);
 		
@@ -280,7 +293,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
-						
+					
+			contentText = (TextView) v.findViewById(R.id.offline_content_text);
 //			if(gridNavigation){
 //				mOffList=dbH.findByPath(pathNavigation);
 //			}
@@ -323,14 +337,17 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
+				contentText.setVisibility(View.GONE);
 				emptyImageView.setImageResource(R.drawable.ic_empty_offline);
 				emptyTextView.setText(R.string.file_browser_empty_folder);
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
+				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+			contentText.setText(getInfoFolder(mOffList));
 		
 			return v;
 		}
@@ -384,12 +401,139 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				emptyTextView.setVisibility(View.GONE);
 			}	
 			
+			contentText.setText(getInfoFolder(mOffList));
+			
 			adapterGrid.setPositionClicked(-1);
 			//adapterGrid.setMultipleSelect(false);
 			listView.setAdapter(adapterGrid);
 			
 			return v;
 		}		
+	}
+	
+	public void download (String path){
+		
+		if (Util.isOnline(context)){
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			MegaNode node = megaApi.getNodeByPath(path);
+			handleList.add(node.getHandle());
+			log("download "+node.getName());
+			((ManagerActivity) context).onFileClick(handleList);
+		}
+		else{
+			//TODO toast no connection
+		}
+	}
+	
+	public void showProperties (String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		log("showProperties "+n.getName());
+		Intent i = new Intent(context, FilePropertiesActivity.class);
+		i.putExtra("handle", n.getHandle());
+
+		if (n.isFolder()) {
+			if (megaApi.isShared(n)){
+				i.putExtra("imageId", R.drawable.mime_folder_shared);	
+			}
+			else{
+				i.putExtra("imageId", R.drawable.mime_folder);
+			}
+
+		} 
+		else {
+			i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());
+		}
+		i.putExtra("name", n.getName());
+		context.startActivity(i);
+	}
+	
+	public void getLink (String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		((ManagerActivity) context).getPublicLinkAndShareIt(n);
+
+	}
+	
+	public void shareFolder (String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		((ManagerActivity) context).shareFolder(n);
+	}
+	
+	public void rename (String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		((ManagerActivity) context).showRenameDialog(n, n.getName());
+	}
+	
+	public void move (String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		ArrayList<Long> handleList = new ArrayList<Long>();
+		handleList.add(n.getHandle());									
+		((ManagerActivity) context).showMove(handleList);
+	}
+	
+	public void copy (String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		ArrayList<Long> handleList = new ArrayList<Long>();
+		handleList.add(n.getHandle());									
+		((ManagerActivity) context).showCopy(handleList);
+	}
+	
+	public boolean isFolder(String path){
+		MegaNode n = megaApi.getNodeByPath(path);
+		if(n.isFile()){
+			return false;
+		}
+		else{
+			return true;
+		}		
+	}
+	
+	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
+		log("getInfoFolder");
+		
+		String info = "";
+		int numFolders=0;
+		int numFiles=0;
+		
+		for(int i=0; i<mOffInfo.size();i++){
+			MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOff.getPath() + mOff.getName();
+
+			File destination = new File(path);
+			if (destination.exists()){
+				if(destination.isFile()){
+					numFiles++;					
+				}
+				else{
+					numFolders++;					
+				}
+			}
+			else{
+				log("File do not exist");
+			}		
+		}
+		
+		if (numFolders > 0) {
+			info = numFolders
+					+ " "
+					+ context.getResources().getQuantityString(
+							R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0) {
+				info = info
+						+ ", "
+						+ numFiles
+						+ " "
+						+ context.getResources().getQuantityString(
+								R.plurals.general_num_files, numFiles);
+			}
+		} else {
+			info = numFiles
+					+ " "
+					+ context.getResources().getQuantityString(
+							R.plurals.general_num_files, numFiles);
+		}
+
+		log(info);
+		return info;
 	}
 		
 	@Override
@@ -471,7 +615,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					else{
 						adapterList.setNodes(mOffList);
 					}
-
+					contentText.setText(getInfoFolder(mOffList));
 					adapterList.setPositionClicked(-1);
 					adapterList.setMultipleSelect(false);
 					notifyDataSetChanged();
@@ -678,6 +822,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					mOffListNavigation=dbH.findByPath(pathNavigation);				
 					adapterList.setNodes(mOffListNavigation);				
 					this.setNodes(mOffListNavigation);
+					contentText.setText(getInfoFolder(mOffListNavigation));
 					return 2;
 				}
 				else{

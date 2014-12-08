@@ -10,7 +10,8 @@
         android:layout_height="match_parent"
         android:checked="false"
         android:focusable="false"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:button="@drawable/btn_check_holo_light" />
     
     <ImageView
         android:id="@+id/offline_list_thumbnail"

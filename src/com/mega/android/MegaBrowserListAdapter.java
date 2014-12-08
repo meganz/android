@@ -75,6 +75,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
 		public ImageView savedOffline;
+		public ImageView savedOfflineMultiselect;
 		public ImageButton imageButtonThreeDots;
 		public RelativeLayout itemLayout;
 		//public ImageView arrowSelection;
@@ -189,6 +190,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
 			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
+			holder.savedOfflineMultiselect = (ImageView) convertView.findViewById(R.id.file_list_saved_offline_multiselect);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
 			holder.optionRename = (ImageView) convertView.findViewById(R.id.file_list_option_rename);
@@ -235,10 +237,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		if (!multipleSelect) {
 			holder.checkbox.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			holder.savedOfflineMultiselect.setVisibility(View.GONE);
+	
 		} else {
 			holder.checkbox.setVisibility(View.VISIBLE);
-			//			holder.arrowSelection.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.savedOffline.setVisibility(View.GONE);				
 
 			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
 			if (checkedItems.get(position, false) == true) {
@@ -364,8 +368,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		
 		if (offlineDirectory.exists()){
-			holder.savedOffline.setVisibility(View.VISIBLE);
-			
+			if(multipleSelect){
+				holder.savedOfflineMultiselect.setVisibility(View.VISIBLE);
+			}
+			else{
+				holder.savedOffline.setVisibility(View.VISIBLE);
+			}
 		}	
 
 		holder.imageButtonThreeDots.setTag(holder);
@@ -401,8 +409,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionShare.setVisibility(View.GONE);
 					holder.optionPermissions.setVisibility(View.GONE);					
 					
-					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
-
 					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 					((TableRow.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
 							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
