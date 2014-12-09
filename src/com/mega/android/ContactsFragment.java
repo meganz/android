@@ -540,6 +540,21 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	public void sortByNameAscending(){
 		updateView();
 	}
+	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
+	}
 
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

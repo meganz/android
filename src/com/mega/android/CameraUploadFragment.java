@@ -132,31 +132,23 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaNode> documents = getSelectedDocuments();
+			List<PhotoSyncHolder> documents = getSelectedDocuments();
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
+						handleList.add(documents.get(i).handle);
 					}
 					clearSelections();
 					hideMultipleSelect();
 					((ManagerActivity) context).onFileClick(handleList);
 					break;
 				}
-				case R.id.cab_menu_rename:{
-					clearSelections();
-					hideMultipleSelect();
-					if (documents.size()==1){
-						((ManagerActivity) context).showRenameDialog(documents.get(0), documents.get(0).getName());
-					}
-					break;
-				}
 				case R.id.cab_menu_copy:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
+						handleList.add(documents.get(i).handle);
 					}
 					clearSelections();
 					hideMultipleSelect();
@@ -166,7 +158,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				case R.id.cab_menu_move:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
+						handleList.add(documents.get(i).handle);
 					}
 					clearSelections();
 					hideMultipleSelect();
@@ -177,23 +169,29 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
+						MegaNode n = megaApi.getNodeByHandle(documents.get(0).handle);
+						((ManagerActivity) context).getPublicLinkAndShareIt(n);
 					}
 					break;
 				}
 				case R.id.cab_menu_trash:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
+						handleList.add(documents.get(i).handle);
 					}
 					clearSelections();
 					hideMultipleSelect();
 					((ManagerActivity) context).moveToTrash(handleList);
 					break;
 				}
-				
-				
-				
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}				
 			}
 			return false;
 		}
@@ -214,7 +212,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = getSelectedDocuments();
+			List<PhotoSyncHolder> selected = getSelectedDocuments();
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -222,13 +220,8 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			boolean showLink = false;
 			boolean showTrash = false;
 			
-			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
-				showRename = true;
-			}
-			
 			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+			if ((selected.size() == 1) && (megaApi.checkAccess(megaApi.getNodeByHandle(selected.get(0).handle), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
 				showLink = true;
 			}
 			
@@ -238,12 +231,25 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				showMove = true;
 				showCopy = true;
 				for(int i=0; i<selected.size();i++)	{
-					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+					if(megaApi.checkMove(megaApi.getNodeByHandle(selected.get(i).handle), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
 						showTrash = false;
 						showMove = false;
 						break;
 					}
 				}
+				
+				if(selected.size() == nodes.size()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
@@ -376,6 +382,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			listView.setOnItemClickListener(this);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
+			listView.setOnItemLongClickListener(this);
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_list_browser_camera_upload_on_off);
@@ -681,9 +688,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			}
 			
 			if (adapterGrid == null){
+				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
 				adapterGrid = new MegaPhotoSyncGridAdapter(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells);
 			}
 			else{
+				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 				adapterGrid.setNodes(monthPics, nodes);
 			}
 			
@@ -691,119 +700,24 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			listView.setAdapter(adapterGrid);
 			
 			return v;
-
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-//			if (nodesArrayGrid != null){
-//				nodesArrayGrid.clear();
-//			}
-//			
-//			if (megaApi.getNodeByHandle(photosyncHandle) != null){
-//				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-//				int month = 0;
-//				int year = 0;
-//				for (int i=0;i<nodes.size();i++){
-//					if (nodes.get(i).isFolder()){
-//						continue;
-//					}
-//					PhotoSyncGridHolder psGH = new PhotoSyncGridHolder();
-//					psGH.handle1 = -1;
-//					psGH.handle2 = -1;
-//					psGH.handle3 = -1;
-//					Date d = new Date(nodes.get(i).getModificationTime()*1000);
-//					if ((month == d.getMonth()) && (year == d.getYear())){
-//						psGH.isNode = true;
-//						psGH.handle1 = nodes.get(i).getHandle();
-//						log("HANDLE1: " + psGH.handle1 + "__" + nodes.get(i).getName());
-//					}
-//					else{
-//						month = d.getMonth();
-//						year = d.getYear();
-//						psGH.isNode = false;
-//						psGH.monthYear = getImageDateString(month, year);
-//						nodesArrayGrid.add(psGH);
-//						log("METO EL MES (1): " + month + "__" + year);
-//						i--;
-//						continue;
-//					}
-//	
-//					i++;
-//					if (i < nodes.size()){
-//						d = new Date(nodes.get(i).getModificationTime()*1000);
-//						if ((month == d.getMonth()) && (year == d.getYear())){
-//							psGH.handle2 = nodes.get(i).getHandle();
-//							log("HANDLE1: " + psGH.handle1 + " HANDLE2: " + psGH.handle2 + "__" + nodes.get(i).getName());
-//						}
-//						else{
-//							nodesArrayGrid.add(psGH);
-//							psGH = new PhotoSyncGridHolder();
-//							month = d.getMonth();
-//							year = d.getYear();
-//							psGH.isNode = false;
-//							psGH.monthYear = getImageDateString(month, year);
-//							nodesArrayGrid.add(psGH);
-//							log("METO EL MES (2): " + month + "__" + year);
-//							i--;
-//							continue;
-//						}
-//						
-//						i++;
-//						if (i < nodes.size()){
-//							d = new Date(nodes.get(i).getModificationTime()*1000);
-//							if ((month == d.getMonth()) && (year == d.getYear())){
-//								psGH.handle3 = nodes.get(i).getHandle();
-//								log("HANDLE1: " + psGH.handle1 + " HANDLE2: " + psGH.handle2 + " HANDLE3: " + psGH.handle3 + "__" + nodes.get(i).getName());
-//								nodesArrayGrid.add(psGH);
-//							}
-//							else{
-//								nodesArrayGrid.add(psGH);
-//								psGH = new PhotoSyncGridHolder();
-//								month = d.getMonth();
-//								year = d.getYear();
-//								psGH.isNode = false;
-//								psGH.monthYear = getImageDateString(month, year);
-//								nodesArrayGrid.add(psGH);								
-//								i--;
-//								continue;
-//							}
-//						}
-//						else{
-//							nodesArrayGrid.add(psGH);
-//						}
-//					}
-//					else{
-//						nodesArrayGrid.add(psGH);
-//					}
-//				}	
-//			}
-//			else{
-//				emptyImageView.setVisibility(View.VISIBLE);
-//				listView.setVisibility(View.GONE);
-//			}
-//			
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaPhotoSyncGridAdapter(context, nodesArrayGrid, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes);
-//			}
-//			else{
-//				adapterGrid.setNodes(nodesArrayGrid, nodes);
-//			}
-//			
-//			adapterGrid.setPositionClicked(-1);	
-//			listView.setAdapter(adapterGrid);
-//			
-//			return v;
+		}
+	}
+	
+	public void selectAll(){
+		if (isList){
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+	
+			adapterList.setMultipleSelect(true);
+			for ( int i=0; i< adapterList.getCount(); i++ ) {
+				listView.setItemChecked(i, true);
+			}
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.selectAll();
+			}
 		}
 	}
 	
@@ -1087,15 +1001,20 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		if (adapterList.getPositionClicked() == -1){
-			clearSelections();
-			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-			listView.setItemChecked(position, true);
-			adapterList.setMultipleSelect(true);
-			updateActionModeTitle();
-			listView.setOnItemLongClickListener(null);
+		log("onItemLongClick");
+		PhotoSyncHolder psH = nodesArray.get(position);
+		if (psH.isNode){
+			if (adapterList.getPositionClicked() == -1){
+				clearSelections();
+				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+				listView.setItemChecked(position, true);
+				adapterList.setMultipleSelect(true);
+				updateActionModeTitle();
+				listView.setOnItemLongClickListener(null);
+			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 	
 	/*
@@ -1116,14 +1035,17 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
-		List<MegaNode> documents = getSelectedDocuments();
+		List<PhotoSyncHolder> documents = getSelectedDocuments();
 		int files = 0;
 		int folders = 0;
-		for (MegaNode document : documents) {
-			if (document.isFile()) {
-				files++;
-			} else if (document.isFolder()) {
-				folders++;
+		for (PhotoSyncHolder document : documents) {
+			MegaNode n = megaApi.getNodeByHandle(document.handle);
+			if (n != null){
+				if (n.isFile()) {
+					files++;
+				} else if (n.isFolder()) {
+					folders++;
+				}
 			}
 		}
 		Resources res = getActivity().getResources();
@@ -1155,18 +1077,20 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	/*
 	 * Get list of all selected documents
 	 */
-	private List<MegaNode> getSelectedDocuments() {
-		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				
-//				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
-//				if (document != null){
-//					documents.add(document);
-//				}
-//			}
-//		}
+	private List<PhotoSyncHolder> getSelectedDocuments() {
+		ArrayList<PhotoSyncHolder> documents = new ArrayList<PhotoSyncHolder>();
+		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				
+				PhotoSyncHolder document = adapterList.getDocumentAt(checkedItems.keyAt(i));
+				if (document != null){
+					if (megaApi.getNodeByHandle(document.handle) != null){
+						documents.add(document);
+					}
+				}
+			}
+		}
 		return documents;
 	}
 	
@@ -1395,11 +1319,20 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		    
 		    int totalWidth = outMetrics.widthPixels;
 		    int totalHeight = outMetrics.heightPixels;
-		    
+		    float dpWidth  = outMetrics.widthPixels / density;
+		    		    
 		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if (numberOfCells < 2){
-				numberOfCells = 2;
-			}
+		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    	if (numberOfCells < 4){
+					numberOfCells = 4;
+				}	
+		    }
+		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		    	if (numberOfCells < 3){
+					numberOfCells = 3;
+				}	
+		    }
+		    
 			
 			if (monthPics != null){
 				monthPics.clear();
@@ -1410,19 +1343,35 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				int month = 0;
 				int year = 0;
 				MegaMonthPic monthPic = new MegaMonthPic();
+				boolean thereAreImages = false;
 				for (int i=0;i<nodes.size();i++){
 					if (nodes.get(i).isFolder()){
 						continue;
 					}
+					
+					if (!MimeType.typeForName(nodes.get(i).getName()).isImage()){
+						continue;
+					}
+					
 					Date d = new Date(nodes.get(i).getModificationTime()*1000);
 					if ((month == 0) && (year == 0)){
 						month = d.getMonth();
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+						monthPics.add(monthPic);
+						monthPic = new MegaMonthPic();
+						i--;
 					}
 					else if ((month == d.getMonth()) && (year == d.getYear())){
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+						thereAreImages = true;
+						if (monthPic.nodeHandles.size() == numberOfCells){
+							monthPics.add(monthPic);
+							monthPic = new MegaMonthPic();
+							monthPic.nodeHandles.add(nodes.get(i).getHandle());
+						}
+						else{
+							monthPic.nodeHandles.add(nodes.get(i).getHandle());
+						}
 					}
 					else{
 						month = d.getMonth();
@@ -1430,11 +1379,23 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						monthPics.add(monthPic);
 						monthPic = new MegaMonthPic();
 						monthPic.monthYearString = getImageDateString(month, year);
-						monthPic.nodeHandles.add(nodes.get(i).getHandle());						
+						monthPics.add(monthPic);
+						monthPic = new MegaMonthPic();
+						i--;						
 					}
 				}
 				if (nodes.size() > 0){
 					monthPics.add(monthPic);
+				}
+				
+				if (!thereAreImages){
+					monthPics.clear();
+					emptyImageView.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.GONE);
+				}
+				else{
+					emptyImageView.setVisibility(View.GONE);
+					listView.setVisibility(View.VISIBLE);
 				}
 			}
 			else{
@@ -1442,23 +1403,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				listView.setVisibility(View.GONE);
 			}
 			
-			for (int i=0;i<monthPics.size();i++){
-				MegaMonthPic monthPic = monthPics.get(i);
-				
-				float numberOfRows = (float)(monthPic.nodeHandles.size()) / (float)numberOfCells;
-				
-				if (numberOfRows > (int)numberOfRows){
-					numberOfRows = (int)numberOfRows + 1;
-				}
-				
-				numberOfRows = numberOfRows + 1; //The line of the month and year textview
-				
-				monthPic.numRows = (int)numberOfRows;
-				
-				monthPics.set(i, monthPic);
-				
-				log(monthPics.get(i).monthYearString + "__" + monthPics.get(i).nodeHandles.size() + "____" + monthPics.get(i).numRows); 
-			}
 			if (adapterGrid != null){
 				adapterGrid.setNodes(monthPics, nodes);
 				if (adapterGrid.getCount() == 0){
@@ -1531,6 +1475,21 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				adapterGrid.setOrder(orderGetChildren);
 			}
 		}
+	}
+	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
 	}
 	
 	private static void log(String log) {

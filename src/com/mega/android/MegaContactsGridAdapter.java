@@ -47,6 +47,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 	MegaApiAndroid megaApi;
 	ListView listFragment;
 	
+	boolean multipleSelect = false;
+	
 	private class UserAvatarListenerGrid implements MegaRequestListenerInterface{
 		
 		Context context;
@@ -725,6 +727,10 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		}
 		
 		return info;
+	}
+	
+	public boolean isMultipleSelect() {
+		return multipleSelect;
 	}
 	
 	private static void log(String log) {

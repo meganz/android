@@ -34,6 +34,14 @@
             android:layout_centerHorizontal="true"
             android:orientation="vertical">
             
+            <ImageView 
+	            android:id="@+id/cell_photosync_menu_long_click_select"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1"
+	            android:layout_gravity="center_vertical|center_horizontal"
+	            android:src="@drawable/media_select_ic"/>
+            
         </LinearLayout>
         
         <LinearLayout 

@@ -2521,6 +2521,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			helpMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(true);
 
 				//Hide
 				pauseRestartTransfersItem.setVisible(false);
@@ -2529,7 +2530,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			addMenuItem.setVisible(false);
     			refreshMenuItem.setVisible(false);
     			sortByMenuItem.setVisible(false);
-    			selectMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(true);
     			addMenuItem.setEnabled(false);
@@ -2680,8 +2680,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	if (cF != null){
 	        		if (drawerItem == DrawerItem.CONTACTS){
 	        			cF.selectAll();
-	        			selectMenuItem.setVisible(false);
-	        			unSelectMenuItem.setVisible(true);	        			
+	        			if (cF.showSelectMenuItem()){
+	        				selectMenuItem.setVisible(true);
+	        				unSelectMenuItem.setVisible(false);
+	        			}
+	        			else{
+	        				selectMenuItem.setVisible(false);
+	        				unSelectMenuItem.setVisible(true);
+	        			}        			
 	        		}
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
@@ -2707,6 +2713,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			unSelectMenuItem.setVisible(true);
 	        		}
     			}
+	        	if (psF != null){
+	        		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+	        			psF.selectAll();
+	        			if (psF.showSelectMenuItem()){
+	        				selectMenuItem.setVisible(true);
+	        				unSelectMenuItem.setVisible(false);
+	        			}
+	        			else{
+	        				selectMenuItem.setVisible(false);
+	        				unSelectMenuItem.setVisible(true);
+	        			}
+	        		}
+	        	}
 	        	
 	        	return true;
 	        }

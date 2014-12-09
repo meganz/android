@@ -3,16 +3,25 @@ package com.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -26,7 +35,9 @@ import com.mega.android.utils.ThumbnailUtils;
 import com.mega.android.utils.Util;
 import com.mega.sdk.MegaApiAndroid;
 import com.mega.sdk.MegaApiJava;
+import com.mega.sdk.MegaError;
 import com.mega.sdk.MegaNode;
+import com.mega.sdk.MegaShare;
 
 public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 	
@@ -49,6 +60,150 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 	
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
+	boolean multipleSelect = false;
+	SparseBooleanArray checkedItems = new SparseBooleanArray();
+	private ActionMode actionMode;
+	
+	private class ActionBarCallBack implements ActionMode.Callback {
+
+		@Override
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			log("onActionItemClicked");
+			List<MegaNode> documents = getSelectedDocuments();
+			
+			switch(item.getItemId()){
+				case R.id.cab_menu_download:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).onFileClick(handleList);
+					break;
+				}
+				case R.id.cab_menu_copy:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showCopy(handleList);
+					break;
+				}	
+				case R.id.cab_menu_move:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).showMove(handleList);
+					break;
+				}
+				case R.id.cab_menu_share_link:{
+					clearSelections();
+					hideMultipleSelect();
+					if (documents.size()==1){
+						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
+					}
+					break;
+				}
+				case R.id.cab_menu_trash:{
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).moveToTrash(handleList);
+					break;
+				}
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			log("onCreateActionMode");
+			MenuInflater inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.file_browser_action, menu);
+			return true;
+		}
+
+		@Override
+		public void onDestroyActionMode(ActionMode mode) {
+			log("onDestroyActionMode");	
+			multipleSelect = false;
+			clearSelections();
+		}
+
+		@Override
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			log("onPrepareActionMode");
+			List<MegaNode> selected = getSelectedDocuments();
+			
+			boolean showDownload = false;
+			boolean showRename = false;
+			boolean showCopy = false;
+			boolean showMove = false;
+			boolean showLink = false;
+			boolean showTrash = false;
+			
+			// Link
+			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
+				showLink = true;
+			}
+			
+			if (selected.size() != 0) {
+				showDownload = true;
+				showTrash = true;
+				showMove = true;
+				showCopy = true;
+				
+				for(int i=0; i<selected.size();i++)	{
+					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
+						showTrash = false;
+						showMove = false;
+						break;
+					}
+				}
+				
+				if(selected.size() == nodes.size()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
+			
+			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
+			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			
+			return false;
+		}
+		
+	}
+	
 	public MegaPhotoSyncGridAdapter(Context _context, ArrayList<MegaMonthPic> _monthPics, long _photosyncHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells) {
 		this.context = _context;
 		this.monthPics = _monthPics;
@@ -70,9 +225,11 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 	}
 	
 	public void setNodes(ArrayList<MegaMonthPic> monthPics, ArrayList<MegaNode> nodes){
+		
 		this.monthPics = monthPics;
 		this.nodes = nodes;
 		positionClicked = -1;	
+		log("setNodes: " + numberOfCells + "__" + nodes.size() + "__" + monthPics.size());
 		notifyDataSetChanged();
 //		listFragment.clearFocus();
 //		if (listFragment != null){
@@ -100,6 +257,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
     	public ArrayList<ImageView> imageViews;
     	public TextView textView;
     	public RelativeLayout textRelativeLayout;
+    	public ArrayList<LinearLayout> longClickLayouts;
     	
     	public ArrayList<Long> documents;
     }
@@ -117,6 +275,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
 			holder.relativeLayoutsComplete = new ArrayList<RelativeLayout>();
 			holder.imageViews = new ArrayList<ImageView>();
+			holder.longClickLayouts = new ArrayList<LinearLayout>();
 			
 			holder.documents = new ArrayList<Long>();
 
@@ -137,6 +296,9 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				
 				ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
 				holder.imageViews.add(iV);
+				
+				LinearLayout lcL = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click);
+				holder.longClickLayouts.add(lcL);
 			}
 			
 			holder.textRelativeLayout = (RelativeLayout) convertView.findViewById(R.id.cell_photosync_grid_month_layout);
@@ -165,6 +327,25 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				for (int i=0;i<numberOfCells;i++){
 					if (monthPic.nodeHandles.size() > i){
 						MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
+						int positionInNodes = 0;
+						for (int j=0;j<nodes.size();j++){
+							if(nodes.get(j).getHandle() == monthPic.nodeHandles.get(i)){
+								positionInNodes = j;
+								break;
+							}
+						}
+						
+						if (multipleSelect){
+							if (isChecked(positionInNodes)){
+								holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
+							}
+							else{
+								holder.longClickLayouts.get(i).setVisibility(View.GONE);
+							}
+						}
+						else{
+							holder.longClickLayouts.get(i).setVisibility(View.GONE);
+						}
 						
 						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
 						holder.imageViews.get(i).setVisibility(View.VISIBLE);
@@ -225,6 +406,25 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				
 				if (monthPic.nodeHandles.size() > i){
 					MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
+					int positionInNodes = 0;
+					for (int j=0;j<nodes.size();j++){
+						if(nodes.get(j).getHandle() == monthPic.nodeHandles.get(i)){
+							positionInNodes = j;
+							break;
+						}
+					}
+					
+					if (multipleSelect){
+						if (isChecked(positionInNodes)){
+							holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
+						}
+						else{
+							holder.longClickLayouts.get(i).setVisibility(View.GONE);
+						}
+					}
+					else{
+						holder.longClickLayouts.get(i).setVisibility(View.GONE);
+					}
 					
 					holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
 					holder.imageViews.get(i).setVisibility(View.VISIBLE);
@@ -281,6 +481,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 		
 		for (int i=0; i< holder.imageViews.size(); i++){
 			final int index = i;
+			final int positionFinal = position;
 			ImageView iV = holder.imageViews.get(i);
 			iV.setTag(holder);
 			iV.setOnClickListener(new OnClickListener() {
@@ -290,75 +491,256 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 					ViewHolderPhotoSyncGrid holder= (ViewHolderPhotoSyncGrid) v.getTag();
 					
 					long handle = holder.documents.get(index);
-//					MegaNode n = megaApi.getNodeByHandle(handle);
-					nodeClicked(handle);
+					
+					MegaNode n = megaApi.getNodeByHandle(handle);
+					if (n != null){
+						int positionInNodes = 0;
+						for (int i=0;i<nodes.size();i++){
+							if(nodes.get(i).getHandle() == n.getHandle()){
+								positionInNodes = i;
+								break;
+							}
+						}
+						
+						onNodeClick(holder, positionFinal, index, positionInNodes);
+					}
 				}
 			} );
+			
+			iV.setOnLongClickListener(new OnLongClickListener() {
+				
+				@Override
+				public boolean onLongClick(View v) {
+					ViewHolderPhotoSyncGrid holder= (ViewHolderPhotoSyncGrid) v.getTag();
+					
+					long handle = holder.documents.get(index);
+					
+					MegaNode n = megaApi.getNodeByHandle(handle);
+					if (n != null){
+						int positionInNodes = 0;
+						for (int i=0;i<nodes.size();i++){
+							if(nodes.get(i).getHandle() == n.getHandle()){
+								positionInNodes = i;
+								break;
+							}
+						}
+						
+						onNodeLongClick(holder, positionFinal, index, positionInNodes);
+					}
+					
+					return true;
+				}
+			});
 		}
 		
 		
 		return convertView;
 	}	
 	
-	public void nodeClicked(long handle){
+	public boolean isChecked(int totalPosition){
 		
-		MegaNode n = megaApi.getNodeByHandle(handle);
-		if (n != null){
-			if (!n.isFolder()){
-				if (MimeType.typeForName(n.getName()).isImage()){
-					int positionInNodes = 0;
-					for (int i=0;i<nodes.size();i++){
-						if(nodes.get(i).getHandle() == n.getHandle()){
-							positionInNodes = i;
-							break;
-						}
-					}
-					
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", positionInNodes);
-					intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
-					intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
-					intent.putExtra("orderGetChildren", orderGetChildren);
-					context.startActivity(intent);
-				}
-				else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
-					MegaNode file = n;
-					Intent service = new Intent(context, MegaStreamingService.class);
-			  		context.startService(service);
-			  		String fileName = file.getName();
-					try {
-						fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-					} 
-					catch (UnsupportedEncodingException e) {
-						e.printStackTrace();
-					}
-					
-			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeType.typeForName(file.getName()).getType();
-			  		System.out.println("FILENAME: " + fileName);
-			  		
-			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-			  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-			  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
-			  			context.startActivity(mediaIntent);
-			  		}
-			  		else{
-			  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-			  			ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(n.getHandle());
-						((ManagerActivity) context).onFileClick(handleList);
-			  		}						
-				}
-				else{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(n.getHandle());
-					((ManagerActivity) context).onFileClick(handleList);
-				}	
-				positionClicked = -1;
+		if (!multipleSelect){
+			return false;
+		}
+		else{
+			if (checkedItems.get(totalPosition, false) == false){
+				return false;
+			}
+			else{
+				return true;
+			}	
+		}
+	}
+	
+	public void onNodeLongClick(ViewHolderPhotoSyncGrid holder, int position, int index, int positionInNodes){
+		log("onNodeLongClick");
+		if (!multipleSelect){
+			if (positionClicked == -1){
+				clearSelections();
+				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+				checkedItems.append(positionInNodes, true);
+				this.multipleSelect = true;
+				updateActionModeTitle();
 				notifyDataSetChanged();
 			}
 		}
+		else{
+    		onNodeClick(holder, position, index, positionInNodes);
+    	}
+	}
+	
+	/*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		this.multipleSelect = false;
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
+	
+	public void selectAll(){
+		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+
+		this.multipleSelect = true;
+		for ( int i=0; i< nodes.size(); i++ ) {
+			checkedItems.append(i, true);
+		}
+		updateActionModeTitle();
+		notifyDataSetChanged();
+	}
+	
+	/*
+	 * Clear all selected items
+	 */
+	private void clearSelections() {
+		log("clearSelections");
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				int checkedPosition = checkedItems.keyAt(i);
+				checkedItems.append(checkedPosition, false);
+			}
+		}
+		updateActionModeTitle();
+		notifyDataSetChanged();
+	}
+	
+	private void updateActionModeTitle() {
+		log("updateActionModeTitle");
+		if (actionMode == null){
+			log("actionMode null");
+			return;
+		}
 		
+		if (context == null){
+			log("context null");
+			return;
+		}
+		
+		List<MegaNode> documents = getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (MegaNode document : documents) {
+			if (document.isFile()) {
+				files++;
+			} else if (document.isFolder()) {
+				folders++;
+			}
+		}
+		Resources res = context.getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = "";
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+		// actionMode.
+	}
+	
+	/*
+	 * Get list of all selected documents
+	 */
+	private List<MegaNode> getSelectedDocuments() {
+		log("getSelectedDocuments");
+		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
+		for (int i = 0; i < checkedItems.size(); i++) {
+			if (checkedItems.valueAt(i) == true) {
+				MegaNode document = null;
+				try {
+					if (nodes != null) {
+						document = nodes.get(checkedItems.keyAt(i));
+					}
+				}
+				catch (IndexOutOfBoundsException e) {}
+				
+				if (document != null){
+					documents.add(document);
+				}
+			}
+		}
+		
+		return documents;
+	}
+	
+	public void onNodeClick(ViewHolderPhotoSyncGrid holder, int position, int index, int positionInNodes){
+		
+		if (!multipleSelect){
+			MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
+			if (n != null){
+				if (!n.isFolder()){
+					if (MimeType.typeForName(n.getName()).isImage()){
+						
+						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						intent.putExtra("position", positionInNodes);
+						intent.putExtra("parentNodeHandle", megaApi.getParentNode(n).getHandle());
+						intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
+						intent.putExtra("orderGetChildren", orderGetChildren);
+						context.startActivity(intent);
+					}
+					else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+						MegaNode file = n;
+						Intent service = new Intent(context, MegaStreamingService.class);
+				  		context.startService(service);
+				  		String fileName = file.getName();
+						try {
+							fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+						} 
+						catch (UnsupportedEncodingException e) {
+							e.printStackTrace();
+						}
+						
+				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
+				  		String mimeType = MimeType.typeForName(file.getName()).getType();
+				  		System.out.println("FILENAME: " + fileName);
+				  		
+				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+				  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+				  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
+				  			context.startActivity(mediaIntent);
+				  		}
+				  		else{
+				  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+				  			ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(n.getHandle());
+							((ManagerActivity) context).onFileClick(handleList);
+				  		}						
+					}
+					else{
+						ArrayList<Long> handleList = new ArrayList<Long>();
+						handleList.add(n.getHandle());
+						((ManagerActivity) context).onFileClick(handleList);
+					}	
+					positionClicked = -1;
+					notifyDataSetChanged();
+				}
+			}
+		}
+		else{
+			if (checkedItems.get(positionInNodes, false) == false){
+				checkedItems.append(positionInNodes, true);
+			}
+			else{
+				checkedItems.append(positionInNodes, false);
+			}				
+			updateActionModeTitle();
+			notifyDataSetChanged();
+		}
 	}
 
 	@Override
@@ -390,6 +772,10 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
+	}
+	
+	public boolean isMultipleSelect() {
+		return multipleSelect;
 	}
 	
 	private static void log(String log) {

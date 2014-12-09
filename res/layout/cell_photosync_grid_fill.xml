@@ -13,6 +13,26 @@
      android:layout_margin="3dp"
      android:background="@color/grid_background"
      android:layout_centerHorizontal="true"/>	
+     
+    <LinearLayout
+        android:id="@+id/cell_photosync_menu_long_click"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_margin="3dp"
+        android:visibility="gone"
+        android:background="@drawable/background_item_photosync_grid_menu_layout"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+        
+        <ImageView 
+            android:id="@+id/cell_photosync_menu_long_click_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/media_select_ic"/>
+        
+    </LinearLayout>
 	
     <RelativeLayout
     	android:id="@+id/cell_photosync_item_layout_empty"

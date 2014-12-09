@@ -177,7 +177,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		}
 
 		@Override
-		public void onDestroyActionMode(ActionMode arg0) {
+		public void onDestroyActionMode(ActionMode mode) {
 			log("onDestroyActionMode");			
 			multipleSelect = false;
 			clearSelections();
