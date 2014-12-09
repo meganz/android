@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import nz.mega.android.ManagerActivity.DrawerItem;
 import nz.mega.android.utils.Util;
@@ -20,6 +21,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -49,11 +53,15 @@ import android.widget.TextView;
 
 public class MyAccountFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
 	
+	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+
 	public static int MY_ACCOUNT_FRAGMENT = 5000;
 	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
 	public static int PAYMENT_FRAGMENT = 5002;
 
+	RelativeLayout avatarLayout;
 	RoundedImageView imageView;
+	TextView initialLetter;
 	RelativeLayout contentLayout;
 	TextView userNameTextView;
 	TextView infoEmail;
@@ -109,10 +117,17 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
+		
+		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_avatar_layout);
+		avatarLayout.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
+		avatarLayout.getLayoutParams().height = Util.px2dp((200*scaleW), outMetrics);
 	
 		imageView = (RoundedImageView) v.findViewById(R.id.my_avatar_image);
 		imageView.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
 		imageView.getLayoutParams().height = Util.px2dp((200*scaleW), outMetrics);
+		
+		initialLetter = (TextView) v.findViewById(R.id.my_account_initial_letter);
+		
 		userNameTextView = (TextView) v.findViewById(R.id.my_name);
 		infoEmail = (TextView) v.findViewById(R.id.my_email);
 		bottomControlBar = (TableLayout) v.findViewById(R.id.progress_my_account);
@@ -143,7 +158,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		myUser = megaApi.getContact(myEmail);
 
 		logoutButton.setText(R.string.action_logout);
-		lastSession.setText("Not implemented yet");
+		lastSession.setText(R.string.general_not_yet_implemented);
 		
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
 		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
@@ -154,9 +169,39 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				visibleContacts.add(contacts.get(i));
 			}
 		}		
-		connections.setText(visibleContacts.size()+" Contacts");
+		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 		
 		megaApi.getAccountDetails(this);
+
+		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+		
+		int radius; 
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+        	radius = defaultAvatar.getWidth()/2;
+        else
+        	radius = defaultAvatar.getHeight()/2;
+        
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		imageView.setImageBitmap(defaultAvatar);
+		
+	    int avatarTextSize = getAvatarTextSize(density);
+	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    if (myEmail != null){
+		    if (myEmail.length() > 0){
+		    	log("TEXT: " + myEmail);
+		    	log("TEXT AT 0: " + myEmail.charAt(0));
+		    	String firstLetter = myEmail.charAt(0) + "";
+		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+		    	initialLetter.setText(firstLetter);
+		    	initialLetter.setTextSize(100);
+		    	initialLetter.setTextColor(Color.WHITE);
+		    	initialLetter.setVisibility(View.VISIBLE);
+		    }
+	    }
 		
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
@@ -191,6 +236,31 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		
 		
 		return v;
+	}
+	
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
 	}
 
 	@Override
