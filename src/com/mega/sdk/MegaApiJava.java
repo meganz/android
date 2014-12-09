@@ -284,8 +284,6 @@ public class MegaApiJava
      * required to log in, this function allows to do this step in a separate function. You should run this function
      * in a background thread, to prevent UI hangs. The resulting key can be used in MegaApi::fastLogin
      *
-     * You take the ownership of the returned value.
-     *
      * @param password Access password
      * @return Base64-encoded private key
      */
@@ -300,8 +298,6 @@ public class MegaApiJava
      * This is a time consuming operation (specially for low-end mobile devices). Since the resulting key is
      * required to log in, this function allows to do this step in a separate function. You should run this function
      * in a background thread, to prevent UI hangs. The resulting key can be used in MegaApi::fastLogin
-     *
-     * You take the ownership of the returned value.
      *
      * @param base64pwkey Private key returned by MegaApi::getBase64PwKey
      * @return Base64-encoded hash
@@ -328,7 +324,6 @@ public class MegaApiJava
 	/**
      * Converts a MegaHandle to a Base64-encoded string
      *
-     * You take the ownership of the returned value
      * You can revert this operation using MegaApi::base64ToHandle
      *
      * @param handle to be converted
@@ -414,8 +409,6 @@ public class MegaApiJava
      *
      * You have to be logged in to get a valid session key. Otherwise,
      * this function returns NULL.
-     *
-     * You take the ownership of the returned value.
      *
      * @return Current session key
      */
@@ -667,8 +660,6 @@ public class MegaApiJava
      * On other platforms, this fuction will return a MegaProxy object
      * of type MegaProxy::PROXY_NONE
      *
-     * You take the ownership of the returned value.
-     *
      * @return MegaProxy object with the detected proxy settings
      */
 	public MegaProxy getAutoProxySettings(){
@@ -689,8 +680,6 @@ public class MegaApiJava
      *
      * If the MegaApi object isn't logged in or the email isn't available,
      * this function returns NULL
-     *
-     * You take the ownership of the returned value
      *
      * @return Email of the account
      */
@@ -1549,8 +1538,6 @@ public class MegaApiJava
      * password is lost:
      * - https://mega.co.nz/#recovery
      *
-     * You take the ownership of the returned value.
-     *
      * @return Base64-encoded master key
      */
 	public String exportMasterKey() 
@@ -2175,9 +2162,7 @@ public class MegaApiJava
 	 *
 	 * If the parent node doesn't exist or it isn't a folder, this function
 	 * returns NULL
-	 *
-	 * You take the ownership of the returned value
-	 *
+	 * 
 	 * @param parent Parent node
 	 * @param order Order for the returned list
 	 * Valid values for this parameter are:
@@ -2226,8 +2211,6 @@ public class MegaApiJava
 	 *
 	 * If the parent node doesn't exist or it isn't a folder, this function
 	 * returns NULL
-	 *
-	 * You take the ownership of the returned value
 	 *
 	 * @param parent Parent node
 	 * 
@@ -2319,8 +2302,6 @@ public class MegaApiJava
      *
      * If the node doesn't exist, this function returns NULL
      *
-     * You take the ownership of the returned value
-     *
      * @param Parent node
      * @param Name of the node
      * @return The MegaNode that has the selected parent and name
@@ -2336,8 +2317,6 @@ public class MegaApiJava
      * If the node doesn't exist in the account or
      * it is a root node, this function returns NULL
      *
-     * You take the ownership of the returned value.
-     *
      * @param node MegaNode to get the parent
      * @return The parent of the provided node
      */
@@ -2352,8 +2331,6 @@ public class MegaApiJava
      * If the node doesn't exist, this function returns NULL.
      * You can recoved the node later unsing MegaApi::getNodeByPath
      * except if the path contains names with  '/', '\' or ':' characters.
-     *
-     * You take the ownership of the returned value
      *
      * @param node MegaNode for which the path will be returned
      * @return The path of the node
@@ -2372,8 +2349,6 @@ public class MegaApiJava
      *
      * Paths with names containing '/', '\' or ':' aren't compatible
      * with this function.
-     *
-     * You take the ownership of the returned value
      *
      * @param path Path to check
      * @param n Base node if the path is relative
@@ -2394,8 +2369,6 @@ public class MegaApiJava
      * Paths with names containing '/', '\' or ':' aren't compatible
      * with this function.
      *
-     * You take the ownership of the returned value
-     *
      * @param path Path to check
      * 
      * @return The MegaNode object in the path, otherwise NULL
@@ -2412,8 +2385,6 @@ public class MegaApiJava
      * can be got in a Base64-encoded string using MegaNode::getBase64Handle. Conversions
      * between these formats can be done using MegaApi::base64ToHandle and MegaApi::handleToBase64
      *
-     * You take the ownership of the returned value.
-     *
      * @param MegaHandler Node handle to check
      * @return MegaNode object with the handle, otherwise NULL
      */
@@ -2424,8 +2395,6 @@ public class MegaApiJava
 	
 	/**
      * Get all contacts of this MEGA account
-     *
-     * You take the ownership of the returned value
      *
      * @return List of MegaUser object with all contacts of this account
      */
@@ -2439,8 +2408,6 @@ public class MegaApiJava
      *
      * You can get the email of a MegaUser using MegaUser::getEmail
      *
-     * You take the ownership of the returned value
-     *
      * @param email Email address to check
      * @return MegaUser that has the email address, otherwise NULL
      */
@@ -2452,8 +2419,6 @@ public class MegaApiJava
 	/**
      * Get a list with all inbound sharings from one MegaUser
      *
-     * You take the ownership of the returned value
-     *
      * @param user MegaUser sharing folders with this account
      * @return List of MegaNode objects that this user is sharing with this account
      */
@@ -2463,9 +2428,7 @@ public class MegaApiJava
 	}
 
 	/**
-     * @brief Get a list with all inboud sharings
-     *
-     * You take the ownership of the returned value
+     * Get a list with all inboud sharings
      *
      * @return List of MegaNode objects that other users are sharing with this account
      */
@@ -2491,8 +2454,6 @@ public class MegaApiJava
 	/**
      * Get a list with all active outbound sharings
      *
-     * You take the ownership of the returned value
-     *
      * @return List of MegaShare objects
      */
 	public ArrayList<MegaShare> getOutShares()
@@ -2504,8 +2465,6 @@ public class MegaApiJava
      * Get a list with the active outbound sharings for a MegaNode
      *
      * If the node doesn't exist in the account, this function returns an empty list.
-     *
-     * You take the ownership of the returned value
      *
      * @param node MegaNode to check
      * @return List of MegaShare objects
@@ -2555,8 +2514,6 @@ public class MegaApiJava
      *
      * If the file can't be found or can't be opened, this function returns null
      *
-     * You take the ownership of the returned value
-     *
      * @param filePath Local file path
      * @return Base64-encoded fingerprint for the file
      */
@@ -2570,8 +2527,6 @@ public class MegaApiJava
      *          
      * If the node doesn't exist or doesn't have a fingerprint, this function returns null
      *
-     * You take the ownership of the returned value
-     *
      * @param node Node for which we want to get the fingerprint
      * @return Base64-encoded fingerprint for the file
      */
@@ -2584,8 +2539,6 @@ public class MegaApiJava
      * Returns a node with the provided fingerprint
      *
      * If there isn't any node in the account with that fingerprint, this function returns null.
-     *
-     * You take the ownership of the returned value.
      *
      * @param fingerprint Fingerprint to check
      * @return MegaNode object with the provided fingerprint
@@ -2652,8 +2605,6 @@ public class MegaApiJava
 	/**
      * Returns the root node of the account
      *
-     * You take the ownership of the returned value
-     *
      * If you haven't successfully called MegaApi::fetchNodes before,
      * this function returns null
      *
@@ -2667,8 +2618,6 @@ public class MegaApiJava
 	/**
      * Returns the inbox node of the account
      *
-     * You take the ownership of the returned value
-     *
      * If you haven't successfully called MegaApi::fetchNodes before,
      * this function returns null
      *
@@ -2681,8 +2630,6 @@ public class MegaApiJava
 
 	/**
      * Returns the rubbish node of the account
-     *
-     * You take the ownership of the returned value
      *
      * If you haven't successfully called MegaApi::fetchNodes before,
      * this function returns null
