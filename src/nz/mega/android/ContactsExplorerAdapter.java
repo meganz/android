@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import nz.mega.android.ContactsExplorerActivity.PhoneContacts;
 import nz.mega.android.utils.Util;
@@ -20,13 +21,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -82,6 +89,7 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 							}
 							else{
 								holder.imageView.setImageBitmap(bitmap);
+								holder.initialLetter.setVisibility(View.GONE);
 							}
 						}
 					}
@@ -189,6 +197,8 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 		TextView contactNameTextView;
 		TextView phoneEmailTextView;
 		RoundedImageView imageView;
+		RelativeLayout contactImageLayout;
+		TextView initialLetter;
 		long contactId;
 		String contactName;
 		String contactMail;
@@ -226,6 +236,8 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
 			holder.phoneEmailTextView.setVisibility(View.GONE);
 			holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
+			holder.contactImageLayout = (RelativeLayout) rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
+			holder.initialLetter = (TextView) rowView.findViewById(R.id.contact_explorer_initial_letter);
 			holder.currentPosition = position;
 			holder.contactMail = contact.getEmail();
 			
@@ -238,6 +250,8 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 	//				}
 	//			});
 	//		}
+			
+			createDefaultAvatar(holder, true);
 			
 			UserAvatarListenerExplorer listener = new UserAvatarListenerExplorer(mContext, holder, this);
 			holder.contactNameTextView.setText(contact.getEmail());
@@ -266,6 +280,7 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 					}
 					else{
 						holder.imageView.setImageBitmap(bitmap);
+						holder.initialLetter.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -314,6 +329,8 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 			holder.phoneEmailTextView = (TextView) rowView.findViewById(R.id.contact_explorer_phone_mail);
 			holder.phoneEmailTextView.setVisibility(View.VISIBLE);
 			holder.imageView = (RoundedImageView) rowView.findViewById(R.id.contact_explorer_thumbnail);
+			holder.contactImageLayout = (RelativeLayout) rowView.findViewById(R.id.contact_explorer_relative_layout_avatar);
+			holder.initialLetter = (TextView) rowView.findViewById(R.id.contact_explorer_initial_letter);
 			holder.currentPosition = position;
 			holder.contactId = contact.getId();
 			holder.contactName = contact.getName();
@@ -331,7 +348,8 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 				holder.phoneEmailTextView.setText("");
 			}
 			
-			holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_contact_picture_holo_light));
+			createDefaultAvatar(holder, false);
+//			holder.imageView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_contact_picture_holo_light));
 			
 			Uri contactPhotoUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contact.getId()));
 			log("PHOTOURI: " + contactPhotoUri);			
@@ -341,10 +359,93 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 				BufferedInputStream buf = new BufferedInputStream(photo_stream);
 	            Bitmap photoBitmap = BitmapFactory.decodeStream(buf);
 	            holder.imageView.setImageBitmap(photoBitmap);
+	            holder.initialLetter.setVisibility(View.GONE);
 			}
 			
 			return rowView;
 		}
+	}
+	
+	public void createDefaultAvatar(ViewHolderContactsExplorer holder, boolean isMegaContact){
+		log("createDefaultAvatar()");
+		
+		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		if (isMegaContact){
+			p.setColor(mContext.getResources().getColor(R.color.color_default_avatar_mega));
+		}
+		else{
+			p.setColor(mContext.getResources().getColor(R.color.color_default_avatar_phone));
+		}
+		
+		int radius; 
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+        	radius = defaultAvatar.getWidth()/2;
+        else
+        	radius = defaultAvatar.getHeight()/2;
+        
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		holder.imageView.setImageBitmap(defaultAvatar);
+		
+		
+		Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = mContext.getResources().getDisplayMetrics().density;
+	    
+	    int avatarTextSize = getAvatarTextSize(density);
+	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    if (isMegaContact){
+		    if (holder.contactMail != null){
+			    if (holder.contactMail.length() > 0){
+			    	String firstLetter = holder.contactMail.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.initialLetter.setVisibility(View.VISIBLE);
+			    	holder.initialLetter.setText(firstLetter);
+			    	holder.initialLetter.setTextSize(32);
+			    	holder.initialLetter.setTextColor(Color.WHITE);
+			    }
+		    }
+	    }
+	    else{
+	    	if (holder.contactName != null){
+	    		if (holder.contactName.length() > 0){
+	    			String firstLetter = holder.contactName.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.initialLetter.setVisibility(View.VISIBLE);
+			    	holder.initialLetter.setText(firstLetter);
+			    	holder.initialLetter.setTextSize(32);
+			    	holder.initialLetter.setTextColor(Color.WHITE);
+	    		}
+	    	}
+	    }
+	}
+	
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
 	}
 	
 	public void setMegaContacts(boolean megaContacts){
