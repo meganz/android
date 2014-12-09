@@ -97,6 +97,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 								else{
 									avatarExists = true;
 									holder.imageView1.setImageBitmap(bitmap);
+									holder.contactInitialLetter1.setVisibility(View.GONE);
 								}
 							}
 						}
@@ -124,99 +125,13 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 								else{
 									avatarExists = true;
 									holder.imageView2.setImageBitmap(bitmap);
+									holder.contactInitialLetter2.setVisibility(View.GONE);
 								}
 							}
 						}
 					}
 				}
 			}
-			
-			if (!avatarExists){
-				createDefaultAvatar();
-			}
-		}
-		
-		public void createDefaultAvatar(){
-			log("createDefaultAvatar()");
-			
-			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-			Canvas c = new Canvas(defaultAvatar);
-			Paint p = new Paint();
-			p.setAntiAlias(true);
-			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
-			
-			int radius; 
-	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-	        	radius = defaultAvatar.getWidth()/2;
-	        else
-	        	radius = defaultAvatar.getHeight()/2;
-	        
-			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-			if (numView == 1){
-				holder.imageView1.setImageBitmap(defaultAvatar);
-			}
-			else if (numView == 2){
-				holder.imageView2.setImageBitmap(defaultAvatar);
-			}
-			
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = context.getResources().getDisplayMetrics().density;
-		    
-		    int avatarTextSize = getAvatarTextSize(density);
-		    log("DENSITY: " + density + ":::: " + avatarTextSize);
-		    if (numView == 1){
-			    if (holder.contactMail1 != null){
-				    if (holder.contactMail1.length() > 0){
-				    	log("TEXT: " + holder.contactMail1);
-				    	log("TEXT AT 0: " + holder.contactMail1.charAt(0));
-				    	String firstLetter = holder.contactMail1.charAt(0) + "";
-				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				    	holder.contactInitialLetter1.setText(firstLetter);
-				    	holder.contactInitialLetter1.setTextSize(100);
-				    	holder.contactInitialLetter1.setTextColor(Color.WHITE);
-				    }
-			    }
-		    }
-		    else if (numView == 2){
-		    	if (holder.contactMail2 != null){
-				    if (holder.contactMail2.length() > 0){
-				    	log("TEXT: " + holder.contactMail2);
-				    	log("TEXT AT 0: " + holder.contactMail2.charAt(0));
-				    	String firstLetter = holder.contactMail2.charAt(0) + "";
-				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				    	holder.contactInitialLetter2.setText(firstLetter);
-				    	holder.contactInitialLetter2.setTextSize(100);
-				    	holder.contactInitialLetter2.setTextColor(Color.WHITE);
-				    }
-			    }
-		    }
-		}
-		
-		private int getAvatarTextSize (float density){
-			float textSize = 0.0f;
-			
-			if (density > 3.0){
-				textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
-			}
-			else if (density > 2.0){
-				textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
-			}
-			else if (density > 1.5){
-				textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
-			}
-			else if (density > 1.0){
-				textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
-			}
-			else if (density > 0.75){
-				textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
-			}
-			else{
-				textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
-			}
-			
-			return (int)textSize;
 		}
 
 		@Override
@@ -389,6 +304,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 			holder.contactMail1 = contact1.getEmail();
 			holder.textViewContactName1.setText(contact1.getEmail());
 			
+			createDefaultAvatar(holder, 1);
+			
 			UserAvatarListenerGrid listener1 = new UserAvatarListenerGrid(context, holder, this, 1);
 			
 			File avatar1 = null;
@@ -416,6 +333,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 					}
 					else{
 						holder.imageView1.setImageBitmap(bitmap1);
+						holder.contactInitialLetter1.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -439,6 +357,8 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 				contact2 = (MegaUser) getItem(position+1);
 				holder.contactMail2 = contact2.getEmail();
 				holder.textViewContactName2.setText(contact2.getEmail());
+				
+				createDefaultAvatar(holder, 2);
 				
 				UserAvatarListenerGrid listener2 = new UserAvatarListenerGrid(context, holder, this, 2);
 				
@@ -467,6 +387,7 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 						}
 						else{
 							holder.imageView2.setImageBitmap(bitmap2);
+							holder.contactInitialLetter2.setVisibility(View.GONE);
 						}
 					}
 					else{
@@ -563,6 +484,92 @@ public class MegaContactsGridAdapter extends BaseAdapter implements OnClickListe
 		}
 		
 		return v;
+	}
+	
+	public void createDefaultAvatar(ViewHolderContactsGrid holder, int numView){
+		log("createDefaultAvatar()");
+		
+		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		
+		int radius; 
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+        	radius = defaultAvatar.getWidth()/2;
+        else
+        	radius = defaultAvatar.getHeight()/2;
+        
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		if (numView == 1){		
+			holder.imageView1.setImageBitmap(defaultAvatar);
+		}
+		if (numView == 2){
+			holder.imageView2.setImageBitmap(defaultAvatar);
+		}
+		
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = context.getResources().getDisplayMetrics().density;
+	    
+	    int avatarTextSize = getAvatarTextSize(density);
+	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    if (numView == 1){
+		    if (holder.contactMail1 != null){
+			    if (holder.contactMail1.length() > 0){
+			    	log("TEXT: " + holder.contactMail1);
+			    	log("TEXT AT 0: " + holder.contactMail1.charAt(0));
+			    	String firstLetter = holder.contactMail1.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.contactInitialLetter1.setVisibility(View.VISIBLE);
+			    	holder.contactInitialLetter1.setText(firstLetter);
+			    	holder.contactInitialLetter1.setTextSize(100);
+			    	holder.contactInitialLetter1.setTextColor(Color.WHITE);
+			    }
+		    }
+	    }
+
+	    if (numView == 2){
+	    	if (holder.contactMail2 != null){
+			    if (holder.contactMail2.length() > 0){
+			    	log("TEXT: " + holder.contactMail2);
+			    	log("TEXT AT 0: " + holder.contactMail2.charAt(0));
+			    	String firstLetter = holder.contactMail2.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.contactInitialLetter2.setVisibility(View.VISIBLE);
+			    	holder.contactInitialLetter2.setText(firstLetter);
+			    	holder.contactInitialLetter2.setTextSize(100);
+			    	holder.contactInitialLetter2.setTextColor(Color.WHITE);
+			    }
+	    	}
+	    }
+	}
+	
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
 	}
 
 	@Override
