@@ -57,9 +57,9 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	RelativeLayout contentLayout;
 	TextView userNameTextView;
 	TextView infoEmail;
-	TableLayout contentTable;
 	Button logoutButton;	
 	Button upgradeButton;
+
 //	String userEmail;	
 	Context context;
 	ActionBar aB;
@@ -73,9 +73,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	TextView lastSession;
 	TextView titleConnections;
 	TextView connections;
-	//	private ListView overflowMenuList;
 	MegaApiAndroid megaApi;
-	//MegaUser contact;
 	String myEmail;
 	MegaUser myUser;
 
@@ -115,10 +113,10 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		imageView = (RoundedImageView) v.findViewById(R.id.my_avatar_image);
 		imageView.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
 		imageView.getLayoutParams().height = Util.px2dp((200*scaleW), outMetrics);
-		contentTable = (TableLayout) v.findViewById(R.id.my_content_table);
 		userNameTextView = (TextView) v.findViewById(R.id.my_name);
 		infoEmail = (TextView) v.findViewById(R.id.my_email);
 		bottomControlBar = (TableLayout) v.findViewById(R.id.progress_my_account);
+		
 		usedSpace = (TextView) v.findViewById(R.id.used_space_my_account);
 	    usedSpaceText = (TextView) v.findViewById(R.id.used_space_text_my_account);
 	    usedSpaceBar = (ProgressBar) v.findViewById(R.id.my_account_used_space_bar);	      
