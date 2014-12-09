@@ -416,72 +416,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			startActivity(offlineIntent);
 			finish();
         	return;
-        	/*dbH.setAttrOnline(false);
-        	
-        	userName.setVisibility(View.INVISIBLE);
-        	userEmail.setVisibility(View.INVISIBLE);
-        	bottomControlBar.setVisibility(View.INVISIBLE);
-        	topControlBar.setVisibility(View.INVISIBLE);
-        	
-        	List<String> items = new ArrayList<String>();
-			for (DrawerItem item : DrawerItem.values()) {
-				if (!item.equals(DrawerItem.RUBBISH_BIN) && (!item.equals(DrawerItem.SEARCH))){
-					items.add(item.getTitle(this));
-				}
-			}
-	        
-			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
-			nDA.setPositionClicked(1);
-			mDrawerList.setAdapter(nDA);
-			
-	        
-	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
-	        getSupportActionBar().setHomeButtonEnabled(true);
-			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-	        
-	        mDrawerToggle = new ActionBarDrawerToggle(
-	                this,                  // host Activity 
-	                mDrawerLayout,         // DrawerLayout object 
-	                R.drawable.ic_drawer,  // nav drawer image to replace 'Up' caret 
-	                R.string.app_name,  // "open drawer" description for accessibility 
-	                R.string.app_name  // "close drawer" description for accessibility 
-	                ) {
-	            public void onDrawerClosed(View view) {
-	                supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
-	            }
-	
-	            public void onDrawerOpened(View drawerView) {
-	                supportInvalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-	            }
-	        };
-	        mDrawerToggle.setDrawerIndicatorEnabled(true);
-	        mDrawerLayout.setDrawerListener(mDrawerToggle);
-	        if (savedInstanceState == null){
-	        	mDrawerLayout.openDrawer(Gravity.LEFT);
-	        }
-	        else{
-				mDrawerLayout.closeDrawer(Gravity.LEFT);
-	        }
-	        
-	        mDrawerLayout.setVisibility(View.GONE);
-	        
-	        //Create the actionBar Menu
-	        getSupportActionBar().setDisplayShowCustomEnabled(true);
-	        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
-	        
-	        customSearch = (LinearLayout) getSupportActionBar().getCustomView().findViewById(R.id.custom_search);
-	        customSearch.setVisibility(View.INVISIBLE);
-			
-			customListGrid = (ImageButton) getSupportActionBar().getCustomView().findViewById(R.id.menu_action_bar_grid);
-			customListGrid.setOnClickListener(this);
-			
-			drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
-			mDrawerLayout.closeDrawer(Gravity.LEFT);
-			
-			//INITIAL FRAGMENT
-			selectDrawerItem(drawerItem);
-			
-        	return;*/
         }
         
         dbH.setAttrOnline(true);
@@ -557,6 +491,37 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					userName.setText(userNameString);
 				}
 				
+				
+				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+				Canvas c = new Canvas(defaultAvatar);
+				Paint p = new Paint();
+				p.setAntiAlias(true);
+				p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+				
+				int radius; 
+		        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+		        	radius = defaultAvatar.getWidth()/2;
+		        else
+		        	radius = defaultAvatar.getHeight()/2;
+		        
+				c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+				imageProfile.setImageBitmap(defaultAvatar);
+				
+			    int avatarTextSize = getAvatarTextSize(density);
+			    log("DENSITY: " + density + ":::: " + avatarTextSize);
+			    if (contact.getEmail() != null){
+				    if (contact.getEmail().length() > 0){
+				    	log("TEXT: " + contact.getEmail());
+				    	log("TEXT AT 0: " + contact.getEmail().charAt(0));
+				    	String firstLetter = contact.getEmail().charAt(0) + "";
+				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				    	textViewProfile.setText(firstLetter);
+				    	textViewProfile.setTextSize(32);
+				    	textViewProfile.setTextColor(Color.WHITE);
+				    	textViewProfile.setVisibility(View.VISIBLE);
+				    }
+			    }
+			    
 				File avatar = null;
 				if (getExternalCacheDir() != null){
 					avatar = new File(getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
@@ -587,8 +552,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					        Paint paint = new Paint();
 					        paint.setShader(shader);
 					
-					        Canvas c = new Canvas(circleBitmap);
-					        int radius; 
+					        c = new Canvas(circleBitmap);
 					        if (imBitmap.getWidth() < imBitmap.getHeight())
 					        	radius = imBitmap.getWidth()/2;
 					        else
@@ -596,6 +560,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					        
 						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
 					        imageProfile.setImageBitmap(circleBitmap);
+					        textViewProfile.setVisibility(View.GONE);
 						}
 					}
 					else{
@@ -3586,19 +3551,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish: "  + request.getRequestString());
-//		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-//			MegaPricing p = request.getPricing();
-//			log("P.SIZE(): " + p.getNumProducts());
-//			if (p.getNumProducts() > 0){
-//				log("p[0] = " + p.getHandle(0));
-//			}
-//			
-//			megaApi.getPaymentUrl(p.getHandle(0), this);
-//		}
-//		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
-//			log("PAYMENT URL: " + request.getLink());
-//			log("EXPORT MASTER KEY: "  + megaApi.exportMasterKey());
-//		}
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -3932,46 +3884,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					        
 						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
 					        imageProfile.setImageBitmap(circleBitmap);
+					        textViewProfile.setVisibility(View.GONE);
 						}
 					}
 				}
-			}
-			
-			if (!avatarExists){
-				log("AVATAR does not exist");
-				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-				Canvas c = new Canvas(defaultAvatar);
-				Paint p = new Paint();
-				p.setAntiAlias(true);
-				p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
-				
-				int radius; 
-		        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-		        	radius = defaultAvatar.getWidth()/2;
-		        else
-		        	radius = defaultAvatar.getHeight()/2;
-		        
-				c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-				imageProfile.setImageBitmap(defaultAvatar);
-				
-				Display display = getWindowManager().getDefaultDisplay();
-				DisplayMetrics outMetrics = new DisplayMetrics ();
-			    display.getMetrics(outMetrics);
-			    float density  = getResources().getDisplayMetrics().density;
-			    
-			    int avatarTextSize = getAvatarTextSize(density);
-			    log("DENSITY: " + density + ":::: " + avatarTextSize);
-			    if (request.getEmail() != null){
-				    if (request.getEmail().length() > 0){
-				    	log("TEXT: " + request.getEmail());
-				    	log("TEXT AT 0: " + request.getEmail().charAt(0));
-				    	String firstLetter = request.getEmail().charAt(0) + "";
-				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-				    	textViewProfile.setText(firstLetter);
-				    	textViewProfile.setTextSize(32);
-				    	textViewProfile.setTextColor(Color.WHITE);
-				    }
-			    }				
 			}
 			
 			log("avatar user downloaded");
