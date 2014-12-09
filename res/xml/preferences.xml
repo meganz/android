@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-     <com.mega.components.MEGAPreferenceCategory 
+     <nz.mega.components.MEGAPreferenceCategory 
         android:key="settings_pin_lock"
         android:title="@string/settings_pin_lock"
         android:textColor="@color/pressed_mega">
@@ -14,7 +14,7 @@
 	        android:title="@string/settings_pin_lock_code"
 	        android:password="true"
 	        android:inputType="numberPassword" />
-    </com.mega.components.MEGAPreferenceCategory>
+    </nz.mega.components.MEGAPreferenceCategory>
     
     <PreferenceCategory 
         android:key="settings_camera_upload"

@@ -14,7 +14,7 @@
         android:layout_centerVertical="true"
         android:button="@drawable/btn_check_holo_light" />
          
-    <com.mega.components.RoundedImageView 
+    <nz.mega.components.RoundedImageView 
          android:id="@+id/shared_folder_contact_thumbnail"
          android:layout_width="40dp"
          android:layout_height="40dp"

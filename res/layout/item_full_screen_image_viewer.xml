@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <com.mega.components.TouchImageView
+    <nz.mega.components.TouchImageView
         android:id="@+id/full_screen_image_viewer_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

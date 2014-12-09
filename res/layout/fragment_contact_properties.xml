@@ -37,7 +37,7 @@
      
     </RelativeLayout>-->
     
-    <com.mega.components.RoundedImageView
+    <nz.mega.components.RoundedImageView
         android:id="@+id/contact_properties_image"
         android:layout_width="270dp"
         android:layout_height="270dp"

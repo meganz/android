@@ -5,7 +5,7 @@
     android:descendantFocusability="blocksDescendants"
     android:id="@+id/contact_list_item_layout" >
          
-    <com.mega.components.RoundedImageView 
+    <nz.mega.components.RoundedImageView 
          android:id="@+id/contact_explorer_thumbnail"
          android:layout_width="54dp"
          android:layout_height="54dp"
