@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/standard_margin" 
     xmlns:rounded="http://schemas.android.com/apk/res-auto" >
 
-    <com.mega.components.RoundedImageView 
+    <nz.mega.components.RoundedImageView 
          android:id="@+id/shared_folder_contact_list_thumbnail"
          android:layout_width="54dp"
          android:layout_height="54dp"

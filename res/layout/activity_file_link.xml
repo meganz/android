@@ -40,7 +40,7 @@
 		        android:layout_alignBottom="@id/file_link_name" />
         </RelativeLayout>
     
-	     <com.mega.components.RoundedImageView 
+	     <nz.mega.components.RoundedImageView 
 	         android:id="@+id/file_link_image"
 	         android:layout_width="wrap_content"
 	         android:layout_height="200dp"

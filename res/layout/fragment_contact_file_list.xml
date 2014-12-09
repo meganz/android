@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@color/file_list_selected_row">
         
-         <com.mega.components.RoundedImageView 
+         <nz.mega.components.RoundedImageView 
 	         android:id="@+id/contact_file_list_thumbnail"
 	         android:layout_width="54dp"
 	         android:layout_height="54dp"

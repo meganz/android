@@ -96,15 +96,15 @@
 
 -keepattributes *Annotation*,EnclosingMethod
 
--keep public class com.mega.sdk.** {
+-keep public class nz.mega.sdk.** {
   public protected *;
 }
 
--keep class com.mega.sdk.** {
+-keep class nz.mega.sdk.** {
   public protected *;
 }
 
--keep public class com.mega.android.pdfViewer.**{
+-keep public class nz.mega.android.pdfViewer.**{
   public protected private *;
 }
 

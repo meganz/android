@@ -37,7 +37,7 @@
      
     </RelativeLayout>-->
     
-    <com.mega.components.RoundedImageView
+    <nz.mega.components.RoundedImageView
         android:id="@+id/my_avatar_image"
         android:layout_width="200dp"
         android:layout_height="200dp"

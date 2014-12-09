@@ -75,7 +75,7 @@
     
     <fragment
         android:id="@+id/file_explorer_fragment"
-        android:name="com.mega.android.FileExplorerFragment"
+        android:name="nz.mega.android.FileExplorerFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/file_explorer_button"
