@@ -3,6 +3,7 @@
     android:layout_height="fill_parent"
     android:gravity="center_vertical"
     android:minHeight="@dimen/thumb_size"
+    android:weightSum="21"
     android:paddingRight="@dimen/standard_margin"
     android:orientation="horizontal" >
 
