@@ -331,6 +331,21 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		updateActionModeTitle();
 		listView.setOnItemLongClickListener(null);
 	}
+	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
+	}
 		
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -600,8 +615,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				if(name.equals(nameOffline)){
 					tempOffline.add(mOffList.get(j));
 				}				
-			}
-			
+			}			
 		}
 		
 		for(int k = 0; k < filesOrder.size() ; k++) {
@@ -800,6 +814,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				aB.setTitle(currentNode.getName());
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				if (context instanceof ManagerActivity){
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
 				}
 				else if (context instanceof OfflineActivity){
@@ -1045,20 +1061,34 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					
 					if (context instanceof ManagerActivity){
 						((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+						
+						if (pathNavigation.equals("/")){
+							aB.setTitle(getString(R.string.section_saved_for_offline));
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+							((ManagerActivity)context).supportInvalidateOptionsMenu();
+						}
+						else{
+							
+							String title = pathNavigation;
+							title=title.replace("/", "");
+							aB.setTitle(title);
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+							((ManagerActivity)context).supportInvalidateOptionsMenu();
+						}
 					}
 					else if (context instanceof OfflineActivity){
 						((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+						
+						if (pathNavigation.equals("/")){
+							aB.setTitle(getString(R.string.section_saved_for_offline));							
+						}
+						else{
+							
+							String title = pathNavigation;
+							title=title.replace("/", "");
+							aB.setTitle(title);							
+						}
 					}
-					
-					if (pathNavigation.equals("/")){
-						aB.setTitle(getString(R.string.section_saved_for_offline));
-					}
-					else{
-						String title = pathNavigation;
-						title=title.replace("/", "");
-						aB.setTitle(title);
-					}
-								
 					ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
 					mOffListNavigation=dbH.findByPath(pathNavigation);
 					

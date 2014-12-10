@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,12 +79,11 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
-		boolean showDownload = false;
 		boolean showRename = false;
-		boolean showCopy = false;
 		boolean showMove = false;
 		boolean showLink = false;
-		boolean showTrash = false;
+		boolean showCopy = false;
+
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -175,26 +175,33 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<MegaNode> selected = getSelectedDocuments();
-		
-			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
-				showRename = true;
-			}
-			
-			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				showLink = true;
-			}
-			
+					
 			if (selected.size() != 0) {
-				showDownload = true;
-				showTrash = true;
-				showMove = true;
+				showMove = false;
 				showCopy = true;
+				
+				// Rename
+				if(selected.size() == 1) {
+					
+					if((megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+						showMove = true;
+						showRename = true;
+						showLink = true;
+					}
+					else if(megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
+						showMove = false;
+						showRename = true;
+						showLink = true;
+					}		
+				}
+				else{
+					showRename = false;
+					showMove = false;
+					showLink = false;
+				}
 				
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
-						showTrash = false;
 						showMove = false;
 						break;
 					}
@@ -214,12 +221,12 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
-			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
+			menu.findItem(R.id.cab_menu_copy).setVisible(true);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			menu.findItem(R.id.cab_menu_trash).setVisible(true);
 			
 			return false;
 		}
@@ -287,16 +294,22 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				if (mTHash != null){
 					adapterList.setTransfers(mTHash);
 				}
-				adapterList.setNodes(nodes);
+//				adapterList.setNodes(nodes);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
-				adapterList.setNodes(nodes);
+//				adapterList.setNodes(nodes);
 			}
 			
 			if (parentHandle == -1){			
 				((ManagerActivity)context).setParentHandleIncoming(-1);					
-				findNodes();		
+				findNodes();	
+				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+					sortByNameDescending();
+				}
+				else{
+					sortByNameAscending();
+				}
 				aB.setTitle(getString(R.string.section_shared_with_me));	
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -308,6 +321,12 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+//				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+//					sortByNameDescending();
+//				}
+//				else{
+//					sortByNameAscending();
+//				}
 				
 				aB.setTitle(parentNode.getName());
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -330,8 +349,27 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			
 			listView.setAdapter(adapterList);		
 			
-			setNodes(nodes);
-	
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
+			
+			if (adapterList.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);	
+				contentText.setVisibility(View.GONE);
+			}
+			else{
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				aB.setTitle(getInfoNode());
+				contentText.setVisibility(View.VISIBLE);
+			}	
+//			setNodes(nodes);	
 			
 			return v;
 		}
@@ -363,31 +401,33 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
-				adapterGrid.setNodes(nodes);
 			}
 			
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
 						
 			adapterGrid.setPositionClicked(-1);
 			
-			listView.setAdapter(adapterGrid);
-			
-			setNodes(nodes);
-			
-			if (adapterGrid.getCount() == 0){				
-				
+			listView.setAdapter(adapterGrid);			
+	
+			if (adapterGrid.getCount() == 0){
 				listView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-
+				emptyTextView.setVisibility(View.VISIBLE);	
+				contentText.setVisibility(View.GONE);
 			}
 			else{
 				listView.setVisibility(View.VISIBLE);
-				contentText.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-
-			}		
-			
+				aB.setTitle(getInfoNode());
+				contentText.setVisibility(View.VISIBLE);
+			}	
+					
 			return v;
 		}		
 	}
@@ -397,7 +437,12 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		log("refresh");
 		findNodes();
 		if(adapterList!=null){
-			adapterList.setNodes(nodes);
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
 		}
 	}
 	
@@ -504,7 +549,13 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-					adapterList.setNodes(nodes);
+					if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+						sortByNameDescending();
+					}
+					else{
+						sortByNameAscending();
+					}
+//					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					
 					//If folder has no files
@@ -645,6 +696,21 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		updateActionModeTitle();
 		listView.setOnItemLongClickListener(null);
 	}
+	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
+	}
 			
 	/*
 	 * Clear all selected items
@@ -720,7 +786,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	/*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		adapterList.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -741,7 +807,13 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				aB.setTitle(getString(R.string.section_shared_with_me));	
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
-				adapterList.setNodes(nodes);
+				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+					sortByNameDescending();
+				}
+				else{
+					sortByNameAscending();
+				}
+//				adapterList.setNodes(nodes);
 				listView.setVisibility(View.VISIBLE);
 				contentText.setText(getInfoNode());
 				emptyImageView.setVisibility(View.GONE);
@@ -771,6 +843,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
+					//TODO
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					adapterList.setParentHandle(parentHandle);
@@ -817,6 +890,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					parentHandle = parentNode.getHandle();
 					((ManagerActivity)context).setParentHandleIncoming(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
+					//TODO ?
 					adapterGrid.setNodes(nodes);
 					listView.setSelection(0);
 					adapterGrid.setParentHandle(parentHandle);
@@ -866,43 +940,43 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		return listView;
 	}
 	
-	public void setNodes(ArrayList<MegaNode> nodes){
-		this.nodes = nodes;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setNodes(nodes);
-				if (adapterList.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);	
-					contentText.setVisibility(View.GONE);
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					aB.setTitle(getInfoNode());
-					contentText.setVisibility(View.VISIBLE);
-				}			
-			}	
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setNodes(nodes);
-				if (adapterGrid.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);					
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-
-				}			
-			}
-		}
-	}
+//	public void setNodes(ArrayList<MegaNode> nodes){
+//		this.nodes = nodes;
+//		if (isList){
+//			if (adapterList != null){
+//				adapterList.setNodes(nodes);
+//				if (adapterList.getCount() == 0){
+//					listView.setVisibility(View.GONE);
+//					emptyImageView.setVisibility(View.VISIBLE);
+//					emptyTextView.setVisibility(View.VISIBLE);	
+//					contentText.setVisibility(View.GONE);
+//				}
+//				else{
+//					listView.setVisibility(View.VISIBLE);
+//					emptyImageView.setVisibility(View.GONE);
+//					emptyTextView.setVisibility(View.GONE);
+//					aB.setTitle(getInfoNode());
+//					contentText.setVisibility(View.VISIBLE);
+//				}			
+//			}	
+//		}
+//		else{
+//			if (adapterGrid != null){
+//				adapterGrid.setNodes(nodes);
+//				if (adapterGrid.getCount() == 0){
+//					listView.setVisibility(View.GONE);
+//					emptyImageView.setVisibility(View.VISIBLE);
+//					emptyTextView.setVisibility(View.VISIBLE);					
+//				}
+//				else{
+//					listView.setVisibility(View.VISIBLE);
+//					emptyImageView.setVisibility(View.GONE);
+//					emptyTextView.setVisibility(View.GONE);
+//
+//				}			
+//			}
+//		}
+//	}
 	
 	public void setPositionClicked(int positionClicked){
 		if (isList){
@@ -950,6 +1024,115 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				adapterGrid.setOrder(orderGetChildren);
 			}
 		}
+	}
+	
+	public void sortByNameDescending(){
+		
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+		
+		
+		for(int k = 0; k < nodes.size() ; k++) {
+			MegaNode node = nodes.get(k);
+			if(node.isFolder()){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
+		}
+		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(foldersOrder);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(filesOrder);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));
+				}				
+			}
+			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));					
+				}				
+			}
+			
+		}
+		
+		nodes.clear();
+		nodes.addAll(tempOffline);
+
+		if (isList){
+			adapterList.setNodes(nodes);
+		}
+		else{
+			adapterGrid.setNodes(nodes);
+		}
+	}
+
+	
+	public void sortByNameAscending(){
+		log("sortByNameAscending");
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+				
+		for(int k = 0; k < nodes.size() ; k++) {
+			MegaNode node = nodes.get(k);
+			if(node.isFolder()){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
+		}		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));
+				}				
+			}			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));
+				}				
+			}
+			
+		}
+		
+		nodes.clear();
+		nodes.addAll(tempOffline);
+
+		if (isList){
+			adapterList.setNodes(nodes);
+		}
+		else{
+			adapterGrid.setNodes(nodes);
+		}		
+
 	}
 	
 	public void setTransfers(HashMap<Long, MegaTransfer> _mTHash){

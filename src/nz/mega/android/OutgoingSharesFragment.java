@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -81,9 +82,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
-		boolean showDownload = false;
 		boolean showRename = false;
-		boolean showCopy = false;
 		boolean showMove = false;
 		boolean showLink = false;
 		boolean showTrash = false;
@@ -177,23 +176,20 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = getSelectedDocuments();
-		
-			// Rename
-			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
-				showRename = true;
-			}
-			
-			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				showLink = true;
-			}
-			
+			List<MegaNode> selected = getSelectedDocuments();		
+					
 			if (selected.size() != 0) {
-				showDownload = true;
 				showTrash = true;
 				showMove = true;
-				showCopy = true;
+				
+				if (selected.size() == 1) {
+					showLink=true;
+					showRename=true;
+				}
+				else{
+					showLink=false;
+					showRename=false;
+				}
 				
 				for(int i=0; i<selected.size();i++)	{
 					if(megaApi.checkMove(selected.get(i), megaApi.getRubbishNode()).getErrorCode() != MegaError.API_OK)	{
@@ -217,12 +213,12 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 			}
 			
-			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
+			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
-			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
-			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_copy).setVisible(true);
+			menu.findItem(R.id.cab_menu_move).setVisible(true);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			menu.findItem(R.id.cab_menu_trash).setVisible(true);
 			
 			return false;
 		}
@@ -256,23 +252,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			return null;
 		}
 		
-		if (parentHandle == -1){			
-			((ManagerActivity)context).setParentHandleOutgoing(-1);					
-			findNodes();			
-			aB.setTitle(getString(R.string.section_shared_with_me));	
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			((ManagerActivity)context).setParentHandleOutgoing(parentHandle);
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);			
-			aB.setTitle(parentNode.getName());
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-		}	
-		
-				
+						
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 	        
@@ -309,23 +289,51 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				adapterList.setNodes(nodes);
 			}
 			
-//			if (parentHandle == -1){
-//				MegaNode infoNode = megaApi.getRootNode();
-//				contentText.setText(getInfoFolder(infoNode));
-//				aB.setTitle(getString(R.string.section_shared_with_me));
-//			}
-//			else{
-//				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-//				contentText.setText(getInfoFolder(infoNode));
-//				aB.setTitle(infoNode.getName());
-//			}						
+			if (parentHandle == -1){			
+				((ManagerActivity)context).setParentHandleOutgoing(-1);					
+				findNodes();	
+				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+					sortByNameDescending();
+				}
+				else{
+					sortByNameAscending();
+				}
+				aB.setTitle(getString(R.string.section_shared_with_me));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}
+			else{
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+				((ManagerActivity)context).setParentHandleOutgoing(parentHandle);
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);			
+				aB.setTitle(parentNode.getName());
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}	
 			
 			adapterList.setPositionClicked(-1);
 			adapterList.setMultipleSelect(false);
 			
-			listView.setAdapter(adapterList);			
+			listView.setAdapter(adapterList);		
 			
-			setNodes(nodes);						
+			if (adapterList != null){
+				adapterList.setNodes(nodes);
+				if (adapterList.getCount() == 0){
+					listView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);	
+					contentText.setVisibility(View.GONE);
+				}
+				else{
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+					contentText.setText(getInfoNode());
+					contentText.setVisibility(View.VISIBLE);
+				}			
+			}	
+			
+//			setNodes(nodes);						
 			
 			return v;
 		}
@@ -359,12 +367,47 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				adapterGrid.setParentHandle(parentHandle);
 				adapterGrid.setNodes(nodes);
 			}
-									
+				
+			if (parentHandle == -1){			
+				((ManagerActivity)context).setParentHandleOutgoing(-1);					
+				findNodes();	
+				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+					sortByNameDescending();
+				}
+				else{
+					sortByNameAscending();
+				}
+				aB.setTitle(getString(R.string.section_shared_with_me));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}
+			else{
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+				((ManagerActivity)context).setParentHandleOutgoing(parentHandle);
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);			
+				aB.setTitle(parentNode.getName());
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}	
+			
 			adapterGrid.setPositionClicked(-1);
 			
 			listView.setAdapter(adapterGrid);
 			
-			setNodes(nodes);			
+			if (adapterGrid != null){
+				adapterGrid.setNodes(nodes);
+				if (adapterGrid.getCount() == 0){
+					listView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);					
+				}
+				else{
+					listView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+
+				}			
+			}		
 			
 			return v;
 		}		
@@ -374,6 +417,12 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 	public void refresh(){
 		log("refresh");
 		findNodes();	
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
 		if(adapterList!=null){
 			adapterList.setNodes(nodes);
 		}
@@ -628,6 +677,130 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		updateActionModeTitle();
 		listView.setOnItemLongClickListener(null);
 	}
+	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
+	}
+	
+public void sortByNameDescending(){
+		
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+		
+		
+		for(int k = 0; k < nodes.size() ; k++) {
+			MegaNode node = nodes.get(k);
+			if(node.isFolder()){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
+		}
+		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(foldersOrder);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(filesOrder);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));
+				}				
+			}
+			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));					
+				}				
+			}
+			
+		}
+		
+		nodes.clear();
+		nodes.addAll(tempOffline);
+
+		if (isList){
+			adapterList.setNodes(nodes);
+		}
+		else{
+			adapterGrid.setNodes(nodes);
+		}
+	}
+
+	
+	public void sortByNameAscending(){
+		log("sortByNameAscending");
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+				
+		for(int k = 0; k < nodes.size() ; k++) {
+			MegaNode node = nodes.get(k);
+			if(node.isFolder()){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
+		}		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));
+				}				
+			}			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < nodes.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = nodes.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(nodes.get(j));
+				}				
+			}
+			
+		}
+		
+		nodes.clear();
+		nodes.addAll(tempOffline);
+
+		if (isList){
+			adapterList.setNodes(nodes);
+		}
+		else{
+			adapterGrid.setNodes(nodes);
+		}		
+
+	}
 			
 	/*
 	 * Clear all selected items
@@ -726,6 +899,12 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				aB.setTitle(getString(R.string.section_shared_with_me));
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
+				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+					sortByNameDescending();
+				}
+				else{
+					sortByNameAscending();
+				}
 				adapterList.setNodes(nodes);
 				contentText.setText(getInfoNode());
 				listView.setVisibility(View.VISIBLE);
@@ -856,43 +1035,43 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		return listView;
 	}
 	
-	public void setNodes(ArrayList<MegaNode> nodes){
-		this.nodes = nodes;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setNodes(nodes);
-				if (adapterList.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);	
-					contentText.setVisibility(View.GONE);
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					contentText.setText(getInfoNode());
-					contentText.setVisibility(View.VISIBLE);
-				}			
-			}	
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setNodes(nodes);
-				if (adapterGrid.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);					
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-
-				}			
-			}
-		}
-	}
+//	public void setNodes(ArrayList<MegaNode> nodes){
+//		this.nodes = nodes;
+//		if (isList){
+//			if (adapterList != null){
+//				adapterList.setNodes(nodes);
+//				if (adapterList.getCount() == 0){
+//					listView.setVisibility(View.GONE);
+//					emptyImageView.setVisibility(View.VISIBLE);
+//					emptyTextView.setVisibility(View.VISIBLE);	
+//					contentText.setVisibility(View.GONE);
+//				}
+//				else{
+//					listView.setVisibility(View.VISIBLE);
+//					emptyImageView.setVisibility(View.GONE);
+//					emptyTextView.setVisibility(View.GONE);
+//					contentText.setText(getInfoNode());
+//					contentText.setVisibility(View.VISIBLE);
+//				}			
+//			}	
+//		}
+//		else{
+//			if (adapterGrid != null){
+//				adapterGrid.setNodes(nodes);
+//				if (adapterGrid.getCount() == 0){
+//					listView.setVisibility(View.GONE);
+//					emptyImageView.setVisibility(View.VISIBLE);
+//					emptyTextView.setVisibility(View.VISIBLE);					
+//				}
+//				else{
+//					listView.setVisibility(View.VISIBLE);
+//					emptyImageView.setVisibility(View.GONE);
+//					emptyTextView.setVisibility(View.GONE);
+//
+//				}			
+//			}
+//		}
+//	}
 	
 	public void setPositionClicked(int positionClicked){
 		if (isList){

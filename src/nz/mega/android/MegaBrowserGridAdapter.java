@@ -51,7 +51,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	MegaApiAndroid megaApi;
 	
 	long parentHandle;
-	
+	boolean multipleSelect;
 	ListView listFragment;
 	ActionBar aB;
 	
@@ -1207,6 +1207,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
+	}
+	
+	public boolean isMultipleSelect(){
+		return multipleSelect;
 	}
 	
 	private static void log(String log) {
