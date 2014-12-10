@@ -56,7 +56,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
-	
 	MegaApiAndroid megaApi;
 	
 	//ArrayList<String> paths = null;
@@ -512,6 +511,66 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		}
 	}
 	
+	public void sortByNameDescending(){
+		log("sortByNameDescending");
+		for(int i = 0, j = mOffList.size() - 1; i < j; i++) {
+			mOffList.add(i, mOffList.remove(j));
+		}
+		
+		if (isList){
+			adapterList.setNodes(mOffList);
+		}
+		else{
+			adapterGrid.setNodes(mOffList);
+		}
+	}
+	
+	public void sortByNameDescending2 (){
+		
+		for (int t=0; t<mOffList.size()-1; t++)
+        {
+            for (int i= 0; i < mOffList.size() - t -1; i++) //for(int i = 0; i<t1.length -1; i++)
+            {
+            	String mOff1 = mOffList.get(i+1).getName();
+            	String mOff2 = mOffList.get(i).getName();
+                if(mOff1.compareTo(mOff2)<0)//if(t1[i+1].compareTo(t1[1+1])>0)
+                {
+                	MegaOffline mOffTemp = mOffList.get(i);
+                    mOffList.set(i, mOffList.get(i+1));
+                    mOffList.set(i+1, mOffTemp);
+                }
+            }
+        }
+	}
+	
+	public void sortByNameAscending(){
+		log("sortByNameAscending");
+		updateView();
+	}
+	
+	public void updateView (){
+		log("updateView");
+		mOffList=dbH.findByPath(pathNavigation);
+		
+		for(int i=0; i<mOffList.size();i++){
+			
+			File offlineDirectory = null;
+			if (Environment.getExternalStorageDirectory() != null){
+				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+			}
+			else{
+				offlineDirectory = context.getFilesDir();
+			}	
+			
+			if (!offlineDirectory.exists()){
+				dbH.removeById(mOffList.get(i).getId());
+				mOffList.remove(i);
+				
+			}			
+		}
+		this.setNodes(mOffList);
+	}
+	
 	public void showProperties (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
 		log("showProperties "+n.getName());
@@ -697,9 +756,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					}
 
 					if (adapterList == null){
+						if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+							sortByNameDescending();
+						}
 						adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
 					}
 					else{
+						if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+							sortByNameDescending();
+						}
 						adapterList.setNodes(mOffList);
 					}
 					contentText.setText(getInfoFolder(mOffList));
@@ -1003,10 +1068,9 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		return listView;
 	}
 	
-	public void setNodes(ArrayList<MegaOffline> mOff){
+	public void setNodes(ArrayList<MegaOffline> _mOff){
 		log("setNodes");
-		this.mOffList = mOff;
-		
+		this.mOffList = _mOff;
 
 		if (isList){
 			if (adapterList != null){
