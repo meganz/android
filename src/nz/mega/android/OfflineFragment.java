@@ -2,14 +2,13 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
-import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -57,8 +56,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
 	MegaApiAndroid megaApi;
-	
-	//ArrayList<String> paths = null;
 	
 	private ActionMode actionMode;
 	
@@ -381,13 +378,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
 					
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);
-//			if(gridNavigation){
-//				mOffList=dbH.findByPath(pathNavigation);
-//			}
-//			else{
-//				setPathNavigation("/");
-//				mOffList=dbH.findByPath(pathNavigation);				
-//			}
+
 			mOffList=dbH.findByPath(pathNavigation);
 									
 			for(int i=0; i<mOffList.size();i++){
@@ -406,12 +397,20 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					
 				}			
 			}
+
 			
 			if (adapterList == null){
 				adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
 			}
 			else{
 				adapterList.setNodes(mOffList);
+			}
+			
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
 			}
 			
 			adapterList.setPositionClicked(-1);
@@ -466,6 +465,13 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				}			
 			}
 			
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
+			
 			if (adapterGrid == null){
 				adapterGrid = new MegaOfflineGridAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
 			}
@@ -512,11 +518,53 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	}
 	
 	public void sortByNameDescending(){
-		log("sortByNameDescending");
-		for(int i = 0, j = mOffList.size() - 1; i < j; i++) {
-			mOffList.add(i, mOffList.remove(j));
+		
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+		
+		
+		for(int k = 0; k < mOffList.size() ; k++) {
+			MegaOffline node = mOffList.get(k);
+			if(node.getType().equals("1")){
+				foldersOrder.add(node.getName());
+			}
+			else{
+				filesOrder.add(node.getName());
+			}
 		}
 		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(foldersOrder);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.reverse(filesOrder);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));
+				}				
+			}
+			
+		}
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));					
+				}				
+			}
+			
+		}
+		
+		mOffList.clear();
+		mOffList.addAll(tempOffline);
+
 		if (isList){
 			adapterList.setNodes(mOffList);
 		}
@@ -524,53 +572,84 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			adapterGrid.setNodes(mOffList);
 		}
 	}
-	
-	public void sortByNameDescending2 (){
-		
-		for (int t=0; t<mOffList.size()-1; t++)
-        {
-            for (int i= 0; i < mOffList.size() - t -1; i++) //for(int i = 0; i<t1.length -1; i++)
-            {
-            	String mOff1 = mOffList.get(i+1).getName();
-            	String mOff2 = mOffList.get(i).getName();
-                if(mOff1.compareTo(mOff2)<0)//if(t1[i+1].compareTo(t1[1+1])>0)
-                {
-                	MegaOffline mOffTemp = mOffList.get(i);
-                    mOffList.set(i, mOffList.get(i+1));
-                    mOffList.set(i+1, mOffTemp);
-                }
-            }
-        }
-	}
+
 	
 	public void sortByNameAscending(){
 		log("sortByNameAscending");
-		updateView();
-	}
-	
-	public void updateView (){
-		log("updateView");
-		mOffList=dbH.findByPath(pathNavigation);
-		
-		for(int i=0; i<mOffList.size();i++){
-			
-			File offlineDirectory = null;
-			if (Environment.getExternalStorageDirectory() != null){
-				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+		ArrayList<String> foldersOrder = new ArrayList<String>();
+		ArrayList<String> filesOrder = new ArrayList<String>();
+		ArrayList<MegaOffline> tempOffline = new ArrayList<MegaOffline>();
+				
+		for(int k = 0; k < mOffList.size() ; k++) {
+			MegaOffline node = mOffList.get(k);
+			if(node.getType().equals("1")){
+				foldersOrder.add(node.getName());
 			}
 			else{
-				offlineDirectory = context.getFilesDir();
-			}	
+				filesOrder.add(node.getName());
+			}
+		}		
+	
+		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
+		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
+
+		for(int k = 0; k < foldersOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = foldersOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));
+				}				
+			}
 			
-			if (!offlineDirectory.exists()){
-				dbH.removeById(mOffList.get(i).getId());
-				mOffList.remove(i);
-				
-			}			
 		}
-		this.setNodes(mOffList);
+		
+		for(int k = 0; k < filesOrder.size() ; k++) {
+			for(int j = 0; j < mOffList.size() ; j++) {
+				String name = filesOrder.get(k);
+				String nameOffline = mOffList.get(j).getName();
+				if(name.equals(nameOffline)){
+					tempOffline.add(mOffList.get(j));
+				}				
+			}
+			
+		}
+		
+		mOffList.clear();
+		mOffList.addAll(tempOffline);
+
+		if (isList){
+			adapterList.setNodes(mOffList);
+		}
+		else{
+			adapterGrid.setNodes(mOffList);
+		}
+
 	}
 	
+//	public void updateView (){
+//		log("updateView");
+//		mOffList=dbH.findByPath(pathNavigation);
+//		
+//		for(int i=0; i<mOffList.size();i++){
+//			
+//			File offlineDirectory = null;
+//			if (Environment.getExternalStorageDirectory() != null){
+//				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+//			}
+//			else{
+//				offlineDirectory = context.getFilesDir();
+//			}	
+//			
+//			if (!offlineDirectory.exists()){
+//				dbH.removeById(mOffList.get(i).getId());
+//				mOffList.remove(i);
+//				
+//			}			
+//		}
+//		this.setNodes(mOffList);
+//	}
+//	
 	public void showProperties (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
 		log("showProperties "+n.getName());
@@ -718,6 +797,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			else{
 				
 				MegaOffline currentNode = mOffList.get(position);
+				aB.setTitle(currentNode.getName());
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				if (context instanceof ManagerActivity){
 					((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
@@ -755,21 +835,23 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						}
 					}
 
-					if (adapterList == null){
-						if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-							sortByNameDescending();
-						}
+					if (adapterList == null){						
 						adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
 					}
-					else{
-						if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-							sortByNameDescending();
-						}
+					else{						
 						adapterList.setNodes(mOffList);
 					}
+					
+					if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+						sortByNameDescending();
+					}
+					else{
+						sortByNameAscending();
+					}
+					
 					contentText.setText(getInfoFolder(mOffList));
 					adapterList.setPositionClicked(-1);
-					adapterList.setMultipleSelect(false);
+					
 					notifyDataSetChanged();
 
 				}else{
@@ -956,13 +1038,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 			else if(pathNavigation != null){
 				if (!pathNavigation.equals("/")){
-					//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
-	
-					// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
-					
+
 					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
 					int index=pathNavigation.lastIndexOf("/");				
 					pathNavigation=pathNavigation.substring(0,index+1);
+					
 					if (context instanceof ManagerActivity){
 						((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
 					}
@@ -970,14 +1050,33 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
 					}
 					
+					if (pathNavigation.equals("/")){
+						aB.setTitle(getString(R.string.section_saved_for_offline));
+					}
+					else{
+						String title = pathNavigation;
+						title=title.replace("/", "");
+						aB.setTitle(title);
+					}
+								
 					ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-					mOffListNavigation=dbH.findByPath(pathNavigation);				
-					adapterList.setNodes(mOffListNavigation);				
-					this.setNodes(mOffListNavigation);
+					mOffListNavigation=dbH.findByPath(pathNavigation);
+					
 					contentText.setText(getInfoFolder(mOffListNavigation));
+					this.setNodes(mOffListNavigation);
+					
+					if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+						sortByNameDescending();
+					}
+					else{
+						sortByNameAscending();
+					}
+					//adapterList.setNodes(mOffList);
+					
 					return 2;
 				}
 				else{
+					log("pathNavigation  / ");
 					return 0;
 				}
 			}
@@ -1009,10 +1108,18 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					}
 					
 					ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
-					mOffListNavigation=dbH.findByPath(pathNavigation);				
-					adapterGrid.setNodes(mOffListNavigation);
-					//adapterGrid.setPathNavigation?
+					mOffListNavigation=dbH.findByPath(pathNavigation);
 					this.setNodes(mOffListNavigation);
+					
+					if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+						sortByNameDescending();
+					}
+					else{
+						sortByNameAscending();
+					}
+					//adapterGrid.setNodes(mOffList);
+					//adapterGrid.setPathNavigation?
+					
 					return 2;
 				}
 				else{
@@ -1138,9 +1245,16 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	public void refreshPaths(){
 		log("refreshPaths()");
-		mOffList=dbH.findByPath("/");			
+		mOffList=dbH.findByPath("/");	
 		
-		setNodes(mOffList);
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
+		
+//		setNodes(mOffList);
 		listView.invalidateViews();
 	}
 	
@@ -1170,7 +1284,14 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			mOffList=dbH.findByPath(retFindPath.getPath()+retFindPath.getName()+"/");
 		}
 				
-		setNodes(mOffList);
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
+		
+//		setNodes(mOffList);
 		pathNavigation=pNav;
 		listView.invalidateViews();
 	}
