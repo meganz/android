@@ -968,7 +968,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				adapterGrid.setCurrentTransfer(mT);
 			}
 		}		
-	}
+	}	
 	
 	private static void log(String log) {
 		Util.log("OutgoingSharesFragment", log);

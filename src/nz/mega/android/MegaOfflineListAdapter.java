@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 
 import android.app.Activity;
@@ -166,6 +167,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
 		this.mOffList = mOffList;
+		
 		positionClicked = -1;	
 		notifyDataSetChanged();
 	}
@@ -411,7 +413,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 	@Override
 	public boolean isEnabled(int position) {
-		log("isEnabled");
+//		log("isEnabled");
 		return super.isEnabled(position);
 	}
 
