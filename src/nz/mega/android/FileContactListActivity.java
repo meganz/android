@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
@@ -95,6 +96,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	MenuItem permissionButton;
 	MenuItem deleteShareButton;
 	MenuItem addSharingContact;
+	MenuItem selectMenuItem;
+	MenuItem unSelectMenuItem;
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 
@@ -194,42 +197,51 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 					
 					break;
 				}
-			case R.id.action_file_contact_list_delete:{
-				
-
-				removeShare = true;
-				changeShare = false;
-				ProgressDialog temp = null;
-
-				try{
-					temp = new ProgressDialog(fileContactListActivity);					
-
-					temp.setMessage((getString(R.string.context_sharing_folder))); 
-					temp.show();
-				}
-				catch(Exception e){
-					return false;
-				}
-
-				statusDialog = temp;
-
-				if(contacts!=null){
-
-					if(contacts.size()!=0){
-
-						for(int j=0;j<contacts.size();j++){									
-							MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-							megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivity);								
-						}
-
+				case R.id.action_file_contact_list_delete:{
+					
+	
+					removeShare = true;
+					changeShare = false;
+					ProgressDialog temp = null;
+	
+					try{
+						temp = new ProgressDialog(fileContactListActivity);					
+	
+						temp.setMessage((getString(R.string.context_sharing_folder))); 
+						temp.show();
 					}
+					catch(Exception e){
+						return false;
+					}
+	
+					statusDialog = temp;
+	
+					if(contacts!=null){
+	
+						if(contacts.size()!=0){
+	
+							for(int j=0;j<contacts.size();j++){									
+								MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+								megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivity);								
+							}
+	
+						}
+					}
+					adapter.setMultipleSelect(false);
+					clearSelections();
+					hideMultipleSelect();
+					break;
 				}
-				adapter.setMultipleSelect(false);
-				clearSelections();
-				hideMultipleSelect();
-				break;
-			}
-
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					actionMode.invalidate();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					actionMode.invalidate();
+					break;
+				}
 			}
 			return false;
 		}
@@ -257,14 +269,26 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 			boolean deleteShare = false;
 			boolean permissions = false;
 						
-			if (selected.size() > 0) {
+			if (selected.size() != 0) {
 				permissions = true;
 				deleteShare = true;
+				
+				if(selected.size()==adapter.getCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
 			}
 			
 			menu.findItem(R.id.action_file_contact_list_permissions).setVisible(permissions);
 			menu.findItem(R.id.action_file_contact_list_delete).setVisible(deleteShare);
-
 			
 			return false;
 		}
@@ -390,6 +414,12 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 //	    deleteShareButton.setVisible(false);
 	    addSharingContact.setVisible(true);
 	    
+	    selectMenuItem = menu.findItem(R.id.action_select);
+		unSelectMenuItem = menu.findItem(R.id.action_unselect);
+		
+		selectMenuItem.setVisible(true);
+		unSelectMenuItem.setVisible(false);
+	    
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
@@ -412,10 +442,30 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		    	
 	        	return true;
 	        }
+		    case R.id.action_select:{
+		    	selectAll();
+		    	if (showSelectMenuItem()){
+    				selectMenuItem.setVisible(true);
+    				unSelectMenuItem.setVisible(false);
+    			}
+    			else{
+    				selectMenuItem.setVisible(false);
+    				unSelectMenuItem.setVisible(true);
+    			}
+		    	return true;
+		    }
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+	
+	public boolean showSelectMenuItem(){
+		if (adapter != null){
+			return adapter.isMultipleSelect();
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -629,6 +679,19 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 				finish();
 				break;
 			}
+		}
+	}
+	
+	public void selectAll(){
+		if (adapter != null){
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+
+			adapter.setMultipleSelect(true);
+			for ( int i=0; i< adapter.getCount(); i++ ) {
+				listView.setItemChecked(i, true);
+			}
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
 		}
 	}
 

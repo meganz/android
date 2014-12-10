@@ -420,6 +420,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				
 				ProgressBar pB = (ProgressBar) rLView.findViewById(R.id.cell__browser_bar);
 				holder.progressBars.add(pB);
+				
+				holder.documents.add(-1l);
 			}
 			
 			convertView.setTag(holder);
@@ -433,12 +435,12 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			if (totalPosition > (nodes.size() - 1)){
 				holder.relativeLayoutsThumbnail.get(i).setVisibility(View.GONE);
 				holder.relativeLayoutsEmpty.get(i).setVisibility(View.VISIBLE);
-				if (holder.documents.size() > i){
+//				if (holder.documents.size() > i){
 					holder.documents.set(i,  -1l);
-				}
-				else{
-					holder.documents.add(i, -1l);
-				}
+//				}
+//				else{
+//					holder.documents.add(i, -1l);
+//				}
 			}
 			else{
 				holder.relativeLayoutsThumbnail.get(i).setVisibility(View.VISIBLE);
@@ -465,12 +467,12 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				}
 				
 				MegaNode node = nodes.get(totalPosition);
-				if (holder.documents.size() > i){
+//				if (holder.documents.size() > i){
 					holder.documents.set(i, node.getHandle());
-				}
-				else{
-					holder.documents.add(i, node.getHandle());
-				}				
+//				}
+//				else{
+//					holder.documents.add(i, node.getHandle());
+//				}				
 				holder.fileNameViews.get(i).setText(node.getName());
 				if (nodes.get(totalPosition).isFolder()){
 					if (megaApi.isShared(node)){

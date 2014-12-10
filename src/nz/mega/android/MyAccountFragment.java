@@ -229,6 +229,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				}
 				else{
 					imageView.setImageBitmap(imBitmap);
+					initialLetter.setVisibility(View.GONE);
 				}
 			}
 		}
@@ -352,6 +353,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 						}
 						else{
 							imageView.setImageBitmap(imBitmap);
+							initialLetter.setVisibility(View.GONE);
 						}
 					}
 				}

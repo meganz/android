@@ -300,6 +300,8 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				
 				LinearLayout lcL = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click);
 				holder.longClickLayouts.add(lcL);
+				
+				holder.documents.add(-1l);
 			}
 			
 			holder.textRelativeLayout = (RelativeLayout) convertView.findViewById(R.id.cell_photosync_grid_month_layout);
@@ -351,12 +353,12 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
 						holder.imageViews.get(i).setVisibility(View.VISIBLE);
 						holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
-						if (holder.documents.size() > i){
+//						if (holder.documents.size() > i){
 							holder.documents.set(i, n.getHandle());
-						}
-						else{
-							holder.documents.add(i, n.getHandle());
-						}
+//						}
+//						else{
+//							holder.documents.add(i, n.getHandle());
+//						}
 						
 						Bitmap thumb = null;						
 						holder.imageViews.get(i).setImageResource(MimeType.typeForName(n.getName()).getIconResourceId());	
@@ -390,12 +392,12 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
 						holder.imageViews.get(i).setVisibility(View.GONE);
 						holder.relativeLayoutsEmpty.get(i).setVisibility(View.VISIBLE);
-						if (holder.documents.size() > i){
+//						if (holder.documents.size() > i){
 							holder.documents.set(i,  -1l);
-						}
-						else{
-							holder.documents.add(i, -1l);
-						}
+//						}
+//						else{
+//							holder.documents.add(i, -1l);
+//						}
 					}
 				}
 			}
@@ -430,12 +432,12 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 					holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
 					holder.imageViews.get(i).setVisibility(View.VISIBLE);
 					holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
-					if (holder.documents.size() > i){
+//					if (holder.documents.size() > i){
 						holder.documents.set(i, n.getHandle());
-					}
-					else{
-						holder.documents.add(i, n.getHandle());
-					}
+//					}
+//					else{
+//						holder.documents.add(i, n.getHandle());
+//					}
 					
 					Bitmap thumb = null;					
 					holder.imageViews.get(i).setImageResource(MimeType.typeForName(n.getName()).getIconResourceId());
@@ -469,12 +471,12 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 					holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
 					holder.imageViews.get(i).setVisibility(View.GONE);
 					holder.relativeLayoutsEmpty.get(i).setVisibility(View.VISIBLE);
-					if (holder.documents.size() > i){
+//					if (holder.documents.size() > i){
 						holder.documents.set(i,  -1l);
-					}
-					else{
-						holder.documents.add(i, -1l);
-					}
+//					}
+//					else{
+//						holder.documents.add(i, -1l);
+//					}
 				}				
 			}
 		}

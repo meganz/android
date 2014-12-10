@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import nz.mega.android.utils.Util;
 import nz.mega.components.RoundedImageView;
@@ -17,6 +18,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -41,7 +45,10 @@ import android.widget.TextView;
 
 public class ContactPropertiesFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
 
+	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+	
 	RoundedImageView imageView;
+	TextView initialLetter;
 	RelativeLayout contentLayout;
 	TextView userNameTextView;
 	TextView infoEmail;
@@ -100,6 +107,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_properties_image);
 			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
 			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
+			initialLetter = (TextView) v.findViewById(R.id.contact_properties_initial_letter);
 			contentTable = (TableLayout) v.findViewById(R.id.contact_properties_content_table);
 			userNameTextView = (TextView) v.findViewById(R.id.contact_properties_name);
 			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
@@ -138,6 +146,36 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			//				overflowMenuList.setVisibility(View.GONE);
 			//			}			
 
+			Bitmap defaultAvatar = Bitmap.createBitmap(imageView.getLayoutParams().width,imageView.getLayoutParams().height, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+			
+			int radius; 
+	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+	        	radius = defaultAvatar.getWidth()/2;
+	        else
+	        	radius = defaultAvatar.getHeight()/2;
+	        
+			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+			imageView.setImageBitmap(defaultAvatar);
+			
+		    int avatarTextSize = getAvatarTextSize(density);
+		    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		    if (userEmail != null){
+			    if (userEmail.length() > 0){
+			    	log("TEXT: " + userEmail);
+			    	log("TEXT AT 0: " + userEmail.charAt(0));
+			    	String firstLetter = userEmail.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	initialLetter.setText(firstLetter);
+			    	initialLetter.setTextSize(100);
+			    	initialLetter.setTextColor(Color.WHITE);
+			    	initialLetter.setVisibility(View.VISIBLE);
+			    }
+		    }
+		    
 			File avatar = null;
 			if (context.getExternalCacheDir() != null){
 				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), contact.getEmail() + ".jpg");
@@ -164,6 +202,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 					}
 					else{
 						imageView.setImageBitmap(imBitmap);
+						initialLetter.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -171,6 +210,31 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 		}
 
 		return v;
+	}
+	
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
 	}
 
 	public void setUserEmail(String userEmail){
@@ -262,6 +326,7 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 						}
 						else{
 							imageView.setImageBitmap(imBitmap);
+							initialLetter.setVisibility(View.GONE);
 						}
 					}
 				}

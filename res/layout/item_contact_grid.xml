@@ -117,7 +117,7 @@
 		            android:id="@+id/contact_grid_option_properties1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_properties"
+		            android:src="@drawable/info_ic"
 		            android:paddingLeft="30dp"
 		            android:paddingTop="10dp"
 		            android:background="@null" 

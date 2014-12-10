@@ -37,25 +37,43 @@
      
     </RelativeLayout>-->
     
-    <nz.mega.components.RoundedImageView
-        android:id="@+id/contact_properties_image"
-        android:layout_width="270dp"
+    <RelativeLayout 
+        android:id="@+id/contact_properties_avatar_layout"
+        android:layout_width="wrap_content"
         android:layout_height="270dp"
         android:layout_centerHorizontal="true"
         android:paddingBottom="10dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        android:paddingTop="10dp"
-        rounded:border_color="@color/border_file_properties"
-        rounded:border_width="2dp"
-        rounded:corner_radius="135dp" />
+        android:paddingTop="10dp">
+    
+	    <nz.mega.components.RoundedImageView
+	        android:id="@+id/contact_properties_image"
+	        android:layout_width="270dp"
+	        android:layout_height="270dp"
+	        android:layout_centerHorizontal="true"
+	        android:paddingBottom="10dp"
+	        android:paddingLeft="30dp"
+	        android:paddingRight="30dp"
+	        android:paddingTop="10dp"
+	        rounded:border_color="@color/border_file_properties"
+	        rounded:border_width="2dp"
+	        rounded:corner_radius="135dp" />
+    
+    	<TextView
+            android:id="@+id/contact_properties_initial_letter"
+            android:layout_width="fill_parent"
+   			android:layout_height="fill_parent"
+   			android:layout_centerInParent="true"
+			android:gravity="center_horizontal|center_vertical"
+   			android:paddingBottom="5dp" />
+	    
+    </RelativeLayout>
 
     <TableLayout
         android:id="@+id/contact_properties_content_table"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/contact_properties_image"
+        android:layout_below="@id/contact_properties_avatar_layout"
         android:background="@color/black" >
 
         <TableRow>

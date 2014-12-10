@@ -1,5 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/cell_item_complete_layout"
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contact_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@color/grid_background"
@@ -8,7 +10,7 @@
     <RelativeLayout 
         android:layout_width="172dp"
         android:layout_height="wrap_content"
-        android:id="@+id/cell_item_layout"
+        android:id="@+id/contact_grid_item_layout"
         android:background="@drawable/background_item_grid"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -16,17 +18,36 @@
         android:layout_marginTop="5dp"
         android:descendantFocusability="blocksDescendants" >
         
-        <ImageButton
-	        android:id="@+id/cell_thumbnail"
-	        android:layout_width="157dp"
-	        android:layout_height="157dp"
-	        android:layout_centerHorizontal="true"
-	        android:scaleType="fitCenter"
-	        android:background="@null"
-	        android:padding="7dp"/>
+        <RelativeLayout
+			android:id="@+id/contact_grid_relative_layout_avatar"
+			android:layout_width="156dp"
+		    android:layout_height="156dp"
+		    android:layout_centerHorizontal="true"
+		    android:paddingTop="5dp"
+		    android:paddingBottom="5dp"
+		    android:layout_marginLeft="5dp"
+		    android:layout_marginTop="5dp"
+		    android:layout_marginRight="5dp">
+		
+		    <nz.mega.components.RoundedImageView 
+			    android:id="@+id/contact_grid_thumbnail"
+			    android:layout_width="156dp"
+			    android:layout_height="156dp"
+			    android:scaleType="fitCenter"
+		        rounded:corner_radius="78dp" 
+		        rounded:border_width="2dp"
+		        rounded:border_color="@color/border_file_properties"/>
+		    
+		    <TextView
+		        android:id="@+id/contact_grid_initial_letter"
+		        android:layout_width="156dp"
+		        android:layout_height="140dp" 
+			    android:gravity="center_horizontal|center_vertical" />
+	    
+	    </RelativeLayout>
         
         <LinearLayout
-            android:id="@+id/cell_menu_long_click"
+            android:id="@+id/contact_cell_menu_long_click"
             android:layout_width="172dp"
             android:layout_height="157dp"
             android:visibility="gone"
@@ -35,7 +56,7 @@
             android:orientation="vertical">
             
             <ImageView 
-	            android:id="@+id/cell_file_menu_long_click_select"
+	            android:id="@+id/cell_contact_menu_long_click_select"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
 	            android:layout_weight="1"
@@ -45,7 +66,7 @@
         </LinearLayout>
         
         <LinearLayout 
-            android:id="@+id/cell_menu_layout"
+            android:id="@+id/contact_cell_menu_layout"
             android:layout_width="172dp"
             android:layout_height="157dp"
             android:visibility="gone"
@@ -54,38 +75,38 @@
             android:orientation="vertical">
             
             <LinearLayout
-                android:id="@+id/cell_menu_layout_first_row"
+                android:id="@+id/contact_cell_menu_layout_first_row"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:layout_weight="1">
                 
                 <ImageView
-		            android:id="@+id/grid_menu_layout_option_download"
+		            android:id="@+id/contact_grid_menu_layout_option_properties"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_download"
+		            android:src="@drawable/info_ic"
 		            style="@style/dialogActionButton" 
 		            android:layout_weight="1"/>
                 
                 <ImageView
-		            android:id="@+id/grid_menu_layout_option_properties"
+		            android:id="@+id/contact_grid_menu_layout_option_share"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_properties"
+		            android:src="@drawable/ic_share"
 		            style="@style/dialogActionButton" 
 		            android:layout_weight="1"/>
             </LinearLayout>
             
             <LinearLayout
-                android:id="@+id/cell_menu_layout_second_row"
+                android:id="@+id/contact_cell_menu_layout_second_row"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:layout_weight="1">
                 
                 <ImageView
-		            android:id="@+id/grid_menu_layout_option_delete"
+		            android:id="@+id/contact_grid_menu_layout_option_delete"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
 		            android:src="@drawable/ic_delete"
@@ -93,7 +114,7 @@
 		            android:layout_weight="1"/>
                 
                 <ImageView
-		            android:id="@+id/grid_menu_layout_option_overflow"
+		            android:id="@+id/contact_grid_menu_layout_option_overflow"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
 		            android:src="@drawable/ic_action_core_overflow"
@@ -110,11 +131,11 @@
 	        android:scaleType="fitCenter"
 	        android:layout_marginLeft="6dp"
 	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/cell_thumbnail"
+	        android:layout_below="@id/contact_grid_relative_layout_avatar"
 	 		 />
         
         <TextView
-	        android:id="@+id/cell_filename"
+	        android:id="@+id/contact_cell_name"
 	        android:layout_width="125dp"
 	        android:layout_height="wrap_content"	
 	        android:paddingLeft="6dp"
@@ -124,17 +145,17 @@
               
         
         <TextView
-	        android:id="@+id/cell_filesize"
+	        android:id="@+id/contact_cell_content"
 	        android:layout_width="wrap_content"
 	        android:layout_height="30dp"
 	        android:paddingLeft="6dp"
 	        android:paddingBottom="7dp"
 	        android:textColor="@color/file_list_second_row"
-	        android:layout_below="@id/cell_filename"
+	        android:layout_below="@id/contact_cell_name"
 	        android:textSize="12sp" />
         
         <ImageButton 
-	        android:id="@+id/cell_three_dots"
+	        android:id="@+id/contact_cell_three_dots"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:src="@drawable/action_selector_ic"
@@ -147,21 +168,11 @@
 	        android:layout_alignParentRight="true" 
 	        android:layout_alignParentBottom="true"/>        
         
-       <ProgressBar
-	    android:id="@+id/cell__browser_bar"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		android:paddingRight="10dp"
-		android:paddingBottom="10dp"
-		style="@style/MEGAProgressBarTransfers"  
-		android:layout_margin="5dip" 
-        android:layout_toLeftOf="@id/cell_three_dots"
-        android:layout_below="@id/cell_filename" /> 
     </RelativeLayout>
     
     
 	<RelativeLayout
-    	android:id="@+id/cell_item_layout_empty"
+    	android:id="@+id/contact_cell_item_layout_empty"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:background="@color/grid_background">

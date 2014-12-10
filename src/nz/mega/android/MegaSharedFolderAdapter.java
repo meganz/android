@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import nz.mega.android.utils.Util;
 import nz.mega.components.RoundedImageView;
@@ -23,6 +24,9 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -109,6 +113,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 							}
 							else{
 								holder.imageView.setImageBitmap(bitmap);
+								holder.initialLetter.setVisibility(View.GONE);
 							}
 						}
 					}
@@ -163,6 +168,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
     private class ViewHolderShareList {
     	CheckBox checkbox;
     	RoundedImageView imageView;
+    	TextView initialLetter;
 //        ImageView imageView;
         TextView textViewContactName; 
         TextView textViewPermissions;
@@ -202,9 +208,10 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			holder.checkbox.setClickable(false);
 			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.shared_folder_item_layout);
 			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.shared_folder_contact_thumbnail);
-			((RelativeLayout.LayoutParams) holder.imageView.getLayoutParams()).setMargins(Util.px2dp((15*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics), Util.px2dp((15*scaleW), outMetrics), 0);
-			holder.imageView.getLayoutParams().width = Util.px2dp((40*scaleW), outMetrics);
-			holder.imageView.getLayoutParams().height = Util.px2dp((40*scaleH), outMetrics);
+			holder.imageView.getLayoutParams().width = Util.px2dp((54*scaleW), outMetrics);
+			holder.imageView.getLayoutParams().height = Util.px2dp((54*scaleH), outMetrics);
+			holder.initialLetter = (TextView) convertView.findViewById(R.id.shared_folder_contact_initial_letter);
+			
 			holder.textViewContactName = (TextView) convertView.findViewById(R.id.shared_folder_contact_name);
 			holder.textViewContactName.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 			holder.textViewContactName.setSingleLine();
@@ -254,6 +261,8 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			MegaUser contact = megaApi.getContact(holder.contactMail);
 			holder.textViewContactName.setText(holder.contactMail);
 			
+			createDefaultAvatar(holder);
+			
 			int accessLevel = share.getAccess();
 			switch(accessLevel){
 				case MegaShare.ACCESS_FULL:{
@@ -296,6 +305,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 					}
 					else{
 						holder.imageView.setImageBitmap(bitmap);
+						holder.initialLetter.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -367,6 +377,71 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		holder.optionRemoveShare.setOnClickListener(this);
 		
 		return convertView;
+	}
+	
+	public void createDefaultAvatar(ViewHolderShareList holder){
+		log("createDefaultAvatar()");
+		
+		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		
+		
+		int radius; 
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+        	radius = defaultAvatar.getWidth()/2;
+        else
+        	radius = defaultAvatar.getHeight()/2;
+        
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		holder.imageView.setImageBitmap(defaultAvatar);
+		
+		
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = context.getResources().getDisplayMetrics().density;
+	    
+	    int avatarTextSize = getAvatarTextSize(density);
+	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    
+	    if (holder.contactMail != null){
+		    if (holder.contactMail.length() > 0){
+		    	String firstLetter = holder.contactMail.charAt(0) + "";
+		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+		    	holder.initialLetter.setVisibility(View.VISIBLE);
+		    	holder.initialLetter.setText(firstLetter);
+		    	holder.initialLetter.setTextSize(32);
+		    	holder.initialLetter.setTextColor(Color.WHITE);
+		    }
+	    }
+	}
+	
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
 	}
 
 	@Override
