@@ -285,9 +285,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
 			leftNewFolder.setVisibility(View.GONE);
 			rightUploadButton.setVisibility(View.GONE);
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
+			buttonsLayout.setVisibility(View.GONE);
 			
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.INCOMING_SHARES_ADAPTER);
@@ -388,10 +386,10 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);			
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
+			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);	
+			leftNewFolder.setVisibility(View.GONE);
+			rightUploadButton.setVisibility(View.GONE);
+			buttonsLayout.setVisibility(View.GONE);
 	        
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
@@ -563,8 +561,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 						listView.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
 						emptyTextView.setVisibility(View.VISIBLE);
-						leftNewFolder.setVisibility(View.VISIBLE);
-						rightUploadButton.setVisibility(View.VISIBLE);
+						leftNewFolder.setVisibility(View.GONE);
+						rightUploadButton.setVisibility(View.GONE);
 
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
