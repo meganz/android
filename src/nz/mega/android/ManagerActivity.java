@@ -1377,14 +1377,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                     }
     			});
     			
-    			//TODO: GO TO FRAGMENT AFTER CLICKING
-    			for (int i=0;i<3;i++){
+    			for (int i=0;i<mTabsAdapterContacts.getCount();i++){
     				final int index = i;
     				mTabHostContacts.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
 						
 						@Override
 						public void onClick(View v) {
-							Toast.makeText(managerActivity, "CLICKED: " + index, Toast.LENGTH_LONG).show();
+							viewPagerContacts.setCurrentItem(index);
 						}
 					});
     			}
@@ -1560,6 +1559,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                         }
                      }
                });
+    			
+    			for (int i=0;i<mTabsAdapterShares.getCount();i++){
+    				final int index = i;
+    				mTabHostShares.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							viewPagerShares.setCurrentItem(index);
+						}
+					});
+    			}
    			
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -2690,6 +2700,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        				selectMenuItem.setVisible(false);
 	        				unSelectMenuItem.setVisible(true);
 	        			}
+	        		}
+	        	}
+	        	
+	        	if (rbF != null){
+	        		if (drawerItem == DrawerItem.RUBBISH_BIN){	        			
+	        			rbF.selectAll();
+	        			if (rbF.showSelectMenuItem()){
+	        				selectMenuItem.setVisible(true);
+	        				unSelectMenuItem.setVisible(false);
+	        			}
+	        			else{
+	        				selectMenuItem.setVisible(false);
+	        				unSelectMenuItem.setVisible(true);
+	        			}
+	        			return true;
 	        		}
 	        	}
 	        	
@@ -5170,6 +5195,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
 					rbF.setNodes(nodes);
+					rbF.setContentText();
 					rbF.getListView().invalidateViews();
 				}				
 			}
