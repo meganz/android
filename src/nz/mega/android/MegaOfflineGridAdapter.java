@@ -54,6 +54,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 	TextView emptyTextViewFragment;
 	ActionBar aB;
 	
+	boolean multipleSelect = false;
+	
 	private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
 
 		ViewHolderOfflineGrid holder;
@@ -951,7 +953,11 @@ private int deleteOffline(Context context,MegaOffline node){
 			int lines = dbH.removeById(mOffDelete.getId());		
 			log("Borradas; "+lines);
 		}		
-}	
+	}
+	
+	public boolean isMultipleSelect(){
+		return multipleSelect;
+	}
 	
 	private static void log(String log) {
 		Util.log("MegaOfflineGridAdapter", log);
