@@ -21,6 +21,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -29,7 +30,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.support.v7.view.ActionMode;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,6 +54,8 @@ import android.widget.ListView;
 
 public class ContactsFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
+	public static int GRID_WIDTH =400;
+	
 	public static final String ARG_OBJECT = "object";
 	
 	MegaApiAndroid megaApi;	
@@ -87,18 +92,6 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			final List<MegaUser> multipleContacts = users;;
 			
 			switch(item.getItemId()){
-				case R.id.cab_menu_settings:{
-					startActivity(new Intent(getActivity(), SettingsActivity.class));
-					break;
-				}
-				case R.id.cab_menu_upgrade_account:{
-					((ManagerActivity) context).showUpAF();
-					break;
-				}
-				case R.id.cab_menu_help:{
-					Toast.makeText(getActivity(), context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_SHORT).show();
-					break;
-				}	
 				case R.id.cab_menu_share_folder:{
 					clearSelections();
 					hideMultipleSelect();
@@ -188,6 +181,11 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);	
 			}
+			
+			menu.findItem(R.id.cab_menu_help).setVisible(false);
+			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
+			menu.findItem(R.id.cab_menu_settings).setVisible(false);
+			
 			return false;
 		}		
 	}
@@ -221,14 +219,21 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	}
 	
 	public void selectAll(){
-		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-
-		adapterList.setMultipleSelect(true);
-		for ( int i=0; i< adapterList.getCount(); i++ ) {
-			listView.setItemChecked(i, true);
+		if (isList){
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+	
+			adapterList.setMultipleSelect(true);
+			for ( int i=0; i< adapterList.getCount(); i++ ) {
+				listView.setItemChecked(i, true);
+			}
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
 		}
-		updateActionModeTitle();
-		listView.setOnItemLongClickListener(null);
+		else{
+			if (adapterGrid != null){
+				adapterGrid.selectAll();
+			}
+		}
 	}
 	
 	/*
@@ -335,6 +340,29 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 		else{
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
 			
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+			
+		    float scaleW = Util.getScaleW(outMetrics, density);
+		    float scaleH = Util.getScaleH(outMetrics, density);
+		    
+		    int totalWidth = outMetrics.widthPixels;
+		    int totalHeight = outMetrics.heightPixels;
+		    
+		    int numberOfCells = totalWidth / GRID_WIDTH;
+		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    	if (numberOfCells < 3){
+					numberOfCells = 3;
+				}	
+		    }
+		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		    	if (numberOfCells < 2){
+					numberOfCells = 2;
+				}	
+		    }
+			
 			listView = (ListView) v.findViewById(R.id.contact_grid_view_browser);
 	        listView.setOnItemClickListener(null);
 	        listView.setItemsCanFocus(false);
@@ -343,7 +371,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
 	        
 	        if (adapterGrid == null){
-	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, listView);
+	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, listView, numberOfCells);
 	        }
 	        else{
 	        	adapterGrid.setContacts(visibleContacts);

@@ -28,7 +28,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
         android:layout_alignParentTop="true"
-		android:layout_above="@+id/add_contact_button">
+		android:layout_above="@+id/add_contact_button"
+		android:divider="@null">
     </ListView>
     
 	<Button

@@ -28,7 +28,7 @@
 	        android:paddingTop="10dp"
 	        rounded:border_color="@color/border_file_properties"
 	        rounded:border_width="2dp"
-	        rounded:corner_radius="100dp" />
+	        rounded:corner_radius="50dp" />
 	    
 	    <TextView
             android:id="@+id/my_account_initial_letter"
@@ -36,8 +36,7 @@
    			android:layout_height="fill_parent"
    			android:layout_centerInParent="true"
 			android:gravity="center_horizontal|center_vertical"
-   			android:paddingBottom="5dp"
-   			android:text="L"  />
+   			android:paddingBottom="5dp" />
 	    
     </RelativeLayout>
 

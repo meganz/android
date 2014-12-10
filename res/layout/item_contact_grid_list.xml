@@ -1,0 +1,9 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/contact_cell_layout"
+   	android:layout_width="fill_parent"
+   	android:layout_height="wrap_content"
+   	android:layout_gravity="center|fill_horizontal"
+   	android:orientation="horizontal"
+  	android:background="@color/grid_background"
+  	android:layout_centerHorizontal="true">
+</LinearLayout>

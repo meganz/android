@@ -14,23 +14,37 @@
         android:layout_centerVertical="true"
         android:button="@drawable/btn_check_holo_light" />
          
-    <nz.mega.components.RoundedImageView 
-         android:id="@+id/shared_folder_contact_thumbnail"
-         android:layout_width="40dp"
-         android:layout_height="40dp"
-         android:layout_marginLeft="5dp" 
-         android:scaleType="fitCenter"
-         android:paddingTop="3dp"
-         rounded:corner_radius="27dp" 
-         rounded:border_width="2dp"
-         rounded:border_color="@color/border_file_properties"
-         android:layout_toRightOf="@id/shared_folder_contact_checkbox"/>
+    <RelativeLayout
+		android:id="@+id/shared_folder_contact_relative_layout_avatar"
+		android:layout_width="54dp"
+		android:layout_height="54dp"
+		android:layout_marginLeft="5dp" 
+		android:paddingTop="3dp"
+		android:layout_toRightOf="@id/shared_folder_contact_checkbox">
+		
+	    <nz.mega.components.RoundedImageView 
+	         android:id="@+id/shared_folder_contact_thumbnail"
+	         android:layout_width="54dp"
+	         android:layout_height="54dp"
+	         android:scaleType="fitCenter"
+	         rounded:corner_radius="27dp" 
+	         rounded:border_width="2dp"
+	         rounded:border_color="@color/border_file_properties"/>
+	    
+	    <TextView
+	        android:id="@+id/shared_folder_contact_initial_letter"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent" 
+	        android:layout_centerInParent="true"
+		    android:gravity="center_horizontal|center_vertical" />
+    
+    </RelativeLayout>
     
     <TextView
         android:id="@+id/shared_folder_contact_name"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_toRightOf="@id/shared_folder_contact_thumbnail"
+        android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
         android:paddingLeft="5dp"
         android:paddingTop="7dp"
          android:textStyle="bold" />
@@ -39,7 +53,7 @@
         android:id="@+id/shared_folder_contact_permissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/shared_folder_contact_thumbnail"
+        android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
         android:layout_below="@id/shared_folder_contact_name"
         android:textColor="@color/file_list_second_row"
         android:paddingLeft="5dp"
