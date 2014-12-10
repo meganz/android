@@ -272,11 +272,9 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
 			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
+			buttonsLayout.setVisibility(View.GONE);
 			leftNewFolder.setVisibility(View.GONE);
 			rightUploadButton.setVisibility(View.GONE);
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
 			
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.OUTGOING_SHARES_ADAPTER);
@@ -352,10 +350,10 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);			
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
+			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);		
+			buttonsLayout.setVisibility(View.GONE);
+			leftNewFolder.setVisibility(View.GONE);
+			rightUploadButton.setVisibility(View.GONE);
 	        
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
@@ -558,8 +556,6 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 						listView.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
 						emptyTextView.setVisibility(View.VISIBLE);
-						leftNewFolder.setVisibility(View.VISIBLE);
-						rightUploadButton.setVisibility(View.VISIBLE);
 
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
@@ -573,8 +569,6 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 						listView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
-						leftNewFolder.setVisibility(View.GONE);
-						rightUploadButton.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -910,8 +904,7 @@ public void sortByNameDescending(){
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
+
 				return 3;
 			}
 			else if (deepBrowserTree>0){
@@ -925,8 +918,6 @@ public void sortByNameDescending(){
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 					
 					aB.setTitle(parentNode.getName());					
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);				
@@ -948,8 +939,6 @@ public void sortByNameDescending(){
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
 				((ManagerActivity)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 				deepBrowserTree=0;
 				return 0;
@@ -972,15 +961,9 @@ public void sortByNameDescending(){
 					listView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 					
-					
-
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-
-					
+					aB.setTitle(parentNode.getName());					
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);					
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
