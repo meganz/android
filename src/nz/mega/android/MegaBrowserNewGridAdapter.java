@@ -239,6 +239,14 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			if (showTrash){
+				if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
+					menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_move_to_trash));
+				}
+				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER){
+					menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_remove));
+				}
+			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			
 			return false;
@@ -282,6 +290,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
 		positionClicked = -1;
+		notifyDataSetChanged();
 		
 		contentText.setText(getInfoFolder(megaApi.getNodeByHandle(parentHandle)));
 		
@@ -289,8 +298,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			listFragment.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			leftNewFolder.setVisibility(View.VISIBLE);
-			rightUploadButton.setVisibility(View.VISIBLE);
+			if (leftNewFolder != null){
+				leftNewFolder.setVisibility(View.VISIBLE);
+				rightUploadButton.setVisibility(View.VISIBLE);
+			}
 
 			if (megaApi.getRootNode().getHandle()==parentHandle) {
 				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
@@ -304,8 +315,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			listFragment.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
+			if (leftNewFolder != null){
+				leftNewFolder.setVisibility(View.GONE);
+				rightUploadButton.setVisibility(View.GONE);
+			}
 		}
 	}
 	

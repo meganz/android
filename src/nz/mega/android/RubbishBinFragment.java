@@ -13,13 +13,16 @@ import nz.mega.sdk.MegaShare;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,11 +40,13 @@ import android.widget.TextView;
 
 public class RubbishBinFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
 
+	public static int GRID_WIDTH =400;
+	
 	Context context;
 	ActionBar aB;
 	ListView listView;
 	MegaBrowserListAdapter adapterList;
-	MegaBrowserGridAdapter adapterGrid;
+	MegaBrowserNewGridAdapter adapterGrid;
 	public RubbishBinFragment rubbishBinFragment = this;
 	
 	boolean isList = true;
@@ -52,6 +57,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
+	TextView contentText;
 	
 	MegaApiAndroid megaApi;
 	
@@ -120,9 +126,14 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					((ManagerActivity) context).moveToTrash(handleList);
 					break;
 				}
-				
-				
-				
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}
 			}
 			return false;
 		}
@@ -180,11 +191,47 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			menu.findItem(R.id.cab_menu_copy).setVisible(showCopy);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
+			if (showTrash){
+				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_remove));
+			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			
 			return false;
 		}
 		
+	}
+	
+	public boolean showSelectMenuItem(){
+		if (isList){
+			if (adapterList != null){
+				return adapterList.isMultipleSelect();
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				return adapterGrid.isMultipleSelect();
+			}
+		}
+		
+		return false;
+	}
+	
+	public void selectAll(){
+		if (isList){
+			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+	
+			adapterList.setMultipleSelect(true);
+			for ( int i=0; i< adapterList.getCount(); i++ ) {
+				listView.setItemChecked(i, true);
+			}
+			updateActionModeTitle();
+			listView.setOnItemLongClickListener(null);
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.selectAll();
+			}
+		}
 	}
 	
 	@Override
@@ -247,6 +294,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
+			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
 			}
@@ -257,9 +305,13 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));
+				MegaNode infoNode = megaApi.getRubbishNode();
+				contentText.setText(getInfoFolder(infoNode));
 			}
 			else{
 				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				contentText.setText(getInfoFolder(infoNode));
 			}
 			
 			adapterList.setPositionClicked(-1);
@@ -273,6 +325,29 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
+			
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+			
+		    float scaleW = Util.getScaleW(outMetrics, density);
+		    float scaleH = Util.getScaleH(outMetrics, density);
+		    
+		    int totalWidth = outMetrics.widthPixels;
+		    int totalHeight = outMetrics.heightPixels;
+		    
+		    int numberOfCells = totalWidth / GRID_WIDTH;
+		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+		    	if (numberOfCells < 3){
+					numberOfCells = 3;
+				}	
+		    }
+		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+		    	if (numberOfCells < 2){
+					numberOfCells = 2;
+				}	
+		    }
 				        
 	        listView = (ListView) v.findViewById(R.id.rubbishbin_grid_view);
 	        listView.setOnItemClickListener(null);
@@ -282,9 +357,10 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
+			contentText = (TextView) v.findViewById(R.id.rubbishbin_content_grid_text);
 			
 			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
+				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.RUBBISH_BIN_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
@@ -293,11 +369,15 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));
+				MegaNode infoNode = megaApi.getRubbishNode();
+				contentText.setText(getInfoFolder(infoNode));
 			}
 			else{
 				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				contentText.setText(getInfoFolder(infoNode));
 			}
-				        
+			
 			adapterGrid.setPositionClicked(-1);
 			listView.setAdapter(adapterGrid);
 			
@@ -306,6 +386,30 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			//TODO comprobar la vista vacía
 			
 			return v;
+//			
+//			if (adapterGrid == null){
+//				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
+//			}
+//			else{
+//				adapterGrid.setParentHandle(parentHandle);
+//				adapterGrid.setNodes(nodes);
+//			}
+//			
+//			if (parentHandle == megaApi.getRubbishNode().getHandle()){
+//				aB.setTitle(getString(R.string.section_rubbish_bin));
+//			}
+//			else{
+//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+//			}
+//				        
+//			adapterGrid.setPositionClicked(-1);
+//			listView.setAdapter(adapterGrid);
+//			
+//			setNodes(nodes);
+//			
+//			//TODO comprobar la vista vacía
+//			
+//			return v;
 		}
 	}
 	
@@ -362,6 +466,8 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = nodes.get(position).getHandle();
+					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					contentText.setText(getInfoFolder(infoNode));
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 					adapterList.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -526,8 +632,21 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterList.setNodes(nodes);
-					listView.setSelection(0);
+					listView.post(new Runnable() 
+				    {
+				        @Override
+				        public void run() 
+				        {
+				        	listView.setSelection(0);
+				            View v = listView.getChildAt(0);
+				            if (v != null) 
+				            {
+				                v.requestFocus();
+				            }
+				        }
+				    });
 					adapterList.setParentHandle(parentHandle);
+					contentText.setText(getInfoFolder(parentNode));
 					return 2;
 				}
 				else{
@@ -565,13 +684,73 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					adapterGrid.setNodes(nodes);
-					listView.setSelection(0);
+					listView.post(new Runnable() 
+				    {
+				        @Override
+				        public void run() 
+				        {
+				        	listView.setSelection(0);
+				            View v = listView.getChildAt(0);
+				            if (v != null) 
+				            {
+				                v.requestFocus();
+				            }
+				        }
+				    });
 					adapterGrid.setParentHandle(parentHandle);
+					contentText.setText(getInfoFolder(parentNode));
+					contentText.setText(getInfoFolder(parentNode));
 					return 2;
 				}
 				else{
 					return 0;
 				}
+			}
+		}
+	}
+	
+	private String getInfoFolder(MegaNode n) {
+		int numFolders = megaApi.getNumChildFolders(n);
+		int numFiles = megaApi.getNumChildFiles(n);
+
+		String info = "";
+		if (numFolders > 0) {
+			info = numFolders
+					+ " "
+					+ context.getResources().getQuantityString(
+							R.plurals.general_num_folders, numFolders);
+			if (numFiles > 0) {
+				info = info
+						+ ", "
+						+ numFiles
+						+ " "
+						+ context.getResources().getQuantityString(
+								R.plurals.general_num_files, numFiles);
+			}
+		} else {
+			info = numFiles
+					+ " "
+					+ context.getResources().getQuantityString(
+							R.plurals.general_num_files, numFiles);
+		}
+
+		return info;
+	}
+	
+	public void setContentText(){
+		
+		if (parentHandle == megaApi.getRubbishNode().getHandle()){
+			MegaNode infoNode = megaApi.getRubbishNode();
+			if (infoNode !=  null){
+				contentText.setText(getInfoFolder(infoNode));
+				aB.setTitle(getString(R.string.section_rubbish_bin));
+			}
+		}
+		else{
+			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+			if (infoNode !=  null){
+				contentText.setText(getInfoFolder(infoNode));
+				aB.setTitle(infoNode.getName());
 			}
 		}
 	}
