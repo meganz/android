@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA هي سحابة تخزين تتمتع دائما بقوة الخصوصية. 50GB مجانا</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">الحجم الإجمالي</string>
@@ -59,38 +59,66 @@
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">لقد تم تصدير المفتاح الرئيسي إلى:</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+         <item context="Plural of file. 2 files" quantity="zero">ملفات</item>
         <item context="Singular of file. 1 file" quantity="one">ملف</item>
+        <item context="Plural of file. 2 files" quantity="two">ملفات</item>
+        <item context="Plural of file. 2 files" quantity="few">ملفات</item>
+        <item context="Plural of file. 2 files" quantity="many">ملفات</item>
         <item context="Plural of file. 2 files" quantity="other">ملفات</item>
     </plurals>
     
      <plurals name="general_num_contacts">
+         <item quantity="zero" context="Title of the contact list">جهات الاتصال</item>
         <item quantity="one" context="referring to a contact in the contact list of the user">جهة الاتصال</item>
+        <item quantity="two" context="Title of the contact list">جهات الاتصال</item>
+        <item quantity="few" context="Title of the contact list">جهات الاتصال</item>
+        <item quantity="many" context="Title of the contact list">جهات الاتصال</item>
         <item quantity="other" context="Title of the contact list">جهات الاتصال</item>
     </plurals>
     
     <plurals name="general_num_folders">
+        <item quantity="zero" context="zero">المجلدات</item>
         <item quantity="one" context="Singular of folder/directory. 1 folder">مجلد</item>
-        <item quantity="other" context="Plural of folder/directory. 2 folders">المجلدات</item>
+        <item quantity="two" context="two">المجلدات</item>
+        <item quantity="few" context="few">المجلدات</item>
+        <item quantity="many" context="many">المجلدات</item>
+        <item quantity="other" context="Plural of folder/directory.">المجلدات</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
+        <item quantity="zero" context="Title of the incoming shared folders of a user in plural.">المجلدات المشاركة</item>
         <item quantity="one" context="Title of the incoming shared folders of a user in singular">المجلد المشارك</item>
+        <item quantity="two" context="Title of the incoming shared folders of a user in plural.">المجلدات المشاركة</item>
+        <item quantity="few" context="Title of the incoming shared folders of a user in plural.">المجلدات المشاركة</item>
+        <item quantity="many" context="Title of the incoming shared folders of a user in plural.">المجلدات المشاركة</item>
         <item quantity="other" context="Title of the incoming shared folders of a user in plural.">المجلدات المشاركة</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="zero" context="Item menu option upon clicking on one or multiple files. zero">downloads</item>
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">التحميل</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="two" context="Item menu option upon clicking on one or multiple files. two">downloads</item>
+        <item quantity="few" context="Item menu option upon clicking on one or multiple files. few">downloads</item>
+        <item quantity="many" context="Item menu option upon clicking on one or multiple files. many">downloads</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
     </plurals>
     
     <plurals name="general_num_uploads">
+        <item quantity="zero" context="Transfer type description in the active file transfer panel, can either be upload or download. Zero">الملفات المرفوعه</item>
         <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">رفع</item>
+        <item quantity="two" context="Transfer type description in the active file transfer panel, can either be upload or download. Two">الملفات المرفوعه</item>
+        <item quantity="few" context="Transfer type description in the active file transfer panel, can either be upload or download. Few">الملفات المرفوعه</item>
+        <item quantity="many" context="Transfer type description in the active file transfer panel, can either be upload or download. Many">الملفات المرفوعه</item>
         <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">الملفات المرفوعه</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="zero" context="used for example when a folder is shared with 0 users">اعضاء</item>
         <item quantity="one" context="used for example when a folder is shared with 1 user">عضو</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">اعضاء</item>
+        <item quantity="two" context="used for example when a folder is shared with 2 users">اعضاء</item>
+        <item quantity="few" context="used for example when a folder is shared with more users">اعضاء</item>
+        <item quantity="many" context="used for example when a folder is shared with more users">اعضاء</item>
+        <item quantity="other" context="used for example when a folder is shared with more users">اعضاء</item>
     </plurals>
     
     
@@ -121,7 +149,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">إنشاء حساب</string>
     <string name="name_text" context="Name of the user">الاسم</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">أنا أتفق معMEGA<a href=\"https://mega.co.nz/mobile_privacy.html\"> MEGA شروط الخدمة </A></string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">أنا أتفق معMEGA&lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt; MEGA شروط الخدمة &lt;/a&gt;</string>
     <string name="already_account" context="Does the user already have a MEGA account">هل لديك حساب؟</string>
     
     <string name="create_account_no_terms" context="warning dialog">ينبغي عليك أن تقبل شروط الخدمة.</string>

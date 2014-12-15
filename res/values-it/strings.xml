@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Dimensione Totale</string>
@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
     <string name="name_text" context="Name of the user">name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\\'s <a href=&quot;https://mega.co.nz/mobile_privacy.html&quot;>Terms of Service</a></string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s &lt;a href=&quot;https://mega.co.nz/mobile_privacy.html&quot;&gt;Terms of Service&lt;/a&gt;</string>
     <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
     
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service.</string>
@@ -169,7 +169,7 @@
 	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Link pubblico</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Accesso completo</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read & write</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Sola lettura</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
@@ -186,7 +186,7 @@
 	
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below.</string>	
 	
-	<string name="error_not_enough_free_space" context="Error message">Non c\\'è abbastanza spazio libero</string>
+	<string name="error_not_enough_free_space" context="Error message">Non c\'è abbastanza spazio libero</string>
 	
 	<string name="download_failed" context="Error message">Download fallito</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">Scaricato</string>
@@ -196,7 +196,7 @@
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Vuoi annullare il download?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Tocca per annullare il download</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">La maggior parte dei dispositivi non può scaricare files più grandi di 4GB. Il download probabilmente fallirà.</string>
-    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">There isn\\'t any available app to execute this file on your device</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">There isn\'t any available app to execute this file on your device</string>
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
@@ -264,14 +264,14 @@
 	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Scegli da File System</string>
 	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Seleziona il tipo di file</string>
 	<string name="upload_uploading" context="status text">Caricamento</string>
-	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Tocca per annullare l\\'upload</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Tocca per annullare l\'upload</string>
 	<string name="upload_failed" context="error message">Upload fallito</string>
 	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">caricato</string>
 	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Vuoi annullare il caricamento?</string>
 	<string name="upload_prepare" context="Status text at the beginning of an upload">File in elaborazione</string>
 	<string name="error_temporary_unavaible" context="error message when downloading a file">Risorsa temporaneamente non disponibile, riprova più tardi</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Impossibile aprire il file selezionato</string>
-	<string name="upload_began" context="when an upload starts, a message is shown to the user">L\\'upload è iniziato</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">L\'upload è iniziato</string>
 	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
 		
 	<string name="error_io_problem" context="error message while browsing the local filesystem">Problema filesystem</string>

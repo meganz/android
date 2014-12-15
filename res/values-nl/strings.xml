@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is cloud opslag met krachtige always-on privacy. 50 GB gratis</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Totale grootte</string>
@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Maak een account aan</string>
     <string name="name_text" context="Name of the user">naam</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Ik ga akkoord met MEGA\\'s <a href=\"https://mega.co.nz/mobile_privacy.html\">Servicevoorwaarden</a></string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Ik ga akkoord met MEGA\'s &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;Servicevoorwaarden&lt;/a&gt;</string>
     <string name="already_account" context="Does the user already have a MEGA account">Heb je al een account?</string>
     
     <string name="create_account_no_terms" context="warning dialog">Je moet onze algemene gebruikersvoorwaarden accepteren.</string>
@@ -169,7 +169,7 @@
 	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Geen publieke link</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Publieke link</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Volledige toegang</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lezen & Schrijven</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lezen &amp; Schrijven</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Alleen-lezen</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Gedeeld met:</string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Machtigingen:</string>
@@ -347,15 +347,15 @@
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Bestand Uploaden</string>
     
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
-        <item context="the options of what to upload.">Alleen foto\\'s</item>
-        <item context="the options of what to upload.">Alleen video\\'s</item>
-        <item context="the options of what to upload.">Foto\\'s en video\\'s</item>
+        <item context="the options of what to upload.">Alleen foto\'s</item>
+        <item context="the options of what to upload.">Alleen video\'s</item>
+        <item context="the options of what to upload.">Foto\'s en video\'s</item>
     </string-array>
     
     <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Camera map</string>
-    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Alleen foto\\'s</string>
-    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Alleen video\\'s</string>
-    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto\\'s en video\\'s</string>
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Alleen foto\'s</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Alleen video\'s</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto\'s en video\'s</string>
     
     <string name="settings_pin_lock_on" context="settings of the pin lock">Schakel PIN Slot in</string>
     <string name="settings_pin_lock_off" context="settings of the pin lock">Schakel PIN Slot uit</string>

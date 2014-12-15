@@ -4,8 +4,8 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן בעל פרטיות מושלמת. 50 ג\\'יגה בייט בחינם.</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA הינו שירות אחסון בענן בעל פרטיות מושלמת. 50 ג\'יגה בייט בחינם.</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">משקל כולל</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">מתוך</string>
@@ -60,37 +60,51 @@
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">קובץ</item>
-        <item context="Plural of file. 2 files" quantity="other">קבצים</item>
+        <item context="Plural of file. 2 files" quantity="two">קבצים</item>
+        <item context="Plural of file. Many files" quantity="many">קבצים</item>
+        <item context="Plural of file. Plural files" quantity="other">קבצים</item>
     </plurals>
     
      <plurals name="general_num_contacts">
         <item quantity="one" context="referring to a contact in the contact list of the user">איש קשר</item>
+        <item quantity="two" context="Title of the contact list">אנשי קשר</item>
+        <item quantity="many" context="Title of the contact list">אנשי קשר</item>
         <item quantity="other" context="Title of the contact list">אנשי קשר</item>
     </plurals>
     
     <plurals name="general_num_folders">
         <item quantity="one" context="Singular of folder/directory. 1 folder">תיקייה</item>
-        <item quantity="other" context="Plural of folder/directory. 2 folders">תיקיות</item>
+        <item quantity="two" context="Plural of folder/directory. 2 folders">תיקיות</item>
+        <item quantity="many" context="Plural of folder/directory. Many folders">תיקיות</item>
+        <item quantity="other" context="Plural of folder/directory. PLural folders">תיקיות</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
         <item quantity="one" context="Title of the incoming shared folders of a user in singular">תיקייה משותפת</item>
+        <item quantity="two" context="Title of the incoming shared folders of a user in plural.">תיקיות משותפות</item>
+        <item quantity="many" context="Title of the incoming shared folders of a user in plural.">תיקיות משותפות</item>
         <item quantity="other" context="Title of the incoming shared folders of a user in plural.">תיקיות משותפות</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">הורד</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="two" context="Item menu option upon clicking on one or multiple files. Singular">הורד</item>
+        <item quantity="many" context="Item menu option upon clicking on one or multiple files. Singular">הורד</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Singular">הורד</item>
     </plurals>
     
     <plurals name="general_num_uploads">
         <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">העלה</item>
+        <item quantity="two" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">העלאות</item>
+        <item quantity="many" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">העלאות</item>
         <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">העלאות</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
         <item quantity="one" context="used for example when a folder is shared with 1 user">משתמש</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">משתמשים</item>
+        <item quantity="two" context="used for example when a folder is shared with 2 users">משתמשים</item>
+        <item quantity="many" context="used for example when a folder is shared with more users">משתמשים</item>
+        <item quantity="other" context="used for example when a folder is shared with more users">משתמשים</item>
     </plurals>
     
     
@@ -121,7 +135,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">צור חשבון</string>
     <string name="name_text" context="Name of the user">שם</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">אני מסכים עם <a href=\"https://mega.co.nz/mobile_privacy.html\">תנאי השימוש</a> של MEGA</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">אני מסכים עם &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;תנאי השימוש&lt;/a&gt; של MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">כבר יש לך חשבון?</string>
     
     <string name="create_account_no_terms" context="warning dialog">הינך חייב להסכים לתנאי השירות שלנו.</string>
@@ -195,7 +209,7 @@
     <string name="download_began" context="message when the download starts">ההורדה החלה</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">האם ברצונך לבטל את ההורדה?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">גע בכדי לבטל את ההורדה</string>
-    <string name="error_file_size_greater_than_4gb" context="Warning message">רוב המכשירים אינם תומכים בהורדה מעל 4 ג\\'יגה בייט.ככל הנראה פעולה זו תיכשל.</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">רוב המכשירים אינם תומכים בהורדה מעל 4 ג\'יגה בייט.ככל הנראה פעולה זו תיכשל.</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">לא נמצאה אפליקציה על מנת להפעיל סוג קובץ זה</string>
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">שתף תמונה בעזרת</string>

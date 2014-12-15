@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">메가는 항상 작동하는 개인정보 보호 기능이 있는 클라우드 저장소입니다. 50GB는 무료입니다.</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">총 크기</string>
@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">계정 생성</string>
     <string name="name_text" context="Name of the user">이름</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">메가의 <a href=\"https://mega.co.nz/mobile_privacy.html\">이용약관</a>에 동의합니다</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">메가의 &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;이용약관&lt;/a&gt;에 동의합니다</string>
     <string name="already_account" context="Does the user already have a MEGA account">이미 계정이 있으신가요?</string>
     
     <string name="create_account_no_terms" context="warning dialog">우리의 이용 약관에 동의하여야 합니다.</string>
@@ -169,7 +169,7 @@
 	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">공개 링크 없음</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">공개 링크</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">완전 접근</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">읽기 & 쓰기</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">읽기 &amp; 쓰기</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">읽기 전용</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">공유된 사람:</string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">권한:</string>
