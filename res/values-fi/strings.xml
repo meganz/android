@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" context="Not translate">MEGA_COM</string>
+    <string name="app_version" context="Not translate">0.43</string>
+    
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA on pilvitallennuspalvelu tehokkaalla aina päällä-yksityisyydellä. 50 GB ilmaiseksi</string>
+    
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Koko</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">sta</string>
+    <string name="general_yes" context="Answer for confirmation dialog.">Kyllä</string>
+    <string name="general_no" context="Answer for confirmation dialog.">Ei</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">Peruuta</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Siirrä kohteeseen</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Kopioi</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Tuo kohteeseen</string>
+    <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Valitse</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Luo</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Lähetä tiedosto</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Lataa</string>
+    <string name="general_add" context="button">Lisää</string>
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Tyhjennä</string>
+    <string name="general_loading" context="state previous to import a file">Ladataan...</string>
+    <string name="general_importing" context="state while importing the file">Tuodaan...</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Tuo</string>
+    <string name="general_updating" context="state while upgrading the account">Päivitetään...</string>  
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Levytilaa</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Liikennöintiä</string>
+    <string name="general_error_word" context="It will be followed by the error message">Virhe</string> 
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Ei vielä toteutettu</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Jo ladattu</string>
+    
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Olet poistamassa vietyä isäntäavaintiedostoa</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Turvallisuusvaroitus! Tämä on korkean riskin toiminto. Haluatko jatkaa?</string> 
+     
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Lisää asetuksia...</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Haluatko poistaa kontaktin</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    
+    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Saapuvat jaot</string>
+    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Lähtevät jaot</string>
+    <string name="action_logout" context="Button where the user can sign off or logout">Kirjaudu ulos</string>
+    <string name="action_add" context="Menu item">Lähetä...</string>
+    <string name="action_create_folder" context="Menu item">Luo uusi kansio</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Lähetä kohteeseen</string>
+    <string name="action_settings" context="Menu item">Asetukset</string>
+    <string name="action_search" context="Search button">Hae</string>
+    <string name="action_refresh" context="Menu item">Päivitä</string>
+    <string name="action_sort_by" context="Menu item">[$2203]</string>
+    <string name="action_help" context="Menu item">Apua</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Päivitä tili</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Valitse kaikki</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Poista kaikki valinnat</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Pikkukuvanäkymä</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">Listanäkymä</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Vie isäntäavain</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Poista isäntäavain</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Isäntäavain vietiin:</string>
+        
+     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">tiedosto</item>
+        <item context="Plural of file. 2 files" quantity="other">tiedostoa</item>
+    </plurals>
+    
+     <plurals name="general_num_contacts">
+        <item quantity="one" context="referring to a contact in the contact list of the user">kontakti</item>
+        <item quantity="other" context="Title of the contact list">kontaktit</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one" context="Singular of folder/directory. 1 folder">kansio</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">kansiota</item>
+    </plurals>
+    
+   <plurals name="general_num_shared_folders">
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">Jaettu kansio</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">jaetut kansiot</item>
+    </plurals>
+    
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">lataa</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">lähetä</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">lähetykset</item>
+    </plurals>
+    
+     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="one" context="used for example when a folder is shared with 1 user">käyttäjä</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">käyttäjät</item>
+    </plurals>
+    
+    
+    <string name="login_text" context="Login button">Kirjaudu</string>
+    <string name="email_text" context="email label">sähköposti</string>
+    <string name="password_text" context="password label">salasana</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Vahvista salasana</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Uusi MEGA-käyttäjä?</string>
+    <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
+    <string name="tour_text_2" context="Not translate. design text">Sed ut perspiciatis unde omnis iste natus</string>
+    <string name="create_account" context="label and text button when creating the account">Luo tili</string>
+    <string name="login_logging_in" context="label when logging in to MEGA">Sisäänkirjautuminen</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Ole hyvä ja syötä sähköpostiosoitteesi</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Virheellinen sähköpostiosoitteen muoto</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Syötä salasanasi</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Ongelma verkkoyhteydessä, ole hyvä ja yritä myöhemin uudestaan</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Lasketaan salausavaimia</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Yhdistetään palvelimelle</string>
+    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Virheellinen sähköposti tai salasana. Tarkista sähköposti</string>    
+    <string name="download_updating_filelist" context="Status text when updating the file manager">Päivitetään tiedostoluetteloa</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Vahvista tili</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Tarkistetaan todennuslinkkiä</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Tilin aktivointi</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Valmistellaan tiedostolistausta</string>
+    
+    
+    <string name="create_account_text" context="button that allows the user to create an account">Luo tili</string>
+    <string name="name_text" context="Name of the user">nimi</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Hyväksyn MEGAn <a href=\"https://mega.co.nz/mobile_privacy.html\">käyttöehdot/a></string>
+    <string name="already_account" context="Does the user already have a MEGA account">Onko sinulla jo tili?</string>
+    
+    <string name="create_account_no_terms" context="warning dialog">Sinun tulee hyväksyä käyttöehtomme.</string>
+	<string name="error_enter_username" context="Warning dialog">Anna nimesi.</string>
+    <string name="error_short_password" context="when creating the account">Salasana on liian lyhyt</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Salasanat eivät täsmää</string>
+    <string name="error_email_registered" contect="when creating the account">Tällä sähköpostilla on jo rekisteröity tili MEGAan.</string>
+    
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Vahvistus vaaditaan</string>
+    <string name="create_account_confirm" context="">Tarkista sähköpostisi ja paina sisäänkirjautumislinkkiä vahvistaaksesi käyttäjätilisi</string>
+    <string name="create_account_creating_account">[$2243]</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Tallennettu offlineen</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Jaettu kanssani</string>
+	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Roskakori</string>
+	<string name="section_contacts" context="Title of the contact list">Kontaktit</string>
+	<string name="tab_contacts" context="Title of the contact tab. Capital letters">KONTAKTIT</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">LÄHETETYT PYYNNÖT</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">VASTAANOTETUT PYYNNÖT</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">Ei lähetettyjä pyyntöjä</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">Ei vastaanotettuja pyyntöjä</string>
+	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Siirrot</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">Tilini</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Kameralähetykset</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s %1$s sta</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">SAAPUVAT</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">LÄHTEVÄT</string>
+	
+	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Ei tiedostoja pilvilevylläsi</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Tyhjennä roskakori</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Ei saapuvia jaettuja kansioita</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Ei lähteviä jaettuja kansioita</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Tyhjä kansio</string>
+	
+	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Ominaisuudet</string>
+	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Saatavilla offlinessa</string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">PÄÄLLÄ</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">POIS</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Koko:</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Sisältö:</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">Lisätty:</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Muokattu:</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Ei julkista linkkiä</string>
+	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Julkinen linkki</string>
+	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Täysi pääsy</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lue & kirjoita</string>
+	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Vain luku</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Jaettu:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Oikeudet:</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">Vaihda oikeuksia</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">Jaa</string>
+	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Jaettu</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Lähetä käyttäjälle</string>
+	
+	<string name="contact_properties_activity" context="title of the contact properties screen">Kontaktin tiedot</string>
+	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Sisältö</string>
+	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Jaetut kansiot:</string>
+	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Lisää uusia kontakteja alla olevalla painikkeella.</string>	
+	
+	<string name="error_not_enough_free_space" context="Error message">Ei tarpeeksi ilmaistilaa</string>
+	
+	<string name="download_failed" context="Error message">Lataus epäonnistui</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">ladattu</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Ladataan</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Valmistellaan tiedostoja</string>
+    <string name="download_began" context="message when the download starts">Ladataan</string>
+    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Keskeytä lataus?</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">Paina keskeyttääksesi lataus</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">Useimmat laitteet voivat ladata korkeintaan 4GB suuruisia tiedostoja. Latauksesi todennäköisesti epäonnistuu.</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Laittellesi ei ole saatavilla sovellusta, jolla tämä tiedosto voitaisiin suorittaa</string>
+	
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Jaa kuva käyttäen</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Jaa linkki</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Hanki linkki</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Nimeä uudelleen</string>
+    <string name="context_renaming" context="while renaming a file or folder">Nimetään uudelleen</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Lataa</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Siirrä</string>
+    <string name="context_moving" context="while moving a file or folder">Siirretään</string>
+    <string name="context_sharing" context="while sharing a folder">Jaetaan kansiota</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Kopioi</string>
+    <string name="context_copying" context="while copying a file or folder">Kopioidaan</string>
+    <string name="context_creating_link" context="status text">Luodaan linkkiä</string>
+    <string name="context_moving_to_trash" context="status text">Siirretään roskakoriin</string>
+    <string name="context_move_to_trash" context="menu item">Siirrä roskakoriin</string>
+    <string name="context_delete_from_mega" context="menu item">Poista MEGAsta</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Kansion nimi</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Kontaktin sähköposti</string>
+    <string name="context_creating_folder" context="status">Luodaan kansiota...</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">Lisätään kontaktia</string>
+    <string name="context_download_to" context="Menu item">Tallenna</string>
+    <string name="context_clear_rubbish" context="Menu option">Tyhjennä roskakori</string>
+    <string name="context_send_link" context="get the link and send it">Lähetä linkki</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Poista</string>
+    <string name="context_share_folder" context="menu item">Jaa kansio</string>
+    <string name="context_view_shared_folders" context="open a shared folder">Näytä jaetut kansiot</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Jakaminen</string>
+    <string name="remove_all_sharing" context="status text">Poistetaan kaikkia jakavia kontakteja</string>
+	<string name="leave_incoming_share" context="status text">Jätetään jaettu kansio</string>
+    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Kamerakansio</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA-kontaktit</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Puhelinkontaktit</string>
+    <string name="context_delete" context="menu item">Poista</string>
+    <string name="context_contact_added" context="success message when adding a contact">Kontakti lisätty</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Kontakti poistettu</string>
+    <string name="context_contact_not_removed" context="error message">Virhe. Kontaktia ei poistettu</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">Oikeudet muutettu</string>
+    <string name="context_permissions_not_changed" context="error message">Virhe. Oikeuksia ei muutettu</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Kansio on jo olemassa</string>
+    <string name="context_folder_created" context="success message when creating a folder">Kansio luotu</string>
+    
+    <string name="context_correctly_renamed" context="success message when renaming a node">Uudelleennimetty</string>
+    <string name="context_no_renamed" context="error message">Virhe. Ei uudelleennimetty</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Kopioitu</string>
+    <string name="context_no_copied" context="error message">Virhe. Ei kopioitu</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Siirretty</string>
+    <string name="context_no_moved" context="error message">Virhe. Ei siirretty</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Jaettu</string>
+    <string name="context_no_shared" context="error message">Virhe. Ei jaettu.</string>
+    <string name="context_no_link" context="error message">Linkin hakeminen mahdotonta</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Poistettu MEGAsta</string>
+    <string name="context_no_removed" context="error message">Virhe. Ei poistettu MEGAsta</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Lähetetty:</string>
+    
+    <string name="context_node_private" context="success message after removing the public link of a folder">Kansio on nyt yksityinen</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Jako poistettu</string>
+  
+    <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Uusi kansio</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Lisää kontakti</string>
+    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Lataa MEGAn linkistä</string>
+    
+    <string name="upload_to_image" context="upload to. Then choose an Image file">Kuva</string>
+	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Ääni</string>
+	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Valitse tiedostojärjestelmästä</string>
+	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Valitse tiedostotyyppi</string>
+	<string name="upload_uploading" context="status text">Lähetetään</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Paina keskeyttääksesi lähetys</string>
+	<string name="upload_failed" context="error message">Tiedoston lähettäminen epäonnistui</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">lähetetty</string>
+	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Haluatko keskeyttää lähetyksen?</string>
+	<string name="upload_prepare" context="Status text at the beginning of an upload">Käsitellään tiedostoa</string>
+	<string name="error_temporary_unavaible" context="error message when downloading a file">Kohde ei saatavilla tällä hetkellä, ole hyvä ja yritä myöhemmin uudestaan</string>
+	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Valittua tiedostoa ei voitu avata</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">Lähetys on käynnistynyt</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">ZIP-tiedostoa puretaan</string>
+		
+	<string name="error_io_problem" context="error message while browsing the local filesystem">Ongelma tiedostojärjestelmässä</string>
+	
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Kuvakatselija</string>
+	
+	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Virheellinen linkkimuoto</string>
+	
+	<string name="my_account_activity" context="Title of the screen where the user account information is shown">Tili</string>
+    <string name="my_account_total_space" context="Headline for the amount of total storage space">Tallennustila</string>
+    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Vapaa tila</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Käytetty tila</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Päivitä nyt!</string>
+    <string name="my_account_change_password" context="menu item">Vaihda salasana</string>
+    
+    <string name="my_account_last_session" context="when did the last session happen">Viime istunto:</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Yhteydet:</string>
+    
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">Vaihdetaan salasanaa</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Nykyinen salasana</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">Uusi salasana</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">Vahvista uusi salasana</string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Virheellinen salasana tai uudet salasanat eivät täsmää. Ole hyvä ja yritä uudestaan.</string>
+    <string name="my_account_change_password_OK" context="Success text">Salasana vaihdettu onnistuneesti</string>
+    
+    <string name="upgrade_activity" context="title of the Upgrade screen">Pro-jäsenyys</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Valitse jäsenyys</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">Kuukausittainen tai vuosittainen uusiutuva</string>
+    <string name="select_membership_2" context="button to go to Paypal">PayPal-tilaus</string>
+    
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Kuukausittain*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Vuosittain*</string>
+    
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* toistuva tilaus voidaan peruuttaa koska tahansa ennen uusimispäivää</string>
+    
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">Linkki on kopioitu leikepöydälle</string>
+    
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Esikatselua ei olla vielä ladattu. Odota hetki.</string>
+    
+    <string name="import_correct" context="success message after import a file">Tuonti onnistui</string>
+    
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">Ei aktiivisia siirtoja</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Kaikki siirrot keskeytetty</string>
+    <string name="menu_pause_transfers" context="menu item">Keskeytä siirrot</string>
+    <string name="menu_restart_transfers" context="menu item">Jatka tiedonsiirtoja</string>
+    
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Vain Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi tai tiedonsiirtosopimus</string>
+    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="cam_sync_skip" context="skip the step of camera upload">Ohita</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Kameralähetys meneillään</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Haluatko peruuttaa kameralataukset?</string>
+    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Kohdekansio ei saatavilla</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Lähetetään kameran kuvia</string>
+    <string name="settings_camera_notif_error" context="notification error">Kameralähetysongelma</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Kameralähetykset valmiit</string>
+    
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Levytilaa</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN-lukko</string>
+    
+    <string name="settings_storage_download_location" context="title of the setting to set the default download location">Latauksen oletussijainti</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Kysy aina lataussijaintia</string>
+    
+    <string name="settings_camera_upload_on" context="settings option">Ota kameralähetykset käyttöön</string>
+    <string name="settings_camera_upload_off" context="settings option">Poista kameralähetykset käytöstä</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Kuinka lähettää</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi tai tiedonsiirtosopimus</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Vain Wi-Fi</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Tiedostolähetys</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">Vain valokuvat</item>
+        <item context="the options of what to upload.">Vain videot</item>
+        <item context="the options of what to upload.">Kuvat ja videot</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Kamerakansio</string>
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Vain valokuvat</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Vain videot</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Kuvat ja videot</string>
+    
+    <string name="settings_pin_lock_on" context="settings of the pin lock">Ota PIN-lukko käyttöön</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">Poista PIN-lukko käytöstä</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN-koodi</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Ei asetettu</string>
+    
+    <string name="pin_lock_enter" context="Button after the pin code input field">Syötä</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Virheellinen tunnuskoodi</string>
+    
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Tietoa</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">Sovellusversio</string>
+    
+    <string name="january">Tammikuu</string>
+    <string name="february">Helmikuu</string>
+    <string name="march">Maaliskuu</string>
+    <string name="april">Huhtikuu</string>
+    <string name="may">Toukokuu</string>
+    <string name="june">Kesäkuu</string>
+    <string name="july">Heinäkuu</string>
+    <string name="august">Elokuu</string>
+    <string name="september">Syyskuu</string>
+    <string name="october">Lokakuu</string>
+    <string name="november">Marraskuu</string>
+    <string name="december">Joulukuu</string>
+    
+    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">MEGA PDF-lukija</string>
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP-selain</string>
+    
+    <string name="my_account_title" context="title of the My Account screen">Tilityyppi:</string>
+    <string name="free_account">ILMAINEN</string>
+    <string name="pro1_account" context="Not translate">PRO I</string>
+    <string name="pro2_account" context="Not translate">PRO II</string>
+    <string name="pro3_account" context="Not translate">PRO III</string>
+    
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Kameralähetyskansio luotu</string>
+    
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">ZIP-tiedosto tullaan lataamaan ja purkamaan</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">ZIP-tiedosto tullaan purkamaan</string>
+    
+</resources>

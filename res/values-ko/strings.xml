@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" context="Not translate">MEGA_COM</string>
+    <string name="app_version" context="Not translate">0.43</string>
+    
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">메가는 항상 작동하는 개인정보 보호 기능이 있는 클라우드 저장소입니다. 50GB는 무료입니다.</string>
+    
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">총 크기</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">개째 진행중. 전체:</string>
+    <string name="general_yes" context="Answer for confirmation dialog.">예</string>
+    <string name="general_no" context="Answer for confirmation dialog.">아니요</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">취소</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">이동할 곳</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">복사할 곳</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">들여올 곳</string>
+    <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">선택</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">생성</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">파일 업로드</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">다운로드</string>
+    <string name="general_add" context="button">추가</string>
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">비우기</string>
+    <string name="general_loading" context="state previous to import a file">로딩중...</string>
+    <string name="general_importing" context="state while importing the file">들여오는중...</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">들여오기</string>
+    <string name="general_updating" context="state while upgrading the account">업데이트중...</string>  
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">저장소</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">대역폭</string>
+    <string name="general_error_word" context="It will be followed by the error message">오류</string> 
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">아직 실행되지 않음</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">이미 다운로드됨</string>
+    
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">내보내진 마스터 키 파일을 삭제하려고 합니다.</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">보안 경고! 매우 위험이 높은 동작입니다. 계속하시겠습니까?</string> 
+     
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">더 많은 옵션...</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">연락처를 삭제할까요?</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    
+    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">들어오는 공유</string>
+    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">나가는 공유</string>
+    <string name="action_logout" context="Button where the user can sign off or logout">로그아웃</string>
+    <string name="action_add" context="Menu item">업로드...</string>
+    <string name="action_create_folder" context="Menu item">새 폴더 생성</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">업로드할 곳</string>
+    <string name="action_settings" context="Menu item">설정</string>
+    <string name="action_search" context="Search button">검색</string>
+    <string name="action_refresh" context="Menu item">새로 고침</string>
+    <string name="action_sort_by" context="Menu item">[$2203]</string>
+    <string name="action_help" context="Menu item">도움말</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">계정 업그레이드</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">모두 선택</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">모든 선택 해제</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">썸네일 보기</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">목록 보기</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">마스터키 내보내기</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">마스터키 삭제</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">마스터키가 다음으로 내보내졌습니다:</string>
+        
+     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">파일</item>
+        <item context="Plural of file. 2 files" quantity="other">파일</item>
+    </plurals>
+    
+     <plurals name="general_num_contacts">
+        <item quantity="one" context="referring to a contact in the contact list of the user">연락처</item>
+        <item quantity="other" context="Title of the contact list">연락처</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one" context="Singular of folder/directory. 1 folder">폴더</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">폴더</item>
+    </plurals>
+    
+   <plurals name="general_num_shared_folders">
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">공유된 폴더</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">공유된 폴더</item>
+    </plurals>
+    
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">다운로드</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">업로드</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">업로드</item>
+    </plurals>
+    
+     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="one" context="used for example when a folder is shared with 1 user">이용자</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">이용자</item>
+    </plurals>
+    
+    
+    <string name="login_text" context="Login button">로그인</string>
+    <string name="email_text" context="email label">이메일</string>
+    <string name="password_text" context="password label">비밀번호</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">비밀번호 확인</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">가나다</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">MEGA에 처음이신가요?</string>
+    <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
+    <string name="tour_text_2" context="Not translate. design text">Sed ut perspiciatis unde omnis iste natus</string>
+    <string name="create_account" context="label and text button when creating the account">계정 만들기</string>
+    <string name="login_logging_in" context="label when logging in to MEGA">로그인 중</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">이메일 주소를 입력하세요</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">잘못된 이메일 주소</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">비밀번호를 입력하세요</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">네트워크 연결 문제, 나중에 다시 시도하세요</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">암호화 키 계산중</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">서버에 연결중</string>
+    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">이메일 또는 비밀번호가 틀렸습니다. 이메일 계정을 승인하셨나요?</string>    
+    <string name="download_updating_filelist" context="Status text when updating the file manager">파일 목록 업데이트중</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">계정 확인</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">인증 링크 확인중</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">활성중인 계정</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">파일 목록 준비중</string>
+    
+    
+    <string name="create_account_text" context="button that allows the user to create an account">계정 생성</string>
+    <string name="name_text" context="Name of the user">이름</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">메가의 <a href=\"https://mega.co.nz/mobile_privacy.html\">이용약관</a>에 동의합니다</string>
+    <string name="already_account" context="Does the user already have a MEGA account">이미 계정이 있으신가요?</string>
+    
+    <string name="create_account_no_terms" context="warning dialog">우리의 이용 약관에 동의하여야 합니다.</string>
+	<string name="error_enter_username" context="Warning dialog">이름을 입력하십시오.</string>
+    <string name="error_short_password" context="when creating the account">비밀번호가 너무 짧습니다</string>
+    <string name="error_passwords_dont_match" context="when creating the account">비밀번호가 일치하지 않습니다</string>
+    <string name="error_email_registered" contect="when creating the account">이 이메일 주소는 이미 메가에 등록되어있는 계정입니다.</string>
+    
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">확인이 필요함</string>
+    <string name="create_account_confirm" context="">이메일을 확인하시고 링크를 클릭하여 로그인하고 계정을 확인하시기 바랍니다.</string>
+    <string name="create_account_creating_account">[$2243]</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">오프라인으로 저장됨</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">나와 공유됨</string>
+	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">휴지통</string>
+	<string name="section_contacts" context="Title of the contact list">연락처</string>
+	<string name="tab_contacts" context="Title of the contact tab. Capital letters">연락처</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">보낸 요청</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">받은 요청</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">발신된 요청 없음</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">수신된 요청 없음</string>
+	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">전송</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">내 계정</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">카메라 업로드</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%2$s 중 %1$s</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">수신</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">나가는 공유</string>
+	
+	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">당신의 클라우드 드라이브에 파일이 없습니다</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">휴지통 비우기</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">들어오는 공유 폴더 없음</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">나가는 공유 폴더 없음</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">빈 폴더</string>
+	
+	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">속성</string>
+	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">오프라인으로 사용 가능</string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">오프라인 가능</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">오프라인</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">크기:</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">내용:</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">추가됨:</string>
+	<string name="file_properties_info_modified" context="when was the file modified">수정됨:</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">공개 링크 없음</string>
+	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">공개 링크</string>
+	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">완전 접근</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">읽기 & 쓰기</string>
+	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">읽기 전용</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">공유된 사람:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">권한:</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">권한 변경</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">공유할 곳</string>
+	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">공유된 사람</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">보낼 곳</string>
+	
+	<string name="contact_properties_activity" context="title of the contact properties screen">연락처 정보</string>
+	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">내용</string>
+	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">다음과 폴더 공유:</string>
+	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">아래의 버튼을 눌러 새 연락처를 추가하세요.</string>	
+	
+	<string name="error_not_enough_free_space" context="Error message">여유 공간이 부족합니다.</string>
+	
+	<string name="download_failed" context="Error message">다운로드 실패</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">다운로드됨</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">다운로드중</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">파일 준비중</string>
+    <string name="download_began" context="message when the download starts">다운로드가 시작되었습니다</string>
+    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">다운로드를 취소하시겠습니까?</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">다운로드를 취소하려면 터치하세요</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">대부분의 장치는 4GB보다 큰 파일을 다운로드할 수 없습니다. 당신의 다운로드는 아마 실패할 것입니다.</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">장치에 이 파일을 실행할 앱이 없습니다</string>
+	
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">다음을 사용하여 이미지 공유</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">링크 공유</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">링크 얻기</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">이름 바꾸기</string>
+    <string name="context_renaming" context="while renaming a file or folder">이름을 바꾸는중</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">다운로드</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">이동</string>
+    <string name="context_moving" context="while moving a file or folder">이동중</string>
+    <string name="context_sharing" context="while sharing a folder">폴더 공유중</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">복사</string>
+    <string name="context_copying" context="while copying a file or folder">복사중</string>
+    <string name="context_creating_link" context="status text">링크 생성중</string>
+    <string name="context_moving_to_trash" context="status text">휴지통으로 이동중</string>
+    <string name="context_move_to_trash" context="menu item">휴지통으로 이동</string>
+    <string name="context_delete_from_mega" context="menu item">메가에서 삭제하기</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">폴더명</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">연락처 이메일</string>
+    <string name="context_creating_folder" context="status">폴더 생성중...</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">연락처 추가중</string>
+    <string name="context_download_to" context="Menu item">다음 위치에 저장</string>
+    <string name="context_clear_rubbish" context="Menu option">휴지통 비우기</string>
+    <string name="context_send_link" context="get the link and send it">링크 보내기</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">제거</string>
+    <string name="context_share_folder" context="menu item">폴더 공유</string>
+    <string name="context_view_shared_folders" context="open a shared folder">공유된 폴더 보기</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">공유하기</string>
+    <string name="remove_all_sharing" context="status text">공유된 모든 연락처 삭제중</string>
+	<string name="leave_incoming_share" context="status text">공유된 폴더를 나가는 중</string>
+    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">카메라 폴더</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">메가 연락처</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">전화 연락처</string>
+    <string name="context_delete" context="menu item">삭제</string>
+    <string name="context_contact_added" context="success message when adding a contact">연락처가 추가되었습니다</string>
+    <string name="context_contact_removed" context="success message when removing a contact">연락처가 삭제되었습니다</string>
+    <string name="context_contact_not_removed" context="error message">오류. 연락처가 삭제되지 않았습니다</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">권한이 변경됨</string>
+    <string name="context_permissions_not_changed" context="error message">오류. 권한이 변경되지 않았습니다</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">폴더가 이미 존재합니다</string>
+    <string name="context_folder_created" context="success message when creating a folder">폴더가 생성되었습니다</string>
+    
+    <string name="context_correctly_renamed" context="success message when renaming a node">올바르게 이름이 바뀌었습니다</string>
+    <string name="context_no_renamed" context="error message">오류. 이름이 바뀌지 않았습니다</string>
+    <string name="context_correctly_copied" context="success message when copying a node">올바르게 복사되었습니다</string>
+    <string name="context_no_copied" context="error message">오류. 복사되지 않았습니다</string>
+    <string name="context_correctly_moved" context="success message when moving a node">올바르게 이동되었습니다</string>
+    <string name="context_no_moved" context="error message">오류. 이동되지 않았습니다</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">올바르게 공유되었습니다</string>
+    <string name="context_no_shared" context="error message">오류. 공유되지 않았습니다</string>
+    <string name="context_no_link" context="error message">링크 얻기 실패</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">메가에서 올바르게 삭제되었습니다</string>
+    <string name="context_no_removed" context="error message">오류. 메가에서 삭제되지 않았습니다</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">올바르게 전송되었습니다:</string>
+    
+    <string name="context_node_private" context="success message after removing the public link of a folder">이 폴더는 이제 개인용입니다</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">공유가 올바르게 삭제되었습니다</string>
+  
+    <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">새 폴더</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">연락처 추가</string>
+    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">MEGA 링크에서 다운로드</string>
+    
+    <string name="upload_to_image" context="upload to. Then choose an Image file">이미지</string>
+	<string name="upload_to_audio" context="upload to. Then choose an Audio file">오디오</string>
+	<string name="upload_to_video" context="upload to. Then choose a Video file">동영상</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">파일 시스템에서 선택</string>
+	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">파일 유형 선택</string>
+	<string name="upload_uploading" context="status text">업로드중</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">업로드를 취소하려면 터치하세요</string>
+	<string name="upload_failed" context="error message">업로드 실패</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">업로드됨</string>
+	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">업로드를 취소하시겠습니까?</string>
+	<string name="upload_prepare" context="Status text at the beginning of an upload">파일 처리중</string>
+	<string name="error_temporary_unavaible" context="error message when downloading a file">리소스가 일시적으로 사용 불가능합니다, 나중에 다시 시도하세요</string>
+	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">선택한 파일을 열 수 없습니다</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">업로드가 시작되었습니다</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">파일 압축 해제중</string>
+		
+	<string name="error_io_problem" context="error message while browsing the local filesystem">파일시스템 문제</string>
+	
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">이미지 뷰어</string>
+	
+	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">잘못된 링크 형식</string>
+	
+	<string name="my_account_activity" context="Title of the screen where the user account information is shown">계정</string>
+    <string name="my_account_total_space" context="Headline for the amount of total storage space">저장 공간</string>
+    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">사용 가능한 공간</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">사용 중인 공간</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">지금 업그레이드!</string>
+    <string name="my_account_change_password" context="menu item">비밀번호 바꾸기</string>
+    
+    <string name="my_account_last_session" context="when did the last session happen">최근 세션</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">연결:</string>
+    
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">비밀번호 변경중</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">현재 비밀번호</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">새 비밀번호</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">새 비밀번호 확인</string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">현재 비밀번호를 틀렸거나 입력하신 새 비밀번호가 일치하지 않습니다. 다시 시도하세요.</string>
+    <string name="my_account_change_password_OK" context="Success text">비밀번호가 성공적으로 변경되었습니다</string>
+    
+    <string name="upgrade_activity" context="title of the Upgrade screen">프로 회원권</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">회원권 선택</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">월간 또는 연간 재구독</string>
+    <string name="select_membership_2" context="button to go to Paypal">페이팔 구독</string>
+    
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">월간*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">연간*</string>
+    
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* 자동 구독은 갱신일 이전에 언제든지 취소할 수 있습니다.</string>
+    
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">링크가 클립보드로 복사되었습니다</string>
+    
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">미리 보기가 아직 다운로드 되지 않았습니다. 잠시만 기다리세요.</string>
+    
+    <string name="import_correct" context="success message after import a file">올바르게 들여왔습니다</string>
+    
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">활성중인 전송 없음</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">모든 전송이 일시정지 되었습니다.</string>
+    <string name="menu_pause_transfers" context="menu item">전송 일시정지</string>
+    <string name="menu_restart_transfers" context="menu item">전송 재시작</string>
+    
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">와이파이 전용</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 데이터 요금제</string>
+    <string name="cam_sync_ok" context="Answer for confirmation dialog.">확인</string>
+    <string name="cam_sync_skip" context="skip the step of camera upload">넘기기</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">카메라 업로드 진행중</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">카메라 업로드를 취소할까요?</string>
+    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">대상 폴더가 이용 불가능합니다</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">카메라 이미지 업로드중</string>
+    <string name="settings_camera_notif_error" context="notification error">카메라 업로드 이상</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">카메라 업로드 완료</string>
+    
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">저장소</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN 잠금</string>
+    
+    <string name="settings_storage_download_location" context="title of the setting to set the default download location">기본 다운로드 위치</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">다운로드 위치를 항상 묻기</string>
+    
+    <string name="settings_camera_upload_on" context="settings option">카메라 업로드 설정</string>
+    <string name="settings_camera_upload_off" context="settings option">카메라 업로드 해제</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">업로드 방법</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">와이파이 또는 데이터 요금제</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">와이파이 전용</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">파일 올리기</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">사진만</item>
+        <item context="the options of what to upload.">동영상만</item>
+        <item context="the options of what to upload.">사진과 동영상</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">카메라 폴더</string>
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">사진만</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">동영상만</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">사진과 동영상</string>
+    
+    <string name="settings_pin_lock_on" context="settings of the pin lock">PIN 잠금 설정</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">PIN 잠금 해제</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN 코드</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">설정되지 않음</string>
+    
+    <string name="pin_lock_enter" context="Button after the pin code input field">입력</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">잘못된 코드</string>
+    
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">대하여</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">앱 버전</string>
+    
+    <string name="january">1월</string>
+    <string name="february">2월</string>
+    <string name="march">3월</string>
+    <string name="april">4월</string>
+    <string name="may">5월</string>
+    <string name="june">6월</string>
+    <string name="july">7월</string>
+    <string name="august">8월</string>
+    <string name="september">9월</string>
+    <string name="october">10월</string>
+    <string name="november">11월</string>
+    <string name="december">12월</string>
+    
+    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">메가 PDF 뷰어</string>
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP 브라우저</string>
+    
+    <string name="my_account_title" context="title of the My Account screen">계정 유형:</string>
+    <string name="free_account">무료</string>
+    <string name="pro1_account" context="Not translate">PRO I</string>
+    <string name="pro2_account" context="Not translate">PRO II</string>
+    <string name="pro3_account" context="Not translate">PRO III</string>
+    
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">카메라 업로드 폴더가 생성되었습니다</string>
+    
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">압축 파일이 다운로드되고 압축 해제됩니다</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">압축 파일이 압축 해제됩니다</string>
+    
+</resources>

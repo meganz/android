@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" context="Not translate">MEGA_COM</string>
+    <string name="app_version" context="Not translate">0.43</string>
+    
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is cloud opslag met krachtige always-on privacy. 50 GB gratis</string>
+    
+    <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Totale grootte</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">van de</string>
+    <string name="general_yes" context="Answer for confirmation dialog.">Ja</string>
+    <string name="general_no" context="Answer for confirmation dialog.">Nee</string>
+    <string name="general_cancel" context="Answer for confirmation dialog.">Annuleren</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Verplaats naar</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Kopiëren naar</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Importeren naar</string>
+    <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Selecteer</string>
+    <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Maak</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload Bestand</string>
+    <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="general_add" context="button">Voeg toe</string>
+    <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Leeg</string>
+    <string name="general_loading" context="state previous to import a file">Laden...</string>
+    <string name="general_importing" context="state while importing the file">Aan het importeren...</string>
+    <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importeren</string>
+    <string name="general_updating" context="state while upgrading the account">Bijwerken...</string>  
+    <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslagruimte</string>
+    <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandbreedte</string>
+    <string name="general_error_word" context="It will be followed by the error message">Fout</string> 
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Nog niet geïmplementeerd</string>
+    <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Reeds gedownload</string>
+    
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Je staat op het punt om het geëxporteerde MasterKey-bestand te verwijderen.</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Beveiligingswaarschuwing! Dit is een handeling met een hoge risicofactor. Wil je doorgaan?</string> 
+     
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Meer opties...</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Wil je het contact verwijderen</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    
+    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Binnenkomende Mappen</string>
+    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Gedeelde uitgaande mappen</string>
+    <string name="action_logout" context="Button where the user can sign off or logout">Uitloggen</string>
+    <string name="action_add" context="Menu item">Upload...</string>
+    <string name="action_create_folder" context="Menu item">Nieuwe map maken</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload naar</string>
+    <string name="action_settings" context="Menu item">Instellingen</string>
+    <string name="action_search" context="Search button">Zoek</string>
+    <string name="action_refresh" context="Menu item">Vernieuw</string>
+    <string name="action_sort_by" context="Menu item">[$2203]</string>
+    <string name="action_help" context="Menu item">Help</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade account</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Selecteer Alles</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Selectie ongedaan maken</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Miniatuurweergave</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">Lijstweergave</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exporteer MasterKey</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Verwijder MasterKey</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">De MasterKey is geëxporteerd naar:</string>
+        
+     <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
+        <item context="Singular of file. 1 file" quantity="one">bestand</item>
+        <item context="Plural of file. 2 files" quantity="other">bestanden</item>
+    </plurals>
+    
+     <plurals name="general_num_contacts">
+        <item quantity="one" context="referring to a contact in the contact list of the user">contact</item>
+        <item quantity="other" context="Title of the contact list">contacten</item>
+    </plurals>
+    
+    <plurals name="general_num_folders">
+        <item quantity="one" context="Singular of folder/directory. 1 folder">map</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">mappen</item>
+    </plurals>
+    
+   <plurals name="general_num_shared_folders">
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">gedeelde map</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">gedeelde mappen</item>
+    </plurals>
+    
+    <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+    </plurals>
+    
+    <plurals name="general_num_uploads">
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
+    </plurals>
+    
+     <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
+        <item quantity="one" context="used for example when a folder is shared with 1 user">gebruiker</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">gebruikers</item>
+    </plurals>
+    
+    
+    <string name="login_text" context="Login button">Login</string>
+    <string name="email_text" context="email label">email</string>
+    <string name="password_text" context="password label">wachtwoord</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Bevestig wachtwoord</string>
+    <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Nieuw bij MEGA?</string>
+    <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
+    <string name="tour_text_2" context="Not translate. design text">Sed ut perspiciatis unde omnis iste natus</string>
+    <string name="create_account" context="label and text button when creating the account">Maak een account aan</string>
+    <string name="login_logging_in" context="label when logging in to MEGA">Inloggen</string>
+    <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Vul je e-mailadres in</string>
+    <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Ongeldig e-mailadres</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Vul je wachtwoord in</string>
+    <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Probleem met netwerk verbinding, probeer later opnieuw</string>
+    <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Encryptiesleutels berekenen</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Verbinding maken met de server</string>
+    <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Ongeldig e-mailadres of wachtwoord. Is je e-mailadres bevestigd?</string>    
+    <string name="download_updating_filelist" context="Status text when updating the file manager">Bijwerken bestandslijst</string>
+    <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Bevestig account</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Validatie link controleren</string>
+    <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Account activeren</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Bestandslijst voorbereiden</string>
+    
+    
+    <string name="create_account_text" context="button that allows the user to create an account">Maak een account aan</string>
+    <string name="name_text" context="Name of the user">naam</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Ik ga akkoord met MEGA\\'s <a href=\"https://mega.co.nz/mobile_privacy.html\">Servicevoorwaarden</a></string>
+    <string name="already_account" context="Does the user already have a MEGA account">Heb je al een account?</string>
+    
+    <string name="create_account_no_terms" context="warning dialog">Je moet onze algemene gebruikersvoorwaarden accepteren.</string>
+	<string name="error_enter_username" context="Warning dialog">Vul a.u.b. uw naam in.</string>
+    <string name="error_short_password" context="when creating the account">Wachtwoord is te kort</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Wachtwoorden komen niet overeen</string>
+    <string name="error_email_registered" contect="when creating the account">Met dit e-mail adres is al een account bij MEGA geregistreerd.</string>
+    
+    <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Bevestiging nodig</string>
+    <string name="create_account_confirm" context="">Check je e-mail en klik op de link om in te loggen en je account te bevestigen</string>
+    <string name="create_account_creating_account">[$2243]</string>
+
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Opgeslagen voor Offline gebruik</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Gedeeld met mij</string>
+	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Prullenbak</string>
+	<string name="section_contacts" context="Title of the contact list">Contacten</string>
+	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTEN</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">VERZONDEN AANVRAGEN</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">ONTVANGEN AANVRAGEN</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">Geen verzonden verzoeken</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">Geen ontvangen verzoeken</string>
+	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Overdrachten</string>
+
+	<string name="section_account" context="button to the settings of the user\'s account">Mijn Account</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s van de %2$s</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">BINNENKOMENDE</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">UITGAAND</string>
+	
+	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Geen bestanden in uw Cloud drive</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Lege Prullenbak</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Geen inkomende gedeelde mappen</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Geen uitgaande gedeelde mappen</string>
+    <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Lege Map</string>
+	
+	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Eigenschappen</string>
+	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Offline beschikbaar</string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ONLINE</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFFLINE</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Grootte:</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Inhoud:</string>
+	<string name="file_properties_info_added" context="when was the file added in MEGA">Toegevoegd:</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Gewijzigd:</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Geen publieke link</string>
+	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Publieke link</string>
+	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Volledige toegang</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Lezen & Schrijven</string>
+	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Alleen-lezen</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Gedeeld met:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Machtigingen:</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">Machtigingen wijzigen</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">Deel met</string>
+	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Gedeeld met</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Verstuur naar</string>
+	
+	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Inhoud</string>
+	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Gedeelde Mappen met:</string>
+	
+	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Voeg nieuwe contacten toe met de onderstaande knop.</string>	
+	
+	<string name="error_not_enough_free_space" context="Error message">Niet genoeg schijfruimte vrij</string>
+	
+	<string name="download_failed" context="Error message">Downloaden mislukt</string>
+	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">gedownload</string>
+	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Downloaden</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Bestanden voorbereiden</string>
+    <string name="download_began" context="message when the download starts">Download is gestart</string>
+    <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Wil je de download afbreken?</string>
+    <string name="download_touch_to_cancel" context="Hint how to cancel the download">Klik om download af te breken</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">De meeste apparaten kunnen bestanden groter dan 4GB niet downloaden. Uw download zal waarschijnlijk mislukken. </string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Er is geen app beschikbaar om dit bestand te openen op je apparaat</string>
+	
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Deel afbeelding door middel van</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Deel link</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Bekijk link</string>
+    <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Naam wijzigen</string>
+    <string name="context_renaming" context="while renaming a file or folder">Naam wijzigen</string>
+    <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
+    <string name="context_move" context="Item menu option upon right click on one or multiple files.">Verplaatsen</string>
+    <string name="context_moving" context="while moving a file or folder">Aan het verplaatsen</string>
+    <string name="context_sharing" context="while sharing a folder">Gedeelde map</string>
+    <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Kopiëren</string>
+    <string name="context_copying" context="while copying a file or folder">Aan het kopiëren</string>
+    <string name="context_creating_link" context="status text">Link aanmaken</string>
+    <string name="context_moving_to_trash" context="status text">Verwijderen naar prullenbak</string>
+    <string name="context_move_to_trash" context="menu item">Verplaats naar prullenbak</string>
+    <string name="context_delete_from_mega" context="menu item">Verwijder van MEGA</string>
+    <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Map Naam</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Contact email</string>
+    <string name="context_creating_folder" context="status">Map aanmaken...</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">Contact toevoegen</string>
+    <string name="context_download_to" context="Menu item">Opslaan naar</string>
+    <string name="context_clear_rubbish" context="Menu option">Leeg Prullenbak</string>
+    <string name="context_send_link" context="get the link and send it">Stuur link</string>
+    <string name="context_remove" context="Menu option to delete one or multiple selected items.">Verwijderen</string>
+    <string name="context_share_folder" context="menu item">Gedeelde map</string>
+    <string name="context_view_shared_folders" context="open a shared folder">Bekijk gedeelde mappen</string>
+    <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Delen</string>
+    <string name="remove_all_sharing" context="status text">Alle delende contacten verwijderen</string>
+	<string name="leave_incoming_share" context="status text">Gedeelde map verlaten</string>
+    <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Camera map</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Contacten</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Telefoon Contacten</string>
+    <string name="context_delete" context="menu item">Verwijder</string>
+    <string name="context_contact_added" context="success message when adding a contact">Contact toegevoegd</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Contact verwijderd</string>
+    <string name="context_contact_not_removed" context="error message">Foutmelding. Contact niet verwijderd</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">Machtigingen gewijzigd</string>
+    <string name="context_permissions_not_changed" context="error message">Foutmelding. Machtigingen niet veranderd</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Map bestaat al</string>
+    <string name="context_folder_created" context="success message when creating a folder">Map aangemaakt</string>
+    
+    <string name="context_correctly_renamed" context="success message when renaming a node">Correct hernoemd</string>
+    <string name="context_no_renamed" context="error message">Foutmelding. Niet hernoemd</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Correct gekopieerd</string>
+    <string name="context_no_copied" context="error message">Foutmelding. Niet gekopieerd</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Correct verplaatst</string>
+    <string name="context_no_moved" context="error message">Foutmelding. Niet verplaatst</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Correct gedeeld</string>
+    <string name="context_no_shared" context="error message">Foutmelding. Niet gedeeld</string>
+    <string name="context_no_link" context="error message">Onmogelijk om de link te krijgen</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correct verwijderd uit MEGA</string>
+    <string name="context_no_removed" context="error message">Foutmelding. Niet verwijderd van MEGA</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correct verstuurd naar:</string>
+    
+    <string name="context_node_private" context="success message after removing the public link of a folder">De map is nu privé</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Gedeelde map correct verwijderd</string>
+  
+    <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Nieuwe map</string>
+    <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Voeg contact toe</string>
+    <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download van MEGA link</string>
+    
+    <string name="upload_to_image" context="upload to. Then choose an Image file">Afbeelding</string>
+	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
+	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
+	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Kies van Bestandssysteem</string>
+	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Selecteer bestandstype</string>
+	<string name="upload_uploading" context="status text">Uploaden</string>
+	<string name="upload_touch_to_cancel" context="hint to how to cancel the upload (by touching the notification)">Klik om upload af te breken</string>
+	<string name="upload_failed" context="error message">Uploaden mislukt</string>
+	<string name="upload_uploaded" context="Label for the current uploaded size of a file. For example, 3 files, 50KB uploaded">geüpload</string>
+	<string name="upload_cancel_uploading" context="Confirmation text for cancelling an upload">Wil je de upload afbreken?</string>
+	<string name="upload_prepare" context="Status text at the beginning of an upload">Bestand verwerken</string>
+	<string name="error_temporary_unavaible" context="error message when downloading a file">Hulpbron tijdelijk niet beschikbaar, probeer later opnieuw</string>
+	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Kan geselecteerd bestand niet openen</string>
+	<string name="upload_began" context="when an upload starts, a message is shown to the user">Upload is gestart</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Bestand uitpakken</string>
+		
+	<string name="error_io_problem" context="error message while browsing the local filesystem">Probleem met het bestandssysteem</string>
+	
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Afbeeldingsgalerij</string>
+	
+	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Ongeldig link type</string>
+	
+	<string name="my_account_activity" context="Title of the screen where the user account information is shown">Account</string>
+    <string name="my_account_total_space" context="Headline for the amount of total storage space">Opslagruimte</string>
+    <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Vrije Ruimte</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Gebruikte Ruimte</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade nu!</string>
+    <string name="my_account_change_password" context="menu item">Wijzig wachtwoord</string>
+    
+    <string name="my_account_last_session" context="when did the last session happen">Laatste sessie:</string>
+    <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connecties:</string>
+    
+    <string name="my_account_changing_password" context="message displayed while the app is changing the password">Wachtwoord wijzigen</string>
+    <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Huidige wachtwoord</string>
+    <string name="my_account_change_password_newPassword1" context="when changing the password">Nieuwe wachtwoord</string>
+    <string name="my_account_change_password_newPassword2" context="when changing the password">Bevestig nieuw wachtwoord</string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">Verkeerd wachtwoord of de nieuwe wachtwoorden komen niet overeen. Probeer opnieuw.</string>
+    <string name="my_account_change_password_OK" context="Success text">Wachtwoord is succesvol veranderd</string>
+    
+    <string name="upgrade_activity" context="title of the Upgrade screen">Pro Lidmaatschap</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Selecteer abonnement</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">Maandelijks of jaarlijks betalen</string>
+    <string name="select_membership_2" context="button to go to Paypal">Paypal abonnement</string>
+    
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Maandelijks*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Jaarlijks*</string>
+    
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* een terugkerend abonnement kan op elk moment worden geannuleerd voor de verlengingsdatum.</string>
+    
+    <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">De link is gekopieerd naar het klembord</string>
+    
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Het voorbeeld is nog niet gedownload. Een ogenblik geduld.</string>
+    
+    <string name="import_correct" context="success message after import a file">Correct geïmporteerd</string>
+    
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">Geen actieve overdrachten</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Alle overdrachten zijn gepauzeerd</string>
+    <string name="menu_pause_transfers" context="menu item">Pauzeer overdrachten</string>
+    <string name="menu_restart_transfers" context="menu item">Herstart overdrachten</string>
+    
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele dataverbinding</string>
+    <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
+    <string name="cam_sync_skip" context="skip the step of camera upload">Overslaan</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload is bezig</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Wil je Camera Uploads annuleren?</string>
+    <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Doelmap is niet beschikbaar</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Camera afbeeldingen uploaden</string>
+    <string name="settings_camera_notif_error" context="notification error">Camera Uploads probleem</string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads compleet</string>
+    
+    <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Opslagruimte</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Slot</string>
+    
+    <string name="settings_storage_download_location" context="title of the setting to set the default download location">Standaard download locatie</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Altijd vragen naar de downloadlocatie</string>
+    
+    <string name="settings_camera_upload_on" context="settings option">Schakel Camera Uploads in</string>
+    <string name="settings_camera_upload_off" context="settings option">Schakel Camera Uploads uit</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Uploaden met</string>
+    
+    <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi of mobiele dataverbinding</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Alleen via Wi-Fi</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Bestand Uploaden</string>
+    
+    <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
+        <item context="the options of what to upload.">Alleen foto\\'s</item>
+        <item context="the options of what to upload.">Alleen video\\'s</item>
+        <item context="the options of what to upload.">Foto\\'s en video\\'s</item>
+    </string-array>
+    
+    <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Camera map</string>
+    <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Alleen foto\\'s</string>
+    <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Alleen video\\'s</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Foto\\'s en video\\'s</string>
+    
+    <string name="settings_pin_lock_on" context="settings of the pin lock">Schakel PIN Slot in</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">Schakel PIN Slot uit</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN code</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Niet ingesteld</string>
+    
+    <string name="pin_lock_enter" context="Button after the pin code input field">Enter</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Foutieve code</string>
+    
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Over ons</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">App versie</string>
+    
+    <string name="january">januari</string>
+    <string name="february">februari</string>
+    <string name="march">maart</string>
+    <string name="april">april</string>
+    <string name="may">mei</string>
+    <string name="june">juni</string>
+    <string name="july">juli</string>
+    <string name="august">augustus</string>
+    <string name="september">september</string>
+    <string name="october">oktober</string>
+    <string name="november">november</string>
+    <string name="december">december</string>
+    
+    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">MEGA PDF Viewer</string>
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP Bestanden</string>
+    
+    <string name="my_account_title" context="title of the My Account screen">Account type:</string>
+    <string name="free_account">GRATIS</string>
+    <string name="pro1_account" context="Not translate">PRO I</string>
+    <string name="pro2_account" context="Not translate">PRO II</string>
+    <string name="pro3_account" context="Not translate">PRO III</string>
+    
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Camera Uploads map aangemaakt</string>
+    
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">Het zip-bestand wordt gedownload en uitgepakt</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">Het zip-bestand wordt uitgepakt</string>
+    
+</resources>
