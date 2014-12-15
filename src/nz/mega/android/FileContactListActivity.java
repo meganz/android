@@ -15,7 +15,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -23,7 +22,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
@@ -139,8 +137,10 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 											log("Tamaño array----- "+contacts.size());	
 											for(int j=0;j<contacts.size();j++){
 												log("Numero: "+j);	
-												MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-												megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);							
+												if(contacts.get(j).getUser()!=null){
+													MegaUser u = megaApi.getContact(contacts.get(j).getUser());													
+													megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);	
+												}
 											}
 										}
 									}		                        	
@@ -152,8 +152,10 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 											log("Tamaño array----- "+contacts.size());		
 											for(int j=0;j<contacts.size();j++){										
 												log("Numero: "+j);
-												MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-												megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);								
+												if(contacts.get(j).getUser()!=null){
+													MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+													megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);		
+												}
 											}
 										}
 									}	
@@ -167,8 +169,10 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 											log("Tamaño array----- "+contacts.size());		
 											for(int j=0;j<contacts.size();j++){										
 												log("Numero: "+j);	
-												MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-												megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);								
+												if(contacts.get(j).getUser()!=null){
+													MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+													megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);								
+												}
 											}
 										}
 									}
@@ -217,16 +221,21 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 					statusDialog = temp;
 	
 					if(contacts!=null){
-	
+
 						if(contacts.size()!=0){
-	
-							for(int j=0;j<contacts.size();j++){									
-								MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-								megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivity);								
+
+							for(int j=0;j<contacts.size();j++){	
+								if(contacts.get(j).getUser()!=null){
+									MegaUser u = megaApi.getContact(contacts.get(j).getUser());
+									megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivity);	
+								}
+								else{
+									megaApi.disableExport(node, fileContactListActivity);
+								}
 							}
-	
+
 						}
-					}
+					}				
 					adapter.setMultipleSelect(false);
 					clearSelections();
 					hideMultipleSelect();
@@ -519,6 +528,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
 			try { 
 				statusDialog.dismiss();	
+				adapter.setShareList(listContacts);
+				listView.invalidateViews();
 			} 
 			catch (Exception ex) {
 				log("Error dismiss status dialog");
