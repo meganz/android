@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA, Güçlü Her Zaman Aktif Gizliliğe sahip Bulut Depolama. Ücretsiz 50 GB alan.</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Toplam boyut</string>
@@ -100,7 +100,7 @@
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Şifreyi onaylayın</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
-    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">MEGA\\'ya yeni misiniz?</string>
+    <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">MEGA\'ya yeni misiniz?</string>
     <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
     <string name="tour_text_2" context="Not translate. design text">Sed ut perspiciatis unde omnis iste natus</string>
     <string name="create_account" context="label and text button when creating the account">Hesap oluşturun</string>
@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Hesap oluştur</string>
     <string name="name_text" context="Name of the user">isim</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">MEGA <a href=\"https://mega.co.nz/mobile_privacy.html\">Hizmet Şartları</a>nı kabul ediyorum</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">MEGA &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;Hizmet Şartları&lt;/a&gt;nı kabul ediyorum</string>
     <string name="already_account" context="Does the user already have a MEGA account">Zaten bir hesabınız var mı?</string>
     
     <string name="create_account_no_terms" context="warning dialog">Hizmet Şartlarımızı kabul etmek zorundasınız.</string>
@@ -195,7 +195,7 @@
     <string name="download_began" context="message when the download starts">İndirme başladı</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">İndirme işlemi iptal edilsin mi?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">İndirmeyi iptal etmek için dokunun</string>
-    <string name="error_file_size_greater_than_4gb" context="Warning message">Çoğu cihaz 4GB\\'dan büyük belgeleri indiremiyor. İndirmenizin başarısız olma ihtimali var.</string>
+    <string name="error_file_size_greater_than_4gb" context="Warning message">Çoğu cihaz 4GB\'dan büyük belgeleri indiremiyor. İndirmenizin başarısız olma ihtimali var.</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Cihazınızda bu dosyayı çalıştırmak için mevcut herhangi bir uygulama yok</string>
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Görseli ... ile paylaş</string>
@@ -212,7 +212,7 @@
     <string name="context_creating_link" context="status text">Bağlantı oluşturuluyor</string>
     <string name="context_moving_to_trash" context="status text">Çöpe atılıyor</string>
     <string name="context_move_to_trash" context="menu item">Çöp Kutusuna Taşı</string>
-    <string name="context_delete_from_mega" context="menu item">MEGA\\'dan sil</string>
+    <string name="context_delete_from_mega" context="menu item">MEGA\'dan sil</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Klasör Adı</string>
     <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Kişi epostası</string>
     <string name="context_creating_folder" context="status">Klasör oluşturuluyor…</string>
@@ -247,8 +247,8 @@
     <string name="context_correctly_shared" context="success message when sharing a folder">Doğru bir şekilde paylaşıldı</string>
     <string name="context_no_shared" context="error message">Hata. Paylaşılamadı</string>
     <string name="context_no_link" context="error message">Bağlantıyı almak imkansız</string>
-    <string name="context_correctly_removed" context="success message when removing a node from MEGA">MEGA\\'dan doğru bir şekilde çıkarıldı</string>
-    <string name="context_no_removed" context="error message">Hata. MEGA\\'dan kaldırılamadı</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">MEGA\'dan doğru bir şekilde çıkarıldı</string>
+    <string name="context_no_removed" context="error message">Hata. MEGA\'dan kaldırılamadı</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Doğru bir şekilde şu kişiye gönderildi:</string>
     
     <string name="context_node_private" context="success message after removing the public link of a folder">Klasör artık özel</string>

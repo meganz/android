@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA_COM</string>
     <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA reprezintă stocare în cloud cu o confideţialitate puternică mereu în funcţiune. 50GB gratuit</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Mărime totală</string>
@@ -60,37 +60,44 @@
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">fişier</item>
-        <item context="Plural of file. 2 files" quantity="other">fişiere</item>
+        <item context="Plural of file. Few files" quantity="few">fişiere</item>
+        <item context="Plural of file. Plural files" quantity="other">fişiere</item>
     </plurals>
     
      <plurals name="general_num_contacts">
         <item quantity="one" context="referring to a contact in the contact list of the user">contact</item>
+        <item quantity="few" context="Title of the contact list">contacte</item>
         <item quantity="other" context="Title of the contact list">contacte</item>
     </plurals>
     
     <plurals name="general_num_folders">
         <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
-        <item quantity="other" context="Plural of folder/directory. 2 folders">foldere</item>
+        <item quantity="few" context="Plural of folder/directory. Few folders">foldere</item>
+        <item quantity="other" context="Plural of folder/directory. Plural folders">foldere</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
         <item quantity="one" context="Title of the incoming shared folders of a user in singular">folder partajat</item>
-        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">foldere partajate</item>
+        <item quantity="few" context="Title of the incoming shared folders of a user in plural.">foldere partajate</item>
+        <item quantity="many" context="Title of the incoming shared folders of a user in plural.">foldere partajate</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">descarcă</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="few" context="Item menu option upon clicking on one or multiple files. Few">descarcă</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">descarcă</item>
     </plurals>
     
     <plurals name="general_num_uploads">
         <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">încărcare</item>
+        <item quantity="few" context="Transfer type description in the active file transfer panel, can either be upload or download. Few">încărcări</item>
         <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">încărcări</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
         <item quantity="one" context="used for example when a folder is shared with 1 user">utilizator</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">utilizatori</item>
+        <item quantity="few" context="used for example when a folder is shared with few users">utilizatori</item>
+        <item quantity="other" context="used for example when a folder is shared with many users">utilizatori</item>
     </plurals>
     
     
@@ -121,7 +128,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Creează cont</string>
     <string name="name_text" context="Name of the user">nume</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Sunt de acord cu <a href=\"https://mega.co.nz/mobile_privacy.html\">termenii serviciului</a> MEGA</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Sunt de acord cu &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;termenii serviciului&lt;/a&gt; MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">Ai deja un cont?</string>
     
     <string name="create_account_no_terms" context="warning dialog">Trebuie să accepţi termenii serviciului nostru.</string>
