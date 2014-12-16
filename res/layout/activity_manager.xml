@@ -227,7 +227,7 @@
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:choiceMode="singleChoice"
-        android:divider="@color/navigation_drawer_divider"
+        
         android:dividerHeight="1dp"
         android:background="@color/navigation_drawer_background"
         android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar"/>

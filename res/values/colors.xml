@@ -13,10 +13,10 @@
     <color name="transfer_progress">#cccccc</color>
     <color name="navigation_drawer_mail">#858585</color>
     <color name="navigation_drawer_text">#d2d2d2</color>
-    <color name="navigation_drawer_background_disabled">#222222</color>
-    <color name="navigation_drawer_background">#333333</color>
-    <color name="navigation_drawer_background_selected">#444444</color>
-    <color name="navigation_drawer_divider">#555555</color>
+    <color name="navigation_drawer_background_odd">#292929</color>
+    <color name="navigation_drawer_background">#222222</color>
+    <color name="color_navigation_drawer_selected">#1AFFFFFF</color> 
+    
     <color name="file_list_second_row">#848484</color>
     <color name="file_list_selected_row">#e5e5e5</color>
     <color name="border_file_properties">#cccccc</color>
@@ -38,7 +38,7 @@
     <color name="color_default_avatar_mega">#d90007</color>
     <color name="color_default_avatar_phone">#777777</color>
     
-    <color name="color_navigation_drawer_selected">#cccc0000</color>  
+ 
     
     <color name="dark_grey_cloud_drive">#6d6f70</color>
     

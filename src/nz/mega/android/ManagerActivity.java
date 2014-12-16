@@ -604,7 +604,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        
 	        mDrawerList.setOnItemClickListener(this);
 	        
-	        getSupportActionBar().setIcon(R.drawable.ic_navigation_drawer);
+	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
 	        getSupportActionBar().setHomeButtonEnabled(true);
 			getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	        
