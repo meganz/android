@@ -71,27 +71,35 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 		switch(position){
 			case 0:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cloud_drive,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
 				break;
 			case 1:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_saved_for_offline,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
 				break;
 			case 2:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_shared_with_me,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
 				break;
 			case 3:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_rubbish_light,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
 				break;
 			case 4:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_contacts,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
 				break;
 			case 5:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
 				break;
 			case 6:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_transfers,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
 				break;
 			case 7:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_settings,0,0,0);
+				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
 //			case 7:
 //				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_my_account,0,0,0);
 				break;
@@ -100,9 +108,9 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 		if (positionClicked == position){
 			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.color_navigation_drawer_selected));
 		}
-		else{
-			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
-		}
+//		else{
+//			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
+//		}
 		
 		return convertView;
 	}
