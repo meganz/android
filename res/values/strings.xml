@@ -32,6 +32,7 @@
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Already downloaded</string>
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">File info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
+    <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
