@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
@@ -184,13 +185,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
 			holder.checkbox.setClickable(false);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
+			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
+			holder.savedOfflineMultiselect = (ImageView) convertView.findViewById(R.id.file_list_saved_offline_multiselect);
+			
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);			
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225 * scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.file_list_filesize);
 			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list__browser_bar);
-			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
-			holder.savedOfflineMultiselect = (ImageView) convertView.findViewById(R.id.file_list_saved_offline_multiselect);
+			
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
 			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
 			holder.optionRename = (RelativeLayout) convertView.findViewById(R.id.file_list_option_rename_layout);
@@ -238,7 +241,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		holder.optionShare.setVisibility(View.GONE);
 		holder.optionPermissions.setVisibility(View.GONE);
 		holder.savedOffline.setVisibility(View.GONE);
-
+		holder.savedOfflineMultiselect.setVisibility(View.GONE);
+				
 		holder.transferProgressBar.setVisibility(View.GONE);
 		holder.textViewFileSize.setVisibility(View.VISIBLE);
 
@@ -249,6 +253,33 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		Bitmap thumb = null;
 
 		holder.textViewFileName.setText(node.getName());
+		
+		if (!multipleSelect) {
+			holder.checkbox.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+		    marginParams.setMargins(30,0,0,0);
+		    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+		    holder.imageView.setLayoutParams(layoutParams);
+	
+		} else {
+			holder.checkbox.setVisibility(View.VISIBLE);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+		    marginParams.setMargins(125,0,0,0);
+		    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+		    holder.imageView.setLayoutParams(layoutParams);
+			
+			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true) {
+				holder.checkbox.setChecked(true);					
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				
+
+			} else {
+				holder.checkbox.setChecked(false);
+			}
+		}
 	
 		holder.textViewFileSize.setText("");
 		if (node.isFolder()) {
@@ -305,12 +336,38 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			if (node.hasThumbnail()) {
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
-					holder.imageView.setImageBitmap(thumb);
+					if(!multipleSelect){
+						holder.imageView.setImageBitmap(thumb);
+						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+					    marginParams.setMargins(41,0,0,0);
+					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+					    holder.imageView.setLayoutParams(layoutParams);
+					}
+					else{
+						holder.imageView.setImageBitmap(thumb);
+						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+					    marginParams.setMargins(125,0,0,0);
+					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+					    holder.imageView.setLayoutParams(layoutParams);
+					}
 				} else {
 					thumb = ThumbnailUtils
 							.getThumbnailFromFolder(node, context);
 					if (thumb != null) {
-						holder.imageView.setImageBitmap(thumb);
+						if(!multipleSelect){
+							holder.imageView.setImageBitmap(thumb);
+							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+						    marginParams.setMargins(41,0,0,0);
+						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+						    holder.imageView.setLayoutParams(layoutParams);
+						}
+						else{
+							holder.imageView.setImageBitmap(thumb);
+							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+						    marginParams.setMargins(125,0,0,0);
+						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+						    holder.imageView.setLayoutParams(layoutParams);
+						}
 					} else {
 						try {
 							thumb = ThumbnailUtils.getThumbnailFromMegaList(
@@ -319,19 +376,58 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						} // Too many AsyncTasks
 
 						if (thumb != null) {
-							holder.imageView.setImageBitmap(thumb);
+							if(!multipleSelect){
+								holder.imageView.setImageBitmap(thumb);
+								MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+							    marginParams.setMargins(41,0,0,0);
+							    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+							    holder.imageView.setLayoutParams(layoutParams);
+							}
+							else{
+								holder.imageView.setImageBitmap(thumb);
+								MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+							    marginParams.setMargins(125,0,0,0);
+							    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+							    holder.imageView.setLayoutParams(layoutParams);
+							}
 						}
 					}
 				}
 			} else {
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
 				if (thumb != null) {
-					holder.imageView.setImageBitmap(thumb);
+					if(!multipleSelect){
+						holder.imageView.setImageBitmap(thumb);
+						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+					    marginParams.setMargins(41,0,0,0);
+					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+					    holder.imageView.setLayoutParams(layoutParams);
+					}
+					else{
+						holder.imageView.setImageBitmap(thumb);
+						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+					    marginParams.setMargins(125,0,0,0);
+					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+					    holder.imageView.setLayoutParams(layoutParams);
+					}
 				} else {
 					thumb = ThumbnailUtils
 							.getThumbnailFromFolder(node, context);
 					if (thumb != null) {
-						holder.imageView.setImageBitmap(thumb);
+						if(!multipleSelect){
+							holder.imageView.setImageBitmap(thumb);
+							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+						    marginParams.setMargins(41,0,0,0);
+						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+						    holder.imageView.setLayoutParams(layoutParams);
+						}
+						else{
+							holder.imageView.setImageBitmap(thumb);
+							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
+						    marginParams.setMargins(125,0,0,0);
+						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+						    holder.imageView.setLayoutParams(layoutParams);
+						}
 					} else {
 						try {
 							ThumbnailUtils.createThumbnailList(context, node,
@@ -341,7 +437,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					}
 				}
 			}
-		}		
+		}
 		
 		File offlineDirectory = null;
 		if (Environment.getExternalStorageDirectory() != null){
@@ -354,11 +450,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		if (offlineDirectory.exists()){
 			if(multipleSelect){
 				holder.savedOfflineMultiselect.setVisibility(View.VISIBLE);
+				holder.savedOffline.setVisibility(View.GONE);
+				log("Entrooooooo222222");
 			}
 			else{
 				holder.savedOffline.setVisibility(View.VISIBLE);
+				holder.savedOfflineMultiselect.setVisibility(View.GONE);
 			}
-		}	
+		}
+
 
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
@@ -621,26 +721,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			.setImageResource(R.drawable.action_selector_ic);
 		}
 
-		if (!multipleSelect) {
-			holder.checkbox.setVisibility(View.GONE);
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			holder.savedOfflineMultiselect.setVisibility(View.GONE);
-	
-		} else {
-			holder.checkbox.setVisibility(View.VISIBLE);
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
-			holder.savedOffline.setVisibility(View.GONE);				
-
-			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
-			if (checkedItems.get(position, false) == true) {
-				holder.checkbox.setChecked(true);					
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				
-
-			} else {
-				holder.checkbox.setChecked(false);
-			}
-		}
 		holder.optionDownload.setTag(holder);
 		holder.optionDownload.setOnClickListener(this);
 		
