@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 
 import nz.mega.android.utils.Util;
@@ -27,6 +28,9 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -64,6 +68,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 
 	TextView nameView;
 	RoundedImageView imageView;
+	TextView contactInitialLetter;
 	ImageView statusDot;
 	TextView textViewContent;
 
@@ -259,11 +264,12 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 
 			if (aB != null){
 				aB.setTitle(R.string.contact_shared_files);
-				aB.setLogo(R.drawable.ic_action_navigation_accept);
+				aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 			}
 
 			nameView = (TextView) v.findViewById(R.id.contact_file_list_name);
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_file_list_thumbnail);
+			contactInitialLetter = (TextView) v.findViewById(R.id.contact_file_list_initial_letter);
 			statusDot = (ImageView) v.findViewById(R.id.contact_file_list_status_dot);
 			textViewContent = (TextView) v.findViewById(R.id.contact_file_list_content);
 			contactLayout = (RelativeLayout) v.findViewById(R.id.contact_file_list_contact_layout);
@@ -271,6 +277,8 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
+			
+			createDefaultAvatar();
 
 			File avatar = null;
 			if (context.getExternalCacheDir() != null) {
@@ -301,6 +309,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 						}
 					} else {
 						imageView.setImageBitmap(imBitmap);
+						contactInitialLetter.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -346,6 +355,69 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 
 		return v;
 	}
+	
+	public void createDefaultAvatar(){
+		log("createDefaultAvatar()");
+		
+		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		
+		int radius; 
+        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+        	radius = defaultAvatar.getWidth()/2;
+        else
+        	radius = defaultAvatar.getHeight()/2;
+        
+		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+		imageView.setImageBitmap(defaultAvatar);
+		
+		
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = context.getResources().getDisplayMetrics().density;
+	    
+	    int avatarTextSize = getAvatarTextSize(density);
+	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    if (userEmail != null){
+		    if (userEmail.length() > 0){
+		    	String firstLetter = userEmail.charAt(0) + "";
+		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+		    	contactInitialLetter.setVisibility(View.VISIBLE);
+		    	contactInitialLetter.setText(firstLetter);
+		    	contactInitialLetter.setTextSize(32);
+		    	contactInitialLetter.setTextColor(Color.WHITE);
+		    }
+	    }
+	}
+		
+	private int getAvatarTextSize (float density){
+		float textSize = 0.0f;
+		
+		if (density > 3.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXXHIGH / 72.0f);
+		}
+		else if (density > 2.0){
+			textSize = density * (DisplayMetrics.DENSITY_XXHIGH / 72.0f);
+		}
+		else if (density > 1.5){
+			textSize = density * (DisplayMetrics.DENSITY_XHIGH / 72.0f);
+		}
+		else if (density > 1.0){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_HIGH / 72.0f);
+		}
+		else if (density > 0.75){
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_MEDIUM / 72.0f);
+		}
+		else{
+			textSize = density * (72.0f / DisplayMetrics.DENSITY_LOW / 72.0f); 
+		}
+		
+		return (int)textSize;
+	}
 
 	public boolean showUpload(){
 		if (!parentHandleStack.isEmpty()){
@@ -365,7 +437,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 			adapter.setParentHandle(parentHandle);
 			if (aB != null){
 				aB.setTitle(R.string.contact_shared_files);
-				aB.setLogo(R.drawable.ic_action_navigation_accept);
+				aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 			}
 			setNodes(megaApi.getInShares(contact));
 		}
@@ -512,6 +584,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 							avatar.delete();
 						} else {
 							imageView.setImageBitmap(imBitmap);
+							contactInitialLetter.setVisibility(View.GONE);
 						}
 					}
 				}
@@ -649,7 +722,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 					contactNodes = megaApi.getInShares(contact);
 					if (aB != null){
 						aB.setTitle(R.string.contact_shared_files);
-						aB.setLogo(R.drawable.ic_action_navigation_accept);
+						aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 					}
 					((ContactPropertiesMainActivity)context).supportInvalidateOptionsMenu();
 					adapter.setNodes(contactNodes);

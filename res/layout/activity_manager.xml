@@ -122,7 +122,7 @@
 				    android:layout_height="50dp"
 				    android:scaleType="fitCenter"         
 			        rounded:corner_radius="25dp" 
-			        rounded:border_width="2dp"
+			        rounded:border_width="0dp"
 			        rounded:border_color="@color/border_file_properties" />
 	            
 	            <TextView
