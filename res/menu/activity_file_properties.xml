@@ -25,6 +25,13 @@
 	    MEGA:showAsAction="never" />
 	
 	<item
+	    android:id="@+id/action_file_properties_remove_link"
+	    android:orderInCategory="110"
+	    android:showAsAction="never"
+	    android:title="@string/context_remove_link_menu"
+	    MEGA:showAsAction="never" />
+		
+	<item
 	    android:id="@+id/action_file_properties_rename"
 	    android:orderInCategory="115"
 	    android:showAsAction="never"
@@ -56,6 +63,6 @@
 	    android:id="@+id/action_file_properties_remove"
 	    android:orderInCategory="135"
 	    android:showAsAction="never"
-	    android:title="@string/context_remove"
+	    android:title="@string/context_move_to_trash"
 	    MEGA:showAsAction="never" />
 </menu>
