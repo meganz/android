@@ -116,7 +116,7 @@
         	android:layout_height="60dp"
         	android:layout_below="@id/file_list_thumbnail"
         	android:padding="0dp"
-        	android:background="#333333"
+        	android:background="@color/adapters_background"
         	android:orientation="horizontal">
         	
             <RelativeLayout

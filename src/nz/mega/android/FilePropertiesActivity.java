@@ -89,7 +89,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	
 	LinearLayout availableOfflineLayout;	
 	TableLayout filePropertiesLayout;
-	RelativeLayout titleLayout;	
+	LinearLayout titleLayout;	
 	
 //	RelativeLayout sharedWith;
 //	TableLayout contactTable;	
@@ -194,13 +194,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					
 			setContentView(R.layout.activity_file_properties);
 //			iconView = (ImageView) findViewById(R.id.file_properties_icon);
-			titleLayout = (RelativeLayout) findViewById(R.id.file_title_layout);
+			titleLayout = (LinearLayout) findViewById(R.id.file_title_layout);
 			titleLayout.setVisibility(View.VISIBLE);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
 			imageView = (ImageView) findViewById(R.id.file_properties_image);
 			imageView.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
 			imageView.getLayoutParams().height = Util.px2dp((250*scaleH), outMetrics);
-			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
+//			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
 //			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((-30*scaleH), outMetrics));
 			
 			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);

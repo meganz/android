@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/offline_list_filesize"
         android:padding="0dp"
-        android:background="#2a2a2a">
+        android:background="@color/adapters_background">
     
 				<ImageView
 		            android:id="@+id/offline_list_option_download"
