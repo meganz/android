@@ -20,6 +20,7 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -44,7 +45,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 		ImageButton imageButtonThreeDots;
 		RelativeLayout itemLayout;
 		//ImageView arrowSelection;
-		RelativeLayout optionsLayout;
+		LinearLayout optionsLayout;
 		//ImageView optionDownload;
 		//ImageView optionProperties;
         ProgressBar transferProgressBar;
@@ -98,7 +99,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			
 			holder.checkbox = (CheckBox) convertView.findViewById(R.id.file_list_checkbox);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.file_list_three_dots);
-			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.file_list_options);
+			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.file_list_options);
 
 			convertView.setTag(holder);
 		} else {
