@@ -53,7 +53,7 @@ import android.widget.TextView;
 
 public class MyAccountFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
 	
-	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
+	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
 	public static int MY_ACCOUNT_FRAGMENT = 5000;
 	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;

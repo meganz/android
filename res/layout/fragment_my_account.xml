@@ -1,221 +1,240 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+<RelativeLayout 
+ 	xmlns:android="http://schemas.android.com/apk/res/android"
+ 	xmlns:rounded="http://schemas.android.com/apk/res-auto"
     xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/my_account_total_relative_layout"
     android:layout_width="match_parent"
-    android:layout_height="fill_parent"
-    android:background="@color/black"
-    android:gravity="center"
-    android:weightSum="15"
-    tools:context=".FilePropertiesFragment" 
-    android:orientation="vertical">
-    
-    <RelativeLayout 
-        android:id="@+id/my_account_avatar_layout"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center_horizontal|center_vertical"
-        android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:layout_weight="1">
-    
-	    <nz.mega.components.RoundedImageView
-	        android:id="@+id/my_avatar_image"
-	        android:layout_width="100dp"
-	         android:layout_height="100dp"
-	       	android:layout_gravity="center_horizontal|center_vertical"
-	        android:paddingBottom="10dp"
-	        android:paddingTop="10dp"
-	        rounded:border_color="@color/border_file_properties"
-	        rounded:border_width="0dp"
-	        rounded:corner_radius="100dp" />
+    android:layout_height="match_parent"
+    android:background="@color/black">
+
+    <ScrollView
+        android:id="@+id/cam_sync_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+		
+		<RelativeLayout    
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@color/black"
+		    android:gravity="center"
+		    android:orientation="vertical">
 	    
-	    <TextView
-            android:id="@+id/my_account_initial_letter"
-            android:layout_width="fill_parent"
-   			android:layout_height="fill_parent"
-   			android:layout_centerInParent="true"
-			android:gravity="center_horizontal|center_vertical"
-   			android:paddingBottom="5dp" />
-	    
-    </RelativeLayout>
-
-      <TextView
-           android:id="@+id/my_name"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_weight="2"
-           android:paddingTop="0dp"
-           android:textSize="20sp"
-           android:layout_gravity="center"
-           android:textColor="@color/white" 
-          android:textStyle="bold" />
-            
-
-         <TextView
-           android:id="@+id/my_email"
-           android:layout_weight="2"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:paddingTop="5dp" 
-           android:layout_gravity="center"               
-           android:textColor="@color/white"/>
-
-    
-     <TableLayout android:id="@+id/progress_my_account"
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"	
-		android:stretchColumns="1"	
-		android:layout_weight="2">        
-
-	<TableRow>
-		    <TextView
-		        android:id="@+id/used_space_text_my_account"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="@string/my_account_used_space" 
-	            android:textColor="@color/navigation_drawer_text"
-	            android:paddingTop="5dp"
-	            android:layout_marginLeft="10dp"
-	            android:textSize="18sp"
-	            android:layout_gravity="left|bottom" />
+		    <RelativeLayout 
+		        android:id="@+id/my_account_avatar_layout"
+		        android:layout_width="100dp"
+		        android:layout_height="100dp"
+		        android:layout_centerHorizontal="true"
+		        android:paddingBottom="10dp"
+		        android:paddingTop="10dp">
 		    
+			    <nz.mega.components.RoundedImageView
+			        android:id="@+id/my_avatar_image"
+			        android:layout_width="100dp"
+			         android:layout_height="100dp"
+			       	android:layout_gravity="center_horizontal|center_vertical"
+			        android:paddingBottom="10dp"
+			        android:paddingTop="10dp"
+			        rounded:border_color="@color/border_file_properties"
+			        rounded:border_width="0dp"
+			        rounded:corner_radius="100dp" />
+			    
+			    <TextView
+		            android:id="@+id/my_account_initial_letter"
+		            android:layout_width="fill_parent"
+		   			android:layout_height="fill_parent"
+		   			android:layout_centerInParent="true"
+					android:gravity="center_horizontal|center_vertical"
+		   			android:paddingBottom="5dp" />
+			    
+		    </RelativeLayout>
+	
 		    <TextView
-		        android:id="@+id/used_space_my_account"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="@string/used_space" 
-	            android:textColor="@color/navigation_drawer_text"
-	            android:paddingTop="5dp"
-	            android:paddingRight="20dp"
-	            android:layout_gravity="right|bottom" />
-            
-		    </TableRow>
-        </TableLayout>
-        	            
-	     <ProgressBar
-		    android:id="@+id/my_account_used_space_bar"
-			android:layout_width="fill_parent"
-			android:layout_weight="2"
-			android:layout_gravity="center"
-			android:layout_height="wrap_content" 
-			style="@style/MEGAProgressBar"  
-			android:paddingLeft="5dip"
-			android:paddingRight="5dip" />
-        
-        <RelativeLayout
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:layout_weight="2"
-              android:layout_gravity="center" >
-
-             
-        <TextView
-             android:id="@+id/my_account_title"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/my_account_title"
-             android:textColor="@color/file_properties_info_menu"
-			 android:textStyle="bold"
-			 android:paddingLeft="120dp"
-			 android:paddingTop="10dp"
-			 android:paddingBottom="10dp" />   
-             
-        <TextView
-             android:id="@+id/my_account_type_account"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_toRightOf="@id/my_account_title"
-             android:textColor="@color/white"			 
-			 android:paddingLeft="4dp"
-			 android:paddingTop="10dp"
-			 android:paddingBottom="10dp" />   
- 
-         </RelativeLayout>     
- 
-        
-     <RelativeLayout android:id="@+id/button_upgrade"
-		android:layout_width="fill_parent" 
-		android:layout_height="wrap_content"		
-		android:layout_weight="1">        
-        
-        <Button
-            android:id="@+id/btn_upgrade"            
-            android:layout_width="200dp"
-       		android:layout_height="48dp"
-       		android:layout_marginTop="10dp"
-       		android:textStyle="bold"
-       		android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="@string/my_account_upgrade_pro" 
-            style="@style/button_MEGA_inverse"/>
-            
-        </RelativeLayout>
-        
-        <RelativeLayout
-                android:layout_width="fill_parent"
+		    	android:id="@+id/my_name"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:paddingTop="0dp"
+		        android:textSize="20sp"
+		        android:layout_centerHorizontal="true"
+		        android:textColor="@color/white" 
+		        android:textStyle="bold"
+		        android:layout_below="@id/my_account_avatar_layout" />
+	            
+	
+	        <TextView
+	           android:id="@+id/my_email"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:paddingTop="5dp" 
+	           android:visibility="gone"
+	           android:layout_centerHorizontal="true"               
+	           android:textColor="@color/white"
+	           android:layout_below="@id/my_name"/>
+	
+	    
+	     	<TableLayout 
+	           android:id="@+id/progress_my_account"
+			   android:layout_width="fill_parent" 
+			   android:layout_height="wrap_content"	
+			   android:stretchColumns="1"
+			   android:layout_below="@id/my_email">        
+	
+				<TableRow>
+				    <TextView
+				        android:id="@+id/used_space_text_my_account"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="@string/my_account_used_space" 
+			            android:textColor="@color/navigation_drawer_text"
+			            android:paddingTop="5dp"
+			            android:layout_marginLeft="10dp"
+			            android:textSize="18sp"
+			            android:layout_gravity="left|bottom" />
+				    
+				    <TextView
+				        android:id="@+id/used_space_my_account"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content"
+			            android:text="@string/used_space" 
+			            android:textColor="@color/navigation_drawer_text"
+			            android:paddingTop="5dp"
+			            android:paddingRight="20dp"
+			            android:layout_gravity="right|bottom" />
+			            
+			    </TableRow>
+	        </TableLayout>
+	        	            
+		    <ProgressBar
+			    android:id="@+id/my_account_used_space_bar"
+				android:layout_width="fill_parent"
+				android:layout_gravity="center"
+				android:layout_height="wrap_content" 
+				style="@style/MEGAProgressBar"  
+				android:paddingLeft="5dip"
+				android:paddingRight="5dip"
+				android:layout_below="@id/progress_my_account" />
+	        
+	        <RelativeLayout
+	              android:id="@+id/my_account_title_type"
+	              android:layout_width="match_parent"
+	              android:layout_height="wrap_content"
+	              android:gravity="center"
+	              android:layout_below="@id/my_account_used_space_bar" >
+	
+	             
+		        <TextView
+		             android:id="@+id/my_account_title"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/my_account_title"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:textStyle="bold"
+					 android:paddingTop="10dp"
+					 android:paddingBottom="10dp" />   
+		             
+		        <TextView
+		             android:id="@+id/my_account_type_account"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:layout_toRightOf="@id/my_account_title"
+		             android:textColor="@color/white"			 
+					 android:paddingLeft="4dp"
+					 android:paddingTop="10dp"
+					 android:paddingBottom="10dp" />   
+	 
+	         </RelativeLayout>     
+	 
+	        
+	     	<RelativeLayout android:id="@+id/button_upgrade"
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content"
+				android:layout_below="@id/my_account_title_type" >        
+	        
+		        <Button
+		            android:id="@+id/btn_upgrade"            
+		            android:layout_width="200dp"
+		       		android:layout_height="48dp"
+		       		android:layout_marginTop="10dp"
+		       		android:textStyle="bold"
+		       		android:layout_centerHorizontal="true"
+		            android:layout_centerVertical="true"
+		            android:text="@string/my_account_upgrade_pro" 
+		            style="@style/button_MEGA_inverse"/>
+	            
+	        </RelativeLayout>
+	        
+	        <RelativeLayout
+	            android:id="@+id/my_account_my_last_session_relative_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="2">           
-            <TextView
-             android:id="@+id/my_last_session_title"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:text="@string/my_account_last_session"
-             android:textColor="@color/file_properties_info_menu"
-			 android:textStyle="bold"
-			 android:paddingLeft="70dp"
-			 android:paddingTop="10dp" />   
-             
-        	<TextView
-             android:id="@+id/my_last_session"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_toRightOf="@id/my_last_session_title"
-             android:textColor="@color/white"
-			 android:paddingLeft="4dp"
-			 android:paddingTop="10dp"/>       
-         </RelativeLayout>
-         
-         <RelativeLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingBottom="5dp"
-                android:layout_weight="2">
-            
-             <TextView
-	            android:id="@+id/my_connections_title"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	             android:paddingLeft="90dp"
-			 android:paddingTop="5dp"
-	            android:text="@string/my_account_connections"
-	            android:textColor="@color/file_properties_info_menu"
-			 	android:textStyle="bold" />   
-            
-	       	<TextView
-	            android:id="@+id/my_connections"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	             android:paddingLeft="4dp"
-			 	android:paddingTop="5dp"
-	            android:layout_toRightOf="@id/my_connections_title"
-	            android:textColor="@color/white"/>      
-       </RelativeLayout>
-    
-
-    <Button
+                android:gravity="center"
+                android:layout_below="@id/button_upgrade">
+		                   
+	            <TextView
+		             android:id="@+id/my_last_session_title"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/my_account_last_session"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:textStyle="bold"
+					 android:paddingTop="10dp" />   
+	             
+	        	<TextView
+		             android:id="@+id/my_last_session"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:layout_toRightOf="@id/my_last_session_title"
+		             android:textColor="@color/white"
+					 android:paddingLeft="4dp"
+					 android:paddingTop="10dp"/>       
+	         </RelativeLayout>
+	         
+	         <RelativeLayout
+	             	android:id="@+id/my_account_my_connections_relative_layout"
+	                android:layout_width="fill_parent"
+	                android:layout_height="wrap_content"
+	                android:gravity="center"
+	                android:paddingBottom="5dp"
+	                android:layout_below="@id/my_account_my_last_session_relative_layout">
+	            
+	           <TextView
+		            android:id="@+id/my_connections_title"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+				 	android:paddingTop="5dp"
+		            android:text="@string/my_account_connections"
+		            android:textColor="@color/file_properties_info_menu"
+				 	android:textStyle="bold" />   
+	            
+		       	<TextView
+		            android:id="@+id/my_connections"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		             android:paddingLeft="4dp"
+				 	android:paddingTop="5dp"
+		            android:layout_toRightOf="@id/my_connections_title"
+		            android:textColor="@color/white"/>      
+	       </RelativeLayout>
+	       
+	         <LinearLayout 
+		            android:layout_width="match_parent"
+		            android:layout_height="48dp"
+		            android:orientation="vertical"
+		            android:layout_below="@id/my_account_my_connections_relative_layout">
+		            
+		        </LinearLayout>
+		</RelativeLayout>
+	</ScrollView>
+	
+	<Button
         android:id="@+id/my_account_logout"
 		android:layout_height="48dp"
 		android:layout_width="fill_parent"
-        android:layout_gravity="center"
-         android:layout_weight="1"
-        android:paddingTop="7dp"
+		android:paddingTop="7dp"
         android:background="@drawable/btn_default_holo_light_without_corners"
         android:text="@string/action_logout"
-        android:textColor="@color/button_text" >
-    </Button>    
-  
+        android:textColor="@color/button_text"
+        android:layout_alignParentBottom="true" >
+    </Button>
 
-</LinearLayout>
+</RelativeLayout>

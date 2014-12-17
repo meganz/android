@@ -21,12 +21,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class UpgradeAccountFragment extends Fragment implements MegaRequestListenerInterface{
@@ -37,6 +39,15 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
+	private TextView pro1Title;
+	private TextView pro2Title;
+	private TextView pro3Title;
+	private TextView proStorage1;
+	private TextView proStorage2;
+	private TextView proStorage3;
+	private TextView proBandwith1;
+	private TextView proBandwith2;
+	private TextView proBandwith3;
 	private TextView storage1;
 	private TextView bandwidth1;
 	private TextView pricingPerMonth1;
@@ -75,7 +86,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
-		aB.setTitle(R.string.section_account);
+		aB.setTitle(R.string.action_upgrade_account);
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -99,9 +110,21 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		pro3.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
 		pro3.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
 		
+		pro1Title = (TextView) v.findViewById(R.id.pro1_title);
+		pro2Title = (TextView) v.findViewById(R.id.pro2_title);
+		pro3Title = (TextView) v.findViewById(R.id.pro3_title);
+		
+		proStorage1 = (TextView) v.findViewById(R.id.pro1_storage_title);
+		proStorage2 = (TextView) v.findViewById(R.id.pro2_storage_title);
+		proStorage3 = (TextView) v.findViewById(R.id.pro3_storage_title);
+		
 		storage1 = (TextView) v.findViewById(R.id.pro1_storage);
 		storage2 = (TextView) v.findViewById(R.id.pro2_storage);
 		storage3 = (TextView) v.findViewById(R.id.pro3_storage);
+		
+		proBandwith1 = (TextView) v.findViewById(R.id.pro1_bandwidth_title);
+		proBandwith2 = (TextView) v.findViewById(R.id.pro2_bandwidth_title);
+		proBandwith3 = (TextView) v.findViewById(R.id.pro3_bandwidth_title);
 		
 		bandwidth1 = (TextView) v.findViewById(R.id.pro1_bandwidth);
 		bandwidth2 = (TextView) v.findViewById(R.id.pro2_bandwidth);
@@ -110,6 +133,30 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		pricingPerMonth1 = (TextView) v.findViewById(R.id.pricing1_from);
 		pricingPerMonth2 = (TextView) v.findViewById(R.id.pricing2_from);
 		pricingPerMonth3 = (TextView) v.findViewById(R.id.pricing3_from);
+		
+		pro1Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pro2Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pro3Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		proStorage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		proStorage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		proStorage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		storage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		storage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		storage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		proBandwith1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		proBandwith2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		proBandwith3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		bandwidth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		bandwidth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		bandwidth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		pricingPerMonth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 		
 		megaApi.getAccountDetails(this);
 		megaApi.getPricing(this);
