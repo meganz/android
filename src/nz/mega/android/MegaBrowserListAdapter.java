@@ -125,12 +125,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.OUTGOING_SHARES_ADAPTER: {
-			//TODO necesito algo?
 			((ManagerActivity) context).setParentHandleOutgoing(-1);
 			break;
 		}
 		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
-			//TODO necesito algo?
 			((ManagerActivity) context).setParentHandleIncoming(-1);
 			break;
 		}
@@ -236,25 +234,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		} else {
 			holder = (ViewHolderBrowserList) convertView.getTag();
 		}
-
-		if (!multipleSelect) {
-			holder.checkbox.setVisibility(View.GONE);
-			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			holder.savedOfflineMultiselect.setVisibility(View.GONE);
 	
-		} else {
-			holder.checkbox.setVisibility(View.VISIBLE);
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
-			holder.savedOffline.setVisibility(View.GONE);				
-
-			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
-			if (checkedItems.get(position, false) == true) {
-				holder.checkbox.setChecked(true);
-			} else {
-				holder.checkbox.setChecked(false);
-			}
-		}
-		
 		holder.optionShare.setVisibility(View.GONE);
 		holder.optionPermissions.setVisibility(View.GONE);
 		holder.savedOffline.setVisibility(View.GONE);
@@ -394,9 +374,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				//				holder.arrowSelection.setVisibility(View.VISIBLE);
 //				holder.optionsLayout.setVisibility(View.GONE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
-				params.height = (int) TypedValue.applyDimension(
-						TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources()
-						.getDisplayMetrics());
+				params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				listFragment.smoothScrollToPosition(_position);
@@ -417,7 +395,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 //					((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
 //							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
+//					holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);			log("clickado:BLANCO "+ holder.currentPosition);
 //					((LinearLayout.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 //							Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
 //					holder.optionPublicLink.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
@@ -643,6 +621,26 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			.setImageResource(R.drawable.action_selector_ic);
 		}
 
+		if (!multipleSelect) {
+			holder.checkbox.setVisibility(View.GONE);
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			holder.savedOfflineMultiselect.setVisibility(View.GONE);
+	
+		} else {
+			holder.checkbox.setVisibility(View.VISIBLE);
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			holder.savedOffline.setVisibility(View.GONE);				
+
+			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
+			if (checkedItems.get(position, false) == true) {
+				holder.checkbox.setChecked(true);					
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				
+
+			} else {
+				holder.checkbox.setChecked(false);
+			}
+		}
 		holder.optionDownload.setTag(holder);
 		holder.optionDownload.setOnClickListener(this);
 		

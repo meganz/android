@@ -3,16 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RubbishBinListFragment"
-    android:background="@color/grid_background" >
+	android:background="@color/fragment_background">
     
     <TextView
 	    android:id="@+id/rubbishbin_content_grid_text"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:paddingLeft="8dp"
-	    android:textColor="@color/button_text"
-	    android:background="@color/dark_grey_cloud_drive"
-	    android:textSize="16sp"/>
+	    android:textColor="@color/black"
+	    android:background="@color/content_text_folder"
+	    android:textSize="14sp"/>
 
     <ListView 
         android:id="@+id/rubbishbin_grid_view"

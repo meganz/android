@@ -7,30 +7,34 @@
     android:background="@color/black"
     tools:context=".FilePropertiesActivity" >
     
-    <RelativeLayout 
+    <LinearLayout 
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:background="@color/black"
+	    android:background="@color/file_properties_top"
+
+	    android:orientation="vertical"
+	    android:weightSum="6"
 	    android:id="@+id/file_title_layout">      	     
-	    
-		      
-        <TextView
-	        android:id="@+id/file_properties_name"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="20dp"
-	        android:layout_marginLeft="10dp"
-	        android:textColor="@color/white"/>
+   
     
 	     <ImageView 
 	         android:id="@+id/file_properties_image"
 	         android:layout_width="wrap_content"
+	         android:layout_gravity="center_horizontal"
 	         android:layout_height="200dp"
-	         android:layout_centerHorizontal="true"
-	         android:layout_below="@id/file_properties_name"/>
+	         android:layout_weight="5"/>
+	     
+	     <TextView
+	        android:id="@+id/file_properties_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginBottom="10dp"
+	        android:layout_weight="1"
+	        android:textColor="@color/white"/>
 
 	
-	  </RelativeLayout>
+	  </LinearLayout>
          
       <LinearLayout       		
 	    android:layout_width="fill_parent"
@@ -103,10 +107,10 @@
      
      <TableLayout 
          android:id="@+id/file_properties_layout"
-         android:layout_width="wrap_content"
+         android:layout_width="fill_parent"
        	 android:layout_height="wrap_content" 
        	 android:layout_gravity="center"
-       	 android:background="@color/black"
+       	 android:background="@color/file_properties_bottom"
        	 android:layout_below="@id/available_offline_layout" >
          
          <TableRow >
@@ -230,7 +234,7 @@
     <Button
         android:id="@+id/shared_with_button"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_gravity="center"
         android:layout_alignParentBottom="true"
         android:background="@drawable/btn_shared_folder_holo_light"

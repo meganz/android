@@ -10,9 +10,9 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:paddingLeft="8dp"
-	    android:textColor="@color/button_text"
-	    android:background="@color/dark_grey_cloud_drive"
-	    android:textSize="16sp"/>
+	    android:textColor="@color/black"
+	    android:background="@color/content_text_folder"
+	    android:textSize="14sp"/>
        
     <ImageView
 	    android:id="@+id/file_grid_empty_image"
