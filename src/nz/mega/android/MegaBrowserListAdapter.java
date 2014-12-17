@@ -77,8 +77,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
 		public ImageView savedOffline;
-		public ImageView savedOfflineMultiselect;
+//		public ImageView savedOfflineMultiselect;
 		public ImageButton imageButtonThreeDots;
+		public ImageView publicLinkImageMultiselect;
+		public ImageView publicLinkImage;
 		public RelativeLayout itemLayout;
 		//public ImageView arrowSelection;
 		public LinearLayout optionsLayout;
@@ -186,7 +188,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.checkbox.setClickable(false);
 			holder.imageView = (ImageView) convertView.findViewById(R.id.file_list_thumbnail);
 			holder.savedOffline = (ImageView) convertView.findViewById(R.id.file_list_saved_offline);
-			holder.savedOfflineMultiselect = (ImageView) convertView.findViewById(R.id.file_list_saved_offline_multiselect);
+			
+			holder.publicLinkImageMultiselect = (ImageView) convertView.findViewById(R.id.file_list_public_link_multiselect);
+			holder.publicLinkImage = (ImageView) convertView.findViewById(R.id.file_list_public_link);
 			
 			holder.textViewFileName = (TextView) convertView.findViewById(R.id.file_list_filename);			
 			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
@@ -202,22 +206,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			holder.optionLeaveShare.setVisibility(View.GONE);
 			
 			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.file_list_option_download_layout);
-//			holder.optionDownload.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);	
-//			((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((11 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-
 			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.file_list_option_properties_layout);
 			holder.propertiesText = (TextView) convertView.findViewById(R.id.file_list_option_properties_text);
-//			holder.optionProperties.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//			((LinearLayout.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((10 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
 			holder.optionPublicLink = (RelativeLayout) convertView.findViewById(R.id.file_list_option_public_link_layout);
 //			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
 //			((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			//			
-			//			holder.shareDisabled = (ImageView) convertView.findViewById(R.id.file_list_option_shared_disabled);
-			//			holder.shareDisabled.getLayoutParams().width = Util.px2dp((60), outMetrics);
-			//			((TableRow.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-			//			
 
 			holder.optionShare = (RelativeLayout) convertView.findViewById(R.id.file_list_option_share_layout);
 			holder.optionPermissions = (RelativeLayout) convertView.findViewById(R.id.file_list_option_permissions_layout);
@@ -240,9 +234,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	
 		holder.optionShare.setVisibility(View.GONE);
 		holder.optionPermissions.setVisibility(View.GONE);
-		holder.savedOffline.setVisibility(View.GONE);
-		holder.savedOfflineMultiselect.setVisibility(View.GONE);
-				
+		holder.savedOffline.setVisibility(View.INVISIBLE);
+//		holder.savedOfflineMultiselect.setVisibility(View.GONE);
+		holder.publicLinkImage.setVisibility(View.GONE);
+		holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+		
 		holder.transferProgressBar.setVisibility(View.GONE);
 		holder.textViewFileSize.setVisibility(View.VISIBLE);
 
@@ -257,18 +253,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		if (!multipleSelect) {
 			holder.checkbox.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-		    marginParams.setMargins(30,0,0,0);
-		    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-		    holder.imageView.setLayoutParams(layoutParams);
 	
 		} else {
 			holder.checkbox.setVisibility(View.VISIBLE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);
-			MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-		    marginParams.setMargins(125,0,0,0);
-		    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-		    holder.imageView.setLayoutParams(layoutParams);
 			
 			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
 			if (checkedItems.get(position, false) == true) {
@@ -338,17 +326,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				if (thumb != null) {
 					if(!multipleSelect){
 						holder.imageView.setImageBitmap(thumb);
-						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-					    marginParams.setMargins(41,0,0,0);
-					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-					    holder.imageView.setLayoutParams(layoutParams);
 					}
 					else{
 						holder.imageView.setImageBitmap(thumb);
-						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-					    marginParams.setMargins(125,0,0,0);
-					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-					    holder.imageView.setLayoutParams(layoutParams);
 					}
 				} else {
 					thumb = ThumbnailUtils
@@ -356,17 +336,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					if (thumb != null) {
 						if(!multipleSelect){
 							holder.imageView.setImageBitmap(thumb);
-							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-						    marginParams.setMargins(41,0,0,0);
-						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-						    holder.imageView.setLayoutParams(layoutParams);
 						}
 						else{
 							holder.imageView.setImageBitmap(thumb);
-							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-						    marginParams.setMargins(125,0,0,0);
-						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-						    holder.imageView.setLayoutParams(layoutParams);
 						}
 					} else {
 						try {
@@ -378,17 +350,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						if (thumb != null) {
 							if(!multipleSelect){
 								holder.imageView.setImageBitmap(thumb);
-								MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-							    marginParams.setMargins(41,0,0,0);
-							    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-							    holder.imageView.setLayoutParams(layoutParams);
 							}
 							else{
 								holder.imageView.setImageBitmap(thumb);
-								MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-							    marginParams.setMargins(125,0,0,0);
-							    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-							    holder.imageView.setLayoutParams(layoutParams);
 							}
 						}
 					}
@@ -398,17 +362,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				if (thumb != null) {
 					if(!multipleSelect){
 						holder.imageView.setImageBitmap(thumb);
-						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-					    marginParams.setMargins(41,0,0,0);
-					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-					    holder.imageView.setLayoutParams(layoutParams);
 					}
 					else{
 						holder.imageView.setImageBitmap(thumb);
-						MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-					    marginParams.setMargins(125,0,0,0);
-					    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-					    holder.imageView.setLayoutParams(layoutParams);
 					}
 				} else {
 					thumb = ThumbnailUtils
@@ -416,22 +372,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					if (thumb != null) {
 						if(!multipleSelect){
 							holder.imageView.setImageBitmap(thumb);
-							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-						    marginParams.setMargins(41,0,0,0);
-						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-						    holder.imageView.setLayoutParams(layoutParams);
 						}
 						else{
 							holder.imageView.setImageBitmap(thumb);
-							MarginLayoutParams marginParams = new MarginLayoutParams(holder.imageView.getLayoutParams());
-						    marginParams.setMargins(125,0,0,0);
-						    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-						    holder.imageView.setLayoutParams(layoutParams);
 						}
 					} else {
 						try {
-							ThumbnailUtils.createThumbnailList(context, node,
-									holder, megaApi, this);
+							ThumbnailUtils.createThumbnailList(context, node,holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
 					}
@@ -449,13 +396,36 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		if (offlineDirectory.exists()){
 			if(multipleSelect){
-				holder.savedOfflineMultiselect.setVisibility(View.VISIBLE);
-				holder.savedOffline.setVisibility(View.GONE);
-				log("Entrooooooo222222");
+				holder.savedOffline.setVisibility(View.VISIBLE);
 			}
 			else{
 				holder.savedOffline.setVisibility(View.VISIBLE);
-				holder.savedOfflineMultiselect.setVisibility(View.GONE);
+			}
+		}
+		
+		ArrayList<MegaShare> sl = megaApi.getOutShares(node);		
+
+		if (sl != null && sl.size() != 0){
+			
+			for(int i=0; i<sl.size();i++){
+
+				//Check if one of the ShareNodes is the public link
+
+				if(sl.get(i).getUser()==null){
+
+					if(multipleSelect){
+						holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+						holder.publicLinkImage.setVisibility(View.GONE);
+					}
+					else
+					{
+						holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+						holder.publicLinkImage.setVisibility(View.VISIBLE);
+					}
+					//
+					break;
+
+				}
 			}
 		}
 
