@@ -107,28 +107,28 @@ import android.widget.Toast;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, SHARED_WITH_ME, RUBBISH_BIN, CONTACTS, CAMERA_UPLOADS, TRANSFERS, SETTINGS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, SHARED_WITH_ME, CONTACTS, TRANSFERS, RUBBISH_BIN, SETTINGS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
 				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline);
-				case SHARED_WITH_ME: return context.getString(R.string.section_shared_with_me);
-				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
-				case CONTACTS: return context.getString(R.string.section_contacts);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
+				case SHARED_WITH_ME: return context.getString(R.string.section_shared_items);
+				case CONTACTS: return context.getString(R.string.section_contacts);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
+				case RUBBISH_BIN: return context.getString(R.string.section_rubbish_bin);
+				case SETTINGS: return context.getString(R.string.action_settings);
 				case ACCOUNT: return context.getString(R.string.section_account);				
 				case SEARCH: return context.getString(R.string.action_search);
-				case SETTINGS: return context.getString(R.string.action_settings);
 			}
 			return null;
 			
 		}
 	}
 	
-	public static int POS_CAMERA_UPLOADS = 5;
+	public static int POS_CAMERA_UPLOADS = 2;
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
@@ -205,6 +205,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public int accountFragment;
 	
 	private static DrawerItem drawerItem;
+	private static DrawerItem lastDrawerItem;
 	
 	private TableLayout topControlBar;
 	private TableLayout bottomControlBar;
@@ -620,7 +621,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	            public void onDrawerClosed(View view) {
 	            	
 	            	if (getSupportActionBar() != null){
-	            		getSupportActionBar().setTitle(titleAB);
+	            		if (titleAB.compareTo("") != 0){
+	            			getSupportActionBar().setTitle(titleAB);
+	            		}
 	            	}
 	            	supportInvalidateOptionsMenu();	// creates call to onPrepareOptionsMenu()
 	            }
@@ -1281,7 +1284,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		case CLOUD_DRIVE:{
 //    			
 //    			megaApi.getPricing(this);
-    			titleAB = getString(R.string.section_cloud_drive);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			    			
 				if (fbF == null){
@@ -1357,7 +1359,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case CONTACTS:{
   			
-    			titleAB = getString(R.string.section_contacts);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (aB == null){
@@ -1457,7 +1458,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case RUBBISH_BIN:{
     			
-    			titleAB = getString(R.string.section_rubbish_bin);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (rbF == null){
@@ -1522,7 +1522,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SHARED_WITH_ME:{    			
     			
-    			titleAB = getString(R.string.section_shared_with_me);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (aB == null){
@@ -1649,17 +1648,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SETTINGS:{
     			
-    			titleAB = getString(R.string.action_settings);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
     			startActivity(new Intent(this, SettingsActivity.class));
     			
+    			drawerItem = lastDrawerItem;
+    			selectDrawerItem(drawerItem);
+    			
     			break;
     		}
     		case ACCOUNT:{
 
-    			titleAB = getString(R.string.section_account);
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
@@ -1719,7 +1719,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case TRANSFERS:{
     			
-    			titleAB = getString(R.string.section_transfers);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (tF == null){
@@ -1777,7 +1776,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SAVED_FOR_OFFLINE:{
     			
-    			titleAB = getString(R.string.section_saved_for_offline);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (oF == null){
@@ -1832,7 +1830,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case SEARCH:{
     			
-    			titleAB = getString(R.string.action_search);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (sF == null){
@@ -1881,7 +1878,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     		case CAMERA_UPLOADS:{
     			
-    			titleAB = getString(R.string.section_photo_sync);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (nDA != null){
@@ -3782,7 +3778,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //		if (position >= 3){
 //			position++;
 //		}
+		
+		lastDrawerItem = drawerItem;
 		drawerItem = DrawerItem.values()[position];
+		if (drawerItem != DrawerItem.SETTINGS){
+			titleAB = "";
+		}
+		else{
+			getSupportActionBar().setTitle(titleAB);
+		}
 		selectDrawerItem(drawerItem);
 	}
 
@@ -3809,6 +3813,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					nDA.setPositionClicked(-1);
 				}
 				drawerItem = DrawerItem.ACCOUNT;
+				titleAB = drawerItem.getTitle(this);
 				selectDrawerItem(drawerItem);
 				break;
 			}
@@ -3817,6 +3822,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					nDA.setPositionClicked(-1);
 				}
 				drawerItem = DrawerItem.ACCOUNT;
+				titleAB = drawerItem.getTitle(this);
 				selectDrawerItem(drawerItem);
 				break;
 			}
