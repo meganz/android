@@ -121,7 +121,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
-		aB.setLogo(R.drawable.ic_action_navigation_accept);
+		aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 
 		contactPropertiesMainActivity=this;
 

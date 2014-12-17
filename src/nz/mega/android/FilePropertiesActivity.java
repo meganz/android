@@ -140,8 +140,6 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	boolean shareIt = true;
 	int imageId;
 	
-	MegaSharedFolderAdapter adapter;
-	
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 	
@@ -170,7 +168,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
-		aB.setLogo(R.drawable.ic_action_navigation_accept);
+		aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 		aB.setTitle(getString(R.string.file_properties_activity));
 		
 		Display display = getWindowManager().getDefaultDisplay();
