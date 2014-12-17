@@ -49,7 +49,7 @@ public class InitialCamSyncActivity extends Activity implements OnClickListener 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_cam_sync_initial);
-		viewPager = (LoopViewPager) findViewById(R.id.cam_sync_pager);
+//		viewPager = (LoopViewPager) findViewById(R.id.cam_sync_pager);
 //		bar = (ImageView) findViewById(R.id.cam_sync_bar);
 		bOK = (Button) findViewById(R.id.cam_sync_button_ok);
 		bSkip = (Button) findViewById(R.id.cam_sync_button_skip);

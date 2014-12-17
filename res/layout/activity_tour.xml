@@ -22,7 +22,7 @@
 	       
 	       <nz.mega.components.LoopViewPager
 	           android:id="@+id/pager"
-	           android:layout_width="wrap_content"
+	           android:layout_width="fill_parent"
 	           android:layout_height="wrap_content"
 	           android:layout_gravity="center" />
 	       
@@ -53,8 +53,8 @@
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:layout_marginBottom="@dimen/standard_margin"
-                android:textColor="@color/text_login"
-                android:text="@string/tour_text_1"
+                android:textColor="@color/mega"
+                android:text="@string/tour_space_title"
                 />
             
             <TextView
@@ -64,7 +64,7 @@
                 android:textSize="14sp"
                 android:layout_marginBottom="@dimen/standard_margin"
                 android:textColor="@color/text_login"
-                android:text="@string/tour_text_2"
+                android:text="@string/tour_space_text"
                 />
             
             <Button

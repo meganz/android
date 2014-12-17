@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class TourActivity extends Activity implements OnClickListener {
@@ -82,7 +83,8 @@ public class TourActivity extends Activity implements OnClickListener {
 	    
 	    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
 	    
-	    viewPager.getLayoutParams().height = Util.px2dp((350*scaleH), outMetrics);
+	    viewPager.getLayoutParams().height = outMetrics.widthPixels;
+//	    viewPager.getLayoutParams().height = Util.px2dp((350*scaleH), outMetrics);
 		
 //		viewPager.getLayoutParams().width = screenWidth;
 //		viewPager.getLayoutParams().height = screenWidth;
@@ -97,6 +99,23 @@ public class TourActivity extends Activity implements OnClickListener {
 														        R.drawable.tour03_bar,
 														        R.drawable.tour04_bar
 														    };
+														
+														int[] barTitles = new int[] {
+															R.string.tour_space_title,
+															R.string.tour_speed_title,
+															R.string.tour_privacy_title,
+															R.string.tour_access_title
+														};
+														
+														int[] barTexts = new int[] {
+																R.string.tour_space_text,
+																R.string.tour_speed_text,
+																R.string.tour_privacy_text,
+																R.string.tour_access_text
+															};
+														
+														tourText1.setText(barTitles[position]);
+														tourText2.setText(barTexts[position]);
 														bar.setImageResource(barImages[position]);
 													}
 												});
