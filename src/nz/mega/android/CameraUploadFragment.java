@@ -114,8 +114,9 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 		long handle3;
 	}
 	
-	private TourImageAdapter adapter;
-	private LoopViewPager viewPager;
+//	private TourImageAdapter adapter;
+//	private LoopViewPager viewPager;
+	private ImageView initialImageView;
 //	private ImageView bar;
 	private Button bOK;
 	private Button bSkip;	
@@ -311,7 +312,9 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			setInitialPreferences();
 			View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
 			
-			viewPager = (LoopViewPager) v.findViewById(R.id.cam_sync_pager);
+			initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
+			initialImageView.getLayoutParams().height = outMetrics.widthPixels;
+//			viewPager = (LoopViewPager) v.findViewById(R.id.cam_sync_pager);
 			bOK = (Button) v.findViewById(R.id.cam_sync_button_ok);
 			bSkip = (Button) v.findViewById(R.id.cam_sync_button_skip);
 			camSyncRadioGroup = (RadioGroup) v.findViewById(R.id.cam_sync_radio_group);
@@ -323,23 +326,23 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			bOK.setOnClickListener(this);
 			bSkip.setOnClickListener(this);
 			
-			adapter = new TourImageAdapter((Activity)context);
-			viewPager.setAdapter(adapter);
-			viewPager.setCurrentItem(0);
-																		
-			viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-				
-				@Override
-				public void onPageSelected (int position){
-					int[] barImages = new int[] {
-					        R.drawable.tour01_bar,
-					        R.drawable.tour02_bar,
-					        R.drawable.tour03_bar,
-					        R.drawable.tour04_bar
-					    };
-//					bar.setImageResource(barImages[position]);
-				}
-			});
+//			adapter = new TourImageAdapter((Activity)context);
+//			viewPager.setAdapter(adapter);
+//			viewPager.setCurrentItem(0);
+//																		
+//			viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+//				
+//				@Override
+//				public void onPageSelected (int position){
+//					int[] barImages = new int[] {
+//					        R.drawable.tour01_bar,
+//					        R.drawable.tour02_bar,
+//					        R.drawable.tour03_bar,
+//					        R.drawable.tour04_bar
+//					    };
+////					bar.setImageResource(barImages[position]);
+//				}
+//			});
 			
 			return v;
 		}

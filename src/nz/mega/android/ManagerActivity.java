@@ -3781,13 +3781,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		lastDrawerItem = drawerItem;
 		drawerItem = DrawerItem.values()[position];
-		if (drawerItem != DrawerItem.SETTINGS){
-			titleAB = "";
+		
+		if (drawerItem != lastDrawerItem){
+			if (drawerItem != DrawerItem.SETTINGS){
+				titleAB = "";
+			}
+			else{
+				getSupportActionBar().setTitle(titleAB);
+			}
+			selectDrawerItem(drawerItem);
 		}
 		else{
 			getSupportActionBar().setTitle(titleAB);
+			titleAB = "";
+			mDrawerLayout.closeDrawer(Gravity.LEFT);
 		}
-		selectDrawerItem(drawerItem);
 	}
 
 	public void uploadFile(){

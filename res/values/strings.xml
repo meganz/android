@@ -104,8 +104,6 @@
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">New to MEGA?</string>
-    <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
-    <string name="tour_text_2" context="Not translate. design text">Sed ut perspiciatis unde omnis iste natus</string>
     <string name="create_account" context="label and text button when creating the account">Create an account</string>
     <string name="login_logging_in" context="label when logging in to MEGA">Logging in</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Please enter your email address</string>
@@ -121,6 +119,14 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     
+    <string name="tour_space_title">MEGA SPACE</string>
+    <string name="tour_speed_title">MEGA SPEED</string>
+    <string name="tour_privacy_title">MEGA PRIVACY</string>
+    <string name="tour_access_title">MEGA ACCESS</string>
+    <string name="tour_space_text">Register now and get 50 GB of free space</string>
+    <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
+    <string name="tour_privacy_text">Keep all you files safe with MEGA\'s end-to-end encryption</string>
+    <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
     
     <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
     <string name="name_text" context="Name of the user">name</string>

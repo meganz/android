@@ -13,18 +13,18 @@ import android.widget.LinearLayout;
 public class TourImageAdapter extends PagerAdapter {
 
 	private int[] mImages = new int[] {
-	        R.drawable.tour01_img,
-	        R.drawable.tour02_img,
-	        R.drawable.tour03_img,
-	        R.drawable.tour04_img
+	        R.drawable.storage_space,
+	        R.drawable.speed,
+	        R.drawable.privacy_security,
+	        R.drawable.access
 	    };	
 	
-	private Activity _activity;
+	private Activity activity;
 	private LayoutInflater inflater;
 	
 	// constructor
 	public TourImageAdapter(Activity activity) {
-		this._activity = activity;
+		this.activity = activity;
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class TourImageAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         ImageView imgDisplay;
  
-        inflater = (LayoutInflater) _activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.tour_image_layout, container,false);
  
         imgDisplay = (ImageView) viewLayout.findViewById(R.id.imageTour);
