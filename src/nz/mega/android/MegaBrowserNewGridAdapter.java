@@ -329,7 +329,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
     	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
     	public ArrayList<ImageView> imageViews;
     	public ArrayList<LinearLayout> menuLayouts;
-    	public ArrayList<LinearLayout> longClickLayouts;
+    	public ArrayList<LinearLayout> longClickLayoutsSelected;
+    	public ArrayList<LinearLayout> longClickLayoutsUnselected;
     	public ArrayList<TextView> fileNameViews;
     	public ArrayList<TextView> fileSizeViews;
     	public ArrayList<ProgressBar> progressBars;
@@ -357,7 +358,8 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
 			holder.imageViews = new ArrayList<ImageView>();
 			holder.menuLayouts = new ArrayList<LinearLayout>();
-			holder.longClickLayouts = new ArrayList<LinearLayout>();
+			holder.longClickLayoutsSelected = new ArrayList<LinearLayout>();
+			holder.longClickLayoutsUnselected = new ArrayList<LinearLayout>();
 			holder.threeDots = new ArrayList<ImageButton>();
 			holder.fileNameViews = new ArrayList<TextView>();
 			holder.fileSizeViews = new ArrayList<TextView>();
@@ -389,8 +391,11 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				LinearLayout mL = (LinearLayout) rLView.findViewById(R.id.cell_menu_layout);
 				holder.menuLayouts.add(mL);
 				
-				LinearLayout lcL = (LinearLayout) rLView.findViewById(R.id.cell_menu_long_click);
-				holder.longClickLayouts.add(lcL);
+				LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.cell_menu_long_click_selected);
+				holder.longClickLayoutsSelected.add(lcLS);
+				
+				LinearLayout lcLU = (LinearLayout) rLView.findViewById(R.id.cell_menu_long_click_unselected);
+				holder.longClickLayoutsUnselected.add(lcLU);
 				
 				ImageView oDo = (ImageView) rLView.findViewById(R.id.grid_menu_layout_option_download);
 				holder.optionsDownload.add(oDo);
@@ -449,14 +454,17 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				
 				if (multipleSelect){
 					if (isChecked(totalPosition)){
-						holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
+						holder.longClickLayoutsSelected.get(i).setVisibility(View.VISIBLE);
+						holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 					}
 					else{
-						holder.longClickLayouts.get(i).setVisibility(View.GONE);
+						holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+						holder.longClickLayoutsUnselected.get(i).setVisibility(View.VISIBLE);
 					}
 				}
 				else{
-					holder.longClickLayouts.get(i).setVisibility(View.GONE);
+					holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+					holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 				}
 				
 				if (totalPosition == positionClicked){

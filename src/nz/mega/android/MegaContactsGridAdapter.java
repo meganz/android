@@ -263,7 +263,8 @@ public class MegaContactsGridAdapter extends BaseAdapter{
     	public ArrayList<RelativeLayout> relativeLayoutsUser;
     	public ArrayList<RelativeLayout> relativeLayoutsEmpty;
     	public ArrayList<LinearLayout> menuLayouts;
-    	public ArrayList<LinearLayout> longClickLayouts;
+    	public ArrayList<LinearLayout> longClickLayoutsSelected;
+    	public ArrayList<LinearLayout> longClickLayoutsUnselected;
     	public ArrayList<ImageButton> threeDots;
     	public ArrayList<RoundedImageView> imageViews;
     	public ArrayList<TextView> initialLetters;
@@ -290,7 +291,8 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 			holder.relativeLayoutsUser = new ArrayList<RelativeLayout>();
 			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
 			holder.menuLayouts = new ArrayList<LinearLayout>();
-			holder.longClickLayouts = new ArrayList<LinearLayout>();
+			holder.longClickLayoutsSelected = new ArrayList<LinearLayout>();
+			holder.longClickLayoutsUnselected = new ArrayList<LinearLayout>();
 			holder.threeDots = new ArrayList<ImageButton>();
 			holder.imageViews = new ArrayList<RoundedImageView>();
 			holder.initialLetters = new ArrayList<TextView>();
@@ -323,8 +325,11 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				LinearLayout mL = (LinearLayout) rLView.findViewById(R.id.contact_cell_menu_layout);
 				holder.menuLayouts.add(mL);
 				
-				LinearLayout lcL = (LinearLayout) rLView.findViewById(R.id.contact_cell_menu_long_click);
-				holder.longClickLayouts.add(lcL);
+				LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.contact_cell_menu_long_click_selected);
+				holder.longClickLayoutsSelected.add(lcLS);
+				
+				LinearLayout lcLU = (LinearLayout) rLView.findViewById(R.id.contact_cell_menu_long_click_unselected);
+				holder.longClickLayoutsUnselected.add(lcLU);
 				
 				ImageView oP = (ImageView) rLView.findViewById(R.id.contact_grid_menu_layout_option_properties);
 				holder.optionsProperties.add(oP);
@@ -382,25 +387,6 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				holder.relativeLayoutsUser.get(i).setVisibility(View.VISIBLE);
 				holder.relativeLayoutsEmpty.get(i).setVisibility(View.GONE);
 				
-				if (multipleSelect){
-					if (isChecked(totalPosition)){
-						holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
-					}
-					else{
-						holder.longClickLayouts.get(i).setVisibility(View.GONE);
-					}
-				}
-				else{
-					holder.longClickLayouts.get(i).setVisibility(View.GONE);
-				}
-				
-				if (totalPosition == positionClicked){
-					holder.menuLayouts.get(i).setVisibility(View.VISIBLE);
-				}
-				else{
-					holder.menuLayouts.get(i).setVisibility(View.GONE);
-				}
-				
 				MegaUser contact = (MegaUser) contacts.get(totalPosition);
 				holder.contactMails.set(i, contact.getEmail());
 				holder.contactNameViews.get(i).setText(contact.getEmail());
@@ -409,6 +395,31 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				holder.contactContentViews.get(i).setText(getDescription(nodes));
 				
 				createDefaultAvatar(holder, totalPosition, i);
+				
+				if (multipleSelect){
+					if (isChecked(totalPosition)){
+						holder.longClickLayoutsSelected.get(i).setVisibility(View.VISIBLE);
+						holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
+						holder.initialLetters.get(i).setVisibility(View.GONE);
+					}
+					else{
+						holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+						holder.longClickLayoutsUnselected.get(i).setVisibility(View.VISIBLE);
+						holder.initialLetters.get(i).setVisibility(View.VISIBLE);
+					}
+				}
+				else{
+					holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+					holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
+					holder.initialLetters.get(i).setVisibility(View.VISIBLE);
+				}
+				
+				if (totalPosition == positionClicked){
+					holder.menuLayouts.get(i).setVisibility(View.VISIBLE);
+				}
+				else{
+					holder.menuLayouts.get(i).setVisibility(View.GONE);
+				}
 				
 				UserAvatarListenerGrid listener = new UserAvatarListenerGrid(context, holder, this, totalPosition, i);
 				

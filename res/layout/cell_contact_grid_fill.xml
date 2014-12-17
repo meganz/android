@@ -45,13 +45,22 @@
 			    android:gravity="center_horizontal|center_vertical" />
 	    
 	    </RelativeLayout>
-        
+	    
         <LinearLayout
-            android:id="@+id/contact_cell_menu_long_click"
+            android:id="@+id/contact_cell_menu_long_click_unselected"
             android:layout_width="172dp"
             android:layout_height="157dp"
             android:visibility="gone"
             android:background="@drawable/background_item_grid_menu_layout"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical">
+		</LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/contact_cell_menu_long_click_selected"
+            android:layout_width="172dp"
+            android:layout_height="157dp"
+            android:visibility="gone"
             android:layout_centerHorizontal="true"
             android:orientation="vertical">
             

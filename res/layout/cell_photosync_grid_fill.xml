@@ -15,12 +15,22 @@
      android:layout_centerHorizontal="true"/>	
      
     <LinearLayout
-        android:id="@+id/cell_photosync_menu_long_click"
+        android:id="@+id/cell_photosync_menu_long_click_unselected"
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:layout_margin="3dp"
         android:visibility="gone"
         android:background="@drawable/background_item_photosync_grid_menu_layout"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+    </LinearLayout>
+     
+    <LinearLayout
+        android:id="@+id/cell_photosync_menu_long_click_selected"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_margin="3dp"
+        android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:orientation="vertical">
         
