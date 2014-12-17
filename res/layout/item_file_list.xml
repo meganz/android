@@ -19,23 +19,22 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_cloud_saved_offline"
 		android:background="@null" 
-        android:layout_centerVertical="true"/> 
+        android:layout_marginTop="22dp"
+        android:layout_toRightOf="@id/file_list_checkbox"/> 
         
-      <ImageView
+<!--       <ImageView
         android:id="@+id/file_list_saved_offline_multiselect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_cloud_saved_offline"
 		android:background="@null" 
-		android:layout_marginLeft="-5dp"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@id/file_list_checkbox"/> 
-    
+     -->
      <ImageView
         android:id="@+id/file_list_thumbnail"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_marginLeft="7dp"
         android:scaleType="fitCenter"
         android:layout_toRightOf="@id/file_list_saved_offline" />    
    
@@ -85,6 +84,25 @@
         android:layout_alignParentRight="true"
 		android:paddingTop="12dp"
         android:paddingRight="15dp" />
+    
+    <ImageView
+        android:id="@+id/file_list_public_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_public_link_list"
+		android:background="@null" 
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/file_list_three_dots"/> 
+        
+    <ImageView
+        android:id="@+id/file_list_public_link_multiselect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_public_link_list"
+		android:background="@null" 
+        android:layout_centerVertical="true"
+        android:paddingRight="7dp" 
+       	android:layout_alignParentRight="true"/> 
                      
     
      <ProgressBar
