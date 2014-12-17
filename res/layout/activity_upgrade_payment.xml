@@ -4,14 +4,15 @@
     android:orientation="vertical"  
     android:weightSum="15"
     android:layout_width="fill_parent"  
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:background="#ffffff" >
         
         <!-- Account type -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:background="@drawable/list_selector_holo_light"
+            android:background="#ffffff"
             android:onClick="onUpgrade1Click"
             android:layout_weight="6">
             <ImageView 
@@ -73,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="@color/color_navigation_drawer_selected"
+                android:textColor="@color/mega"
                 android:layout_toRightOf="@id/pro_title"  
                 android:layout_alignLeft="@id/pro_bandwidth_title"            
                 android:layout_below="@id/pro_image"/>
@@ -91,12 +92,13 @@
             android:background="@color/mega">
 
             <TextView
-                 android:id="@+id/select_membership"
+                android:id="@+id/select_membership"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/upgrade_select_pricing"/>
             
             <TextView
@@ -110,13 +112,15 @@
                 android:layout_below="@id/select_membership"/>
             
             <TextView
+                android:id="@+id/paypal_subscription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:layout_alignLeft="@id/select_membership"
                 android:text="@string/select_membership_2"
-                 android:layout_below="@id/select_recurring"/>
+                android:layout_below="@id/select_recurring"
+                android:layout_marginBottom="5dp"/>
         </RelativeLayout>
         
         
@@ -124,27 +128,41 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:layout_weight="2"
-            android:background="@drawable/list_selector_holo_light"
+            android:layout_marginRight="20dp"
+            android:background="#ffffff"
             android:onClick="onMonthlyClick">
+            
+            <ImageView 
+                android:id="@+id/save_image_invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_save_17"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:visibility="invisible"/>
             
             <TextView
                 android:id="@+id/per_month"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_marginLeft="30dp"
-                android:layout_margin="@dimen/standard_margin"
-                android:text="@string/upgrade_per_month"/>
+                android:text="@string/upgrade_per_month"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/save_image_invisible"/>
             
             <TextView
                 android:id="@+id/per_month_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin"
-                android:layout_toRightOf="@id/per_month"/>
+                android:layout_centerVertical="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentRight="true"/>
             
             
         </RelativeLayout>
@@ -155,34 +173,40 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:layout_marginRight="20dp"
             android:layout_weight="2"
-            android:background="@drawable/list_selector_holo_light"
+            android:background="#ffffff"
             android:onClick="onYearlyClick">
             
              <ImageView 
                 android:id="@+id/save_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_save_17"/>
+                android:src="@drawable/ic_save_17"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"/>
             
             <TextView
                 android:id="@+id/per_year"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                 android:text="@string/upgrade_per_year"
-                 android:layout_toRightOf="@id/save_image"
-                android:layout_margin="@dimen/standard_margin_double"/>            
-           
+                android:text="@string/upgrade_per_year"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/save_image"/>
             
-             <TextView
+            <TextView
                 android:id="@+id/per_year_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:layout_margin="@dimen/standard_margin_double"
-                android:layout_toRightOf="@id/per_year"/>
+                android:layout_centerVertical="true"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentRight="true"/>
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
@@ -193,7 +217,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:layout_weight="2"
-            android:background="@drawable/list_selector_holo_light">
+            android:background="#ffffff">
             <TextView
                 android:id="@+id/comment"
                 android:layout_width="wrap_content"

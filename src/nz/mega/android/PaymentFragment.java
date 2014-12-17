@@ -20,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,7 +83,14 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	private TextView perYear;
 	private TextView pricingFrom;
 	private ArrayList<Long> handleUrl;
-//	private TextView perMonthTitle;
+	private TextView storageTitle;
+	private TextView bandwithTitle;
+	private TextView selectMemberShip;
+	private TextView selectRecurring;
+	private TextView paypalSubscrition;
+	private TextView perMonthTitle;
+	private TextView perYearTitle;
+	private TextView comment;
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
@@ -111,7 +119,21 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
-		aB.setTitle(R.string.section_account);
+		switch (parameterType) {
+			case 1:{
+				aB.setTitle(getString(R.string.pro1_account));
+				break;
+			}
+			case 2:{
+				aB.setTitle(getString(R.string.pro2_account));
+				break;
+			}
+			case 3:{
+				aB.setTitle(getString(R.string.pro3_account));
+				break;
+			}
+		}
+		
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -129,18 +151,50 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		packageIcon.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
 		
 		packageName = (TextView) v.findViewById(R.id.pro_title);
-		storage = (TextView) v.findViewById(R.id.pro_storage);
-		bandwidth = (TextView) v.findViewById(R.id.pro_bandwidth);
 		pricingFrom = (TextView) v.findViewById(R.id.pricing_from);
 		
-//		perMonthTitle = (TextView) findViewById(R.id.per_month);
+		perMonthTitle = (TextView) v.findViewById(R.id.per_month);
 		perMonth = (TextView) v.findViewById(R.id.per_month_price);
 		perYear = (TextView) v.findViewById(R.id.per_year_price);
+		perYearTitle = (TextView) v.findViewById(R.id.per_year);
 		
 		accountType = AccountType.getById(parameterType);
 
 		packageIcon.setImageResource(accountType.getImageResource());
 		packageName.setText(accountType.getNameResource());
+		packageName.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		pricingFrom.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		storageTitle = (TextView) v.findViewById(R.id.pro_storage_title);
+		storageTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		storage = (TextView) v.findViewById(R.id.pro_storage);
+		storage.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		bandwithTitle = (TextView) v.findViewById(R.id.pro_bandwidth_title);
+		bandwithTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		bandwidth = (TextView) v.findViewById(R.id.pro_bandwidth);
+		bandwidth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		selectMemberShip = (TextView) v.findViewById(R.id.select_membership);
+		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		selectRecurring = (TextView) v.findViewById(R.id.select_recurring);
+		selectRecurring.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+		
+		paypalSubscrition = (TextView) v.findViewById(R.id.paypal_subscription);
+		paypalSubscrition.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+		
+		perMonth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		perMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		perYear.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		perYearTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		
+		comment = (TextView) v.findViewById(R.id.comment);
+		comment.setTextSize(TypedValue.COMPLEX_UNIT_SP, (12*scaleH));
 		
 		megaApi.getPricing(this);	
 		

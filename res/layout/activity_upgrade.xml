@@ -10,7 +10,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:background="@drawable/list_selector_holo_light"
+            android:background="#ffffff"
             android:onClick="onUpgrade1Click"
             android:layout_weight="1">
             <ImageView 
@@ -72,8 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:text="@string/general_bandwidth"
-                android:textColor="@color/color_navigation_drawer_selected"
+                android:textColor="@color/mega"
                 android:layout_toRightOf="@id/pro1_title"  
                 android:layout_alignLeft="@id/pro1_bandwidth_title"            
                 android:layout_below="@id/pro1_image"/>
@@ -88,7 +87,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:onClick="onUpgrade2Click"
-            android:background="@drawable/list_selector_holo_light"
+            android:background="#ffffff"
             android:layout_weight="1">
             <ImageView 
                 android:id="@+id/pro2_image"
@@ -149,8 +148,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="@color/color_navigation_drawer_selected"
-                android:text="@string/general_bandwidth"
+                android:textColor="@color/mega"
                 android:layout_alignLeft="@id/pro2_bandwidth_title" 
                 android:layout_toRightOf="@id/pro2_title"
                 android:layout_below="@id/pro2_image"/>
@@ -163,7 +161,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:background="@drawable/list_selector_holo_light"
+            android:background="#ffffff"
             android:onClick="onUpgrade3Click"
             android:layout_weight="1">
             <ImageView 
@@ -225,7 +223,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-                android:textColor="@color/color_navigation_drawer_selected"
+                android:textColor="@color/mega"
                 android:text="@string/general_bandwidth"
                 android:layout_alignLeft="@id/pro3_bandwidth_title" 
                 android:layout_toRightOf="@id/pro3_title"
