@@ -211,6 +211,7 @@
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
@@ -318,6 +319,7 @@
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled any time before renewal date.</string>
     
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">The link has been copied to the clipboard</string>
+    <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait.</string>
     

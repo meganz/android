@@ -60,8 +60,9 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 	TextView emptyText;
 	
 	ArrayList<MegaShare> listContacts;	
+	ArrayList<MegaShare> tempListContacts;	
 	
-	ArrayList<MegaUser> listContactsArray = new ArrayList<MegaUser>();
+//	ArrayList<MegaUser> listContactsArray = new ArrayList<MegaUser>();
 	
 	long nodeHandle;
 	MegaNode node;
@@ -315,6 +316,8 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		
 		megaApi.addGlobalListener(this);
 		
+		listContacts = new ArrayList<MegaShare>();
+		
 		aB = getSupportActionBar();
 		aB.setHomeButtonEnabled(true);
 		aB.setDisplayShowTitleEnabled(true);
@@ -346,7 +349,12 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 			
 			imageView.setImageResource(R.drawable.mime_folder_shared);	
 			
-			listContacts = megaApi.getOutShares(node);							
+			tempListContacts = megaApi.getOutShares(node);		
+			for(int i=0; i<tempListContacts.size();i++){
+				if(tempListContacts.get(i).getUser()!=null){
+					listContacts.add(tempListContacts.get(i));
+				}
+			}
 					
 			listView = (ListView) findViewById(R.id.file_contact_list_view_browser);
 			listView.setOnItemClickListener(this);
@@ -834,8 +842,16 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 		log("onNodesUpdate");
 
 		if (node.isFolder()){
+			listContacts.clear();
+			
+			tempListContacts = megaApi.getOutShares(node);		
+			for(int i=0; i<tempListContacts.size();i++){
+				if(tempListContacts.get(i).getUser()!=null){
+					listContacts.add(tempListContacts.get(i));
+				}
+			}
 
-			listContacts = megaApi.getOutShares(node);
+//			listContacts = megaApi.getOutShares(node);
 			if (listContacts != null){
 				if (listContacts.size() > 0){
 					fileContactLayout.setVisibility(View.VISIBLE);

@@ -70,13 +70,18 @@ import android.widget.Toast;
 
 public class FilePropertiesActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
 	
+	static int TYPE_EXPORT_GET = 0;
+	static int TYPE_EXPORT_REMOVE = 1;
+	
 //	ImageView iconView;
 	TextView nameView;
 	TextView availableOfflineView;
 	ImageView imageView;	
+	ImageView publicLinkImage;
 	MySwitch availableSwitchOnline;
 	MySwitch availableSwitchOffline;
 	ActionBar aB;
+	int typeExport = -1;
 	
 	TextView sizeTextView;
 	TextView sizeTitleTextView;
@@ -135,6 +140,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	
 	MenuItem downloadMenuItem; 
 	MenuItem shareFolderMenuItem;
+	MenuItem getLinkMenuItem;
+	MenuItem removeLinkMenuItem;
+	MenuItem sendLinkMenuItem;
 	ImageView statusImageView;
 
 	boolean shareIt = true;
@@ -202,6 +210,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			imageView.getLayoutParams().height = Util.px2dp((250*scaleH), outMetrics);
 //			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
 //			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((-30*scaleH), outMetrics));
+			publicLinkImage = (ImageView) findViewById(R.id.file_properties_image_link);
+//			((RelativeLayout.LayoutParams) publicLinkImage.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
+			((RelativeLayout.LayoutParams) publicLinkImage.getLayoutParams()).setMargins(Util.px2dp((-10*scaleH), outMetrics), Util.px2dp((-20*scaleH), outMetrics), 0, 0);
+			publicLinkImage.setVisibility(View.GONE);
 			
 			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
 			availableOfflineLayout.setVisibility(View.VISIBLE);	
@@ -263,6 +275,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				
 				contentTextView.setVisibility(View.GONE);
 				contentTitleTextView.setVisibility(View.GONE);
+				
+				sl = megaApi.getOutShares(node);		
+
+				if (sl != null){
+					
+					if (sl.size() != 0){
+						publicLink=true;
+						publicLinkImage.setVisibility(View.VISIBLE);
+					}
+				}
 				
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 				
@@ -387,6 +409,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							if(sl.get(i).getUser()==null){
 								//Public link + users								
 								publicLink=true;
+								publicLinkImage.setVisibility(View.VISIBLE);
 								break;
 
 							}
@@ -398,15 +421,17 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							
 							if(sl.size()>1){
 								//It is public and shared
-								imageView.setImageResource(R.drawable.mime_folder_public_shared);
+								imageView.setImageResource(R.drawable.mime_folder_shared);
 								sharedWithButton.setVisibility(View.VISIBLE);
-								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
+								publicLinkImage.setVisibility(View.VISIBLE);
+								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 							}
 							else{
 								//It is just public
-								imageView.setImageResource(R.drawable.mime_folder_public);
-								sharedWithButton.setVisibility(View.VISIBLE);
-								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
+								imageView.setImageResource(R.drawable.mime_folder);
+								sharedWithButton.setVisibility(View.GONE);
+								publicLinkImage.setVisibility(View.VISIBLE);
+//								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 							}
 							
 						}
@@ -414,6 +439,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 //							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 							//It is private and shared
 							imageView.setImageResource(R.drawable.mime_folder_shared);
+							publicLinkImage.setVisibility(View.GONE);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 						}
@@ -561,14 +587,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						
 						if(sl.size()>1){
 							//It is public and shared
-							imageView.setImageResource(R.drawable.mime_folder_public_shared);
+							imageView.setImageResource(R.drawable.mime_folder_shared);
+							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
 							//It is just public
-							imageView.setImageResource(R.drawable.mime_folder_public);
+							imageView.setImageResource(R.drawable.mime_folder);
 							sharedWithButton.setVisibility(View.VISIBLE);
+							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 						}
 						
@@ -578,6 +606,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						//It is private and shared
 						imageView.setImageResource(R.drawable.mime_folder_shared);
 						sharedWithButton.setVisibility(View.VISIBLE);
+						publicLinkImage.setVisibility(View.GONE);
 						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 					}
 					
@@ -1066,7 +1095,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		    }
 		    case R.id.action_file_properties_get_link:{
 		    	shareIt = false;
+		    	typeExport=TYPE_EXPORT_GET;
 		    	getPublicLinkAndShareIt();
+		    	return true;
+		    }
+		    case R.id.action_file_properties_remove_link:{
+		    	shareIt = false;
+		    	typeExport=TYPE_EXPORT_REMOVE;
+		    	megaApi.disableExport(node, this);
 		    	return true;
 		    }
 		    case R.id.action_file_properties_send_link:{
@@ -1371,7 +1407,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.activity_file_properties, menu);
-	   
+	    sendLinkMenuItem = menu.findItem(R.id.action_file_properties_send_link);
+	    sendLinkMenuItem.setVisible(false);
+		getLinkMenuItem = menu.findItem(R.id.action_file_properties_get_link);
+		removeLinkMenuItem = menu.findItem(R.id.action_file_properties_remove_link);
+			   
 	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
 	    shareFolderMenuItem = menu.findItem(R.id.action_file_properties_share_folder);
 	    
@@ -1380,6 +1420,15 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    }
 	    else{
 	    	shareFolderMenuItem.setVisible(false);
+	    }
+	    
+	    if(publicLink){
+	    	getLinkMenuItem.setVisible(false);
+	    	removeLinkMenuItem.setVisible(true);
+	    }
+	    else{
+	    	getLinkMenuItem.setVisible(true);
+	    	removeLinkMenuItem.setVisible(false);
 	    }
 	    
 	    if (availableOfflineBoolean){
@@ -1404,6 +1453,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
 		
 		log("onRequestFinish");
+		
 		if (request.getType() == MegaRequest.TYPE_EXPORT){
 			try { 
 				statusDialog.dismiss();	
@@ -1411,28 +1461,36 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				String link = request.getLink();
-				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-				if (filePropertiesActivity != null){
-					if (shareIt){
-						Intent intent = new Intent(Intent.ACTION_SEND);
-						intent.setType("text/plain");
-						intent.putExtra(Intent.EXTRA_TEXT, link);
-						startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
-					}
-					else{
-						if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
-						    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-						    clipboard.setText(link);
-						} else {
-						    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
-				            clipboard.setPrimaryClip(clip);
+				
+				if(typeExport==TYPE_EXPORT_GET){
+					String link = request.getLink();
+					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
+					if (filePropertiesActivity != null){
+						if (shareIt){
+							Intent intent = new Intent(Intent.ACTION_SEND);
+							intent.setType("text/plain");
+							intent.putExtra(Intent.EXTRA_TEXT, link);
+							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 						}
-						
-						Toast.makeText(this, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+						else{
+							if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+							    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+							    clipboard.setText(link);
+							} else {
+							    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+					            clipboard.setPrimaryClip(clip);
+							}
+							
+							Toast.makeText(this, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+						}
 					}
 				}
+				else if(typeExport==TYPE_EXPORT_REMOVE)
+				{
+					Toast.makeText(this, getString(R.string.file_properties_remove_link), Toast.LENGTH_LONG).show();
+				}					
+				
 			}
 			else{
 				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
@@ -1802,6 +1860,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
 		
+		supportInvalidateOptionsMenu();
+		
 		if (node.isFolder()){
 			imageView.setImageResource(imageId);
 			sl = megaApi.getOutShares(node);		
@@ -1865,14 +1925,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						
 						if(sl.size()>1){
 							//It is public and shared
-							imageView.setImageResource(R.drawable.mime_folder_public_shared);
+							imageView.setImageResource(R.drawable.mime_folder_shared);
+							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
 							//It is just public
-							imageView.setImageResource(R.drawable.mime_folder_public);
+							imageView.setImageResource(R.drawable.mime_folder);
 							sharedWithButton.setVisibility(View.VISIBLE);
+							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 						}
 						
@@ -1882,6 +1944,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						//It is private and shared
 						imageView.setImageResource(R.drawable.mime_folder_shared);
 						sharedWithButton.setVisibility(View.VISIBLE);
+						publicLinkImage.setVisibility(View.GONE);
 						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 					}
 					
@@ -1905,6 +1968,18 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			}
 
 //			iconView.setImageResource(imageId);
+		}
+		else
+		{
+			sl = megaApi.getOutShares(node);
+
+			if (sl != null){
+				
+				if (sl.size() != 0){
+					publicLink=true;
+					publicLinkImage.setVisibility(View.VISIBLE);
+				}
+			}
 		}
 	}
 
