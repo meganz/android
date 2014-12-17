@@ -258,7 +258,8 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
     	public ArrayList<ImageView> imageViews;
     	public TextView textView;
     	public RelativeLayout textRelativeLayout;
-    	public ArrayList<LinearLayout> longClickLayouts;
+    	public ArrayList<LinearLayout> longClickLayoutsSelected;
+    	public ArrayList<LinearLayout> longClickLayoutsUnselected;
     	
     	public ArrayList<Long> documents;
     }
@@ -276,7 +277,8 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 			holder.relativeLayoutsEmpty = new ArrayList<RelativeLayout>();
 			holder.relativeLayoutsComplete = new ArrayList<RelativeLayout>();
 			holder.imageViews = new ArrayList<ImageView>();
-			holder.longClickLayouts = new ArrayList<LinearLayout>();
+			holder.longClickLayoutsSelected = new ArrayList<LinearLayout>();
+			holder.longClickLayoutsUnselected = new ArrayList<LinearLayout>();
 			
 			holder.documents = new ArrayList<Long>();
 
@@ -298,8 +300,11 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
 				holder.imageViews.add(iV);
 				
-				LinearLayout lcL = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click);
-				holder.longClickLayouts.add(lcL);
+				LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_selected);
+				holder.longClickLayoutsSelected.add(lcLS);
+				
+				LinearLayout lcLU = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_unselected);
+				holder.longClickLayoutsUnselected.add(lcLU);
 				
 				holder.documents.add(-1l);
 			}
@@ -340,14 +345,17 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 						
 						if (multipleSelect){
 							if (isChecked(positionInNodes)){
-								holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
+								holder.longClickLayoutsSelected.get(i).setVisibility(View.VISIBLE);
+								holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 							}
 							else{
-								holder.longClickLayouts.get(i).setVisibility(View.GONE);
+								holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+								holder.longClickLayoutsUnselected.get(i).setVisibility(View.VISIBLE);
 							}
 						}
 						else{
-							holder.longClickLayouts.get(i).setVisibility(View.GONE);
+							holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+							holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 						}
 						
 						holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
@@ -419,14 +427,17 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 					
 					if (multipleSelect){
 						if (isChecked(positionInNodes)){
-							holder.longClickLayouts.get(i).setVisibility(View.VISIBLE);
+							holder.longClickLayoutsSelected.get(i).setVisibility(View.VISIBLE);
+							holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 						}
 						else{
-							holder.longClickLayouts.get(i).setVisibility(View.GONE);
+							holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+							holder.longClickLayoutsUnselected.get(i).setVisibility(View.VISIBLE);
 						}
 					}
 					else{
-						holder.longClickLayouts.get(i).setVisibility(View.GONE);
+						holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+						holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 					}
 					
 					holder.relativeLayoutsComplete.get(i).setVisibility(View.VISIBLE);
