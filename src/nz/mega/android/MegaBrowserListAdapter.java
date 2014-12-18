@@ -281,8 +281,18 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			if (sl != null) {
 				if (sl.size() > 0) {
-					holder.imageView
-					.setImageResource(R.drawable.folder_shared_mime);
+					if(sl.size() == 1){
+						if(sl.get(0).getUser()==null){
+							//IT is just public link, not shared folder
+							holder.imageView.setImageResource(R.drawable.folder_mime);
+						}
+						else{
+							holder.imageView.setImageResource(R.drawable.folder_shared_mime);
+						}
+					}
+					else{
+						holder.imageView.setImageResource(R.drawable.folder_shared_mime);
+					}
 				} else {
 					holder.imageView.setImageResource(R.drawable.folder_mime);
 				}
