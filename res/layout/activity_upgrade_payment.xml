@@ -137,7 +137,7 @@
                 android:id="@+id/save_image_invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_save_17"
+                android:src="@drawable/save_label"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:visibility="invisible"/>
@@ -182,7 +182,7 @@
                 android:id="@+id/save_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_save_17"
+                android:src="@drawable/save_label"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"/>
             
@@ -223,8 +223,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:text="@string/upgrade_comment"
-                android:layout_margin="@dimen/standard_margin_double" />
+                android:text="@string/upgrade_comment" />
             
         </RelativeLayout>
         
