@@ -231,7 +231,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				nameView.setText(document.getName());
 				sizeTextView.setText(Formatter.formatFileSize(this, document.getSize()));
 				
-				imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+				imageView.setImageResource(MimeTypeMime.typeForName(document.getName()).getIconResourceId());
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 			}
 		 }

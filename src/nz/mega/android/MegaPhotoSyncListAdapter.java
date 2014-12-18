@@ -365,7 +365,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 					i.putExtra("imageId", R.drawable.ic_folder_list);
 				}
 				else{
-					i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());	
+					i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());	
 				}				
 				i.putExtra("name", n.getName());
 				context.startActivity(i);							
