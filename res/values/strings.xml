@@ -184,7 +184,7 @@
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
-	<string name="file_properties_shared_folder_select_contact" context="menu item">Share with</string>
+	<string name="file_properties_shared_folder_select_contact" context="button name">Shared with</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
 	
