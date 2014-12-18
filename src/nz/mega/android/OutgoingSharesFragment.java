@@ -435,14 +435,16 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		
 		for(int k=0;k<outNodeList.size();k++){
 			
-			MegaShare mS = outNodeList.get(k);				
-			MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
-			
-			if(lastFolder!=node.getHandle()){
-				lastFolder=node.getHandle();
-				nodes.add(node);			
-			}	
-		}		
+			if(outNodeList.get(k).getUser()!=null){
+				MegaShare mS = outNodeList.get(k);				
+				MegaNode node = megaApi.getNodeByHandle(mS.getNodeHandle());
+				
+				if(lastFolder!=node.getHandle()){
+					lastFolder=node.getHandle();
+					nodes.add(node);			
+				}	
+			}
+		}
 	}
 		
 	@Override
