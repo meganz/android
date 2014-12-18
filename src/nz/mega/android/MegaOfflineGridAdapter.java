@@ -326,9 +326,9 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				holder.textViewFileSize1.setText(Util.getSizeString(nodeSize));		
 			}
 						
-			holder.imageView1.setImageResource(MimeTypeList.typeForName(currentNode1.getName()).getIconResourceId());
+			holder.imageView1.setImageResource(MimeTypeThumbnail.typeForName(currentNode1.getName()).getIconResourceId());
 			if (currentFile1.isFile()){
-				if (MimeTypeList.typeForName(currentNode1.getName()).isImage()){
+				if (MimeTypeThumbnail.typeForName(currentNode1.getName()).isImage()){
 					Bitmap thumb = null;
 									
 					if (currentFile1.exists()){
@@ -405,9 +405,9 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 					holder.textViewFileSize2.setText(Util.getSizeString(nodeSize));
 				}				
 				
-				holder.imageView2.setImageResource(MimeTypeList.typeForName(currentNode2.getName()).getIconResourceId());
+				holder.imageView2.setImageResource(MimeTypeThumbnail.typeForName(currentNode2.getName()).getIconResourceId());
 				if (currentFile2.isFile()){
-					if (MimeTypeList.typeForName(currentNode2.getName()).isImage()){
+					if (MimeTypeThumbnail.typeForName(currentNode2.getName()).isImage()){
 						Bitmap thumb = null;
 										
 						if (currentFile2.exists()){
@@ -604,7 +604,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				}else{
 					//if(currentFile.exists()&&currentFile.isFile()){
 						log("Open it!");
-						if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+						if (MimeTypeThumbnail.typeForName(currentFile.getName()).isImage()){
 							Intent intent = new Intent(context, FullScreenImageViewer.class);
 							intent.putExtra("position", currentPosition);
 							intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
@@ -614,13 +614,13 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						else{
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(context, viewIntent)){
 								context.startActivity(viewIntent);
 							}
 							else{
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 								if (ManagerActivity.isIntentAvailable(context, intentShare)){
 									context.startActivity(intentShare);
 								}
@@ -716,7 +716,7 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				}else{
 					//if(currentFile.exists()&&currentFile.isFile()){
 						log("Open it!");
-						if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+						if (MimeTypeThumbnail.typeForName(currentFile.getName()).isImage()){
 							Intent intent = new Intent(context, FullScreenImageViewer.class);
 							intent.putExtra("position", currentPosition);
 							intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
@@ -726,13 +726,13 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						else{
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(context, viewIntent)){
 								context.startActivity(viewIntent);
 							}
 							else{
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 								if (ManagerActivity.isIntentAvailable(context, intentShare)){
 									context.startActivity(intentShare);
 								}
@@ -780,13 +780,13 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				positionClicked = -1;
 				notifyDataSetChanged();
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
 					context.startActivity(viewIntent);
 				}
 				else{
 					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 					if (ManagerActivity.isIntentAvailable(context, intentShare)){
 						context.startActivity(intentShare);
 					}
@@ -799,13 +799,13 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				positionClicked = -1;
 				notifyDataSetChanged();
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
 					context.startActivity(viewIntent);
 				}
 				else{
 					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
 					if (ManagerActivity.isIntentAvailable(context, intentShare)){
 						context.startActivity(intentShare);
 					}

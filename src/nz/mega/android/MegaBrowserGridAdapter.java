@@ -312,7 +312,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 			else{
 				long node1Size = node1.getSize();
 				holder.textViewFileSize1.setText(Util.getSizeString(node1Size));
-				holder.imageView1.setImageResource(MimeTypeList.typeForName(node1.getName()).getIconResourceId());
+				holder.imageView1.setImageResource(MimeTypeThumbnail.typeForName(node1.getName()).getIconResourceId());
 				
 				if(mTHash!=null){
 					
@@ -361,7 +361,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 								holder.imageView1.setImageBitmap(thumb1);
 							}
 							else{
-								holder.imageView1.setImageResource(MimeTypeList.typeForName(node1.getName()).getIconResourceId());
+								holder.imageView1.setImageResource(MimeTypeThumbnail.typeForName(node1.getName()).getIconResourceId());
 							}
 						}
 					}
@@ -411,7 +411,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				else{
 					long node2Size = node2.getSize();
 					holder.textViewFileSize2.setText(Util.getSizeString(node2Size));
-					holder.imageView2.setImageResource(MimeTypeList.typeForName(node2.getName()).getIconResourceId());
+					holder.imageView2.setImageResource(MimeTypeThumbnail.typeForName(node2.getName()).getIconResourceId());
 					
 					if(mTHash!=null){
 						
@@ -468,7 +468,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 									holder.imageView2.setImageBitmap(thumb2);
 								}
 								else{
-									holder.imageView2.setImageResource(MimeTypeList.typeForName(node2.getName()).getIconResourceId());
+									holder.imageView2.setImageResource(MimeTypeThumbnail.typeForName(node2.getName()).getIconResourceId());
 								}
 							}
 						}
@@ -812,7 +812,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 //					}
 				}
 				else{
-					if (MimeTypeList.typeForName(n.getName()).isImage()){
+					if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", currentPosition);
 						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
@@ -846,7 +846,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
+					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -859,7 +859,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+				  		String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -950,7 +950,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 //					}
 				}
 				else{
-					if (MimeTypeList.typeForName(n.getName()).isImage()){
+					if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", (currentPosition+1));
 						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
@@ -982,7 +982,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio()){
+					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio()){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -995,7 +995,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+				  		String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);

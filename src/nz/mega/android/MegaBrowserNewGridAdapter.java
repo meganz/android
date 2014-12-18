@@ -492,7 +492,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					holder.fileSizeViews.get(i).setText(getInfoFolder(node));
 				}
 				else{
-					holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+					holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 					holder.fileSizeViews.get(i).setText(Util.getSizeString(node.getSize()));
 					
 					if(mTHash!=null){
@@ -543,7 +543,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 									holder.imageViews.get(i).setImageBitmap(thumb);
 								}
 								else{
-									holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+									holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(node.getName()).getIconResourceId());
 								}
 							}
 						}
@@ -1041,7 +1041,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				listFragment.setSelection(0);
 			}
 			else{
-				if (MimeTypeList.typeForName(n.getName()).isImage()){
+				if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewer.class);
 					intent.putExtra("position", totalPosition);
 					if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
@@ -1075,7 +1075,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					}
 					context.startActivity(intent);
 				}
-				else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
+				else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
 					MegaNode file = n;
 					Intent service = new Intent(context, MegaStreamingService.class);
 			  		context.startService(service);
@@ -1088,7 +1088,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					}
 					
 			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+			  		String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
 			  		System.out.println("FILENAME: " + fileName);
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
