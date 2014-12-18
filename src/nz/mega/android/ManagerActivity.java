@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
+import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.components.EditTextCursorWatcher;
@@ -36,7 +37,9 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -304,6 +307,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
+		
+		File thumbDir;
+		if (getExternalCacheDir() != null){
+			thumbDir = new File (getExternalCacheDir(), "thumbnailsMEGA");
+			thumbDir.mkdirs();
+		}
+		else{
+			thumbDir = getDir("thumbnailsMEGA", 0);
+		}
+		File previewDir;
+		if (getExternalCacheDir() != null){
+			previewDir = new File (getExternalCacheDir(), "previewsMEGA");
+			previewDir.mkdirs();
+		}
+		else{
+			previewDir = getDir("previewsMEGA", 0);
+		}
 		
 //	    dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -3859,7 +3879,48 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		try {
 			Util.deleteFolderAndSubfolders(context, offlineDirectory);
 		} catch (IOException e) {}
-
+		
+		File thumbDir = ThumbnailUtils.getThumbFolder(context);
+		File previewDir = PreviewUtils.getPreviewFolder(context);
+		
+		try {
+			Util.deleteFolderAndSubfolders(context, thumbDir);
+		} catch (IOException e) {}
+		
+		try {
+			Util.deleteFolderAndSubfolders(context, previewDir);
+		} catch (IOException e) {}
+		
+		File externalCacheDir = context.getExternalCacheDir();
+		File cacheDir = context.getCacheDir();
+		try {
+			Util.deleteFolderAndSubfolders(context, externalCacheDir);
+		} catch (IOException e) {}
+		
+		Toast.makeText(context, "CACHEDIR: " + cacheDir, Toast.LENGTH_LONG).show();
+		try {
+			Util.deleteFolderAndSubfolders(context, cacheDir);
+		} catch (IOException e) {}
+		
+		PackageManager m = context.getPackageManager();
+		String s = context.getPackageName();
+		try {
+		    PackageInfo p = m.getPackageInfo(s, 0);
+		    s = p.applicationInfo.dataDir;
+		} catch (NameNotFoundException e) {
+		    log("Error Package name not found " + e);
+		}
+		
+		File appDir = new File(s);
+		
+		for (File c : appDir.listFiles()){
+			if (c.isFile()){
+				c.delete();
+			}
+//			deleteFolderAndSubfolders(context, c);
+		}
+		
+		
 //		DatabaseHandler dbH = new DatabaseHandler(context);
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.clearCredentials();
@@ -3875,6 +3936,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			stopIntent.setAction(CameraSyncService.ACTION_LOGOUT);
 			context.startService(stopIntent);
 		}
+		dbH.clearOffline();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

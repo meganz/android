@@ -770,6 +770,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         onCreate(db);
 	}
 	
+	public void clearOffline(){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
+		onCreate(db);
+	}
+	
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);
 	}
