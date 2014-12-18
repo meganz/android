@@ -454,7 +454,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						continue;
 					}
 					
-					if (!MimeType.typeForName(nodes.get(i).getName()).isImage()){
+					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage()){
 						continue;
 					}
 					
@@ -637,7 +637,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						continue;
 					}
 					
-					if (!MimeType.typeForName(nodes.get(i).getName()).isImage()){
+					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage()){
 						continue;
 					}
 					
@@ -947,7 +947,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						
 					}
 					else{
-						if (MimeType.typeForName(n.getName()).isImage()){
+						if (MimeTypeList.typeForName(n.getName()).isImage()){
 							int positionInNodes = 0;
 							for (int i=0;i<nodes.size();i++){
 								if(nodes.get(i).getHandle() == n.getHandle()){
@@ -961,7 +961,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 							intent.putExtra("orderGetChildren", orderGetChildren);
 							startActivity(intent);
 						}
-						else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+						else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
 							Intent service = new Intent(context, MegaStreamingService.class);
 					  		context.startService(service);
 					  		String fileName = n.getName();
@@ -973,7 +973,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 							}
 							
 					  		String url = "http://127.0.0.1:4443/" + n.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeType.typeForName(n.getName()).getType();
+					  		String mimeType = MimeTypeList.typeForName(n.getName()).getType();
 					  		System.out.println("FILENAME: " + fileName);
 					  		
 					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -1353,7 +1353,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						continue;
 					}
 					
-					if (!MimeType.typeForName(nodes.get(i).getName()).isImage()){
+					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage()){
 						continue;
 					}
 					

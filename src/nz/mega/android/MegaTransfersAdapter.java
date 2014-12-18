@@ -271,10 +271,10 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 			
 			//if node == null --> Public node
 			if (node == null){
-				holder.imageView.setImageResource(MimeType.typeForName(transfer.getFileName()).getIconResourceId());	
+				holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());	
 			}
 			else{
-				holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 				
 				Bitmap thumb = null;
 				if (node.hasThumbnail()){
@@ -303,10 +303,10 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		}
 		else if (transfer.getType() == MegaTransfer.TYPE_UPLOAD){
 			holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers);
-			holder.imageView.setImageResource(MimeType.typeForName(transfer.getFileName()).getIconResourceId());
+			holder.imageView.setImageResource(MimeTypeList.typeForName(transfer.getFileName()).getIconResourceId());
 			holder.currentPath = transfer.getPath();
 			
-			if (MimeType.typeForName(transfer.getFileName()).isImage()){
+			if (MimeTypeList.typeForName(transfer.getFileName()).isImage()){
 				/*Bitmap thumb = null;
 				thumb = ThumbnailUtils.getThumbnailFromCache(holder.currentPath);
 				if (thumb != null){

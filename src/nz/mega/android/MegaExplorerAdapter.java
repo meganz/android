@@ -137,14 +137,14 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 				}
 			}
 			holder.textViewFileSize.setText(getInfoFolder(node));
-			holder.imageView.setImageResource(R.drawable.mime_folder);
+			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 		}
 		else{
 			Util.setViewAlpha(holder.imageView, .4f);
 			holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 			
 			if (node.hasThumbnail()){
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);

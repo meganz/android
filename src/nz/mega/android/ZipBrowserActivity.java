@@ -366,7 +366,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		
 		log("The absolutePath of the file to open is: "+absolutePath);
 		 
-		if (MimeType.typeForName(absolutePath).isImage()){
+		if (MimeTypeList.typeForName(absolutePath).isImage()){
 			Intent intent = new Intent(this, FullScreenImageViewer.class);
 			intent.putExtra("position", position);
 			intent.putExtra("adapterType", ManagerActivity.ZIP_ADAPTER);
@@ -389,12 +389,12 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 //		}
 		else{							
 			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeType.typeForName(absolutePath).getType());
+			viewIntent.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
 			if (ManagerActivity.isIntentAvailable(this, viewIntent))
 				startActivity(viewIntent);
 			else{
 				Intent intentShare = new Intent(Intent.ACTION_SEND);
-				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeType.typeForName(absolutePath).getType());
+				intentShare.setDataAndType(Uri.fromFile(new File(absolutePath)), MimeTypeList.typeForName(absolutePath).getType());
 				if (ManagerActivity.isIntentAvailable(this, intentShare))
 					startActivity(intentShare);
 				String toastMessage = getString(R.string.general_already_downloaded) + ": " + absolutePath;

@@ -279,12 +279,12 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 						if (ManagerActivity.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
@@ -581,7 +581,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				}
 			}
 			else{
-				if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(this, FullScreenImageViewer.class);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", ManagerActivity.FOLDER_LINK_ADAPTER);
@@ -595,7 +595,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 					intent.putExtra("isFolderLink", true);
 					startActivity(intent);
 				}
-				else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 					MegaNode file = nodes.get(position);
 					Intent service = new Intent(this, MegaStreamingService.class);
 			  		startService(service);
@@ -608,7 +608,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 					}
 					
 			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeType.typeForName(file.getName()).getType();
+			  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 			  		System.out.println("FILENAME: " + fileName);
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);

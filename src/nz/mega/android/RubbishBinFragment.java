@@ -494,7 +494,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 					}
 				}
 				else{
-					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+					if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", ManagerActivity.RUBBISH_BIN_ADAPTER);

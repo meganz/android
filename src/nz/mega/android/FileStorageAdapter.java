@@ -158,7 +158,7 @@ public class FileStorageAdapter extends BaseAdapter implements OnClickListener {
 				Util.setViewAlpha(imageView, .4f);
 				textView.setTextColor(mContext.getResources().getColor(R.color.text_secondary));
 			}
-			imageResId = R.drawable.mime_folder;
+			imageResId = R.drawable.ic_folder_list;
 		}
 		
 		imageView.setImageDrawable(mContext.getResources().getDrawable(imageResId));

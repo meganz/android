@@ -190,7 +190,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			log("SIZE: " + fList.length);
 			for (File f : fList){
 				log("F: " + f.getAbsolutePath());
-				if (MimeType.typeForName(f.getName()).isImage()){
+				if (MimeTypeList.typeForName(f.getName()).isImage()){
 					paths.add(f.getAbsolutePath());
 					if (index == positionG){
 						positionG = imageNumber; 
@@ -243,7 +243,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
-				if (MimeType.typeForName(n.getName()).isImage()){
+				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
 					if (i == positionG){
 						positionG = imageNumber; 
@@ -341,7 +341,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
-				if (MimeType.typeForName(n.getName()).isImage()){
+				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					imageHandles.add(n.getHandle());
 					if (i == positionG){
 						positionG = imageNumber; 
@@ -1163,12 +1163,12 @@ public void moveToTrash(){
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 						if (ManagerActivity.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;

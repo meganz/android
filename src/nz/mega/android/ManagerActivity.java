@@ -6005,7 +6005,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //							
 //						}
 //						else
-						if(MimeType.typeForName(tempNode.getName()).isZip()){
+						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
 							
 		    			    File zipFile = new File(localPath);
 		    			    
@@ -6019,12 +6019,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 						else{							
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else{
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 								if (isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;

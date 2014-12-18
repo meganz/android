@@ -582,7 +582,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				}
 				else{
 					//Is file
-					if (MimeType.typeForName(nodes.get(position).getName()).isImage()){
+					if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", ManagerActivity.FILE_BROWSER_ADAPTER);
@@ -597,7 +597,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 						startActivity(intent);
 								
 					}
-					else if (MimeType.typeForName(nodes.get(position).getName()).isVideo() || MimeType.typeForName(nodes.get(position).getName()).isAudio() ){
+					else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 						MegaNode file = nodes.get(position);
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -610,7 +610,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeType.typeForName(file.getName()).getType();
+				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);

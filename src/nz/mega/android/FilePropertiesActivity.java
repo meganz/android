@@ -421,14 +421,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							
 							if(sl.size()>1){
 								//It is public and shared
-								imageView.setImageResource(R.drawable.mime_folder_shared);
+								imageView.setImageResource(R.drawable.folder_shared_mime);
 								sharedWithButton.setVisibility(View.VISIBLE);
 								publicLinkImage.setVisibility(View.VISIBLE);
 								sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 							}
 							else{
 								//It is just public
-								imageView.setImageResource(R.drawable.mime_folder);
+								imageView.setImageResource(R.drawable.folder_mime);
 								sharedWithButton.setVisibility(View.GONE);
 								publicLinkImage.setVisibility(View.VISIBLE);
 //								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
@@ -438,7 +438,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						else{
 //							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 							//It is private and shared
-							imageView.setImageResource(R.drawable.mime_folder_shared);
+							imageView.setImageResource(R.drawable.folder_shared_mime);
 							publicLinkImage.setVisibility(View.GONE);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
@@ -587,15 +587,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						
 						if(sl.size()>1){
 							//It is public and shared
-							imageView.setImageResource(R.drawable.mime_folder_shared);
+							imageView.setImageResource(R.drawable.folder_shared_mime);
 							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
 							//It is just public
-							imageView.setImageResource(R.drawable.mime_folder);
+							imageView.setImageResource(R.drawable.folder_mime);
 							sharedWithButton.setVisibility(View.GONE);
+
 							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 						}
@@ -604,7 +605,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					else{
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 						//It is private and shared
-						imageView.setImageResource(R.drawable.mime_folder_shared);
+						imageView.setImageResource(R.drawable.folder_shared_mime);
 						sharedWithButton.setVisibility(View.VISIBLE);
 						publicLinkImage.setVisibility(View.GONE);
 						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_select_contact)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
@@ -1075,7 +1076,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						supportInvalidateOptionsMenu();
 					}
 		    		Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setDataAndType(Uri.fromFile(offlineFile), MimeType.typeForName(offlineFile.getName()).getType());
+					intent.setDataAndType(Uri.fromFile(offlineFile), MimeTypeList.typeForName(offlineFile.getName()).getType());
 					if (ManagerActivity.isIntentAvailable(this, intent)){
 						startActivity(intent);
 					}
@@ -1925,15 +1926,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						
 						if(sl.size()>1){
 							//It is public and shared
-							imageView.setImageResource(R.drawable.mime_folder_shared);
+							imageView.setImageResource(R.drawable.folder_shared_mime);
 							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+(sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
 						}
 						else{
 							//It is just public
-							imageView.setImageResource(R.drawable.mime_folder);
+							imageView.setImageResource(R.drawable.folder_mime);
 							sharedWithButton.setVisibility(View.GONE);
+
 							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 						}
@@ -1942,7 +1944,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					else{
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 						//It is private and shared
-						imageView.setImageResource(R.drawable.mime_folder_shared);
+						imageView.setImageResource(R.drawable.folder_shared_mime);
 						sharedWithButton.setVisibility(View.VISIBLE);
 						publicLinkImage.setVisibility(View.GONE);
 						sharedWithButton.setText(getResources().getString(R.string.file_properties_shared_folder_list_shares)+" "+sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
@@ -2050,12 +2052,12 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 						if (ManagerActivity.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;

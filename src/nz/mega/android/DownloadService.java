@@ -372,7 +372,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else
 		{
-			if (MimeType.typeForName(currentFile.getName()).isPdf()){
+			if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 				
 				if (fromContactFile){
 					log("FROM CONTACT FILE");
@@ -390,7 +390,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				    startActivity(intentPdf);				
 				}
 			}
-			else if (MimeType.typeForName(currentFile.getName()).isZip()){
+			else if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
 				log("Download success of zip file!");				
 				
 				if(pathFileToOpen!=null){
@@ -415,27 +415,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			    
 				log("Lanzo intent al manager.....");
 			}
-			else if (MimeType.typeForName(currentFile.getName()).isDocument()){
+			else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
 				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 				viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				if (ManagerActivity.isIntentAvailable(this, viewIntent))
 					startActivity(viewIntent);
 				else{
 					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 					startActivity(intentShare);
 				}
 			}
 			log("Current File: " + currentFile.getAbsolutePath());
 			intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName())
+			intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 					.getType());
 			
 			if (!ManagerActivity.isIntentAvailable(DownloadService.this, intent)){
 				intent.setAction(Intent.ACTION_SEND);
-				intent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName())
+				intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 						.getType());
 			}
 				

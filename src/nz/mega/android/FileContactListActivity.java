@@ -347,7 +347,7 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
 						
 			nameView.setText(node.getName());		
 			
-			imageView.setImageResource(R.drawable.mime_folder_shared);	
+			imageView.setImageResource(R.drawable.ic_folder_shared_list);	
 			
 			tempListContacts = megaApi.getOutShares(node);		
 			for(int i=0; i<tempListContacts.size();i++){

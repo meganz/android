@@ -282,12 +282,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			if (sl != null) {
 				if (sl.size() > 0) {
 					holder.imageView
-					.setImageResource(R.drawable.mime_folder_shared);
+					.setImageResource(R.drawable.folder_shared_mime);
 				} else {
-					holder.imageView.setImageResource(R.drawable.mime_folder);
+					holder.imageView.setImageResource(R.drawable.folder_mime);
 				}
 			} else {
-				holder.imageView.setImageResource(R.drawable.mime_folder);
+				holder.imageView.setImageResource(R.drawable.folder_mime);
 			}
 		} 
 		else {
@@ -323,7 +323,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				}
 			}					
 
-			holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
 			if (node.hasThumbnail()) {
 				thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -607,7 +607,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				} 
 				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
 					
-					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					holder.imageView.setImageResource(R.drawable.folder_shared_mime);
 					
 					//TODO Tengo que comprobar el parentHandle
 					//Visible
@@ -824,14 +824,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 			if (n.isFolder()) {
 				if (megaApi.isShared(n)){
-					i.putExtra("imageId", R.drawable.mime_folder_shared);	
+					i.putExtra("imageId", R.drawable.folder_shared_mime);	
 				}
 				else{
-					i.putExtra("imageId", R.drawable.mime_folder);
+					i.putExtra("imageId", R.drawable.folder_mime);
 				}
 			} 
 			else {
-				i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());
+				i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());
 			}
 			i.putExtra("name", n.getName());
 			context.startActivity(i);

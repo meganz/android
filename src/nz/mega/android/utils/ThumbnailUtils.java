@@ -13,7 +13,7 @@ import nz.mega.android.MegaPhotoSyncGridAdapter;
 import nz.mega.android.MegaPhotoSyncListAdapter;
 import nz.mega.android.MegaShareInOutListAdapter;
 import nz.mega.android.MegaTransfersAdapter;
-import nz.mega.android.MimeType;
+import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.ThumbnailCache;
 import nz.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
@@ -1280,7 +1280,7 @@ public class ThumbnailUtils {
 	
 	public static void createThumbnailPhotoSyncList(Context context, MegaNode document, ViewHolderPhotoSyncList holder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapter adapter){
 		
-		if (!MimeType.typeForName(document.getName()).isImage()) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
 			return;
 		}
@@ -1299,7 +1299,7 @@ public class ThumbnailUtils {
 	
 	public static void createThumbnailList(Context context, MegaNode document, ViewHolderBrowserList holder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
 		
-		if (!MimeType.typeForName(document.getName()).isImage()) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
 			return;
 		}
@@ -1318,7 +1318,7 @@ public class ThumbnailUtils {
 	
 	public static void createThumbnailListShare(Context context, MegaNode document, ViewHolderInOutShareList holder, MegaApiAndroid megaApi, MegaShareInOutListAdapter adapter){
 		
-		if (!MimeType.typeForName(document.getName()).isImage()) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
 			return;
 		}
@@ -1337,7 +1337,7 @@ public class ThumbnailUtils {
 
 	public static void createThumbnailGrid(Context context, MegaNode document, ViewHolderBrowserGrid holder, MegaApiAndroid megaApi, MegaBrowserGridAdapter adapter, int numView){
 		
-		if (!MimeType.typeForName(document.getName()).isImage()) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
 			return;
 		}
@@ -1355,7 +1355,7 @@ public class ThumbnailUtils {
 	
 	public static void createThumbnailNewGrid(Context context, MegaNode document, ViewHolderBrowserNewGrid holder, MegaApiAndroid megaApi, MegaBrowserNewGridAdapter adapter, int numView){
 		
-		if (!MimeType.typeForName(document.getName()).isImage()) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
 			return;
 		}
@@ -1373,7 +1373,7 @@ public class ThumbnailUtils {
 	
 	public static void createThumbnailExplorer(Context context, MegaNode document, ViewHolderExplorer holder, MegaApiAndroid megaApi, MegaExplorerAdapter adapter){
 		
-		if (!MimeType.typeForName(document.getName()).isImage()) {
+		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
 			return;
 		}

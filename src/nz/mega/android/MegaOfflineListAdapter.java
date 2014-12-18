@@ -292,9 +292,9 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 		}
 		
-		holder.imageView.setImageResource(MimeType.typeForName(currentNode.getName()).getIconResourceId());
+		holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
 		if (currentFile.isFile()){
-			if (MimeType.typeForName(currentNode.getName()).isImage()){
+			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
 								
 				if (currentFile.exists()){
@@ -314,7 +314,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			}
 		}
 		else{
-			holder.imageView.setImageResource(R.drawable.mime_folder);
+			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 		}
 		
 		holder.imageButtonThreeDots.setTag(holder);

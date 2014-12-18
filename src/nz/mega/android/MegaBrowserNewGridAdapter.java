@@ -484,15 +484,15 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				holder.fileNameViews.get(i).setText(node.getName());
 				if (nodes.get(totalPosition).isFolder()){
 					if (megaApi.isShared(node)){
-						holder.imageViews.get(i).setImageResource(R.drawable.mime_folder_shared);	
+						holder.imageViews.get(i).setImageResource(R.drawable.folder_shared_thumbnail);	
 					}
 					else{
-						holder.imageViews.get(i).setImageResource(R.drawable.mime_folder);	
+						holder.imageViews.get(i).setImageResource(R.drawable.folder_thumbnail);	
 					}
 					holder.fileSizeViews.get(i).setText(getInfoFolder(node));
 				}
 				else{
-					holder.imageViews.get(i).setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+					holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 					holder.fileSizeViews.get(i).setText(Util.getSizeString(node.getSize()));
 					
 					if(mTHash!=null){
@@ -543,7 +543,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 									holder.imageViews.get(i).setImageBitmap(thumb);
 								}
 								else{
-									holder.imageViews.get(i).setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+									holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 								}
 							}
 						}
@@ -793,15 +793,15 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 
 		if (n.isFolder()) {
 			if (megaApi.isShared(n)){
-				i.putExtra("imageId", R.drawable.mime_folder_shared);	
+				i.putExtra("imageId", R.drawable.folder_shared_thumbnail);	
 			}
 			else{
-				i.putExtra("imageId", R.drawable.mime_folder);
+				i.putExtra("imageId", R.drawable.folder_thumbnail);
 			}
 
 		} 
 		else {
-			i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());
+			i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());
 		}
 		i.putExtra("name", n.getName());
 		context.startActivity(i);
@@ -1041,7 +1041,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				listFragment.setSelection(0);
 			}
 			else{
-				if (MimeType.typeForName(n.getName()).isImage()){
+				if (MimeTypeList.typeForName(n.getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewer.class);
 					intent.putExtra("position", totalPosition);
 					if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
@@ -1075,7 +1075,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					}
 					context.startActivity(intent);
 				}
-				else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+				else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
 					MegaNode file = n;
 					Intent service = new Intent(context, MegaStreamingService.class);
 			  		context.startService(service);
@@ -1088,7 +1088,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 					}
 					
 			  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-			  		String mimeType = MimeType.typeForName(file.getName()).getType();
+			  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 			  		System.out.println("FILENAME: " + fileName);
 			  		
 			  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);

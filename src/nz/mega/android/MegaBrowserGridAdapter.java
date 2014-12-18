@@ -299,20 +299,20 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node1);
 				if (sl != null){
 					if (sl.size() > 0){
-						holder.imageView1.setImageResource(R.drawable.mime_folder_shared);		
+						holder.imageView1.setImageResource(R.drawable.folder_shared_thumbnail);		
 					}
 					else{
-						holder.imageView1.setImageResource(R.drawable.mime_folder);
+						holder.imageView1.setImageResource(R.drawable.folder_thumbnail);
 					}
 				}
 				else{
-					holder.imageView1.setImageResource(R.drawable.mime_folder);				
+					holder.imageView1.setImageResource(R.drawable.folder_thumbnail);				
 				}
 			}
 			else{
 				long node1Size = node1.getSize();
 				holder.textViewFileSize1.setText(Util.getSizeString(node1Size));
-				holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+				holder.imageView1.setImageResource(MimeTypeList.typeForName(node1.getName()).getIconResourceId());
 				
 				if(mTHash!=null){
 					
@@ -361,7 +361,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 								holder.imageView1.setImageBitmap(thumb1);
 							}
 							else{
-								holder.imageView1.setImageResource(MimeType.typeForName(node1.getName()).getIconResourceId());
+								holder.imageView1.setImageResource(MimeTypeList.typeForName(node1.getName()).getIconResourceId());
 							}
 						}
 					}
@@ -398,20 +398,20 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					ArrayList<MegaShare> sl = megaApi.getOutShares(node2);
 					if (sl != null){
 						if (sl.size() > 0){
-							holder.imageView2.setImageResource(R.drawable.mime_folder_shared);		
+							holder.imageView2.setImageResource(R.drawable.folder_shared_thumbnail);		
 						}
 						else{
-							holder.imageView2.setImageResource(R.drawable.mime_folder);
+							holder.imageView2.setImageResource(R.drawable.folder_thumbnail);
 						}
 					}
 					else{
-						holder.imageView2.setImageResource(R.drawable.mime_folder);				
+						holder.imageView2.setImageResource(R.drawable.folder_thumbnail);				
 					}
 				}
 				else{
 					long node2Size = node2.getSize();
 					holder.textViewFileSize2.setText(Util.getSizeString(node2Size));
-					holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+					holder.imageView2.setImageResource(MimeTypeList.typeForName(node2.getName()).getIconResourceId());
 					
 					if(mTHash!=null){
 						
@@ -468,7 +468,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 									holder.imageView2.setImageBitmap(thumb2);
 								}
 								else{
-									holder.imageView2.setImageResource(MimeType.typeForName(node2.getName()).getIconResourceId());
+									holder.imageView2.setImageResource(MimeTypeList.typeForName(node2.getName()).getIconResourceId());
 								}
 							}
 						}
@@ -812,7 +812,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 //					}
 				}
 				else{
-					if (MimeType.typeForName(n.getName()).isImage()){
+					if (MimeTypeList.typeForName(n.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", currentPosition);
 						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
@@ -846,7 +846,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio() ){
+					else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -859,7 +859,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeType.typeForName(file.getName()).getType();
+				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -950,7 +950,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 //					}
 				}
 				else{
-					if (MimeType.typeForName(n.getName()).isImage()){
+					if (MimeTypeList.typeForName(n.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", (currentPosition+1));
 						if (type == ManagerActivity.FILE_BROWSER_ADAPTER){
@@ -982,7 +982,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						context.startActivity(intent);
 					}
-					else if (MimeType.typeForName(n.getName()).isVideo() || MimeType.typeForName(n.getName()).isAudio()){
+					else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio()){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -995,7 +995,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeType.typeForName(file.getName()).getType();
+				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
@@ -1077,10 +1077,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				i.putExtra("handle", n.getHandle());
 				if (n.isFolder()){
-					i.putExtra("imageId", R.drawable.mime_folder);
+					i.putExtra("imageId", R.drawable.folder_thumbnail);
 				}
 				else{
-					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
+					i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());	
 				}				
 				i.putExtra("name", n.getName());
 				context.startActivity(i);							
@@ -1093,10 +1093,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				i.putExtra("handle", n.getHandle());
 				if (n.isFolder()){
-					i.putExtra("imageId", R.drawable.mime_folder);
+					i.putExtra("imageId", R.drawable.folder_thumbnail);
 				}
 				else{
-					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
+					i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());	
 				}				
 				i.putExtra("name", n.getName());
 				context.startActivity(i);							
