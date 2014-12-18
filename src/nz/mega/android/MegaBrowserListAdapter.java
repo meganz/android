@@ -96,6 +96,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public RelativeLayout optionRemoveTotal;
 		public RelativeLayout optionClearShares;
 		public RelativeLayout optionLeaveShare;
+		public RelativeLayout optionMoveTo;
 		public TextView propertiesText;
 		public int currentPosition;
 		public long document;
@@ -224,7 +225,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 //			((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
 
-			holder.optionClearShares = (RelativeLayout) convertView.findViewById(R.id.file_list_option_clear_share_layout);				
+			holder.optionClearShares = (RelativeLayout) convertView.findViewById(R.id.file_list_option_clear_share_layout);	
+			holder.optionMoveTo = (RelativeLayout) convertView.findViewById(R.id.file_list_option_move_layout);		
 			
 			holder.optionMore = (RelativeLayout) convertView.findViewById(R.id.file_list_option_overflow_layout);
 //			holder.optionMore.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
@@ -477,7 +479,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionClearShares.setVisibility(View.GONE);
 					holder.optionRemoveTotal.setVisibility(View.GONE);
 					holder.optionShare.setVisibility(View.GONE);
-					holder.optionPermissions.setVisibility(View.GONE);					
+					holder.optionPermissions.setVisibility(View.GONE);
+					holder.optionMoveTo.setVisibility(View.GONE);
 					
 //					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 //					((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -511,8 +514,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 					int accessLevel = megaApi.getAccess(folder);
 					log("Node: "+folder.getName());
-					log("ManagerActivity.CONTACT_FILE_ADAPTER: "+accessLevel);
-
+					log("ManagerActivity.CONTACT_FILE_ADAPTER: "+accessLevel);					
+					
 					switch (accessLevel) {
 					case MegaShare.ACCESS_FULL: {
 
@@ -531,23 +534,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionRename.setVisibility(View.GONE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 						holder.optionMore.setVisibility(View.VISIBLE);
+						holder.optionMoveTo.setVisibility(View.GONE);
 
-//						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//						holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);	
-//						holder.optionLeaveShare.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionLeaveShare.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//						holder.optionDelete.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((25), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
-//						holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-						// holder.textViewPermissions.setText(context.getString(R.string.file_properties_shared_folder_full_access));
 						break;
 					}
 					case MegaShare.ACCESS_READ: {
@@ -560,23 +548,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionRemoveTotal.setVisibility(View.GONE);
 						holder.optionClearShares.setVisibility(View.GONE);
 						holder.optionMore.setVisibility(View.GONE);
+						holder.optionMoveTo.setVisibility(View.GONE);
 						
 						if(node.isFile()){
 							holder.optionLeaveShare.setVisibility(View.GONE);
 						}
 						else {
 							holder.optionLeaveShare.setVisibility(View.VISIBLE);
-						}
-						
-
-//						holder.optionDownload.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//						holder.optionProperties.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//						holder.optionLeaveShare.getLayoutParams().width = Util.px2dp((100 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionLeaveShare.getLayoutParams()).setMargins(Util.px2dp((20), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
+						}						
 						break;
 					}
 					case MegaShare.ACCESS_READWRITE: {
@@ -589,6 +568,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionDelete.setVisibility(View.GONE);
 						holder.optionRemoveTotal.setVisibility(View.GONE);
 						holder.optionClearShares.setVisibility(View.GONE);
+						holder.optionMoveTo.setVisibility(View.GONE);
 						if(node.isFile()){
 							holder.optionLeaveShare.setVisibility(View.GONE);
 						}
@@ -598,24 +578,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						
 						holder.optionMore.setVisibility(View.VISIBLE);
 
-//						holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//						holder.optionProperties.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionProperties.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);	
-//						holder.optionLeaveShare.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionLeaveShare.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-//						holder.optionRename.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionRename.getLayoutParams()).setMargins(Util.px2dp((25), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);						
-//						holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
-//						((LinearLayout.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//								Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 						break;
 					}
 					}
+					if(type == ManagerActivity.INCOMING_SHARES_ADAPTER){
+						holder.optionDelete.setVisibility(View.GONE);
+					}
+
 				} 
 				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
 					
@@ -636,6 +605,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionDelete.setVisibility(View.GONE);		
 					holder.optionRemoveTotal.setVisibility(View.GONE);
 					holder.optionRename.setVisibility(View.GONE);
+					holder.optionMoveTo.setVisibility(View.GONE);
 
 //					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 //					((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((20 * scaleW), outMetrics),
@@ -651,8 +621,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //							Util.px2dp((4 * scaleH), outMetrics), 0, 0);					
 //					holder.optionMore.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 //					((LinearLayout.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
-//							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
-					
+//							Util.px2dp((4 * scaleH), outMetrics), 0, 0);					
 					
 				}
 				else if (type == ManagerActivity.RUBBISH_BIN_ADAPTER) {
@@ -666,6 +635,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionRename.setVisibility(View.GONE);
 					holder.optionDelete.setVisibility(View.GONE);
 					holder.optionRemoveTotal.setVisibility(View.VISIBLE);
+					holder.optionMoveTo.setVisibility(View.VISIBLE);
 
 //					holder.optionDownload.getLayoutParams().width = Util.px2dp((44 * scaleW), outMetrics);
 //					((LinearLayout.LayoutParams) holder.optionDownload.getLayoutParams()).setMargins(Util.px2dp((9 * scaleW), outMetrics),
@@ -691,6 +661,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					holder.optionDelete.setVisibility(View.GONE);
 					holder.optionRemoveTotal.setVisibility(View.GONE);
 					holder.optionClearShares.setVisibility(View.GONE);
+					holder.optionMoveTo.setVisibility(View.GONE);
 
 //					holder.optionDownload.getLayoutParams().width = Util.px2dp(
 //							(335 * scaleW), outMetrics);
@@ -731,12 +702,18 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 
 		holder.optionDelete.setTag(holder);
 		holder.optionDelete.setOnClickListener(this);
+		
+		holder.optionRemoveTotal.setTag(holder);
+		holder.optionRemoveTotal.setOnClickListener(this);
 
 		holder.optionPublicLink.setTag(holder);
 		holder.optionPublicLink.setOnClickListener(this);
 		
 		holder.optionMore.setTag(holder);
 		holder.optionMore.setOnClickListener(this);
+		
+		holder.optionMoveTo.setTag(holder);
+		holder.optionMoveTo.setOnClickListener(this);
 		
 		return convertView;
 	}
@@ -830,6 +807,16 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			//Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 			break;
 		}
+		case R.id.file_list_option_move_layout:{
+			if (type == ManagerActivity.RUBBISH_BIN_ADAPTER) {
+				positionClicked = -1;
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(n.getHandle());
+				((ManagerActivity) context).showMove(handleList);
+			} 
+			break;
+		}
 		case R.id.file_list_option_properties_layout: {
 			Intent i = new Intent(context, FilePropertiesActivity.class);
 			i.putExtra("handle", n.getHandle());
@@ -857,6 +844,26 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
 				//break;
 			}
+		}
+		case R.id.file_list_option_remove_layout: {
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			handleList.add(n.getHandle());
+			setPositionClicked(-1);
+			notifyDataSetChanged();
+			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
+				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
+				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
+				//break;
+			}
+			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
+				((ManagerActivity) context).moveToTrash(handleList);
+				//break;
+			} 
+			else {
+				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
+				//break;
+			}
+			break;
 		}
 		case R.id.file_list_option_delete_layout: {
 			ArrayList<Long> handleList = new ArrayList<Long>();

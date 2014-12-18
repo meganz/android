@@ -385,31 +385,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			//TODO comprobar la vista vacía
 			
-			return v;
-//			
-//			if (adapterGrid == null){
-//				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
-//			}
-//			else{
-//				adapterGrid.setParentHandle(parentHandle);
-//				adapterGrid.setNodes(nodes);
-//			}
-//			
-//			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_rubbish_bin));
-//			}
-//			else{
-//				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-//			}
-//				        
-//			adapterGrid.setPositionClicked(-1);
-//			listView.setAdapter(adapterGrid);
-//			
-//			setNodes(nodes);
-//			
-//			//TODO comprobar la vista vacía
-//			
-//			return v;
+			return v;	
 		}
 	}
 	
