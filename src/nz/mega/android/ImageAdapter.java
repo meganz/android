@@ -43,7 +43,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(R.drawable.mime_image);
+        imageView.setImageResource(R.drawable.ic_image_list);
         return imageView;
     }
 }

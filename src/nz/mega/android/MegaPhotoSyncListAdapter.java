@@ -203,7 +203,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			else{
 				long nodeSize = node.getSize();
 				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
-				holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 				
 				if (node.hasThumbnail()){
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -362,10 +362,10 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				i.putExtra("handle", n.getHandle());
 			
 				if (n.isFolder()){
-					i.putExtra("imageId", R.drawable.mime_folder);
+					i.putExtra("imageId", R.drawable.ic_folder_list);
 				}
 				else{
-					i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());	
+					i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());	
 				}				
 				i.putExtra("name", n.getName());
 				context.startActivity(i);							

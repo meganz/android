@@ -121,7 +121,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			String info = ((ZipBrowserActivity)context).countFiles(nameFile);
 			
 			holder.textViewFileSize.setText(info);
-			holder.imageView.setImageResource(R.drawable.mime_folder);
+			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			
 			//TODO: how to know the files & folders inside
 			
@@ -132,7 +132,7 @@ public class ZipListAdapter  extends BaseAdapter implements OnClickListener {
 			nameFile = nameFile.substring(index+1, nameFile.length());
 			
 			holder.textViewFileSize.setText(Util.getSizeString(zipNode.getSize()));	
-			holder.imageView.setImageResource(MimeType.typeForName(zipNode.getName()).getIconResourceId());
+			holder.imageView.setImageResource(MimeTypeList.typeForName(zipNode.getName()).getIconResourceId());
 		}	
 						
 		holder.textViewFileName.setText(nameFile);

@@ -21,10 +21,10 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
     <string name="general_add" context="button">Añadir</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Vaciar</string>
-    <string name="general_loading" context="state previous to import a file">Cargando...</string>
-    <string name="general_importing" context="state while importing the file">Importado...</string>
+    <string name="general_loading" context="state previous to import a file">Cargando&#8230;</string>
+    <string name="general_importing" context="state while importing the file">Importado&#8230;</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importar</string>
-    <string name="general_updating" context="state while upgrading the account">Actualizando...</string>  
+    <string name="general_updating" context="state while upgrading the account">Actualizando&#8230;</string>  
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Ancho de Banda</string>
     <string name="general_error_word" context="It will be followed by the error message">Error</string> 
@@ -34,20 +34,20 @@
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo de clave maestra exportado</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Quiere continuar?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones...</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones&#8230;</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Carpetas compartidas Entrantes</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Compartidos Salientes</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
-    <string name="action_add" context="Menu item">Subir...</string>
+    <string name="action_add" context="Menu item">Subir&#8230;</string>
     <string name="action_create_folder" context="Menu item">Crear nueva carpeta</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Subir a</string>
     <string name="action_settings" context="Menu item">Configuración</string>
     <string name="action_search" context="Search button">Buscar</string>
     <string name="action_refresh" context="Menu item">Actualizar</string>
-    <string name="action_sort_by" context="Menu item">[$2203]</string>
+    <string name="action_sort_by" context="Menu item">Ordenar por&#8230;</string>
     <string name="action_help" context="Menu item">Ayuda</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Mejorar cuenta</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar Todo</string>

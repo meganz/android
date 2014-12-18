@@ -672,15 +672,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 		if (n.isFolder()) {
 			if (megaApi.isShared(n)){
-				i.putExtra("imageId", R.drawable.mime_folder_shared);	
+				i.putExtra("imageId", R.drawable.folder_shared_mime);	
 			}
 			else{
-				i.putExtra("imageId", R.drawable.mime_folder);
+				i.putExtra("imageId", R.drawable.folder_mime);
 			}
 
 		} 
 		else {
-			i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());
+			i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());
 		}
 		i.putExtra("name", n.getName());
 		context.startActivity(i);
@@ -873,7 +873,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				}else{
 					if(currentFile.exists()&&currentFile.isFile()){
 						//Open it!
-						if (MimeType.typeForName(currentFile.getName()).isImage()){
+						if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 							Intent intent = new Intent(context, FullScreenImageViewer.class);
 							intent.putExtra("position", position);
 							intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
@@ -892,13 +892,13 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 //						}
 						else{
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(context, viewIntent)){
 								context.startActivity(viewIntent);
 							}
 							else{
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
-								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
+								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 								if (ManagerActivity.isIntentAvailable(context, intentShare)){
 									context.startActivity(intentShare);
 								}

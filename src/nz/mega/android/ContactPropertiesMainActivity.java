@@ -473,7 +473,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 //
 //						}
 //						else 
-						if(MimeType.typeForName(tempNode.getName()).isZip()){
+						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
 
 							File zipFile = new File(localPath);
 
@@ -489,13 +489,13 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)),
-									MimeType.typeForName(tempNode.getName()).getType());
+									MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								intentShare.setDataAndType(Uri.fromFile(new File(localPath)),
-										MimeType.typeForName(tempNode.getName()).getType());
+										MimeTypeList.typeForName(tempNode.getName()).getType());
 								if (ManagerActivity.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;

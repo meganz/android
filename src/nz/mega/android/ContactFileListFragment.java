@@ -652,7 +652,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 				}
 			} 
 			else {
-				if (MimeType.typeForName(contactNodes.get(position).getName()).isImage()) {
+				if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
 					Intent intent = new Intent(context, FullScreenImageViewer.class);
 					intent.putExtra("position", position);
 					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
@@ -662,7 +662,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 					}
 					((ContactPropertiesMainActivity)context).startActivity(intent);
 				} 
-				else if (MimeType.typeForName(contactNodes.get(position).getName()).isVideo()	|| MimeType.typeForName(contactNodes.get(position).getName()).isAudio()) {
+				else if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isVideo()	|| MimeTypeList.typeForName(contactNodes.get(position).getName()).isAudio()) {
 					MegaNode file = contactNodes.get(position);
 					Intent service = new Intent(context, MegaStreamingService.class);
 					((ContactPropertiesMainActivity)context).startService(service);
@@ -674,7 +674,7 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 					}
 
 					String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-					String mimeType = MimeType.typeForName(file.getName()).getType();
+					String mimeType = MimeTypeList.typeForName(file.getName()).getType();
 					System.out.println("FILENAME: " + fileName);
 
 					Intent mediaIntent = new Intent(Intent.ACTION_VIEW);

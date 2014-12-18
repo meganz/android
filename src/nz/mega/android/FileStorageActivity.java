@@ -237,7 +237,7 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 	 */
 	public static class FileDocument {
 		private File file;
-		private MimeType mimeType;
+		private MimeTypeList mimeType;
 
 		public FileDocument(File file) {
 			this.file = file;
@@ -267,9 +267,9 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 			return file.getName();
 		}
 
-		public MimeType getMimeType() {
+		public MimeTypeList getMimeType() {
 			if (mimeType == null) {
-				mimeType = MimeType.typeForName(getName());
+				mimeType = MimeTypeList.typeForName(getName());
 			}
 			return mimeType;
 		}

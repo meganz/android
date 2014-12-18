@@ -231,8 +231,8 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				nameView.setText(document.getName());
 				sizeTextView.setText(Formatter.formatFileSize(this, document.getSize()));
 				
-				imageView.setImageResource(MimeType.typeForName(document.getName()).getIconResourceId());
-				iconView.setImageResource(MimeType.typeForName(document.getName()).getIconResourceId());
+				imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
 			}
 		 }
 		else if (request.getType() == MegaRequest.TYPE_COPY){
@@ -426,12 +426,12 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 						catch(Exception e) {}
 						
 						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 						if (ManagerActivity.isIntentAvailable(this, viewIntent))
 							startActivity(viewIntent);
 						else{
 							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeType.typeForName(tempNode.getName()).getType());
+							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (ManagerActivity.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;

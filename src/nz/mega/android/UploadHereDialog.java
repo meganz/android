@@ -31,14 +31,14 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 	private static ArrayList<ListItem> items;
 	static {
 		items = new ArrayList<UploadHereDialog.ListItem>();
-		items.add(new ListItem(R.string.upload_to_image, MimeType.typeForName(
+		items.add(new ListItem(R.string.upload_to_image, MimeTypeList.typeForName(
 				"image.png").getIconResourceId(), "image/*"));
-		items.add(new ListItem(R.string.upload_to_audio, MimeType.typeForName(
+		items.add(new ListItem(R.string.upload_to_audio, MimeTypeList.typeForName(
 				"song.mp3").getIconResourceId(), "audio/*"));
-		items.add(new ListItem(R.string.upload_to_video, MimeType.typeForName(
+		items.add(new ListItem(R.string.upload_to_video, MimeTypeList.typeForName(
 				"film.mkv").getIconResourceId(), "video/*"));
 		items.add(new ListItem(R.string.upload_to_filesystem,
-				R.drawable.mime_folder, null));
+				R.drawable.ic_folder_list, null));
 	}
 	
 	ListView listView;	

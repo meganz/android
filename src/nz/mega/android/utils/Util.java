@@ -15,7 +15,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.MimeType;
+import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
@@ -415,7 +415,7 @@ public class Util {
 		Cursor cursor = null;
 		try 
 		{
-			if(MimeType.typeForName(fileName).isImage())
+			if(MimeTypeList.typeForName(fileName).isImage())
 			{
 				final String[] projection = { MediaStore.Images.Media.DATA };
 				final String selection = MediaStore.Images.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Images.Media.SIZE + " = ?";
@@ -447,7 +447,7 @@ public class Util {
 				}
 				if(cursor != null) cursor.close();
 			}
-			else if(MimeType.typeForName(fileName).isVideo())
+			else if(MimeTypeList.typeForName(fileName).isVideo())
 			{
 				final String[] projection = { MediaStore.Video.Media.DATA };
 				final String selection = MediaStore.Video.Media.DISPLAY_NAME + " = ? AND " + MediaStore.Video.Media.SIZE + " = ?";

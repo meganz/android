@@ -213,7 +213,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 				if (node.isFolder()) {
 					holder.textViewFileSize.setText(getInfoFolder(node));			
 					
-					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 						
 				} else {
 					long nodeSize = node.getSize();
@@ -247,7 +247,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 						}
 					}			
 					
-					holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+					holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 	
 					if (node.hasThumbnail()) {
 						thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -352,7 +352,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 					
 					holder.textViewFileSize.setText(getInfoFolder(node));			
 					
-					holder.imageView.setImageResource(R.drawable.mime_folder_shared);
+					holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 					
 					holder.itemLayoutFile.setVisibility(View.VISIBLE);
 					holder.imageView.setVisibility(View.VISIBLE);
@@ -395,7 +395,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 					}
 				}			
 				
-				holder.imageView.setImageResource(MimeType.typeForName(node.getName()).getIconResourceId());
+				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
 				if (node.hasThumbnail()) {
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
@@ -668,16 +668,16 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 
 					if (sl.size() > 0) {
 
-						i.putExtra("imageId", R.drawable.mime_folder_shared);
+						i.putExtra("imageId", R.drawable.ic_folder_shared_list);
 					} else {
-						i.putExtra("imageId", R.drawable.mime_folder);
+						i.putExtra("imageId", R.drawable.ic_folder_list);
 					}
 				} else {
-					i.putExtra("imageId", R.drawable.mime_folder);
+					i.putExtra("imageId", R.drawable.ic_folder_list);
 				}
 
 			} else {
-				i.putExtra("imageId", MimeType.typeForName(n.getName())
+				i.putExtra("imageId", MimeTypeList.typeForName(n.getName())
 						.getIconResourceId());
 			}
 			i.putExtra("name", n.getName());
