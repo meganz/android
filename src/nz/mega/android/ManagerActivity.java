@@ -1370,7 +1370,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
-	    			rubbishBinMenuItem.setVisible(true);
+	    			rubbishBinMenuItem.setVisible(false);
 	    			rubbishBinMenuItem.setTitle(getString(R.string.section_rubbish_bin));
 	    			clearRubbishBinMenuitem.setVisible(false);
     			}
@@ -1533,7 +1533,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			}
         			rbF.setIsList(isListRubbishBin);	        			
         			rbF.setParentHandle(parentHandleRubbish);
-        			rubbishBinMenuItem.setVisible(true);
+        			rubbishBinMenuItem.setVisible(false);
         			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
 	    			clearRubbishBinMenuitem.setVisible(true);
 	    		}
@@ -2224,7 +2224,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				selectMenuItem.setVisible(true);
 				sortByMenuItem.setVisible(true);
 				thumbViewMenuItem.setVisible(true);
-				rubbishBinMenuItem.setVisible(true);
+				rubbishBinMenuItem.setVisible(false);
 				refreshMenuItem.setVisible(true);
 				helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
@@ -2343,7 +2343,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			rbF.setIsList(isListRubbishBin);	        			
     			rbF.setParentHandle(parentHandleRubbish);
-    			rubbishBinMenuItem.setVisible(true);
+    			rubbishBinMenuItem.setVisible(false);
     			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
     			clearRubbishBinMenuitem.setVisible(true);
 			}
