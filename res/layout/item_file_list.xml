@@ -148,8 +148,7 @@
 		            style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
 		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"
-	             />
+		            android:paddingTop="2dp"/>
                 
                 <TextView 
                     android:id="@+id/file_list_option_download_text"
@@ -208,8 +207,7 @@
 		            style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
 		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"
-	             />
+		            android:paddingTop="2dp"/>
 				
 				<TextView 
                     android:id="@+id/file_list_option_public_link_text"
@@ -235,10 +233,22 @@
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
 		            android:src="@drawable/leave_share_ic"
-		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
-	             />		   	               
+		            android:layout_alignParentTop="true"
+		            android:layout_marginTop="-10dp"/>		
+		        
+				<TextView 
+                    android:id="@+id/file_list_option_leave_share_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_leave_menu"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>	               
 		      </RelativeLayout>  
 		         
 		   <RelativeLayout
@@ -252,11 +262,24 @@
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
 		            android:src="@drawable/ic_share"
-		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-	             />
-		     </RelativeLayout>
+		             android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+		        
+		        <TextView 
+                    android:id="@+id/file_list_option_share_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_share_folder"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>	               
+		      </RelativeLayout>  
+
 		     
 		    <RelativeLayout
                 android:id="@+id/file_list_option_permissions_layout"
@@ -269,13 +292,26 @@
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
 		            android:src="@drawable/permissions_ic"
-		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
-	             />
+		            android:layout_alignParentTop="true"
+		            android:layout_marginTop="-10dp"/>
+		         
+		          <TextView 
+                    android:id="@+id/file_list_option_permissions_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/file_properties_shared_folder_select_contact"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>	
 		           
-		         </RelativeLayout>
-		     <RelativeLayout
+		     </RelativeLayout>
+		    
+		    <RelativeLayout
                 android:id="@+id/file_list_option_clear_share_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -289,9 +325,22 @@
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
-	             />
-		           
-		         </RelativeLayout>
+		            android:layout_alignParentTop="true"
+		            android:layout_marginTop="-10dp"/>
+		         <TextView 
+                    android:id="@+id/file_list_option_clear_share_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_clean_shares_menu"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>	               
+		      </RelativeLayout>  
+
+		         
 		    <RelativeLayout
                 android:id="@+id/file_list_option_rename_layout"
                 android:layout_width="match_parent"
@@ -354,8 +403,7 @@
 		            style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
 		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"
-	             />
+		            android:paddingTop="2dp"/>
 		         
 		         <TextView 
                     android:id="@+id/file_list_option_remove_text"
