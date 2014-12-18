@@ -4533,7 +4533,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}		
 	}
 	
-	public void moveToTrash(ArrayList<Long> handleList){
+	public void moveToTrash(final ArrayList<Long> handleList){
 		log("moveToTrash");
 		isClearRubbishBin = false;
 		
@@ -4546,48 +4546,84 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			return;	
 		}
 		
-		MegaNode rubbishNode = megaApi.getRubbishNode();
+		final MegaNode rubbishNode = megaApi.getRubbishNode();
+		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	//TODO remove the outgoing shares
+		        	
+		        	for (int i=0;i<handleList.size();i++){
+		    			//Check if the node is not yet in the rubbish bin (if so, remove it)
+		    			MegaNode parent = megaApi.getNodeByHandle(handleList.get(i));
+		    			while (megaApi.getParentNode(parent) != null){
+		    				parent = megaApi.getParentNode(parent);
+		    			}
+		    				
+		    			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+		    				moveToRubbish = true;
+		    				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, managerActivity);
+		    			}
+		    			else{
+		    				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), managerActivity);
+		    			}
+		    		}
+		    		
+		    		if (moveToRubbish){
+		    			ProgressDialog temp = null;
+		    			try{
+		    				temp = new ProgressDialog(managerActivity);
+		    				temp.setMessage(getString(R.string.context_move_to_trash));
+		    				temp.show();
+		    			}
+		    			catch(Exception e){
+		    				return;
+		    			}
+		    			statusDialog = temp;
+		    		}
+		    		else{
+		    			ProgressDialog temp = null;
+		    			try{
+		    				temp = new ProgressDialog(managerActivity);
+		    				temp.setMessage(getString(R.string.context_delete_from_mega));
+		    				temp.show();
+		    			}
+		    			catch(Exception e){
+		    				return;
+		    			}
+		    			statusDialog = temp;
+		    		}
+		        	
+		            break;
 
-		for (int i=0;i<handleList.size();i++){
-			//Check if the node is not yet in the rubbish bin (if so, remove it)
-			MegaNode parent = megaApi.getNodeByHandle(handleList.get(i));
-			while (megaApi.getParentNode(parent) != null){
-				parent = megaApi.getParentNode(parent);
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+
+		if (handleList.size() > 0){
+			MegaNode p = megaApi.getNodeByHandle(handleList.get(0));
+			while (megaApi.getParentNode(p) != null){
+				p = megaApi.getParentNode(p);
 			}
-				
-			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-				moveToRubbish = true;
-				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, this);
+			if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
+				AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
+				String message= getResources().getString(R.string.confirmation_move_to_rubbish);
+				builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 			}
 			else{
-				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
+				String message= getResources().getString(R.string.confirmation_delete_from_mega);
+				builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 			}
 		}
 		
-		if (moveToRubbish){
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_move_to_trash));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
-		}
-		else{
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_delete_from_mega));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
-		}
 	}
 	
 	public void getPublicLinkAndShareIt(MegaNode document){
