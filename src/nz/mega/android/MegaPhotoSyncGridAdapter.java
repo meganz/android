@@ -369,7 +369,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 //						}
 						
 						Bitmap thumb = null;						
-						holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(n.getName()).getIconResourceId());	
+						holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());	
 						if (n.hasThumbnail()){
 							thumb = ThumbnailUtils.getThumbnailFromCache(n);
 							if (thumb != null){
@@ -390,7 +390,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 										holder.imageViews.get(i).setImageBitmap(thumb);
 									}
 									else{
-										holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(n.getName()).getIconResourceId());
+										holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
 									}
 								}
 							}
@@ -451,7 +451,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 //					}
 					
 					Bitmap thumb = null;					
-					holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(n.getName()).getIconResourceId());
+					holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
 					if (n.hasThumbnail()){
 						thumb = ThumbnailUtils.getThumbnailFromCache(n);
 						if (thumb != null){
@@ -472,7 +472,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 									holder.imageViews.get(i).setImageBitmap(thumb);
 								}
 								else{
-									holder.imageViews.get(i).setImageResource(MimeTypeList.typeForName(n.getName()).getIconResourceId());
+									holder.imageViews.get(i).setImageResource(MimeTypeThumbnail.typeForName(n.getName()).getIconResourceId());
 								}
 							}
 						}
@@ -698,7 +698,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 			MegaNode n = megaApi.getNodeByHandle(holder.documents.get(index));
 			if (n != null){
 				if (!n.isFolder()){
-					if (MimeTypeList.typeForName(n.getName()).isImage()){
+					if (MimeTypeThumbnail.typeForName(n.getName()).isImage()){
 						
 						Intent intent = new Intent(context, FullScreenImageViewer.class);
 						intent.putExtra("position", positionInNodes);
@@ -707,7 +707,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 						intent.putExtra("orderGetChildren", orderGetChildren);
 						context.startActivity(intent);
 					}
-					else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
+					else if (MimeTypeThumbnail.typeForName(n.getName()).isVideo() || MimeTypeThumbnail.typeForName(n.getName()).isAudio() ){
 						MegaNode file = n;
 						Intent service = new Intent(context, MegaStreamingService.class);
 				  		context.startService(service);
@@ -720,7 +720,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 						}
 						
 				  		String url = "http://127.0.0.1:4443/" + file.getBase64Handle() + "/" + fileName;
-				  		String mimeType = MimeTypeList.typeForName(file.getName()).getType();
+				  		String mimeType = MimeTypeThumbnail.typeForName(file.getName()).getType();
 				  		System.out.println("FILENAME: " + fileName);
 				  		
 				  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
