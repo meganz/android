@@ -829,7 +829,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				else{
 					i.putExtra("imageId", R.drawable.mime_folder);
 				}
-
 			} 
 			else {
 				i.putExtra("imageId", MimeType.typeForName(n.getName()).getIconResourceId());
