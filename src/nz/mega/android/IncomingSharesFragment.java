@@ -136,16 +136,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					}
 					break;
 				}
-				case R.id.cab_menu_trash:{
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					for (int i=0;i<documents.size();i++){
-						handleList.add(documents.get(i).getHandle());
-					}
-					clearSelections();
-					hideMultipleSelect();
-					((ManagerActivity) context).moveToTrash(handleList);
-					break;
-				}
 				case R.id.cab_menu_select_all:{
 					selectAll();
 					break;
@@ -225,8 +215,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
-			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(true);
+			menu.findItem(R.id.cab_menu_share_link).setVisible(false);
+			menu.findItem(R.id.cab_menu_trash).setVisible(false);
 			
 			return false;
 		}
@@ -260,8 +250,6 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		if (megaApi.getRootNode() == null){
 			return null;
 		}
-		
-				
 				
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);

@@ -6257,7 +6257,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		statusDialog = temp;
 		megaApi.remove(n);
 	}
-		
+
 	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node)
 	{
 		ProgressDialog temp = null;
@@ -6286,8 +6286,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				megaApi.disableExport(node, this);
 			}
 		}	
-		
-//		statusDialog.dismiss();
+		//TODO change the place
+		try{
+			statusDialog.dismiss();
+		}
+		catch(Exception e){
+			return;
+		}		
 	}
 	
 	public void showUpAF(){
