@@ -433,9 +433,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 		}
 
-
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
+		
+		holder.optionClearShares.setTag(holder);
+		holder.optionClearShares.setOnClickListener(this);
 
 		holder.optionPermissions.setTag(holder);
 		holder.optionPermissions.setOnClickListener(this);
@@ -838,6 +840,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			positionClicked = -1;
 			notifyDataSetChanged();
 			break;
+		}
+		case R.id.file_list_option_clear_share_layout: {
+			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
+				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
+				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
+				//break;
+			}
 		}
 		case R.id.file_list_option_delete_layout: {
 			ArrayList<Long> handleList = new ArrayList<Long>();

@@ -42,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -76,13 +77,14 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
         TextView textViewFileSize;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-
-        LinearLayout optionsLayout;
-        ImageView optionDownload;
-		ImageView optionProperties;
-		ImageView optionMore;		
-		ImageView optionPublicLink;
-        ImageView optionDelete;
+        public TextView propertiesText;
+       
+		public LinearLayout optionsLayout;
+		public RelativeLayout optionDownload;
+		public RelativeLayout optionProperties;
+		public RelativeLayout optionMore;
+		public RelativeLayout optionPublicLink;
+		public RelativeLayout optionDelete;
         
         LinearLayout optionsLayoutOffline;
         ImageView optionDeleteOffline;
@@ -206,14 +208,14 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) convertView.findViewById(R.id.offline_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.offline_list_three_dots);
-			
+			holder.propertiesText = (TextView) convertView.findViewById(R.id.offline_list_option_properties_text);
 			
 			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.offline_list_options);			
-			holder.optionDownload = (ImageView) convertView.findViewById(R.id.offline_list_option_download);
-			holder.optionProperties = (ImageView) convertView.findViewById(R.id.offline_list_option_properties);
-			holder.optionPublicLink = (ImageView) convertView.findViewById(R.id.offline_list_option_public_link);
-			holder.optionDelete = (ImageView) convertView.findViewById(R.id.offline_list_option_delete);
-			holder.optionMore = (ImageView) convertView.findViewById(R.id.offline_list_option_overflow);
+			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_download_layout);
+			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_properties_layout);
+			holder.optionPublicLink = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_public_link_layout);
+			holder.optionDelete = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_delete_layout);
+			holder.optionMore = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_overflow_layout);
 			
 	        holder.optionsLayoutOffline = (LinearLayout) convertView.findViewById(R.id.offline_list_options_no_connection);	
 	        holder.optionDeleteOffline = (ImageView) convertView.findViewById(R.id.offline_list_option_delete_no_connection);
@@ -262,6 +264,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		int folders=0;
 		int files=0;
 		if (currentFile.isDirectory()){
+			holder.propertiesText.setText(R.string.general_folder_info);
 			
 			File[] fList = currentFile.listFiles();
 			for (File f : fList){
@@ -288,6 +291,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			holder.textViewFileSize.setText(info);			
 		}
 		else{
+			holder.propertiesText.setText(R.string.general_file_info);
 			long nodeSize = currentFile.length();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 		}

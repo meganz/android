@@ -211,6 +211,8 @@
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
+    <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove shares</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
@@ -248,7 +250,6 @@
     <string name="context_permissions_not_changed" context="error message">Error. Permissions not changed</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
-    
     <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
     <string name="context_no_renamed" context="error message">Error. Not renamed</string>
     <string name="context_correctly_copied" context="success message when copying a node">Correctly copied</string>
