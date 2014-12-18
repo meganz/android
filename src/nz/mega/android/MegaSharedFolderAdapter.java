@@ -40,6 +40,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -174,9 +175,9 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
         TextView textViewPermissions;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-        RelativeLayout optionsLayout;
-        ImageButton optionPermissions;
-        ImageButton optionRemoveShare;
+        LinearLayout optionsLayout;
+        RelativeLayout optionPermissions;
+        RelativeLayout optionRemoveShare;
         int currentPosition;
         String contactMail;
     } 
@@ -217,13 +218,9 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			holder.textViewContactName.setSingleLine();
 			holder.textViewPermissions = (TextView) convertView.findViewById(R.id.shared_folder_contact_permissions);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.shared_folder_contact_three_dots);
-			holder.optionsLayout = (RelativeLayout) convertView.findViewById(R.id.shared_folder_contact_options);
-			holder.optionPermissions = (ImageButton) convertView.findViewById(R.id.shared_folder_permissions_option);
-			holder.optionPermissions.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-			holder.optionRemoveShare = (ImageButton) convertView.findViewById(R.id.shared_folder_remove_share_option);
-			holder.optionRemoveShare.setPadding(Util.px2dp((50*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
-//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.shared_folder_contact_arrow_selection);
-//			holder.arrowSelection.setVisibility(View.GONE);
+			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.shared_folder_options);
+			holder.optionPermissions = (RelativeLayout) convertView.findViewById(R.id.shared_folder_permissions_option_layout);			
+			holder.optionRemoveShare = (RelativeLayout) convertView.findViewById(R.id.shared_folder_remove_share_option_layout);			
 			convertView.setTag(holder); 
 		}
 		else{
@@ -338,15 +335,10 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 //				holder.arrowSelection.setVisibility(View.VISIBLE);
 				LayoutParams params = holder.optionsLayout.getLayoutParams();
 				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));				
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				ListView list = (ListView) parent;
 				list.smoothScrollToPosition(_position);
-				
-				holder.optionPermissions.getLayoutParams().width = Util.px2dp((120*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionPermissions.getLayoutParams()).setMargins(Util.px2dp((29*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
-				holder.optionRemoveShare.getLayoutParams().width = Util.px2dp((140*scaleW), outMetrics);
-				((TableRow.LayoutParams) holder.optionRemoveShare.getLayoutParams()).setMargins(Util.px2dp((17*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), 0, 0);
 			}
 			else{
 //				holder.arrowSelection.setVisibility(View.GONE);
@@ -479,7 +471,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		}
 				
 		switch (v.getId()){
-			case R.id.shared_folder_permissions_option:{
+			case R.id.shared_folder_permissions_option_layout:{
 				log("En el adapter - change");
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
 				dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
@@ -530,7 +522,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 //				((FileContactListActivity)context).refreshView();
 				break;
 			}
-			case R.id.shared_folder_remove_share_option:{
+			case R.id.shared_folder_remove_share_option_layout:{
 				log("En el adapter - remove");
 				((FileContactListActivity)context).removeShare(c);
 				positionClicked = -1;

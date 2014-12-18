@@ -153,10 +153,10 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
         LinearLayout optionsLayout;
-        ImageButton optionProperties;
+        RelativeLayout optionProperties;
 //        ImageButton optionSend;
-        ImageButton optionShare;
-        ImageButton optionRemove;
+        RelativeLayout optionShare;
+        RelativeLayout optionRemove;
         int currentPosition;
         String contactMail;
     }
@@ -191,11 +191,11 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_list_content);
 			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_list_three_dots);
 			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.contact_list_options);
-			holder.optionProperties = (ImageButton) convertView.findViewById(R.id.contact_list_option_properties);
+			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_properties_layout);
 //			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-			holder.optionShare = (ImageButton) convertView.findViewById(R.id.contact_list_option_share);
+			holder.optionShare = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_share_layout);
 //			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-			holder.optionRemove = (ImageButton) convertView.findViewById(R.id.contact_list_option_remove);
+			holder.optionRemove = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_remove_layout);
 //			holder.optionRemove.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			convertView.setTag(holder);
 		}
