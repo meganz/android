@@ -677,7 +677,7 @@ public class MegaShareInOutListAdapter extends BaseAdapter implements OnClickLis
 				}
 
 			} else {
-				i.putExtra("imageId", MimeTypeList.typeForName(n.getName())
+				i.putExtra("imageId", MimeTypeMime.typeForName(n.getName())
 						.getIconResourceId());
 			}
 			i.putExtra("name", n.getName());

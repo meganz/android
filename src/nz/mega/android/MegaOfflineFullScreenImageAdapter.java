@@ -142,7 +142,7 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
-		holder.imgDisplay.setImageResource(MimeTypeList.typeForName(currentFile.getName()).getIconResourceId());
+		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(currentFile.getName()).getIconResourceId());
 		holder.imgDisplay.setOnClickListener(this);
 		holder.progressBar = (ProgressBar) viewLayout.findViewById(R.id.full_screen_image_viewer_progress_bar);
 		holder.progressBar.setVisibility(View.GONE);

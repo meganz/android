@@ -1080,7 +1080,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					i.putExtra("imageId", R.drawable.folder_thumbnail);
 				}
 				else{
-					i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());	
+					i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());	
 				}				
 				i.putExtra("name", n.getName());
 				context.startActivity(i);							
@@ -1096,7 +1096,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 					i.putExtra("imageId", R.drawable.folder_thumbnail);
 				}
 				else{
-					i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());	
+					i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());	
 				}				
 				i.putExtra("name", n.getName());
 				context.startActivity(i);							

@@ -831,7 +831,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				}
 			} 
 			else {
-				i.putExtra("imageId", MimeTypeList.typeForName(n.getName()).getIconResourceId());
+				i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
 			}
 			i.putExtra("name", n.getName());
 			context.startActivity(i);
