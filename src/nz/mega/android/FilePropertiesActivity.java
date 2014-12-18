@@ -595,7 +595,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						else{
 							//It is just public
 							imageView.setImageResource(R.drawable.mime_folder);
-							sharedWithButton.setVisibility(View.VISIBLE);
+							sharedWithButton.setVisibility(View.GONE);
 							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 						}
@@ -1933,7 +1933,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						else{
 							//It is just public
 							imageView.setImageResource(R.drawable.mime_folder);
-							sharedWithButton.setVisibility(View.VISIBLE);
+							sharedWithButton.setVisibility(View.GONE);
 							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 						}
