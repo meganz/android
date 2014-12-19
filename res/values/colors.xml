@@ -17,7 +17,7 @@
     <color name="navigation_drawer_background">#222222</color>
     <color name="color_navigation_drawer_selected">#1AFFFFFF</color> 
     <color name="file_list_second_row">#848484</color>
-    <color name="file_list_selected_row">#33000000</color>
+    <color name="file_list_selected_row">#1A000000</color>
     <color name="border_file_properties">#cccccc</color>
     <color name="file_properties_available_layout">#eeeeee</color>
     <color name="file_properties_text_available">#666666</color>
@@ -36,7 +36,7 @@
     <color name="switch_selector_layout">#555555</color>
     <color name="color_default_avatar_mega">#d90007</color>
     <color name="color_default_avatar_phone">#777777</color>
- 	<color name="content_text_folder">#66333333</color>
+ 	<color name="content_text_folder">#80333333</color>
  	<color name="fragment_background">#EEEEEE</color>
  	<color name="adapters_background">#333333</color>
  	<color name="file_properties_bottom">#292929</color>

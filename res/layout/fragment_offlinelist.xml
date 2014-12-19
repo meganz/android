@@ -10,7 +10,9 @@
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:paddingLeft="8dp"
-	    android:textColor="@color/black"
+	    android:textColor="@color/white"
+	    android:paddingTop="3dp"
+	    android:paddingBottom="3dp"
 	    android:background="@color/content_text_folder"
 	    android:textSize="14sp"/>
 
