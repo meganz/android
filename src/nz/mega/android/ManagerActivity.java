@@ -3900,7 +3900,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			Util.deleteFolderAndSubfolders(context, externalCacheDir);
 		} catch (IOException e) {}
 		
-		Toast.makeText(context, "CACHEDIR: " + cacheDir, Toast.LENGTH_LONG).show();
 		try {
 			Util.deleteFolderAndSubfolders(context, cacheDir);
 		} catch (IOException e) {}
