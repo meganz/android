@@ -213,9 +213,11 @@
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Manage link</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove shares</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
@@ -235,6 +237,7 @@
     <string name="context_download_to" context="Menu item">Save to</string>
     <string name="context_clear_rubbish" context="Menu option">Clear Rubbish Bin</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
+    <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>

@@ -25,6 +25,13 @@
 	    MEGA:showAsAction="never" />
 	
 	<item
+	    android:id="@+id/action_file_properties_manage_link"
+	    android:orderInCategory="110"
+	    android:showAsAction="never"
+	    android:title="@string/context_manage_link_menu"
+	    MEGA:showAsAction="never" />
+	
+	<item
 	    android:id="@+id/action_file_properties_remove_link"
 	    android:orderInCategory="110"
 	    android:showAsAction="never"

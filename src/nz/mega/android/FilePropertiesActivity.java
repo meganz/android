@@ -24,6 +24,7 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -46,8 +47,10 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -72,6 +75,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;
+	static int TYPE_EXPORT_MANAGE = 2;
 	
 //	ImageView iconView;
 	TextView nameView;
@@ -141,6 +145,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	MenuItem downloadMenuItem; 
 	MenuItem shareFolderMenuItem;
 	MenuItem getLinkMenuItem;
+	MenuItem manageLinkMenuItem;
 	MenuItem removeLinkMenuItem;
 	MenuItem sendLinkMenuItem;
 	ImageView statusImageView;
@@ -1100,10 +1105,66 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		    	getPublicLinkAndShareIt();
 		    	return true;
 		    }
+		    case R.id.action_file_properties_manage_link:{
+		    	shareIt = false;
+		    	typeExport=TYPE_EXPORT_MANAGE;
+		    	getPublicLinkAndShareIt();
+		    	return true;
+		    }
 		    case R.id.action_file_properties_remove_link:{
 		    	shareIt = false;
-		    	typeExport=TYPE_EXPORT_REMOVE;
-		    	megaApi.disableExport(node, this);
+		    	AlertDialog removeLinkDialog;
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.context_remove_link_menu));
+				
+				LayoutInflater inflater = getLayoutInflater();
+				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+				TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
+				TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
+				
+				thumb.setVisibility(View.GONE);
+				url.setVisibility(View.GONE);
+				key.setVisibility(View.GONE);
+				symbol.setVisibility(View.GONE);
+				removeText.setVisibility(View.VISIBLE);
+				
+				removeText.setText(getString(R.string.context_remove_link_warning_text));
+		    	
+				Display display = getWindowManager().getDefaultDisplay();
+				DisplayMetrics outMetrics = new DisplayMetrics();
+				display.getMetrics(outMetrics);
+				float density = getResources().getDisplayMetrics().density;
+
+				float scaleW = Util.getScaleW(outMetrics, density);
+				float scaleH = Util.getScaleH(outMetrics, density);
+				
+				removeText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleW));
+				
+				builder.setView(dialoglayout);
+				
+				builder.setPositiveButton(getString(R.string.context_remove), new android.content.DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						typeExport=TYPE_EXPORT_REMOVE;
+				    	megaApi.disableExport(node, filePropertiesActivity);
+					}
+				});
+				
+				builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						
+					}
+				});
+				
+				removeLinkDialog = builder.create();
+				removeLinkDialog.show();
+				Util.brandAlertDialog(removeLinkDialog);
 		    	return true;
 		    }
 		    case R.id.action_file_properties_send_link:{
@@ -1411,6 +1472,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    sendLinkMenuItem = menu.findItem(R.id.action_file_properties_send_link);
 	    sendLinkMenuItem.setVisible(false);
 		getLinkMenuItem = menu.findItem(R.id.action_file_properties_get_link);
+		manageLinkMenuItem = menu.findItem(R.id.action_file_properties_manage_link);
 		removeLinkMenuItem = menu.findItem(R.id.action_file_properties_remove_link);
 			   
 	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
@@ -1426,10 +1488,12 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    if(publicLink){
 	    	getLinkMenuItem.setVisible(false);
 	    	removeLinkMenuItem.setVisible(true);
+	    	manageLinkMenuItem.setVisible(true);
 	    }
 	    else{
 	    	getLinkMenuItem.setVisible(true);
 	    	removeLinkMenuItem.setVisible(false);
+	    	manageLinkMenuItem.setVisible(false);
 	    }
 	    
 	    if (availableOfflineBoolean){
@@ -1463,17 +1527,70 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				if(typeExport==TYPE_EXPORT_GET){
-					String link = request.getLink();
-					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-					if (filePropertiesActivity != null){
-						if (shareIt){
+				if((typeExport==TYPE_EXPORT_GET) || (typeExport == TYPE_EXPORT_MANAGE)){
+					final String link = request.getLink();
+					
+					AlertDialog getLinkDialog;
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					if (typeExport == TYPE_EXPORT_GET){
+						builder.setTitle(getString(R.string.context_get_link_menu));
+					}
+					else{
+						builder.setTitle(getString(R.string.context_manage_link_menu));
+					}
+					
+					LayoutInflater inflater = getLayoutInflater();
+					View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+					ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+					TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+					TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+					
+					String urlString = "";
+					String keyString = "";
+					String [] s = link.split("!");
+					if (s.length == 3){
+						urlString = s[0] + "!" + s[1];
+						keyString = s[2];
+					}
+					if (node.isFolder()){
+						thumb.setImageResource(R.drawable.folder_thumbnail);
+					}
+					else{
+						thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+					}
+					
+					Display display = getWindowManager().getDefaultDisplay();
+					DisplayMetrics outMetrics = new DisplayMetrics();
+					display.getMetrics(outMetrics);
+					float density = getResources().getDisplayMetrics().density;
+
+					float scaleW = Util.getScaleW(outMetrics, density);
+					float scaleH = Util.getScaleH(outMetrics, density);
+					
+					url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+					key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+					
+					url.setText(urlString);
+					key.setText(keyString);
+					
+					
+					builder.setView(dialoglayout);
+					
+					builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
 							Intent intent = new Intent(Intent.ACTION_SEND);
 							intent.setType("text/plain");
 							intent.putExtra(Intent.EXTRA_TEXT, link);
 							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 						}
-						else{
+					});
+					
+					builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
 							if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
 							    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 							    clipboard.setText(link);
@@ -1483,9 +1600,13 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					            clipboard.setPrimaryClip(clip);
 							}
 							
-							Toast.makeText(this, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+							Toast.makeText(filePropertiesActivity, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
 						}
-					}
+					});
+					
+					getLinkDialog = builder.create();
+					getLinkDialog.show();
+					Util.brandAlertDialog(getLinkDialog);
 				}
 				else if(typeExport==TYPE_EXPORT_REMOVE)
 				{
