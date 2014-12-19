@@ -1077,9 +1077,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							((ManagerActivity)context).supportInvalidateOptionsMenu();
 						}
 						else{
-							
 							String title = pathNavigation;
-							title=title.replace("/", "");
+							index=title.lastIndexOf("/");				
+							title=title.substring(0,index);
+							index=title.lastIndexOf("/");				
+							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);
 							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 							((ManagerActivity)context).supportInvalidateOptionsMenu();
@@ -1094,7 +1096,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						else{
 							
 							String title = pathNavigation;
-							title=title.replace("/", "");
+							index=title.lastIndexOf("/");				
+							title=title.substring(0,index);
+							index=title.lastIndexOf("/");				
+							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);							
 						}
 					}
