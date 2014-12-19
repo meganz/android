@@ -39,7 +39,7 @@
  	<color name="content_text_folder">#66333333</color>
  	<color name="fragment_background">#EEEEEE</color>
  	<color name="adapters_background">#333333</color>
- 	<color name="file_properties_bottom">#1AFFFFFF</color>
+ 	<color name="file_properties_bottom">#292929</color>
  	<color name="file_properties_top">#111111</color>
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 

@@ -228,7 +228,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			availableSwitchOffline = (MySwitch) findViewById(R.id.file_properties_switch_offline);
 			availableSwitchOffline.setChecked(false);
 			availableSwitchOnline.setOnCheckedChangeListener(this);			
-			availableSwitchOffline.setOnCheckedChangeListener(this);		
+			availableSwitchOffline.setOnCheckedChangeListener(this);	
+			availableSwitchOnline.getLayoutParams().height = Util.px2dp((20 * scaleH), outMetrics);
+			availableSwitchOffline.getLayoutParams().height = Util.px2dp((20 * scaleH), outMetrics);
+			((LinearLayout.LayoutParams) availableSwitchOnline.getLayoutParams()).setMargins(Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics));
+			((LinearLayout.LayoutParams) availableSwitchOffline.getLayoutParams()).setMargins(Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics));
 			
 			filePropertiesLayout = (TableLayout) findViewById(R.id.file_properties_layout);
 			filePropertiesLayout.setVisibility(View.VISIBLE);			
