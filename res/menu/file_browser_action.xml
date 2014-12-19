@@ -52,7 +52,7 @@
         android:orderInCategory="125"
         android:showAsAction="never"
         android:icon="@drawable/ic_menu_download_link_dark"
-        android:title="@string/context_get_link"
+        android:title="@string/context_get_link_menu"
         MEGA:showAsAction="never" />
     
     <item

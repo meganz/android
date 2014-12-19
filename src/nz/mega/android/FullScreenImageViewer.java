@@ -36,8 +36,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -280,13 +282,12 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			downloadIcon.setVisibility(View.VISIBLE);
 			downloadIcon.setOnClickListener(this);
 			
-			String menuOptions[] = new String[6];
+			String menuOptions[] = new String[5];
 			menuOptions[0] = getString(R.string.context_get_link_menu);
 			menuOptions[1] = getString(R.string.context_rename);
 			menuOptions[2] = getString(R.string.context_move);
 			menuOptions[3] = getString(R.string.context_copy);
-			menuOptions[4] = getString(R.string.context_send_link);
-			menuOptions[5] = getString(R.string.context_remove);
+			menuOptions[4] = getString(R.string.context_remove);
 			
 			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
@@ -379,13 +380,12 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			downloadIcon.setVisibility(View.VISIBLE);
 			downloadIcon.setOnClickListener(this);
 			
-			String menuOptions[] = new String[6];
+			String menuOptions[] = new String[5];
 			menuOptions[0] = getString(R.string.context_get_link_menu);
 			menuOptions[1] = getString(R.string.context_rename);
 			menuOptions[2] = getString(R.string.context_move);
 			menuOptions[3] = getString(R.string.context_copy);
-			menuOptions[4] = getString(R.string.context_send_link);
-			menuOptions[5] = getString(R.string.context_remove);
+			menuOptions[4] = getString(R.string.context_remove);
 			
 			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
@@ -871,15 +871,65 @@ public void moveToTrash(){
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				String link = request.getLink();
-				if (fullScreenImageViewer != null){
-					if (shareIt){
+				
+				final String link = request.getLink();
+				
+				AlertDialog getLinkDialog;
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setTitle(getString(R.string.context_get_link_menu));
+				
+				LayoutInflater inflater = getLayoutInflater();
+				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+				
+				String urlString = "";
+				String keyString = "";
+				String [] s = link.split("!");
+				if (s.length == 3){
+					urlString = s[0] + "!" + s[1];
+					keyString = s[2];
+				}
+				if (node.isFolder()){
+					thumb.setImageResource(R.drawable.folder_thumbnail);
+				}
+				else{
+					thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+				}
+				
+				Display display = getWindowManager().getDefaultDisplay();
+				DisplayMetrics outMetrics = new DisplayMetrics();
+				display.getMetrics(outMetrics);
+				float density = getResources().getDisplayMetrics().density;
+
+				float scaleW = Util.getScaleW(outMetrics, density);
+				float scaleH = Util.getScaleH(outMetrics, density);
+				
+				url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+				key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+				
+				url.setText(urlString);
+				key.setText(keyString);
+				
+				
+				builder.setView(dialoglayout);
+				
+				builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent(Intent.ACTION_SEND);
 						intent.setType("text/plain");
 						intent.putExtra(Intent.EXTRA_TEXT, link);
 						startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 					}
-					else{
+				});
+				
+				builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
 						if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
 						    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 						    clipboard.setText(link);
@@ -889,9 +939,13 @@ public void moveToTrash(){
 				            clipboard.setPrimaryClip(clip);
 						}
 						
-						Toast.makeText(this, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+						Toast.makeText(fullScreenImageViewer, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
 					}
-				}
+				});
+				
+				getLinkDialog = builder.create();
+				getLinkDialog.show();
+				Util.brandAlertDialog(getLinkDialog);
 			}
 			else{
 				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
@@ -1011,11 +1065,6 @@ public void moveToTrash(){
 				break;
 			}
 			case 4:{
-				shareIt = true;
-		    	getPublicLinkAndShareIt();
-				break;
-			}
-			case 5:{
 				moveToTrash();
 				break;
 			}

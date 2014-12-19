@@ -843,7 +843,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					
 					final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Wi-Fi only", "Wi-Fi or data plan"});
 					AlertDialog.Builder builder = new AlertDialog.Builder(context);
-					builder.setTitle("Camera Upload");
+					builder.setTitle(getString(R.string.section_photo_sync));
 					builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 						
 						@Override
