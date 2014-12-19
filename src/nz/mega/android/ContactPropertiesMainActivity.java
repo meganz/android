@@ -219,6 +219,22 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		}
 		}
 	}
+	
+	public void leaveIncomingShare (MegaNode n){
+		log("leaveIncomingShare");
+		//TODO
+//		ProgressDialog temp = null;
+//		try{
+//			temp = new ProgressDialog(this);
+//			temp.setMessage(getString(R.string.leave_incoming_share)); 
+//			temp.show();
+//		}
+//		catch(Exception e){
+//			return;
+//		}
+//		statusDialog = temp;
+		megaApi.remove(n);
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -251,7 +267,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		}
 		}	    
 	}
-
+	
 	public String getDescription(ArrayList<MegaNode> nodes){
 		int numFolders = 0;
 		int numFiles = 0;

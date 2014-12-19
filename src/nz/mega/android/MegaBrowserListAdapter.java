@@ -536,8 +536,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionRemoveTotal.setVisibility(View.GONE);
 						holder.optionClearShares.setVisibility(View.GONE);
 						holder.optionRename.setVisibility(View.VISIBLE);
-						holder.optionDelete.setVisibility(View.VISIBLE);
-						holder.optionMore.setVisibility(View.VISIBLE);
+						holder.optionDelete.setVisibility(View.GONE);
 						holder.optionMoveTo.setVisibility(View.GONE);
 
 						break;
@@ -585,10 +584,6 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						break;
 					}
 					}
-					if(type == ManagerActivity.INCOMING_SHARES_ADAPTER){
-						holder.optionDelete.setVisibility(View.GONE);
-					}
-
 				} 
 				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
 					
@@ -805,8 +800,15 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case R.id.file_list_option_leave_share_layout: {
-			positionClicked = -1;			
-			((ManagerActivity) context).leaveIncomingShare(n);
+			positionClicked = -1;	
+			notifyDataSetChanged();
+			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+				((ContactPropertiesMainActivity) context).leaveIncomingShare(n);
+			}
+			else
+			{
+				((ManagerActivity) context).leaveIncomingShare(n);
+			}			
 			//Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 			break;
 		}
@@ -904,14 +906,17 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case R.id.file_list_option_rename_layout: {
-			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
+			if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
+				((ContactPropertiesMainActivity) context).showRenameDialog(n, n.getName());
+			}
+			else if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
 				((ManagerActivity) context).showRenameDialog(n, n.getName());
 			}
 			break;
 		}		
 		case R.id.file_list_option_overflow_layout: {
 
-			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER)) {
+			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER) || (type == ManagerActivity.OUTGOING_SHARES_ADAPTER)) {
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
 				
@@ -1002,6 +1007,53 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 								ArrayList<Long> handleList = new ArrayList<Long>();
 								handleList.add(n.getHandle());									
 								((ManagerActivity) context).showCopy(handleList);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				Util.brandAlertDialog(moreOptionsDialog);
+			}
+			
+			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("More options");
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which){
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ContactPropertiesMainActivity) context).showMove(handleList);
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ContactPropertiesMainActivity) context).showCopy(handleList);
 								break;
 							}
 						}

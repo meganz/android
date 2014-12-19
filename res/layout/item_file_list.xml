@@ -475,10 +475,21 @@
 		            android:src="@drawable/ic_action_core_overflow"
 		            android:layout_gravity="center_vertical"
 		            style="@style/dialogActionButton"
-		            android:layout_alignParentRight="true"
-		            android:background="@null"
-		            android:paddingRight="15dp"
-	             />
+		            android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+		         
+		         <TextView 
+                    android:id="@+id/file_list_option_more_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_more"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>
             
 		         </RelativeLayout>
         </LinearLayout>
