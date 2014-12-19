@@ -315,7 +315,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
 				menu.findItem(R.id.cab_menu_trash).setVisible(true);
 			}			
-			
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}
 		
@@ -1053,9 +1053,13 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				return 1;
 			}
 			else if(pathNavigation != null){
+				if(pathNavigation.isEmpty()){
+					return 0;
+				}
 				if (!pathNavigation.equals("/")){
-
+					log("onBackPress: "+pathNavigation);
 					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
+					log("substring: "+pathNavigation);
 					int index=pathNavigation.lastIndexOf("/");				
 					pathNavigation=pathNavigation.substring(0,index+1);
 					
