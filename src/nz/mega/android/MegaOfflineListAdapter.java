@@ -457,7 +457,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
 		
 		switch (v.getId()){
-			case R.id.offline_list_option_download:{
+			case R.id.offline_list_option_download_layout:{
 				positionClicked = -1;
 				notifyDataSetChanged();				
 				if (Util.isOnline(context)){
@@ -466,7 +466,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				}
 				break;
 			}
-			case R.id.offline_list_option_properties:{
+			case R.id.offline_list_option_properties_layout:{
 				
 				positionClicked = -1;
 				notifyDataSetChanged();
@@ -477,7 +477,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 
 				break;
 			}
-			case R.id.offline_list_option_delete:{
+			case R.id.offline_list_option_delete_layout:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();				
 									
@@ -487,7 +487,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				
 				break;
 			}
-			case R.id.offline_list_option_public_link:{
+			case R.id.offline_list_option_public_link_layout:{
 				setPositionClicked(-1);
 				notifyDataSetChanged();	
 				if (Util.isOnline(context)){
@@ -504,7 +504,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				
 				break;
 			}
-			case R.id.offline_list_option_overflow:{
+			case R.id.offline_list_option_overflow_layout:{
 				
 				if (Util.isOnline(context)){
 					String path = mOff.getPath() + mOff.getName();
