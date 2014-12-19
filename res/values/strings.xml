@@ -302,7 +302,7 @@
 	<string name="my_account_activity" context="Title of the screen where the user account information is shown">Account</string>
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Storage Space</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Free Space</string>
-    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used space</string>
+    <string name="my_account_used_space" context="Headline for the amount of storage space is used">Used Space</string>
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade now!</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     
