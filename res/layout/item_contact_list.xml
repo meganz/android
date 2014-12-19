@@ -94,7 +94,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1" >
                 
-	            <ImageButton
+	            <ImageView
 		            android:id="@+id/contact_list_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -123,7 +123,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1" >
 	           
-             <ImageButton
+             <ImageView
 		            android:id="@+id/contact_list_option_share"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -161,7 +161,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1" >
 	        
-		        <ImageButton
+		        <ImageView
 		            android:id="@+id/contact_list_option_remove"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"

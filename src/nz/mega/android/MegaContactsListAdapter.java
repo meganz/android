@@ -438,7 +438,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		MegaUser c = (MegaUser) getItem(currentPosition);
 		
 		switch (v.getId()){
-			case R.id.contact_list_option_properties:{
+			case R.id.contact_list_option_properties_layout:{
+				log("optionProperties");
 				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				i.putExtra("name", c.getEmail());
 				context.startActivity(i);							
@@ -446,8 +447,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				notifyDataSetChanged();
 				break;
 			}
-			case R.id.contact_list_option_share:{
-				log("optionShareeee");
+			case R.id.contact_list_option_share_layout:{
+				log("optionShare");
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(c);
 				((ManagerActivity) context).pickFolderToShare(user);
@@ -455,7 +456,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				break;
 			}
 			//TODO remove contact
-			case R.id.contact_list_option_remove:{
+			case R.id.contact_list_option_remove_layout:{
 				log("Remove contact");
 				((ManagerActivity) context).removeContact(c);
 				notifyDataSetChanged();	

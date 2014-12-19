@@ -531,7 +531,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						holder.optionPublicLink.setVisibility(View.GONE);
 						holder.optionRemoveTotal.setVisibility(View.GONE);
 						holder.optionClearShares.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.GONE);
+						holder.optionRename.setVisibility(View.VISIBLE);
 						holder.optionDelete.setVisibility(View.VISIBLE);
 						holder.optionMore.setVisibility(View.VISIBLE);
 						holder.optionMoveTo.setVisibility(View.GONE);
@@ -696,9 +696,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		holder.optionProperties.setTag(holder);
 		holder.optionProperties.setOnClickListener(this);
 
-		//TODO
-//		holder.optionRename.setTag(holder);
-//		holder.optionRename.setOnClickListener(this);
+		holder.optionRename.setTag(holder);
+		holder.optionRename.setOnClickListener(this);
 
 		holder.optionDelete.setTag(holder);
 		holder.optionDelete.setOnClickListener(this);
@@ -894,7 +893,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			}
 			break;
 		}
-		
+		case R.id.file_list_option_rename_layout: {
+			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
+				((ManagerActivity) context).showRenameDialog(n, n.getName());
+			}
+			break;
+		}		
 		case R.id.file_list_option_overflow_layout: {
 
 			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER)) {
@@ -961,9 +965,56 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				moreOptionsDialog.show();
 				Util.brandAlertDialog(moreOptionsDialog);
 			}
+			
+			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("More options");
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which){
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showMove(handleList);
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showCopy(handleList);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				Util.brandAlertDialog(moreOptionsDialog);
+			}
 			break;
 		}	
-		
+				
 		case R.id.file_list_option_permissions_layout: {
 			Intent i = new Intent(context, FileContactListActivity.class);
 			i.putExtra("name", n.getHandle());
