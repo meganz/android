@@ -195,6 +195,7 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_remove));
 			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
 		}

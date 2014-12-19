@@ -219,7 +219,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			menu.findItem(R.id.cab_menu_move).setVisible(true);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_trash).setVisible(true);
-			
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}
 		

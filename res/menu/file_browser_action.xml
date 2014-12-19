@@ -55,6 +55,14 @@
         android:title="@string/context_get_link_menu"
         MEGA:showAsAction="never" />
     
+     <item
+        android:id="@+id/cab_menu_leave_multiple_share"
+        android:orderInCategory="130"
+        android:showAsAction="never"
+        android:icon="@drawable/leave_share_ic"
+        android:title="@string/context_leave_menu"
+        MEGA:showAsAction="never" />
+    
     <item
         android:id="@+id/cab_menu_trash"
         android:icon="@drawable/ic_rubbish_bin"

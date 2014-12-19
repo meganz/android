@@ -5145,6 +5145,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		megaApi.renameNode(document, newName, this);
 	}
 	
+	public void leaveMultipleShares (ArrayList<Long> handleList){
+	
+		for (int i=0; i<handleList.size(); i++){
+			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+			this.leaveIncomingShare(node);
+		}
+	}
+	
 	public void showMove(ArrayList<Long> handleList){
 		log("showMove");
 		Intent intent = new Intent(this, FileExplorerActivity.class);

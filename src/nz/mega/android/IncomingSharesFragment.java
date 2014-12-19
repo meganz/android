@@ -144,6 +144,15 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 					clearSelections();
 					break;
 				}
+				case R.id.cab_menu_leave_multiple_share: {
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						handleList.add(documents.get(i).getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).leaveMultipleShares(handleList);					
+				}
 			}
 			return false;
 		}
@@ -212,6 +221,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(true);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
