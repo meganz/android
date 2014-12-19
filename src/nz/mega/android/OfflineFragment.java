@@ -482,6 +482,13 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					mOffList.remove(i);
 					
 				}			
+			}			
+			
+			if (adapterGrid == null){
+				adapterGrid = new MegaOfflineGridAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
+			}
+			else{
+				adapterGrid.setNodes(mOffList);
 			}
 			
 			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -489,13 +496,6 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 			else{
 				sortByNameAscending();
-			}
-			
-			if (adapterGrid == null){
-				adapterGrid = new MegaOfflineGridAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
-			}
-			else{
-				adapterGrid.setNodes(mOffList);
 			}
 			
 						

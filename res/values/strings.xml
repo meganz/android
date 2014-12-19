@@ -249,6 +249,7 @@
     <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Contacts</string>
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
     <string name="context_delete" context="menu item">Delete</string>
+    <string name="context_more" context="menu item">More</string>
     <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>

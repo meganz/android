@@ -2494,7 +2494,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				refreshMenuItem.setVisible(true);
     			sortByMenuItem.setVisible(true);
     			helpMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(false); //TODO
     			selectMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
@@ -6329,17 +6329,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void leaveIncomingShare (MegaNode n){
 		log("leaveIncomingShare");
-		
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.leave_incoming_share)); 
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
+		//TODO 
+//		ProgressDialog temp = null;
+//		try{
+//			temp = new ProgressDialog(this);
+//			temp.setMessage(getString(R.string.leave_incoming_share)); 
+//			temp.show();
+//		}
+//		catch(Exception e){
+//			return;
+//		}
+//		statusDialog = temp;
 		megaApi.remove(n);
 	}
 
