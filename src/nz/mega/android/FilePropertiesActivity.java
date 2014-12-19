@@ -76,6 +76,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;
 	static int TYPE_EXPORT_MANAGE = 2;
+	static int FROM_FILE_BROWSER = 13;
+	static int FROM_INCOMING_SHARES= 14;
+	static int FROM_OFFLINE= 15;
 	
 //	ImageView iconView;
 	TextView nameView;
@@ -148,10 +151,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	MenuItem manageLinkMenuItem;
 	MenuItem removeLinkMenuItem;
 	MenuItem sendLinkMenuItem;
+	MenuItem leaveShareMenuItem;
+	MenuItem moveMenuItem;
+	MenuItem renameMenuItem;
 	ImageView statusImageView;
 
 	boolean shareIt = true;
 	int imageId;
+	int from;
 	
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -195,6 +202,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
 			imageId = extras.getInt("imageId");
+			from = extras.getInt("from");
 			String name = extras.getString("name");
 			handle = extras.getLong("handle", -1);
 			node = megaApi.getNodeByHandle(handle);
@@ -394,7 +402,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							
 							switch(accessLevel){
 								case MegaShare.ACCESS_FULL:{
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
+									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));	
 									break;
 								}
 								case MegaShare.ACCESS_READ:{
@@ -1192,6 +1200,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		    	showCopy();
 		    	return true;
 		    }
+		    case R.id.action_file_properties_leave_share: {
+		    	leaveIncomingShare();
+		    	return true;
+		    }
 		}	    
 	    return super.onOptionsItemSelected(item);
 	}
@@ -1207,6 +1219,32 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
 			}
 		}, 50);
+	}
+	
+	public void leaveIncomingShare (){
+		log("leaveIncomingShare");
+			
+		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	//TODO remove the incoming shares		        	
+		    		megaApi.remove(node,filePropertiesActivity);		        	
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+	    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 	}
 	
 	public void showCopy(){
@@ -1478,6 +1516,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		getLinkMenuItem = menu.findItem(R.id.action_file_properties_get_link);
 		manageLinkMenuItem = menu.findItem(R.id.action_file_properties_manage_link);
 		removeLinkMenuItem = menu.findItem(R.id.action_file_properties_remove_link);
+		leaveShareMenuItem = menu.findItem(R.id.action_file_properties_leave_share);
+		moveMenuItem = menu.findItem(R.id.action_file_properties_move);
+		renameMenuItem = menu.findItem(R.id.action_file_properties_rename);
 			   
 	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
 	    shareFolderMenuItem = menu.findItem(R.id.action_file_properties_share_folder);
@@ -1506,6 +1547,39 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    else{
 	    	downloadMenuItem.setIcon(R.drawable.ic_menu_download_dark);
 	    }
+	    
+	    if(from==FROM_INCOMING_SHARES){
+	    	shareFolderMenuItem.setVisible(false);
+	    	getLinkMenuItem.setVisible(false);
+	    	removeLinkMenuItem.setVisible(false);
+	    	manageLinkMenuItem.setVisible(false);
+	    	leaveShareMenuItem.setVisible(true);
+	    	int accessLevel= megaApi.getAccess(node);
+			log("Node: "+node.getName());
+			
+			switch(accessLevel){
+			
+				case MegaShare.ACCESS_FULL:{
+					renameMenuItem.setVisible(true);
+					moveMenuItem.setVisible(true);
+					break;
+				}
+				case MegaShare.ACCESS_READ:{
+					renameMenuItem.setVisible(false);
+					moveMenuItem.setVisible(false);
+					break;
+				}
+				case MegaShare.ACCESS_READWRITE:{
+					renameMenuItem.setVisible(false);
+					moveMenuItem.setVisible(false);
+					break;
+				}
+			}
+	    }
+	    else{
+	    	leaveShareMenuItem.setVisible(false);
+	    }
+	 
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -1521,7 +1595,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
 		
-		log("onRequestFinish");
+		log("onRequestFinish: "+request.getType());
 		
 		if (request.getType() == MegaRequest.TYPE_EXPORT){
 			try { 
@@ -1668,21 +1742,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				if (statusDialog.isShowing()){
-					try { 
-						statusDialog.dismiss();	
-					} 
-					catch (Exception ex) {}
-					Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
-				}
-				finish();
+			log("remove request finished");
+			if (e.getErrorCode() == MegaError.API_OK){				
+				finish();				
 			}
 			else{
 				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
-			}
-			log("remove request finished");
+			}			
+			
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
 			try { 
@@ -1990,8 +2057,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		
 		if (node.isFolder()){
 			imageView.setImageResource(imageId);
-			sl = megaApi.getOutShares(node);		
-
+			sl = megaApi.getOutShares(node);
 			if (sl != null){
 
 				if (sl.size() == 0){						
@@ -2016,11 +2082,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						
 						switch(accessLevel){
 							case MegaShare.ACCESS_FULL:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));								
 								break;
 							}
 							case MegaShare.ACCESS_READ:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));								
 								break;
 							}						
 							case MegaShare.ACCESS_READWRITE:{								

@@ -65,6 +65,13 @@
 	    android:showAsAction="never"
 	    android:title="@string/context_send_link"
 	    MEGA:showAsAction="never" />
+ 	
+ 	 <item
+	    android:id="@+id/action_file_properties_leave_share"
+	    android:orderInCategory="130"
+	    android:showAsAction="never"
+	    android:title="@string/context_leave_menu"
+	    MEGA:showAsAction="never" />
 	
 	<item
 	    android:id="@+id/action_file_properties_remove"
