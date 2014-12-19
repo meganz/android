@@ -58,6 +58,10 @@ import android.widget.Toast;
 
 public class MegaBrowserNewGridAdapter extends BaseAdapter {
 	
+	static int FROM_FILE_BROWSER = 13;
+	static int FROM_INCOMING_SHARES= 14;
+	static int FROM_OFFLINE= 15;
+	
 	Context context;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
@@ -790,6 +794,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		
 		Intent i = new Intent(context, FilePropertiesActivity.class);
 		i.putExtra("handle", n.getHandle());
+		i.putExtra("from", FROM_FILE_BROWSER);
 
 		if (n.isFolder()) {
 			if (megaApi.isShared(n)){

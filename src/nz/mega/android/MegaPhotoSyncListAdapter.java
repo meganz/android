@@ -36,6 +36,10 @@ import android.widget.TextView;
 
 public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickListener {
 	
+	static int FROM_FILE_BROWSER = 13;
+	static int FROM_INCOMING_SHARES= 14;
+	static int FROM_OFFLINE= 15;
+	
 	Context context;
 	MegaApiAndroid megaApi;
 
@@ -360,6 +364,7 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 			case R.id.photo_sync_list_option_properties:{
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				i.putExtra("handle", n.getHandle());
+				i.putExtra("from", FROM_FILE_BROWSER);
 			
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.ic_folder_list);

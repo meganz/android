@@ -36,6 +36,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class OfflineFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
+	
+	static int FROM_FILE_BROWSER = 13;
+	static int FROM_INCOMING_SHARES= 14;
+	static int FROM_OFFLINE= 15;
 
 	Context context;
 	ActionBar aB;
@@ -669,6 +673,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		log("showProperties "+n.getName());
 		Intent i = new Intent(context, FilePropertiesActivity.class);
 		i.putExtra("handle", n.getHandle());
+		i.putExtra("from", FROM_OFFLINE);
 
 		if (n.isFolder()) {
 			if (megaApi.isShared(n)){

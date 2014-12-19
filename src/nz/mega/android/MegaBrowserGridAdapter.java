@@ -41,6 +41,10 @@ import android.widget.Toast;
 
 public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListener {
 	
+	static int FROM_FILE_BROWSER = 13;
+	static int FROM_INCOMING_SHARES= 14;
+	static int FROM_OFFLINE= 15;
+	
 	Context context;
 	ArrayList<Integer> imageIds;
 	ArrayList<String> names;
@@ -1076,6 +1080,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				MegaNode n = (MegaNode) getItem(currentPosition);
 				i.putExtra("handle", n.getHandle());
+				i.putExtra("from", FROM_FILE_BROWSER);
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.folder_thumbnail);
 				}
@@ -1092,6 +1097,7 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
 				Intent i = new Intent(context, FilePropertiesActivity.class);
 				MegaNode n = (MegaNode) getItem(currentPosition+1);
 				i.putExtra("handle", n.getHandle());
+				i.putExtra("from", FROM_FILE_BROWSER);
 				if (n.isFolder()){
 					i.putExtra("imageId", R.drawable.folder_thumbnail);
 				}
