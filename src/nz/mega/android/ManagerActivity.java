@@ -221,6 +221,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private TextView userEmail;
 	private TextView usedSpaceText;
 	private TextView usedSpace;
+	private ImageView usedSpaceWarning;
 	
 	ProgressBar usedSpaceBar;
 	
@@ -430,6 +431,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         bottomControlBar.setOnClickListener(this);
         usedSpace = (TextView) findViewById(R.id.used_space);
         usedSpaceText = (TextView) findViewById(R.id.used_space_text);
+        usedSpaceWarning = (ImageView) findViewById(R.id.used_space_warning);
+        usedSpaceWarning.setVisibility(View.INVISIBLE);
         usedSpaceBar = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
         usedSpaceBar.setProgress(0);        
@@ -4057,14 +4060,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        if (usedPerc < 90){
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
 		        }
 		        else if ((usedPerc >= 90) && (usedPerc <= 95)){
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        	usedSpaceWarning.setVisibility(View.VISIBLE);
 		        }
 		        else{
 		        	if (usedPerc > 100){
 			        	usedPerc = 100;
+			        	usedSpaceWarning.setVisibility(View.VISIBLE);
 			        }
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));    
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

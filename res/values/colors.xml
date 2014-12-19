@@ -7,7 +7,7 @@
     <color name="background_secondary">#eeeeee</color>
     <color name="mega">#db0605</color>
     <color name="text_login">#333333</color>
-    <color name="used_space_ok">#1ea4e3</color>
+    <color name="used_space_ok">#1fa4e7</color>
     <color name="used_space_warning">#ffb800</color>
     <color name="used_space_exceed">#d52400</color>
     <color name="transfer_progress">#cccccc</color>
@@ -40,7 +40,7 @@
  	<color name="fragment_background">#EEEEEE</color>
  	<color name="adapters_background">#333333</color>
  	<color name="file_properties_bottom">#292929</color>
- 	<color name="file_properties_top">#111111</color>
+ 	<color name="file_properties_top">#222222</color>
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
     
