@@ -5788,14 +5788,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		if (psF != null){
 			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-				long cameraUploadHandle = psF.getPhotoSyncHandle();
-				MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
-				log("cameraUploadHandle: " + cameraUploadHandle);
-				if (nps != null){
-					log("nps != null");
-					ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-					psF.setNodes(nodes);
-				}
+				if(psF.isAdded()){
+					long cameraUploadHandle = psF.getPhotoSyncHandle();
+					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+					log("cameraUploadHandle: " + cameraUploadHandle);
+					if (nps != null){
+						log("nps != null");
+						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+						psF.setNodes(nodes);
+					}
+				}				
 			}
 		}
 		if (cF != null){
