@@ -30,7 +30,7 @@
             android:layout_width="172dp"
             android:layout_height="157dp"
             android:visibility="gone"
-            android:background="@drawable/background_item_grid_menu_layout"
+            android:background="@drawable/background_item_grid_long_click"
             android:layout_centerHorizontal="true"
             android:orientation="vertical">
 	    </LinearLayout>
@@ -81,7 +81,7 @@
 		            android:id="@+id/grid_menu_layout_option_properties"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_properties"
+		            android:src="@drawable/info_ic"
 		            style="@style/dialogActionButton" 
 		            android:layout_weight="1"/>
             </LinearLayout>
@@ -97,7 +97,7 @@
 		            android:id="@+id/grid_menu_layout_option_delete"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ic_rubbish_bin"
 		            style="@style/dialogActionButton" 
 		            android:layout_weight="1"/>
                 

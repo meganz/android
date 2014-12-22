@@ -252,6 +252,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				}
 			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
+			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
 		}
@@ -702,12 +703,12 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)}; 
 			}
 			else{
-				optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)};
+				optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
 			}
 			
 			final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
 			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-			builder.setTitle("More options");
+			builder.setTitle(R.string.more_options_overflow);
 			builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 				
 				@Override
@@ -744,19 +745,19 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 							((ManagerActivity) context).showCopy(handleList);
 							break;
 						}
-						case 4:{
-							setPositionClicked(-1);
-							notifyDataSetChanged();
-							((ManagerActivity) context).getPublicLinkAndShareIt(n);
-							break;
-						}
+//						case 4:{
+//							setPositionClicked(-1);
+//							notifyDataSetChanged();
+//							((ManagerActivity) context).getPublicLinkAndShareIt(n);
+//							break;
+//						}
 					}
 
 					dialog.dismiss();
 				}
 			});
 			
-			builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+			builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
 				
 				@Override
 				public void onClick(DialogInterface dialog, int which) {

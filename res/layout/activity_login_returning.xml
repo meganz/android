@@ -130,7 +130,7 @@
             <TextView 
                 android:id="@+id/login_text_create_account"
                 android:layout_gravity="center"
-                android:text="Create one now!"
+                android:text="@string/new_account"
                 android:textColor="@color/mega"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
