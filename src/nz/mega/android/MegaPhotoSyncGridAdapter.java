@@ -231,7 +231,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 		this.monthPics = monthPics;
 		this.nodes = nodes;
 		positionClicked = -1;	
-		log("setNodes: " + numberOfCells + "__" + nodes.size() + "__" + monthPics.size());
+//		log("setNodes: " + numberOfCells + "__" + nodes.size() + "__" + monthPics.size());
 		notifyDataSetChanged();
 //		listFragment.clearFocus();
 //		if (listFragment != null){

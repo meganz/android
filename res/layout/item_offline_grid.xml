@@ -91,7 +91,7 @@
             android:layout_height="wrap_content">
             
             <TableRow>
-  	            <ImageButton
+  	  <!--          <ImageButton
 		            android:id="@+id/offline_grid_option_open1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
-<!--		        <ImageView
+		        <ImageView
 		            android:id="@+id/offline_grid_option_properties1"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -202,7 +202,7 @@
             android:layout_height="wrap_content">
             
             <TableRow>
-  	            <ImageButton
+  	  <!--          <ImageButton
 		            android:id="@+id/offline_grid_option_open2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
@@ -212,7 +212,7 @@
 		            android:background="@null" 
 		            android:layout_gravity="center_vertical"/>
 	        
-<!-- 				<ImageView
+ 				<ImageView
 		            android:id="@+id/offline_grid_option_download2"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"

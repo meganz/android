@@ -502,7 +502,21 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //					((LinearLayout.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((25 * scaleW), outMetrics),
 //							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 					
-				}		
+				}	
+				else if (type == ManagerActivity.SEARCH_ADAPTER){
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.VISIBLE);	
+					holder.optionPublicLink.setVisibility(View.VISIBLE);
+					holder.optionRename.setVisibility(View.GONE);
+					holder.optionDelete.setVisibility(View.GONE);
+					holder.optionRemoveTotal.setVisibility(View.GONE);
+					holder.optionClearShares.setVisibility(View.GONE);
+					holder.optionMore.setVisibility(View.GONE);
+					holder.optionMoveTo.setVisibility(View.VISIBLE);
+					holder.optionLeaveShare.setVisibility(View.GONE);
+					holder.optionPermissions.setVisibility(View.GONE);
+						
+				}
 				else if ((type == ManagerActivity.CONTACT_FILE_ADAPTER) || (type == ManagerActivity.INCOMING_SHARES_ADAPTER)) {
 
 					// Choose the buttons to show depending on the type of

@@ -256,8 +256,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 			holder.imageButtonThreeDots2 = (ImageButton) v.findViewById(R.id.offline_grid_three_dots2);
 			
 			holder.optionsLayout1 = (RelativeLayout) v.findViewById(R.id.offline_grid_options1);
-			holder.optionOpen1 = (ImageButton) v.findViewById(R.id.offline_grid_option_open1);
-			holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+//			holder.optionOpen1 = (ImageButton) v.findViewById(R.id.offline_grid_option_open1);
+//			holder.optionOpen1.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDelete1 = (ImageView) v.findViewById(R.id.offline_grid_option_delete1);
 			holder.optionDelete1.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete1.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
@@ -265,8 +265,8 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 //			holder.arrowSelection1.setVisibility(View.GONE);
 
 			holder.optionsLayout2 = (RelativeLayout) v.findViewById(R.id.offline_grid_options2);
-			holder.optionOpen2 = (ImageButton) v.findViewById(R.id.offline_grid_option_open2);
-			holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
+//			holder.optionOpen2 = (ImageButton) v.findViewById(R.id.offline_grid_option_open2);
+//			holder.optionOpen2.setPadding(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), 0, 0);
 			holder.optionDelete2 = (ImageView) v.findViewById(R.id.offline_grid_option_delete2);
 			holder.optionDelete2.getLayoutParams().width = Util.px2dp((35*scaleW), outMetrics);
 			((TableRow.LayoutParams) holder.optionDelete2.getLayoutParams()).setMargins(Util.px2dp((17*scaleH), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0, 0);
@@ -775,43 +775,43 @@ public class MegaOfflineGridAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				break;
 			}
-			case R.id.offline_grid_option_open1:{
-				File currentFile = new File((String)getItem(currentPosition));
-				positionClicked = -1;
-				notifyDataSetChanged();
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-					context.startActivity(viewIntent);
-				}
-				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, intentShare)){
-						context.startActivity(intentShare);
-					}
-				}
-				break;
-			}
-			case R.id.offline_grid_option_open2:{
-				
-				File currentFile = new File((String)getItem(currentPosition+1));
-				positionClicked = -1;
-				notifyDataSetChanged();
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
-				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-					context.startActivity(viewIntent);
-				}
-				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, intentShare)){
-						context.startActivity(intentShare);
-					}
-				}
-				break;
-			}
+//			case R.id.offline_grid_option_open1:{
+//				File currentFile = new File((String)getItem(currentPosition));
+//				positionClicked = -1;
+//				notifyDataSetChanged();
+//				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+//				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
+//				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+//					context.startActivity(viewIntent);
+//				}
+//				else{
+//					Intent intentShare = new Intent(Intent.ACTION_SEND);
+//					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
+//					if (ManagerActivity.isIntentAvailable(context, intentShare)){
+//						context.startActivity(intentShare);
+//					}
+//				}
+//				break;
+//			}
+//			case R.id.offline_grid_option_open2:{
+//				
+//				File currentFile = new File((String)getItem(currentPosition+1));
+//				positionClicked = -1;
+//				notifyDataSetChanged();
+//				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+//				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
+//				if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+//					context.startActivity(viewIntent);
+//				}
+//				else{
+//					Intent intentShare = new Intent(Intent.ACTION_SEND);
+//					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeThumbnail.typeForName(currentFile.getName()).getType());
+//					if (ManagerActivity.isIntentAvailable(context, intentShare)){
+//						context.startActivity(intentShare);
+//					}
+//				}
+//				break;
+//			}
 			case R.id.offline_grid_three_dots1:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
