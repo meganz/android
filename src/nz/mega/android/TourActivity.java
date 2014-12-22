@@ -76,8 +76,15 @@ public class TourActivity extends Activity implements OnClickListener {
 	    paramsRegister.setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
 	    bRegister.setLayoutParams(paramsRegister);
 	    
-	    tourText1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-	    tourText2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+	    float scaleText;
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
+	    tourText1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+	    tourText2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 	    
 	    tourLoginCreate.setPadding(0, Util.px2dp((5*scaleH), outMetrics), 0, Util.px2dp((10*scaleH), outMetrics));
 	    
