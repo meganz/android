@@ -1540,14 +1540,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    	removeLinkMenuItem.setVisible(false);
 	    	manageLinkMenuItem.setVisible(false);
 	    }
-	    
-	    if (availableOfflineBoolean){
-	    	downloadMenuItem.setIcon(R.drawable.ic_action_collections_collection_dark);
-	    }
-	    else{
-	    	downloadMenuItem.setIcon(R.drawable.ic_menu_download_dark);
-	    }
-	    
+    
+    
 	    if(from==FROM_INCOMING_SHARES){
 	    	shareFolderMenuItem.setVisible(false);
 	    	getLinkMenuItem.setVisible(false);

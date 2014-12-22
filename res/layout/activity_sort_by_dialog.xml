@@ -24,16 +24,14 @@
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_default_asc"/>
+		        style="@style/dialogActionButton"/>
 	    	         
             <ImageButton 
 		        android:id="@+id/sort_by_default_desc"
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_default_desc"/> 
+		        style="@style/dialogActionButton"/> 
          </TableRow>
     
          <TableRow >
@@ -50,16 +48,14 @@
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_az_asc"/>
+		        style="@style/dialogActionButton"/>
 	    	         
             <ImageButton
 		        android:id="@+id/sort_by_az_desc"
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_az_desc"/> 
+		        style="@style/dialogActionButton"/> 
          </TableRow>
          
          <TableRow >
@@ -76,16 +72,14 @@
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_size_asc"/>
+		        style="@style/dialogActionButton"/>
 	    	         
             <ImageButton
 		        android:id="@+id/sort_by_size_desc"
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_size_desc"/> 
+		        style="@style/dialogActionButton"/> 
          </TableRow>
          
          <TableRow >
@@ -102,16 +96,14 @@
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_time_asc"/>
+		        style="@style/dialogActionButton"/>
 	    	         
             <ImageButton 
 		        android:id="@+id/sort_by_created_desc"
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_time_desc"/> 
+		        style="@style/dialogActionButton"/> 
          </TableRow>
          
          <TableRow>
@@ -128,16 +120,14 @@
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_time_asc"/>
+		        style="@style/dialogActionButton"/>
 	    	         
             <ImageButton 
 		        android:id="@+id/sort_by_modified_desc"
 		        android:layout_width="70dp"
 		        android:layout_height="70dp"
 		        android:scaleType="fitCenter"
-		        style="@style/dialogActionButton"
-		        android:src="@drawable/sort_by_time_desc"/>
+		        style="@style/dialogActionButton"/>
          </TableRow>
     </TableLayout>
 
