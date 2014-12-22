@@ -71,7 +71,7 @@
 		        style="@style/InputField" />
 		    
 		    <TableLayout 
-		        android:layout_width="wrap_content"
+		        android:layout_width="match_parent"
 		        android:layout_height="wrap_content"
 		        android:gravity="left" >
 		        
@@ -92,7 +92,10 @@
 	                    android:gravity="left|center_vertical"
 	                    android:layout_marginTop="5dp"
 	                    android:layout_marginBottom="5dp"
-	                    android:linksClickable="true" />
+	                    android:layout_marginRight="5dp"
+	                    android:linksClickable="true"
+	                    android:singleLine="false"
+	                    android:textSize="8sp" />
 		    
 		    		<!-- <TextView
 	                    android:id="@+id/terms"

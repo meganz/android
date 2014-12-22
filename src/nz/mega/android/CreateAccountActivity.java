@@ -19,6 +19,9 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -41,6 +44,7 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	EditText userPasswordConfirm;
 	
 	CheckBox chkTOS;
+	TextView tos;
 	
 	MegaApiAndroid megaApi;
 	
@@ -74,6 +78,17 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_create_account);	
 		
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+	    
+	    float dpHeight = outMetrics.heightPixels / density;
+	    float dpWidth  = outMetrics.widthPixels / density;
+	    
 		megaApi = ((MegaApplication) getApplication()).getMegaApi();
 		
 		TextView tos = (TextView)findViewById(R.id.tos);
@@ -93,6 +108,15 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 		userPasswordConfirm = (EditText) findViewById(R.id.create_account_password_text_confirm);
 		
 		chkTOS = (CheckBox) findViewById(R.id.create_account_chkTOS);
+		tos = (TextView) findViewById(R.id.tos);
+		float scaleText;
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
+	    tos.setTextSize(TypedValue.COMPLEX_UNIT_SP, (8*scaleText));
 		
 		createAccountLayout = (LinearLayout) findViewById(R.id.create_account_create_layout);
 		createAccountLoginLayout = (LinearLayout) findViewById(R.id.create_account_login_layout);
