@@ -290,20 +290,20 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					if(sl.size() == 1){
 						if(sl.get(0).getUser()==null){
 							//IT is just public link, not shared folder
-							holder.imageView.setImageResource(R.drawable.folder_mime);
+							holder.imageView.setImageResource(R.drawable.ic_folder_list);
 						}
 						else{
-							holder.imageView.setImageResource(R.drawable.folder_shared_mime);
+							holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 						}
 					}
 					else{
-						holder.imageView.setImageResource(R.drawable.folder_shared_mime);
+						holder.imageView.setImageResource(R.drawable.ic_folder_shared_list);
 					}
 				} else {
-					holder.imageView.setImageResource(R.drawable.folder_mime);
+					holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				}
 			} else {
-				holder.imageView.setImageResource(R.drawable.folder_mime);
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			}
 		} 
 		else {
@@ -920,9 +920,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
 				
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)});
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle("More options");
+				builder.setTitle(R.string.more_options_overflow);
 				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 					
 					@Override
@@ -956,19 +956,19 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 								((ManagerActivity) context).showCopy(handleList);
 								break;
 							}
-							case 4:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								((ManagerActivity) context).getPublicLinkAndShareIt(n);
-								break;
-							}
+//							case 4:{
+//								setPositionClicked(-1);
+//								notifyDataSetChanged();
+//								((ManagerActivity) context).getPublicLinkAndShareIt(n);
+//								break;
+//							}
 						}
 
 						dialog.dismiss();
 					}
 				});
 				
-				builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -987,7 +987,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				
 				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle("More options");
+				builder.setTitle(R.string.more_options_overflow);
 				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 					
 					@Override
@@ -1015,7 +1015,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					}
 				});
 				
-				builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -1034,7 +1034,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				
 				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle("More options");
+				builder.setTitle(R.string.more_options_overflow);
 				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 					
 					@Override
@@ -1062,7 +1062,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					}
 				});
 				
-				builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {

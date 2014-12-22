@@ -543,7 +543,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		
 		final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("More options");
+		builder.setTitle(R.string.more_options_overflow);
 		builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 			
 			@Override
@@ -592,7 +592,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			}
 		});
 		
-		builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -611,7 +611,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		
 		final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("More options");
+		builder.setTitle(R.string.more_options_overflow);
 		builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 			
 			@Override
@@ -650,7 +650,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			}
 		});
 		
-		builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {

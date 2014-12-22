@@ -20,7 +20,7 @@
         android:layout_height="110dp"
         android:layout_margin="3dp"
         android:visibility="gone"
-        android:background="@drawable/background_item_photosync_grid_menu_layout"
+        android:background="@drawable/background_item_photosync_grid_long_click"
         android:layout_centerHorizontal="true"
         android:orientation="vertical">
     </LinearLayout>

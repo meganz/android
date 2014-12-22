@@ -11,9 +11,6 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
-import android.accounts.Account;
-import android.accounts.AccountAuthenticatorActivity;
-import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -41,15 +39,8 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
  
-public class LoginActivity extends AccountAuthenticatorActivity implements OnClickListener, MegaRequestListenerInterface{
+public class LoginActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface{
 	
-	public final static String ARG_ACCOUNT_TYPE = "ACCOUNT_TYPE";
-    public final static String ARG_AUTH_TYPE = "AUTH_TYPE";
-    public final static String ARG_ACCOUNT_NAME = "ACCOUNT_NAME";
-    public final static String ARG_IS_ADDING_NEW_ACCOUNT = "IS_ADDING_ACCOUNT";
-    
-    public final static String AUTH_TOKEN_TYPE_INSTANTIATE = "MEGA User";
-    
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
 	public static String ACTION_CONFIRM = "MEGA_ACTION_CONFIRM";
@@ -105,10 +96,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
     
     boolean firstRequestUpdate = true;
     boolean firstTime = true;
-    
-    AccountManager accountManager;
-    String authTokenType;
-    
+        
     Handler handler = new Handler();
     
     Bundle extras = null;
@@ -137,9 +125,7 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		accountManager = AccountManager.get(this);
-		
+				
 		loginClicked = false;
 		
 		loginActivity = this;
@@ -729,17 +715,17 @@ public class LoginActivity extends AccountAuthenticatorActivity implements OnCli
 
 				//TODO
 				//Aqui va el addAccount (email, session)
-				String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
-				if (accountType != null){
-					authTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
-					if (authTokenType == null){
-						authTokenType = LoginActivity.AUTH_TOKEN_TYPE_INSTANTIATE;
-					}
-					Account account = new Account(lastEmail, accountType);
-					accountManager.addAccountExplicitly(account, gSession, null);
-					log("AUTTHO: _" + authTokenType + "_");
-					accountManager.setAuthToken(account, authTokenType, gSession);
-				}
+//				String accountType = getIntent().getStringExtra(ARG_ACCOUNT_TYPE);
+//				if (accountType != null){
+//					authTokenType = getIntent().getStringExtra(ARG_AUTH_TYPE);
+//					if (authTokenType == null){
+//						authTokenType = LoginActivity.AUTH_TOKEN_TYPE_INSTANTIATE;
+//					}
+//					Account account = new Account(lastEmail, accountType);
+//					accountManager.addAccountExplicitly(account, gSession, null);
+//					log("AUTTHO: _" + authTokenType + "_");
+//					accountManager.setAuthToken(account, authTokenType, gSession);
+//				}
 				
 				megaApi.fetchNodes(loginActivity);
 			}

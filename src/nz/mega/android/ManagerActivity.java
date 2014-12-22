@@ -242,7 +242,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListRubbishBin = true;
 	private boolean isListSharedWithMe = true;
 	private boolean isListOffline = true;
-	private boolean isListCameraUpload = true;
+	private boolean isListCameraUpload = false;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
@@ -3604,6 +3604,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    		return true;
 	    	}
 	        case R.id.action_menu_upgrade_account:{
+	        	drawerItem = DrawerItem.ACCOUNT;
 	        	showUpAF();
 				return true;
 	        }
