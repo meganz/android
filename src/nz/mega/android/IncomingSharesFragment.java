@@ -306,7 +306,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				else{
 					sortByNameAscending();
 				}
-				aB.setTitle(getString(R.string.section_shared_with_me));	
+				aB.setTitle(getString(R.string.section_shared_items));	
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
 				adapterList.parentHandle=-1;
@@ -331,7 +331,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 
 			if (deepBrowserTree == 0){
 				contentText.setText(getInfoNode());
-				aB.setTitle(getString(R.string.section_shared_with_me));
+				aB.setTitle(getString(R.string.section_shared_items));
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			}
 			else{
@@ -800,7 +800,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				//In the beginning of the navigation
 				((ManagerActivity)context).setParentHandleIncoming(-1);
 				parentHandle=-1;
-				aB.setTitle(getString(R.string.section_shared_with_me));	
+				aB.setTitle(getString(R.string.section_shared_items));	
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				findNodes();
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){

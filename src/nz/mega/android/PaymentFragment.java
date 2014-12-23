@@ -164,22 +164,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		packageName.setText(accountType.getNameResource());
 		packageName.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 		
-		pricingFrom.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pricingFrom.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 		
 		storageTitle = (TextView) v.findViewById(R.id.pro_storage_title);
-		storageTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		storageTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 		
 		storage = (TextView) v.findViewById(R.id.pro_storage);
-		storage.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		storage.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 		
 		bandwithTitle = (TextView) v.findViewById(R.id.pro_bandwidth_title);
-		bandwithTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		bandwithTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 		
 		bandwidth = (TextView) v.findViewById(R.id.pro_bandwidth);
-		bandwidth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		bandwidth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 		
 		selectMemberShip = (TextView) v.findViewById(R.id.select_membership);
-		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 		
 		selectRecurring = (TextView) v.findViewById(R.id.select_recurring);
 		selectRecurring.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
@@ -283,7 +283,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					double saving3 = p.getAmount(1)/12.00/100.00;
 					String saving3String =df.format(saving3);
 	
-					pricingFrom.setText("from " + saving3String +" € per month");
+					pricingFrom.setText("from " + saving3String + " € per month");
 	
 					double perMonthF=p.getAmount(0)/100.00;
 			        String perMonthString =df.format(perMonthF);

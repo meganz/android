@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.File;
 
 import nz.mega.android.utils.Util;
+import nz.mega.components.TwoLineCheckPreference;
 import nz.mega.sdk.MegaApiAndroid;
 
 import android.content.Intent;
@@ -61,7 +62,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	ListPreference cameraUploadWhat;
 	Preference cameraUploadFolder;
 	
-	CheckBoxPreference storageAskMeAlways;
+	TwoLineCheckPreference storageAskMeAlways;
 	
 	boolean cameraUpload = false;
 	boolean pinLock = false;
@@ -112,7 +113,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		downloadLocation = findPreference(KEY_STORAGE_DOWNLOAD_LOCATION);
 		downloadLocation.setOnPreferenceClickListener(this);
 		
-		storageAskMeAlways = (CheckBoxPreference) findPreference(KEY_STORAGE_ASK_ME_ALWAYS);
+		storageAskMeAlways = (TwoLineCheckPreference) findPreference(KEY_STORAGE_ASK_ME_ALWAYS);
 		storageAskMeAlways.setOnPreferenceClickListener(this);
 		
 		cameraUploadOn = findPreference(KEY_CAMERA_UPLOAD_ON);

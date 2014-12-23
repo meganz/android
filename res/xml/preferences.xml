@@ -47,7 +47,7 @@
         android:title="@string/settings_storage"
         android:textColor="@color/pressed_mega">
 		
-        <CheckBoxPreference
+        <nz.mega.components.TwoLineCheckPreference
             android:key="settings_storage_ask_me_always"
         	android:title="@string/settings_storage_ask_me_always" />
         

@@ -94,6 +94,14 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
+		
+		float scaleText;
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
 
 		View v = null;
 		v = inflater.inflate(R.layout.activity_upgrade, container, false);
@@ -104,11 +112,11 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		
 	
 		pro1.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		pro1.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
+		pro1.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
 		pro2.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		pro2.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
+		pro2.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
 		pro3.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		pro3.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
+		pro3.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
 		
 		pro1Title = (TextView) v.findViewById(R.id.pro1_title);
 		pro2Title = (TextView) v.findViewById(R.id.pro2_title);
@@ -134,29 +142,29 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		pricingPerMonth2 = (TextView) v.findViewById(R.id.pricing2_from);
 		pricingPerMonth3 = (TextView) v.findViewById(R.id.pricing3_from);
 		
-		pro1Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		pro2Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		pro3Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pro1Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		pro2Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		pro3Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
 		
-		proStorage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		proStorage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		proStorage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		proStorage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		proStorage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		proStorage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		storage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		storage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		storage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		storage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		storage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		storage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		proBandwith1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		proBandwith2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		proBandwith3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		proBandwith1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		proBandwith2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		proBandwith3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		bandwidth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		bandwidth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		bandwidth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		bandwidth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		bandwidth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		bandwidth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		pricingPerMonth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+		pricingPerMonth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
 		megaApi.getAccountDetails(this);
 		megaApi.getPricing(this);

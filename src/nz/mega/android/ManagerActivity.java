@@ -1555,7 +1555,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (aB == null){
     				aB = getSupportActionBar();
     			}
-    			aB.setTitle(getString(R.string.section_shared_with_me));
+    			aB.setTitle(getString(R.string.section_shared_items));
     			
     			if (getmDrawerToggle() != null){
     				getmDrawerToggle().setDrawerIndicatorEnabled(true);
@@ -1601,7 +1601,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	            					aB.setTitle(node.getName());
             					}
                 				else{
-                					aB.setTitle(getResources().getString(R.string.section_shared_with_me));
+                					aB.setTitle(getResources().getString(R.string.section_shared_items));
                 					outSF.refresh(); 
                 				}            					   				
                 			}
@@ -1615,7 +1615,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             					}
                 				else{
                 					
-                					aB.setTitle(getResources().getString(R.string.section_shared_with_me));
+                					aB.setTitle(getResources().getString(R.string.section_shared_items));
                 					inSF.refresh(); 
                 				}   				
                 			}                           	
@@ -1663,12 +1663,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    		}
     			
     			if (inSF != null){
-    				aB.setTitle(getString(R.string.section_shared_with_me));	
+    				aB.setTitle(getString(R.string.section_shared_items));	
     				inSF.refresh();			
     				
     			}    			
     			if (outSF != null){    				
-					aB.setTitle(getString(R.string.section_shared_with_me));				
+					aB.setTitle(getString(R.string.section_shared_items));				
 					outSF.refresh();    				
     			}
     			
@@ -5774,7 +5774,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
 				//ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 //				inSF.setNodes(nodes);
-				aB.setTitle(getString(R.string.section_shared_with_me));	
+				aB.setTitle(getString(R.string.section_shared_items));	
 				inSF.refresh();			
 			}
 		}		
@@ -5782,7 +5782,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		if (outSF != null){
 			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				aB.setTitle(getString(R.string.section_shared_with_me));				
+				aB.setTitle(getString(R.string.section_shared_items));				
 				outSF.refresh();
 			}
 		}
