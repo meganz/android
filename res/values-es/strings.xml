@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA (beta)</string>
-    <string name="app_version" context="Not translate">2.00CR</string>
+    <string name="app_version" context="Not translate">2.0</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA es Almacenamiento en la Nube con Potenhte Privacidad Contínuamente Activa. 50GB gratis</string>
@@ -40,6 +40,10 @@
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones&#8230;</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Enviar a la papelera de reciclaje?</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Eliminar completamente de MEGA?</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
+    
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Entrantes</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Salientes</string>
@@ -135,9 +139,9 @@
     <string name="create_account_confirm" context="">Por favor, comprueba tu correo electrónico y haz clic en el enlace para iniciar sesión y confirmar tu cuenta</string>
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta.</string>
 
-    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
+    <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Disponible sin conexión</string>
-	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartido conmigo</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartida</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papelera</string>
 	<string name="section_contacts" context="Title of the contact list">Contactos</string>
 	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTOS</string>
@@ -176,7 +180,7 @@
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Compartido con:</string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permisos:</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Cambiar permisos</string>
-	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida con</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Compartido con</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
 	
@@ -202,12 +206,16 @@
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Compartir imagen usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Compartir enlace</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Obtener Enlace</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Enlace</string>
+    <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Abandonar</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">No compartir</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renombrar</string>
     <string name="context_renaming" context="while renaming a file or folder">Renombrando</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mover</string>
     <string name="context_moving" context="while moving a file or folder">Moviendo</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Gestionar enlace</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Eliminar enlace</string>
     <string name="context_sharing" context="while sharing a folder">Compartiendo carpeta</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copiar</string>
     <string name="context_copying" context="while copying a file or folder">Copiando</string>

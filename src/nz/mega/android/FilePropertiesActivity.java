@@ -83,6 +83,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 //	ImageView iconView;
 	TextView nameView;
 	TextView availableOfflineView;
+	TextView offText;
+	TextView onText;
 	ImageView imageView;	
 	ImageView publicLinkImage;
 	MySwitch availableSwitchOnline;
@@ -231,6 +233,19 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
 			availableOfflineLayout.setVisibility(View.VISIBLE);	
 			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
+			float scaleText;
+			if (scaleH < scaleW){
+				scaleText = scaleH;
+			}
+			else{
+				scaleText = scaleW;
+			}
+			availableOfflineView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleText));
+			onText = (TextView) findViewById(R.id.file_properties_available_offline_on);
+			offText = (TextView) findViewById(R.id.file_properties_available_offline_off);
+
+			onText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleText));
+			offText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleText));
 			availableSwitchOnline = (MySwitch) findViewById(R.id.file_properties_switch_online);
 			availableSwitchOnline.setChecked(true);
 			availableSwitchOffline = (MySwitch) findViewById(R.id.file_properties_switch_offline);
@@ -303,8 +318,12 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					}
 				}
 				
-				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
-				
+				if (node.isFile()){
+					availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);
+				}
+				else{
+					availableOfflineView.setPadding(Util.px2dp(15*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);
+				}
 				//Choose the button availableSwitch
 				
 				if(dbH.exists(node.getHandle())){

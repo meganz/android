@@ -147,7 +147,7 @@
 		        android:id="@+id/login_mega_logo"
 		        android:layout_width="200dp"
 		        android:layout_height="200dp"
-		        android:src="@drawable/ic_launcher"
+		        android:src="@drawable/logo_loading_ic"
 		        android:layout_marginTop="20dp"/>
 		    
 		    <TextView
