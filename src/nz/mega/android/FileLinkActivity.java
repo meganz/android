@@ -15,9 +15,12 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
@@ -225,6 +228,9 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				
 				if (document == null){
 					Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, this);
+					Intent backIntent = new Intent(this, ManagerActivity.class);
+	    			startActivity(backIntent);
+	    			finish();
 					return;
 				}
 
@@ -233,6 +239,32 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 				
 				imageView.setImageResource(MimeTypeMime.typeForName(document.getName()).getIconResourceId());
 				iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
+			}
+			else{
+				
+				try{ 
+					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_file_not_found), null);
+					dialogBuilder.setPositiveButton(
+						getString(android.R.string.ok),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+								Intent backIntent = new Intent(fileLinkActivity, ManagerActivity.class);
+				    			startActivity(backIntent);
+				    			finish();
+							}
+						});
+									
+					AlertDialog dialog = dialogBuilder.create();
+					dialog.show(); 
+					Util.brandAlertDialog(dialog);
+				}
+				catch(Exception ex){
+					Util.showToast(this, getString(R.string.general_error_file_not_found)); 
+				}
+				
+    			return;
 			}
 		 }
 		else if (request.getType() == MegaRequest.TYPE_COPY){

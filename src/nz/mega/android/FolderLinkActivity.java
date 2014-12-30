@@ -17,7 +17,9 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -402,7 +404,32 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		log("onRequestFinish: " + request.getRequestString());
 		
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
-			megaApiFolder.fetchNodes(this);	
+			if (e.getErrorCode() == MegaError.API_OK){
+				megaApiFolder.fetchNodes(this);	
+			}
+			else{
+				try{ 
+					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);
+					dialogBuilder.setPositiveButton(
+						getString(android.R.string.ok),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+								Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
+				    			startActivity(backIntent);
+				    			finish();
+							}
+						});
+									
+					AlertDialog dialog = dialogBuilder.create();
+					dialog.show(); 
+					Util.brandAlertDialog(dialog);
+				}
+				catch(Exception ex){
+					Util.showToast(this, getString(R.string.general_error_folder_not_found)); 
+				}
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 				
@@ -425,6 +452,29 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				adapterList.setMultipleSelect(false);
 				
 				listView.setAdapter(adapterList);
+			}
+			else{
+				try{ 
+					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);
+					dialogBuilder.setPositiveButton(
+						getString(android.R.string.ok),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+								Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
+				    			startActivity(backIntent);
+				    			finish();
+							}
+						});
+									
+					AlertDialog dialog = dialogBuilder.create();
+					dialog.show(); 
+					Util.brandAlertDialog(dialog);
+				}
+				catch(Exception ex){
+					Util.showToast(this, getString(R.string.general_error_folder_not_found)); 
+				}
 			}
 		}
 	}
