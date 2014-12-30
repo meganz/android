@@ -130,6 +130,7 @@ public class Util {
 		
 			AlertDialog dialog = dialogBuilder.create();
 			dialog.show(); 
+			brandAlertDialog(dialog);
 		}
 		catch(Exception ex){
 			Util.showToast(activity, message); 

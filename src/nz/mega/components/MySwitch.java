@@ -185,7 +185,7 @@ public class MySwitch extends CompoundButton {
         //Log.d(TAG, "mLeftBackground="+mLeftBackground);
         //Log.d(TAG, "mRightBackground="+mRightBackground);
         mThumbDrawable = a.getDrawable(R.styleable.MySwitch_thumb);
-        mTrackDrawable = a.getDrawable(R.styleable.MySwitch_track);
+        mTrackDrawable = a.getDrawable(R.styleable.MySwitch_trackMySwitch);
         mTextOn = a.getText(R.styleable.MySwitch_textOn);
         mTextOff = a.getText(R.styleable.MySwitch_textOff);
         mDrawableOn = a.getDrawable(R.styleable.MySwitch_drawableOn);
@@ -193,11 +193,11 @@ public class MySwitch extends CompoundButton {
         mPushStyle = a.getBoolean(R.styleable.MySwitch_pushStyle, false);
         mTextOnThumb = a.getBoolean(R.styleable.MySwitch_textOnThumb, false);
         mThumbExtraMovement = a.getDimensionPixelSize(R.styleable.MySwitch_thumbExtraMovement, 0);
-        mThumbTextPadding = a.getDimensionPixelSize( R.styleable.MySwitch_thumbTextPadding, 0);
+        mThumbTextPadding = a.getDimensionPixelSize( R.styleable.MySwitch_thumbTextPaddingMySwitch, 0);
         mTrackTextPadding = a.getDimensionPixelSize( R.styleable.MySwitch_trackTextPadding, 0);
-        mSwitchMinWidth = a.getDimensionPixelSize( R.styleable.MySwitch_switchMinWidth, 0);
+        mSwitchMinWidth = a.getDimensionPixelSize( R.styleable.MySwitch_switchMinWidthMySwitch, 0);
         mSwitchMinHeight = a.getDimensionPixelSize( R.styleable.MySwitch_switchMinHeight, 0);
-        mSwitchPadding =  a.getDimensionPixelSize( R.styleable.MySwitch_switchPadding, 0);
+        mSwitchPadding =  a.getDimensionPixelSize( R.styleable.MySwitch_switchPaddingMySwitch, 0);
 
         mTrackDrawable.getPadding(mTrackPaddingRect) ;
         //Log.d(TAG, "mTrackPaddingRect=" + mTrackPaddingRect);

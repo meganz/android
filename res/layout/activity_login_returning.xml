@@ -80,7 +80,7 @@
 				        mySwitch:textOn=""
 				        mySwitch:textOnThumb="false"
 				        mySwitch:thumb="@drawable/switch_thumb"
-				        mySwitch:track="@drawable/switch_track_online" />
+				        mySwitch:trackMySwitch="@drawable/switch_track_online" />
 		            
 		            <TextView 
 	       			 	android:id="@+id/ABC"

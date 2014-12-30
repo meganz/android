@@ -90,7 +90,7 @@
 		        mySwitch:textOn=""
 		        mySwitch:textOnThumb="false"
 		        mySwitch:thumb="@drawable/switch_thumb"
-		        mySwitch:track="@drawable/switch_track_online" 
+		        mySwitch:trackMySwitch="@drawable/switch_track_online" 
 		        android:layout_weight="1"/>
            	
            	<nz.mega.components.MySwitch
@@ -105,7 +105,7 @@
 	        mySwitch:textOn=""
 	        mySwitch:textOnThumb="false"
 	        mySwitch:thumb="@drawable/switch_thumb"
-	        mySwitch:track="@drawable/switch_track_offline"
+	        mySwitch:trackMySwitch="@drawable/switch_track_offline"
 	        android:layout_weight="1" />
                
          <TextView

@@ -28,6 +28,8 @@
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Almacenamiento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Ancho de Banda</string>
     <string name="general_error_word" context="It will be followed by the error message">Error</string> 
+    <string name="general_error_file_not_found" context="Message shown when a file don't exist">Enlace de fichero no existente</string>
+    <string name="general_error_folder_not_found" context="Message shown when a folder don't exist">Enlace de carpeta no existente</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Todavía no implementado</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Descargado anteriormente</string>
      <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">Info</string>
