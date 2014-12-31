@@ -108,7 +108,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_PREFERENCES); 
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CREDENTIALS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
         onCreate(db);
         
 //        ContentValues values = new ContentValues();

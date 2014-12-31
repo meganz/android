@@ -842,7 +842,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				else{					
 					AlertDialog wifiDialog;
 					
-					final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.id.cam_sync_wifi), getResources().getString(R.id.cam_sync_data)});
+					final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
 					AlertDialog.Builder builder = new AlertDialog.Builder(context);
 					builder.setTitle(getString(R.string.section_photo_sync));
 					builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
