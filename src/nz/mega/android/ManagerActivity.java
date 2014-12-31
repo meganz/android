@@ -569,10 +569,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Bitmap imBitmap = null;
 				if (avatar.exists()){
 					if (avatar.length() > 0){
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						BitmapFactory.Options options = new BitmapFactory.Options();
+						options.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+						int imageHeight = options.outHeight;
+						int imageWidth = options.outWidth;
+						String imageType = options.outMimeType;
+						
+						// Calculate inSampleSize
+					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
+					    
+					    // Decode bitmap with inSampleSize set
+					    options.inJustDecodeBounds = false;
+
+						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 						if (imBitmap == null) {
 							avatar.delete();
 							if (getExternalCacheDir() != null){
@@ -793,6 +803,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			selectDrawerItem(drawerItem);
 		}
 	}	
+	
+	public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    // Raw height and width of image
+    final int height = options.outHeight;
+    final int width = options.outWidth;
+    int inSampleSize = 1;
+
+    if (height > reqHeight || width > reqWidth) {
+
+        final int halfHeight = height / 2;
+        final int halfWidth = width / 2;
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while ((halfHeight / inSampleSize) > reqHeight
+                && (halfWidth / inSampleSize) > reqWidth) {
+            inSampleSize *= 2;
+        }
+    }
+
+    return inSampleSize;
+}
     
     @Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -4404,10 +4437,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Bitmap imBitmap = null;
 				if (avatar.exists()){
 					if (avatar.length() > 0){
-						BitmapFactory.Options bOpts = new BitmapFactory.Options();
-						bOpts.inPurgeable = true;
-						bOpts.inInputShareable = true;
-						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+						BitmapFactory.Options options = new BitmapFactory.Options();
+						options.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+						int imageHeight = options.outHeight;
+						int imageWidth = options.outWidth;
+						String imageType = options.outMimeType;
+						
+						// Calculate inSampleSize
+					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
+					    
+					    // Decode bitmap with inSampleSize set
+					    options.inJustDecodeBounds = false;
+
+						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
 						if (imBitmap == null) {
 							avatar.delete();
 						}
