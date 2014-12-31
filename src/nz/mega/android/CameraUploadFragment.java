@@ -1118,6 +1118,23 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					adapterList.notifyDataSetChanged();
 					return 1;
 				}
+				else if (adapterList.isMultipleSelect()){
+					hideMultipleSelect();
+					return 2;
+				}
+			}
+		}
+		else{
+			if (adapterGrid != null){
+				if (adapterGrid.getPositionClicked() != -1){
+					adapterGrid.setPositionClicked(-1);
+					adapterGrid.notifyDataSetChanged();
+					return 1;
+				}
+				else if (adapterGrid.isMultipleSelect()){
+					adapterGrid.hideMultipleSelect();
+					return 2;
+				}
 			}
 		}
 		

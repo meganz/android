@@ -583,6 +583,15 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			parentHandle = adapterList.getParentHandle();
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 			
+			if (adapterList == null){
+				return 0;
+			}
+			
+			if (adapterList.isMultipleSelect()){
+				hideMultipleSelect();
+				return 2;
+			}
+			
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();
@@ -634,6 +643,15 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 		else{
 			parentHandle = adapterGrid.getParentHandle();
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+			
+			if (adapterGrid == null){
+				return 0;
+			}
+			
+			if (adapterGrid.isMultipleSelect()){
+				adapterGrid.hideMultipleSelect();
+				return 2;
+			}
 			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);

@@ -923,8 +923,10 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
 
 		this.multipleSelect = true;
-		for ( int i=0; i< nodes.size(); i++ ) {
-			checkedItems.append(i, true);
+		if (nodes != null){
+			for ( int i=0; i< nodes.size(); i++ ) {
+				checkedItems.append(i, true);
+			}
 		}
 		updateActionModeTitle();
 		notifyDataSetChanged();

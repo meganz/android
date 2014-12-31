@@ -516,6 +516,11 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		parentHandle = adapterList.getParentHandle();
 		((ManagerActivity)context).setParentHandleSearch(parentHandle);
 		
+		if (adapterList.isMultipleSelect()){
+			hideMultipleSelect();
+			return 3;
+		}
+		
 		if (adapterList.getPositionClicked() != -1){
 			adapterList.setPositionClicked(-1);
 			adapterList.notifyDataSetChanged();

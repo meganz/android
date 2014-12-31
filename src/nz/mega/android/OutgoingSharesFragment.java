@@ -887,6 +887,15 @@ public void sortByNameDescending(){
 		
 		if (isList){
 			
+			if (adapterList == null){
+				return 0;
+			}
+			
+			if (adapterList.isMultipleSelect()){
+				hideMultipleSelect();
+				return 2;
+			}
+			
 			if(deepBrowserTree==0){
 				//In the beginning of the navigation
 				((ManagerActivity)context).setParentHandleOutgoing(-1);
@@ -950,6 +959,10 @@ public void sortByNameDescending(){
 		else{
 			parentHandle = adapterGrid.getParentHandle();
 			((ManagerActivity)context).setParentHandleOutgoing(parentHandle);
+			
+			if (adapterGrid == null){
+				return 0;
+			}
 			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);

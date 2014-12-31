@@ -796,6 +796,15 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 		
 		if (isList){
 			
+			if (adapterList == null){
+				return 0;
+			}
+			
+			if (adapterList.isMultipleSelect()){
+				hideMultipleSelect();
+				return 2;
+			}
+			
 			if(deepBrowserTree==0){
 				//In the beginning of the navigation
 				((ManagerActivity)context).setParentHandleIncoming(-1);

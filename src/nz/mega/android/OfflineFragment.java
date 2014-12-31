@@ -1052,6 +1052,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	public int onBackPressed(){
 		log("onBackPressed");
 		if (isList){
+			if (adapterList == null){
+				return 0;
+			}
+			
+			if (adapterList.isMultipleSelect()){
+				hideMultipleSelect();
+				return 2;
+			}
+			
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();

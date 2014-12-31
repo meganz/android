@@ -774,113 +774,129 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	public int onBackPressed(){
 
 		if (isList){
-			parentHandle = adapterList.getParentHandle();
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			
-			if (adapterList.getPositionClicked() != -1){
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-				return 1;
-			}
-			else{
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
-				if (parentNode != null){
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_cloud_drive));	
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					}
-					
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					adapterList.setNodes(nodes);
-					listView.post(new Runnable() 
-				    {
-				        @Override
-				        public void run() 
-				        {
-				        	listView.setSelection(0);
-				            View v = listView.getChildAt(0);
-				            if (v != null) 
-				            {
-				                v.requestFocus();
-				            }
-				        }
-				    });
-					adapterList.setParentHandle(parentHandle);
-					contentText.setText(getInfoFolder(parentNode));
-					return 2;
+			if (adapterList != null){
+				parentHandle = adapterList.getParentHandle();
+				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				
+				if (adapterList.isMultipleSelect()){
+					hideMultipleSelect();
+					return 3;
+				}
+				
+				if (adapterList.getPositionClicked() != -1){
+					adapterList.setPositionClicked(-1);
+					adapterList.notifyDataSetChanged();
+					return 1;
 				}
 				else{
-					return 0;
+					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
+					if (parentNode != null){
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+						leftNewFolder.setVisibility(View.GONE);
+						rightUploadButton.setVisibility(View.GONE);
+						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+							aB.setTitle(getString(R.string.section_cloud_drive));	
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+						}
+						else{
+							aB.setTitle(parentNode.getName());					
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+						}
+						
+						((ManagerActivity)context).supportInvalidateOptionsMenu();
+						
+						parentHandle = parentNode.getHandle();
+						((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+						nodes = megaApi.getChildren(parentNode, orderGetChildren);
+						adapterList.setNodes(nodes);
+						listView.post(new Runnable() 
+					    {
+					        @Override
+					        public void run() 
+					        {
+					        	listView.setSelection(0);
+					            View v = listView.getChildAt(0);
+					            if (v != null) 
+					            {
+					                v.requestFocus();
+					            }
+					        }
+					    });
+						adapterList.setParentHandle(parentHandle);
+						contentText.setText(getInfoFolder(parentNode));
+						return 2;
+					}
+					else{
+						return 0;
+					}
 				}
 			}
 		}
 		else{
-			parentHandle = adapterGrid.getParentHandle();
-			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-			
-			if (adapterGrid.getPositionClicked() != -1){
-				adapterGrid.setPositionClicked(-1);
-				adapterGrid.notifyDataSetChanged();
-				return 1;
-			}
-			else{
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-				if (parentNode != null){
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-						aB.setTitle(getString(R.string.section_cloud_drive));	
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					}
-					
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = parentNode.getHandle();
-					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					adapterGrid.setNodes(nodes);
-					listView.post(new Runnable() 
-				    {
-				        @Override
-				        public void run() 
-				        {
-				        	listView.setSelection(0);
-				            View v = listView.getChildAt(0);
-				            if (v != null) 
-				            {
-				                v.requestFocus();
-				            }
-				        }
-				    });
-					adapterGrid.setParentHandle(parentHandle);
-					contentText.setText(getInfoFolder(parentNode));
-					return 2;
+			if (adapterGrid != null){
+				parentHandle = adapterGrid.getParentHandle();
+				((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+				
+				if (adapterGrid.isMultipleSelect()){
+					adapterGrid.hideMultipleSelect();
+					return 3;
+				}
+				
+				if (adapterGrid.getPositionClicked() != -1){
+					adapterGrid.setPositionClicked(-1);
+					adapterGrid.notifyDataSetChanged();
+					return 1;
 				}
 				else{
-					return 0;
+					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+					if (parentNode != null){
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+						leftNewFolder.setVisibility(View.GONE);
+						rightUploadButton.setVisibility(View.GONE);
+						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+							aB.setTitle(getString(R.string.section_cloud_drive));	
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+						}
+						else{
+							aB.setTitle(parentNode.getName());					
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+						}
+						
+						((ManagerActivity)context).supportInvalidateOptionsMenu();
+						
+						parentHandle = parentNode.getHandle();
+						((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+						nodes = megaApi.getChildren(parentNode, orderGetChildren);
+						adapterGrid.setNodes(nodes);
+						listView.post(new Runnable() 
+					    {
+					        @Override
+					        public void run() 
+					        {
+					        	listView.setSelection(0);
+					            View v = listView.getChildAt(0);
+					            if (v != null) 
+					            {
+					                v.requestFocus();
+					            }
+					        }
+					    });
+						adapterGrid.setParentHandle(parentHandle);
+						contentText.setText(getInfoFolder(parentNode));
+						return 2;
+					}
+					else{
+						return 0;
+					}
 				}
 			}
 		}
+		
+		return 0;
 	}
 	
 	public long getParentHandle(){

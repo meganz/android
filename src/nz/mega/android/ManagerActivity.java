@@ -2147,18 +2147,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (sF != null){
-			if (drawerItem == DrawerItem.SEARCH){
-				if (sF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
-				}
-			}
-		}
+//		if (sF != null){
+//			if (drawerItem == DrawerItem.SEARCH){
+//				if (sF.onBackPressed() == 0){
+//					drawerItem = DrawerItem.CLOUD_DRIVE;
+//					selectDrawerItem(drawerItem);
+//					if(nDA!=null){
+//						nDA.setPositionClicked(0);
+//					}
+//					return;
+//				}
+//			}
+//		}
 		
 		if (psF != null){
 			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
@@ -2534,9 +2534,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			helpMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(true);
 	    			settingsMenuItem.setVisible(true);
-	    			thumbViewMenuItem.setVisible(true);
+	    			
 
 					//Hide
+	    			thumbViewMenuItem.setVisible(false);
 					pauseRestartTransfersItem.setVisible(false);
 	    			createFolderMenuItem.setVisible(false);
 	    			addContactMenuItem.setVisible(false);
