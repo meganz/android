@@ -377,6 +377,15 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	
 	public int onBackPressed(){
 		
+		if (adapter == null){
+			return 0;
+		}
+		
+		if (adapter.isMultipleSelect()){
+			hideMultipleSelect();
+			return 2;
+		}
+		
 		if (adapter.getPositionClicked() != -1){
 			adapter.setPositionClicked(-1);
 			adapter.notifyDataSetChanged();

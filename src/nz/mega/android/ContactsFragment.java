@@ -467,6 +467,11 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	public int onBackPressed(){
 		
 		if (isList){
+			if (adapterList.isMultipleSelect()){
+				hideMultipleSelect();
+				return 2;
+			}
+			
 			if (adapterList.getPositionClicked() != -1){
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();
@@ -477,6 +482,11 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			}
 		}
 		else{
+			if (adapterGrid.isMultipleSelect()){
+				adapterGrid.hideMultipleSelect();
+				return 2;
+			}
+			
 			if (adapterGrid.getPositionClicked() != -1){
 				adapterGrid.setPositionClicked(-1);
 				adapterGrid.notifyDataSetChanged();

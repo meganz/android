@@ -10,11 +10,11 @@
         <item name="pushStyle">false</item>
         <item name="textOnThumb">true</item>
         <item name="thumbExtraMovement">0dp</item>
-        <item name="thumbTextPadding">6dp</item>
+        <item name="thumbTextPaddingMySwitch">6dp</item>
         <item name="trackTextPadding">6dp</item>
-        <item name="switchMinWidth">69dp</item>
+        <item name="switchMinWidthMySwitch">69dp</item>
         <item name="switchMinHeight">36dp</item>
-        <item name="switchPadding">6dp</item>
+        <item name="switchPaddingMySwitch">6dp</item>
     </style>
     
     <style name="mySwitchTextAppearance">
