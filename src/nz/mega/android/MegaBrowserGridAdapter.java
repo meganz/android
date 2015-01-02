@@ -1206,8 +1206,10 @@ public class MegaBrowserGridAdapter extends BaseAdapter implements OnClickListen
     {
     	this.currentTransfer = mT;
     	MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
-    	if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
-    		notifyDataSetChanged();    		
+    	if (megaApi.getParentNode(nodeT) != null){
+	    	if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
+	    		notifyDataSetChanged();    		
+	    	}
     	}
     } 
 	
