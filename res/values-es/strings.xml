@@ -110,8 +110,8 @@
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">...</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">¿Nuevo en MEGA?</string>
-    <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
-    <string name="login_logging_in" context="label when logging in to MEGA">Iniciando sesión</string>
+    <string name="create_account" context="label and text button when creating the account">Crear cuenta</string>
+	<string name="login_logging_in" context="label when logging in to MEGA">Iniciando sesión</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Por favor, escribe tu correo electrónico</string>
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Correo electrónico no valido</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Por favor, introduzca su contraseña</string>
