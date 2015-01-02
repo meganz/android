@@ -163,14 +163,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		UserCredentials userCredentials = null;
 		
 		String selectQuery = "SELECT  * FROM " + TABLE_CREDENTIALS;
-		Cursor cursor = db.rawQuery(selectQuery, null);		
-		if (cursor.moveToFirst()) {
-			int id = Integer.parseInt(cursor.getString(0));
-			String email = decrypt(cursor.getString(1));
-			String session = decrypt(cursor.getString(2));
-			userCredentials = new UserCredentials(email, session);
+		try{
+			Cursor cursor = db.rawQuery(selectQuery, null);		
+			if (cursor.moveToFirst()) {
+				int id = Integer.parseInt(cursor.getString(0));
+				String email = decrypt(cursor.getString(1));
+				String session = decrypt(cursor.getString(2));
+				userCredentials = new UserCredentials(email, session);
+			}
+			cursor.close();
 		}
-		cursor.close();
+		catch (Exception e){
+			
+		}
         
         return userCredentials; 
 	}
