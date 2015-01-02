@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.Settings;
 import android.util.Base64;
@@ -173,8 +174,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			}
 			cursor.close();
 		}
-		catch (Exception e){
-			
+		catch (SQLiteException e){
+			if (db != null){
+				onCreate(db);
+			}
 		}
         
         return userCredentials; 
