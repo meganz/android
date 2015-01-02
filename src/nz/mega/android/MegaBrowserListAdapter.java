@@ -1236,8 +1236,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	{
 		this.currentTransfer = mT;
 		MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
-		if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
-			notifyDataSetChanged();    		
+		if (megaApi.getParentNode(nodeT) != null){
+			if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
+				notifyDataSetChanged();    		
+			}
 		}
 
 		if (type == ManagerActivity.SHARED_WITH_ME_ADAPTER){
