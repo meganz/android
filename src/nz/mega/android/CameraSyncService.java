@@ -465,19 +465,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		for(int i=0; i<uris.size(); i++){
 			
 			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
-			int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-	        int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
-	        while(cursor.moveToNext()){
-	        	Media media = new Media();
-		        media.filePath = cursor.getString(dataColumn);
-		        media.timestamp = cursor.getLong(timestampColumn) * 1000;
-		        
-		        if (!checkFile(media)){
-		        	continue;	
-		        }
-		        
-		        cameraFiles.add(media);
-	        }				
+			if (cursor != null){
+				int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+		        int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+		        while(cursor.moveToNext()){
+		        	Media media = new Media();
+			        media.filePath = cursor.getString(dataColumn);
+			        media.timestamp = cursor.getLong(timestampColumn) * 1000;
+			        
+			        if (!checkFile(media)){
+			        	continue;	
+			        }
+			        
+			        cameraFiles.add(media);
+		        }	
+			}
 		}
 		
 		cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
@@ -726,15 +728,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	private boolean checkFile(Media media){
 		
-		if (media.filePath.startsWith(localPath)){
-			Time t = new Time(Time.getCurrentTimezone());
-			t.setToNow();
-			long timeSpent = t.toMillis(true) - media.timestamp;
-			if (timeSpent > ((5 * 60 * 1000)-1)){
+		if (media.filePath != null){
+			if (media.filePath.startsWith(localPath)){
+				Time t = new Time(Time.getCurrentTimezone());
+				t.setToNow();
+				long timeSpent = t.toMillis(true) - media.timestamp;
+				if (timeSpent > ((5 * 60 * 1000)-1)){
+					return true;
+				}
 				return true;
 			}
-			return true;
 		}
+		
 		return false;
 	}
 	
