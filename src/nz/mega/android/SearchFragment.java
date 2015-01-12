@@ -226,7 +226,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 			nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 			
-			aB.setTitle(getString(R.string.action_search));	
+			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);	
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
@@ -569,7 +569,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 				listView.setSelection(0);
 				adapterList.setParentHandle(parentHandle);
 				levels--;
-				aB.setTitle(getString(R.string.action_search));	
+				aB.setTitle(getString(R.string.action_search)+": "+searchQuery);	
 				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
 				return 3;
