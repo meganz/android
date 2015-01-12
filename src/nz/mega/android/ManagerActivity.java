@@ -959,9 +959,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     @Override
 	protected void onNewIntent(Intent intent){
     	log("onNewIntent");
+
     	if ((intent != null) && Intent.ACTION_SEARCH.equals(intent.getAction())){
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
     		parentHandleSearch = -1;
+    		aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
     		
     		isSearching = true;
     		
@@ -1917,7 +1919,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				ft.replace(R.id.fragment_container, sF, "sF");
     			ft.commit();
     			
-    			customSearch.setVisibility(View.GONE);    			
+    			customSearch.setVisibility(View.VISIBLE);    			
 
     			if (createFolderMenuItem != null){
         			createFolderMenuItem.setVisible(false);
@@ -2222,7 +2224,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	protected void onPostResume() {
 	    super.onPostResume();
 	    if (isSearching){
-    		selectDrawerItem(DrawerItem.SEARCH);
+    		selectDrawerItem(DrawerItem.SEARCH);    		
     		isSearching = false;
 	    } 
 	}
