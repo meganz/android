@@ -226,7 +226,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 			nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 			
-			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);	
+			aB.setTitle(getString(R.string.action_search)+": "+searchQuery);
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
