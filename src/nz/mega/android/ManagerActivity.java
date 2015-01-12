@@ -954,6 +954,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	} 
     }
     
+    boolean isSearching = false;
+    
     @Override
 	protected void onNewIntent(Intent intent){
     	log("onNewIntent");
@@ -961,7 +963,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		searchQuery = intent.getStringExtra(SearchManager.QUERY);
     		parentHandleSearch = -1;
     		
-    		selectDrawerItem(DrawerItem.SEARCH);
+    		isSearching = true;
     		
     		if (searchMenuItem != null) {
     			MenuItemCompat.collapseActionView(searchMenuItem);
@@ -2214,6 +2216,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (!openLink){
 			mDrawerToggle.syncState();
 		}
+	}
+	
+	@Override
+	protected void onPostResume() {
+	    super.onPostResume();
+	    if (isSearching){
+    		selectDrawerItem(DrawerItem.SEARCH);
+    		isSearching = false;
+	    } 
 	}
 
 	
