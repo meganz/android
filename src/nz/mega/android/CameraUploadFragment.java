@@ -455,7 +455,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						continue;
 					}
 					
-					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage()){
+					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
 						continue;
 					}
 					
@@ -638,7 +638,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						continue;
 					}
 					
-					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage()){
+					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
 						continue;
 					}
 					
