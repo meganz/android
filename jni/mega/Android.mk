@@ -5,7 +5,6 @@ local_c_includes := \
         $(LOCAL_PATH)/.. \
         $(LOCAL_PATH)/sdk/include \
         $(LOCAL_PATH)/sdk/include/mega/posix \
-        $(LOCAL_PATH)/sdk/third_party/utf8proc \
         $(LOCAL_PATH)/sdk/third_party/glob \
         $(LOCAL_PATH)/android
 
