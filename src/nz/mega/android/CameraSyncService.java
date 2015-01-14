@@ -315,6 +315,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
+		log("reconnect");
+		megaApi.reconnect();
+		
 		int result = shouldRun();
 		if (result != 0){
 			return result;
