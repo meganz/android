@@ -476,6 +476,89 @@ public class MegaApiJava
 	}
 	
 	/**
+     * Get data about the logged account
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_USER_DATA.
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getName - Returns the name of the logged user
+     * - MegaRequest::getPassword - Returns the the public RSA key of the account, Base64-encoded
+     * - MegaRequest::getPrivateKey - Returns the private RSA key of the account, Base64-encoded
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void getUserData(MegaRequestListenerInterface listener) 
+	{
+		megaApi.getUserData(createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Get data about the logged account
+     * 
+     */
+	public void getUserData() 
+	{
+		megaApi.getUserData();
+	}
+
+	/**
+     * Get data about a contact
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_USER_DATA.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getEmail - Returns the email of the contact
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - Returns the XMPP ID of the contact
+     * - MegaRequest::getPassword - Returns the public RSA key of the contact, Base64-encoded
+     *
+     * @param user Contact to get the data
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void getUserData(MegaUser user, MegaRequestListenerInterface listener) {
+		megaApi.getUserData(user, createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Get data about a contact
+     *
+     * @param user Contact to get the data
+     */
+	public void getUserData(MegaUser user) {
+		megaApi.getUserData(user);
+	}
+
+	/**
+     * Get data about a contact
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_USER_DATA.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getEmail - Returns the email or the Base64 handle of the contact
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - Returns the XMPP ID of the contact
+     * - MegaRequest::getPassword - Returns the public RSA key of the contact, Base64-encoded
+     *
+     * @param user Email or Base64 handle of the contact
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void getUserData(String user, MegaRequestListenerInterface listener) {
+		megaApi.getUserData(user, createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Get data about a contact
+     *
+     * @param user Email or Base64 handle of the contact
+     */
+	public void getUserData(String user) {
+		megaApi.getUserData(user);
+	}
+	
+	/**
      * Initialize the creation of a new MEGA account
      *
      * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
