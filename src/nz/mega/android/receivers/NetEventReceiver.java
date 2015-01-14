@@ -1,5 +1,9 @@
 package nz.mega.android.receivers;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+
 import nz.mega.android.CameraSyncService;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.MegaAttributes;
@@ -51,6 +55,10 @@ public class NetEventReceiver extends BroadcastReceiver {
 			dbH.setAttrOnline(false);
 		}
 		
+		String ipAddress = getLocalIpAddress();
+		
+		log("IPADDRESS: " + ipAddress);
+		
 		handler.postDelayed(new Runnable() {
 			
 			@Override
@@ -59,6 +67,25 @@ public class NetEventReceiver extends BroadcastReceiver {
 				c.startService(new Intent(c, CameraSyncService.class));		
 			}
 		}, 5 * 1000);
+	}
+	
+	public String getLocalIpAddress(){
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						return inetAddress.getHostAddress().toString();
+					}
+				}
+			}
+		} 
+		catch (Exception ex) {
+			log(ex.toString());
+		}
+		
+		return null;
 	}
 	
 	public static void log(String message) {
