@@ -222,6 +222,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private TextView usedSpaceText;
 	private TextView usedSpace;
 	private ImageView usedSpaceWarning;
+	private int usedPerc=0;
 	
 	ProgressBar usedSpaceBar;
 	
@@ -520,14 +521,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (contact != null){
 				userEmail.setVisibility(View.VISIBLE);
 				userEmail.setText(contact.getEmail());
-				String userNameString = contact.getEmail();
-				String [] sp = userNameString.split("@");
-				if (sp.length != 0){
-					userNameString = sp[0];
-					userName.setVisibility(View.VISIBLE);
-					userName.setText(userNameString);
-				}
-				
+//				String userNameString = contact.getEmail();
+//				String [] sp = userNameString.split("@");
+//				if (sp.length != 0){
+//					userNameString = sp[0];
+//					userName.setVisibility(View.VISIBLE);
+//					userName.setText(userNameString);
+//				}
+				megaApi.getUserData(this);
 				
 				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 				Canvas c = new Canvas(defaultAvatar);
@@ -3647,7 +3648,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	return true;
 	        }
 	        case R.id.action_menu_help:{
-	        	Toast.makeText(managerActivity, getString(R.string.general_not_yet_implemented), Toast.LENGTH_SHORT).show();
+	        	Intent intent = new Intent();
+	            intent.setAction(Intent.ACTION_VIEW);
+	            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+	            intent.setData(Uri.parse("https://mega.co.nz/#help/android"));
+	            startActivity(intent);
+
 	    		return true;
 	    	}
 	        case R.id.action_menu_upgrade_account:{
@@ -4101,7 +4107,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
 		        
 		        bottomControlBar.setVisibility(View.VISIBLE);
-		        int usedPerc = 0;
+		        usedPerc = 0;
 		        if (totalStorage != 0){
 		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
 		        }
@@ -4133,6 +4139,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
+			if (e.getErrorCode() == MegaError.API_OK){
+				userName.setText(request.getName());
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			log("fecthnodes request finished");
@@ -6519,5 +6530,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void onMonthlyClick(View view) {
 		log("monthly");
 		pF.payMonth();		
+	}
+	
+	public int getUsedPerc()
+	{
+		usedPerc=96;
+		return usedPerc;
 	}
 }
