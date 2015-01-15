@@ -298,6 +298,7 @@
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espacio utilizado</string>
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">¡Hazte PRO!</string>
     <string name="my_account_change_password" context="menu item">Modificar contraseña</string>
+    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Te estás quedando sin espacio libre.\n ¿Quieres mejorar tu cuenta?</string>
     
     <string name="my_account_last_session" context="when did the last session happen">Última sesión:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones:</string>

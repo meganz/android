@@ -153,9 +153,13 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		
 		myEmail=megaApi.getMyEmail();
 		infoEmail.setText(myEmail);
-		userNameTextView.setText(myEmail);
+				
+		//My Name
+		megaApi.getUserData(this);
 		
+		userNameTextView.setText(myEmail);		
 		myUser = megaApi.getContact(myEmail);
+
 
 		logoutButton.setText(R.string.action_logout);
 		lastSession.setText(R.string.general_not_yet_implemented);
@@ -357,6 +361,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 						}
 					}
 				}
+			}
+		}
+		if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
+			if (e.getErrorCode() == MegaError.API_OK){
+				userNameTextView.setText(request.getName());
 			}
 		}
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
