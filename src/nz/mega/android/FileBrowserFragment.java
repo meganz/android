@@ -66,10 +66,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	Button leftNewFolder;
 	Button rightUploadButton;
 	TextView contentText;
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
+//	LinearLayout outSpaceLayout=null;
+//	TextView outSpaceText;
+//	Button outSpaceButton;
+//	int usedSpacePerc;
 	
 	MegaApiAndroid megaApi;
 		
@@ -300,9 +300,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
+//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
@@ -311,24 +311,24 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
 			
-			outSpaceButton.setOnClickListener(this);
+//			outSpaceButton.setOnClickListener(this);
 			
-			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				buttonsLayout.setVisibility(View.GONE);				
-				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-			}
-			else{
-				//Hide the Layout				
-				outSpaceLayout.setVisibility(View.GONE);
-				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-				p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-				listView.setLayoutParams(p);
-			}
+//			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+//			if(usedSpacePerc>95){
+//				//Change below of ListView
+//				buttonsLayout.setVisibility(View.GONE);				
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+//				outSpaceLayout.setVisibility(View.VISIBLE);
+//			}
+//			else{
+//				//Hide the Layout				
+//				outSpaceLayout.setVisibility(View.GONE);
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//				listView.setLayoutParams(p);
+//			}
 //			outSpaceText.setText(R.string.warning_out_space);	
 			
 			
@@ -504,9 +504,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				((ManagerActivity)getActivity()).uploadFile();
 				break;
 				
-			case R.id.out_space_btn:
-				//TODO add
-				break;
+//			case R.id.out_space_btn:
+//				//TODO add
+//				break;
 		}
 	}
 	

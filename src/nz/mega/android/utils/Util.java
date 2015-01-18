@@ -5,11 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -745,6 +748,24 @@ public class Util {
 		
 		return photoSyncName;
 	}
+	
+	public static String getLocalIpAddress()
+	  {
+	          try {
+	              for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	                  NetworkInterface intf = en.nextElement();
+	                  for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	                      InetAddress inetAddress = enumIpAddr.nextElement();
+	                      if (!inetAddress.isLoopbackAddress()) {
+	                          return inetAddress.getHostAddress().toString();
+	                      }
+	                  }
+	              }
+	          } catch (Exception ex) {
+	              log("Error IP Address: " + ex.toString());
+	          }
+	          return null;
+	      }
 
 	private static void log(String message) {
 		log("Util", message);

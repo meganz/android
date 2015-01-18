@@ -369,6 +369,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    float scaleH = Util.getScaleH(outMetrics, density);
 	    
 		if (dbH.getCredentials() == null){
+			
+			if (OldPreferences.getOldCredentials(this) != null){
+	    		Intent loginWithOldCredentials = new Intent(this, LoginActivity.class);
+	    		startActivity(loginWithOldCredentials);
+	    		finish();
+	    		return;
+		    }
+			
 			Intent newIntent = getIntent();
 		    
 		    if (newIntent != null){
@@ -6532,9 +6540,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		pF.payMonth();		
 	}
 	
-	public int getUsedPerc()
-	{
-		usedPerc=96;
-		return usedPerc;
-	}
+//	public int getUsedPerc()
+//	{
+//		usedPerc=96;
+//		return usedPerc;
+//	}
 }

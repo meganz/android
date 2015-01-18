@@ -315,8 +315,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
-		log("reconnect");
-		megaApi.reconnect();
+		if (app.getLocalIpAddress() == null){
+			app.setLocalIpAddress(Util.getLocalIpAddress());
+		}
+		else{
+			if (app.getLocalIpAddress().compareTo("") == 0){
+				app.setLocalIpAddress(Util.getLocalIpAddress());
+			}
+			else{
+				if (app.getLocalIpAddress().compareTo(Util.getLocalIpAddress()) != 0){
+					app.setLocalIpAddress(Util.getLocalIpAddress());
+					
+					if (megaApi.getRootNode() != null){
+						log("reconnect");
+						megaApi.reconnect();
+					}
+				}
+			}
+		}
 		
 		int result = shouldRun();
 		if (result != 0){
