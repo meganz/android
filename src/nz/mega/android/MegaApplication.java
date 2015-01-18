@@ -16,6 +16,7 @@ public class MegaApplication extends Application
 	static final String USER_AGENT = "MEGA Android/2.0 BETA";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
+	String localIpAddress = "";
 	
 	@Override
 	public void onCreate() {
@@ -76,6 +77,14 @@ public class MegaApplication extends Application
 		}
 		
 		return megaApi;
+	}
+	
+	public String getLocalIpAddress(){
+		return localIpAddress;
+	}
+	
+	public void setLocalIpAddress(String ip){
+		localIpAddress = ip;
 	}
 	
 	public static void log(String message) {

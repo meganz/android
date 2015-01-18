@@ -416,6 +416,27 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 				}
 			}
 		}
+		else{
+			if (OldPreferences.getOldCredentials(this) != null){
+				loginLogin.setVisibility(View.GONE);
+				loginDelimiter.setVisibility(View.GONE);
+				loginCreateAccount.setVisibility(View.GONE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
+				loginLoggingIn.setVisibility(View.VISIBLE);
+				generatingKeysText.setVisibility(View.VISIBLE);
+				loginProgressBar.setVisibility(View.VISIBLE);
+				loginFetchNodesProgressBar.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.VISIBLE);
+				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
+				
+				OldUserCredentials oldCredentials = OldPreferences.getOldCredentials(this);
+				lastEmail = oldCredentials.getEmail();
+				OldPreferences.clearCredentials(this);
+				onKeysGeneratedLogin(oldCredentials.getPrivateKey(), oldCredentials.getPublicKey());
+			}
+		}
 	}
 	
 	@Override
