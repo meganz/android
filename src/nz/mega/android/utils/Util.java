@@ -590,23 +590,25 @@ public class Util {
 	}
 	
 	public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
-		if (f.isDirectory()) {
-			for (File c : f.listFiles()){
-				deleteFolderAndSubfolders(context, c);
+		if (f != null){
+			if (f.isDirectory()) {
+				for (File c : f.listFiles()){
+					deleteFolderAndSubfolders(context, c);
+				}
 			}
-		}
-		
-		if (!f.delete()){
-			throw new FileNotFoundException("Failed to delete file: " + f);
-		}
-		else{
 			
-			Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-			File fileToDelete = new File(f.getAbsolutePath());
-		    Uri contentUri = Uri.fromFile(fileToDelete);
-		    mediaScanIntent.setData(contentUri);
-		    context.sendBroadcast(mediaScanIntent);
-	    
+			if (!f.delete()){
+				throw new FileNotFoundException("Failed to delete file: " + f);
+			}
+			else{
+				
+				Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+				File fileToDelete = new File(f.getAbsolutePath());
+			    Uri contentUri = Uri.fromFile(fileToDelete);
+			    mediaScanIntent.setData(contentUri);
+			    context.sendBroadcast(mediaScanIntent);
+		    
+			}
 		}
 	}
 	
