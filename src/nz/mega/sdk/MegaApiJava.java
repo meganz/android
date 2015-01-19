@@ -935,6 +935,11 @@ public class MegaApiJava
 	{
 		megaApi.copyNode(node, newParent, createDelegateRequestListener(listener));
 	}
+	
+	public void copyNode(MegaNode node, MegaNode newParent, String newName, MegaRequestListenerInterface listener)
+	{
+		megaApi.copyNode(node, newParent, newName, createDelegateRequestListener(listener));
+	}
 
 	/**
      * Copy a node in the MEGA account
@@ -2631,6 +2636,11 @@ public class MegaApiJava
 	    return megaApi.getNodeByFingerprint(fingerprint);
 	}
 
+	public MegaNode getNodeByFingerprint(String fingerprint, MegaNode preferredParent) 
+	{
+	    return megaApi.getNodeByFingerprint(fingerprint, preferredParent);
+	}
+	
 	/**
      * Check if the account already has a node with the provided fingerprint
      *
