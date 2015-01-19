@@ -105,6 +105,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	TableLayout filePropertiesLayout;
 	LinearLayout titleLayout;	
 	
+	boolean owner= true;
+	
 //	RelativeLayout sharedWith;
 //	TableLayout contactTable;	
 //	TableLayout sharedLayout;
@@ -412,13 +414,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						}
 						else{	
 							
+							owner = false;
 							//If I am not the owner
 							permissionLabel.setVisibility(View.VISIBLE);
 							permissionInfo.setVisibility(View.VISIBLE);
 							
 							int accessLevel= megaApi.getAccess(node);
 							log("Node: "+node.getName());
-							
+																					
 							switch(accessLevel){
 								case MegaShare.ACCESS_FULL:{
 									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));	
@@ -580,6 +583,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					else{	
 						
 						//If I am not the owner
+						owner = false;
 						permissionLabel.setVisibility(View.VISIBLE);
 						permissionInfo.setVisibility(View.VISIBLE);
 						
@@ -764,24 +768,45 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		if (isChecked){
-			availableOfflineBoolean = false;
-			availableSwitchOffline.setVisibility(View.GONE);
-			availableSwitchOnline.setVisibility(View.VISIBLE);
-			availableSwitchOffline.setChecked(false);	
-			mOffDelete = dbH.findByHandle(node.getHandle());
-			removeOffline(mOffDelete);			
-			supportInvalidateOptionsMenu();
+		if(owner){
+			if (isChecked){
+				availableOfflineBoolean = false;
+				availableSwitchOffline.setVisibility(View.GONE);
+				availableSwitchOnline.setVisibility(View.VISIBLE);
+				availableSwitchOffline.setChecked(false);	
+				mOffDelete = dbH.findByHandle(node.getHandle());
+				removeOffline(mOffDelete);			
+				supportInvalidateOptionsMenu();
+			}
+			else{	
+										
+				availableOfflineBoolean = true;
+				availableSwitchOffline.setVisibility(View.VISIBLE);
+				availableSwitchOnline.setVisibility(View.GONE);
+				availableSwitchOnline.setChecked(true);			
+				saveOffline();
+				supportInvalidateOptionsMenu();
+			}	
 		}
-		else{	
-									
-			availableOfflineBoolean = true;
-			availableSwitchOffline.setVisibility(View.VISIBLE);
-			availableSwitchOnline.setVisibility(View.GONE);
-			availableSwitchOnline.setChecked(true);			
-			saveOffline();
-			supportInvalidateOptionsMenu();
-		}		
+		else{
+
+			if (isChecked){
+				availableOfflineBoolean = false;
+				availableSwitchOffline.setVisibility(View.GONE);
+				availableSwitchOnline.setVisibility(View.VISIBLE);
+				availableSwitchOffline.setChecked(false);	
+				supportInvalidateOptionsMenu();
+			}
+			else{	
+										
+				availableOfflineBoolean = false;
+				availableSwitchOffline.setVisibility(View.GONE);
+				availableSwitchOnline.setVisibility(View.VISIBLE);
+				availableSwitchOffline.setChecked(false);	
+				Toast.makeText(getApplicationContext(), "Incoming shares cannot be stored offline yet", Toast.LENGTH_SHORT).show();
+				supportInvalidateOptionsMenu();
+			}
+		}
 	}
 	
 	public void saveOffline (){
@@ -2087,6 +2112,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					else{	
 						
 						//If I am not the owner
+						owner = false;
 						permissionLabel.setVisibility(View.VISIBLE);
 						permissionInfo.setVisibility(View.VISIBLE);
 						
