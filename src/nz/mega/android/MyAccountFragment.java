@@ -402,7 +402,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 						
 				long totalStorage = accountInfo.getStorageMax();
 				long usedStorage = accountInfo.getStorageUsed();				
-							
+				boolean totalGb = false;
+				
 				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 				String total = "";
 				if (totalStorage >= 1024){
@@ -411,16 +412,24 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				}
 				else{
 					 total = total + totalStorage + " GB";
+					 totalGb = true;
 				}
 
 				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
 				String used = "";
-				if (usedStorage >= 1024){
-					usedStorage = usedStorage / 1024;
-					used = used + usedStorage + " TB";
+				if(totalGb){
+					
+					used = used + usedStorage + " GB";
+					
 				}
 				else{
-					used = used + usedStorage + " GB";
+					if (usedStorage >= 1024){
+						usedStorage = usedStorage / 1024;
+						used = used + usedStorage + " TB";
+					}
+					else{
+						used = used + usedStorage + " GB";
+					}
 				}
 				
 		        String usedSpaceString = getString(R.string.used_space, used, total);

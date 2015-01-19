@@ -64,7 +64,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	Button rightUploadButton;
 	TextView contentText;
 	MegaApiAndroid megaApi;
-		
+	LinearLayout outSpaceLayout=null;
 	long parentHandle = -1;
 	int deepBrowserTree = 0;
 	boolean isList = true;
@@ -277,7 +277,9 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
-						
+				
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+			outSpaceLayout.setVisibility(View.GONE);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
 			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	

@@ -4089,6 +4089,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				
 				long totalStorage = accountInfo.getStorageMax();
 				long usedStorage = accountInfo.getStorageUsed();
+				boolean totalGb = false;
 				
 				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
 				String total = "";
@@ -4098,19 +4099,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				else{
 					 total = total + totalStorage + " GB";
+					 totalGb = true;
 				}
 
 				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
 				String used = "";
-				if (usedStorage >= 1024){
-					usedStorage = usedStorage / 1024;
-					used = used + usedStorage + " TB";
+				if(totalGb){
+					
+					used = used + usedStorage + " GB";
+					
 				}
 				else{
-					used = used + usedStorage + " GB";
+					if (usedStorage >= 1024){
+						usedStorage = usedStorage / 1024;
+						used = used + usedStorage + " TB";
+					}
+					else{
+						used = used + usedStorage + " GB";
+					}
 				}
-				
-		        String usedSpaceString = getString(R.string.used_space, used, total);
+		      
+				String usedSpaceString = getString(R.string.used_space, used, total);
 		        usedSpace.setText(usedSpaceString);
 		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
 		        
@@ -4142,7 +4151,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 4, used.length() + 4 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        usedSpace.setText(wordtoSpan);	  
+		        usedSpace.setText(wordtoSpan);	
+		        
+		        log("onRequest TYPE_ACCOUNT_DETAILS: "+usedPerc);
+
+		        if(drawerItem==DrawerItem.CLOUD_DRIVE){
+		        	if (usedPerc > 95){
+		        		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+						ft.detach(fbF);
+						ft.attach(fbF);
+						ft.commit();
+		        	}
+		        }
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
@@ -6540,9 +6560,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		pF.payMonth();		
 	}
 	
-//	public int getUsedPerc()
-//	{
-//		usedPerc=96;
-//		return usedPerc;
-//	}
+	public int getUsedPerc()
+	{
+		return usedPerc;
+	}
+	
+	public void upgradeAccountButton(){
+		drawerItem = DrawerItem.ACCOUNT;
+    	showUpAF();
+	}
+
 }

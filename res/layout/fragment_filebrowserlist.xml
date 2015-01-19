@@ -62,7 +62,7 @@
              android:text="@string/general_upload" />
       </LinearLayout>    
       
- <!--      <LinearLayout
+      <LinearLayout
          android:id="@+id/out_space"
     	 android:layout_width="fill_parent"
     	 android:layout_height="wrap_content"
@@ -93,18 +93,8 @@
             android:background="@drawable/btn_default_holo_light_without_corners"
             android:textColor="@color/button_text"
             android:text="@string/my_account_upgrade_pro" />
-      </LinearLayout>    
-      
-      <ListView
-        android:id="@+id/file_list_view_browser"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:choiceMode="multipleChoice"
-        android:layout_below="@id/content_text"
-        android:layout_above="@id/out_space">
-    </ListView>
-	 -->
-	 
+     </LinearLayout>          
+		 
 	 <ListView
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"

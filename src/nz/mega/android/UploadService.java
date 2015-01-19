@@ -236,7 +236,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				}
 				case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER:{
 					log("CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
-					Toast.makeText(getApplicationContext(), file.getName() + " already uploaded in folder " + megaApi.getNodeByHandle(parentHandle).getName(), Toast.LENGTH_SHORT).show();
+					String sShow=file.getName() + " " + getString(R.string.general_already_uploaded);					
+					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
 					
 					if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0)){
 						successCount = transfersOK.size();

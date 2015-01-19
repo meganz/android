@@ -23,6 +23,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -36,6 +37,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -66,16 +69,21 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	Button leftNewFolder;
 	Button rightUploadButton;
 	TextView contentText;
-//	LinearLayout outSpaceLayout=null;
-//	TextView outSpaceText;
-//	Button outSpaceButton;
-//	int usedSpacePerc;
+	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	Button outSpaceButton;
+	int usedSpacePerc;
 	
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
 	boolean isList = true;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	ArrayList<MegaNode> nodes;
 	
@@ -260,6 +268,14 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			return null;
 		}
 		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
+		
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
 			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
@@ -300,9 +316,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			
-//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-//			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-//			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
@@ -311,26 +327,45 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
 			
-//			outSpaceButton.setOnClickListener(this);
+			outSpaceButton.setOnClickListener(this);
 			
-//			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
-//			if(usedSpacePerc>95){
-//				//Change below of ListView
-//				buttonsLayout.setVisibility(View.GONE);				
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+				buttonsLayout.setVisibility(View.GONE);				
 //				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 //				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
 //				listView.setLayoutParams(p);
-//				outSpaceLayout.setVisibility(View.VISIBLE);
-//			}
-//			else{
-//				//Hide the Layout				
-//				outSpaceLayout.setVisibility(View.GONE);
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//				listView.setLayoutParams(p);
-//			}
-//			outSpaceText.setText(R.string.warning_out_space);	
-			
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						outSpaceLayout.bringToFront();
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+			}
+
 			
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
@@ -482,6 +517,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
         aB = ((ActionBarActivity)activity).getSupportActionBar();
     }
 	
+	public void showAlertStorage(){
+		log("showAlertStorage "+usedSpacePerc);
+		
+		usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+		log("PERCENTA: "+usedSpacePerc);
+				
+	}
 	
 	
 	
@@ -502,11 +544,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				
 			case R.id.btnRight_grid_upload:
 				((ManagerActivity)getActivity()).uploadFile();
+				break;				
+
+			case R.id.out_space_btn:
+				((ManagerActivity)getActivity()).upgradeAccountButton();
 				break;
-				
-//			case R.id.out_space_btn:
-//				//TODO add
-//				break;
 		}
 	}
 	
