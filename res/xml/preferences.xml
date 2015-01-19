@@ -62,6 +62,11 @@
         android:textColor="@color/pressed_mega">
 		
         <Preference
+            android:key="settings_about_sdk_version"
+        	android:title="@string/settings_about_sdk_version"
+        	android:summary="@string/sdk_version" />
+		
+        <Preference
             android:key="settings_about_app_version"
         	android:title="@string/settings_about_app_version"
         	android:summary="@string/app_version" />
