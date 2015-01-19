@@ -325,12 +325,16 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				if (app.getLocalIpAddress() != null){
-					if (app.getLocalIpAddress().compareTo(Util.getLocalIpAddress()) != 0){
-						app.setLocalIpAddress(Util.getLocalIpAddress());
-						
-						if (megaApi.getRootNode() != null){
-							log("reconnect");
-							megaApi.reconnect();
+					if (Util.getLocalIpAddress() != null){
+						if (app.getLocalIpAddress().compareTo(Util.getLocalIpAddress()) != 0){
+							app.setLocalIpAddress(Util.getLocalIpAddress());
+							
+							if (megaApi.getRootNode() != null){
+								if (Util.isOnline(this)){
+									log("reconnect");
+									megaApi.reconnect();
+								}
+							}
 						}
 					}
 				}
@@ -1083,7 +1087,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				ArrayList<MegaNode> nLAfter = megaApi.getChildren(megaApi.getNodeByHandle(cameraUploadHandle), MegaApiJava.ORDER_ALPHABETICAL_ASC);
 				log("SIZEEEEEE: " + nLAfter.size());
-				waitForOnNodesUpdate = true;
+				uploadNextImage();
 			}
 			else{
 				log("Image Sync FAIL: " + transfer.getFileName());

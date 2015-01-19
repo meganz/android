@@ -23,7 +23,7 @@ public class MegaApplication extends Application
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_INFO);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
 		
 		
 //		new MegaTest(getMegaApi()).start();
