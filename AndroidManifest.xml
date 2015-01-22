@@ -197,7 +197,6 @@
         <activity
             android:name="FolderLinkActivity"
             android:label="@string/app_name"
-            android:uiOptions="splitActionBarWhenNarrow"
             android:screenOrientation="portrait" >
         </activity>
         

@@ -359,6 +359,9 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			buttonsLayout.setVisibility(View.GONE);
 			leftNewFolder.setVisibility(View.GONE);
 			rightUploadButton.setVisibility(View.GONE);
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
+			outSpaceLayout.setVisibility(View.GONE);
 	        
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);

@@ -393,6 +393,9 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			rightUploadButton.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
 	        
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
+			outSpaceLayout.setVisibility(View.GONE);
+			
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserGridAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
 				if (mTHash != null){
