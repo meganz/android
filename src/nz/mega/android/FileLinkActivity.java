@@ -322,6 +322,33 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 	}
 	
 	void downloadNode(){
+		
+		if (document == null){
+			try{ 
+				AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_file_not_found), null);
+				dialogBuilder.setPositiveButton(
+					getString(android.R.string.ok),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							Intent backIntent = new Intent(fileLinkActivity, ManagerActivity.class);
+			    			startActivity(backIntent);
+			    			finish();
+						}
+					});
+								
+				AlertDialog dialog = dialogBuilder.create();
+				dialog.show(); 
+				Util.brandAlertDialog(dialog);
+			}
+			catch(Exception ex){
+				Util.showToast(this, getString(R.string.general_error_file_not_found)); 
+			}
+			
+			return;
+		}
+		
 		long[] hashes = new long[1];
 		hashes[0]=document.getHandle();
 		long size = document.getSize();
