@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
+import nz.mega.android.ManagerActivity.DrawerItem;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -49,6 +50,7 @@ import android.widget.Toast;
 public class FolderLinkActivity extends PinActivity implements MegaRequestListenerInterface, OnItemClickListener, OnItemLongClickListener{
 	
 	FolderLinkActivity folderLinkActivity = this;
+	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	
 	ActionBar aB;
@@ -67,6 +69,9 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	MegaBrowserListAdapter adapterList;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	
+	private MenuItem downloadFolderMenuItem;
+	private MenuItem importFolderMenuItem;
 	
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -136,6 +141,52 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		}
 		
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenu");
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.folder_link_action, menu);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		
+		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
+		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
+		
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
+		// Handle presses on the action bar items
+	    switch (item.getItemId()) {
+		    case R.id.action_import_folder:{
+		    	//TODO
+		    	return true;
+		    }
+	        case R.id.action_download_folder:{
+	        	//TODO        	
+	        	
+	        	MegaNode rootNode = megaApiFolder.getRootNode();	        	
+	        	onFolderClick(rootNode.getHandle(),rootNode.getSize());	        	
+	        	return true;
+	        
+	        }
+	        default:{
+	            return super.onOptionsItemSelected(item);
+            }
+	    }
+//		return false;
+    }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +209,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
+		megaApi = app.getMegaApi();
 		
 		setContentView(R.layout.fragment_filebrowserlist);
 		
@@ -257,7 +309,50 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		}
 	}
 	
+	public void onFolderClick(long handle, long size){
+		log("onFolderClick");
+		
+		long[] hashes = new long[1];
+		
+		hashes[0] = handle;		
+		
+		if (dbH == null){
+//			dbH = new DatabaseHandler(getApplicationContext());
+			dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		}
+		
+		boolean askMe = true;
+		String downloadLocationDefaultPath = "";
+		prefs = dbH.getPreferences();		
+		if (prefs != null){
+			if (prefs.getStorageAskAlways() != null){
+				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					if (prefs.getStorageDownloadLocation() != null){
+						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
+							askMe = false;
+							downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+						}
+					}
+				}
+			}
+		}		
+			
+		if (askMe){
+			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+			intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
+			intent.setClass(this, FileStorageActivity.class);
+			intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
+			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+		}
+		else{
+			downloadTo(downloadLocationDefaultPath, null, size, hashes);
+		}
+	}
+	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
+		log("downloadTo");
+		
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);
@@ -307,6 +402,38 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 						}								
 						return;
 					}
+				}
+				else{
+					
+					MegaNode node = megaApiFolder.getNodeByHandle(hashes[0]);
+					if(node != null){
+						Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+						if (node.getType() == MegaNode.TYPE_FOLDER) {
+							getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+						} else {
+							dlFiles.put(node, parentPath);
+						}
+						
+						for (MegaNode document : dlFiles.keySet()) {
+							
+							String path = dlFiles.get(document);
+							
+							if(availableFreeSpace < document.getSize()){
+								Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+								continue;
+							}
+							
+							log("EXTRA_HASH: " + document.getHandle());
+							Intent service = new Intent(this, DownloadService.class);
+							service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+							service.putExtra(DownloadService.EXTRA_URL, url);
+							service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+							service.putExtra(DownloadService.EXTRA_PATH, path);
+							service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
+							startService(service);
+						}
+					}
+					
 				}
 			}
 			
