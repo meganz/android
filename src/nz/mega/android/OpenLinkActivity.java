@@ -16,6 +16,7 @@ public class OpenLinkActivity extends PinActivity {
 	MegaApplication app;
 	MegaApiAndroid megaApi;
 	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -48,13 +49,7 @@ public class OpenLinkActivity extends PinActivity {
 			openFileIntent.setData(Uri.parse(url));
 			startActivity(openFileIntent);
 			finish();
-//			
-//			Intent errorIntent = new Intent(this, ManagerActivity.class);
-//			errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//			startActivity(errorIntent);
-//			finish();			
-//			Toast toast = Toast.makeText(getApplicationContext(), "File link (not implemented yet)", Toast.LENGTH_LONG);
-//			toast.show();
+
 			return;
 		}
 		

@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -191,6 +193,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem searchMenuItem;
 	
 	private MenuItem createFolderMenuItem;
+	private MenuItem importLinkMenuItem;
 	private MenuItem addMenuItem;
 	private MenuItem pauseRestartTransfersItem;
 	private MenuItem refreshMenuItem;
@@ -1157,69 +1160,58 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	}
     }
     
-    /*
-	 * Open MEGA link from intent from another app
-	 */
-	private void handleOpenLinkIntent(Intent intent) {
-		log("handleOpenLinkIntent");
-		final String url = intent.getDataString();
-		log("url: " + url);
-
-		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
-			importLink(url);
-			intent.setData(null);
-		}
-	}
-	
 	/*
 	 * Show Import Dialog
 	 */
-	private void importLink(final String url) {
-		log("importLink");
-		this.urlLink = url;
-		String[] parts = parseDownloadUrl(url);
-		if (parts == null) {
-			if (url != null && url.matches("^https://mega.co.nz/#F!.+$")){
-				Util.showErrorAlertDialog("importLink: Folder links not yet implemented", false, this);
-			}
-			else{
-				Util.showErrorAlertDialog(getString(R.string.manager_download_from_link_incorrect), false, this);
-			}
-			return;
-		}
+	private void importLink(String url) {
 		
-		if(!Util.isOnline(this))
-		{
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),
-					false, this);
-			return;
-		}
-
-		if(this.isFinishing()) return;
-		
-		ProgressDialog temp = null;
 		try {
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.general_loading));
-			temp.show();
+			url = URLDecoder.decode(url, "UTF-8");
+		} 
+		catch (UnsupportedEncodingException e) {}
+		url.replace(' ', '+');
+		if(url.startsWith("mega://")){
+			url = url.replace("mega://", "https://mega.co.nz/");
 		}
-		catch(Exception ex)
-		{ return; }
 		
-		statusDialog = temp;
+		log("url " + url);
 		
-		megaApi.getPublicNode(url, this);
+		// Download link
+		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
+			log("open link url");
+			
+//			Intent openIntent = new Intent(this, ManagerActivity.class);
+			Intent openFileIntent = new Intent(this, FileLinkActivity.class);
+			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openFileIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_LINK);
+			openFileIntent.setData(Uri.parse(url));
+			startActivity(openFileIntent);
+//			finish();
+			return;
+		}
+		
+		// Folder Download link
+		else if (url != null && url.matches("^https://mega.co.nz/#F!.+$")) {
+			log("folder link url");
+			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
+			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			openFolderIntent.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+			openFolderIntent.setData(Uri.parse(url));
+			startActivity(openFolderIntent);
+//			finish();
+			return;
+		}
+		else{
+			log("wrong url");
+			Intent errorIntent = new Intent(this, ManagerActivity.class);
+			errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(errorIntent);
+		}
+		
+
+
 	}
 	
-	
-//	public void onCreate(Bundle savedInstanceState) {
-//		super.onCreate(savedInstanceState);
-//		setContentView(R.layout.main);
-//		mTabHostContacts = (TabHost) findViewById(android.R.id.tabhost);
-//		setupTab(new TextView(this), "Tab 1");
-//		setupTab(new TextView(this), "Tab 2");
-//		setupTab(new TextView(this), "Tab 3");
-//	}
 	
 	/*
 	 * Check MEGA url and parse if valid
@@ -2261,6 +2253,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		addMenuItem = menu.findItem(R.id.action_add);
 		pauseRestartTransfersItem = menu.findItem(R.id.action_pause_restart_transfers);
 		createFolderMenuItem = menu.findItem(R.id.action_new_folder);
+		importLinkMenuItem = menu.findItem(R.id.action_import_link);
 		selectMenuItem = menu.findItem(R.id.action_select);
 		unSelectMenuItem = menu.findItem(R.id.action_unselect);
 		thumbViewMenuItem= menu.findItem(R.id.action_grid);
@@ -2292,7 +2285,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				helpMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
-				
+    			importLinkMenuItem.setVisible(true);
+    			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
     			addContactMenuItem.setVisible(false);    			
@@ -2340,6 +2334,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			removeMK.setVisible(false); 
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
+	    			importLinkMenuItem.setVisible(false);
 	    			
 	    			if (isListContacts){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2372,6 +2367,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			importLinkMenuItem.setVisible(false);
 			}
 		}
 		
@@ -2397,6 +2393,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
+    			importLinkMenuItem.setVisible(false);
     			
     			if (isListRubbishBin){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2438,6 +2435,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
+    			importLinkMenuItem.setVisible(false);
     		}
 		}
 		
@@ -2467,6 +2465,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			changePass.setVisible(false); 
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
+    			importLinkMenuItem.setVisible(false);
     		}
 		}
 		
@@ -2493,6 +2492,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			createFolderMenuItem.setEnabled(false);
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			importLinkMenuItem.setVisible(false);
     			
     			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
     			log("Export in: "+path);
@@ -2531,6 +2531,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			importLinkMenuItem.setVisible(false);
     			
 //    			if (downloadPlay){
 //    				addMenuItem.setIcon(R.drawable.ic_pause);
@@ -2570,6 +2571,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			importLinkMenuItem.setVisible(false);
     			
     			if (isListOffline){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2608,6 +2610,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setEnabled(false);
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
+	    			importLinkMenuItem.setVisible(false);
 				}
 			}
 		}
@@ -2637,6 +2640,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
+    			importLinkMenuItem.setVisible(false);
 
     			if (isListCameraUpload){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2717,6 +2721,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    			}
 		    		}
 				}
+		    	return true;
+		    }
+		    case R.id.action_import_link:{
+		    	showImportLinkDialog();
 		    	return true;
 		    }
 	        case R.id.action_search:{
@@ -5215,6 +5223,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				return false;
 			}
 		});
+	}
+	
+	public void showImportLinkDialog(){
+		log("showRenameDialog");
+		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+		input.setImeActionLabel(getString(R.string.context_import_link_title),KeyEvent.KEYCODE_ENTER);
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_import_link), null, input);
+		builder.setPositiveButton(getString(R.string.context_import_link),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						importLink(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		renameDialog = builder.create();
+		renameDialog.show();		
 	}
 	
 	private void rename(MegaNode document, String newName){

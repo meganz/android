@@ -57,12 +57,13 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
+	TextView contentText;
 	
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
 	
 	LinearLayout outSpaceLayout=null;
-	
+	LinearLayout buttonsLayout=null;
 	MegaBrowserListAdapter adapterList;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -171,6 +172,12 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 
 		outSpaceLayout = (LinearLayout) findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
+		
+		buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
+		buttonsLayout.setVisibility(View.GONE);	
+		
+		contentText = (TextView) findViewById(R.id.content_text);
+		contentText.setVisibility(View.GONE);
 		
 		Intent intent = getIntent();
     	

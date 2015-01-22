@@ -53,6 +53,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload&#8230;</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
+    <string name="action_import_link" context="Menu item">Import link</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
@@ -224,6 +225,8 @@
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Rename</string>
+    <string name="context_import_link" context="Item menu option upon right click on one or multiple files.">Import</string>
+    <string name="context_import_link_title" context="Item menu option upon right click on one or multiple files.">Import link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Move</string>
