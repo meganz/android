@@ -38,6 +38,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 	TextView emptyTextView;
 	TextView contentText;
 	LinearLayout buttonsLayout;
+	LinearLayout outSpaceLayout=null;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -77,6 +78,9 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		contentText.setVisibility(View.GONE);
 		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 		buttonsLayout.setVisibility(View.GONE);
+		
+		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+		outSpaceLayout.setVisibility(View.GONE);
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);

@@ -65,7 +65,9 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 	Button leftNewFolder;
 	Button rightUploadButton;
 	TextView contentText;
-//	LinearLayout outSpaceLayout=null;
+
+	LinearLayout outSpaceLayout=null;
+
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
@@ -275,8 +277,9 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			buttonsLayout.setVisibility(View.GONE);
 			leftNewFolder.setVisibility(View.GONE);
 			rightUploadButton.setVisibility(View.GONE);
-//			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-//			outSpaceLayout.setVisibility(View.GONE);
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+			outSpaceLayout.setVisibility(View.GONE);
+
 			
 			if (adapterList == null){
 				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.OUTGOING_SHARES_ADAPTER);
