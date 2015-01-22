@@ -81,7 +81,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	MegaPhotoSyncListAdapter adapterList;
 	MegaPhotoSyncGridAdapter adapterGrid;
 	CameraUploadFragment fileBrowserFragment = this;
-	
+	LinearLayout outSpaceLayout=null;
 	MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
@@ -382,6 +382,9 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			
 			contentText.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+			outSpaceLayout.setVisibility(View.GONE);
 			
 			listView = (ListView) v.findViewById(R.id.file_list_view_browser);
 			listView.setOnItemClickListener(this);

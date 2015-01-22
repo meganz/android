@@ -40,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +60,8 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
+	
+	LinearLayout outSpaceLayout=null;
 	
 	MegaBrowserListAdapter adapterList;
 	
@@ -166,6 +169,9 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
 
+		outSpaceLayout = (LinearLayout) findViewById(R.id.out_space);
+		outSpaceLayout.setVisibility(View.GONE);
+		
 		Intent intent = getIntent();
     	
     	if (intent != null) {
