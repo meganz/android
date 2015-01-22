@@ -289,7 +289,8 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 	}
 
 	@Override
-	public void onClick(View v) {
+	public void onClick(View v) {		
+		log("onClick");
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
 				if (mode == Mode.PICK_FOLDER) {
@@ -337,6 +338,15 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 		}
 		
 	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+	        // do nothing
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	} 
 
 	@Override
 	public void onItemCheckClick(int position) {
