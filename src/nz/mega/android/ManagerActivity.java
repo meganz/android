@@ -59,6 +59,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -169,6 +170,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
+	public static int TAKE_PHOTO_CODE = 0;
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -210,6 +212,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem changePass;
 	private MenuItem exportMK;
 	private MenuItem removeMK;
+	private MenuItem takePicture;
 	
 	public int accountFragment;
 	
@@ -2270,6 +2273,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
 		removeMK = menu.findItem(R.id.action_menu_remove_MK);
 		
+		takePicture = menu.findItem(R.id.action_take_picture);
+		
 //		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		if (fbF != null){
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -2286,6 +2291,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			importLinkMenuItem.setVisible(true);
+    			takePicture.setVisible(true);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -2335,6 +2341,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
 	    			importLinkMenuItem.setVisible(false);
+	    			takePicture.setVisible(false);
 	    			
 	    			if (isListContacts){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2368,6 +2375,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
 			}
 		}
 		
@@ -2394,6 +2402,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
     			
     			if (isListRubbishBin){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2436,6 +2445,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
     		}
 		}
 		
@@ -2466,6 +2476,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			exportMK.setVisible(false); 
     			removeMK.setVisible(false); 
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
     		}
 		}
 		
@@ -2493,6 +2504,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
     			
     			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
     			log("Export in: "+path);
@@ -2532,6 +2544,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
     			
 //    			if (downloadPlay){
 //    				addMenuItem.setIcon(R.drawable.ic_pause);
@@ -2572,6 +2585,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
     			
     			if (isListOffline){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -2611,6 +2625,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
 	    			importLinkMenuItem.setVisible(false);
+	    			takePicture.setVisible(false);
 				}
 			}
 		}
@@ -2623,6 +2638,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
+    			takePicture.setVisible(true);
 
 				//Hide
 				pauseRestartTransfersItem.setVisible(false);
@@ -2725,6 +2741,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    }
 		    case R.id.action_import_link:{
 		    	showImportLinkDialog();
+		    	return true;
+		    }
+		    case R.id.action_take_picture:{
+		    	
+		    	String file = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
+		    	log("new file: "+file);
+	            File newfile = new File(file);
+	            try {
+	                newfile.createNewFile();
+	            } catch (IOException e) {}       
+
+	            Uri outputFileUri = Uri.fromFile(newfile);
+
+	            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); 
+	            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+	            startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
 		    	return true;
 		    }
 	        case R.id.action_search:{
@@ -5692,6 +5725,34 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}
+		else if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK){
+			log("Tengo la foto tomada");
+						
+			Intent intentPicture = new Intent(this, SecureSelfiePreviewActivity.class);			
+			startActivity(intentPicture);
+			
+//			InputStream stream = null;
+//	        try {
+//	          // recyle unused bitmaps
+//	          if (bitmap != null) {
+//	            bitmap.recycle();
+//	          }
+//	          stream = getContentResolver().openInputStream(data.getData());
+//	          bitmap = BitmapFactory.decodeStream(stream);
+//
+//	          imageView.setImageBitmap(bitmap);
+//	        } catch (FileNotFoundException e) {
+//	          e.printStackTrace();
+//	        } finally ch (IOException e) {
+//	          e{
+//	          if (stream != null)
+//	            try {
+//	              stream.close();
+//	            } catch (IOException e) {
+//	              e.printStackTrace();
+//	            }
+//	        }
+	    }
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -5752,7 +5813,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						inSF.getListView().invalidateViews();
 					}
 				}
-			}
+			}			
 		}
 	}	
 	

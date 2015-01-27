@@ -118,8 +118,6 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		fullScreenImageViewer = this;
-		
 		
 		handler = new Handler();
 		fullScreenImageViewer = this;

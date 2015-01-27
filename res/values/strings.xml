@@ -347,6 +347,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">All transfers are paused</string>
     <string name="menu_pause_transfers" context="menu item">Pause transfers</string>
     <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
+    <string name="menu_take_picture" context="menu item">Take picture</string>
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</string>
