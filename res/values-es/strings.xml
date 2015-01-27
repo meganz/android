@@ -53,6 +53,7 @@
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
     <string name="action_add" context="Menu item">Subir&#8230;</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
+    <string name="action_open_link" context="Menu item">Abrir link&#8230;</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Subir a</string>
     <string name="action_settings" context="Menu item">Configuración</string>
     <string name="action_search" context="Search button">Buscar</string>
@@ -213,6 +214,8 @@
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Abandonar</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">No compartir</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renombrar</string>
+    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
+    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Abrir link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renombrando</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mover</string>

@@ -126,7 +126,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 			url = intent.getDataString();		
 		}
 		
-		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
 			try{
 				statusDialog.dismiss();
 			}
@@ -191,7 +191,7 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 		if (url == null) {
 			return null;
 		}
-		if (!url.matches("^https://mega.co.nz/#!.*!.*$")) {
+		if (!url.matches("^https://mega.co.nz/#!.*!.*$") && !url.matches("^https://mega.nz/#!.*!.*$")) {
 			return null;
 		}
 		String[] parts = url.split("!");

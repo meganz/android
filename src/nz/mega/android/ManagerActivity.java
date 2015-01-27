@@ -277,6 +277,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     private static int EDIT_TEXT_ID = 1;  
     private AlertDialog renameDialog;
+    private AlertDialog openLinkDialog;
     private AlertDialog newFolderDialog;
     private AlertDialog addContactDialog;
     private AlertDialog clearRubbishBinDialog;
@@ -1180,7 +1181,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("url " + url);
 		
 		// Download link
-		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
 			log("open link url");
 			
 //			Intent openIntent = new Intent(this, ManagerActivity.class);
@@ -1194,7 +1195,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		// Folder Download link
-		else if (url != null && url.matches("^https://mega.co.nz/#F!.+$")) {
+		else if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
 			log("folder link url");
 			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -2291,7 +2292,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			importLinkMenuItem.setVisible(true);
-    			takePicture.setVisible(true);
+    			takePicture.setVisible(false);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -2638,7 +2639,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
-    			takePicture.setVisible(true);
+    			takePicture.setVisible(false);
 
 				//Hide
 				pauseRestartTransfersItem.setVisible(false);
@@ -5260,26 +5261,52 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void showImportLinkDialog(){
 		log("showRenameDialog");
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
+		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_import_link_title),KeyEvent.KEYCODE_ENTER);
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_import_link), null, input);
-		builder.setPositiveButton(getString(R.string.context_import_link),
+		input.setImeActionLabel(getString(R.string.context_open_link_title),KeyEvent.KEYCODE_ENTER);
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_open_link_title), null, input);
+		builder.setPositiveButton(getString(R.string.context_open_link),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						String value = input.getText().toString().trim();
 						if (value.length() == 0) {
 							return;
 						}
+						
+						try{
+							openLinkDialog.dismiss();
+						}
+						catch(Exception e){}
 						importLink(value);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		renameDialog = builder.create();
-		renameDialog.show();		
+		openLinkDialog = builder.create();
+		openLinkDialog.show();
+		
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					try{
+						openLinkDialog.dismiss();
+					}
+					catch(Exception e){}
+					
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					importLink(value);
+					return true;
+				}
+				return false;
+			}
+		});
 	}
 	
 	private void rename(MegaNode document, String newName){

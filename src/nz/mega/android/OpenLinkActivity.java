@@ -39,7 +39,7 @@ public class OpenLinkActivity extends PinActivity {
 		log("url " + url);
 		
 		// Download link
-		if (url != null && url.matches("^https://mega.co.nz/#!.*!.*$")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#!.*!.*$") || url.matches("^https://mega.nz/#!.*!.*$"))) {
 			log("open link url");
 			
 //			Intent openIntent = new Intent(this, ManagerActivity.class);
@@ -54,7 +54,7 @@ public class OpenLinkActivity extends PinActivity {
 		}
 		
 		// Confirmation link
-		if (url != null && url.matches("^https://mega.co.nz/#confirm.+$")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#confirm.+$") || url.matches("^https://mega.nz/#confirm.+$"))) {
 			log("confirmation url");
 			ManagerActivity.logout(this, app, megaApi, true);
 			Intent confirmIntent = new Intent(this, LoginActivity.class);
@@ -67,7 +67,7 @@ public class OpenLinkActivity extends PinActivity {
 		}
 		
 		// Folder Download link
-		if (url != null && url.matches("^https://mega.co.nz/#F!.+$")) {
+		if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
 			log("folder link url");
 			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
