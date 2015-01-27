@@ -702,7 +702,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
 //					}
 					
-					new LookForRenameTask(media).execute(nodeExists); 
+					new LookForRenameTask(media).rename(nodeExists); 
 				}
 			}
 		}
@@ -712,19 +712,16 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 	}
 	
-	private class LookForRenameTask extends AsyncTask<MegaNode, Void, Boolean> {
+	private class LookForRenameTask{
 
 		Media media;
-		MegaNode nodeExists;
 		String photoFinalName;
 		
 		public LookForRenameTask(Media media) {
 			this.media = media;
 		}
 		
-		@Override
-		protected Boolean doInBackground(MegaNode... args) {
-			this.nodeExists = args[0];
+		protected Boolean rename(MegaNode nodeExists) {
 			File file = new File(media.filePath);
 			log("RENOMBRAR EL FICHERO: " + media.filePath);
 			Calendar cal = Calendar.getInstance();
@@ -752,17 +749,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("photoFinalName: " + photoFinalName + "______" + photoIndex);
 				currentTimeStamp = media.timestamp;
 				
+				megaApi.renameNode(nodeExists, photoFinalName, cameraSyncService);
+				
 				return true;
-			}
-			else{
-				return false;	
-			}
-		}
-		
-		@Override
-		protected void onPostExecute(Boolean shouldRename) {
-			if(shouldRename){
-				megaApi.renameNode(nodeExists, photoFinalName, cameraSyncService);				
 			}
 			else{
 				currentTimeStamp = media.timestamp;
@@ -770,9 +759,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				File f = new File(media.filePath);
 				totalSizeUploaded += f.length();
 				uploadNextImage();
+				
+				return false;	
 			}
 		}
-		
 	}
 	
 	void registerObservers(){
