@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Felhasználó fiúk létrehozása</string>
     <string name="name_text" context="Name of the user">név</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Egyetértek a MEGA &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;Szolgátatási feltételeivel&lt;/a&gt;</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Egyetértek a MEGA Szolgátatási feltételeivel</string>
     <string name="already_account" context="Does the user already have a MEGA account">Már felhasználónk vagy?</string>
     
     <string name="create_account_no_terms" context="warning dialog">A folytatáshoz el kell fogadnod a Szolgáltatási Feltételeinket.</string>

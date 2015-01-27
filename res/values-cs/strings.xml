@@ -128,7 +128,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Vytvořit účet</string>
     <string name="name_text" context="Name of the user">jméno</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Souhlasím s &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;Podmínkami užívání&lt;/a&gt; MEGA</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Souhlasím s Podmínkami užívání MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">Již máte účet?</string>
     
     <string name="create_account_no_terms" context="warning dialog">Musíte souhlasit s našimi Podmínkami užívání.</string>

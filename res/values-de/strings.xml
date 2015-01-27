@@ -121,7 +121,7 @@
     
     <string name="create_account_text" context="button that allows the user to create an account">Account erstellen</string>
     <string name="name_text" context="Name of the user">Name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Ich stimme MEGA\'s &lt;a href=\"https://mega.co.nz/mobile_privacy.html\"&gt;Allgemeinen Geschäftsbedingungen&lt;/a&gt; zu</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Ich stimme MEGA\'s Allgemeinen Geschäftsbedingungen zu</string>
     <string name="already_account" context="Does the user already have a MEGA account">Haben Sie bereits einen Account?</string>
     
     <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service.</string>

@@ -11,9 +11,11 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
@@ -92,10 +94,12 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 		megaApi = ((MegaApplication) getApplication()).getMegaApi();
 		
 		TextView tos = (TextView)findViewById(R.id.tos);
-		Spanned spanned = Html.fromHtml(getString(R.string.tos));
-		tos.setMovementMethod(LinkMovementMethod.getInstance());
-		tos.setText(spanned);
-		tos.setLinkTextColor(getResources().getColor(R.color.mega));
+		tos.setTextColor(getResources().getColor(R.color.mega));
+//		Spanned spanned = Html.fromHtml(getString(R.string.tos));
+//		tos.setMovementMethod(LinkMovementMethod.getInstance());
+//		tos.setText(spanned);
+//		tos.setLinkTextColor(getResources().getColor(R.color.mega));
+		tos.setOnClickListener(this);
 		
 		bRegister = (Button) findViewById(R.id.button_create_account_create);
 		bLogin = (Button) findViewById(R.id.button_login_create);
@@ -146,13 +150,24 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-		case R.id.button_create_account_create:
-			onCreateAccountClick(v);
-			break;
+			case R.id.button_create_account_create:
+				onCreateAccountClick(v);
+				break;
+				
+			case R.id.button_login_create:
+				onLoginClick(v);
+				break;
 			
-		case R.id.button_login_create:
-			onLoginClick(v);
-			break;
+			case R.id.tos:
+//				Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+//				browserIntent.setComponent(new ComponentName("com.android.browser", "com.android.browser.BrowserActivity"));
+//				browserIntent.setDataAndType(Uri.parse("http://www.google.es"), "text/html");
+//				browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+//				startActivity(browserIntent);
+				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+				viewIntent.setData(Uri.parse("https://mega.co.nz/mobile_privacy.html"));
+				startActivity(viewIntent);
+				break;
 		}		
 	}
 	
