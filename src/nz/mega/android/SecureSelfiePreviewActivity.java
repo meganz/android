@@ -75,6 +75,7 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
     public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
 	public static int REQUEST_CODE_SELECT_COPY_FOLDER = 1002;
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
+	public static int REQUEST_CODE_SELECT_SELFIE_FOLDER = 1005;
 	
 	MegaNode node;
 	
@@ -202,6 +203,10 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 			}
 			case R.id.secure_selfie_viewer_repeat:{
 				//Delete image
+				Intent intent = new Intent(this, ManagerActivity.class);
+				intent.setAction(ManagerActivity.ACTION_TAKE_SELFIE);
+				//intent.putExtra("IMAGE_PATH", imagePath);
+				startActivity(intent);
 				finish();
 				break;
 			}
@@ -214,34 +219,7 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 				File newFile = new File(newPath);
 				imgFile.renameTo(newFile);
 				
-//				Intent uploadServiceIntent = new Intent (this, UploadService.class);
-//				ShareInfo info = ShareInfo.infoFromFile(imgFile);
-//				if (info == null){
-//					continue;
-//				}
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-//				log("EXTRA_FILE_PATH_file:" + info.getFileAbsolutePath());
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_FOLDERPATH, folderPath);
-//				uploadServiceIntent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-//				startService(uploadServiceIntent);
-				
-				
-				
-				
-//				String fileName = "ruta";
-//				File previewFile = new File(fileName);
-//				
-//				if (previewFile.exists()){
-//					Intent share = new Intent(android.content.Intent.ACTION_SEND);
-//					share.setType("image/*");
-//					share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + previewFile));
-//					startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
-//				}
-//				else{
-//					Toast.makeText(this, getString(R.string.full_image_viewer_not_preview), Toast.LENGTH_LONG).show();
-//				}
+				showFileChooser(newPath);		
 				
 				break;
 			}
@@ -249,23 +227,39 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 
 	}
 	
-	public void showFileChooser(ArrayList<Long> handleList){
+	public void showFileChooser(String imagePath){
 		log("showMove");
 		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("MOVE_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+		intent.setAction(FileExplorerActivity.ACTION_UPLOAD_SELFIE);
+		intent.putExtra("IMAGE_PATH", imagePath);
+		//startActivity(intent);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_SELFIE_FOLDER);
 	}
-
+	
 	
 	@Override
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
 
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		log("onActivityResult - FINISH ----------------------------------------------");
+		
+		if (requestCode == REQUEST_CODE_SELECT_SELFIE_FOLDER && resultCode == RESULT_OK) {
+			
+			finish();
+		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+		
+		if(imgFile.exists()){
+			imgFile.delete();
+		}			
+		super.onBackPressed();
 	}
 	
 //	@Override

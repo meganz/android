@@ -74,7 +74,7 @@ public class Util {
 	
 	public static String offlineDIR = "MEGA/MEGA Offline"; 
 	public static String downloadDIR ="MEGA/MEGA Downloads";
-	public static String temporalPicDIR ="MEGA";
+	public static String temporalPicDIR ="MEGA/MEGA Selfies";
 	
 	public static DatabaseHandler dbH;
 	
