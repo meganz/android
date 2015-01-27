@@ -10,6 +10,7 @@ import java.net.NetworkInterface;
 import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -22,6 +23,7 @@ import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaNode;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -750,6 +752,22 @@ public class Util {
 		photoSyncName = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + "_" + photoIndex + "." + extension;
 		
 		return photoSyncName;
+	}
+	
+	public static int getNumberOfNodes (MegaNode parent, MegaApiAndroid megaApi){
+		int numberOfNodes = 0;
+		
+		ArrayList<MegaNode> children = megaApi.getChildren(parent);
+		for (int i=0; i<children.size(); i++){
+			if (children.get(i).isFile()){
+				numberOfNodes++;
+			}
+			else{
+				numberOfNodes = numberOfNodes + getNumberOfNodes(children.get(i), megaApi);
+			}
+		}
+		
+		return numberOfNodes;
 	}
 	
 	public static String getLocalIpAddress()

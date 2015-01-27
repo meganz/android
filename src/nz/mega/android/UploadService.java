@@ -577,17 +577,21 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-				log("onRequestFinish: " + request.getRequestString() + "_" + foldersCreation.get(0).folderName);
+				if (foldersCreation.size() > 0){
+					log("onRequestFinish: " + request.getRequestString() + "_" + foldersCreation.get(0).folderName);
+				}
 				if (e.getErrorCode() == MegaError.API_OK){					
-					long currentNodeHandle = request.getNodeHandle();
-//					MegaNode currentNode = megaApi.getNodeByHandle(currentNodeHandle);
-					
-					FolderCreation fC = foldersCreation.get(0);
-					
-					File localFolder = new File(fC.localPath);
-					
-					UploadTask uploadTask = new UploadTask(currentNodeHandle, localFolder);
-					uploadTask.start();				
+					if (foldersCreation.size() > 0){
+						long currentNodeHandle = request.getNodeHandle();
+	//					MegaNode currentNode = megaApi.getNodeByHandle(currentNodeHandle);
+						
+						FolderCreation fC = foldersCreation.get(0);
+						
+						File localFolder = new File(fC.localPath);
+						
+						UploadTask uploadTask = new UploadTask(currentNodeHandle, localFolder);
+						uploadTask.start();				
+					}
 				}
 			}
 		}
