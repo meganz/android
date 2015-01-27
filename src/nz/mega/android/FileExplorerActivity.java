@@ -1,5 +1,6 @@
 package nz.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
 	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
-		
+	public static String ACTION_UPLOAD_SELFIE = "ACTION_UPLOAD_SELFIE";	
 	/*
 	 * Select modes:
 	 * UPLOAD - pick folder for upload
@@ -53,7 +54,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	 * CAMERA - pick folder for camera sync destination
 	 */
 	private enum Mode {
-		UPLOAD, MOVE, COPY, CAMERA, IMPORT, SELECT;
+		UPLOAD, MOVE, COPY, CAMERA, IMPORT, SELECT,UPLOAD_SELFIE;
 	}
 	
 	private Button uploadButton;
@@ -68,6 +69,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	private long[] moveFromHandles;
 	private long[] copyFromHandles;
 	private String[] selectedContacts;
+	private String imagePath;
 	
 	private boolean folderSelected = false;
 	
@@ -176,6 +178,10 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
 				
 			}
+			else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
+				mode = Mode.UPLOAD_SELFIE;
+				imagePath=intent.getStringExtra("IMAGE_PATH");
+			}
 		}
 		
 		uploadButton = (Button) findViewById(R.id.file_explorer_button);
@@ -203,6 +209,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		else if (mode == Mode.SELECT){
 			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
 		}
+		else if(mode == Mode.UPLOAD_SELFIE){
+			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
+		}
 		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -226,6 +235,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		}
 		else if (mode == Mode.SELECT){
 			uploadButton.setText(getString(R.string.general_select) + " " + folder);
+		}
+		else if(mode == Mode.UPLOAD_SELFIE){
+			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
 		}
 	}
 	
@@ -346,6 +358,28 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					setResult(RESULT_OK, intent);
 					log("finish!");
 					finish();
+				}
+				else if(mode == Mode.UPLOAD_SELFIE){
+				
+					long parentHandle = fe.getParentHandle();
+					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+					if(parentNode == null){
+						parentNode = megaApi.getRootNode();
+					}
+				
+					Intent intent = new Intent(this, UploadService.class);
+					File selfie = new File(imagePath);
+					intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+					intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+					intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+					startService(intent);
+					
+					Intent intentResult = new Intent();
+					setResult(RESULT_OK, intentResult);
+					log("----------------------------------------finish!");
+					finish();
+					
 				}
 				else if (mode == Mode.UPLOAD){
 					if (filePreparedInfos == null){

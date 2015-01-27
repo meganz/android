@@ -156,6 +156,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	
+	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
 	public static String ACTION_CANCEL_CAM_SYNC = "CANCEL_CAM_SYNC";
@@ -988,8 +989,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
     		return;
     	}
-    	
-    	super.onNewIntent(intent);
+     	super.onNewIntent(intent);
     	setIntent(intent); 
     	return;
 	}
@@ -1003,7 +1003,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     @Override
 	protected void onResume() {
-    	log("onResume");
+    	log("onResume ");
     	super.onResume();
     	managerActivity = this;
     	
@@ -1018,7 +1018,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}			
 		}
     	   	
-    	if (intent != null) {    		
+    	if (intent != null) {  
+    		log("intent not null!");
     		// Open folder from the intent
 			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
 				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
@@ -1027,6 +1028,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
     					
     		if (intent.getAction() != null){ 
+    			log("intent action");
     			
     			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
 
@@ -1158,6 +1160,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						startService(cancelIntent); 
 					}
 				}
+    			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
+    				log("Intent take selfie");
+    				takePicture();
+    			}
     			intent.setAction(null);
 				setIntent(null);
     		}
@@ -2671,6 +2677,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
@@ -2746,19 +2753,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    }
 		    case R.id.action_take_picture:{
 		    	
-		    	String file = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR + "/picture.jpg";
-		    	log("new file: "+file);
-	            File newfile = new File(file);
-	            try {
-	                newfile.createNewFile();
-	            } catch (IOException e) {}       
-
-	            Uri outputFileUri = Uri.fromFile(newfile);
-
-	            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); 
-	            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
-
-	            startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
+		    	this.takePicture();
 		    	return true;
 		    }
 	        case R.id.action_search:{
@@ -3819,6 +3814,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				cF.sortByNameDescending();
 			}
 		}
+	}
+	
+	public void takePicture(){
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;		    		
+        File newFolder = new File(path);
+        newFolder.mkdirs();
+        
+        String file = path + "/picture.jpg";
+        File newFile = new File(file);
+        try {
+        	newFile.createNewFile();
+        } catch (IOException e) {}       
+
+        Uri outputFileUri = Uri.fromFile(newFile);
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); 
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+
+        startActivityForResult(cameraIntent, TAKE_PHOTO_CODE);
 	}
 	
 	public void selectSortByOffline(int _orderOffline){
@@ -5756,29 +5770,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log("Tengo la foto tomada");
 						
 			Intent intentPicture = new Intent(this, SecureSelfiePreviewActivity.class);			
-			startActivity(intentPicture);
-			
-//			InputStream stream = null;
-//	        try {
-//	          // recyle unused bitmaps
-//	          if (bitmap != null) {
-//	            bitmap.recycle();
-//	          }
-//	          stream = getContentResolver().openInputStream(data.getData());
-//	          bitmap = BitmapFactory.decodeStream(stream);
-//
-//	          imageView.setImageBitmap(bitmap);
-//	        } catch (FileNotFoundException e) {
-//	          e.printStackTrace();
-//	        } finally ch (IOException e) {
-//	          e{
-//	          if (stream != null)
-//	            try {
-//	              stream.close();
-//	            } catch (IOException e) {
-//	              e.printStackTrace();
-//	            }
-//	        }
+			startActivity(intentPicture);	
+
 	    }
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
 			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);

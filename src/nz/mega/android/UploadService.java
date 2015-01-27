@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -340,6 +341,17 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
+		
+		String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;						
+		File f = new File(pathSelfie);
+		//Delete recursively all files and folder
+		if (f.exists()) {
+			if (f.isDirectory()) {
+			    for (File c : f.listFiles())
+			      c.delete();
+			}
+			f.delete();
+		}
 	}
 	
 	/*
@@ -758,6 +770,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				try{ wl.release(); } catch(Exception ex) {}
 				
 			UploadService.this.cancel();
+			
+			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;						
+			File f = new File(pathSelfie);
+			//Delete recursively all files and folder
+			if (f.isDirectory()) {
+			    for (File c : f.listFiles())
+			      c.delete();
+			}
+			f.delete();					
+			
 		}		
 		else{
 			if (error.getErrorCode() == MegaError.API_OK) {
@@ -807,7 +829,16 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				successCount = transfersOK.size();
 				errorCount = transfersError.size();
 				onQueueComplete();
+			}	
+			
+			log("En finish: "+transfer.getFileName()+"path? "+transfer.getPath());
+			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;
+			
+			if(transfer.getPath().startsWith(pathSelfie)){
+				File f = new File(transfer.getPath());
+				f.delete();
 			}
+
 		}
 	}
 
