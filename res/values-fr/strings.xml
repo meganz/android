@@ -110,7 +110,7 @@
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Veuillez renseigner votre mot de passe</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Problème de connection réseau, veuillez réessayer.</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calcul en cours des clefs de chiffrement</string>
-    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connection au serveur</string>
+    <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connexion au serveur</string>
     <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Email ou mot de passe incorrect. Avez-vous validé votre compte ?</string>    
     <string name="download_updating_filelist" context="Status text when updating the file manager">Mise à jour de la liste des fichiers</string>
     <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Confirmer le compte</string>
