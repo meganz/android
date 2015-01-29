@@ -52,17 +52,8 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		
-		if (parentHandle == -1){
-			if (megaApi.getRootNode() == null){
-				return;
-			}			
-			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(megaApi.getRootNode());
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
+		if (megaApi.getRootNode() == null){
+			return;
 		}
 		
 		Bundle bundle = this.getArguments();
@@ -100,6 +91,16 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
 		String actionBarTitle = getString(R.string.section_cloud_drive);
+		
+		if (parentHandle == -1){
+			
+			parentHandle = megaApi.getRootNode().getHandle();
+			nodes = megaApi.getChildren(megaApi.getRootNode());
+		}
+		else{
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			nodes = megaApi.getChildren(parentNode);
+		}
 		
 		if (modeCloud == FileExplorerActivity.MOVE) {
 			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
