@@ -116,5 +116,17 @@
        	android:visibility="gone"
        	android:layout_below="@id/buttons_layout">
     </Button>
+    
+     <Button
+       	android:id="@+id/file_explorer_button"
+       	android:layout_gravity="center"
+       	android:layout_height="55dp"
+       	android:layout_width="fill_parent"
+       	android:layout_alignParentBottom="true"
+       	android:background="@drawable/btn_default_holo_light_without_corners"
+       	android:textColor="@color/button_text"
+       	android:visibility="gone"
+       	android:layout_below="@id/buttons_layout">
+    </Button>   
 
 </RelativeLayout>

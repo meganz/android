@@ -19,10 +19,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -33,7 +36,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
@@ -53,27 +58,33 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	 * MOVE - move files, folders
 	 * CAMERA - pick folder for camera sync destination
 	 */
-	private enum Mode {
-		UPLOAD, MOVE, COPY, CAMERA, IMPORT, SELECT,UPLOAD_SELFIE;
-	}
 	
-	private Button uploadButton;
+	public static int UPLOAD = 0;
+	public static int MOVE = 1;
+	public static int COPY = 2;
+	public static int CAMERA = 3;
+	public static int IMPORT = 4;
+	public static int SELECT = 5;
+	public static int UPLOAD_SELFIE = 6;
+	
+
 	private TextView windowTitle;
 	private ImageButton newFolderButton;
 	
-	private FileExplorerFragment fe;
-	
 	private MegaApiAndroid megaApi;
-	private Mode mode;
+	private int mode;
 	
 	private long[] moveFromHandles;
 	private long[] copyFromHandles;
 	private String[] selectedContacts;
 	private String imagePath;
-	
+	String actionBarTitle;
 	private boolean folderSelected = false;
 	
 	private Handler handler;
+	
+	private CloudDriveExplorerFragment cDriveExplorer;
+	private IncomingSharesExplorerFragment iSharesExplorer;
 	
 	private static int EDIT_TEXT_ID = 2;
 	
@@ -82,6 +93,10 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	ProgressDialog statusDialog;
 	
 	private List<ShareInfo> filePreparedInfos;
+	
+	private TabHost mTabHostExplorer;
+	TabsAdapter mTabsAdapterExplorer;
+    ViewPager viewPagerExplorer; 
 	
 	ArrayList<MegaNode> nodes;
 	
@@ -110,6 +125,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate first");
 		super.onCreate(savedInstanceState);
 		
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
@@ -129,6 +145,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		
 		megaApi.addGlobalListener(this);
 		
+		setContentView(R.layout.activity_file_explorer);
+        		
 		Intent intent = getIntent();
 		if (megaApi.getRootNode() == null){
 			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
@@ -141,104 +159,153 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			return;
 		}
 		
-		handler = new Handler();
-		
-		setContentView(R.layout.activity_file_explorer);
-		
-		fe = (FileExplorerFragment) getSupportFragmentManager().findFragmentById(R.id.file_explorer_fragment);
-		
-		mode = Mode.UPLOAD;
-		
+		handler = new Handler();		
+			
 		if ((intent != null) && (intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
-				mode = Mode.MOVE;
+				mode = MOVE;
 				moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 				
 				ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
 				for (long n : moveFromHandles){
 					list.add(n);
 				}
-				fe.setDisableNodes(list);
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(cDriveExplorer!=null){
+					cDriveExplorer.setDisableNodes(list);
+				}				
 			}
 			else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
-				mode = Mode.COPY;
+				mode = COPY;
 				copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
 				
 				ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
 				for (long n : copyFromHandles){
 					list.add(n);
 				}
-				fe.setDisableNodes(list);
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if(cDriveExplorer!=null){
+					cDriveExplorer.setDisableNodes(list);
+				}
 			}
 			else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
-				mode = Mode.IMPORT;
+				mode = IMPORT;
 			}
 			else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
-				mode = Mode.SELECT;
+				mode = SELECT;
 				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
 				
 			}
 			else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
-				mode = Mode.UPLOAD_SELFIE;
+				mode = UPLOAD_SELFIE;
 				imagePath=intent.getStringExtra("IMAGE_PATH");
 			}
 		}
 		
-		uploadButton = (Button) findViewById(R.id.file_explorer_button);
-		uploadButton.setOnClickListener(this);
+		mTabHostExplorer = (TabHost)findViewById(R.id.tabhost_explorer);
+		mTabHostExplorer.setup();
+        viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+        
+        //Create tabs
+        mTabHostExplorer.getTabWidget().setBackgroundColor(Color.BLACK);
+		
+        mTabHostExplorer.setVisibility(View.VISIBLE);    			
+		
+		
+		if (mTabsAdapterExplorer == null){
+			mTabsAdapterExplorer= new TabsAdapter(this, mTabHostExplorer, viewPagerExplorer);   	
+			
+			TabHost.TabSpec tabSpec3 = mTabHostExplorer.newTabSpec("incomingExplorerFragment");
+			tabSpec3.setIndicator(getTabIndicator(mTabHostExplorer.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+	        //tabSpec.setContent(contentID);
+	        //mTabHostContacts.addTab(tabSpec);
+	        TabHost.TabSpec tabSpec4 = mTabHostExplorer.newTabSpec("outgoingExplorerFragment");
+	        tabSpec4.setIndicator(getTabIndicator(mTabHostExplorer.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+	                	          				
+	        Bundle b1 = new Bundle();
+	        b1.putInt("MODE", mode);
+			mTabsAdapterExplorer.addTab(tabSpec3, CloudDriveExplorerFragment.class, b1);
+			mTabsAdapterExplorer.addTab(tabSpec4, IncomingSharesExplorerFragment.class, b1);
+			
+		}
+		
+		mTabHostExplorer.setOnTabChangedListener(new OnTabChangeListener(){
+            @Override
+            public void onTabChanged(String tabId) {
+//            	log("TabId :"+ tabId);
+//                if(tabId.equals("outgoingSharesFragment")){                         	
+//        			if (outSF != null){                 				
+//        				if(parentHandleOutgoing!=-1){
+//            				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+//        					aB.setTitle(node.getName());
+//    					}
+//        				else{
+//        					aB.setTitle(getResources().getString(R.string.section_shared_items));
+//        					outSF.refresh(); 
+//        				}            					   				
+//        			}
+//                }
+//                else if(tabId.equals("incomingSharesFragment")){                        	
+//                	if (inSF != null){                        		
+//                		if(parentHandleIncoming!=-1){
+//                			
+//                			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+//        					aB.setTitle(node.getName());	
+//    					}
+//        				else{
+//        					
+//        					aB.setTitle(getResources().getString(R.string.section_shared_items));
+//        					inSF.refresh(); 
+//        				}   				
+//        			}                           	
+//                }
+             }
+		});
+		
+		for (int i=0;i<mTabsAdapterExplorer.getCount();i++){
+			final int index = i;
+			mTabHostExplorer.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					viewPagerExplorer.setCurrentItem(index);							
+				}
+			});
+		}
 		
 		newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
 		newFolderButton.setOnClickListener(this);
 		
 		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-		String actionBarTitle = getString(R.string.section_cloud_drive);
+		actionBarTitle = getString(R.string.section_cloud_drive);
 		windowTitle.setText(actionBarTitle);
-		
-		if (mode == Mode.MOVE) {
-			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
-		}
-		else if (mode == Mode.COPY){
-			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
-		}
-		else if (mode == Mode.UPLOAD){
-			uploadButton.setText(getString(R.string.action_upload));
-		}
-		else if (mode == Mode.IMPORT){
-			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
-		}
-		else if (mode == Mode.SELECT){
-			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
-		}
-		else if(mode == Mode.UPLOAD_SELFIE){
-			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
-		}
+
 		
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 	}
 	
-	public void changeNavigationTitle(String folder){
-		
-		windowTitle.setText(folder);
-		
-		if (mode == Mode.MOVE) {
-			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
-		}
-		else if (mode == Mode.COPY){
-			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
-		}
-		else if (mode == Mode.UPLOAD){
-			uploadButton.setText(getString(R.string.action_upload));
-		}
-		else if (mode == Mode.IMPORT){
-			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
-		}
-		else if (mode == Mode.SELECT){
-			uploadButton.setText(getString(R.string.general_select) + " " + folder);
-		}
-		else if(mode == Mode.UPLOAD_SELFIE){
-			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
-		}
+	private View getTabIndicator(Context context, String title) {
+        View view = LayoutInflater.from(context).inflate(R.layout.tab_layout, null);
+
+        TextView tv = (TextView) view.findViewById(R.id.textView);
+        tv.setText(title);
+        return view;
+    }
+	
+	public void changeTitle (String title){
+		windowTitle.setText(title);
+	}
+	
+	private String getFragmentTag(int viewPagerId, int fragmentPosition)
+	{
+	     return "android:switcher:" + viewPagerId + ":" + fragmentPosition;
+	}
+	
+	public void finishActivity(){
+		finish();
 	}
 	
 	@Override
@@ -251,7 +318,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	protected void onResume() {
 		super.onResume();
 		if (getIntent() != null){
-			if (mode == Mode.UPLOAD) {
+			if (mode == UPLOAD) {
 				if (folderSelected){
 					if (filePreparedInfos == null){
 						FilePrepareTask filePrepareTask = new FilePrepareTask(this);
@@ -274,14 +341,24 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	@Override
 	public void onBackPressed() {
-		if (fe != null){
-			if (fe.isVisible()){
-				if (fe.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
-				}
+		
+		String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 0);	
+		log("Tag: "+ cFTag1);
+		cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);	
+		
+		if(cDriveExplorer!=null){
+			if (cDriveExplorer.onBackPressed() == 0){
+				super.onBackPressed();
+				return;
 			}
 		}
+		
+//		
+//		if (cDriveExplorer != null){
+//			if (cDriveExplorer.isVisible()){
+//				
+//			}
+//		}
 	}
 	
 	public void onIntentProcessed() {
@@ -302,7 +379,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				return;
 			}
 			else {
-				long parentHandle = fe.getParentHandle();
+				long parentHandle = cDriveExplorer.getParentHandle();
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
@@ -322,16 +399,122 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			}	
 		}
 	}
+	
+	public void buttonClick(long handle){
+		folderSelected = true;
+		
+		log("buttonClick"+ mode);
+		
+		if (mode == MOVE) {
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+			
+			Intent intent = new Intent();
+			intent.putExtra("MOVE_TO", parentNode.getHandle());
+			intent.putExtra("MOVE_HANDLES", moveFromHandles);
+			setResult(RESULT_OK, intent);
+			log("finish!");
+			finish();
+		}
+		else if (mode == COPY){
+			
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+			
+			Intent intent = new Intent();
+			intent.putExtra("COPY_TO", parentNode.getHandle());
+			intent.putExtra("COPY_HANDLES", copyFromHandles);
+			setResult(RESULT_OK, intent);
+			log("finish!");
+			finish();
+		}
+		else if(mode == UPLOAD_SELFIE){
+		
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+		
+			Intent intent = new Intent(this, UploadService.class);
+			File selfie = new File(imagePath);
+			intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
+			intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
+			intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+			intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
+			startService(intent);
+			
+			Intent intentResult = new Intent();
+			setResult(RESULT_OK, intentResult);
+			log("----------------------------------------finish!");
+			finish();
+			
+		}
+		else if (mode == UPLOAD){
+			if (filePreparedInfos == null){
+				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
+				filePrepareTask.execute(getIntent());
+				ProgressDialog temp = null;
+				try{
+					temp = new ProgressDialog(this);
+					temp.setMessage(getString(R.string.upload_prepare));
+					temp.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				statusDialog = temp;
+			}
+			else{
+				onIntentProcessed();
+			}
+		}
+		else if (mode == IMPORT){
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+			
+			Intent intent = new Intent();
+			intent.putExtra("IMPORT_TO", parentNode.getHandle());
+			setResult(RESULT_OK, intent);
+			log("finish!");
+			finish();
+		}
+		else if (mode == SELECT){
+
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+
+			Intent intent = new Intent();
+			intent.putExtra("SELECT", parentNode.getHandle());
+			intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+			setResult(RESULT_OK, intent);
+			finish();
+		}
+	}
+	
+	
 
 	@Override
 	public void onClick(View v) {
-		switch(v.getId()){
+		switch(v.getId()){/*
 			case R.id.file_explorer_button:{
 				log("button clicked!");
 				folderSelected = true;
 				
 				if (mode == Mode.MOVE) {
-					long parentHandle = fe.getParentHandle();
+					long parentHandle = cDriveExplorer.getParentHandle();
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 					if(parentNode == null){
 						parentNode = megaApi.getRootNode();
@@ -346,7 +529,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				}
 				else if (mode == Mode.COPY){
 					
-					long parentHandle = fe.getParentHandle();
+					long parentHandle = cDriveExplorer.getParentHandle();
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 					if(parentNode == null){
 						parentNode = megaApi.getRootNode();
@@ -361,7 +544,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				}
 				else if(mode == Mode.UPLOAD_SELFIE){
 				
-					long parentHandle = fe.getParentHandle();
+					long parentHandle = cDriveExplorer.getParentHandle();
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 					if(parentNode == null){
 						parentNode = megaApi.getRootNode();
@@ -401,7 +584,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					}
 				}
 				else if (mode == Mode.IMPORT){
-					long parentHandle = fe.getParentHandle();
+					long parentHandle = cDriveExplorer.getParentHandle();
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 					if(parentNode == null){
 						parentNode = megaApi.getRootNode();
@@ -415,7 +598,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				}
 				else if (mode == Mode.SELECT){
 
-					long parentHandle = fe.getParentHandle();
+					long parentHandle = cDriveExplorer.getParentHandle();
 					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 					if(parentNode == null){
 						parentNode = megaApi.getRootNode();
@@ -428,7 +611,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					finish();
 				}
 				break;
-			}
+			}*/
 			case R.id.file_explorer_new_folder:{
 				showNewFolderDialog(null);
 				break;
@@ -506,7 +689,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		return;	
 	}
 	
-	long parentHandle = fe.getParentHandle();	
+	long parentHandle = cDriveExplorer.getParentHandle();	
 	MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 	
 	if (parentNode == null){
@@ -575,9 +758,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
-				fe.setNodes(nodes);
-				fe.getListView().invalidateViews();
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+				cDriveExplorer.setNodes(nodes);
+				cDriveExplorer.getListView().invalidateViews();
 			}
 		}
 	}
@@ -604,10 +787,10 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
-		if (fe != null){
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(fe.getParentHandle()));
-			fe.setNodes(nodes);
-			fe.getListView().invalidateViews();
+		if (cDriveExplorer != null){
+			nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+			cDriveExplorer.setNodes(nodes);
+			cDriveExplorer.getListView().invalidateViews();
 		}
 	}
 

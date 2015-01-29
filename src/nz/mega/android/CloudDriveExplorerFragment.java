@@ -1,13 +1,13 @@
 package nz.mega.android;
 
 import java.util.ArrayList;
-
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,13 +16,14 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class FileExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class CloudDriveExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -31,8 +32,11 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 	
 	MegaExplorerAdapter adapter;
 	
-	boolean first = false;
+	int modeCloud;
 	
+//	boolean first = false;
+//	private boolean folderSelected = false;
+	private Button uploadButton;
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -61,12 +65,18 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			nodes = megaApi.getChildren(parentNode);
 		}
 		
-		first=true;
+		Bundle bundle = this.getArguments();
+		if (bundle != null) {
+		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);		    
+		}
+		log("onCreate mode: "+modeCloud);
+//		first=true;
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		
+		log("onCreateView");
+				
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);		
 		
 		listView = (ListView) v.findViewById(R.id.file_list_view_browser);
@@ -82,9 +92,34 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
 		
+		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
+		uploadButton.setOnClickListener(this);
+		uploadButton.setVisibility(View.VISIBLE);
+		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
+		String actionBarTitle = getString(R.string.section_cloud_drive);
+		
+		if (modeCloud == FileExplorerActivity.MOVE) {
+			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
+		}
+		else if (modeCloud == FileExplorerActivity.COPY){
+			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
+		}
+		else if (modeCloud == FileExplorerActivity.UPLOAD){
+			uploadButton.setText(getString(R.string.action_upload));
+		}
+		else if (modeCloud == FileExplorerActivity.IMPORT){
+			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
+		}
+		else if (modeCloud == FileExplorerActivity.SELECT){
+			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
+		}
+		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
+			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
+		}	
+				
 		if (adapter == null){
 			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
 		}
@@ -93,11 +128,47 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			adapter.setNodes(nodes);
 		}
 		
-		adapter.setPositionClicked(-1);
+		adapter.setPositionClicked(-1);		
 		
 		listView.setAdapter(adapter);		
 		
 		return v;
+	}
+	
+//	public void setMode(int mode){
+//		log("setMode: "+mode);
+//		modeCloud=mode;
+//		log("setMode: "+modeCloud);
+//	}	
+	
+	public void changeButtonTitle(String folder){
+		log("changeButtonTitle "+folder);
+//		windowTitle.setText(folder);
+		
+		if (modeCloud == FileExplorerActivity.MOVE) {
+			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
+		}
+		else if (modeCloud == FileExplorerActivity.COPY){
+			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
+		}
+		else if (modeCloud == FileExplorerActivity.UPLOAD){
+			uploadButton.setText(getString(R.string.action_upload));
+		}
+		else if (modeCloud == FileExplorerActivity.IMPORT){
+			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
+		}
+		else if (modeCloud == FileExplorerActivity.SELECT){
+			uploadButton.setText(getString(R.string.general_select) + " " + folder);
+		}
+		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
+			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
+		}	
+		
+		
+	}
+	
+	public void changeActionBarTitle(String folder){
+		((FileExplorerActivity) context).changeTitle(folder);
 	}
 	
 	@Override
@@ -108,20 +179,16 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 	
 	@Override
 	public void onClick(View v) {
-
 		switch(v.getId()){
-
+			case R.id.file_explorer_button:{
+				((FileExplorerActivity) context).buttonClick(parentHandle);
+			}
 		}
 	}
 
 	@Override
-	public void onResume() {
-		first=false;
-		super.onResume();
-	}
-
-	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
+		log("onItemClick");
 		
 		if (nodes.get(position).isFolder()){
 					
@@ -132,7 +199,8 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			temp = path.split("/");
 			String name = temp[temp.length-1];
 
-//			((FileExplorerActivity)getActivity()).changeNavigationTitle(name);
+			changeButtonTitle(name);
+			changeActionBarTitle(name);
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
@@ -159,8 +227,8 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
-	}
-	
+	}	
+
 	public int onBackPressed(){
 		
 		parentHandle = adapter.getParentHandle();
@@ -170,7 +238,8 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				
-//				changeNavigationTitle(context.getString(R.string.section_cloud_drive));
+				changeButtonTitle(context.getString(R.string.section_cloud_drive));
+				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			}
 			else{
 				String path=parentNode.getName();	
@@ -178,7 +247,8 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 				temp = path.split("/");
 				String name = temp[temp.length-1];
 
-//				changeNavigationTitle(name);
+				changeButtonTitle(name);
+				changeActionBarTitle(name);
 			}
 			
 			listView.setVisibility(View.VISIBLE);
@@ -206,7 +276,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 	}
 	
 	private static void log(String log) {
-		Util.log("FileExplorerFragment", log);
+		Util.log("CloudDriveExplorerFragment", log);
 	}
 	
 	public long getParentHandle(){

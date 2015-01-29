@@ -22,7 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 
-public class FileExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class IncomingSharesExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -132,7 +132,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			temp = path.split("/");
 			String name = temp[temp.length-1];
 
-//			((FileExplorerActivity)getActivity()).changeNavigationTitle(name);
+			changeNavigationTitle(name);
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
@@ -161,6 +161,30 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		}
 	}
 	
+	public void changeNavigationTitle(String folder){
+		
+//		windowTitle.setText(folder);
+		
+//		if (modeCloud == Mode.MOVE) {
+//			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
+//		}
+//		else if (modeCloud == Mode.COPY){
+//			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
+//		}
+//		else if (modeCloud == Mode.UPLOAD){
+//			uploadButton.setText(getString(R.string.action_upload));
+//		}
+//		else if (modeCloud == Mode.IMPORT){
+//			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
+//		}
+//		else if (modeCloud == Mode.SELECT){
+//			uploadButton.setText(getString(R.string.general_select) + " " + folder);
+//		}
+//		else if(modeCloud == Mode.UPLOAD_SELFIE){
+//			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
+//		}
+	}
+	
 	public int onBackPressed(){
 		
 		parentHandle = adapter.getParentHandle();
@@ -170,7 +194,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				
-//				changeNavigationTitle(context.getString(R.string.section_cloud_drive));
+				changeNavigationTitle(context.getString(R.string.section_cloud_drive));
 			}
 			else{
 				String path=parentNode.getName();	
@@ -178,7 +202,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 				temp = path.split("/");
 				String name = temp[temp.length-1];
 
-//				changeNavigationTitle(name);
+				changeNavigationTitle(name);
 			}
 			
 			listView.setVisibility(View.VISIBLE);
