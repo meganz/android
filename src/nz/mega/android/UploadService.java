@@ -556,12 +556,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		private void createFoldersCreationArray(File currentFolder, String parentFolderPath){
 			if (currentFolder.isDirectory()){
 				File[] files = currentFolder.listFiles();
-				for (int i=0; i<files.length; i++){
-					File f = files[i];
-					if (f.isDirectory()){
-						FolderCreation fC = new FolderCreation(f.getAbsolutePath(), f.getName(), parentFolderPath);
-						foldersCreation.add(fC);
-						createFoldersCreationArray(f, parentFolderPath + "/" + f.getName());
+				if (files != null){
+					for (int i=0; i<files.length; i++){
+						File f = files[i];
+						if (f.isDirectory()){
+							FolderCreation fC = new FolderCreation(f.getAbsolutePath(), f.getName(), parentFolderPath);
+							foldersCreation.add(fC);
+							createFoldersCreationArray(f, parentFolderPath + "/" + f.getName());
+						}
 					}
 				}
 			}
