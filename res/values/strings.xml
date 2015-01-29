@@ -170,6 +170,9 @@
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
 	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
 	
+	<string name="tab_cloud_drive_explorer" context="Capital letters. Incoming shared folders. The title of a tab">CLOUD DRIVE</string>
+	<string name="tab_incoming_shares_explorer" context="Capital letters. Outgoing shared folders. The title of a tab">INCOMING</string>
+	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No files in your Cloud Drive</string>
 	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>

@@ -24,6 +24,9 @@ import android.widget.TextView;
 
 
 public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
+	
+	final public static int CLOUD_EXPLORER = 0;
+	final public static int INCOMING_SHARES_EXPLORER = 1;
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -36,6 +39,8 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	private ArrayList<Long> disabledNodes;
 	
 	long parentHandle = -1;
+	
+	int caller;
 	
 	ListView listFragment;
 	ImageView emptyImageViewFragment;

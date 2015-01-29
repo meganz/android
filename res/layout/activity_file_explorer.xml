@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_gravity="center" />-->
+        android:layout_gravity="center" />
     
     
   <Button
@@ -72,13 +72,37 @@
        	android:background="@drawable/btn_default_holo_light_without_corners"
        	android:textColor="@color/button_text">
     </Button>
-    
-    <fragment
-        android:id="@+id/file_explorer_fragment"
-        android:name="nz.mega.android.FileExplorerFragment"
+ -->
+<TabHost
+        android:id="@+id/tabhost_explorer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/file_explorer_button"
-        android:layout_below="@id/file_explorer_divider_top" />
- -->
+        android:layout_below="@id/file_explorer_divider_top">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+           <TabWidget
+            android:id="@android:id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+       	   </TabWidget>
+
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0"/>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/explorer_tabs_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
+    </TabHost>
+
 </RelativeLayout>
