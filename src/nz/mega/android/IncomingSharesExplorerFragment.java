@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaUser;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -31,14 +34,18 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	
 	MegaExplorerAdapter adapter;
 	
-	boolean first = false;
+	int modeCloud;
 	
+//	boolean first = false;
+//	private boolean folderSelected = false;
+	private Button uploadButton;
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
 	LinearLayout buttonsLayout;
 	LinearLayout outSpaceLayout=null;
+	int deepBrowserTree = 0;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -49,24 +56,24 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		
-		if (parentHandle == -1){
-			if (megaApi.getRootNode() == null){
-				return;
-			}			
-			parentHandle = megaApi.getRootNode().getHandle();
-			nodes = megaApi.getChildren(megaApi.getRootNode());
-		}
-		else{
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
+		if (megaApi.getRootNode() == null){
+			return;
 		}
 		
-		first=true;
+		nodes = new ArrayList<MegaNode>();
+		
+		parentHandle = -1;
+		
+		Bundle bundle = this.getArguments();
+		if (bundle != null) {
+		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);		    
+		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		
+		log("onCreateView");
+				
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);		
 		
 		listView = (ListView) v.findViewById(R.id.file_list_view_browser);
@@ -82,6 +89,10 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
 		
+		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
+		uploadButton.setOnClickListener(this);
+		uploadButton.setVisibility(View.VISIBLE);
+		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
@@ -93,11 +104,72 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			adapter.setNodes(nodes);
 		}
 		
-		adapter.setPositionClicked(-1);
+		String actionBarTitle = getString(R.string.section_cloud_drive);
+		
+		if (parentHandle == -1){			
+			findNodes();	
+			adapter.parentHandle=-1;
+			uploadButton.setText("Choose folder");
+		}
+		else{
+			adapter.parentHandle=parentHandle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			nodes = megaApi.getChildren(parentNode);
+		}	
+
+		if (deepBrowserTree != 0){		
+			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+		}						
+	
+		adapter.setPositionClicked(-1);		
 		
 		listView.setAdapter(adapter);		
 		
 		return v;
+	}
+	
+	public void findNodes(){
+		deepBrowserTree=0;
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		nodes.clear();
+		for (int i=0;i<contacts.size();i++){			
+			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
+			if(nodeContact!=null){
+				if(nodeContact.size()>0){
+					nodes.addAll(nodeContact);
+				}
+			}			
+		}		
+	}
+	
+	public void changeButtonTitle(String folder){
+		log("changeButtonTitle "+folder);
+//		windowTitle.setText(folder);
+		
+		if (modeCloud == FileExplorerActivity.MOVE) {
+			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
+		}
+		else if (modeCloud == FileExplorerActivity.COPY){
+			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
+		}
+		else if (modeCloud == FileExplorerActivity.UPLOAD){
+			uploadButton.setText(getString(R.string.action_upload));
+		}
+		else if (modeCloud == FileExplorerActivity.IMPORT){
+			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
+		}
+		else if (modeCloud == FileExplorerActivity.SELECT){
+			uploadButton.setText(getString(R.string.general_select) + " " + folder);
+		}
+		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
+			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
+		}	
+		
+		
+	}
+	
+	public void changeActionBarTitle(String folder){
+		((FileExplorerActivity) context).changeTitle(folder);
 	}
 	
 	@Override
@@ -108,20 +180,16 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	
 	@Override
 	public void onClick(View v) {
-
 		switch(v.getId()){
-
+			case R.id.file_explorer_button:{
+				((FileExplorerActivity) context).buttonClick(parentHandle);
+			}
 		}
 	}
 
 	@Override
-	public void onResume() {
-		first=false;
-		super.onResume();
-	}
-
-	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
+		log("onItemClick");
 		
 		if (nodes.get(position).isFolder()){
 					
@@ -132,7 +200,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			temp = path.split("/");
 			String name = temp[temp.length-1];
 
-			changeNavigationTitle(name);
+			changeButtonTitle(name);
+			changeActionBarTitle(name);
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
@@ -159,32 +228,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
-	}
-	
-	public void changeNavigationTitle(String folder){
-		
-//		windowTitle.setText(folder);
-		
-//		if (modeCloud == Mode.MOVE) {
-//			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
-//		}
-//		else if (modeCloud == Mode.COPY){
-//			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
-//		}
-//		else if (modeCloud == Mode.UPLOAD){
-//			uploadButton.setText(getString(R.string.action_upload));
-//		}
-//		else if (modeCloud == Mode.IMPORT){
-//			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
-//		}
-//		else if (modeCloud == Mode.SELECT){
-//			uploadButton.setText(getString(R.string.general_select) + " " + folder);
-//		}
-//		else if(modeCloud == Mode.UPLOAD_SELFIE){
-//			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
-//		}
-	}
-	
+	}	
+
 	public int onBackPressed(){
 		
 		parentHandle = adapter.getParentHandle();
@@ -194,7 +239,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				
-				changeNavigationTitle(context.getString(R.string.section_cloud_drive));
+				changeButtonTitle(context.getString(R.string.section_cloud_drive));
+				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			}
 			else{
 				String path=parentNode.getName();	
@@ -202,7 +248,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 				temp = path.split("/");
 				String name = temp[temp.length-1];
 
-				changeNavigationTitle(name);
+				changeButtonTitle(name);
+				changeActionBarTitle(name);
 			}
 			
 			listView.setVisibility(View.VISIBLE);
@@ -230,7 +277,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	}
 	
 	private static void log(String log) {
-		Util.log("FileExplorerFragment", log);
+		Util.log("CloudDriveExplorerFragment", log);
 	}
 	
 	public long getParentHandle(){
