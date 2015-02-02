@@ -2771,6 +2771,22 @@ public class MegaApiJava
 		return result;
 	}
 	
+	public String getVersion() {
+		return megaApi.getVersion();
+	}
+
+	public String getUserAgent() {
+		return megaApi.getUserAgent();
+	}
+
+	public String nameToLocal(String name) {
+		return megaApi.nameToLocal(name);
+	}
+
+	public String localToName(String localName) {
+		return megaApi.localToName(localName);
+	}
+	
 	/****************************************************************************************************/
 	//INTERNAL METHODS
 	/****************************************************************************************************/
