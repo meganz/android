@@ -1417,17 +1417,23 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				
 				if (!thereAreImages){
 					monthPics.clear();
-					emptyImageView.setVisibility(View.VISIBLE);
-					listView.setVisibility(View.GONE);
+					if (emptyImageView != null){
+						emptyImageView.setVisibility(View.VISIBLE);
+						listView.setVisibility(View.GONE);
+					}
 				}
 				else{
-					emptyImageView.setVisibility(View.GONE);
-					listView.setVisibility(View.VISIBLE);
+					if (emptyImageView != null){
+						emptyImageView.setVisibility(View.GONE);
+						listView.setVisibility(View.VISIBLE);
+					}
 				}
 			}
 			else{
-				emptyImageView.setVisibility(View.VISIBLE);
-				listView.setVisibility(View.GONE);
+				if (emptyImageView != null){
+					emptyImageView.setVisibility(View.VISIBLE);
+					listView.setVisibility(View.GONE);
+				}
 			}
 			
 			if (adapterGrid != null){
