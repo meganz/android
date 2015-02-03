@@ -95,7 +95,7 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		log("secureSelfiePreviewActivity");
+		log("secureSelfiePreviewActivity onCreate");
 		super.onCreate(savedInstanceState);
 		
 		handler = new Handler();
@@ -195,7 +195,8 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 				finish();
 				break;
 			}
-			case R.id.secure_selfie_viewer_discard:{
+			case R.id.secure_selfie_viewer_discard:{				
+				log("Option discard");
 				if(imgFile.exists()){
 					imgFile.delete();
 				}	
@@ -233,8 +234,8 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_UPLOAD_SELFIE);
 		intent.putExtra("IMAGE_PATH", imagePath);
-		//startActivity(intent);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_SELFIE_FOLDER);
+		startActivity(intent);
+		finish();
 	}
 	
 	
@@ -242,17 +243,7 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 	public void onSaveInstanceState (Bundle savedInstanceState){
 		super.onSaveInstanceState(savedInstanceState);
 
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("onActivityResult - FINISH ----------------------------------------------");
-		
-		if (requestCode == REQUEST_CODE_SELECT_SELFIE_FOLDER && resultCode == RESULT_OK) {
-			
-			finish();
-		}
-	}
+	}	
 	
 	@Override
 	public void onBackPressed() {
