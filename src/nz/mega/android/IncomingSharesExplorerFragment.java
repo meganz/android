@@ -6,6 +6,7 @@ import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 
 import android.app.Activity;
@@ -36,6 +37,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	
 	int modeCloud;
 	
+	public String name;
+	
 //	boolean first = false;
 //	private boolean folderSelected = false;
 	private Button uploadButton;
@@ -61,7 +64,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		}
 		
 		nodes = new ArrayList<MegaNode>();
-		
+		deepBrowserTree=0;
 		parentHandle = -1;
 		
 		Bundle bundle = this.getArguments();
@@ -104,12 +107,12 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			adapter.setNodes(nodes);
 		}
 		
-		String actionBarTitle = getString(R.string.section_cloud_drive);
+		String actionBarTitle = getString(R.string.title_incoming_shares_explorer);	
 		
 		if (parentHandle == -1){			
 			findNodes();	
 			adapter.parentHandle=-1;
-			uploadButton.setText("Choose folder");
+			uploadButton.setText(getString(R.string.choose_folder_explorer));
 		}
 		else{
 			adapter.parentHandle=parentHandle;
@@ -131,6 +134,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	public void findNodes(){
 		deepBrowserTree=0;
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<Long> disabledNodes = new ArrayList<Long>();
 		nodes.clear();
 		for (int i=0;i<contacts.size();i++){			
 			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
@@ -139,7 +143,19 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 					nodes.addAll(nodeContact);
 				}
 			}			
-		}		
+		}
+		
+		for (int i=0;i<nodes.size();i++){	
+			MegaNode folder = nodes.get(i);
+			int accessLevel = megaApi.getAccess(folder);
+			
+			if(accessLevel==MegaShare.ACCESS_READ) {
+				disabledNodes.add(folder.getHandle());
+			}
+		}
+		
+		this.setDisableNodes(disabledNodes);
+		
 	}
 	
 	public void changeButtonTitle(String folder){
@@ -189,16 +205,19 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 
 	@Override
     public void onItemClick(AdapterView<?> parent, View view, int position,long id) {
-		log("onItemClick");
+		log("------------------onItemClick: "+deepBrowserTree);
+		
 		
 		if (nodes.get(position).isFolder()){
 					
+			deepBrowserTree = deepBrowserTree+1;
+			
 			MegaNode n = nodes.get(position);			
 			
 			String path=n.getName();	
 			String[] temp;
 			temp = path.split("/");
-			String name = temp[temp.length-1];
+			name = temp[temp.length-1];
 
 			changeButtonTitle(name);
 			changeActionBarTitle(name);
@@ -230,41 +249,56 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		}
 	}	
 
-	public int onBackPressed(){
-		
-		parentHandle = adapter.getParentHandle();
-		
-		MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-		if (parentNode != null){
-			
-			if(parentNode.getType()==MegaNode.TYPE_ROOT){
-				
-				changeButtonTitle(context.getString(R.string.section_cloud_drive));
-				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-			}
-			else{
-				String path=parentNode.getName();	
-				String[] temp;
-				temp = path.split("/");
-				String name = temp[temp.length-1];
 
-				changeButtonTitle(name);
-				changeActionBarTitle(name);
-			}
+	public int onBackPressed(){
+		log("deepBrowserTree "+deepBrowserTree);
+		deepBrowserTree = deepBrowserTree-1;
+		
+		if(deepBrowserTree==0){
+			parentHandle=-1;
+			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+			uploadButton.setText(getString(R.string.choose_folder_explorer));
+			findNodes();
 			
-			listView.setVisibility(View.VISIBLE);
-			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			
-			parentHandle = parentNode.getHandle();
-			nodes = megaApi.getChildren(parentNode);
 			adapter.setNodes(nodes);
 			listView.setSelection(0);
 			adapter.setParentHandle(parentHandle);
+
+//			adapterList.setNodes(nodes);
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+
+			return 3;
+		}
+		else if (deepBrowserTree>0){
+			parentHandle = adapter.getParentHandle();
+			//((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);			
 			
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
+
+			if (parentNode != null){
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+
+				changeActionBarTitle(parentNode.getName());		
+				
+				parentHandle = parentNode.getHandle();
+				nodes = megaApi.getChildren(parentNode);
+
+				adapter.setNodes(nodes);
+				listView.setSelection(0);
+				adapter.setParentHandle(parentHandle);
+				return 2;
+			}	
 			return 2;
 		}
 		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			deepBrowserTree=0;
 			return 0;
 		}
 	}
@@ -277,7 +311,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	}
 	
 	private static void log(String log) {
-		Util.log("CloudDriveExplorerFragment", log);
+		Util.log("IncomingSharesExplorerFragment", log);
 	}
 	
 	public long getParentHandle(){

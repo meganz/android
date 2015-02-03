@@ -797,8 +797,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	}
 	
 	public int onBackPressed(){
-
-		log("onBackPressed");
+		log("onBackPressed "+deepBrowserTree);
 		deepBrowserTree = deepBrowserTree-1;
 		
 		if (isList){

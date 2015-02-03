@@ -95,6 +95,7 @@ public class SecureSelfiePreviewActivity extends PinActivity implements OnClickL
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("secureSelfiePreviewActivity");
 		super.onCreate(savedInstanceState);
 		
 		handler = new Handler();
