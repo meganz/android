@@ -470,7 +470,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			
 			Intent intentResult = new Intent();
 			setResult(RESULT_OK, intentResult);
-			log("----------------------------------------finish!");
+			log("Upload Selfie----------------------------------------finish!");
 			finish();
 			
 		}

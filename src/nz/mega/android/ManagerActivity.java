@@ -155,6 +155,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_IMPORT_FOLDER = 1007;
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
+	public static int TAKE_PHOTO_CODE = 1010;
 	
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -171,7 +172,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
-	public static int TAKE_PHOTO_CODE = 0;
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -1019,7 +1019,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
     	   	
     	if (intent != null) {  
-    		log("intent not null!");
+    		log("intent not null! "+intent.getAction());
     		// Open folder from the intent
 			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
 				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
@@ -1034,15 +1034,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
     				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
     				
-    				log("Path: "+pathZip);
-    				
-    				//Lanzar nueva activity ZipBrowserActivity
-    				
     				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);    				
     				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-    				//frgsfg
-    			    startActivity(intentZip);
-   				
+    			    startActivity(intentZip);   				
     				
     			}
 //    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
@@ -5455,11 +5449,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("onActivityResult");
-		if (intent == null) {
-			return;
-		}
+		log("onActivityResult "+requestCode);
+		
 		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			Uri uri = intent.getData();
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
@@ -5476,6 +5473,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			statusDialog = temp;
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
+			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
 			
 			if(!Util.isOnline(this)){
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -5543,6 +5545,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}	
 		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
+			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			if(!Util.isOnline(this)){
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;
@@ -5628,6 +5636,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}		
 		else if (requestCode == REQUEST_CODE_GET_LOCAL && resultCode == RESULT_OK) {
 			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
 			
@@ -5645,6 +5658,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 		
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			if(!Util.isOnline(this)){
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;
@@ -5673,6 +5691,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
+			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			if(!Util.isOnline(this)){
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;
@@ -5699,6 +5723,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
+			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
 			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
 			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
@@ -5708,6 +5738,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			Util.showToast(this, R.string.download_began);
 		}
 		else if (requestCode == REQUEST_CODE_REFRESH && resultCode == RESULT_OK) {
+			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
 			
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				parentHandleBrowser = intent.getLongExtra("PARENT_HANDLE", -1);
@@ -5766,14 +5801,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}
-		else if (requestCode == TAKE_PHOTO_CODE && resultCode == Activity.RESULT_OK){
-			log("Tengo la foto tomada");
-						
-			Intent intentPicture = new Intent(this, SecureSelfiePreviewActivity.class);			
-			startActivity(intentPicture);	
+		else if (requestCode == TAKE_PHOTO_CODE){
+			log("Entrooo en requestCode");
+			if(resultCode == Activity.RESULT_OK){
+				
+				log("REcibo el intent OOOOKK");
+				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivity.class);			
+				startActivity(intentPicture);
+			}
+			else{
+				log("REcibo el intent con error");
+			}			
 
 	    }
 		else if (requestCode == REQUEST_CODE_SORT_BY && resultCode == RESULT_OK){
+			
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
 			orderGetChildren = intent.getIntExtra("ORDER_GET_CHILDREN", 1);
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
