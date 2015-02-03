@@ -2298,7 +2298,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			upgradeAccountMenuItem.setVisible(true);
     			settingsMenuItem.setVisible(true);
     			importLinkMenuItem.setVisible(true);
-    			takePicture.setVisible(false);
+    			takePicture.setVisible(true);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -2645,7 +2645,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			settingsMenuItem.setVisible(true);
     			upgradeAccountMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
-    			takePicture.setVisible(false);
+    			takePicture.setVisible(true);
 
 				//Hide
 				pauseRestartTransfersItem.setVisible(false);

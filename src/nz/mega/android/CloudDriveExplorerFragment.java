@@ -34,6 +34,8 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	
 	int modeCloud;
 	
+	public String name;
+	
 //	boolean first = false;
 //	private boolean folderSelected = false;
 	private Button uploadButton;
@@ -55,6 +57,8 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		if (megaApi.getRootNode() == null){
 			return;
 		}
+		
+		parentHandle = -1;
 		
 		Bundle bundle = this.getArguments();
 		if (bundle != null) {
@@ -91,7 +95,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
 		String actionBarTitle = getString(R.string.section_cloud_drive);
-		
+
 		if (parentHandle == -1){
 			
 			parentHandle = megaApi.getRootNode().getHandle();
@@ -198,7 +202,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			String path=n.getName();	
 			String[] temp;
 			temp = path.split("/");
-			String name = temp[temp.length-1];
+			name = temp[temp.length-1];
 
 			changeButtonTitle(name);
 			changeActionBarTitle(name);
@@ -231,6 +235,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	}	
 
 	public int onBackPressed(){
+		log("onBackPressed");
 		
 		parentHandle = adapter.getParentHandle();
 		
@@ -238,7 +243,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		if (parentNode != null){
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
-				
+				parentHandle=-1;
 				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			}
@@ -246,17 +251,19 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 				String path=parentNode.getName();	
 				String[] temp;
 				temp = path.split("/");
-				String name = temp[temp.length-1];
+				name = temp[temp.length-1];
 
 				changeButtonTitle(name);
 				changeActionBarTitle(name);
+				
+				parentHandle = parentNode.getHandle();
 			}
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			
-			parentHandle = parentNode.getHandle();
+			
 			nodes = megaApi.getChildren(parentNode);
 			adapter.setNodes(nodes);
 			listView.setSelection(0);
