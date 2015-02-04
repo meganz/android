@@ -104,6 +104,15 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		}
 	}
 	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+	        // do nothing
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	} 
+	
 	private class RefreshContactsTask extends AsyncTask<String, Void, Boolean> {
 
 		ArrayList<PhoneContacts> contactList;
