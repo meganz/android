@@ -421,8 +421,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public void buttonClick(long handle){
 		folderSelected = true;
 		
-		log("buttonClick"+ mode);
-		
 		if (mode == MOVE) {
 			long parentHandle = handle;
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
@@ -470,7 +468,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			
 			Intent intentResult = new Intent();
 			setResult(RESULT_OK, intentResult);
-			log("Upload Selfie----------------------------------------finish!");
 			finish();
 			
 		}
@@ -521,8 +518,6 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			finish();
 		}
 	}
-	
-	
 
 	@Override
 	public void onClick(View v) {
