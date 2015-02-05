@@ -1,6 +1,7 @@
 package nz.mega.android;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -31,7 +32,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class UpgradeAccountFragment extends Fragment implements MegaRequestListenerInterface{
+public class UpgradeAccountFragment extends Fragment implements MegaRequestListenerInterface{		
+	
+	public ArrayList<Product> accounts;
 	
 	public static int MY_ACCOUNT_FRAGMENT = 5000;
 	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
@@ -70,6 +73,8 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
+		accounts = new ArrayList<Product>();
+		
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
@@ -166,22 +171,23 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		megaApi.getAccountDetails(this);
+//		megaApi.getAccountDetails(this);
+
 		megaApi.getPricing(this);
 		
 		return v;
 	}	
 
 	public void onUpgrade1Click(View view) {
-		((ManagerActivity)context).showpF(1);
+		((ManagerActivity)context).showpF(1, accounts);
 	}
 
 	public void onUpgrade2Click(View view) {
-		((ManagerActivity)context).showpF(2);
+		((ManagerActivity)context).showpF(2, accounts);
 	}
 
 	public void onUpgrade3Click(View view) {
-		((ManagerActivity)context).showpF(3);
+		((ManagerActivity)context).showpF(3, accounts);
 	}
 
 	@Override
@@ -199,12 +205,39 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		 
+		DecimalFormat df = new DecimalFormat("#.##");
+		
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 	            MegaPricing p = request.getPricing();
 	            
 	            for (int i=0;i<p.getNumProducts();i++){
-	                log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i)); 
+	                log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+
+	                Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 	                
+	                if(account.getLevel()==1&&account.getMonths()==12){
+	                	storage1.setText(account.getStorage()+"GB");
+	                	bandwidth1.setText(sizeTranslation(account.getTransfer(),0));
+	                	double saving1 = account.getAmount()/12.00/100.00;	    	            
+	    	            String saving1String =df.format(saving1);
+	    	            pricingPerMonth1.setText("from " + saving1String +" € per month");
+	                }
+	                else if(account.getLevel()==2&&account.getMonths()==12){
+	                	 storage2.setText(sizeTranslation(account.getStorage(),0));
+	                	 bandwidth2.setText(sizeTranslation(account.getTransfer(),0));
+	                	 double saving2 = account.getAmount()/12.00/100.00;
+	                	 String saving2String =df.format(saving2);
+	                	 pricingPerMonth2.setText("from " + saving2String +" € per month");
+	                }
+	                else if(account.getLevel()==3&&account.getMonths()==12){	                	 
+	    	            storage3.setText(sizeTranslation(account.getStorage(),0));         
+	    	            bandwidth3.setText(sizeTranslation(account.getTransfer(),0));
+	    	            double saving3 = account.getAmount()/12.00/100.00;
+	    	            String saving3String =df.format(saving3);
+	    	            pricingPerMonth3.setText("from " + saving3String +" € per month");
+	                }
+	                
+	                accounts.add(account);
 	            }    
 	            /*RESULTS
 	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
@@ -213,35 +246,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
         		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
         		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
         		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-	                       	            
-	            storage1.setText(p.getGBStorage(1)+"GB");
-	            storage2.setText(sizeTranslation(p.getGBStorage(3),0));
-	            storage3.setText(sizeTranslation(p.getGBStorage(5),0));           
-	            	            	            
-	            bandwidth1.setText(sizeTranslation(p.getGBTransfer(0)*12,0));
-	            bandwidth2.setText(sizeTranslation(p.getGBTransfer(2)*12,0));
-	            bandwidth3.setText(sizeTranslation(p.getGBTransfer(4)*12,0));
-	            
-	            double saving1 = p.getAmount(1)/12.00/100.00;
-	            DecimalFormat df = new DecimalFormat("#.##");
-	            String saving1String =df.format(saving1);
-	            
-	            double saving2 = p.getAmount(3)/12.00/100.00;
-	            String saving2String =df.format(saving2);
-	            
-	            double saving3 = p.getAmount(5)/12.00/100.00;
-	            String saving3String =df.format(saving3);
-	            
-	            pricingPerMonth1.setText("from " + saving1String +" € per month");
-	            pricingPerMonth2.setText("from " + saving2String +" € per month");
-	            pricingPerMonth3.setText("from " + saving3String +" € per month");
-	        }
-	        else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
-	            log("PAYMENT URL: " + request.getLink());
-	            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
-	            startActivity(browserIntent);
-	            
-	        }
+ 	        }
 	}
 	
 	public String sizeTranslation(long size, int type) {
@@ -265,6 +270,10 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 			MegaError e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public ArrayList<Product> getAccounts(){
+		return accounts;
 	}
 	
 	@Override

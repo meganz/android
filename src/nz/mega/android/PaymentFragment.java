@@ -94,6 +94,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
+	ArrayList<Product> accounts;
 	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -110,7 +111,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-				
+
+		DecimalFormat df = new DecimalFormat("#.##");  
+
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -118,22 +121,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
-		
-		switch (parameterType) {
-			case 1:{
-				aB.setTitle(getString(R.string.pro1_account));
-				break;
-			}
-			case 2:{
-				aB.setTitle(getString(R.string.pro2_account));
-				break;
-			}
-			case 3:{
-				aB.setTitle(getString(R.string.pro3_account));
-				break;
-			}
-		}
-		
+
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -144,60 +132,162 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 		View v = null;
 		v = inflater.inflate(R.layout.activity_upgrade_payment, container, false);
-		
+
 		packageIcon = (ImageView) v.findViewById(R.id.pro_image);
-		
+
 		packageIcon.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
 		packageIcon.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
-		
+
 		packageName = (TextView) v.findViewById(R.id.pro_title);
 		pricingFrom = (TextView) v.findViewById(R.id.pricing_from);
-		
+
 		perMonthTitle = (TextView) v.findViewById(R.id.per_month);
 		perMonth = (TextView) v.findViewById(R.id.per_month_price);
 		perYear = (TextView) v.findViewById(R.id.per_year_price);
 		perYearTitle = (TextView) v.findViewById(R.id.per_year);
-		
+
 		accountType = AccountType.getById(parameterType);
 
 		packageIcon.setImageResource(accountType.getImageResource());
 		packageName.setText(accountType.getNameResource());
 		packageName.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		
+
 		pricingFrom.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-		
+
 		storageTitle = (TextView) v.findViewById(R.id.pro_storage_title);
 		storageTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-		
+
 		storage = (TextView) v.findViewById(R.id.pro_storage);
 		storage.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-		
+
 		bandwithTitle = (TextView) v.findViewById(R.id.pro_bandwidth_title);
 		bandwithTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-		
+
 		bandwidth = (TextView) v.findViewById(R.id.pro_bandwidth);
 		bandwidth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-		
+
 		selectMemberShip = (TextView) v.findViewById(R.id.select_membership);
 		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-		
+
 		selectRecurring = (TextView) v.findViewById(R.id.select_recurring);
 		selectRecurring.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
-		
+
 		paypalSubscrition = (TextView) v.findViewById(R.id.paypal_subscription);
 		paypalSubscrition.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
-		
+
 		perMonth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 		perMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		
+
 		perYear.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 		perYearTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		
+
 		comment = (TextView) v.findViewById(R.id.comment);
 		comment.setTextSize(TypedValue.COMPLEX_UNIT_SP, (12*scaleH));
-		
-		megaApi.getPricing(this);	
-		
+
+		switch (parameterType) {
+			case 1:{
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==1){
+						aB.setTitle(getString(R.string.pro1_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double saving3 = account.getAmount()/12.00/100.00;
+						String saving3String =df.format(saving3);
+	
+						pricingFrom.setText("from " + saving3String + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
+	
+				break;
+			}
+			case 2:{
+	
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==2){
+						aB.setTitle(getString(R.string.pro2_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double saving3 = account.getAmount()/12.00/100.00;
+						String saving3String =df.format(saving3);
+	
+						pricingFrom.setText("from " + saving3String + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
+	
+				break;
+			}
+			case 3:{
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==3){
+						aB.setTitle(getString(R.string.pro3_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double saving3 = account.getAmount()/12.00/100.00;
+						String saving3String =df.format(saving3);
+	
+						pricingFrom.setText("from " + saving3String + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
+				break;
+			}
+		}
+
+		//		megaApi.getPricing(this);	
+
 		return v;
 	}	
 	
@@ -207,18 +297,40 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		switch(parameterType){
 		
 			case 1:{
-				Long handle = handleUrl.get(1);
-				megaApi.getPaymentUrl(handle,this);		
+				
+				for (int i=0;i<accounts.size();i++){
+					
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==1&&account.getMonths()==12){
+						
+						megaApi.getPaymentUrl(account.getHandle(),this);	
+					}
+				}
 				break;
 			}
 			case 2:{
-				Long handle = handleUrl.get(3);
-				megaApi.getPaymentUrl(handle,this);			
+				for (int i=0;i<accounts.size();i++){
+					
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==2&&account.getMonths()==12){
+						
+						megaApi.getPaymentUrl(account.getHandle(),this);	
+					}
+				}
 				break;
 			}
 			case 3:{
-				Long handle = handleUrl.get(5);
-				megaApi.getPaymentUrl(handle,this);			
+				for (int i=0;i<accounts.size();i++){
+					
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==3&&account.getMonths()==12){
+						
+						megaApi.getPaymentUrl(account.getHandle(),this);	
+					}
+				}
 				break;
 			}
 			
@@ -231,26 +343,52 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		switch(parameterType){
 		
 			case 1:{
-				Long handle = handleUrl.get(0);
-				megaApi.getPaymentUrl(handle,this);		
+				
+				for (int i=0;i<accounts.size();i++){
+					
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==1&&account.getMonths()==1){
+						
+						megaApi.getPaymentUrl(account.getHandle(),this);	
+					}
+				}
 				break;
+
 			}
 			case 2:{
-				Long handle = handleUrl.get(2);
-				megaApi.getPaymentUrl(handle,this);			
+				
+				for (int i=0;i<accounts.size();i++){
+					
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==2&&account.getMonths()==1){
+						
+						megaApi.getPaymentUrl(account.getHandle(),this);	
+					}
+				}
 				break;
+
 			}
 			case 3:{
-				Long handle = handleUrl.get(4);
-				megaApi.getPaymentUrl(handle,this);	
+				
+				for (int i=0;i<accounts.size();i++){
+					
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==3&&account.getMonths()==1){
+						
+						megaApi.getPaymentUrl(account.getHandle(),this);	
+					}
+				}
 				break;
-			}
-			
+			}			
 		}
 	}
 	
-	public void setParameterType (int type){
-		this.parameterType = type;
+	public void setInfo (int _type, ArrayList<Product> _accounts){
+		this.accounts = _accounts;
+		this.parameterType = _type;
 	}
 	
 
@@ -268,87 +406,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-
-		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-			MegaPricing p = request.getPricing();
-
-			switch(parameterType){
-
-				case 1:{
-	
-					storage.setText(p.getGBStorage(parameterType)+"GB");		            
-					bandwidth.setText(sizeTranslation(p.getGBTransfer(parameterType)*12,0));
-					
-					DecimalFormat df = new DecimalFormat("#.##");  
-					double saving3 = p.getAmount(1)/12.00/100.00;
-					String saving3String =df.format(saving3);
-	
-					pricingFrom.setText("from " + saving3String + " € per month");
-	
-					double perMonthF=p.getAmount(0)/100.00;
-			        String perMonthString =df.format(perMonthF);
-			        double perYearF=p.getAmount(1)/100.00;
-					String perYearString =df.format(perYearF);
-					
-					perMonth.setText(perMonthString+" €");
-					perYear.setText(perYearString+" €");
-					
-					for(int i=0; i<p.getNumProducts();i++){
-						handleUrl.add(p.getHandle(i));
-					}
-					break;
-				}
-				case 2:{
-					storage.setText(sizeTranslation(p.getGBStorage(parameterType),0));
-		             
-					bandwidth.setText(sizeTranslation(p.getGBTransfer(parameterType)*12,0));
-			           
-					DecimalFormat df = new DecimalFormat("#.##");  
-					double saving3 = p.getAmount(3)/12.00/100.00;
-			        String saving3String =df.format(saving3);
-			            
-			        pricingFrom.setText("from " + saving3String +" € per month");
-	
-			        double perMonthF=p.getAmount(2)/100.00;
-			        String perMonthString =df.format(perMonthF);
-			        double perYearF=p.getAmount(3)/100.00;
-					String perYearString =df.format(perYearF);
-					
-					perMonth.setText(perMonthString+" €");
-					perYear.setText(perYearString+" €");					
-
-					for(int i=0; i<p.getNumProducts();i++){
-						handleUrl.add(p.getHandle(i));
-					}
-					break;
-				}
-				case 3:{
-					storage.setText(sizeTranslation(p.getGBStorage(5),0));
-					
-					bandwidth.setText(sizeTranslation(p.getGBTransfer(4)*12,0));
-					
-					DecimalFormat df = new DecimalFormat("#.##");  
-					double saving3 = p.getAmount(5)/12.00/100.00;
-			        String saving3String =df.format(saving3);
-			            
-			        pricingFrom.setText("from " + saving3String +" € per month");
-			        
-			        double perMonthF=p.getAmount(4)/100.00;
-			        String perMonthString =df.format(perMonthF);
-			        double perYearF=p.getAmount(5)/100.00;
-					String perYearString =df.format(perYearF);
-					
-					perMonth.setText(perMonthString+" €");
-					perYear.setText(perYearString+" €");					
-
-					for(int i=0; i<p.getNumProducts();i++){
-						handleUrl.add(p.getHandle(i));
-					}
-					break;
-				}
-
-			}
-		}
 
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
 			log("PAYMENT URL: " + request.getLink());

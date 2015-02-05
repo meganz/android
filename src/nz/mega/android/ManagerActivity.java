@@ -6693,7 +6693,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
-	public void showpF(int type){
+	public void showpF(int type, ArrayList<Product> accounts){
 		
 		accountFragment=PAYMENT_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
@@ -6703,27 +6703,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if(pF==null){			
 			pF = new PaymentFragment();
-			pF.setParameterType(type);
+//			Bundle args = new Bundle();
+//			args.putInt("type", type);
+//			f.setArguments(args);
+			pF.setInfo(type, accounts);
 			ft.replace(R.id.fragment_container, pF, "pF");
 			ft.commit();
 		}
 		else{			
-			pF.setParameterType(type);			
+			pF.setInfo(type, accounts);			
 			ft.replace(R.id.fragment_container, pF, "pF");
 			ft.commit();
 		}
 	}
 	
 	public void onUpgrade1Click(View view) {
-		showpF(1);
+		showpF(1, upAF.getAccounts());
 	}
 
 	public void onUpgrade2Click(View view) {
-		showpF(2);
+		showpF(2, upAF.getAccounts());
 	}
 
 	public void onUpgrade3Click(View view) {
-		showpF(3);
+		showpF(3, upAF.getAccounts());
 	}
 	
 	public void onYearlyClick(View view) {
