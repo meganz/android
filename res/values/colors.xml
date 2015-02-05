@@ -48,4 +48,7 @@
      
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    
+    <color name="transparent_black">#80000000</color>
+    <color name="transparent_mega">#80db0605</color>
 </resources>

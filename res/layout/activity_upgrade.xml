@@ -4,15 +4,16 @@
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent" >
   
-        
          <!-- Pro 1 -->
         <RelativeLayout
+            android:id="@+id/pro1_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:background="#ffffff"
             android:onClick="onUpgrade1Click"
             android:layout_weight="1">
+        
             <ImageView 
                 android:id="@+id/pro1_image"
                 android:layout_width="wrap_content"
@@ -76,13 +77,14 @@
                 android:layout_toRightOf="@id/pro1_title"  
                 android:layout_alignLeft="@id/pro1_bandwidth_title"            
                 android:layout_below="@id/pro1_image"/>
-            
-        </RelativeLayout>
-        
+
+        </RelativeLayout>        
+                      
         <include layout="@layout/delimiter" />
         
         <!-- Pro 2 -->
         <RelativeLayout
+            android:id="@+id/pro2_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -158,6 +160,7 @@
         
         <!-- Pro 3 -->
         <RelativeLayout
+            android:id="@+id/pro3_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
