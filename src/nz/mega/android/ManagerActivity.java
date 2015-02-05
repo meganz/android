@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -323,6 +327,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
 		
+//		Toast.makeText(this, "(): " + GooglePlayServicesUtil.isGooglePlayServicesAvailable(this), Toast.LENGTH_LONG).show();
+		
 		File thumbDir;
 		if (getExternalCacheDir() != null){
 			thumbDir = new File (getExternalCacheDir(), "thumbnailsMEGA");
@@ -357,6 +363,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 
 		app = (MegaApplication)getApplication();
+//		// Get tracker.
+//		Tracker t = app.getTracker(TrackerName.APP_TRACKER);
+//		// Enable Advertising Features.
+//		t.enableAdvertisingIdCollection(true);
+//		// Set screen name.
+//		t.setScreenName("Prueba");
+//		// Send a screen view.
+//		t.send(new HitBuilders.AppViewBuilder().build());
+		
+		
 		megaApi = app.getMegaApi();
 		
 		if (megaApi == null){
