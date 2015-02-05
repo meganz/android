@@ -37,6 +37,9 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.Megaactionbar" >
         
+        <meta-data android:name="com.google.android.gms.version"
+        	android:value="@integer/google_play_services_version" />
+        
         <activity
             android:name="TourActivity"
             android:label="@string/app_name"
@@ -290,6 +293,19 @@
             android:name="MegaStreamingService"
             android:exported="false" >
         </service>
+        
+        <!-- Used for Google Play Store Campaign Measurement-->
+		<service 
+		    android:name="com.google.android.gms.analytics.CampaignTrackingService" />
+		
+		<receiver 
+		    android:name="nz.mega.android.receivers.CustomInstallReferrerReceiver"
+          	android:exported="true">
+  				<intent-filter>
+    				<action 
+    				    android:name="com.android.vending.INSTALL_REFERRER" />
+  				</intent-filter>
+		</receiver>
         
         <receiver
 	        android:name="nz.mega.android.receivers.CameraEventReceiver"
