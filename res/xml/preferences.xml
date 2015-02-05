@@ -2,8 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
      <nz.mega.components.MEGAPreferenceCategory 
         android:key="settings_pin_lock"
-        android:title="@string/settings_pin_lock"
-        android:textColor="@color/pressed_mega">
+        android:title="@string/settings_pin_lock">
+ <!--        android:textColor="@color/pressed_mega">  -->
         
          <Preference
 	        android:key="settings_pin_lock_enable"
