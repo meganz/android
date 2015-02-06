@@ -150,7 +150,7 @@ public class MegaApiJava
      */
 	public void addRequestListener(MegaRequestListenerInterface listener)
 	{
-		megaApi.addRequestListener(createDelegateRequestListener(listener));
+		megaApi.addRequestListener(createDelegateRequestListener(listener, false));
 	}
 	
 	/**
@@ -2792,7 +2792,14 @@ public class MegaApiJava
 	/****************************************************************************************************/
 	private MegaRequestListener createDelegateRequestListener(MegaRequestListenerInterface listener)
 	{
-		DelegateMegaRequestListener delegateListener = new DelegateMegaRequestListener(this, listener);
+		DelegateMegaRequestListener delegateListener = new DelegateMegaRequestListener(this, listener, true);
+		activeRequestListeners.add(delegateListener);
+		return delegateListener;
+	}
+	
+	private MegaRequestListener createDelegateRequestListener(MegaRequestListenerInterface listener, boolean singleListener)
+	{
+		DelegateMegaRequestListener delegateListener = new DelegateMegaRequestListener(this, listener, singleListener);
 		activeRequestListeners.add(delegateListener);
 		return delegateListener;
 	}

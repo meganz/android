@@ -14,10 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -419,7 +415,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    }
 		    
 		    if (!openLink){
-		    	logout(this, (MegaApplication)getApplication(), megaApi, false);
+		    	logout(this, megaApi, false);
 		    }
 		    
 	    	return;
@@ -1029,7 +1025,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	dbH = DatabaseHandler.getDbHandler(getApplicationContext());
     	if(dbH.getCredentials() == null){	
     		if (!openLink){
-    			logout(this, (MegaApplication)getApplication(), megaApi, false);
+    			logout(this, megaApi, false);
     			return;
     		}			
 		}
@@ -3996,7 +3992,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	 /*
 	 * Logout user
 	 */
-	static public void logout(Context context, MegaApplication app, MegaApiAndroid megaApi, boolean confirmAccount) {
+	static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
 //		context.stopService(new Intent(context, BackgroundService.class));
 		log("logout");
 //		context.stopService(new Intent(context, CameraSyncService.class));
@@ -4057,6 +4053,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		
 //		DatabaseHandler dbH = new DatabaseHandler(context);
+		Intent cancelTransfersIntent = new Intent(context, DownloadService.class);
+		cancelTransfersIntent.setAction(DownloadService.ACTION_CANCEL);
+		context.startService(cancelTransfersIntent);
+		cancelTransfersIntent = new Intent(context, UploadService.class);
+		cancelTransfersIntent.setAction(UploadService.ACTION_CANCEL);
+		context.startService(cancelTransfersIntent);
+		
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		dbH.clearCredentials();
 		if (dbH.getPreferences() != null){
@@ -4089,12 +4092,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				managerActivity = null;
 			}
 			else{
-				Intent intent = new Intent (context, TourActivity.class);
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				context.startActivity(intent);
-				((Activity)context).finish();
-				context = null;
+//				Intent intent = new Intent (context, TourActivity.class);
+//				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+//		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//				context.startActivity(intent);
+//				if (context instanceof Activity){
+//					((Activity)context).finish();
+//				}
+//				context = null;
 			}
 		}
 		else{
@@ -4233,6 +4238,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
+//			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+//				log("type_logout");
+//				if (e.getErrorCode() == MegaError.API_ESID){
+//					log("calling ManagerActivity.logout");
+//					MegaApiAndroid megaApi = app.getMegaApi(); 
+//					ManagerActivity.logout(managerActivity, app, megaApi, false);
+//				}
+//			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
 			if (e.getErrorCode() == MegaError.API_OK){

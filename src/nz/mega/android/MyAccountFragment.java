@@ -280,7 +280,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 
 		switch (v.getId()) {
 			case R.id.my_account_logout:{
-				ManagerActivity.logout(context, (MegaApplication)((ManagerActivity)context).getApplication(), megaApi, false);
+				ManagerActivity.logout(context, megaApi, false);
 				break;
 			}
 			case R.id.btn_upgrade:{

@@ -56,7 +56,7 @@ public class OpenLinkActivity extends PinActivity {
 		// Confirmation link
 		if (url != null && (url.matches("^https://mega.co.nz/#confirm.+$") || url.matches("^https://mega.nz/#confirm.+$"))) {
 			log("confirmation url");
-			ManagerActivity.logout(this, app, megaApi, true);
+			ManagerActivity.logout(this, megaApi, true);
 			Intent confirmIntent = new Intent(this, LoginActivity.class);
 			confirmIntent.putExtra(LoginActivity.EXTRA_CONFIRMATION, url);
 			confirmIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

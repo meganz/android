@@ -4,11 +4,13 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 
 	MegaApiJava megaApi;
 	MegaRequestListenerInterface listener;
+	boolean singleListener;
 	
-	DelegateMegaRequestListener(MegaApiJava megaApi, MegaRequestListenerInterface listener)
+	DelegateMegaRequestListener(MegaApiJava megaApi, MegaRequestListenerInterface listener, boolean singleListener)
 	{
 		this.megaApi = megaApi;
 		this.listener = listener;
+		this.singleListener = singleListener;
 	}
 	
 	MegaRequestListenerInterface getUserListener()
@@ -63,7 +65,9 @@ class DelegateMegaRequestListener extends MegaRequestListener {
 			    }
 			});
 		}
-		megaApi.privateFreeRequestListener(this);
+		if (singleListener){
+			megaApi.privateFreeRequestListener(this);
+		}
 	}
 
 	@Override

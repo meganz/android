@@ -135,7 +135,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (dbH.getCredentials() == null){
-			ManagerActivity.logout(this, (MegaApplication)getApplication(), megaApi, false);
+			ManagerActivity.logout(this, megaApi, false);
 			return;
 		}
 		

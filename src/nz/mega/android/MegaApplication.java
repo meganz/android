@@ -1,13 +1,21 @@
 package nz.mega.android;
 
-import java.util.HashMap;
+//import com.google.android.gms.analytics.GoogleAnalytics;
+//import com.google.android.gms.analytics.Logger.LogLevel;
+//import com.google.android.gms.analytics.Tracker;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
-import com.google.android.gms.analytics.Logger.LogLevel;
-import com.google.android.gms.analytics.Tracker;
+import java.util.ArrayList;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaError;
+import nz.mega.sdk.MegaListenerInterface;
+import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUser;
 import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,7 +23,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 
-public class MegaApplication extends Application
+public class MegaApplication extends Application implements MegaListenerInterface
 {
 	final String TAG = "MegaApplication";
 	static final String APP_KEY = "U5NE3TxD";
@@ -23,6 +31,7 @@ public class MegaApplication extends Application
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
+	BackgroundRequestListener requestListener;
 	
 //	static final String GA_PROPERTY_ID = "UA-59254318-1";
 //	
@@ -42,17 +51,53 @@ public class MegaApplication extends Application
 //
 //	HashMap<TrackerName, Tracker> mTrackers = new HashMap<TrackerName, Tracker>();
 	
+	class BackgroundRequestListener implements MegaRequestListenerInterface
+	{
+
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			log("onRequestStart: " + request.getRequestString());
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			log("onRequestUpdate: " + request.getRequestString());
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request,
+				MegaError e) {
+			log("onRequestFinish: " + request.getRequestString());
+			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+				log("type_logout");
+				if (e.getErrorCode() == MegaError.API_ESID){
+					log("calling ManagerActivity.logout");
+					ManagerActivity.logout(getApplicationContext(), megaApi, false);
+				}
+			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,
+				MegaRequest request, MegaError e) {
+			log("onRequestTemporaryError: " + request.getRequestString());
+		}
+		
+	}
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_INFO);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
 		
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
 	}
+	
+	
 	
 //	private void initializeGA(){
 //		// Set the log level to verbose.
@@ -87,6 +132,7 @@ public class MegaApplication extends Application
 	{
 		if(megaApi == null)
 		{
+			log("MEGAAPI = null");
 			PackageManager m = getPackageManager();
 			String s = getPackageName();
 			PackageInfo p;
@@ -104,6 +150,11 @@ public class MegaApplication extends Application
 			Log.d(TAG, "Database path: " + path);
 			megaApi = new MegaApiAndroid(MegaApplication.APP_KEY, 
 					MegaApplication.USER_AGENT, path);
+			
+			requestListener = new BackgroundRequestListener();
+			log("ADD REQUESTLISTENER");
+			megaApi.addRequestListener(requestListener);
+//			megaApi.addListener(this);
 		}
 		
 		return megaApi;
@@ -138,5 +189,112 @@ public class MegaApplication extends Application
 	
 	public static void log(String message) {
 		Util.log("MegaApplication", message);
+	}
+
+
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		log("onRequestFinish: " + request.getRequestString());
+		if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			log("type_logout");
+			if (e.getErrorCode() == MegaError.API_ESID){
+				log("calling ManagerActivity.logout");
+				ManagerActivity.logout(getApplicationContext(), megaApi, false);
+			}
+		}
+	}
+
+
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onReloadNeeded(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+			MegaError e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void onTransferTemporaryError(MegaApiJava api,
+			MegaTransfer transfer, MegaError e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
+			byte[] buffer) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

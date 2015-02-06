@@ -19,8 +19,10 @@ import nz.mega.sdk.MegaUtils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
@@ -281,10 +283,19 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
         log ("INSTANTIATE POSITION " + position);
 
 		MegaNode node = megaApi.getNodeByHandle(imageHandles.get(position));
-				
+		
 		ViewHolderFullImage holder = new ViewHolderFullImage();
 		LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View viewLayout = inflater.inflate(R.layout.item_full_screen_image_viewer, container,false);
+		
+		if (node == null){
+			Intent intent = new Intent(activity, TourActivity.class);
+	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+	        activity.startActivity(intent);
+	        activity.finish();
+	        return viewLayout;
+		}
 		
 		holder.imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.full_screen_image_viewer_image);
 		holder.imgDisplay.setImageResource(MimeTypeMime.typeForName(node.getName()).getIconResourceId());
