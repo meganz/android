@@ -90,7 +90,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 //		dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (dbH.getCredentials() == null){
-			ManagerActivity.logout(this, app, megaApi, false);
+			ManagerActivity.logout(this, megaApi, false);
 			return;
 		}
 		

@@ -19,6 +19,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -418,6 +419,16 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 				
 				if (monthPic.nodeHandles.size() > i){
 					MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
+					if (n == null){
+						Intent intent = new Intent(context, TourActivity.class);
+				        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+				        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				        context.startActivity(intent);
+				        if (context instanceof Activity){
+				        	((Activity)context).finish();
+				        }
+				        return convertView;
+					}
 					int positionInNodes = 0;
 					for (int j=0;j<nodes.size();j++){
 						if(nodes.get(j).getHandle() == monthPic.nodeHandles.get(i)){
