@@ -152,9 +152,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //		this.emptyTextViewFragment = emptyTextView;
 		this.aB = aB;
 		this.positionClicked = -1;
-		this.type = type;
-		
-		
+		this.type = type;		
 
 		if (megaApi == null) {
 			megaApi = ((MegaApplication) ((Activity) context).getApplication())

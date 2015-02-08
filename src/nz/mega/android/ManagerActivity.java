@@ -538,13 +538,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log("rootNode != null");		
 			megaApi.addGlobalListener(this);
 			megaApi.addTransferListener(this);
-			ArrayList<MegaUser> contacts = megaApi.getContacts();
+//			ArrayList<MegaUser> contacts = megaApi.getContacts();
 			
-			for (int i=0; i < contacts.size(); i++){
-				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
-					contact = contacts.get(i);
-				}
-			}
+//			for (int i=0; i < contacts.size(); i++){
+//				if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_ME){
+//					contact = contacts.get(i);
+//				}
+//			}
+			
+			contact = megaApi.getContact(megaApi.getMyEmail());
 			
 			if (contact != null){
 				userEmail.setVisibility(View.VISIBLE);

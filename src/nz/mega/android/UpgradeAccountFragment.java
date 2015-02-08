@@ -68,7 +68,6 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	private ImageView pro2;
 	private ImageView pro3;
 	private RelativeLayout pro1Layout;
-	private RelativeLayout pro1LayoutTrans;
 	private RelativeLayout pro3Layout;
 	private RelativeLayout pro2Layout;
 	private Fragment selectMembership;
