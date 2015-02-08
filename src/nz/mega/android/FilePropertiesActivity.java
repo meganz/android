@@ -118,6 +118,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	ArrayList<MegaShare> sl;
 	MegaOffline mOffDelete;
 	Button sharedWithButton;	
+	
+	TextView ownerInfo;	
 
 	ArrayList<MegaNode> dTreeList = null;
 	
@@ -274,6 +276,8 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			nameView.setSingleLine();
 			nameView.setTypeface(null, Typeface.BOLD);
 
+			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
+			ownerInfo.setVisibility(View.GONE);			
 			
 //			sharedWith = (RelativeLayout) findViewById(R.id.contacts_shared_with_eye);
 //			sharedLayout= (TableLayout) findViewById(R.id.file_properties_content_table);
@@ -394,9 +398,33 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					availableSwitchOffline.setVisibility(View.GONE);
 					availableSwitchOnline.setVisibility(View.VISIBLE);
 				}
-				
+
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
 				imageView.setImageResource(imageId);
+
+				if(from==FROM_INCOMING_SHARES){
+					//Show who is the owner
+					ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
+					boolean found=false;
+					int i=0;
+					while(!found && i<usersIncoming.size()){
+						MegaUser user = usersIncoming.get(i);
+						ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
+						
+						for(int j=0; j<nodesIncoming.size();j++){
+							MegaNode nI = nodesIncoming.get(j);
+							
+							if(nI.getName().equals(node.getName())){
+								ownerInfo.setText(user.getEmail());
+								ownerInfo.setVisibility(View.VISIBLE);	
+								found=true;
+								break;
+							}
+						}
+						i++;
+					}
+				}
+				
 				sl = megaApi.getOutShares(node);		
 
 				if (sl != null){

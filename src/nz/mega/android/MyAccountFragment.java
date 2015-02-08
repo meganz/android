@@ -158,8 +158,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		megaApi.getUserData(this);
 		
 		userNameTextView.setText(myEmail);		
-		myUser = megaApi.getContact(myEmail);
-
+		myUser = megaApi.getContact(myEmail);		
 
 		logoutButton.setText(R.string.action_logout);
 		lastSession.setText(R.string.general_not_yet_implemented);
