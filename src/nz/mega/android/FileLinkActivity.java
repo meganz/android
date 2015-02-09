@@ -2,7 +2,6 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
@@ -14,15 +13,10 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.DialogInterface.OnCancelListener;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
@@ -268,19 +262,44 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 			}
 		 }
 		else if (request.getType() == MegaRequest.TYPE_COPY){
+			
 			try{
 				statusDialog.dismiss(); 
 			} catch(Exception ex){};
 
 			if (e.getErrorCode() != MegaError.API_OK) {
-				Util.showErrorAlertDialog(e, this);
-			}
+				
+				log("e.getErrorCode() != MegaError.API_OK");
+				
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					Toast.makeText(this, e.getErrorCode()+"", Toast.LENGTH_LONG).show();
+					
+					Intent intent = new Intent(this, ManagerActivity.class);
+					intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
+					startActivity(intent);
+					finish();
+
+				}
+				else
+				{
+					Util.showErrorAlertDialog(e, this);
+					Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+					Intent intent = new Intent(this, ManagerActivity.class);
+			        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					startActivity(intent);
+					finish();
+				}							
+				
+			}else{
+				Intent intent = new Intent(this, ManagerActivity.class);
+		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				startActivity(intent);
+				finish();
+			}		
 			
-			Intent intent = new Intent(this, ManagerActivity.class);
-	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-	        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-			startActivity(intent);
-			finish();
 		}
 	}
 

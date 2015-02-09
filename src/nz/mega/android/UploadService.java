@@ -805,6 +805,19 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 					currentTransfers.remove(transfer.getTag());
 				}
+				else if(error.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+error.getErrorCode());
+					
+					Intent intent = new Intent(this, ManagerActivity.class);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
+					startActivity(intent);
+					
+					Intent tempIntent = null;
+					tempIntent = new Intent(this, UploadService.class);
+					tempIntent.setAction(UploadService.ACTION_CANCEL);
+					startService(tempIntent);	
+				}
 				else{
 					totalUploadedError++;
 					totalSizeUploadedError += transfer.getTotalBytes();

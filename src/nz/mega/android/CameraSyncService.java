@@ -1079,6 +1079,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("SIZEEEEEE: " + nLAfter.size());
 				uploadNextImage();
 			}
+			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				log("OVERQUOTA ERROR: "+e.getErrorCode());
+				
+				Intent intent = new Intent(this, ManagerActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
+				startActivity(intent);
+	
+			}
 			else{
 				log("Image Sync FAIL: " + transfer.getFileName());
 				megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);

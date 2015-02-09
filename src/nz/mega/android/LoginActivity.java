@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -67,6 +68,7 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 	TextView loggingInText;
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
+	ScrollView scrollView;
 	
 	int heightGrey = 0;
 	float scaleH, scaleW;
@@ -160,9 +162,16 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 			registerText.setOnClickListener(this);
 			heightGrey = (int) (Util.percScreenLoginReturning * outMetrics.heightPixels);
 			firstTime = false;
-		}
-		
-		
+		}	
+
+//		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
+//		
+//		scrollView.post(new Runnable() { 
+//	        public void run() { 
+//	        	scrollView.fullScroll(scrollView.FOCUS_DOWN);
+//	        } 
+//		});		
+				
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
@@ -204,8 +213,7 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 				}
 				return false;
 			}
-		});
-		
+		});		
 		
 		bLogin = (Button) findViewById(R.id.button_login_login);
 		
