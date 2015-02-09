@@ -143,7 +143,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
-	final public static int PAYMENT_FRAGMENT = 5002;	
+	final public static int PAYMENT_FRAGMENT = 5002;
+	final public static int OVERQUOTA_ALERT = 5003;
 	
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -156,7 +157,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
-	
+
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -172,6 +173,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
+	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -314,6 +316,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	String pathNavigation = "/";	
 	long lastTimeOnTransferUpdate = -1;	
 	boolean firstTimeCam = false;
+	
+	AlertDialog overquotaDialog;
 	
 	String titleAB = "";
 	
@@ -1120,6 +1124,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					}
     				}
     			}
+    			else if(intent.getAction().equals(ACTION_OVERQUOTA_ALERT)){
+	    			showOverquotaAlert();
+	    		}
     			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
     				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
 					Intent tempIntent = null;
@@ -2171,7 +2178,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case PAYMENT_FRAGMENT:{
 					showUpAF();
 					return;					
-				}			
+				}
+				case OVERQUOTA_ALERT:{
+					if (upAF != null){						
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+							
+						}					
+					}
+					return;
+				}
+				default:{
+					if (fbF != null){						
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+							
+						}					
+					}
+				}
 			}
 		}
 		
@@ -4535,9 +4563,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
-			}
-			log("copy nodes request finished");
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					showOverquotaAlert();
+				}
+				else
+				{
+					Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+				}
+			}			
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try { 
@@ -4674,6 +4708,54 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				log("ERROR MegaRequest.TYPE_SHARE");
 			}
 		}
+	}
+	
+	private void showOverquotaAlert(){
+		
+		dbH.setCamSyncEnabled(false);
+		
+		if(overquotaDialog==null){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getString(R.string.overquota_alert_title));
+			LayoutInflater inflater = getLayoutInflater();
+			View dialoglayout = inflater.inflate(R.layout.dialog_overquota_error, null);
+			TextView textOverquota = (TextView) dialoglayout.findViewById(R.id.dialog_overquota);
+			builder.setView(dialoglayout);
+			
+			builder.setPositiveButton(getString(R.string.my_account_upgrade_pro), new android.content.DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					//Show UpgradeAccountActivity
+					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+					if(upAF==null){
+						upAF = new UpgradeAccountFragment();
+						ft.replace(R.id.fragment_container, upAF, "upAF");
+						drawerItem = DrawerItem.ACCOUNT;
+						accountFragment=OVERQUOTA_ALERT;
+						ft.commit();
+					}
+					else{			
+						ft.replace(R.id.fragment_container, upAF, "upAF");
+						drawerItem = DrawerItem.ACCOUNT;
+						accountFragment=OVERQUOTA_ALERT;
+						ft.commit();
+					}
+				}
+			});
+			builder.setNegativeButton(getString(R.string.general_cancel), new android.content.DialogInterface.OnClickListener() {			
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {						
+					dialog.dismiss();	
+					overquotaDialog=null;
+				}
+			});
+			
+			overquotaDialog = builder.create();
+			overquotaDialog.show();
+			Util.brandAlertDialog(overquotaDialog);
+		}	
 	}
 
 	private int getAvatarTextSize (float density){
@@ -5325,6 +5407,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		openLinkDialog = builder.create();
 		openLinkDialog.show();
+		Util.brandAlertDialog(openLinkDialog);
 		
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override

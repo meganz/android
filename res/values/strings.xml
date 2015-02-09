@@ -321,6 +321,8 @@
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade now!</string>
     <string name="my_account_change_password" context="menu item">Change password</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
+     <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
     
     <string name="my_account_last_session" context="when did the last session happen">Last session:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections:</string>
