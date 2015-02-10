@@ -32,3 +32,7 @@
 /MegaTransferList.java
 /MegaShareList.java
 /MegaNodeList.java
+/MegaAccountBalance.java
+/MegaAccountPurchase.java
+/MegaAccountSession.java
+/MegaAccountTransaction.java
