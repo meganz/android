@@ -32,6 +32,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.content.Intent;
 import android.database.Cursor;
@@ -42,6 +43,7 @@ import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
@@ -75,6 +77,7 @@ public class Util {
 	public static String offlineDIR = "MEGA/MEGA Offline"; 
 	public static String downloadDIR ="MEGA/MEGA Downloads";
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";
+	public static String logDIR = "MEGA/MEGA Logs";
 	
 	public static DatabaseHandler dbH;
 	
@@ -787,6 +790,19 @@ public class Util {
 	          }
 	          return null;
 	      }
+	
+	@SuppressLint("InlinedApi") 
+	public static boolean isCharging(Context context) {
+		final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+		int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+
+		if (Build.VERSION.SDK_INT < 17) {
+			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB;
+		} else {
+			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
+		}
+
+	}
 
 	private static void log(String message) {
 		log("Util", message);

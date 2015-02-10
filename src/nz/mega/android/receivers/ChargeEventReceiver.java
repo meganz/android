@@ -24,6 +24,8 @@ public class ChargeEventReceiver extends BroadcastReceiver {
 		log("ChargeEventReceiver");
 		final Context c = context;
 		
+		log("isCharging(): "+Util.isCharging(c));
+		
 		handler.postDelayed(new Runnable() {
 			
 			@Override
