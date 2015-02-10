@@ -237,6 +237,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 					}
 					
+//					boolean isCharging = Util.isCharging(this);
+//					//TODO: now assuming that ischarging is needed
+//					if (!isCharging){
+//						log("no charging...");
+//						finish();
+//						return START_REDELIVER_INTENT;
+//					}
+					
 					//The "Camera Upload" folder exists?
 					if (prefs.getCamSyncHandle() == null){
 						cameraUploadHandle = -1;

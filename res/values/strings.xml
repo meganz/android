@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.0.5</string>
-    <string name="sdk_version" context="Not translate">e6ad747</string>
+    <string name="app_version" context="Not translate">2.0.6</string>
+    <string name="sdk_version" context="Not translate">dc651d3</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -118,6 +118,7 @@
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Invalid email address</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Network connection problem, please try again later</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Calculating encryption keys</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Connecting to the server</string>
     <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Incorrect email or password. Have you validated your email account?</string>    
