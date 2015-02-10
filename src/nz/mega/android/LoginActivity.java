@@ -690,7 +690,10 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 				else if (error.getErrorCode() == MegaError.API_ENOENT) {
 					errorMessage = getString(R.string.error_server_connection_problem);
 				}
-				else {
+				else if (error.getErrorCode() == MegaError.API_ESID){
+					errorMessage = getString(R.string.error_server_expired_session);
+				}
+				else{
 					errorMessage = error.getErrorString();
 				}
 				loginLoggingIn.setVisibility(View.GONE);
