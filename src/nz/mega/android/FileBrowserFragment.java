@@ -136,6 +136,19 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					((ManagerActivity) context).showMove(handleList);
 					break;
 				}
+				case R.id.cab_menu_share:{
+					//Check that all the selected options are folders
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						if(documents.get(i).isFolder()){
+							handleList.add(documents.get(i).getHandle());
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).shareFolder(handleList);					
+					break;
+				}
 				case R.id.cab_menu_share_link:{
 					clearSelections();
 					hideMultipleSelect();
@@ -190,7 +203,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			boolean showMove = false;
 			boolean showLink = false;
 			boolean showTrash = false;
-		
+			boolean showShare = true;
 			// Rename
 			if((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)) {
 				showRename = true;
@@ -212,6 +225,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 						showTrash = false;
 						showMove = false;
 						break;
+					}
+					if(showShare){
+						if(selected.get(i).isFile()){
+							showShare = false;
+						}
 					}
 				}
 				
@@ -237,6 +255,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
 			
 			return false;
 		}
