@@ -5670,13 +5670,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				return;
 			}
 			
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);
-			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
-			final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
+			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);			
 			final boolean megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
+			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			
 			if (megaContacts){
+				
+				//Just one folder to share
+				if(multiselectIntent==0){
 
+					final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+					final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
+					
 					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
@@ -5728,6 +5733,79 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
 					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+				}
+				else if(multiselectIntent==1){
+					//Several folder to share
+					final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+					
+						
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							ProgressDialog temp = null;
+							try{
+								temp = new ProgressDialog(managerActivity);
+								temp.setMessage(getString(R.string.context_sharing_folder));
+								temp.show();
+							}
+							catch(Exception e){
+								return;
+							}
+							statusDialog = temp;
+							permissionsDialog.dismiss();
+							
+							switch(item) {
+			                    case 0:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
+			                    		for(int j=0; j<nodeHandles.length;j++){						
+			            					
+			        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+			        						megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
+			                    		}
+			                    	}
+			                    	break;
+			                    }
+			                    case 1:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		for(int j=0; j<nodeHandles.length;j++){						
+			            					
+			        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+			        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+			                    		}
+//			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+			                    	}
+			                        break;
+			                    }
+			                    case 2:{
+			                    	for (int i=0;i<contactsData.size();i++){
+			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+			                    		for(int j=0; j<nodeHandles.length;j++){						
+			            					
+			        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+			        						megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+			                    		}
+//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+			                    	}		                    	
+			                        break;
+			                    }
+			                }
+						}
+					});
+					permissionsDialog = dialogBuilder.create();
+					permissionsDialog.show();
+					Resources resources = permissionsDialog.getContext().getResources();
+					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+			        alertTitle.setTextColor(resources.getColor(R.color.mega));
+					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+					
+				}
 
 			}
 			else{
@@ -6683,24 +6761,35 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void shareFolder(ArrayList<Long> handleList){
-		
+		log("shareFolder ArrayListLong");
 		//TODO shareMultipleFolders
 
 		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
-									
 			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
 	    	intent.setClass(this, ContactsExplorerActivity.class);
-	    	//intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
+	    	
+	    	long[] handles=new long[handleList.size()];
+	    	int j=0;
+	    	for(int i=0; i<handleList.size();i++){
+	    		handles[j]=handleList.get(i);
+	    		j++;
+	    	}	    	
+	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, handles);
+	    	//Multiselect=1 (multiple folders)
+	    	intent.putExtra("MULTISELECT", 1);
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
 	}
 	
 	public void shareFolder(MegaNode node){
-
+		log("shareFolder MegaNode");
+		
 		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
 									
 			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SHARE_FOLDER);
 	    	intent.setClass(this, ContactsExplorerActivity.class);
+	    	//Multiselect=0
+	    	intent.putExtra("MULTISELECT", 0);
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			

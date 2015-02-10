@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.MultiSelectListPreference;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
@@ -59,6 +60,8 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	
 	boolean megaContacts = true;
 	
+	int multipleSelectIntent;
+	
 	private TextView windowTitle;
 	private Button button;
 	private ListView listView;
@@ -66,6 +69,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	private ImageButton megaPhoneContacts;
 	
 	long nodeHandle = -1;
+	long[] nodeHandles;
 	
 	ContactsExplorerAdapter adapter;
 	
@@ -205,8 +209,13 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		setContentView(R.layout.activity_contactsexplorer);
 		
 		if (savedInstanceState != null) {
-			if (savedInstanceState.containsKey(EXTRA_NODE_HANDLE)) {
-				nodeHandle = savedInstanceState.getLong(EXTRA_NODE_HANDLE);
+			if (savedInstanceState.containsKey(EXTRA_NODE_HANDLE)) {				
+				if(multipleSelectIntent==0){
+					nodeHandle =  savedInstanceState.getLong(EXTRA_NODE_HANDLE);
+				}
+				else if(multipleSelectIntent==1){
+					nodeHandles = savedInstanceState.getLongArray(EXTRA_NODE_HANDLE);
+				}
 			}
 		}
 		
@@ -252,7 +261,14 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		
 		
 		Intent intent = getIntent();
-		nodeHandle =  intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
+		
+		multipleSelectIntent = intent.getIntExtra("MULTISELECT", -1);
+		if(multipleSelectIntent==0){
+			nodeHandle =  intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
+		}
+		else if(multipleSelectIntent==1){
+			nodeHandles=intent.getLongArrayExtra(EXTRA_NODE_HANDLE);
+		}
 		
 		button.setOnClickListener(this);
 		addContactButton.setOnClickListener(this);
@@ -271,7 +287,13 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	
 	@Override
 	public void onSaveInstanceState(Bundle state) {
-		state.putLong(EXTRA_NODE_HANDLE, nodeHandle);
+		if(multipleSelectIntent==0){
+			state.putLong(EXTRA_NODE_HANDLE, nodeHandle);
+		}
+		else if(multipleSelectIntent==1){
+			state.putLongArray(EXTRA_NODE_HANDLE, nodeHandles);
+		}
+
 		super.onSaveInstanceState(state);
 	}
 	
@@ -447,7 +469,14 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	private void setResultContacts(ArrayList<String> emails, boolean megaContacts) {
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra(EXTRA_CONTACTS, emails);
-		intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
+		if(multipleSelectIntent==0){
+			intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
+			intent.putExtra("MULTISELECT", 0);
+		}
+		else if(multipleSelectIntent==1){
+			intent.putExtra(EXTRA_NODE_HANDLE, nodeHandles);
+			intent.putExtra("MULTISELECT", 1);
+		}		
 		intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 		setResult(RESULT_OK, intent);
 		finish();

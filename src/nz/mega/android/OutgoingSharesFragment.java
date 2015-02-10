@@ -88,6 +88,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 		boolean showMove = false;
 		boolean showLink = false;
 		boolean showTrash = false;
+		boolean showShare = false;
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -122,6 +123,19 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 					((ManagerActivity) context).showCopy(handleList);
 					break;
 				}	
+				case R.id.cab_menu_share:{
+					//Check that all the selected options are folders
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						if(documents.get(i).isFolder()){
+							handleList.add(documents.get(i).getHandle());
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivity) context).shareFolder(handleList);					
+					break;
+				}
 				case R.id.cab_menu_move:{
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
@@ -183,6 +197,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			if (selected.size() != 0) {
 				showTrash = true;
 				showMove = true;
+				showShare = true;
 				
 				if (selected.size() == 1) {
 					showLink=true;
@@ -218,9 +233,10 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			menu.findItem(R.id.cab_menu_download).setVisible(true);
 			menu.findItem(R.id.cab_menu_rename).setVisible(showRename);
 			menu.findItem(R.id.cab_menu_copy).setVisible(true);
-			menu.findItem(R.id.cab_menu_move).setVisible(true);
+			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
+			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
-			menu.findItem(R.id.cab_menu_trash).setVisible(true);
+			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}
