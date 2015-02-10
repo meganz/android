@@ -104,6 +104,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	ArrayList<MegaNode> nodes;
 	
+	long gParentHandle;
+	
 	/*
 	 * Background task to process files for uploading
 	 */
@@ -397,7 +399,13 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				return;
 			}
 			else {
-				long parentHandle = cDriveExplorer.getParentHandle();
+				long parentHandle;
+				if (cDriveExplorer != null){
+					parentHandle = cDriveExplorer.getParentHandle();
+				}
+				else{
+					parentHandle = gParentHandle;
+				}
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
@@ -420,6 +428,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	public void buttonClick(long handle){
 		folderSelected = true;
+		this.gParentHandle = handle;
 		
 		if (mode == MOVE) {
 			long parentHandle = handle;
