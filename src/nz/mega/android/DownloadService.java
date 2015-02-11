@@ -1,7 +1,10 @@
 package nz.mega.android;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -29,6 +32,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.StatFs;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
@@ -58,6 +62,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	
+	public static String DB_FILE = "0";
+	public static String DB_FOLDER = "1";	
 	
 	private int successCount = 0;
 	private int errorCount = 0;
@@ -69,6 +75,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isFolderLink = false;
 	private boolean fromContactFile = false;
 	private String pathFileToOpen;
+	
+	ArrayList<MegaNode> dTreeList = null;
 
 	MegaApplication app;
 	MegaApiAndroid megaApi;
@@ -79,6 +87,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	File currentFile;
 	File currentDir;	
 	MegaNode currentDocument;
+	
+	DatabaseHandler dbH = null;
 	
 	private int notificationId = 2;
 	private int notificationIdFinal = 4;
@@ -97,7 +107,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	int totalDownloadedError;
 	long totalSizeToDownload;
 	long totalSizeDownloaded;
-	long totalSizeDownloadedError;	
+	long totalSizeDownloadedError;
+	
+	MegaNode offlineNode;
 	
 	
 	@SuppressLint("NewApi")
@@ -198,7 +210,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("stopping service!");
 					showCompleteSuccessNotification();
 				}
-			}
+			}			
 		}
 		
 		long totalFromSparse = 0;
@@ -601,6 +613,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			    Uri contentUri = Uri.fromFile(f);
 			    mediaScanIntent.setData(contentUri);
 			    this.sendBroadcast(mediaScanIntent);
+			    
+			    if(isOffline){
+					dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+					offlineNode = megaApi.getNodeByHandle(transfer.getNodeHandle());		
+					
+					if(offlineNode!=null){
+						saveOffline(offlineNode, transfer.getPath());
+					}
+			    }
 			}
 			else 
 			{
@@ -633,6 +654,243 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				onQueueComplete();
 			}
 		}		
+	}
+	
+	public void saveOffline (MegaNode node, String path){
+		log("saveOffline");
+
+		File destination = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			destination = new File(path);
+		}
+		else{
+			destination = getFilesDir();
+		}
+
+		if (destination.exists() && destination.isDirectory()){
+			File offlineFile = new File(destination, node.getName());
+			if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+				return;
+			}
+		}
+
+		destination.mkdirs();
+		
+		log ("DESTINATION!!!!!: " + destination.getAbsolutePath());
+
+		Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+		if (node.getType() == MegaNode.TYPE_FOLDER) {
+			log("saveOffline:isFolder");
+			getDlList(dlFiles, node, new File(destination, new String(node.getName())));
+		} else {
+			log("saveOffline:isFile");
+			dlFiles.put(node, destination.getAbsolutePath());			
+		}
+
+		ArrayList<MegaNode> nodesToDB = new ArrayList<MegaNode>();
+		
+		for (MegaNode document : dlFiles.keySet()) {						
+			nodesToDB.add(document);				
+		}		
+		insertDB(nodesToDB);			
+	}
+	
+	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
+		
+		if (megaApi.getRootNode() == null)
+			return;
+		
+		folder.mkdir();
+		ArrayList<MegaNode> nodeList = megaApi.getChildren(parent);
+		for(int i=0; i<nodeList.size(); i++){
+			MegaNode document = nodeList.get(i);
+			if (document.getType() == MegaNode.TYPE_FOLDER) {
+				File subfolder = new File(folder, new String(document.getName()));
+				getDlList(dlFiles, document, subfolder);
+			} 
+			else {
+				dlFiles.put(document, folder.getAbsolutePath());
+			}
+		}
+	}
+	
+	private void insertDB (ArrayList<MegaNode> nodesToDB){
+		log("insertDB");
+		
+		MegaNode parentNode = null;	
+		MegaNode nodeToInsert = null;	
+
+		String path = "/";	
+		MegaOffline mOffParent=null;
+		MegaOffline mOffNode = null;
+
+		parentNode = megaApi.getParentNode(nodeToInsert);
+
+		for(int i=nodesToDB.size()-1; i>=0; i--){
+
+			nodeToInsert = nodesToDB.get(i);
+			log("Node to insert: "+nodeToInsert.getName());
+
+			if(megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT){
+				
+				parentNode = megaApi.getParentNode(nodeToInsert);
+				log("ParentNode: "+parentNode.getName());
+				log("PARENT NODE nooot ROOT");
+
+				path = createStringTree(nodeToInsert);
+				if(path==null){
+					path="/";
+				}
+				else{
+					path="/"+path;
+				}
+				log("PAth node to insert: --- "+path);
+				//Get the node parent 
+				mOffParent = dbH.findByHandle(parentNode.getHandle());
+				//If the parent is not in the DB
+				//Insert the parent in the DB		
+				if(mOffParent==null){
+					insertParentDB(parentNode);						
+				}	
+
+				mOffNode = dbH.findByHandle(nodeToInsert.getHandle());				
+				mOffParent = dbH.findByHandle(parentNode.getHandle());
+				if(mOffNode == null){			
+
+					if(mOffParent!=null){
+						if(nodeToInsert.isFile()){
+							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,false);
+							long checkInsert=dbH.setOfflineFile(mOffInsert);
+							log("Test insert A: "+checkInsert);
+						}
+						else{
+							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, false);
+							long checkInsert=dbH.setOfflineFile(mOffInsert);
+							log("Test insert B: "+checkInsert);
+						}			
+					}
+				}					
+
+			}
+			else{	
+				path="/";
+
+				if(nodeToInsert.isFile()){
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, false);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert C: "+checkInsert);
+				}
+				else{
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, false);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert D: "+checkInsert);
+				}
+
+			}
+
+		}
+	}
+	
+	
+	private void insertParentDB (MegaNode parentNode){
+		log("insertParentDB: "+parentNode.getName());
+		
+		MegaOffline mOffParentParent = null;
+		String path=createStringTree(parentNode);
+		if(path==null){
+			path="/";
+		}
+		else{
+			path="/"+path;
+		}
+		
+		if(megaApi.getParentNode(parentNode).getType() != MegaNode.TYPE_ROOT){
+			
+			mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
+			if(mOffParentParent==null){						
+				insertParentDB(megaApi.getParentNode(parentNode));
+				//Insert the parent node
+				mOffParentParent = dbH.findByHandle(megaApi.getParentNode(parentNode).getHandle());
+				if(mOffParentParent==null){						
+					insertParentDB(megaApi.getParentNode(parentNode));						
+					
+				}
+				else{			
+					if(parentNode.isFile()){
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false);
+						long checkInsert=dbH.setOfflineFile(mOffInsert);
+						log("Test insert E: "+checkInsert);
+					}
+					else{
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, false);
+						long checkInsert=dbH.setOfflineFile(mOffInsert);
+						log("Test insert F: "+checkInsert);
+					}	
+				}	
+				
+			}
+			else{
+
+				if(parentNode.isFile()){
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert G: "+checkInsert);
+				}
+				else{
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, false);
+					long checkInsert=dbH.setOfflineFile(mOffInsert);
+					log("Test insert H: "+checkInsert);
+				}	
+			}	
+		}
+		else{
+			log("---------------PARENT NODE ROOT------");
+			if(parentNode.isFile()){
+				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, false);
+				long checkInsert=dbH.setOfflineFile(mOffInsert);
+				log("Test insert I: "+checkInsert);
+			}
+			else{
+				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, false);
+				long checkInsert=dbH.setOfflineFile(mOffInsert);
+				log("Test insert J: "+checkInsert);
+			}						
+		}			
+		
+	}
+
+	
+	private String createStringTree (MegaNode node){
+		log("createStringTree");
+		dTreeList = new ArrayList<MegaNode>();
+		MegaNode parentNode = null;
+		MegaNode nodeTemp = node;
+		StringBuilder dTree = new StringBuilder();
+		String s;
+		
+		dTreeList.add(node);
+		
+		if(node.getType() != MegaNode.TYPE_ROOT){
+			parentNode=megaApi.getParentNode(nodeTemp);
+			
+			while (parentNode.getType() != MegaNode.TYPE_ROOT){
+				dTreeList.add(parentNode);
+				dTree.insert(0, parentNode.getName()+"/");	
+				nodeTemp=parentNode;
+				parentNode=megaApi.getParentNode(nodeTemp);
+				
+			}
+		}			
+		
+		if(dTree.length()>0){
+			s = dTree.toString();
+		}
+		else{
+			s="";
+		}
+			
+		log("createStringTree: "+s);
+		return s;
 	}
 
 	@Override
