@@ -185,7 +185,7 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 			menu.findItem(R.id.cab_menu_help).setVisible(false);
 			menu.findItem(R.id.cab_menu_upgrade_account).setVisible(false);
 			menu.findItem(R.id.cab_menu_settings).setVisible(false);
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
+//			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}		
 	}
