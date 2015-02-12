@@ -99,9 +99,15 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		if (parentHandle == -1){
 			
 			parentHandle = megaApi.getRootNode().getHandle();
+			if (context instanceof FileExplorerActivity){
+				((FileExplorerActivity)context).setParentHandle(parentHandle);
+			}
 			nodes = megaApi.getChildren(megaApi.getRootNode());
 		}
 		else{
+			if (context instanceof FileExplorerActivity){
+				((FileExplorerActivity)context).setParentHandle(parentHandle);
+			}
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
 		}
@@ -208,6 +214,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			changeActionBarTitle(name);
 			
 			parentHandle = nodes.get(position).getHandle();
+			if (context instanceof FileExplorerActivity){
+				((FileExplorerActivity)context).setParentHandle(parentHandle);
+			}
 			adapter.setParentHandle(parentHandle);
 			nodes = megaApi.getChildren(nodes.get(position));
 			adapter.setNodes(nodes);
@@ -268,6 +277,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			adapter.setNodes(nodes);
 			listView.setSelection(0);
 			adapter.setParentHandle(parentHandle);
+			if (context instanceof FileExplorerActivity){
+				((FileExplorerActivity)context).setParentHandle(parentHandle);
+			}
 			
 			return 2;
 		}
@@ -295,6 +307,10 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		this.parentHandle = parentHandle;
 		if (adapter != null){
 			adapter.setParentHandle(parentHandle);
+		}
+		
+		if (context instanceof FileExplorerActivity){
+			((FileExplorerActivity)context).setParentHandle(parentHandle);
 		}
 	}
 	
