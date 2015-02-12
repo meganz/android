@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 /*
 *  A simple Broadcast Receiver to receive an INSTALL_REFERRER
@@ -59,7 +60,15 @@ public class CustomInstallReferrerReceiver extends BroadcastReceiver {
         for (String param : params)
         {
             String[] pair = param.split("="); // $NON-NLS-1$
-            referralParams.put(pair[0], pair[1]);
+            if (pair.length == 1){
+            	referralParams.put(pair[0], "");	
+            }
+            else if (pair.length == 2){
+            	referralParams.put(pair[0], pair[1]);
+            }
+            else if (pair.length > 2){
+            	referralParams.put(pair[0], pair[1]);
+            }
         }
 
 //        CustomInstallReferrerReceiver.storeReferralParams(context, referralParams);
@@ -70,6 +79,7 @@ public class CustomInstallReferrerReceiver extends BroadcastReceiver {
             if(value != null)
             {
             	log("KEY: "  + key + "; VALUE: " + value);
+            	Log.d("MEGAInstallReferrerReceiver", key + " = " + value);
             }
         }
 
