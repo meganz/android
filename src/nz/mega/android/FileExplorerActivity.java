@@ -105,6 +105,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	ArrayList<MegaNode> nodes;
 	
 	long gParentHandle;
+	String gcFTag = "";
 	
 	/*
 	 * Background task to process files for uploading
@@ -176,7 +177,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				for (long n : moveFromHandles){
 					list.add(n);
 				}
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if(cDriveExplorer!=null){
 					cDriveExplorer.setDisableNodes(list);
@@ -190,7 +192,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				for (long n : copyFromHandles){
 					list.add(n);
 				}
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if(cDriveExplorer!=null){
 					cDriveExplorer.setDisableNodes(list);
@@ -244,7 +247,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
                 if(tabId.equals("cloudExplorerFragment")){                     	
 
      				tabShown=CLOUD_TAB;
-    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+    				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
     				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 
     				if(cDriveExplorer!=null){
@@ -260,7 +264,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 
             		tabShown=INCOMING_TAB;
             		
-            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);		
+            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+            		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
     				iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
     		
     				if(iSharesExplorer!=null){
@@ -355,7 +360,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		log("onBackPressed: "+tabShown);		
 		
 		if(tabShown==CLOUD_TAB){
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 			cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 	
 			if(cDriveExplorer!=null){
@@ -366,7 +372,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			}
 		}
 		else if(tabShown==INCOMING_TAB){
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);		
+			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 			iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		
 			if(iSharesExplorer!=null){
@@ -702,49 +709,74 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 
 	private void createFolder(String title) {
 	
-	if (!Util.isOnline(this)){
-		Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-		return;
-	}
-	
-	if(isFinishing()){
-		return;	
-	}
-	
-	long parentHandle = cDriveExplorer.getParentHandle();	
-	MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-	
-	if (parentNode == null){
-		parentNode = megaApi.getRootNode();
-	}
-	
-	
-	boolean exists = false;
-	ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
-	for (int i=0;i<nL.size();i++){
-		if (title.compareTo(nL.get(i).getName()) == 0){
-			exists = true;
-		}
-	}
-	
-	if (!exists){
-		statusDialog = null;
-		try {
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.context_creating_folder));
-			statusDialog.show();
-		}
-		catch(Exception e){
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 			return;
 		}
 		
-		megaApi.createFolder(title, parentNode, this);
-	}
-	else{
-		Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
+		if(isFinishing()){
+			return;	
+		}
+		
+		long parentHandle = -1;
+		if(tabShown==CLOUD_TAB){
+			if (cDriveExplorer != null){
+				parentHandle = cDriveExplorer.getParentHandle();
+			}
+			else{
+				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
+				if (cDriveExplorer != null){
+					parentHandle = cDriveExplorer.getParentHandle();
+				}	
+			}
+		}
+		else if (tabShown == INCOMING_TAB){
+			if (iSharesExplorer != null){
+				parentHandle = iSharesExplorer.getParentHandle();
+			}
+			else{
+				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
+				if (iSharesExplorer != null){
+					parentHandle = iSharesExplorer.getParentHandle();
+				}	
+			}
+		}
+		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+		
+		if (parentNode != null){
+			boolean exists = false;
+			ArrayList<MegaNode> nL = megaApi.getChildren(parentNode);
+			for (int i=0;i<nL.size();i++){
+				if (title.compareTo(nL.get(i).getName()) == 0){
+					exists = true;
+				}
+			}
+			
+			if (!exists){
+				statusDialog = null;
+				try {
+					statusDialog = new ProgressDialog(this);
+					statusDialog.setMessage(getString(R.string.context_creating_folder));
+					statusDialog.show();
+				}
+				catch(Exception e){
+					return;
+				}
+				
+				megaApi.createFolder(title, parentNode, this);
+			}
+			else{
+				Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
+			}
+		}
+		
 	}
 	
-}
+	public void setParentHandle (long parentHandle){
+		this.gParentHandle = parentHandle;
+	}
 
 	/*
 	 * Display keyboard
@@ -780,9 +812,29 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-				cDriveExplorer.setNodes(nodes);
-				cDriveExplorer.getListView().invalidateViews();
+				if(tabShown==CLOUD_TAB){
+					long parentHandle;
+					if (cDriveExplorer != null){
+						parentHandle = cDriveExplorer.getParentHandle();
+						if (megaApi.getNodeByHandle(parentHandle) != null){
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+							cDriveExplorer.setNodes(nodes);
+							cDriveExplorer.getListView().invalidateViews();
+						}					
+					}
+					else{
+						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+						cDriveExplorer = (CloudDriveExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
+						if (cDriveExplorer != null){
+							parentHandle = cDriveExplorer.getParentHandle();
+							if (megaApi.getNodeByHandle(parentHandle) != null){
+								nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+								cDriveExplorer.setNodes(nodes);
+								cDriveExplorer.getListView().invalidateViews();
+							}
+						}	
+					}
+				}
 			}
 		}
 	}
@@ -810,9 +862,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
 		if (cDriveExplorer != null){
-			nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-			cDriveExplorer.setNodes(nodes);
-			cDriveExplorer.getListView().invalidateViews();
+			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
+				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
+				cDriveExplorer.setNodes(nodes);
+				cDriveExplorer.getListView().invalidateViews();
+			}
 		}
 	}
 
