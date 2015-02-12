@@ -933,6 +933,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 	public void removeOffline(MegaOffline mOffDelete){
 		
+		if (mOffDelete == null){
+			return;
+		}
+		
 		log("removeOffline - file: "+mOffDelete.getName());	
 		//mOffDelete = node;
 		MegaOffline parentNode = null;	
