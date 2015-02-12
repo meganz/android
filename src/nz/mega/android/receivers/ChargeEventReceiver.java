@@ -24,7 +24,9 @@ public class ChargeEventReceiver extends BroadcastReceiver {
 		log("ChargeEventReceiver");
 		final Context c = context;
 		
-		log("isCharging(): "+Util.isCharging(c));
+		//This line may crash in some devices because it tries to register a receiver in a broadcastreceiver (context). 
+		//The solution is to start a service (which is what is done in the CameraSyncService)
+//		log("isCharging(): "+Util.isCharging(c));
 		
 		handler.postDelayed(new Runnable() {
 			

@@ -33,7 +33,7 @@ public class MEGAPreferenceCategory extends PreferenceCategory{
 	protected View onCreateView (ViewGroup parent){
 		TextView  categoryTitle = (TextView)super.onCreateView(parent);
 //		categoryTitle.setBackgroundColor(Color.WHITE);
-		categoryTitle.setTextColor(context.getResources().getColor(R.color.pressed_mega));
+//		categoryTitle.setTextColor(context.getResources().getColor(R.color.pressed_mega));
 
 		return categoryTitle;
 	}
