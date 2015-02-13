@@ -454,7 +454,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			for (int i=0;i<foldersCreation.size();i++){
 				log("[" + i + "] PARENTPATH: " + foldersCreation.get(i).parentFolderPath +  "___ FOLDER NAME: " + foldersCreation.get(i).folderName + "____ PARENTFOLDERHANDLE: " + foldersCreation.get(i).parentFolderHandle);
 			}
-			createFolderCreation(foldersCreation.get(0));
+			
+			if (!foldersCreation.isEmpty()){
+				createFolderCreation(foldersCreation.get(0));
+			}
 		}
 		
 		private void createFolderCreation(FolderCreation fC){
@@ -537,7 +540,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							}
 						}
 						
-						foldersCreation.remove(0);
+						if (!foldersCreation.isEmpty()){
+							foldersCreation.remove(0);
+						}
 						if (!foldersCreation.isEmpty()){
 							for (int i=0; i<foldersCreation.size(); i++){
 								if (nodePath.compareTo(foldersCreation.get(i).parentFolderPath) == 0){
@@ -546,7 +551,9 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 								}
 							}
 							
-							createFolderCreation(foldersCreation.get(0));
+							if (!foldersCreation.isEmpty()){
+								createFolderCreation(foldersCreation.get(0));
+							}
 						}
 					}
 				}
