@@ -159,8 +159,10 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
 			Intent loginIntent = new Intent(this, LoginActivity.class);
 			loginIntent.setAction(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD);
-			loginIntent.putExtras(intent.getExtras());
-			loginIntent.setData(intent.getData());
+			if (intent != null){
+				loginIntent.putExtras(intent.getExtras());
+				loginIntent.setData(intent.getData());
+			}
 			startActivity(loginIntent);
 			finish();
 			return;
