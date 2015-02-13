@@ -111,11 +111,9 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 			}
 			
 			menu.findItem(R.id.cab_menu_trash).setVisible(showRemove);
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
 		}
-		
 	}
 	
 	private Handler handler;
