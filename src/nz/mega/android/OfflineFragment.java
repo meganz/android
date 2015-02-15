@@ -399,22 +399,47 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);
 
 			mOffList=dbH.findByPath(pathNavigation);
+			
+			log("Number of elements: "+mOffList.size());
 									
 			for(int i=0; i<mOffList.size();i++){
 				
-				File offlineDirectory = null;
-				if (Environment.getExternalStorageDirectory() != null){
-					offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+				MegaOffline checkOffline = mOffList.get(i);
+				
+				if(!checkOffline.isIncoming()){				
+					log("NOT isIncomingOffline");
+					File offlineDirectory = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + checkOffline.getPath()+checkOffline.getName());
+					}
+					else{
+						offlineDirectory = context.getFilesDir();
+					}	
+					
+					if (!offlineDirectory.exists()){
+						dbH.removeById(mOffList.get(i).getId());
+						mOffList.remove(i);
+						
+					}	
 				}
 				else{
-					offlineDirectory = context.getFilesDir();
-				}	
-				
-				if (!offlineDirectory.exists()){
-					dbH.removeById(mOffList.get(i).getId());
-					mOffList.remove(i);
+					log("isIncomingOffline");
+					File offlineDirectory = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandle() + "/" + checkOffline.getPath()+checkOffline.getName());
+						log("offlineDirectory: "+offlineDirectory);
+					}
+					else{
+						offlineDirectory = context.getFilesDir();
+					}	
 					
-				}			
+					if (!offlineDirectory.exists()){
+						dbH.removeById(mOffList.get(i).getId());
+						mOffList.remove(i);
+						
+					}	
+					
+				}
 			}
 
 			
@@ -1371,8 +1396,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			findPath (pathToShow);
 		}
 		
-		return nodeToShow;
-		
+		return nodeToShow;		
 	}	
 	
 	public void setPathNavigation(String _pathNavigation){
