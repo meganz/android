@@ -44,6 +44,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_OFF_PARENT = "parentId";
     private static final String KEY_OFF_TYPE = "type";
     private static final String KEY_OFF_INCOMING = "incoming";
+    private static final String KEY_OFF_HANDLE_INCOMING = "incomingHandle";
 
     private static DatabaseHandler instance;
     
@@ -70,7 +71,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		
         String CREATE_OFFLINE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_OFFLINE + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER, " + KEY_OFF_INCOMING + " INTEGER "+")";
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_OFF_HANDLE + " TEXT," + KEY_OFF_PATH + " TEXT," + KEY_OFF_NAME + " TEXT," + 
+        		KEY_OFF_PARENT + " INTEGER," + KEY_OFF_TYPE + " INTEGER, " + KEY_OFF_INCOMING + " INTEGER, " + KEY_OFF_HANDLE_INCOMING + " INTEGER "+")";
         db.execSQL(CREATE_OFFLINE_TABLE);
 		
 		String CREATE_CREDENTIALS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CREDENTIALS + "("
@@ -262,6 +264,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             values.put(KEY_OFF_PARENT, offline.getparentId());
             values.put(KEY_OFF_TYPE, offline.getType());
             values.put(KEY_OFF_INCOMING, offline.isIncoming());
+            values.put(KEY_OFF_HANDLE_INCOMING, offline.getHandleIncoming());
             
             long ret = db.insert(TABLE_OFFLINE, nullColumnHack, values);
             
@@ -286,7 +289,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				int parent = cursor.getInt(4);
 				String type = decrypt(cursor.getString(5));
 				boolean incoming = (cursor.getInt(6) == 1);
-				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type, incoming);
+				String handleIncoming = decrypt(cursor.getString(7));
+				MegaOffline offline = new MegaOffline(id,handle, path, name, parent, type, incoming, handleIncoming);
 				listOffline.add(offline);
 			} while (cursor.moveToNext());
 		}
@@ -334,6 +338,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _name = null;
 				String _type = null;
 				boolean _incoming = false;
+				String _handleIncoming = null;
 
 				_id = Integer.parseInt(cursor.getString(0));
 				_handle = cursor.getString(1);
@@ -342,7 +347,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_parent = cursor.getInt(4);
 				_type = cursor.getString(5);
 				_incoming = (cursor.getInt(6) == 1);
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming);
+				_handleIncoming = cursor.getString(7);
+				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 				cursor.close();
 				return offline;
 			}
@@ -369,7 +375,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				String _name = null;
 				String _type = null;
 				boolean _incoming = false;
-
+				String _handleIncoming = null;
+				
 				_id = Integer.parseInt(cursor.getString(0));
 				_handle = cursor.getString(1);
 				_path = cursor.getString(2);
@@ -377,7 +384,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				_parent = cursor.getInt(4);
 				_type = cursor.getString(5);
 				_incoming = (cursor.getInt(6) == 1);
-				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming);
+				_handleIncoming = cursor.getString(7);
+				offline = new MegaOffline(_id,_handle, _path, _name, _parent, _type,  _incoming, _handleIncoming);
 				cursor.close();
 				return offline;
 			}
@@ -405,7 +413,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _name = null;
 					String _type = null;
 					boolean _incoming = false;
-	
+					String _handleIncoming = null;
+					
 					_id = Integer.parseInt(cursor.getString(0));
 					_handle = cursor.getString(1);
 					_path = cursor.getString(2);
@@ -413,8 +422,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_parent = cursor.getInt(4);
 					_type = cursor.getString(5);
 					_incoming = (cursor.getInt(6) == 1);
+					_handleIncoming = cursor.getString(7);
 					
-					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming));
+					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
 			}
 		}
@@ -439,7 +449,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _name = null;
 					String _type = null;
 					boolean _incoming = false;
-	
+					String _handleIncoming = null;
+					
 					_id = Integer.parseInt(cursor.getString(0));
 					_handle = cursor.getString(1);
 					_path = cursor.getString(2);
@@ -447,8 +458,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_parent = cursor.getInt(4);
 					_type = cursor.getString(5);
 					_incoming = (cursor.getInt(6) == 1);
+					_handleIncoming = cursor.getString(7);
 					
-					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming);
+					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 					
 				} while (cursor.moveToNext());
 			}
@@ -483,6 +495,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _name = null;
 					String _type = null;
 					boolean _incoming = false;
+					String _handleIncoming = null;
 	
 					_id = Integer.parseInt(cursor.getString(0));
 					_handle = cursor.getString(1);
@@ -491,8 +504,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_parent = cursor.getInt(4);
 					_type = cursor.getString(5);
 					_incoming = (cursor.getInt(6) == 1);
+					_handleIncoming = cursor.getString(7);
 					
-					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming));
+					listOffline.add(new MegaOffline(_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming));
 				} while (cursor.moveToNext());
 			}
 		}
@@ -517,7 +531,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					String _name = null;
 					String _type = null;
 					boolean _incoming = false;
-	
+					String _handleIncoming = null;
+					
 					_id = Integer.parseInt(cursor.getString(0));
 					_handle = cursor.getString(1);
 					_path = cursor.getString(2);
@@ -525,8 +540,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_parent = cursor.getInt(4);
 					_type = cursor.getString(5);
 					_incoming = (cursor.getInt(6) == 1);
+					_handleIncoming = cursor.getString(7);
 					
-					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming);
+					mOffline = new MegaOffline (_id,_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 					
 				} while (cursor.moveToNext());
 			}
@@ -544,6 +560,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		String _name = null;
 		String _type = null;
 		boolean _incoming = false;
+		String _handleIncoming = null;
 		
 		//Get the foreign key of the node 
 		String selectQuery = "SELECT * FROM " + TABLE_OFFLINE + " WHERE " + KEY_OFF_PATH + " = '" + path + "'" + "AND" + KEY_OFF_NAME + " = '" + name + "'"  ;
@@ -559,6 +576,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			_parent = cursor.getInt(4);
 			_type = decrypt(cursor.getString(5));
 			_incoming = (cursor.getInt(6) == 1);
+			_handleIncoming = cursor.getString(7);
 		}
 		
 		ArrayList<MegaOffline> listOffline = new ArrayList<MegaOffline>();
@@ -579,8 +597,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 					_parent = cursor.getInt(4);
 					_type = decrypt(cursor.getString(5));
 					_incoming = (cursor.getInt(6) == 1);
+					_handleIncoming = cursor.getString(7);
 					
-					MegaOffline offline = new MegaOffline(_handle, _path, _name, _parent, _type, _incoming);
+					MegaOffline offline = new MegaOffline(_handle, _path, _name, _parent, _type, _incoming, _handleIncoming);
 					listOffline.add(offline);
 				} while (cursor.moveToNext());
 			}

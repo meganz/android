@@ -247,9 +247,18 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
 		
+		String path=null;
+		
+		if(currentNode.isIncoming()){
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
+		}
+		else{
+			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+		}	
+		
 		File currentFile = null;
 		if (Environment.getExternalStorageDirectory() != null){
-			currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath()+currentNode.getName());
+			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
 		}
 		else{
 			currentFile = context.getFilesDir();
@@ -298,6 +307,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		
 		holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
 		if (currentFile.isFile()){
+			log("...........................Busco Thumb");
 			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
 				Bitmap thumb = null;
 								

@@ -9,17 +9,19 @@ public class MegaOffline {
 	int parentId = -1;
 	String type = "";	
 	boolean incoming = false;
+	String handleIncoming = "";
 	
-	public MegaOffline(String handle, String path, String name, int parentId, String type, boolean incoming) {
+	public MegaOffline(String handle, String path, String name, int parentId, String type, boolean incoming, String handleIncoming) {
 		this.handle = handle;
 		this.path = path;
 		this.name = name;
 		this.parentId = parentId;
 		this.type = type;
 		this.incoming = incoming;
+		this.handleIncoming = handleIncoming;
 	}
 	
-	public MegaOffline(int id, String handle, String path, String name, int parentId, String type, boolean incoming) {
+	public MegaOffline(int id, String handle, String path, String name, int parentId, String type, boolean incoming, String handleIncoming) {
 		this.id=id;
 		this.handle = handle;
 		this.path = path;
@@ -27,6 +29,7 @@ public class MegaOffline {
 		this.parentId = parentId;
 		this.type = type;
 		this.incoming = incoming;
+		this.handleIncoming = handleIncoming;
 	}
 	
 	public String getHandle() {
@@ -91,6 +94,14 @@ public class MegaOffline {
 
 	public void setIncoming(boolean incoming) {
 		this.incoming = incoming;
+	}
+
+	public String getHandleIncoming() {
+		return handleIncoming;
+	}
+
+	public void setHandleIncoming(String handleIncoming) {
+		this.handleIncoming = handleIncoming;
 	}
 
 
