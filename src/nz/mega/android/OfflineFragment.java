@@ -426,7 +426,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					log("isIncomingOffline");
 					File offlineDirectory = null;
 					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandle() + "/" + checkOffline.getPath()+checkOffline.getName());
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +checkOffline.getHandleIncoming() + "/" + checkOffline.getPath()+checkOffline.getName());
 						log("offlineDirectory: "+offlineDirectory);
 					}
 					else{
@@ -521,8 +521,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 			else{
 				sortByNameAscending();
-			}
-			
+			}			
 						
 			if (adapterGrid.getCount() == 0){
 				listView.setVisibility(View.GONE);
@@ -758,28 +757,40 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	private String getInfoFolder(ArrayList<MegaOffline> mOffInfo) {
 		log("getInfoFolder");
+//		log("primer elemento: "+mOffInfo.get(0).getName());
 		
 		String info = "";
 		int numFolders=0;
 		int numFiles=0;
 		
-		for(int i=0; i<mOffInfo.size();i++){
-			MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
-			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOff.getPath() + mOff.getName();
-
-			File destination = new File(path);
-			if (destination.exists()){
-				if(destination.isFile()){
-					numFiles++;					
-				}
-				else{
-					numFolders++;					
-				}
+		String pathI=null;
+		
+		if(mOffInfo.size()>0){
+			if(mOffInfo.get(0).isIncoming()){
+				pathI = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + mOffInfo.get(0).getHandleIncoming() + "/";
 			}
 			else{
-				log("File do not exist");
-			}		
-		}
+				pathI= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+			}	
+			
+			for(int i=0; i<mOffInfo.size();i++){
+				MegaOffline mOff = (MegaOffline) mOffInfo.get(i);
+				String path = pathI + mOff.getPath() + mOff.getName();			
+
+				File destination = new File(path);
+				if (destination.exists()){
+					if(destination.isFile()){
+						numFiles++;					
+					}
+					else{
+						numFolders++;					
+					}
+				}
+				else{
+					log("File do not exist");
+				}		
+			}
+		}		
 		
 		if (numFolders > 0) {
 			info = numFolders
@@ -839,8 +850,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				adapterList.notifyDataSetChanged();
 			}
 			else{
-				
 				MegaOffline currentNode = mOffList.get(position);
+				
 				aB.setTitle(currentNode.getName());
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				if (context instanceof ManagerActivity){
@@ -851,7 +862,16 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 				else if (context instanceof OfflineActivity){
 					((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
 				}
-				File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+				
+				File currentFile=null;
+				
+				if(currentNode.isIncoming()){
+					String handleString = currentNode.getHandleIncoming();
+					currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
+				}
+				else{
+					currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+				}
 				
 				if(currentFile.exists()&&currentFile.isDirectory()){
 
@@ -862,11 +882,21 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						emptyTextView.setVisibility(View.VISIBLE);						
 					}
 					else{
+						File offlineDirectory = null;
+						String path;
+						
+						if(currentNode.isIncoming()){
+							path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandle() + "/";
+						}
+						else{
+							path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName();
+						}						
+						
+						
 						for(int i=0; i<mOffList.size();i++){
-
-							File offlineDirectory = null;
+							
 							if (Environment.getExternalStorageDirectory() != null){
-								offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+								offlineDirectory = new File(path + mOffList.get(i).getPath()+mOffList.get(i).getName());
 							}
 							else{
 								offlineDirectory = context.getFilesDir();
@@ -935,10 +965,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							}
 						}
 						
-					}
-					
+					}					
 				}
-				
 
 				
 				
@@ -970,6 +998,207 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			}
 		}
     }
+	
+	private void selectItemIncoming(MegaOffline currentNode, int position){
+		aB.setTitle(currentNode.getName());
+		pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
+		if (context instanceof ManagerActivity){
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+		}
+		else if (context instanceof OfflineActivity){
+			((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+		}
+		File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+		
+		if(currentFile.exists()&&currentFile.isDirectory()){
+
+			mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
+			if (adapterList.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);						
+			}
+			else{
+				for(int i=0; i<mOffList.size();i++){
+
+					File offlineDirectory = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+					}
+					else{
+						offlineDirectory = context.getFilesDir();
+					}	
+
+					if (!offlineDirectory.exists()){
+						//Updating the DB because the file does not exist														
+						dbH.removeById(mOffList.get(i).getId());
+
+						mOffList.remove(i);
+					}			
+				}
+			}
+
+			if (adapterList == null){						
+				adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
+			}
+			else{						
+				adapterList.setNodes(mOffList);
+			}
+			
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
+			
+			contentText.setText(getInfoFolder(mOffList));
+			adapterList.setPositionClicked(-1);
+			
+			notifyDataSetChanged();
+
+		}else{
+			if(currentFile.exists()&&currentFile.isFile()){
+				//Open it!
+				if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", position);
+					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+					intent.putExtra("parentNodeHandle", -1L);
+					intent.putExtra("offlinePathDirectory", currentFile.getParent());
+					startActivity(intent);
+				}
+//				else if(currentFile.exists()&&MimeType.typeForName(currentFile.getName()).isPdf()){
+//    			    log("Offline - File PDF");		    			    
+//    			    Intent intentPdf = new Intent();
+//    			    intentPdf.setDataAndType(Uri.fromFile(currentFile), "application/pdf");
+//    			    intentPdf.setClass(context, OpenPDFActivity.class);
+//    			    intentPdf.setAction("android.intent.action.VIEW");
+//    				this.startActivity(intentPdf);						
+//					
+//				}
+				else{
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+						context.startActivity(viewIntent);
+					}
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+							context.startActivity(intentShare);
+						}
+					}
+				}
+				
+			}
+			
+		}
+	}
+	
+	private void selectItemNotIncoming(MegaOffline currentNode,  int position){
+		
+		aB.setTitle(currentNode.getName());
+		pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
+		if (context instanceof ManagerActivity){
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+		}
+		else if (context instanceof OfflineActivity){
+			((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+		}
+		File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+		
+		if(currentFile.exists()&&currentFile.isDirectory()){
+
+			mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
+			if (adapterList.getCount() == 0){
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);						
+			}
+			else{
+				for(int i=0; i<mOffList.size();i++){
+
+					File offlineDirectory = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
+					}
+					else{
+						offlineDirectory = context.getFilesDir();
+					}	
+
+					if (!offlineDirectory.exists()){
+						//Updating the DB because the file does not exist														
+						dbH.removeById(mOffList.get(i).getId());
+
+						mOffList.remove(i);
+					}			
+				}
+			}
+
+			if (adapterList == null){						
+				adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
+			}
+			else{						
+				adapterList.setNodes(mOffList);
+			}
+			
+			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+				sortByNameDescending();
+			}
+			else{
+				sortByNameAscending();
+			}
+			
+			contentText.setText(getInfoFolder(mOffList));
+			adapterList.setPositionClicked(-1);
+			
+			notifyDataSetChanged();
+
+		}else{
+			if(currentFile.exists()&&currentFile.isFile()){
+				//Open it!
+				if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					intent.putExtra("position", position);
+					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+					intent.putExtra("parentNodeHandle", -1L);
+					intent.putExtra("offlinePathDirectory", currentFile.getParent());
+					startActivity(intent);
+				}
+//				else if(currentFile.exists()&&MimeType.typeForName(currentFile.getName()).isPdf()){
+//    			    log("Offline - File PDF");		    			    
+//    			    Intent intentPdf = new Intent();
+//    			    intentPdf.setDataAndType(Uri.fromFile(currentFile), "application/pdf");
+//    			    intentPdf.setClass(context, OpenPDFActivity.class);
+//    			    intentPdf.setAction("android.intent.action.VIEW");
+//    				this.startActivity(intentPdf);						
+//					
+//				}
+				else{
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+						context.startActivity(viewIntent);
+					}
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+							context.startActivity(intentShare);
+						}
+					}
+				}
+				
+			}
+			
+		}
+	}
 	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

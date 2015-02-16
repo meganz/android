@@ -759,12 +759,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 						if(mOffParent!=null){
 							if(nodeToInsert.isFile()){
-								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,false);
+								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,false, "-1");
 								long checkInsert=dbH.setOfflineFile(mOffInsert);
 								log("Test insert A: "+checkInsert);
 							}
 							else{
-								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, false);
+								MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, false, "-1");
 								long checkInsert=dbH.setOfflineFile(mOffInsert);
 								log("Test insert B: "+checkInsert);
 							}			
@@ -776,12 +776,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					path="/";
 
 					if(nodeToInsert.isFile()){
-						MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, false);
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(),-1, DB_FILE, false, "-1");
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
 						log("Test insert C: "+checkInsert);
 					}
 					else{
-						MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, false);
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), -1, DB_FOLDER, false, "-1");
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
 						log("Test insert D: "+checkInsert);
 					}
@@ -792,13 +792,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else{				
 				//If I am not the owner
 				
-				log("------------------Im not the owner: "+megaApi.getParentNode(nodeToInsert));
+				log("Im not the owner: "+megaApi.getParentNode(nodeToInsert));
 				
 //				if(megaApi.getParentNode(nodeToInsert).getType() != MegaNode.TYPE_ROOT){
 					
 				parentNode = megaApi.getParentNode(nodeToInsert);
 				log("ParentNode: "+parentNode.getName());
-				log("PARENT NODE nooot ROOT");
 
 				path = createStringTree(nodeToInsert);
 				if(path==null){
@@ -818,19 +817,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						insertIncomingParentDB(parentNode);			
 					}									
 				}	
-
+								
 				mOffNode = dbH.findByHandle(nodeToInsert.getHandle());				
-				mOffParent = dbH.findByHandle(parentNode.getHandle());
-				if(mOffNode == null){			
+				mOffParent = dbH.findByHandle(parentNode.getHandle());				
+				
+				String handleIncoming = "";
+				if(parentNode!=null){
+					MegaNode ownerNode = megaApi.getParentNode(parentNode);
+					if(ownerNode!=null){
+						MegaNode nodeWhile = ownerNode;
+						while (nodeWhile!=null){
+							ownerNode=nodeWhile;
+							nodeWhile = megaApi.getParentNode(nodeWhile);					
+						}
+
+						handleIncoming=Long.toString(ownerNode.getHandle());
+					}
+					else{
+						handleIncoming=Long.toString(parentNode.getHandle());
+					}
+					
+				}	
+				
+				if(mOffNode == null){
+					log("Inserto el propio nodo: "+ nodeToInsert.getName() + "handleIncoming: "+handleIncoming);
 
 					if(mOffParent!=null){
 						if(nodeToInsert.isFile()){
-							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,true);
+							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FILE,true, handleIncoming);
 							long checkInsert=dbH.setOfflineFile(mOffInsert);
 							log("Test insert A: "+checkInsert);
 						}
 						else{
-							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, true);
+							MegaOffline mOffInsert = new MegaOffline(Long.toString(nodeToInsert.getHandle()), path, nodeToInsert.getName(), mOffParent.getId(), DB_FOLDER, true, handleIncoming);
 							long checkInsert=dbH.setOfflineFile(mOffInsert);
 							log("Test insert B: "+checkInsert);
 						}			
@@ -871,21 +890,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		log("PATH   IncomingParentDB: "+path);
 		
-		MegaNode parentparentNode = megaApi.getParentNode(parentNode);
+		MegaNode parentparentNode = megaApi.getParentNode(parentNode);	
+		
 		if(parentparentNode==null){
+			
 			if(parentNode.isFile()){
-				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, true);
+				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, true, Long.toString(parentNode.getHandle()));
 				long checkInsert=dbH.setOfflineFile(mOffInsert);
 				log("Test insert I: "+checkInsert);
 			}
 			else{
-				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, true);
+				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, true, Long.toString(parentNode.getHandle()));
 				long checkInsert=dbH.setOfflineFile(mOffInsert);
 				log("Test insert J: "+checkInsert);
 			}			
 		}	
 		else{
-		
+			
+			String handleIncoming = "";
+			
+			MegaNode ownerNode = megaApi.getParentNode(parentparentNode);
+			if(ownerNode!=null){
+				MegaNode nodeWhile = ownerNode;
+				while (nodeWhile!=null){
+					ownerNode=nodeWhile;
+					nodeWhile = megaApi.getParentNode(nodeWhile);					
+				}
+
+				handleIncoming=Long.toString(ownerNode.getHandle());
+			}
+			else{
+				handleIncoming=Long.toString(parentparentNode.getHandle());
+			}
+				
 			
 			mOffParentParent = dbH.findByHandle(parentparentNode.getHandle());
 			if(mOffParentParent==null){						
@@ -896,14 +933,15 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					insertIncomingParentDB(megaApi.getParentNode(parentNode));						
 					
 				}
-				else{			
+				else{										
+					
 					if(parentNode.isFile()){
-						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, true);
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, true, handleIncoming);
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
 						log("Test insert E: "+checkInsert);
 					}
 					else{
-						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, true);
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, true, handleIncoming);
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
 						log("Test insert F: "+checkInsert);
 					}	
@@ -912,12 +950,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else{
 
 				if(parentNode.isFile()){
-					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, true);
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, true, handleIncoming);
 					long checkInsert=dbH.setOfflineFile(mOffInsert);
 					log("Test insert G: "+checkInsert);
 				}
 				else{
-					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, true);
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, true, handleIncoming);
 					long checkInsert=dbH.setOfflineFile(mOffInsert);
 					log("Test insert H: "+checkInsert);
 				}	
@@ -969,12 +1007,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 				else{			
 					if(parentNode.isFile()){
-						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false);
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false, "-1");
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
 						log("Test insert E: "+checkInsert);
 					}
 					else{
-						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, false);
+						MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, false, "-1");
 						long checkInsert=dbH.setOfflineFile(mOffInsert);
 						log("Test insert F: "+checkInsert);
 					}	
@@ -983,12 +1021,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			else{
 
 				if(parentNode.isFile()){
-					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false);
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FILE, false, "-1");
 					long checkInsert=dbH.setOfflineFile(mOffInsert);
 					log("Test insert G: "+checkInsert);
 				}
 				else{
-					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, false);
+					MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), mOffParentParent.getId(), DB_FOLDER, false, "-1");
 					long checkInsert=dbH.setOfflineFile(mOffInsert);
 					log("Test insert H: "+checkInsert);
 				}	
@@ -997,12 +1035,12 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else{
 			log("---------------PARENT NODE ROOT------");
 			if(parentNode.isFile()){
-				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, false);
+				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(),-1, DB_FILE, false, "-1");
 				long checkInsert=dbH.setOfflineFile(mOffInsert);
 				log("Test insert I: "+checkInsert);
 			}
 			else{
-				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, false);
+				MegaOffline mOffInsert = new MegaOffline(Long.toString(parentNode.getHandle()), path, parentNode.getName(), -1, DB_FOLDER, false, "-1");
 				long checkInsert=dbH.setOfflineFile(mOffInsert);
 				log("Test insert J: "+checkInsert);
 			}						
