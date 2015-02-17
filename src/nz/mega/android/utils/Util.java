@@ -53,6 +53,7 @@ import android.text.SpannableStringBuilder;
 import android.text.format.Formatter;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
