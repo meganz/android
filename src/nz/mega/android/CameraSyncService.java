@@ -229,15 +229,40 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 					
 					boolean isWifi = Util.isOnWifi(this);
-					if (prefs.getCamSyncWifi() == null || Boolean.parseBoolean(prefs.getCamSyncWifi())){
+					if (prefs.getCamSyncWifi() == null){
 						if (!isWifi){
 							log("no wifi...");
 							finish();
 							return START_REDELIVER_INTENT;
 						}
 					}
+					else{
+						if (Boolean.parseBoolean(prefs.getCamSyncWifi())){
+							if (!isWifi){
+								log("no wifi...");
+								finish();
+								return START_REDELIVER_INTENT;
+							}
+						}
+					}
 					
-//					boolean isCharging = Util.isCharging(this);
+					boolean isCharging = Util.isCharging(this);
+					if (prefs.getCamSyncCharging() == null){
+						if (!isCharging){
+							log("not charging...");
+							finish();
+							return START_REDELIVER_INTENT;
+						}
+					}
+					else{
+						if (Boolean.parseBoolean(prefs.getCamSyncCharging())){
+							if (!isCharging){
+								log("not charging...");
+								finish();
+								return START_REDELIVER_INTENT;
+							}
+						}
+					}
 //					//TODO: now assuming that ischarging is needed
 //					if (!isCharging){
 //						log("no charging...");
@@ -1224,7 +1249,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			log("stopping service!");
 			if (success){
 				if (totalSizeUploaded != 0){
-					showCompleteSuccessNotification();
+//					showCompleteSuccessNotification();
 				}
 			}
 		}
