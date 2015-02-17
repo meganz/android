@@ -84,6 +84,9 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 		
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApi = app.getMegaApi();
+		if(megaApi==null){
+			log("Disconnected");
+		}
 		
 		setContentView(R.layout.activity_file_link);
 		

@@ -61,6 +61,8 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		log("onCreateView");
+		
 		View view = inflater.inflate(R.layout.upload_dialog, container, false);
 		
 		listView = (ListView) view.findViewById(R.id.upload_dialog_list_view);
