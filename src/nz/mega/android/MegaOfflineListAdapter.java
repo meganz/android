@@ -482,7 +482,8 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				notifyDataSetChanged();
 				if (Util.isOnline(context)){
 					String path = mOff.getPath() + mOff.getName();
-					fragment.showProperties(path);
+					String handle = mOff.getHandle();
+					fragment.showProperties(path, handle);
 				}
 
 				break;
