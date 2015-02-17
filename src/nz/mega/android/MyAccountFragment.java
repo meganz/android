@@ -180,7 +180,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
-		p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
+		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
 		
 		int radius; 
         if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
@@ -309,17 +309,17 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 
 		String info = "";
 		if (numFolders > 0){
-			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
+			info = numFolders +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
 			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
+				info = info + ", " + numFiles + " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
 			}
 		}
 		else {
 			if (numFiles == 0){
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
+				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
 			}
 			else{
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
+				info = numFiles +  " " + context.getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
 			}
 		}
 
@@ -377,7 +377,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				switch(accountType){				
 				
 					case 0:{	  
-						typeAccount.setTextColor(getResources().getColor(R.color.green_free_account));
+						typeAccount.setTextColor(getActivity().getResources().getColor(R.color.green_free_account));
 						typeAccount.setText(R.string.free_account);
 						break;
 					}
