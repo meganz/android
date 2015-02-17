@@ -3,8 +3,6 @@ package nz.mega.android;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.google.android.gms.internal.ch;
-
 import nz.mega.android.utils.Util;
 
 import android.content.ContentValues;
@@ -168,18 +166,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	} 
 	
 	public static String encrypt(String original) {
-//		if (original == null) {
-//			return null;
-//		}
-//		try {
-//			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
-//			return Base64.encodeToString(encrypted, Base64.DEFAULT);
-//		} catch (Exception e) {
-//			log("ee");
-//			e.printStackTrace();
-//			return null;
-//		}
-		return original;
+		if (original == null) {
+			return null;
+		}
+		try {
+			byte[] encrypted = Util.aes_encrypt(getAesKey(),original.getBytes());
+			return Base64.encodeToString(encrypted, Base64.DEFAULT);
+		} catch (Exception e) {
+			log("ee");
+			e.printStackTrace();
+			return null;
+		}
+//		return original;
 	}
 	
 	private static byte[] getAesKey() {
@@ -195,18 +193,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 	
 	public static String decrypt(String encodedString) {
-//		if (encodedString == null) {
-//			return null;
-//		}
-//		try {
-//			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
-//			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
-//			return new String(original);
-//		} catch (Exception e) {
-//			log("de");
-//			return null;
-//		}
-		return encodedString;
+		if (encodedString == null) {
+			return null;
+		}
+		try {
+			byte[] encoded = Base64.decode(encodedString, Base64.DEFAULT);
+			byte[] original = Util.aes_decrypt(getAesKey(), encoded);
+			return new String(original);
+		} catch (Exception e) {
+			log("de");
+			return null;
+		}
+//		return encodedString;
 	}
 	
 	public UserCredentials getCredentials(){
