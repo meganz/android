@@ -1657,6 +1657,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                     @Override
                     public void onTabChanged(String tabId) {
                     	log("TabId :"+ tabId);
+                    	supportInvalidateOptionsMenu();
                         if(tabId.equals("outgoingSharesFragment")){                         	
                 			if (outSF != null){                 				
                 				if(parentHandleOutgoing!=-1){
@@ -1692,7 +1693,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						
 						@Override
 						public void onClick(View v) {
-							viewPagerShares.setCurrentItem(index);							
+							viewPagerShares.setCurrentItem(index);	
 						}
 					});
 				}
@@ -2460,72 +2461,90 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			clearRubbishBinMenuitem.setVisible(true);
 			}
 		}
-		
-		String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
-		if (inSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				sortByMenuItem.setVisible(true);
-				thumbViewMenuItem.setVisible(true); 
-				refreshMenuItem.setVisible(true);
-				helpMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			settingsMenuItem.setVisible(true);
-				
-    			//Hide
-    			pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);   			
-    			selectMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);  				
-    			rubbishBinMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			createFolderMenuItem.setVisible(false);
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-    		}
+
+		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==0){	
+				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
+				if (inSF != null){
+					sortByMenuItem.setVisible(true);
+					thumbViewMenuItem.setVisible(true); 
+					refreshMenuItem.setVisible(true);
+					helpMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(true);
+					settingsMenuItem.setVisible(true);
+
+					addMenuItem.setEnabled(true);
+					addMenuItem.setVisible(true);
+
+					log("----------------------parentHandleIncoming: "+parentHandleIncoming);
+					if(parentHandleIncoming==-1){
+						addMenuItem.setVisible(false);
+					}
+					else{
+						addMenuItem.setVisible(true);
+					}
+
+					//Hide
+					pauseRestartTransfersItem.setVisible(false);
+					createFolderMenuItem.setVisible(false);
+					addContactMenuItem.setVisible(false);
+					selectMenuItem.setVisible(false);
+					unSelectMenuItem.setVisible(false);  				
+					rubbishBinMenuItem.setVisible(false);
+					createFolderMenuItem.setVisible(false);
+					rubbishBinMenuItem.setVisible(false);
+					clearRubbishBinMenuitem.setVisible(false);
+					changePass.setVisible(false); 
+					exportMK.setVisible(false); 
+					removeMK.setVisible(false); 
+					importLinkMenuItem.setVisible(false);
+					takePicture.setVisible(false);
+				}
+			}
+			else if(index==1){
+				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
+				if (outSF != null){
+
+					selectMenuItem.setVisible(true);
+					sortByMenuItem.setVisible(true);
+					thumbViewMenuItem.setVisible(true); 
+					refreshMenuItem.setVisible(true);
+					helpMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(true);
+					settingsMenuItem.setVisible(true);
+
+					log("----------------------parentHandleOutgoing: "+parentHandleOutgoing);
+					if(parentHandleOutgoing==-1){
+						addMenuItem.setVisible(false);
+					}
+					else{
+						addMenuItem.setVisible(true);
+					}
+
+					//Hide
+					pauseRestartTransfersItem.setVisible(false);
+					createFolderMenuItem.setVisible(false);
+					addContactMenuItem.setVisible(false);
+					unSelectMenuItem.setVisible(false);  				
+					rubbishBinMenuItem.setVisible(false);
+					createFolderMenuItem.setVisible(false);
+					rubbishBinMenuItem.setVisible(false);
+					clearRubbishBinMenuitem.setVisible(false);
+					changePass.setVisible(false); 
+					exportMK.setVisible(false); 
+					removeMK.setVisible(false); 
+					importLinkMenuItem.setVisible(false);
+					takePicture.setVisible(false);
+				}
+			}
 		}
 		
-		sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
-		if (outSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				selectMenuItem.setVisible(true);
-				sortByMenuItem.setVisible(true);
-				thumbViewMenuItem.setVisible(true); 
-				refreshMenuItem.setVisible(true);
-				helpMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
-    			settingsMenuItem.setVisible(true);
-				
-    			//Hide
-    			pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);   			
-    			unSelectMenuItem.setVisible(false);  				
-    			rubbishBinMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			createFolderMenuItem.setVisible(false);
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-    		}
-		}
-		
-		if (maF != null){
-			if (drawerItem == DrawerItem.ACCOUNT){
-				
+		if (drawerItem == DrawerItem.ACCOUNT){
+			if (maF != null){
+					
 				//Show
 				refreshMenuItem.setVisible(true);
 				helpMenuItem.setVisible(true);
@@ -5837,15 +5856,36 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
 			
 			int i = 0;
-			long parentHandle;
+			long parentHandleUpload=-1;
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				parentHandle = fbF.getParentHandle();
+				parentHandleUpload = fbF.getParentHandle();
+			}
+			else if(drawerItem == DrawerItem.SHARED_WITH_ME){
+				int index = viewPagerShares.getCurrentItem();
+				if(index==0){	
+					//INCOMING
+					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+//					log("Tag: "+ cFTag1);
+					inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+					if (inSF != null){		
+						parentHandleUpload=inSF.getParentHandle();
+					}					
+				}
+				else if(index==1){
+					//OUTGOING
+					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 1);	
+//					log("Tag: "+ cFTag1);
+					outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+					if (outSF != null){		
+						parentHandleUpload=outSF.getParentHandle();
+					}	
+				}
 			}
 			else{
 				return;
 			}
 			
-			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, parentHandle);
+			UploadServiceTask uploadServiceTask = new UploadServiceTask(folderPath, paths, parentHandleUpload);
 			uploadServiceTask.start();			
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
