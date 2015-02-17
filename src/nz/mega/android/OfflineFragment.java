@@ -384,6 +384,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 		
+		//Check pathNAvigation
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 	        
@@ -692,11 +693,12 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 //		this.setNodes(mOffList);
 //	}
 //	
-	public void showProperties (String path){
-		MegaNode n = megaApi.getNodeByPath(path);
-		log("showProperties "+n.getName());
+	public void showProperties (String path, String handle){
+		log("showProperties: "+path);
+		
+		MegaNode n = megaApi.getNodeByHandle(Long.valueOf(handle));		
 		Intent i = new Intent(context, FilePropertiesActivity.class);
-		i.putExtra("handle", n.getHandle());
+		i.putExtra("handle", Long.valueOf(handle));
 		i.putExtra("from", FROM_OFFLINE);
 
 		if (n.isFolder()) {
@@ -886,7 +888,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						String path;
 						
 						if(currentNode.isIncoming()){
-							path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandle() + "/";
+							path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming();
 						}
 						else{
 							path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName();
@@ -903,7 +905,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							}	
 
 							if (!offlineDirectory.exists()){
-								//Updating the DB because the file does not exist														
+								//Updating the DB because the file does not exist	
+								log("Path to remove: "+(path + mOffList.get(i).getPath()+mOffList.get(i).getName()));
 								dbH.removeById(mOffList.get(i).getId());
 
 								mOffList.remove(i);
@@ -997,209 +1000,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 //				}
 			}
 		}
-    }
-	
-	private void selectItemIncoming(MegaOffline currentNode, int position){
-		aB.setTitle(currentNode.getName());
-		pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
-		if (context instanceof ManagerActivity){
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-			((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
-		}
-		else if (context instanceof OfflineActivity){
-			((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
-		}
-		File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
+    }	
 		
-		if(currentFile.exists()&&currentFile.isDirectory()){
-
-			mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
-			if (adapterList.getCount() == 0){
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);						
-			}
-			else{
-				for(int i=0; i<mOffList.size();i++){
-
-					File offlineDirectory = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
-					}
-					else{
-						offlineDirectory = context.getFilesDir();
-					}	
-
-					if (!offlineDirectory.exists()){
-						//Updating the DB because the file does not exist														
-						dbH.removeById(mOffList.get(i).getId());
-
-						mOffList.remove(i);
-					}			
-				}
-			}
-
-			if (adapterList == null){						
-				adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
-			}
-			else{						
-				adapterList.setNodes(mOffList);
-			}
-			
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
-			
-			contentText.setText(getInfoFolder(mOffList));
-			adapterList.setPositionClicked(-1);
-			
-			notifyDataSetChanged();
-
-		}else{
-			if(currentFile.exists()&&currentFile.isFile()){
-				//Open it!
-				if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
-					intent.putExtra("parentNodeHandle", -1L);
-					intent.putExtra("offlinePathDirectory", currentFile.getParent());
-					startActivity(intent);
-				}
-//				else if(currentFile.exists()&&MimeType.typeForName(currentFile.getName()).isPdf()){
-//    			    log("Offline - File PDF");		    			    
-//    			    Intent intentPdf = new Intent();
-//    			    intentPdf.setDataAndType(Uri.fromFile(currentFile), "application/pdf");
-//    			    intentPdf.setClass(context, OpenPDFActivity.class);
-//    			    intentPdf.setAction("android.intent.action.VIEW");
-//    				this.startActivity(intentPdf);						
-//					
-//				}
-				else{
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-						context.startActivity(viewIntent);
-					}
-					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						if (ManagerActivity.isIntentAvailable(context, intentShare)){
-							context.startActivity(intentShare);
-						}
-					}
-				}
-				
-			}
-			
-		}
-	}
-	
-	private void selectItemNotIncoming(MegaOffline currentNode,  int position){
-		
-		aB.setTitle(currentNode.getName());
-		pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
-		if (context instanceof ManagerActivity){
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
-			((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
-		}
-		else if (context instanceof OfflineActivity){
-			((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
-		}
-		File currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName());
-		
-		if(currentFile.exists()&&currentFile.isDirectory()){
-
-			mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
-			if (adapterList.getCount() == 0){
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);						
-			}
-			else{
-				for(int i=0; i<mOffList.size();i++){
-
-					File offlineDirectory = null;
-					if (Environment.getExternalStorageDirectory() != null){
-						offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + mOffList.get(i).getPath()+mOffList.get(i).getName());
-					}
-					else{
-						offlineDirectory = context.getFilesDir();
-					}	
-
-					if (!offlineDirectory.exists()){
-						//Updating the DB because the file does not exist														
-						dbH.removeById(mOffList.get(i).getId());
-
-						mOffList.remove(i);
-					}			
-				}
-			}
-
-			if (adapterList == null){						
-				adapterList = new MegaOfflineListAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
-			}
-			else{						
-				adapterList.setNodes(mOffList);
-			}
-			
-			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
-				sortByNameDescending();
-			}
-			else{
-				sortByNameAscending();
-			}
-			
-			contentText.setText(getInfoFolder(mOffList));
-			adapterList.setPositionClicked(-1);
-			
-			notifyDataSetChanged();
-
-		}else{
-			if(currentFile.exists()&&currentFile.isFile()){
-				//Open it!
-				if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
-					intent.putExtra("parentNodeHandle", -1L);
-					intent.putExtra("offlinePathDirectory", currentFile.getParent());
-					startActivity(intent);
-				}
-//				else if(currentFile.exists()&&MimeType.typeForName(currentFile.getName()).isPdf()){
-//    			    log("Offline - File PDF");		    			    
-//    			    Intent intentPdf = new Intent();
-//    			    intentPdf.setDataAndType(Uri.fromFile(currentFile), "application/pdf");
-//    			    intentPdf.setClass(context, OpenPDFActivity.class);
-//    			    intentPdf.setAction("android.intent.action.VIEW");
-//    				this.startActivity(intentPdf);						
-//					
-//				}
-				else{
-					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
-						context.startActivity(viewIntent);
-					}
-					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						if (ManagerActivity.isIntentAvailable(context, intentShare)){
-							context.startActivity(intentShare);
-						}
-					}
-				}
-				
-			}
-			
-		}
-	}
-	
 	@Override
 	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 		log("onItemLongClick");
@@ -1346,7 +1148,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							index=title.lastIndexOf("/");				
 							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);
-							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 							((ManagerActivity)context).supportInvalidateOptionsMenu();
 						}
 					}
@@ -1354,7 +1156,9 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
 						
 						if (pathNavigation.equals("/")){
-							aB.setTitle(getString(R.string.section_saved_for_offline));							
+							aB.setTitle(getString(R.string.section_saved_for_offline));
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+							((OfflineActivity)context).supportInvalidateOptionsMenu();
 						}
 						else{
 							
@@ -1363,7 +1167,9 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 							title=title.substring(0,index);
 							index=title.lastIndexOf("/");				
 							title=title.substring(index+1,title.length());			
-							aB.setTitle(title);							
+							aB.setTitle(title);	
+							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+							((ManagerActivity)context).supportInvalidateOptionsMenu();
 						}
 					}
 					ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				
@@ -1403,6 +1209,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
 		
 					// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					
 					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
 					int index=pathNavigation.lastIndexOf("/");				
