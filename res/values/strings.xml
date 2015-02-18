@@ -38,6 +38,8 @@
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload.</string>
+    
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
      
@@ -325,6 +327,7 @@
     <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
      <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
     
+    <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>
     <string name="my_account_last_session" context="when did the last session happen">Last session:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Connections:</string>
     

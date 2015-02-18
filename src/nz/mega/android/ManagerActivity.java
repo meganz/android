@@ -284,6 +284,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private AlertDialog newFolderDialog;
     private AlertDialog addContactDialog;
     private AlertDialog clearRubbishBinDialog;
+    private AlertDialog alertNotPermissionsUpload;
     private Handler handler;    
     private boolean moveToRubbish = false;    
     private boolean isClearRubbishBin = false;
@@ -2478,7 +2479,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					addMenuItem.setEnabled(true);
 					addMenuItem.setVisible(true);
 
-					log("----------------------parentHandleIncoming: "+parentHandleIncoming);
+					log("parentHandleIncoming: "+parentHandleIncoming);
 					if(parentHandleIncoming==-1){
 						addMenuItem.setVisible(false);
 					}
@@ -2516,7 +2517,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					upgradeAccountMenuItem.setVisible(true);
 					settingsMenuItem.setVisible(true);
 
-					log("----------------------parentHandleOutgoing: "+parentHandleOutgoing);
+					log("parentHandleOutgoing: "+parentHandleOutgoing);
 					if(parentHandleOutgoing==-1){
 						addMenuItem.setVisible(false);
 					}
@@ -2836,7 +2837,47 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	return true;
 	        }
 	        case R.id.action_add:{
-	        	this.uploadFile();
+	        	
+	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
+	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+	        		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);
+	        		if (viewPagerShares.getCurrentItem()==0){		
+		        		if (inSF != null){	        		
+		        			Long checkHandle = inSF.getParentHandle();		        			
+		        			MegaNode checkNode = megaApi.getNodeByHandle(checkHandle);
+		        			
+		        			if((megaApi.checkAccess(checkNode, MegaShare.ACCESS_FULL).getErrorCode() == MegaError.API_OK)){
+		        				this.uploadFile();
+							}
+							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READWRITE).getErrorCode() == MegaError.API_OK){
+								this.uploadFile();
+							}	
+							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
+								log("Not permissions to upload");
+								AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.no_permissions_upload), null, null);
+								builder.setTitle(R.string.op_not_allowed);
+								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
+							           public void onClick(DialogInterface dialog, int id) {
+							                //do things
+							        	   alertNotPermissionsUpload.dismiss();
+							           }
+							       });
+								
+								alertNotPermissionsUpload = builder.create();
+								alertNotPermissionsUpload.show();
+								Util.brandAlertDialog(alertNotPermissionsUpload);
+							}
+		        		}
+	        		}
+	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+	        		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);	
+	        		if (viewPagerShares.getCurrentItem()==1){	
+		        		if (outSF != null){        			
+		        			this.uploadFile();
+		        		}
+	        		}
+	        	}	        	
+	        	
 	        	return true;     	
 	        }
 	        case R.id.action_pause_restart_transfers:{
