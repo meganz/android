@@ -358,134 +358,56 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 			StatFs stat = new StatFs(parentPath);
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
-		catch(Exception ex){}
-		
-		
-		if (hashes == null){
-			if(url != null) {
+		catch(Exception ex){}		
+			
+		for (long hash : hashes) {
+			MegaNode node = megaApiFolder.getNodeByHandle(hash);
+			if(node != null){
+				Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+				if (node.getType() == MegaNode.TYPE_FOLDER) {
+					getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
+				} else {
+					dlFiles.put(node, parentPath);
+				}
+
+				for (MegaNode document : dlFiles.keySet()) {
+
+					String path = dlFiles.get(document);
+
+					if(availableFreeSpace < document.getSize()){
+						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+						continue;
+					}
+
+					log("EXTRA_HASH: " + document.getHandle());
+					Intent service = new Intent(this, DownloadService.class);
+					service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+					service.putExtra(DownloadService.EXTRA_URL, url);
+					service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+					service.putExtra(DownloadService.EXTRA_PATH, path);
+					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
+					startService(service);
+				}
+			}
+			else if(url != null) {
 				if(availableFreeSpace < size) {
 					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-					return;
+					continue;
 				}
-				
 				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_HASH, hash);
 				service.putExtra(DownloadService.EXTRA_URL, url);
 				service.putExtra(DownloadService.EXTRA_SIZE, size);
 				service.putExtra(DownloadService.EXTRA_PATH, parentPath);
 				service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
 				startService(service);
 			}
-		}
-		else{
-			if(hashes.length == 1){
-				MegaNode tempNode = megaApiFolder.getNodeByHandle(hashes[0]);
-				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
-					log("ISFILE");
-					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
-					if(localPath != null){	
-						try { 
-							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
-						}
-						catch(Exception e) {}
-						
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-						if (ManagerActivity.isIntentAvailable(this, viewIntent))
-							startActivity(viewIntent);
-						else{
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivity.isIntentAvailable(this, intentShare))
-								startActivity(intentShare);
-							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
-						}								
-						return;
-					}
-				}
-				else{
-					
-					MegaNode node = megaApiFolder.getNodeByHandle(hashes[0]);
-					if(node != null){
-						Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-						if (node.getType() == MegaNode.TYPE_FOLDER) {
-							getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-						} else {
-							dlFiles.put(node, parentPath);
-						}
-						
-						for (MegaNode document : dlFiles.keySet()) {
-							
-							String path = dlFiles.get(document);
-							
-							if(availableFreeSpace < document.getSize()){
-								Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-								continue;
-							}
-							
-							log("EXTRA_HASH: " + document.getHandle());
-							Intent service = new Intent(this, DownloadService.class);
-							service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-							service.putExtra(DownloadService.EXTRA_URL, url);
-							service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-							service.putExtra(DownloadService.EXTRA_PATH, path);
-							service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
-							startService(service);
-						}
-					}
-					
-				}
-			}
-			
-			for (long hash : hashes) {
-				MegaNode node = megaApiFolder.getNodeByHandle(hash);
-				if(node != null){
-					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
-					if (node.getType() == MegaNode.TYPE_FOLDER) {
-						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
-					} else {
-						dlFiles.put(node, parentPath);
-					}
-					
-					for (MegaNode document : dlFiles.keySet()) {
-						
-						String path = dlFiles.get(document);
-						
-						if(availableFreeSpace < document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
-							continue;
-						}
-						
-						log("EXTRA_HASH: " + document.getHandle());
-						Intent service = new Intent(this, DownloadService.class);
-						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
-						service.putExtra(DownloadService.EXTRA_URL, url);
-						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
-						service.putExtra(DownloadService.EXTRA_PATH, path);
-						service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
-						startService(service);
-					}
-				}
-				else if(url != null) {
-					if(availableFreeSpace < size) {
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
-						continue;
-					}
-					
-					Intent service = new Intent(this, DownloadService.class);
-					service.putExtra(DownloadService.EXTRA_HASH, hash);
-					service.putExtra(DownloadService.EXTRA_URL, url);
-					service.putExtra(DownloadService.EXTRA_SIZE, size);
-					service.putExtra(DownloadService.EXTRA_PATH, parentPath);
-					service.putExtra(DownloadService.EXTRA_FOLDER_LINK, true);
-					startService(service);
-				}
-				else {
-					log("node not found");
-				}
+			else {
+				log("node not found");
 			}
 		}
 	}
+	
 	
 	/*
 	 * Get list of all child files
