@@ -932,13 +932,24 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
 				
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+				String [] optionsString = null;
+				if (n.isFolder()){
+					optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)}; 
+				}
+				else{
+					optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
+				}
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
 				AlertDialog.Builder builder = new AlertDialog.Builder(context);
 				builder.setTitle(R.string.more_options_overflow);
 				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+						if (n.isFile()){
+							which = which + 1;
+						}
 						switch (which){
 							case 0:{
 								setPositionClicked(-1);

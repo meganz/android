@@ -5115,6 +5115,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		clearRubbishBinDialog = builder.create();
 		clearRubbishBinDialog.show();
+		Util.brandAlertDialog(clearRubbishBinDialog);
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
