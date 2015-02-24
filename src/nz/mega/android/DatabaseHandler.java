@@ -162,6 +162,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <= 7){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_CAM_SYNC_CHARGING + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_CAM_SYNC_CHARGING + " = '" + encrypt("false") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_OFFLINE + " ADD COLUMN " + KEY_OFF_INCOMING + " INTEGER;");
+			db.execSQL("ALTER TABLE " + TABLE_OFFLINE + " ADD COLUMN " + KEY_OFF_HANDLE_INCOMING + " INTEGER;");
+			db.execSQL("UPDATE " + TABLE_OFFLINE + " SET " + KEY_OFF_INCOMING + " = '0';");
 		}		
 	} 
 	
