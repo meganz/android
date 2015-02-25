@@ -4082,10 +4082,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
+		logout(context, megaApi, confirmAccount, false);
+	}
+	
 	 /*
 	 * Logout user
 	 */
-	static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount) {
+	static public void logout(Context context, MegaApiAndroid megaApi, boolean confirmAccount, boolean logoutBadSession) {
 //		context.stopService(new Intent(context, BackgroundService.class));
 		log("logout");
 //		context.stopService(new Intent(context, CameraSyncService.class));
@@ -4172,7 +4176,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-		megaApi.logout();
+		if (!logoutBadSession){
+			megaApi.logout();
+		}
 		drawerItem = null;
 		
 		if (!confirmAccount){		

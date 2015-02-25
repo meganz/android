@@ -68,9 +68,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		public void onRequestFinish(MegaApiJava api, MegaRequest request,
 				MegaError e) {
 			log("onRequestFinish: " + request.getRequestString());
-			if (request.getType() == MegaRequest.TYPE_LOGOUT){
-				log("type_logout");
-				if (e.getErrorCode() == MegaError.API_ESID){
+			if (e.getErrorCode() == MegaError.API_ESID){
+				if (request.getType() == MegaRequest.TYPE_LOGOUT){
+					log("type_logout");
+					ManagerActivity.logout(getApplicationContext(), megaApi, false, true);
+				}
+				else{
 					log("calling ManagerActivity.logout");
 					ManagerActivity.logout(getApplicationContext(), megaApi, false);
 				}
