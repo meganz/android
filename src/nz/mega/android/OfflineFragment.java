@@ -418,9 +418,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					}	
 					
 					if (!offlineDirectory.exists()){
-						dbH.removeById(mOffList.get(i).getId());
-						mOffList.remove(i);
-						
+						log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+//						dbH.removeById(mOffList.get(i).getId());
+//						mOffList.remove(i);
+//						
 					}	
 				}
 				else{
@@ -435,9 +436,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					}	
 					
 					if (!offlineDirectory.exists()){
-						dbH.removeById(mOffList.get(i).getId());
-						mOffList.remove(i);
+						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));						
 						
+//						dbH.removeById(mOffList.get(i).getId());
+//						mOffList.remove(i);
+//						
 					}	
 					
 				}
@@ -890,14 +893,15 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 						if(currentNode.isIncoming()){
 							path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming();
 						}
-						else{
-							path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + currentNode.getPath() + "/" + currentNode.getName();
+						else{							
+							path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+							log("Path NOT INCOMING: "+path);							
 						}						
-						
-						
+												
 						for(int i=0; i<mOffList.size();i++){
 							
-							if (Environment.getExternalStorageDirectory() != null){
+							if (Environment.getExternalStorageDirectory() != null){								
+								log("mOffList path: "+path+mOffList.get(i).getPath());
 								offlineDirectory = new File(path + mOffList.get(i).getPath()+mOffList.get(i).getName());
 							}
 							else{
@@ -906,9 +910,8 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 							if (!offlineDirectory.exists()){
 								//Updating the DB because the file does not exist	
-								log("Path to remove: "+(path + mOffList.get(i).getPath()+mOffList.get(i).getName()));
+								log("Path to remove C: "+(path +mOffList.get(i).getName()));
 								dbH.removeById(mOffList.get(i).getId());
-
 								mOffList.remove(i);
 							}			
 						}
