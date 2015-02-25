@@ -146,7 +146,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		
 	
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
-		upgradeButton.setOnClickListener(this); 
+//		upgradeButton.setOnClickListener(this); 
+		upgradeButton.setVisibility(View.INVISIBLE);
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
 		
