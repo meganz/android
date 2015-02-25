@@ -2876,7 +2876,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        			this.uploadFile();
 		        		}
 	        		}
-	        	}	        	
+	        	}	
+	        	else {
+	        		this.uploadFile();
+	        	}
 	        	
 	        	return true;     	
 	        }
