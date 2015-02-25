@@ -267,54 +267,18 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 				switch(accountType){				
 	
 					case 1:{
-						pro1Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
-						pro1Layout.setClickable(false);
-						
-						AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-						alpha.setDuration(0); 
-						alpha.setFillAfter(true); 
-						pro1.startAnimation(alpha);
-						
-						pro1Title.setTextColor(getResources().getColor(R.color.transparent_black));		
-						proStorage1.setTextColor(getResources().getColor(R.color.transparent_black));	
-						storage1.setTextColor(getResources().getColor(R.color.transparent_black));
-						proBandwith1.setTextColor(getResources().getColor(R.color.transparent_black));						
-						bandwidth1.setTextColor(getResources().getColor(R.color.transparent_black));						
-						pricingPerMonth1.setTextColor(getResources().getColor(R.color.transparent_mega));
+						hideProI();
 						break;
 					}	
 					case 2:{
-						pro2Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
-						pro2Layout.setClickable(false);
-						
-						AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-						alpha.setDuration(0); 
-						alpha.setFillAfter(true); 
-						pro2.startAnimation(alpha);
-						
-						pro2Title.setTextColor(getResources().getColor(R.color.transparent_black));		
-						proStorage2.setTextColor(getResources().getColor(R.color.transparent_black));	
-						storage2.setTextColor(getResources().getColor(R.color.transparent_black));
-						proBandwith2.setTextColor(getResources().getColor(R.color.transparent_black));						
-						bandwidth2.setTextColor(getResources().getColor(R.color.transparent_black));						
-						pricingPerMonth2.setTextColor(getResources().getColor(R.color.transparent_mega));
+						hideProI();
+						hideProII();
 						break;
 					}	
 					case 3:{
-						pro3Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
-						pro3Layout.setClickable(false);
-						
-						AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-						alpha.setDuration(0); 
-						alpha.setFillAfter(true); 
-						pro3.startAnimation(alpha);
-						
-						pro3Title.setTextColor(getResources().getColor(R.color.transparent_black));		
-						proStorage3.setTextColor(getResources().getColor(R.color.transparent_black));	
-						storage3.setTextColor(getResources().getColor(R.color.transparent_black));
-						proBandwith3.setTextColor(getResources().getColor(R.color.transparent_black));						
-						bandwidth3.setTextColor(getResources().getColor(R.color.transparent_black));						
-						pricingPerMonth3.setTextColor(getResources().getColor(R.color.transparent_mega));
+						hideProI();
+						hideProII();
+						hideProIII();
 						break;
 					}
 				}
@@ -322,6 +286,56 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		}
 	}
 	
+	private void hideProI(){
+		pro1Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
+		pro1Layout.setClickable(false);
+		
+		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
+		alpha.setDuration(0); 
+		alpha.setFillAfter(true); 
+		pro1.startAnimation(alpha);
+		
+		pro1Title.setTextColor(getResources().getColor(R.color.transparent_black));		
+		proStorage1.setTextColor(getResources().getColor(R.color.transparent_black));	
+		storage1.setTextColor(getResources().getColor(R.color.transparent_black));
+		proBandwith1.setTextColor(getResources().getColor(R.color.transparent_black));						
+		bandwidth1.setTextColor(getResources().getColor(R.color.transparent_black));						
+		pricingPerMonth1.setTextColor(getResources().getColor(R.color.transparent_mega));
+	}
+	
+	private void hideProII(){
+		pro2Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
+		pro2Layout.setClickable(false);
+		
+		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
+		alpha.setDuration(0); 
+		alpha.setFillAfter(true); 
+		pro2.startAnimation(alpha);
+		
+		pro2Title.setTextColor(getResources().getColor(R.color.transparent_black));		
+		proStorage2.setTextColor(getResources().getColor(R.color.transparent_black));	
+		storage2.setTextColor(getResources().getColor(R.color.transparent_black));
+		proBandwith2.setTextColor(getResources().getColor(R.color.transparent_black));						
+		bandwidth2.setTextColor(getResources().getColor(R.color.transparent_black));						
+		pricingPerMonth2.setTextColor(getResources().getColor(R.color.transparent_mega));
+	}
+	
+	private void hideProIII(){
+		pro3Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
+		pro3Layout.setClickable(false);
+		
+		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
+		alpha.setDuration(0); 
+		alpha.setFillAfter(true); 
+		pro3.startAnimation(alpha);
+		
+		pro3Title.setTextColor(getResources().getColor(R.color.transparent_black));		
+		proStorage3.setTextColor(getResources().getColor(R.color.transparent_black));	
+		storage3.setTextColor(getResources().getColor(R.color.transparent_black));
+		proBandwith3.setTextColor(getResources().getColor(R.color.transparent_black));						
+		bandwidth3.setTextColor(getResources().getColor(R.color.transparent_black));						
+		pricingPerMonth3.setTextColor(getResources().getColor(R.color.transparent_mega));
+	}
 	public String sizeTranslation(long size, int type) {
 		switch(type){
 			case 0:{

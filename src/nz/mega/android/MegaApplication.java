@@ -27,7 +27,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 {
 	final String TAG = "MegaApplication";
 	static final String APP_KEY = "U5NE3TxD";
-	static final String USER_AGENT = "MEGAAndroid/2.0.7";
+	static final String USER_AGENT = "MEGAAndroid/2.1";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";

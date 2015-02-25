@@ -314,6 +314,30 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				contentTextView.setVisibility(View.GONE);
 				contentTitleTextView.setVisibility(View.GONE);
 				
+				if(from==FROM_INCOMING_SHARES){
+					//Show who is the owner
+					owner=false;
+					ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
+					boolean found=false;
+					int i=0;
+					while(!found && i<usersIncoming.size()){
+						MegaUser user = usersIncoming.get(i);
+						ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
+						
+						for(int j=0; j<nodesIncoming.size();j++){
+							MegaNode nI = nodesIncoming.get(j);
+							
+							if(nI.getName().equals(node.getName())){
+								ownerInfo.setText(user.getEmail());
+								ownerInfo.setVisibility(View.VISIBLE);	
+								found=true;
+								break;
+							}
+						}
+						i++;
+					}
+				}
+
 				sl = megaApi.getOutShares(node);		
 
 				if (sl != null){
@@ -811,7 +835,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				availableOfflineBoolean = true;
 				availableSwitchOffline.setVisibility(View.VISIBLE);
 				availableSwitchOnline.setVisibility(View.GONE);
-				availableSwitchOnline.setChecked(true);		
+				availableSwitchOnline.setChecked(true);	
+				
+				log("Path destination: "+Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/"+createStringTree(node));
 				
 				File destination = null;
 				if (Environment.getExternalStorageDirectory() != null){
@@ -856,26 +882,51 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 				
 				log("Comprobando el node"+node.getName());
 				
-				String handleString = Long.toString(node.getHandle());
-				String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+createStringTree(node);
-				
-				File destination = null;
-				if (Environment.getExternalStorageDirectory() != null){
-					destination = new File(destinationPath);
-				}
-				else{
-					destination = getFilesDir();
-				}
-
-				if (destination.exists() && destination.isDirectory()){
-					File offlineFile = new File(destination, node.getName());
-					if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
-						return;
+				//check the parent
+				long result = findIncomingParentHandle(node);
+				log("IncomingParentHandle: "+result);
+				if(result!=-1){
+					String handleString = Long.toString(result);
+					String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+createStringTree(node);
+					log("Not owner path destination: "+destinationPath);
+					
+					File destination = null;
+					if (Environment.getExternalStorageDirectory() != null){
+						destination = new File(destinationPath);
 					}
-				}				
-				saveOffline(destination);								
+					else{
+						destination = getFilesDir();
+					}
+
+					if (destination.exists() && destination.isDirectory()){
+						File offlineFile = new File(destination, node.getName());
+						if (offlineFile.exists() && node.getSize() == offlineFile.length() && offlineFile.getName().equals(node.getName())){ //This means that is already available offline
+							return;
+						}
+					}				
+					saveOffline(destination);
+				}
+								
 			}
 		}
+	}
+	
+	public long findIncomingParentHandle(MegaNode nodeToFind){
+		
+		MegaNode parentNodeI = megaApi.getParentNode(nodeToFind);
+		long result=-1;
+		if(parentNodeI==null){
+			log("findIncomingParentHandle A: "+nodeToFind.getHandle());
+			return nodeToFind.getHandle();
+		}
+		else{
+			result=findIncomingParentHandle(parentNodeI);
+			while(result==-1){
+				result=findIncomingParentHandle(parentNodeI);
+			}	
+			log("findIncomingParentHandle B: "+nodeToFind.getHandle());
+			return result;
+		}	
 	}
 	
 	public void saveOffline (File destination){

@@ -149,7 +149,6 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		upgradeButton.setOnClickListener(this); 
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
-
 		
 		myEmail=megaApi.getMyEmail();
 		infoEmail.setText(myEmail);
@@ -400,7 +399,15 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				}
 						
 				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();				
+				long usedStorage = accountInfo.getStorageUsed();	
+				
+				bottomControlBar.setVisibility(View.VISIBLE);
+		        int usedPerc = 0;
+		        if (totalStorage != 0){
+		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
+		        }
+		        usedSpaceBar.setProgress(usedPerc); 
+			        
 				boolean totalGb = false;
 				
 				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
@@ -434,12 +441,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		        String usedSpaceString = getString(R.string.used_space, used, total);
 		        usedSpace.setText(usedSpaceString);
 		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
-		        
-		        bottomControlBar.setVisibility(View.VISIBLE);
-		        int usedPerc = 0;
-		        if (totalStorage != 0){
-		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
-		        }
+		       		       
 		        if (usedPerc < 90){
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -454,8 +456,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 			        }
 		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));    
 		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        }
-		        usedSpaceBar.setProgress(usedPerc);      
+		        }	             
 		        
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
