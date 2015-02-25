@@ -75,7 +75,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 				}
 				else{
 					log("calling ManagerActivity.logout");
-					ManagerActivity.logout(getApplicationContext(), megaApi, false);
+//					ManagerActivity.logout(getApplicationContext(), megaApi, false);
 				}
 			}
 		}

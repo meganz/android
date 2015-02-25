@@ -211,8 +211,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			
 			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.file_list_option_download_layout);
 			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.file_list_option_properties_layout);
-			holder.propertiesText = (TextView) convertView.findViewById(R.id.file_list_option_properties_text);
-			
+			holder.propertiesText = (TextView) convertView.findViewById(R.id.file_list_option_properties_text);			
 
 			holder.optionPublicLink = (RelativeLayout) convertView.findViewById(R.id.file_list_option_public_link_layout);
 //			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
@@ -406,7 +405,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		
 		File offlineDirectory = null;
 		if (Environment.getExternalStorageDirectory() != null){
-			offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +node.getName());
+			offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
 		}
 		else{
 			offlineDirectory = context.getFilesDir();

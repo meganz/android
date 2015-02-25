@@ -1321,7 +1321,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //			refreshMenuItem.setVisible(true);
 //			sortByMenuItem.setVisible(true);
 //			helpMenuItem.setVisible(true);
-//			upgradeAccountMenuItem.setVisible(true);
+//			upgradeAccountMenuItem.setVisible(false);
 //			settingsMenuItem.setVisible(true);
 //			selectMenuItem.setVisible(true);
 //			unSelectMenuItem.setVisible(false);
@@ -1429,7 +1429,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -1530,7 +1530,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -1706,7 +1706,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				selectMenuItem.setVisible(true);
     				sortByMenuItem.setVisible(true);
     				thumbViewMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
 
     				
         			//Hide
@@ -1779,7 +1779,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
@@ -1835,7 +1835,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (createFolderMenuItem != null){
     				//Show
     				pauseRestartTransfersItem.setVisible(true);
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
         			
     				//Hide
     				createFolderMenuItem.setVisible(false);
@@ -1898,7 +1898,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -1954,7 +1954,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
         			sortByMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2009,7 +2009,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2332,7 +2332,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				sortByMenuItem.setVisible(true);
 				thumbViewMenuItem.setVisible(true);
 				rubbishBinMenuItem.setVisible(false);				
-    			upgradeAccountMenuItem.setVisible(true);    			
+    			upgradeAccountMenuItem.setVisible(false);    			
     			importLinkMenuItem.setVisible(true);
     			takePicture.setVisible(true);
     			
@@ -2370,7 +2370,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			
 	    			//Hide	
 	    			pauseRestartTransfersItem.setVisible(false);
@@ -2400,7 +2400,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			else{
 				//Show
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			
     			//Hide	
     			addContactMenuItem.setVisible(false);
@@ -2473,7 +2473,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (inSF != null){
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(false);
 
 					addMenuItem.setEnabled(true);
 					addMenuItem.setVisible(true);
@@ -2514,7 +2514,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(false);
 
 
 					log("parentHandleOutgoing: "+parentHandleOutgoing);
@@ -2552,7 +2552,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//Show
 				refreshMenuItem.setVisible(true);
 				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(false);
 				changePass.setVisible(true); 
 				
 				//Hide
@@ -2591,7 +2591,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.TRANSFERS){
 				//Show
 				pauseRestartTransfersItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			
 				//Hide
 				createFolderMenuItem.setVisible(false);
@@ -2633,7 +2633,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			sortByMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(false); //TODO
     			selectMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -2669,7 +2669,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (createFolderMenuItem != null){
 					
 					//Show
-	    			upgradeAccountMenuItem.setVisible(true);	    			
+	    			upgradeAccountMenuItem.setVisible(false);	    			
 
 					//Hide
 	    			thumbViewMenuItem.setVisible(false);
@@ -2701,7 +2701,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 				
 				//Show
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			selectMenuItem.setVisible(true);
     			takePicture.setVisible(true);
 
