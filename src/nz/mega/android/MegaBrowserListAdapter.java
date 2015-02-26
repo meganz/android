@@ -67,7 +67,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 	ActionBar aB;
 	HashMap<Long, MegaTransfer> mTHash = null;
 	MegaTransfer currentTransfer = null;
-
+	boolean incoming = false;
+	DatabaseHandler dbH = null;
 	boolean multipleSelect;
 //	boolean overflowMenu = false;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
@@ -138,6 +139,8 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.INCOMING_SHARES_ADAPTER: {
+			incoming=true;
+			dbH = DatabaseHandler.getDbHandler(context);
 			((ManagerActivity) context).setParentHandleIncoming(-1);
 			break;
 		}
@@ -404,19 +407,40 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		}
 		
 		File offlineDirectory = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
+		
+		if(incoming){
+			log("Incoming tab: MegaBrowserListAdapter: "+node.getHandle());
+			//Find in the database
+			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
+			if(offlineNode!=null){
+				//Find in the filesystem
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming());
+					log("offline Directory: "+offlineDirectory.getAbsolutePath());
+				}
+				else{
+					offlineDirectory = context.getFilesDir();
+				}
+			}
 		}
 		else{
-			offlineDirectory = context.getFilesDir();
-		}
-		
-		if (offlineDirectory.exists()){
-			if(multipleSelect){
-				holder.savedOffline.setVisibility(View.VISIBLE);
+			//Find in the filesystem
+			if (Environment.getExternalStorageDirectory() != null){
+				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
 			}
 			else{
-				holder.savedOffline.setVisibility(View.VISIBLE);
+				offlineDirectory = context.getFilesDir();
+			}
+		}		
+		
+		if (offlineDirectory!=null){
+			if (offlineDirectory.exists()){
+				if(multipleSelect){
+					holder.savedOffline.setVisibility(View.VISIBLE);
+				}
+				else{
+					holder.savedOffline.setVisibility(View.VISIBLE);
+				}
 			}
 		}
 		
