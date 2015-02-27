@@ -597,8 +597,9 @@ public class Util {
 	}
 	
 	public static void deleteFolderAndSubfolders(Context context, File f) throws IOException {
-		log("deleteFolderAndSubfolders: "+ f.getAbsolutePath());
+		
 		if (f != null){
+			log("deleteFolderAndSubfolders: "+ f.getAbsolutePath());
 			if (f.isDirectory()) {
 				for (File c : f.listFiles()){
 					deleteFolderAndSubfolders(context, c);
