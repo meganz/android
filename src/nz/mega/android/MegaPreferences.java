@@ -14,12 +14,13 @@ public class MegaPreferences{
 	String pinLockCode = "";
 	String storageAskAlways = "";
 	String storageDownloadLocation = "";
+	String lastFolderUpload = "";
 	
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	
-	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, String storageDownloadLocation, String camSyncCharging){
+	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, String storageDownloadLocation, String camSyncCharging, String lastFolderUpload){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -32,6 +33,7 @@ public class MegaPreferences{
 		this.storageAskAlways = storageAskAlways;
 		this.storageDownloadLocation = storageDownloadLocation;
 		this.camSyncCharging = camSyncCharging;
+		this.lastFolderUpload = lastFolderUpload;
 	}
 	
 	public String getFirstTime (){
@@ -128,6 +130,14 @@ public class MegaPreferences{
 	
 	public void setStorageDownloadLocation(String storageDownloadLocation){
 		this.storageDownloadLocation = storageDownloadLocation;
+	}
+
+	public String getLastFolderUpload() {
+		return lastFolderUpload;
+	}
+
+	public void setLastFolderUpload(String lastFolderUpload) {
+		this.lastFolderUpload = lastFolderUpload;
 	}
 }
 

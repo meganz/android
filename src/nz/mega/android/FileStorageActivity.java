@@ -68,7 +68,8 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 			}
 		}
 	}
-	
+	MegaPreferences prefs;
+	DatabaseHandler dbH;
 	private Mode mode;
 	
 	private File path;
@@ -132,7 +133,19 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 		listView.setItemsCanFocus(false);
 
 		adapter.setOnItemCheckClickListener(this);
+		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
+//		dbH.setLastUploadFolder("/storage/emulated/0/Pictures");		
+		
+		prefs = dbH.getPreferences();
+		if (prefs == null){
+			path = new File(Environment.getExternalStorageDirectory().toString());
+			log("Not defined, so not enabled");
+			finish();
+		}
+		else{
+			path = new File(prefs.getLastFolderUpload());
+		}		
 		if (path == null) {
 			path = new File(Environment.getExternalStorageDirectory().toString());
 		}
@@ -293,6 +306,8 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 		log("onClick");
 		switch (v.getId()) {
 			case R.id.file_storage_button:{
+//				log("onClick: "+path.getAbsolutePath());
+				dbH.setLastUploadFolder(path.getAbsolutePath());
 				if (mode == Mode.PICK_FOLDER) {
 					Intent intent = new Intent();
 					intent.putExtra(EXTRA_PATH, path.getAbsolutePath());
@@ -408,6 +423,7 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 			// Select file if mode is PICK_FILE
 			ArrayList<String> files = new ArrayList<String>();
 			files.add(document.getFile().getAbsolutePath());
+			dbH.setLastUploadFolder(path.getAbsolutePath());
 			setResultFiles(files);
 			listView.setItemChecked(position, false);
 		}
