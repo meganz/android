@@ -6313,26 +6313,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (inSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				//ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-//				inSF.setNodes(nodes);
-				aB.setTitle(getString(R.string.section_shared_items));	
-				inSF.refresh();			
+		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==1){				
+				//OUTGOING				
+				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				log("Tag: "+ cFTag2);
+				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSF != null){					
+					aB.setTitle(getString(R.string.section_shared_items));				
+					outSF.refresh(this.parentHandleOutgoing);				
+				}
 			}
-		}		
-		cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (outSF != null){
-			if (drawerItem == DrawerItem.SHARED_WITH_ME){
-				aB.setTitle(getString(R.string.section_shared_items));				
-				outSF.refresh();
-			}
+			else{			
+				//InCOMING
+				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+				log("Tag: "+ cFTag1);
+				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSF != null){					
+					aB.setTitle(getString(R.string.section_shared_items));	
+					inSF.refresh(this.parentHandleIncoming);			
+				}				
+			}	
 		}
-		if (psF != null){
-			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+			if (psF != null){			
 				if(psF.isAdded()){
 					long cameraUploadHandle = psF.getPhotoSyncHandle();
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);

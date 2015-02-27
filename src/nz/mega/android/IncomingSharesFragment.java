@@ -438,6 +438,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 
 	public void refresh(){
 		log("refresh");
+		//TODO conservar el path
 		findNodes();
 		if(adapterList!=null){
 			if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -447,6 +448,52 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				sortByNameAscending();
 			}
 		}
+	}
+	
+	public void refresh (long _parentHandle){
+		MegaNode n = megaApi.getNodeByHandle(_parentHandle);
+		
+		aB.setTitle(n.getName());
+		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		
+		parentHandle = n.getHandle();												
+		contentText.setText(getInfoFolder(n));
+		adapterList.setParentHandle(parentHandle);
+		nodes = megaApi.getChildren(n, orderGetChildren);
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
+
+		listView.setSelection(0);
+		
+		//If folder has no files
+		if (adapterList.getCount() == 0){
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+			leftNewFolder.setVisibility(View.GONE);
+			rightUploadButton.setVisibility(View.GONE);
+
+			if (megaApi.getRootNode().getHandle()==n.getHandle()) {
+				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+				emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+			} else {
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);
+			}
+		}
+		else{
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+			leftNewFolder.setVisibility(View.GONE);
+			rightUploadButton.setVisibility(View.GONE);
+		}
+	
 	}
 	
 	@Override
