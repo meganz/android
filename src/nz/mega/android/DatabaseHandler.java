@@ -17,7 +17,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 8; 
+	private static final int DATABASE_VERSION = 9; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -38,6 +38,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_PIN_LOCK_CODE = "pinlockcode";
     private static final String KEY_STORAGE_ASK_ALWAYS = "storageaskalways";
     private static final String KEY_STORAGE_DOWNLOAD_LOCATION = "storagedownloadlocation";
+    private static final String KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder";
     private static final String KEY_ATTR_ONLINE = "online";
     private static final String KEY_OFF_HANDLE = "handle";
     private static final String KEY_OFF_PATH = "path";
@@ -88,7 +89,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		+ KEY_CAM_SYNC_LOCAL_PATH + " TEXT, " + KEY_CAM_SYNC_WIFI + " BOOLEAN, " 
         		+ KEY_CAM_SYNC_FILE_UPLOAD + " TEXT, " + KEY_PIN_LOCK_ENABLED + " TEXT, " + 
         		KEY_PIN_LOCK_CODE + " TEXT, " + KEY_STORAGE_ASK_ALWAYS + " TEXT, " +
-        		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, " + KEY_CAM_SYNC_TIMESTAMP + " TEXT, " + KEY_CAM_SYNC_CHARGING + " BOOLEAN" + ")";
+        		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, " + KEY_CAM_SYNC_TIMESTAMP + " TEXT, " + KEY_CAM_SYNC_CHARGING + " BOOLEAN, " + KEY_LAST_UPLOAD_FOLDER + " TEXT" +")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
@@ -166,6 +167,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_OFFLINE + " ADD COLUMN " + KEY_OFF_HANDLE_INCOMING + " INTEGER;");
 			db.execSQL("UPDATE " + TABLE_OFFLINE + " SET " + KEY_OFF_INCOMING + " = '0';");
 		}		
+		
+		if (oldVersion <=8){
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_LAST_UPLOAD_FOLDER + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_LAST_UPLOAD_FOLDER + " = '" + encrypt("") + "';");
+		}
 	} 
 	
 	public static String encrypt(String original) {
@@ -269,7 +275,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String downloadLocation = decrypt(cursor.getString(10));
 			String camSyncTimeStamp = decrypt(cursor.getString(11));
 			String camSyncCharging = decrypt(cursor.getString(12));
-			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, pinLockCode, askAlways, downloadLocation, camSyncCharging);
+			String lastFolderUpload = decrypt(cursor.getString(13));
+			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload);
 		}
 		cursor.close();
 		
@@ -697,6 +704,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		cursor.close();
 	}
+	
+	public void setLastUploadFolder (String folderPath){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_LAST_UPLOAD_FOLDER + "= '" + encrypt(folderPath + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE UPLOAD FOLDER: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_LAST_UPLOAD_FOLDER, encrypt(folderPath + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+	
 	
 	public void setCamSyncCharging (boolean charging){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;

@@ -596,7 +596,7 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 					log("deepBrowserTree "+deepBrowserTree);
 					
 					MegaNode n = nodes.get(position);
-					
+										
 					aB.setTitle(n.getName());
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
