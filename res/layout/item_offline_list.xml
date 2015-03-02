@@ -69,7 +69,7 @@
         android:padding="0dp"
         android:background="@color/adapters_background"
         android:orientation="horizontal">
-        
+        <!--  
         <RelativeLayout
                 android:id="@+id/offline_list_option_download_layout"
                 android:layout_width="match_parent"
@@ -99,7 +99,7 @@
 					android:textSize="10sp"
 					android:textStyle="bold"/>
        </RelativeLayout>
-       
+       -->
                    
 		<RelativeLayout
                android:id="@+id/offline_list_option_properties_layout"
