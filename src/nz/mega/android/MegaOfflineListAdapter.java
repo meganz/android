@@ -80,7 +80,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
         public TextView propertiesText;
        
 		public LinearLayout optionsLayout;
-		public RelativeLayout optionDownload;
+//		public RelativeLayout optionDownload;
 		public RelativeLayout optionProperties;
 		public RelativeLayout optionMore;
 		public RelativeLayout optionPublicLink;
@@ -211,7 +211,7 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 			holder.propertiesText = (TextView) convertView.findViewById(R.id.offline_list_option_properties_text);
 			
 			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.offline_list_options);			
-			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_download_layout);
+//			holder.optionDownload = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_download_layout);
 			holder.optionProperties = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_properties_layout);
 			holder.optionPublicLink = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_public_link_layout);
 			holder.optionDelete = (RelativeLayout) convertView.findViewById(R.id.offline_list_option_delete_layout);
@@ -391,9 +391,9 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}	
 		}
-		
-		holder.optionDownload.setTag(holder);
-		holder.optionDownload.setOnClickListener(this);
+//		
+//		holder.optionDownload.setTag(holder);
+//		holder.optionDownload.setOnClickListener(this);
 		
 		holder.optionMore.setTag(holder);
 		holder.optionMore.setOnClickListener(this);
@@ -467,15 +467,15 @@ public class MegaOfflineListAdapter extends BaseAdapter implements OnClickListen
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
 		
 		switch (v.getId()){
-			case R.id.offline_list_option_download_layout:{
-				positionClicked = -1;
-				notifyDataSetChanged();				
-				if (Util.isOnline(context)){
-					String path = mOff.getPath() + mOff.getName();
-					fragment.download(path);	
-				}
-				break;
-			}
+//			case R.id.offline_list_option_download_layout:{
+//				positionClicked = -1;
+//				notifyDataSetChanged();				
+//				if (Util.isOnline(context)){
+//					String path = mOff.getPath() + mOff.getName();
+//					fragment.download(path);	
+//				}
+//				break;
+//			}
 			case R.id.offline_list_option_properties_layout:{
 				
 				positionClicked = -1;

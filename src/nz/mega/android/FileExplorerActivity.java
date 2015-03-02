@@ -258,7 +258,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
     						changeTitle(getString(R.string.section_cloud_drive));
     					}
     					else{
-    						changeTitle(cDriveExplorer.name);
+    						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
     					}    					
     				}	
                 }

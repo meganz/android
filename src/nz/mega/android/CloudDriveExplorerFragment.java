@@ -1,5 +1,6 @@
 package nz.mega.android;
 
+import java.io.File;
 import java.util.ArrayList;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -9,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +35,8 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	MegaExplorerAdapter adapter;
 	
 	int modeCloud;
+	MegaPreferences prefs;
+	DatabaseHandler dbH;
 	
 	public String name;
 	
@@ -59,6 +63,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		}
 		
 		parentHandle = -1;
+		dbH = DatabaseHandler.getDbHandler(context);
 		
 		Bundle bundle = this.getArguments();
 		if (bundle != null) {
@@ -94,15 +99,39 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
-		String actionBarTitle = getString(R.string.section_cloud_drive);
-
-		if (parentHandle == -1){
+		String actionBarTitle = getString(R.string.section_cloud_drive);	
+		
+		if (parentHandle == -1){			
 			
-			parentHandle = megaApi.getRootNode().getHandle();
+			//Find in the database the last parentHandle
+			prefs = dbH.getPreferences();
+			if (prefs == null){
+				actionBarTitle = getString(R.string.section_cloud_drive);
+				parentHandle = megaApi.getRootNode().getHandle();
+				nodes = megaApi.getChildren(megaApi.getRootNode());
+			}
+			else{
+				String lastFolder=prefs.getLastFolderCloud();
+				if(lastFolder!=null){
+					parentHandle = Long.parseLong(lastFolder);
+					MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
+					if(chosenNode!=null){
+						changeButtonTitle(chosenNode.getName());
+						changeActionBarTitle(chosenNode.getName());					
+						nodes = megaApi.getChildren(chosenNode);
+					}	
+				}
+				else{
+					actionBarTitle = getString(R.string.section_cloud_drive);
+					parentHandle = megaApi.getRootNode().getHandle();
+					nodes = megaApi.getChildren(megaApi.getRootNode());
+				}
+			}
+
 			if (context instanceof FileExplorerActivity){
 				((FileExplorerActivity)context).setParentHandle(parentHandle);
 			}
-			nodes = megaApi.getChildren(megaApi.getRootNode());
+			
 		}
 		else{
 			if (context instanceof FileExplorerActivity){
@@ -112,25 +141,25 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			nodes = megaApi.getChildren(parentNode);
 		}
 		
-		if (modeCloud == FileExplorerActivity.MOVE) {
-			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
-		}
-		else if (modeCloud == FileExplorerActivity.COPY){
-			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
-		}
-		else if (modeCloud == FileExplorerActivity.UPLOAD){
-			uploadButton.setText(getString(R.string.action_upload));
-		}
-		else if (modeCloud == FileExplorerActivity.IMPORT){
-			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
-		}
-		else if (modeCloud == FileExplorerActivity.SELECT){
-			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
-		}
-		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
-			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
-		}	
-				
+//		if (modeCloud == FileExplorerActivity.MOVE) {
+//			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
+//		}
+//		else if (modeCloud == FileExplorerActivity.COPY){
+//			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
+//		}
+//		else if (modeCloud == FileExplorerActivity.UPLOAD){
+//			uploadButton.setText(getString(R.string.action_upload));
+//		}
+//		else if (modeCloud == FileExplorerActivity.IMPORT){
+//			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
+//		}
+//		else if (modeCloud == FileExplorerActivity.SELECT){
+//			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
+//		}
+//		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
+//			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
+//		}	
+//				
 		if (adapter == null){
 			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
 		}
@@ -191,7 +220,8 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.file_explorer_button:{
+			case R.id.file_explorer_button:{				
+				dbH.setLastCloudFolder(Long.toString(parentHandle));
 				((FileExplorerActivity) context).buttonClick(parentHandle);
 			}
 		}
