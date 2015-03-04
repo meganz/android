@@ -1633,6 +1633,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			if (e.getErrorCode() == MegaError.API_OK){
 				
 				if((typeExport==TYPE_EXPORT_GET) || (typeExport == TYPE_EXPORT_MANAGE)){
+					
 					final String link = request.getLink();
 					
 					AlertDialog getLinkDialog;
@@ -1714,7 +1715,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					Util.brandAlertDialog(getLinkDialog);
 				}
 				else if(typeExport==TYPE_EXPORT_REMOVE)
-				{
+				{		
+					
+					publicLinkImage.setVisibility(View.GONE);
+					publicLink=false;
+					invalidateOptionsMenu();
 					Toast.makeText(this, getString(R.string.file_properties_remove_link), Toast.LENGTH_LONG).show();
 				}					
 				
@@ -2108,8 +2113,10 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			sl = megaApi.getOutShares(node);
 			if (sl != null){
 
-				if (sl.size() == 0){						
+				if (sl.size() == 0){
+					log("sl.size==0");
 					sharedWithButton.setVisibility(View.GONE);
+					imageView.setImageResource(R.drawable.folder_mime);
 					
 //					If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
@@ -2146,14 +2153,16 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 					}
 					
 				}
-				else{		
+				else{	
+
 					publicLink=false;
 					for(int i=0; i<sl.size();i++){
 
 						//Check if one of the ShareNodes is the public link
 
 						if(sl.get(i).getUser()==null){
-							//Public link + users								
+							//Public link + users
+							log(sl.get(i).getUser());
 							publicLink=true;
 							break;
 
