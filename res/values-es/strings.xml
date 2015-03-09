@@ -340,6 +340,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Todas las transferencias están pausadas</string>
     <string name="menu_pause_transfers" context="menu item">Pausar transferencias</string>
     <string name="menu_restart_transfers" context="menu item">Reiniciar transferencias</string>
+    <string name="menu_take_picture" context="menu item">Hacer foto</string>
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-fi o tarifa de datos</string>
