@@ -6,6 +6,8 @@ import java.util.Locale;
 
 import nz.mega.android.ManagerActivity.DrawerItem;
 import nz.mega.android.utils.Util;
+import nz.mega.android.utils.billing.IabHelper;
+import nz.mega.android.utils.billing.IabResult;
 import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
@@ -146,8 +148,13 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		
 	
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
-//		upgradeButton.setOnClickListener(this); 
-		upgradeButton.setVisibility(View.INVISIBLE);
+		upgradeButton.setOnClickListener(this); 
+		if (myEmail.compareTo("android102@yopmail.com") == 0){
+			upgradeButton.setVisibility(View.VISIBLE);
+		}
+		else{
+			upgradeButton.setVisibility(View.INVISIBLE);
+		}
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
 		
@@ -284,10 +291,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 			}
 			case R.id.btn_upgrade:{
 				
-				((ManagerActivity)context).showUpAF();
+				if (myEmail.compareTo("android102@yopmail.com") == 0){
+					((ManagerActivity)context).paySubs();
+				}				
 				
-//				Intent intent = new Intent(getActivity(), UpgradeActivity.class);
-//				startActivity(intent);
+//				((ManagerActivity)context).showUpAF();
 				break;
 			}
 		}

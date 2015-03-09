@@ -18,6 +18,10 @@ import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
+import nz.mega.android.utils.billing.IabHelper;
+import nz.mega.android.utils.billing.IabResult;
+import nz.mega.android.utils.billing.Inventory;
+import nz.mega.android.utils.billing.Purchase;
 import nz.mega.components.EditTextCursorWatcher;
 import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaAccountDetails;
@@ -78,6 +82,7 @@ import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -157,7 +162,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
-
+	
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
 	public static String ACTION_CANCEL_UPLOAD = "CANCEL_UPLOAD";
@@ -323,6 +328,164 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	String titleAB = "";
 	
 	private boolean isGetLink = false;
+	
+	
+	//Billing
+	IabHelper mHelper;
+	// SKU for our subscription PRO_I monthly
+    static final String SKU_PRO_I_MONTH = "pro_i_month_b";
+    // (arbitrary) request code for the purchase flow
+    public static final int RC_REQUEST = 10001;
+    String orderId = "";
+    
+ // Callback for when a purchase is finished
+    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
+        public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
+            log("Purchase finished: " + result + ", purchase: " + purchase);
+
+            // if we were disposed of in the meantime, quit.
+            if (mHelper == null) return;
+
+            if (result.isFailure()) {
+                log("Error purchasing: " + result);
+                return;
+            }
+            if (!verifyDeveloperPayload(purchase)) {
+                log("Error purchasing. Authenticity verification failed.");
+                return;
+            }
+
+            log("Purchase successful.");
+            
+            orderId = purchase.getOrderId();
+            Toast.makeText(getApplicationContext(), "ORDERID WHEN FINISHED: ****_____" + purchase.getOrderId() + "____*****", Toast.LENGTH_LONG).show();
+            log("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
+            if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
+                // bought the infinite gas subscription
+                log("PRO I Monthly subscription purchased.");
+                alert("Thank you for subscribing to PRO I Monthly!");
+            }
+        }
+    };
+    
+    /** Verifies the developer payload of a purchase. */
+    boolean verifyDeveloperPayload(Purchase p) {
+        String payload = p.getDeveloperPayload();
+
+        /*
+         * TODO: verify that the developer payload of the purchase is correct. It will be
+         * the same one that you sent when initiating the purchase.
+         *
+         * WARNING: Locally generating a random string when starting a purchase and
+         * verifying it here might seem like a good approach, but this will fail in the
+         * case where the user purchases an item on one device and then uses your app on
+         * a different device, because on the other device you will not have access to the
+         * random string you originally generated.
+         *
+         * So a good developer payload has these characteristics:
+         *
+         * 1. If two different users purchase an item, the payload is different between them,
+         *    so that one user's purchase can't be replayed to another user.
+         *
+         * 2. The payload must be such that you can verify it even when the app wasn't the
+         *    one who initiated the purchase flow (so that items purchased by the user on
+         *    one device work on other devices owned by the user).
+         *
+         * Using your own server to store and verify developer payloads across app
+         * installations is recommended.
+         */
+
+        return true;
+    }
+    
+    void alert(String message) {
+        AlertDialog.Builder bld = new AlertDialog.Builder(this);
+        bld.setMessage(message);
+        bld.setNeutralButton("OK", null);
+        log("Showing alert dialog: " + message);
+        bld.create().show();
+    }
+	
+	// Listener that's called when we finish querying the items and subscriptions we own
+    IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+        public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
+            log("Query inventory finished.");
+
+            // Have we been disposed of in the meantime? If so, quit.
+            if (mHelper == null) return;
+
+            // Is it a failure?
+            if (result.isFailure()) {
+                log("Failed to query inventory: " + result);
+                return;
+            }
+
+            log("Query inventory was successful.");
+            
+            Purchase proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
+            boolean isProIMonthly = false;
+            if (proIMonthly != null){
+            	isProIMonthly = true;
+            }
+            if (isProIMonthly){
+            	log("PRO I IS SUBSCRIPTED: ORDERID: ***____" + proIMonthly.getOrderId() + "____*****");
+            }
+            else{
+            	log("PRO I IS NOT SUBSCRIPTED");
+            }
+            
+            if (!mHelper.subscriptionsSupported()) {
+            	log("SUBSCRIPTIONS NOT SUPPORTED");
+            }
+            else{
+            	log("SUBSCRIPTIONS SUPPORTED");
+            	
+            	launchPayment();
+            }            
+            
+            /*
+             * Check for items we own. Notice that for each purchase, we check
+             * the developer payload to see if it's correct! See
+             * verifyDeveloperPayload().
+             */
+
+            // Do we have the premium upgrade?
+//            Purchase premiumPurchase = inventory.getPurchase(SKU_PREMIUM);
+//            mIsPremium = (premiumPurchase != null && verifyDeveloperPayload(premiumPurchase));
+//            log("User is " + (mIsPremium ? "PREMIUM" : "NOT PREMIUM"));
+//
+//            // Do we have the infinite gas plan?
+//            Purchase infiniteGasPurchase = inventory.getPurchase(SKU_INFINITE_GAS);
+//            mSubscribedToInfiniteGas = (infiniteGasPurchase != null &&
+//                    verifyDeveloperPayload(infiniteGasPurchase));
+//            Log.d(TAG, "User " + (mSubscribedToInfiniteGas ? "HAS" : "DOES NOT HAVE")
+//                        + " infinite gas subscription.");
+//            if (mSubscribedToInfiniteGas) mTank = TANK_MAX;
+//
+//            // Check for gas delivery -- if we own gas, we should fill up the tank immediately
+//            Purchase gasPurchase = inventory.getPurchase(SKU_GAS);
+//            if (gasPurchase != null && verifyDeveloperPayload(gasPurchase)) {
+//                log("We have gas. Consuming it.");
+//                mHelper.consumeAsync(inventory.getPurchase(SKU_GAS), mConsumeFinishedListener);
+//                return;
+//            }
+//
+//            updateUi();
+//            setWaitScreen(false);
+            log("Initial inventory query finished.");
+        }
+    };
+    
+    void launchPayment(){
+    	/* TODO: for security, generate your payload here for verification. See the comments on
+         *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
+         *        an empty string, but on a production app you should carefully generate this. */
+    	String payload = "";
+    	
+    	mHelper.launchPurchaseFlow(this,
+    			SKU_PRO_I_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                RC_REQUEST, mPurchaseFinishedListener, payload);
+    }    
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -393,7 +556,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
 	    
-		if (dbH.getCredentials() == null){
+	    if (dbH.getCredentials() == null){
 			
 			if (OldPreferences.getOldCredentials(this) != null){
 	    		Intent loginWithOldCredentials = new Intent(this, LoginActivity.class);
@@ -4091,6 +4254,33 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		logout(context, megaApi, confirmAccount, false);
 	}
 	
+	public void paySubs(){
+		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlxJdfjvhsCAK1Lu5n6WtQfMkjjOUCDDuM7zeiS3jsfCghG1bpwMmD4E8vQfPboyYtQBftdEG5GbWrqWJL+z6M/2SN+6pHqExFw8fjzP/4/CDzHLhmITKTOegm/6cfMUWcrghZuiHKfM6n4vmNYrHy4Bpx68RJW+J4BwL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLSYgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
+		
+		log ("Creating IAB helper.");
+		mHelper = new IabHelper(this, base64EncodedPublicKey);
+		mHelper.enableDebugLogging(true);
+		
+		mHelper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            public void onIabSetupFinished(IabResult result) {
+                log("Setup finished.");
+
+                if (!result.isSuccess()) {
+                    // Oh noes, there was a problem.
+                    log("Problem setting up in-app billing: " + result);
+                    return;
+                }
+
+                // Have we been disposed of in the meantime? If so, quit.
+                if (mHelper == null) return;
+
+                // IAB is fully set up. Now, let's get an inventory of stuff we own.
+                log("Setup successful. Querying inventory.");
+                mHelper.queryInventoryAsync(mGotInventoryListener);
+            }
+        });
+	}
+	
 	 /*
 	 * Logout user
 	 */
@@ -6170,6 +6360,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 			}			
+		}
+		else if (requestCode == RC_REQUEST){
+			// Pass on the activity result to the helper for handling
+	        if (!mHelper.handleActivityResult(requestCode, resultCode, intent)) {
+	            // not handled, so handle it ourselves (here's where you'd
+	            // perform any handling of activity results not related to in-app
+	            // billing...
+	        	
+	        	super.onActivityResult(requestCode, resultCode, intent);
+	        }
+	        else {
+	            log("onActivityResult handled by IABUtil.");
+	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
+	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
+	        }
 		}
 	}	
 	
