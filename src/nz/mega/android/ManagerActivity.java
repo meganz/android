@@ -440,7 +440,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             else{
             	log("SUBSCRIPTIONS SUPPORTED");
             	
-            	launchPayment();
+//            	launchPayment();
             }            
             
             /*
