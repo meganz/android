@@ -1616,6 +1616,27 @@ public class MegaApiJava
 	{
 		megaApi.getPaymentUrl(productHandle);
 	}
+	
+	/**
+     * Send the Google Play receipt after a correct purchase of a subscription
+     *
+     * @param receipt String The complete receipt from Google Play
+     * @param listener MegaRequestListener to track this request
+     * 
+     */
+	public void submitPurchaseReceipt(String receipt, MegaRequestListenerInterface listener) {
+		megaApi.submitPurchaseReceipt(receipt, createDelegateRequestListener(listener));
+    }
+
+	/**
+     * Send the Google Play receipt after a correct purchase of a subscription
+     *
+     * @param receipt String The complete receipt from Google Play
+     * 
+     */
+	public void submitPurchaseReceipt(String receipt) {
+		megaApi.submitPurchaseReceipt(receipt);
+    }
 
 	/**
      * Export the master key of the account
