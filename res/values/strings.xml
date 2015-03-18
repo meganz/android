@@ -411,6 +411,8 @@
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Incorrect code</string>
     
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">About</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
     <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">MEGA SDK version</string>
     

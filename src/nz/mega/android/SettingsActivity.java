@@ -7,6 +7,7 @@ import nz.mega.components.TwoLineCheckPreference;
 import nz.mega.sdk.MegaApiAndroid;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceCategory;
+import android.widget.Toast;
 
 
 public class SettingsActivity extends PinPreferenceActivity implements OnPreferenceClickListener, OnPreferenceChangeListener {
@@ -43,6 +45,9 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	public static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
 	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_camera_upload_folder";
 	
+	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
+	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
+	
 	public final static int CAMERA_UPLOAD_WIFI_OR_DATA_PLAN = 1001;
 	public final static int CAMERA_UPLOAD_WIFI = 1002;
 	
@@ -63,6 +68,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	ListPreference cameraUploadWhat;
 	TwoLineCheckPreference cameraUploadCharging;
 	Preference cameraUploadFolder;
+	Preference aboutPrivacy;
+	Preference aboutTOS;
 	
 	TwoLineCheckPreference storageAskMeAlways;
 	
@@ -133,6 +140,12 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		
 		cameraUploadFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER);	
 		cameraUploadFolder.setOnPreferenceClickListener(this);
+		
+		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
+		aboutPrivacy.setOnPreferenceClickListener(this);
+		
+		aboutTOS = findPreference(KEY_ABOUT_TOS);
+		aboutTOS.setOnPreferenceClickListener(this);
 		
 		if (prefs == null){
 			dbH.setStorageAskAlways(false);
@@ -478,6 +491,16 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_camera_folder));
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
+		}
+		else if (preference.getKey().compareTo(KEY_ABOUT_PRIVACY_POLICY) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://mega.nz/mobile_privacy.html"));
+			startActivity(viewIntent);
+		}
+		else if (preference.getKey().compareTo(KEY_ABOUT_TOS) == 0){
+			Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+			viewIntent.setData(Uri.parse("https://mega.nz/mobile_terms.html"));
+			startActivity(viewIntent);
 		}
 		log("KEY = " + preference.getKey());
 		
