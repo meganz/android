@@ -391,6 +391,8 @@
     <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código incorrecto</string>
     
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Términos de uso</string>
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versión de App</string>
     
