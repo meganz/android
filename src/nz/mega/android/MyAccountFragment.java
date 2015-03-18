@@ -149,17 +149,19 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
 		upgradeButton.setOnClickListener(this); 
-		if (myEmail.compareTo("android102@yopmail.com") == 0){
+
+		myEmail=megaApi.getMyEmail();
+		infoEmail.setText(myEmail);
+		
+//		if (myEmail.compareTo("android102@yopmail.com") == 0){
 			upgradeButton.setVisibility(View.VISIBLE);
-		}
-		else{
-			upgradeButton.setVisibility(View.INVISIBLE);
-		}
+//		}
+//		else{
+//			upgradeButton.setVisibility(View.INVISIBLE);
+//		}
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
 		
-		myEmail=megaApi.getMyEmail();
-		infoEmail.setText(myEmail);
 				
 		//My Name
 		megaApi.getUserData(this);
@@ -291,11 +293,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 			}
 			case R.id.btn_upgrade:{
 				
-				if (myEmail.compareTo("android102@yopmail.com") == 0){
-					((ManagerActivity)context).paySubs();
-				}				
+//				if (myEmail.compareTo("android102@yopmail.com") == 0){
+//					((ManagerActivity)context).paySubs();
+//				}				
 				
-//				((ManagerActivity)context).showUpAF();
+				((ManagerActivity)context).showUpAF();
 				break;
 			}
 		}
