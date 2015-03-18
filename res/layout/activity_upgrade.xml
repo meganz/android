@@ -3,9 +3,75 @@
     android:weightSum="3"
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent" >
+    
+        <Button
+	        android:id="@+id/lite_month_button"
+			android:layout_height="48dp"
+			android:layout_width="fill_parent"
+			android:paddingTop="7dp"
+	        android:background="@drawable/btn_default_holo_light_without_corners"
+	        android:text="LITE Month"
+	        android:textColor="@color/button_text"
+	        android:layout_marginBottom="10dp">
+	    </Button>
+	    
+        <Button
+	        android:id="@+id/lite_year_button"
+			android:layout_height="48dp"
+			android:layout_width="fill_parent"
+			android:paddingTop="7dp"
+	        android:background="@drawable/btn_default_holo_light_without_corners"
+	        android:text="LITE Year"
+	        android:textColor="@color/button_text"
+	        android:layout_marginBottom="10dp">
+	    </Button>
+	    
+        <Button
+	        android:id="@+id/pro_i_month_button"
+			android:layout_height="48dp"
+			android:layout_width="fill_parent"
+			android:paddingTop="7dp"
+	        android:background="@drawable/btn_default_holo_light_without_corners"
+	        android:text="PRO I Month"
+	        android:textColor="@color/button_text"
+	        android:layout_marginBottom="10dp">
+	    </Button>
+	    
+        <Button
+	        android:id="@+id/pro_i_year_button"
+			android:layout_height="48dp"
+			android:layout_width="fill_parent"
+			android:paddingTop="7dp"
+	        android:background="@drawable/btn_default_holo_light_without_corners"
+	        android:text="PRO I Year"
+	        android:textColor="@color/button_text"
+	        android:layout_marginBottom="10dp">
+	    </Button>
+	    
+        <Button
+	        android:id="@+id/pro_ii_month_button"
+			android:layout_height="48dp"
+			android:layout_width="fill_parent"
+			android:paddingTop="7dp"
+	        android:background="@drawable/btn_default_holo_light_without_corners"
+	        android:text="PRO II Month"
+	        android:textColor="@color/button_text"
+	        android:layout_marginBottom="10dp">
+	    </Button>
+	    
+        <Button
+	        android:id="@+id/pro_iii_month_button"
+			android:layout_height="48dp"
+			android:layout_width="fill_parent"
+			android:paddingTop="7dp"
+	        android:background="@drawable/btn_default_holo_light_without_corners"
+	        android:text="PRO III Month"
+	        android:textColor="@color/button_text"
+	        android:layout_marginBottom="10dp">
+	    </Button>
   
          <!-- Pro 1 -->
-        <RelativeLayout
+<!--         <RelativeLayout
             android:id="@+id/pro1_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,9 +147,9 @@
         </RelativeLayout>        
                       
         <include layout="@layout/delimiter" />
-        
+-->        
         <!-- Pro 2 -->
-        <RelativeLayout
+<!--         <RelativeLayout
             android:id="@+id/pro2_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -157,9 +223,9 @@
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
-        
+-->
         <!-- Pro 3 -->
-        <RelativeLayout
+<!--         <RelativeLayout
             android:id="@+id/pro3_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -235,5 +301,5 @@
         
         <include layout="@layout/delimiter" />
         
-        
+-->        
     </LinearLayout>

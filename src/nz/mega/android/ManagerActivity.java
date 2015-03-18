@@ -333,7 +333,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	//Billing
 	IabHelper mHelper;
 	// SKU for our subscription PRO_I monthly
-    static final String SKU_PRO_I_MONTH = "pro_i_month_b";
+    static final String SKU_PRO_I_MONTH = "mega.android.pro1.onemonth";
+    // SKU for our subscription PRO_I yearly
+    static final String SKU_PRO_I_YEAR = "mega.android.pro1.oneyear";
+    // SKU for our subscription PRO_II monthly
+    static final String SKU_PRO_II_MONTH = "mega.android.pro2.onemonth";
+    // SKU for our subscription PRO_III monthly
+    static final String SKU_PRO_III_MONTH = "mega.android.pro3.onemonth";
+    // SKU for our subscription PRO_LITE monthly
+    static final String SKU_PRO_LITE_MONTH = "mega.android.prolite.onemonth";
+    // SKU for our subscription PRO_LITE yearly
+    static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
+    
+    
+    
     // (arbitrary) request code for the purchase flow
     public static final int RC_REQUEST = 10001;
     String orderId = "";
@@ -356,6 +369,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             }
 
             log("Purchase successful.");
+            log("ORIGINAL JSON: ****_____" + purchase.getOriginalJson() + "____****");
             
             orderId = purchase.getOrderId();
             Toast.makeText(getApplicationContext(), "ORDERID WHEN FINISHED: ****_____" + purchase.getOrderId() + "____*****", Toast.LENGTH_LONG).show();
@@ -364,6 +378,38 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                 // bought the infinite gas subscription
                 log("PRO I Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO I Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
+                // bought the infinite gas subscription
+                log("PRO I Yearly subscription purchased.");
+                alert("Thank you for subscribing to PRO I Yearly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
+                // bought the infinite gas subscription
+                log("PRO II Monthly subscription purchased.");
+                alert("Thank you for subscribing to PRO II Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
+                // bought the infinite gas subscription
+                log("PRO III Monthly subscription purchased.");
+                alert("Thank you for subscribing to PRO III Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
+                // bought the infinite gas subscription
+                log("PRO LITE Monthly subscription purchased.");
+                alert("Thank you for subscribing to PRO LITE Monthly!");
+            }
+            else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
+                // bought the infinite gas subscription
+                log("PRO LITE Yearly subscription purchased.");
+                alert("Thank you for subscribing to PRO LITE Yearly!");
+            }
+            
+            if (managerActivity != null){
+            	megaApi.submitPurchaseReceipt(purchase.getOriginalJson(), managerActivity);
+            }
+            else{
+            	megaApi.submitPurchaseReceipt(purchase.getOriginalJson());
             }
         }
     };
@@ -476,15 +522,47 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         }
     };
     
-    void launchPayment(){
+    void launchPayment(String productId){
     	/* TODO: for security, generate your payload here for verification. See the comments on
          *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
          *        an empty string, but on a production app you should carefully generate this. */
     	String payload = "";
     	
-    	mHelper.launchPurchaseFlow(this,
-    			SKU_PRO_I_MONTH, IabHelper.ITEM_TYPE_SUBS,
-                RC_REQUEST, mPurchaseFinishedListener, payload);
+    	if (mHelper == null){
+    		initGooglePlayPayments();
+    	}
+    	
+    	if (productId.compareTo(SKU_PRO_I_MONTH) == 0){
+    		mHelper.launchPurchaseFlow(this,
+        			SKU_PRO_I_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_I_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_I_YEAR, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_II_MONTH) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_II_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_III_MONTH) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_III_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_LITE_MONTH) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_LITE_MONTH, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	else if (productId.compareTo(SKU_PRO_LITE_YEAR) == 0){
+    		mHelper.launchPurchaseFlow(this,
+    				SKU_PRO_LITE_YEAR, IabHelper.ITEM_TYPE_SUBS,
+                    RC_REQUEST, mPurchaseFinishedListener, payload);	
+    	}
+    	
     }    
     
 	@Override
@@ -527,6 +605,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 
 		app = (MegaApplication)getApplication();
+		
+		initGooglePlayPayments();
+		
 //		// Get tracker.
 //		Tracker t = app.getTracker(TrackerName.APP_TRACKER);
 //		// Enable Advertising Features.
@@ -4254,7 +4335,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		logout(context, megaApi, confirmAccount, false);
 	}
 	
-	public void paySubs(){
+	public void initGooglePlayPayments(){
 		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlxJdfjvhsCAK1Lu5n6WtQfMkjjOUCDDuM7zeiS3jsfCghG1bpwMmD4E8vQfPboyYtQBftdEG5GbWrqWJL+z6M/2SN+6pHqExFw8fjzP/4/CDzHLhmITKTOegm/6cfMUWcrghZuiHKfM6n4vmNYrHy4Bpx68RJW+J4BwL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLSYgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
 		
 		log ("Creating IAB helper.");
@@ -4971,6 +5052,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			else{
 				log("ERROR MegaRequest.TYPE_SHARE");
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
+			}
+			else{
+				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
 			}
 		}
 	}
