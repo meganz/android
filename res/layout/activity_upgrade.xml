@@ -1,9 +1,18 @@
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    android:stackFromBottom="true"
+    android:id="@+id/scroll_view_upgrade" >  
+    
+    <LinearLayout
     android:orientation="vertical"  
     android:weightSum="3"
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent" >
-    
+ <!--    
         <Button
 	        android:id="@+id/lite_month_button"
 			android:layout_height="48dp"
@@ -69,16 +78,92 @@
 	        android:textColor="@color/button_text"
 	        android:layout_marginBottom="10dp">
 	    </Button>
-  
+ -->  
+ 
+ 		 <!-- Pro Lite -->
+         <RelativeLayout
+            android:id="@+id/prolite_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="#ffffff"
+            android:onClick="onUpgradeLiteClick">
+        
+            <ImageView 
+                android:id="@+id/prolite_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/standard_margin"
+                android:src="@drawable/ic_pro_lite"
+                />
+            <TextView
+                android:id="@+id/prolite_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="35dp" 
+                android:textSize="20sp"
+                android:text="@string/prolite_account"
+                android:layout_below="@id/prolite_image"/>
+            
+            <TextView
+                android:id="@+id/prolite_storage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/settings_storage"
+                android:layout_alignTop="@id/prolite_image"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/prolite_image"/>
+            
+            <TextView
+                android:id="@+id/prolite_bandwidth_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/general_bandwidth"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/prolite_image"
+                android:layout_below="@id/prolite_storage_title"/>
+            
+            <TextView
+                android:id="@+id/prolite_storage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/prolite_image"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/prolite_storage_title"/>
+            
+            <TextView
+                android:id="@+id/prolite_bandwidth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_margin="@dimen/standard_margin"
+                android:layout_toRightOf="@id/prolite_bandwidth_title"
+                android:layout_below="@id/prolite_storage"/>
+            
+            <TextView
+                android:id="@+id/princinglite_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/mega"
+                android:layout_toRightOf="@id/prolite_title"  
+                android:layout_alignLeft="@id/prolite_bandwidth_title"            
+                android:layout_below="@id/prolite_image"/>
+
+        </RelativeLayout>        
+                      
+        <include layout="@layout/delimiter" />
          <!-- Pro 1 -->
-<!--         <RelativeLayout
+         <RelativeLayout
             android:id="@+id/pro1_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:background="#ffffff"
-            android:onClick="onUpgrade1Click"
-            android:layout_weight="1">
+            android:onClick="onUpgrade1Click">
         
             <ImageView 
                 android:id="@+id/pro1_image"
@@ -147,16 +232,15 @@
         </RelativeLayout>        
                       
         <include layout="@layout/delimiter" />
--->        
+       
         <!-- Pro 2 -->
-<!--         <RelativeLayout
+        <RelativeLayout
             android:id="@+id/pro2_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:onClick="onUpgrade2Click"
-            android:background="#ffffff"
-            android:layout_weight="1">
+            android:background="#ffffff">
             <ImageView 
                 android:id="@+id/pro2_image"
                 android:layout_width="wrap_content"
@@ -223,16 +307,15 @@
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
--->
+
         <!-- Pro 3 -->
-<!--         <RelativeLayout
+        <RelativeLayout
             android:id="@+id/pro3_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:background="#ffffff"
-            android:onClick="onUpgrade3Click"
-            android:layout_weight="1">
+            android:onClick="onUpgrade3Click">
             <ImageView 
                 android:id="@+id/pro3_image"
                 android:layout_width="wrap_content"
@@ -301,5 +384,6 @@
         
         <include layout="@layout/delimiter" />
         
--->        
+        
     </LinearLayout>
+</ScrollView>

@@ -300,7 +300,7 @@
     <string name="upgrade_activity" context="title of the Upgrade screen">Pro-jäsenyys</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Valitse jäsenyys</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Kuukausittainen tai vuosittainen uusiutuva</string>
-    <string name="select_membership_2" context="button to go to Paypal">PayPal-tilaus</string>
+    <string name="select_membership_2" context="button to go to Google Play">Google Play-tilaus</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Kuukausittain*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Vuosittain*</string>

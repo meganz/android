@@ -328,7 +328,7 @@
     <string name="upgrade_activity" context="title of the Upgrade screen">العضوية المتميزة</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">اختر العضوية</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">الدفع شهريا أو سنويا</string>
-    <string name="select_membership_2" context="button to go to Paypal">اشتراك Paypal</string>
+    <string name="select_membership_2" context="button to go to Google Play">اشتراك Google Play</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">شهريا*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">سنويا*</string>
