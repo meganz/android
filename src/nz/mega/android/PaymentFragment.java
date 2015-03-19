@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class PaymentFragment extends Fragment implements MegaRequestListenerInterface{
@@ -35,7 +36,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		FREE(0, R.drawable.ic_free),
 		PRO_1(1, R.drawable.ic_pro_1, R.string.pro1_account),
 		PRO_2(2, R.drawable.ic_pro_2, R.string.pro2_account),
-		PRO_3(3, R.drawable.ic_pro_3, R.string.pro3_account);
+		PRO_3(3, R.drawable.ic_pro_3, R.string.pro3_account),
+		PRO_LITE(4, R.drawable.ic_pro_lite, R.string.prolite_account);
 		
 		private int id;
 		private int resource;
@@ -87,10 +89,12 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	private TextView bandwithTitle;
 	private TextView selectMemberShip;
 	private TextView selectRecurring;
-	private TextView paypalSubscrition;
+	private TextView googlePlaySubscription;
 	private TextView perMonthTitle;
 	private TextView perYearTitle;
 	private TextView comment;
+	private RelativeLayout paymentPerMonth;
+	private RelativeLayout paymentPerYear;
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
@@ -172,8 +176,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		selectRecurring = (TextView) v.findViewById(R.id.select_recurring);
 		selectRecurring.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
 
-		paypalSubscrition = (TextView) v.findViewById(R.id.paypal_subscription);
-		paypalSubscrition.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+		googlePlaySubscription = (TextView) v.findViewById(R.id.google_play_subscription);
+		googlePlaySubscription.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
 
 		perMonth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 		perMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
@@ -183,105 +187,223 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 		comment = (TextView) v.findViewById(R.id.comment);
 		comment.setTextSize(TypedValue.COMPLEX_UNIT_SP, (12*scaleH));
-
+		
+		paymentPerMonth = (RelativeLayout) v.findViewById(R.id.payment_per_month);
+		paymentPerYear = (RelativeLayout) v.findViewById(R.id.payment_per_year);
+		
 		switch (parameterType) {
 			case 1:{
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==1){
-						aB.setTitle(getString(R.string.pro1_account));
-	
-						storage.setText(account.getStorage()+"GB");		            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double saving3 = account.getAmount()/12.00/100.00;
-						String saving3String =df.format(saving3);
-	
-						pricingFrom.setText("from " + saving3String + " € per month");
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-						}
-					}
-				}
+				aB.setTitle(getString(R.string.pro1_account));
+				storage.setText("500 GB");
+				bandwidth.setText("12 TB");
+				double saving1 = 9999/12.00/100.00;
+				String saving1String =df.format(saving1);
+				pricingFrom.setText("from " + saving1String + " € per month");
+				
+				double perYearF=9999/100.00;
+				String perYearString =df.format(perYearF);
+
+				perYear.setText(perYearString+" €");
+				
+				double perMonthF=999/100.00;
+				String perMonthString =df.format(perMonthF);
+
+				perMonth.setText(perMonthString+" €");
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
+				
+//				for (int i=0;i<accounts.size();i++){
+//	
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==1){
+//						aB.setTitle(getString(R.string.pro1_account));
+//	
+//						storage.setText(account.getStorage()+"GB");		            
+//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+//	
+//						double saving3 = account.getAmount()/12.00/100.00;
+//						String saving3String =df.format(saving3);
+//	
+//						pricingFrom.setText("from " + saving3String + " € per month");
+//	
+//						if(account.getMonths()==12){
+//							double perYearF=account.getAmount()/100.00;
+//							String perYearString =df.format(perYearF);
+//	
+//							perYear.setText(perYearString+" €");
+//						}
+//						else if(account.getMonths()==1){
+//							double perMonthF=account.getAmount()/100.00;
+//							String perMonthString =df.format(perMonthF);
+//	
+//							perMonth.setText(perMonthString+" €");
+//						}
+//					}
+//				}
 	
 				break;
 			}
 			case 2:{
+				
+				aB.setTitle(getString(R.string.pro2_account));
+				storage.setText("2 TB");
+				bandwidth.setText("48 TB");
+				double saving2 = 1999/100.00;
+				String saving2String =df.format(saving2);
+				pricingFrom.setText("from " + saving2String + " € per month");
+				
+				double perYearF=19999/100.00;
+				String perYearString =df.format(perYearF);
+
+				perYear.setText(perYearString+" €");
+				
+				double perMonthF=1999/100.00;
+				String perMonthString =df.format(perMonthF);
+
+				perMonth.setText(perMonthString+" €");
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.INVISIBLE);
 	
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==2){
-						aB.setTitle(getString(R.string.pro2_account));
-	
-						storage.setText(account.getStorage()+"GB");		            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double saving3 = account.getAmount()/12.00/100.00;
-						String saving3String =df.format(saving3);
-	
-						pricingFrom.setText("from " + saving3String + " € per month");
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-						}
-					}
-				}
+//				for (int i=0;i<accounts.size();i++){
+//	
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==2){
+//						aB.setTitle(getString(R.string.pro2_account));
+//	
+//						storage.setText(account.getStorage()+"GB");		            
+//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+//	
+//						double saving3 = account.getAmount()/12.00/100.00;
+//						String saving3String =df.format(saving3);
+//	
+//						pricingFrom.setText("from " + saving3String + " € per month");
+//	
+//						if(account.getMonths()==12){
+//							double perYearF=account.getAmount()/100.00;
+//							String perYearString =df.format(perYearF);
+//	
+//							perYear.setText(perYearString+" €");
+//						}
+//						else if(account.getMonths()==1){
+//							double perMonthF=account.getAmount()/100.00;
+//							String perMonthString =df.format(perMonthF);
+//	
+//							perMonth.setText(perMonthString+" €");
+//						}
+//					}
+//				}
 	
 				break;
 			}
 			case 3:{
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==3){
-						aB.setTitle(getString(R.string.pro3_account));
-	
-						storage.setText(account.getStorage()+"GB");		            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double saving3 = account.getAmount()/12.00/100.00;
-						String saving3String =df.format(saving3);
-	
-						pricingFrom.setText("from " + saving3String + " € per month");
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-						}
-					}
-				}
+				
+				aB.setTitle(getString(R.string.pro2_account));
+				storage.setText("2 TB");
+				bandwidth.setText("96 TB");
+				double saving3 = 2999/100.00;
+				String saving3String =df.format(saving3);
+				pricingFrom.setText("from " + saving3String + " € per month");
+				
+				double perYearF=29999/100.00;
+				String perYearString =df.format(perYearF);
+
+				perYear.setText(perYearString+" €");
+				
+				double perMonthF=2999/100.00;
+				String perMonthString =df.format(perMonthF);
+
+				perMonth.setText(perMonthString+" €");
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.INVISIBLE);
+				
+//				for (int i=0;i<accounts.size();i++){
+//	
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==3){
+//						aB.setTitle(getString(R.string.pro3_account));
+//	
+//						storage.setText(account.getStorage()+"GB");		            
+//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+//	
+//						double saving3 = account.getAmount()/12.00/100.00;
+//						String saving3String =df.format(saving3);
+//	
+//						pricingFrom.setText("from " + saving3String + " € per month");
+//	
+//						if(account.getMonths()==12){
+//							double perYearF=account.getAmount()/100.00;
+//							String perYearString =df.format(perYearF);
+//	
+//							perYear.setText(perYearString+" €");
+//						}
+//						else if(account.getMonths()==1){
+//							double perMonthF=account.getAmount()/100.00;
+//							String perMonthString =df.format(perMonthF);
+//	
+//							perMonth.setText(perMonthString+" €");
+//						}
+//					}
+//				}
+				break;
+			}
+			
+			case 4:{
+				
+				aB.setTitle(getString(R.string.prolite_account));
+				storage.setText("200 GB");
+				bandwidth.setText("12 TB");
+				double savingLite = 4999/12.00/100.00;
+				String savingLiteString =df.format(savingLite);
+				pricingFrom.setText("from " + savingLiteString + " € per month");
+				
+				double perYearF=4999/100.00;
+				String perYearString =df.format(perYearF);
+
+				perYear.setText(perYearString+" €");
+				
+				double perMonthF=499/100.00;
+				String perMonthString =df.format(perMonthF);
+
+				perMonth.setText(perMonthString+" €");
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
+				
+//				for (int i=0;i<accounts.size();i++){
+//	
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==3){
+//						aB.setTitle(getString(R.string.pro3_account));
+//	
+//						storage.setText(account.getStorage()+"GB");		            
+//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+//	
+//						double saving3 = account.getAmount()/12.00/100.00;
+//						String saving3String =df.format(saving3);
+//	
+//						pricingFrom.setText("from " + saving3String + " € per month");
+//	
+//						if(account.getMonths()==12){
+//							double perYearF=account.getAmount()/100.00;
+//							String perYearString =df.format(perYearF);
+//	
+//							perYear.setText(perYearString+" €");
+//						}
+//						else if(account.getMonths()==1){
+//							double perMonthF=account.getAmount()/100.00;
+//							String perMonthString =df.format(perMonthF);
+//	
+//							perMonth.setText(perMonthString+" €");
+//						}
+//					}
+//				}
 				break;
 			}
 		}
@@ -298,39 +420,45 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 			case 1:{
 				
-				for (int i=0;i<accounts.size();i++){
-					
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==1&&account.getMonths()==12){
-						
-						megaApi.getPaymentUrl(account.getHandle(),this);	
-					}
-				}
+				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
+				
+//				for (int i=0;i<accounts.size();i++){
+//					
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==1&&account.getMonths()==12){
+//						
+//						megaApi.getPaymentUrl(account.getHandle(),this);	
+//					}
+//				}
 				break;
 			}
 			case 2:{
-				for (int i=0;i<accounts.size();i++){
-					
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==2&&account.getMonths()==12){
-						
-						megaApi.getPaymentUrl(account.getHandle(),this);	
-					}
-				}
+//				for (int i=0;i<accounts.size();i++){
+//					
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==2&&account.getMonths()==12){
+//						
+//						megaApi.getPaymentUrl(account.getHandle(),this);	
+//					}
+//				}
 				break;
 			}
 			case 3:{
-				for (int i=0;i<accounts.size();i++){
-					
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==3&&account.getMonths()==12){
-						
-						megaApi.getPaymentUrl(account.getHandle(),this);	
-					}
-				}
+//				for (int i=0;i<accounts.size();i++){
+//					
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==3&&account.getMonths()==12){
+//						
+//						megaApi.getPaymentUrl(account.getHandle(),this);	
+//					}
+//				}
+				break;
+			}			
+			case 4:{
+				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
 				break;
 			}
 			
@@ -344,45 +472,55 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 			case 1:{
 				
-				for (int i=0;i<accounts.size();i++){
-					
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==1&&account.getMonths()==1){
-						
-						megaApi.getPaymentUrl(account.getHandle(),this);	
-					}
-				}
+				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
+				
+//				for (int i=0;i<accounts.size();i++){
+//					
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==1&&account.getMonths()==1){
+//						
+//						megaApi.getPaymentUrl(account.getHandle(),this);	
+//					}
+//				}
 				break;
 
 			}
 			case 2:{
 				
-				for (int i=0;i<accounts.size();i++){
-					
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==2&&account.getMonths()==1){
-						
-						megaApi.getPaymentUrl(account.getHandle(),this);	
-					}
-				}
+				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
+				
+//				for (int i=0;i<accounts.size();i++){
+//					
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==2&&account.getMonths()==1){
+//						
+//						megaApi.getPaymentUrl(account.getHandle(),this);	
+//					}
+//				}
 				break;
 
 			}
 			case 3:{
 				
-				for (int i=0;i<accounts.size();i++){
-					
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==3&&account.getMonths()==1){
-						
-						megaApi.getPaymentUrl(account.getHandle(),this);	
-					}
-				}
+				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
+				
+//				for (int i=0;i<accounts.size();i++){
+//					
+//					Product account = accounts.get(i);
+//	
+//					if(account.getLevel()==3&&account.getMonths()==1){
+//						
+//						megaApi.getPaymentUrl(account.getHandle(),this);	
+//					}
+//				}
 				break;
-			}			
+			}	
+			case 4:{
+				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+				break;
+			}
 		}
 	}
 	

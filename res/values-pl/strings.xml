@@ -314,7 +314,7 @@
     <string name="upgrade_activity" context="title of the Upgrade screen">Konto Pro</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Wybierz konto</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Płatność miesięczna lub roczna</string>
-    <string name="select_membership_2" context="button to go to Paypal">Zapłać przez Paypal</string>
+    <string name="select_membership_2" context="button to go to Google Play">Zapłać przez Google Play</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Miesięcznie*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Rocznie*</string>

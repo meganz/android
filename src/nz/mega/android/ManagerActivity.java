@@ -345,6 +345,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     // SKU for our subscription PRO_LITE yearly
     static final String SKU_PRO_LITE_YEAR = "mega.android.prolite.oneyear";
     
+    Purchase proLiteMonthly;
+    Purchase proLiteYearly;
+    Purchase proIMonthly;
+    Purchase proIYearly;
+    Purchase proIIMonthly;
+    Purchase proIIIMonthly;
+    
+    Purchase maxP;
+    
+    boolean inventoryFinished = false;
+    boolean accountDetailsFinished = false;
+    
+    int levelAccountDetails = -1;
+    int levelInventory = -1;
     
     
     // (arbitrary) request code for the purchase flow
@@ -372,35 +386,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             log("ORIGINAL JSON: ****_____" + purchase.getOriginalJson() + "____****");
             
             orderId = purchase.getOrderId();
-            Toast.makeText(getApplicationContext(), "ORDERID WHEN FINISHED: ****_____" + purchase.getOrderId() + "____*****", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "ORDERID WHEN FINISHED: ****_____" + purchase.getOrderId() + "____*****", Toast.LENGTH_LONG).show();
             log("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
             if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
-                // bought the infinite gas subscription
                 log("PRO I Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO I Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
-                // bought the infinite gas subscription
                 log("PRO I Yearly subscription purchased.");
                 alert("Thank you for subscribing to PRO I Yearly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
-                // bought the infinite gas subscription
                 log("PRO II Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO II Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
-                // bought the infinite gas subscription
                 log("PRO III Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO III Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
-                // bought the infinite gas subscription
                 log("PRO LITE Monthly subscription purchased.");
                 alert("Thank you for subscribing to PRO LITE Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
-                // bought the infinite gas subscription
                 log("PRO LITE Yearly subscription purchased.");
                 alert("Thank you for subscribing to PRO LITE Yearly!");
             }
@@ -468,7 +476,66 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
             log("Query inventory was successful.");
             
-            Purchase proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
+            proLiteMonthly = inventory.getPurchase(SKU_PRO_LITE_MONTH);
+            proLiteYearly = inventory.getPurchase(SKU_PRO_LITE_YEAR);
+            proIMonthly = inventory.getPurchase(SKU_PRO_I_MONTH);
+            proIYearly = inventory.getPurchase(SKU_PRO_I_YEAR);
+            proIIMonthly = inventory.getPurchase(SKU_PRO_II_MONTH);
+            proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
+           
+            if (proLiteMonthly != null){
+        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+        			levelInventory = 0;	
+        			maxP = proLiteMonthly;
+        		}
+        	}
+            
+            if (proLiteYearly != null){
+        		if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+        			levelInventory = 0;
+        			maxP = proLiteYearly;
+        		}
+        	}
+            
+            if (proIMonthly != null){
+        		if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+        			levelInventory = 1;	
+        			maxP = proIMonthly;
+        		}
+        	}
+            
+            if (proIYearly!= null){
+        		if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+        			levelInventory = 1;
+        			maxP = proIYearly;
+        		}
+        	}
+            
+            if (proIIMonthly != null){
+            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+        			levelInventory = 2;
+        			maxP = proIIMonthly;
+        		}
+            }
+            
+            if (proIIIMonthly != null){
+            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+        			levelInventory = 3;	
+        			maxP = proIIIMonthly;
+        		}
+            }
+            
+            inventoryFinished = true;
+            
+            if (accountDetailsFinished){
+            	if (levelInventory > levelAccountDetails){
+            		if (maxP != null){
+            			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
+            		}
+            	}
+            }
+            
+            
             boolean isProIMonthly = false;
             if (proIMonthly != null){
             	isProIMonthly = true;
@@ -526,7 +593,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	/* TODO: for security, generate your payload here for verification. See the comments on
          *        verifyDeveloperPayload() for more info. Since this is a SAMPLE, we just use
          *        an empty string, but on a production app you should carefully generate this. */
-    	String payload = "";
+    	String payload = megaApi.getMyEmail();
     	
     	if (mHelper == null){
     		initGooglePlayPayments();
@@ -4336,7 +4403,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void initGooglePlayPayments(){
-		String base64EncodedPublicKey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlxJdfjvhsCAK1Lu5n6WtQfMkjjOUCDDuM7zeiS3jsfCghG1bpwMmD4E8vQfPboyYtQBftdEG5GbWrqWJL+z6M/2SN+6pHqExFw8fjzP/4/CDzHLhmITKTOegm/6cfMUWcrghZuiHKfM6n4vmNYrHy4Bpx68RJW+J4BwL6PWE8ZGGeeJmU0eAJeRJMsNEwMrW2LATnIoJ4/qLYU4gKDINPMRaIE6/4pQnbd2NurWm8ZQT7XSMQZcisTqwRLSYgjYKCXtjloP8QnKu0IGOoo79Cfs3Z9eC3sQ1fcLQsMM2wExlbnYI2KPTs0EGCmcMXrrO5MimGjYeW8GQlrKsbiZ0UwIDAQAB";
+		String base64EncodedPublicKey = Util.base64EncodedPublicKey_1 + Util.base64EncodedPublicKey_2 + Util.base64EncodedPublicKey_3 + Util.base64EncodedPublicKey_4 + Util.base64EncodedPublicKey_5; 
 		
 		log ("Creating IAB helper.");
 		mHelper = new IabHelper(this, base64EncodedPublicKey);
@@ -4532,6 +4599,42 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (e.getErrorCode() == MegaError.API_OK){
 				
 				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+				
+				
+				int accountType = accountInfo.getProLevel();
+				
+				switch (accountType){
+					case 0:{
+						levelAccountDetails = -1;
+						break;
+					}
+					case 1:{
+						levelAccountDetails = 1;
+						break;
+					}
+					case 2:{
+						levelAccountDetails = 2;
+						break;
+					}
+					case 3:{
+						levelAccountDetails = 3;
+						break;
+					}
+					case 4:{
+						levelAccountDetails = 0;
+						break;
+					}
+				}
+				
+				accountDetailsFinished = true;
+				
+				if (inventoryFinished){
+					if (levelAccountDetails < levelInventory){
+						if (maxP != null){
+							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
+						}
+					}
+				}
 				
 				long totalStorage = accountInfo.getStorageMax();
 				long usedStorage = accountInfo.getStorageUsed();
@@ -5056,7 +5159,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
+//				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				selectDrawerItem(drawerItem);
 			}
 			else{
 				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
@@ -6461,7 +6566,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        else {
 	            log("onActivityResult handled by IABUtil.");
-	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
+	            drawerItem = DrawerItem.CLOUD_DRIVE;
+//	            Toast.makeText(this, "HURRAY!: ORDERID: **__" + orderId + "__**", Toast.LENGTH_LONG).show();
 	            log("HURRAY!: ORDERID: **__" + orderId + "__**");
 	        }
 		}
@@ -7310,6 +7416,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	public void onUpgrade3Click(View view) {
 		showpF(3, upAF.getAccounts());
+	}
+	
+	public void onUpgradeLiteClick(View view){
+		showpF(4, upAF.getAccounts());
 	}
 	
 	public void onYearlyClick(View view) {

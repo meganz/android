@@ -300,7 +300,7 @@
     <string name="upgrade_activity" context="title of the Upgrade screen">Pro Üyelik</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Üyelik seç</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Aylık veya yıllık tekrarlayan</string>
-    <string name="select_membership_2" context="button to go to Paypal">Paypal aboneliği</string>
+    <string name="select_membership_2" context="button to go to Google Play">Google Play aboneliği</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Aylık*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Yıllık*</string>

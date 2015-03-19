@@ -112,7 +112,7 @@
                 android:layout_below="@id/select_membership"/>
             
             <TextView
-                android:id="@+id/paypal_subscription"
+                android:id="@+id/google_play_subscription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
@@ -126,6 +126,7 @@
         
          <!-- Per month -->
         <RelativeLayout
+            android:id="@+id/payment_per_month"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -171,6 +172,7 @@
         
         <!-- Per year -->
         <RelativeLayout
+            android:id="@+id/payment_per_year"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
