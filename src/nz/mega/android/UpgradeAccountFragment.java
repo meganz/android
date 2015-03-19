@@ -225,34 +225,34 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		DecimalFormat df = new DecimalFormat("#.##");
-		storageLite.setText("200 GB");
-		bandwidthLite.setText("12 TB");
-		double savingLite = 4999/12.00/100.00;	    	            
-		String savingLiteString =df.format(savingLite);
-		pricingPerMonthLite.setText("from " + savingLiteString +" € per month");
-		
-		storage1.setText("500 GB");
-		bandwidth1.setText("12 TB");
-		double saving1 = 9999/12.00/100.00;	    	            
-		String saving1String =df.format(saving1);
-		pricingPerMonth1.setText("from " + saving1String +" € per month");
-		
-		storage2.setText("2 TB");
-		bandwidth2.setText("48 TB");
-		double saving2 = 1999/100.00;	    	            
-		String saving2String =df.format(saving2);
-		pricingPerMonth2.setText("from " + saving2String +" € per month");
-		
-		storage3.setText("4 TB");
-		bandwidth3.setText("96 TB");
-		double saving3 = 2999/100.00;	    	            
-		String saving3String =df.format(saving3);
-		pricingPerMonth3.setText("from " + saving3String +" € per month");
+//		DecimalFormat df = new DecimalFormat("#.##");
+//		storageLite.setText("200 GB");
+//		bandwidthLite.setText("12 TB");
+//		double savingLite = 4999/12.00/100.00;	    	            
+//		String savingLiteString =df.format(savingLite);
+//		pricingPerMonthLite.setText("from " + savingLiteString +" € per month");
+//		
+//		storage1.setText("500 GB");
+//		bandwidth1.setText("12 TB");
+//		double saving1 = 9999/12.00/100.00;	    	            
+//		String saving1String =df.format(saving1);
+//		pricingPerMonth1.setText("from " + saving1String +" € per month");
+//		
+//		storage2.setText("2 TB");
+//		bandwidth2.setText("48 TB");
+//		double saving2 = 1999/100.00;	    	            
+//		String saving2String =df.format(saving2);
+//		pricingPerMonth2.setText("from " + saving2String +" € per month");
+//		
+//		storage3.setText("4 TB");
+//		bandwidth3.setText("96 TB");
+//		double saving3 = 2999/100.00;	    	            
+//		String saving3String =df.format(saving3);
+//		pricingPerMonth3.setText("from " + saving3String +" € per month");
 		
 		megaApi.getAccountDetails(this);
 
-//		megaApi.getPricing(this);
+		megaApi.getPricing(this);
 		
 		return v;
 	}	
@@ -287,47 +287,50 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		
+		DecimalFormat df = new DecimalFormat("#.##");
+
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 			MegaPricing p = request.getPricing();
-			
-			Toast.makeText(context, "NUMBER: " + p.getNumProducts(), Toast.LENGTH_LONG).show();
-		}
 
-//		DecimalFormat df = new DecimalFormat("#.##");
-//
-//		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-//			MegaPricing p = request.getPricing();
-//
-//			for (int i=0;i<p.getNumProducts();i++){
-//				log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
-//
-//				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-//
-//				if(account.getLevel()==1&&account.getMonths()==12){
-//					storage1.setText(account.getStorage()+"GB");
-//					bandwidth1.setText(sizeTranslation(account.getTransfer(),0));
-//					double saving1 = account.getAmount()/12.00/100.00;	    	            
-//					String saving1String =df.format(saving1);
-//					pricingPerMonth1.setText("from " + saving1String +" € per month");
-//				}
-//				else if(account.getLevel()==2&&account.getMonths()==12){
-//					storage2.setText(sizeTranslation(account.getStorage(),0));
-//					bandwidth2.setText(sizeTranslation(account.getTransfer(),0));
-//					double saving2 = account.getAmount()/12.00/100.00;
-//					String saving2String =df.format(saving2);
-//					pricingPerMonth2.setText("from " + saving2String +" € per month");
-//				}
-//				else if(account.getLevel()==3&&account.getMonths()==12){	                	 
-//					storage3.setText(sizeTranslation(account.getStorage(),0));         
-//					bandwidth3.setText(sizeTranslation(account.getTransfer(),0));
-//					double saving3 = account.getAmount()/12.00/100.00;
-//					String saving3String =df.format(saving3);
-//					pricingPerMonth3.setText("from " + saving3String +" € per month");
-//				}
-//
-//				accounts.add(account);
-//			}    
+			for (int i=0;i<p.getNumProducts();i++){
+				log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+
+				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+
+				if(account.getLevel()==1&&account.getMonths()==12){
+					storage1.setText(account.getStorage()+"GB");
+					bandwidth1.setText(sizeTranslation(account.getTransfer(),0));
+					double saving1 = account.getAmount()/12.00/100.00;	    	            
+					String saving1String =df.format(saving1);
+					pricingPerMonth1.setText("from " + saving1String +" € per month");
+				}
+				else if(account.getLevel()==2&&account.getMonths()==1){
+					storage2.setText(sizeTranslation(account.getStorage(),0));
+					double saving2 = account.getAmount()/100.00;
+					String saving2String =df.format(saving2);
+					pricingPerMonth2.setText("from " + saving2String +" € per month");
+				}
+				else if(account.getLevel()==2&&account.getMonths()==12){
+					bandwidth2.setText(sizeTranslation(account.getTransfer(),0));
+				}
+				else if(account.getLevel()==3&&account.getMonths()==1){	                	 
+					storage3.setText(sizeTranslation(account.getStorage(),0));         
+					double saving3 = account.getAmount()/100.00;
+					String saving3String =df.format(saving3);
+					pricingPerMonth3.setText("from " + saving3String +" € per month");
+				}
+				else if(account.getLevel()==3&&account.getMonths()==12){
+					bandwidth3.setText(sizeTranslation(account.getTransfer(),0));
+				}
+				else if (account.getLevel()==4&&account.getMonths()==12){
+					storageLite.setText(account.getStorage()+"GB");
+					bandwidthLite.setText(sizeTranslation(account.getTransfer(),0));
+					double savingLite = account.getAmount()/12.00/100.00;	    	            
+					String savingLiteString =df.format(savingLite);
+					pricingPerMonthLite.setText("from " + savingLiteString +" € per month");
+				}
+				accounts.add(account);
+			}    
 //			/*RESULTS
 //	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
 //        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
@@ -335,7 +338,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 //        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
 //        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
 //        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
-//		}
+		}
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
