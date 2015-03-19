@@ -221,13 +221,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						aB.setTitle(getString(R.string.pro1_account));
 	
 						storage.setText(account.getStorage()+"GB");		            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double saving3 = account.getAmount()/12.00/100.00;
-						String saving3String =df.format(saving3);
-	
-						pricingFrom.setText("from " + saving3String + " € per month");
-	
+						
 						if(account.getMonths()==12){
 							double perYearF=account.getAmount()/100.00;
 							String perYearString =df.format(perYearF);
@@ -239,6 +233,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							String perMonthString =df.format(perMonthF);
 	
 							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(account.getTransfer()/1024 + " TB");
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
 					}
 				}
@@ -275,12 +271,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						aB.setTitle(getString(R.string.pro2_account));
 	
 						storage.setText(account.getStorage()/1024+"TB");		            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double saving3 = account.getAmount()/12.00/100.00;
-						String saving3String =df.format(saving3);
-	
-						pricingFrom.setText("from " + saving3String + " € per month");
 	
 						if(account.getMonths()==12){
 							double perYearF=account.getAmount()/100.00;
@@ -293,6 +283,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							String perMonthString =df.format(perMonthF);
 	
 							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
 					}
 				}
@@ -329,12 +321,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						aB.setTitle(getString(R.string.pro3_account));
 	
 						storage.setText(account.getStorage()/1024+"TB");            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double saving3 = account.getAmount()/12.00/100.00;
-						String saving3String =df.format(saving3);
-	
-						pricingFrom.setText("from " + saving3String + " € per month");
 	
 						if(account.getMonths()==12){
 							double perYearF=account.getAmount()/100.00;
@@ -347,6 +333,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							String perMonthString =df.format(perMonthF);
 	
 							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
 					}
 				}
@@ -383,12 +371,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						aB.setTitle(getString(R.string.prolite_account));
 	
 						storage.setText(account.getStorage()+"GB");		            
-						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-	
-						double savingLite = account.getAmount()/12.00/100.00;
-						String savingLiteString =df.format(savingLite);
-	
-						pricingFrom.setText("from " + savingLiteString + " € per month");
 	
 						if(account.getMonths()==12){
 							double perYearF=account.getAmount()/100.00;
@@ -401,6 +383,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 							String perMonthString =df.format(perMonthF);
 	
 							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(account.getTransfer()/1024 + " TB");
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
 					}
 				}

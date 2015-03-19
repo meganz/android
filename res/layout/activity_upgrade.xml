@@ -151,7 +151,8 @@
                 android:textColor="@color/mega"
                 android:layout_toRightOf="@id/prolite_title"  
                 android:layout_alignLeft="@id/prolite_bandwidth_title"            
-                android:layout_below="@id/prolite_image"/>
+                android:layout_below="@id/prolite_image"
+                android:layout_marginBottom="10dp"/>
 
         </RelativeLayout>        
                       
@@ -227,7 +228,8 @@
                 android:textColor="@color/mega"
                 android:layout_toRightOf="@id/pro1_title"  
                 android:layout_alignLeft="@id/pro1_bandwidth_title"            
-                android:layout_below="@id/pro1_image"/>
+                android:layout_below="@id/pro1_image"
+                android:layout_marginBottom="10dp"/>
 
         </RelativeLayout>        
                       
@@ -303,7 +305,8 @@
                 android:textColor="@color/mega"
                 android:layout_alignLeft="@id/pro2_bandwidth_title" 
                 android:layout_toRightOf="@id/pro2_title"
-                android:layout_below="@id/pro2_image"/>
+                android:layout_below="@id/pro2_image"
+                android:layout_marginBottom="10dp"/>
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
@@ -379,7 +382,8 @@
                 android:text="@string/general_bandwidth"
                 android:layout_alignLeft="@id/pro3_bandwidth_title" 
                 android:layout_toRightOf="@id/pro3_title"
-                android:layout_below="@id/pro3_image"/>
+                android:layout_below="@id/pro3_image"
+                android:layout_marginBottom="10dp"/>
         </RelativeLayout>
         
         <include layout="@layout/delimiter" />
