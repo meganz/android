@@ -297,37 +297,33 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 
 				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 
-				if(account.getLevel()==1&&account.getMonths()==12){
+				if(account.getLevel()==1&&account.getMonths()==1){
 					storage1.setText(account.getStorage()+"GB");
-					bandwidth1.setText(sizeTranslation(account.getTransfer(),0));
-					double saving1 = account.getAmount()/12.00/100.00;	    	            
+					bandwidth1.setText(account.getTransfer()/1024 + " TB");
+					double saving1 = account.getAmount()/100.00;	    	            
 					String saving1String =df.format(saving1);
-					pricingPerMonth1.setText("from " + saving1String +" € per month");
+					pricingPerMonth1.setText(saving1String +" € " + getString(R.string.per_month));
 				}
 				else if(account.getLevel()==2&&account.getMonths()==1){
 					storage2.setText(sizeTranslation(account.getStorage(),0));
 					double saving2 = account.getAmount()/100.00;
 					String saving2String =df.format(saving2);
-					pricingPerMonth2.setText("from " + saving2String +" € per month");
-				}
-				else if(account.getLevel()==2&&account.getMonths()==12){
+					pricingPerMonth2.setText(saving2String +" € " + getString(R.string.per_month));
 					bandwidth2.setText(sizeTranslation(account.getTransfer(),0));
 				}
 				else if(account.getLevel()==3&&account.getMonths()==1){	                	 
 					storage3.setText(sizeTranslation(account.getStorage(),0));         
 					double saving3 = account.getAmount()/100.00;
 					String saving3String =df.format(saving3);
-					pricingPerMonth3.setText("from " + saving3String +" € per month");
-				}
-				else if(account.getLevel()==3&&account.getMonths()==12){
+					pricingPerMonth3.setText(saving3String +" € " + getString(R.string.per_month));
 					bandwidth3.setText(sizeTranslation(account.getTransfer(),0));
 				}
-				else if (account.getLevel()==4&&account.getMonths()==12){
+				else if (account.getLevel()==4&&account.getMonths()==1){
 					storageLite.setText(account.getStorage()+"GB");
-					bandwidthLite.setText(sizeTranslation(account.getTransfer(),0));
-					double savingLite = account.getAmount()/12.00/100.00;	    	            
+					bandwidthLite.setText(account.getTransfer()/1024 + " TB");
+					double savingLite = account.getAmount()/100.00;	    	            
 					String savingLiteString =df.format(savingLite);
-					pricingPerMonthLite.setText("from " + savingLiteString +" € per month");
+					pricingPerMonthLite.setText(savingLiteString +" € " + getString(R.string.per_month));
 				}
 				accounts.add(account);
 			}    
@@ -349,15 +345,18 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 				switch(accountType){				
 	
 					case 1:{
+						hideProLite();
 						hideProI();
 						break;
 					}	
 					case 2:{
+						hideProLite();
 						hideProI();
 						hideProII();
 						break;
 					}	
 					case 3:{
+						hideProLite();
 						hideProI();
 						hideProII();
 						hideProIII();
@@ -366,6 +365,23 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 				}
 			}
 		}
+	}
+	
+	private void hideProLite(){
+		proLiteLayout.setBackgroundColor(Color.parseColor("#80ffffff"));
+		proLiteLayout.setClickable(false);
+		
+		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
+		alpha.setDuration(0); 
+		alpha.setFillAfter(true); 
+		proLite.startAnimation(alpha);
+		
+		proLiteTitle.setTextColor(getResources().getColor(R.color.transparent_black));		
+		proStorageLite.setTextColor(getResources().getColor(R.color.transparent_black));	
+		storageLite.setTextColor(getResources().getColor(R.color.transparent_black));
+		proBandwithLite.setTextColor(getResources().getColor(R.color.transparent_black));						
+		bandwidthLite.setTextColor(getResources().getColor(R.color.transparent_black));						
+		pricingPerMonthLite.setTextColor(getResources().getColor(R.color.transparent_mega));
 	}
 	
 	private void hideProI(){
