@@ -484,45 +484,57 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             proIIIMonthly = inventory.getPurchase(SKU_PRO_III_MONTH);
            
             if (proLiteMonthly != null){
-        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
-        			levelInventory = 0;	
-        			maxP = proLiteMonthly;
-        		}
+            	if (megaApi.getMyEmail() != null){
+	        		if (proLiteMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 0;	
+	        			maxP = proLiteMonthly;
+	        		}
+            	}
         	}
             
             if (proLiteYearly != null){
-        		if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
-        			levelInventory = 0;
-        			maxP = proLiteYearly;
-        		}
+            	if (megaApi.getMyEmail() != null){
+	            	if (proLiteYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 0;
+	        			maxP = proLiteYearly;
+	        		}
+            	}
         	}
             
             if (proIMonthly != null){
-        		if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
-        			levelInventory = 1;	
-        			maxP = proIMonthly;
-        		}
+            	if (megaApi.getMyEmail() != null){
+	            	if (proIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 1;	
+	        			maxP = proIMonthly;
+	        		}
+            	}
         	}
             
             if (proIYearly!= null){
-        		if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
-        			levelInventory = 1;
-        			maxP = proIYearly;
-        		}
+            	if (megaApi.getMyEmail() != null){
+	            	if (proIYearly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 1;
+	        			maxP = proIYearly;
+	        		}
+            	}
         	}
             
             if (proIIMonthly != null){
-            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
-        			levelInventory = 2;
-        			maxP = proIIMonthly;
-        		}
+            	if (megaApi.getMyEmail() != null){
+	            	if (proIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 2;
+	        			maxP = proIIMonthly;
+	        		}
+            	}
             }
             
             if (proIIIMonthly != null){
-            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
-        			levelInventory = 3;	
-        			maxP = proIIIMonthly;
-        		}
+            	if (megaApi.getMyEmail() != null){
+	            	if (proIIIMonthly.getDeveloperPayload().compareTo(megaApi.getMyEmail()) == 0){
+	        			levelInventory = 3;	
+	        			maxP = proIIIMonthly;
+	        		}
+            	}
             }
             
             inventoryFinished = true;

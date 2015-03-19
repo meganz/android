@@ -193,217 +193,217 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		switch (parameterType) {
 			case 1:{
-				aB.setTitle(getString(R.string.pro1_account));
-				storage.setText("500 GB");
-				bandwidth.setText("12 TB");
-				double saving1 = 9999/12.00/100.00;
-				String saving1String =df.format(saving1);
-				pricingFrom.setText("from " + saving1String + " € per month");
-				
-				double perYearF=9999/100.00;
-				String perYearString =df.format(perYearF);
-
-				perYear.setText(perYearString+" €");
-				
-				double perMonthF=999/100.00;
-				String perMonthString =df.format(perMonthF);
-
-				perMonth.setText(perMonthString+" €");
+//				aB.setTitle(getString(R.string.pro1_account));
+//				storage.setText("500 GB");
+//				bandwidth.setText("12 TB");
+//				double saving1 = 9999/12.00/100.00;
+//				String saving1String =df.format(saving1);
+//				pricingFrom.setText("from " + saving1String + " € per month");
+//				
+//				double perYearF=9999/100.00;
+//				String perYearString =df.format(perYearF);
+//
+//				perYear.setText(perYearString+" €");
+//				
+//				double perMonthF=999/100.00;
+//				String perMonthString =df.format(perMonthF);
+//
+//				perMonth.setText(perMonthString+" €");
 				
 				paymentPerMonth.setVisibility(View.VISIBLE);
 				paymentPerYear.setVisibility(View.VISIBLE);
 				
-//				for (int i=0;i<accounts.size();i++){
-//	
-//					Product account = accounts.get(i);
-//	
-//					if(account.getLevel()==1){
-//						aB.setTitle(getString(R.string.pro1_account));
-//	
-//						storage.setText(account.getStorage()+"GB");		            
-//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-//	
-//						double saving3 = account.getAmount()/12.00/100.00;
-//						String saving3String =df.format(saving3);
-//	
-//						pricingFrom.setText("from " + saving3String + " € per month");
-//	
-//						if(account.getMonths()==12){
-//							double perYearF=account.getAmount()/100.00;
-//							String perYearString =df.format(perYearF);
-//	
-//							perYear.setText(perYearString+" €");
-//						}
-//						else if(account.getMonths()==1){
-//							double perMonthF=account.getAmount()/100.00;
-//							String perMonthString =df.format(perMonthF);
-//	
-//							perMonth.setText(perMonthString+" €");
-//						}
-//					}
-//				}
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==1){
+						aB.setTitle(getString(R.string.pro1_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double saving3 = account.getAmount()/12.00/100.00;
+						String saving3String =df.format(saving3);
+	
+						pricingFrom.setText("from " + saving3String + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
 	
 				break;
 			}
 			case 2:{
 				
-				aB.setTitle(getString(R.string.pro2_account));
-				storage.setText("2 TB");
-				bandwidth.setText("48 TB");
-				double saving2 = 1999/100.00;
-				String saving2String =df.format(saving2);
-				pricingFrom.setText("from " + saving2String + " € per month");
-				
-				double perYearF=19999/100.00;
-				String perYearString =df.format(perYearF);
-
-				perYear.setText(perYearString+" €");
-				
-				double perMonthF=1999/100.00;
-				String perMonthString =df.format(perMonthF);
-
-				perMonth.setText(perMonthString+" €");
+//				aB.setTitle(getString(R.string.pro2_account));
+//				storage.setText("2 TB");
+//				bandwidth.setText("48 TB");
+//				double saving2 = 1999/100.00;
+//				String saving2String =df.format(saving2);
+//				pricingFrom.setText("from " + saving2String + " € per month");
+//				
+//				double perYearF=19999/100.00;
+//				String perYearString =df.format(perYearF);
+//
+//				perYear.setText(perYearString+" €");
+//				
+//				double perMonthF=1999/100.00;
+//				String perMonthString =df.format(perMonthF);
+//
+//				perMonth.setText(perMonthString+" €");
 				
 				paymentPerMonth.setVisibility(View.VISIBLE);
 				paymentPerYear.setVisibility(View.INVISIBLE);
 	
-//				for (int i=0;i<accounts.size();i++){
-//	
-//					Product account = accounts.get(i);
-//	
-//					if(account.getLevel()==2){
-//						aB.setTitle(getString(R.string.pro2_account));
-//	
-//						storage.setText(account.getStorage()+"GB");		            
-//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-//	
-//						double saving3 = account.getAmount()/12.00/100.00;
-//						String saving3String =df.format(saving3);
-//	
-//						pricingFrom.setText("from " + saving3String + " € per month");
-//	
-//						if(account.getMonths()==12){
-//							double perYearF=account.getAmount()/100.00;
-//							String perYearString =df.format(perYearF);
-//	
-//							perYear.setText(perYearString+" €");
-//						}
-//						else if(account.getMonths()==1){
-//							double perMonthF=account.getAmount()/100.00;
-//							String perMonthString =df.format(perMonthF);
-//	
-//							perMonth.setText(perMonthString+" €");
-//						}
-//					}
-//				}
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==2){
+						aB.setTitle(getString(R.string.pro2_account));
+	
+						storage.setText(account.getStorage()/1024+"TB");		            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double saving3 = account.getAmount()/12.00/100.00;
+						String saving3String =df.format(saving3);
+	
+						pricingFrom.setText("from " + saving3String + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
 	
 				break;
 			}
 			case 3:{
 				
-				aB.setTitle(getString(R.string.pro2_account));
-				storage.setText("2 TB");
-				bandwidth.setText("96 TB");
-				double saving3 = 2999/100.00;
-				String saving3String =df.format(saving3);
-				pricingFrom.setText("from " + saving3String + " € per month");
-				
-				double perYearF=29999/100.00;
-				String perYearString =df.format(perYearF);
-
-				perYear.setText(perYearString+" €");
-				
-				double perMonthF=2999/100.00;
-				String perMonthString =df.format(perMonthF);
-
-				perMonth.setText(perMonthString+" €");
+//				aB.setTitle(getString(R.string.pro2_account));
+//				storage.setText("2 TB");
+//				bandwidth.setText("96 TB");
+//				double saving3 = 2999/100.00;
+//				String saving3String =df.format(saving3);
+//				pricingFrom.setText("from " + saving3String + " € per month");
+//				
+//				double perYearF=29999/100.00;
+//				String perYearString =df.format(perYearF);
+//
+//				perYear.setText(perYearString+" €");
+//				
+//				double perMonthF=2999/100.00;
+//				String perMonthString =df.format(perMonthF);
+//
+//				perMonth.setText(perMonthString+" €");
 				
 				paymentPerMonth.setVisibility(View.VISIBLE);
 				paymentPerYear.setVisibility(View.INVISIBLE);
 				
-//				for (int i=0;i<accounts.size();i++){
-//	
-//					Product account = accounts.get(i);
-//	
-//					if(account.getLevel()==3){
-//						aB.setTitle(getString(R.string.pro3_account));
-//	
-//						storage.setText(account.getStorage()+"GB");		            
-//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-//	
-//						double saving3 = account.getAmount()/12.00/100.00;
-//						String saving3String =df.format(saving3);
-//	
-//						pricingFrom.setText("from " + saving3String + " € per month");
-//	
-//						if(account.getMonths()==12){
-//							double perYearF=account.getAmount()/100.00;
-//							String perYearString =df.format(perYearF);
-//	
-//							perYear.setText(perYearString+" €");
-//						}
-//						else if(account.getMonths()==1){
-//							double perMonthF=account.getAmount()/100.00;
-//							String perMonthString =df.format(perMonthF);
-//	
-//							perMonth.setText(perMonthString+" €");
-//						}
-//					}
-//				}
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==3){
+						aB.setTitle(getString(R.string.pro3_account));
+	
+						storage.setText(account.getStorage()/1024+"TB");            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double saving3 = account.getAmount()/12.00/100.00;
+						String saving3String =df.format(saving3);
+	
+						pricingFrom.setText("from " + saving3String + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
 				break;
 			}
 			
 			case 4:{
 				
-				aB.setTitle(getString(R.string.prolite_account));
-				storage.setText("200 GB");
-				bandwidth.setText("12 TB");
-				double savingLite = 4999/12.00/100.00;
-				String savingLiteString =df.format(savingLite);
-				pricingFrom.setText("from " + savingLiteString + " € per month");
-				
-				double perYearF=4999/100.00;
-				String perYearString =df.format(perYearF);
-
-				perYear.setText(perYearString+" €");
-				
-				double perMonthF=499/100.00;
-				String perMonthString =df.format(perMonthF);
-
-				perMonth.setText(perMonthString+" €");
+//				aB.setTitle(getString(R.string.prolite_account));
+//				storage.setText("200 GB");
+//				bandwidth.setText("12 TB");
+//				double savingLite = 4999/12.00/100.00;
+//				String savingLiteString =df.format(savingLite);
+//				pricingFrom.setText("from " + savingLiteString + " € per month");
+//				
+//				double perYearF=4999/100.00;
+//				String perYearString =df.format(perYearF);
+//
+//				perYear.setText(perYearString+" €");
+//				
+//				double perMonthF=499/100.00;
+//				String perMonthString =df.format(perMonthF);
+//
+//				perMonth.setText(perMonthString+" €");
 				
 				paymentPerMonth.setVisibility(View.VISIBLE);
 				paymentPerYear.setVisibility(View.VISIBLE);
 				
-//				for (int i=0;i<accounts.size();i++){
-//	
-//					Product account = accounts.get(i);
-//	
-//					if(account.getLevel()==3){
-//						aB.setTitle(getString(R.string.pro3_account));
-//	
-//						storage.setText(account.getStorage()+"GB");		            
-//						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
-//	
-//						double saving3 = account.getAmount()/12.00/100.00;
-//						String saving3String =df.format(saving3);
-//	
-//						pricingFrom.setText("from " + saving3String + " € per month");
-//	
-//						if(account.getMonths()==12){
-//							double perYearF=account.getAmount()/100.00;
-//							String perYearString =df.format(perYearF);
-//	
-//							perYear.setText(perYearString+" €");
-//						}
-//						else if(account.getMonths()==1){
-//							double perMonthF=account.getAmount()/100.00;
-//							String perMonthString =df.format(perMonthF);
-//	
-//							perMonth.setText(perMonthString+" €");
-//						}
-//					}
-//				}
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==4){
+						aB.setTitle(getString(R.string.prolite_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+						bandwidth.setText(sizeTranslation(account.getTransfer(),0));							
+	
+						double savingLite = account.getAmount()/12.00/100.00;
+						String savingLiteString =df.format(savingLite);
+	
+						pricingFrom.setText("from " + savingLiteString + " € per month");
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+						}
+					}
+				}
 				break;
 			}
 		}
