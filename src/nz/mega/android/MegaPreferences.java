@@ -137,7 +137,7 @@ public class MegaPreferences{
 	}
 
 	public String getLastFolderUpload() {
-		if(lastFolderUpload.length() == 0)
+		if(lastFolderUpload == null || lastFolderUpload.length() == 0)
 			return null;
 		return lastFolderUpload;
 	}
@@ -147,7 +147,7 @@ public class MegaPreferences{
 	}
 
 	public String getLastFolderCloud() {
-		if(lastFolderCloud.length() == 0)
+		if(lastFolderCloud == null || lastFolderCloud.length() == 0)
 			return null;
 		
 		return lastFolderCloud;

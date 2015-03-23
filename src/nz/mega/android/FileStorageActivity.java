@@ -147,6 +147,10 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 			String lastFolder = prefs.getLastFolderUpload();
 			if(lastFolder!=null){
 				path = new File(prefs.getLastFolderUpload());
+				if(!path.exists())
+				{
+					path = null;
+				}
 			}
 			else{
 				path = new File(Environment.getExternalStorageDirectory().toString());
