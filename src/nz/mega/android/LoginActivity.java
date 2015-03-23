@@ -969,4 +969,14 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 	public static void log(String message) {
 		Util.log("LoginActivity", message);
 	}
+	
+	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
 }

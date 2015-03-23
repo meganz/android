@@ -578,7 +578,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		if (cameraFiles.size() > 0){
-			Media media = cameraFiles.poll();
+			final Media media = cameraFiles.poll();
 			
 			File file = new File(media.filePath);
 			if(!file.exists()){
@@ -735,7 +735,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
 //					}
 					
-					new LookForRenameTask(media).rename(nodeExists); 
+					final MegaNode existingNode = nodeExists;
+					handler.post(new Runnable() {
+						@Override
+						public void run() {
+							new LookForRenameTask(media).rename(existingNode); 
+						}
+					});
 				}
 			}
 		}
@@ -925,7 +931,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
  			mediaObserver = null;
  		}
 		
-		megaApi.removeGlobalListener(this);
+		if(megaApi != null)
+		{
+			megaApi.removeGlobalListener(this);
+			megaApi.removeRequestListener(this);
+		}
 		
 		super.onDestroy();
 	}

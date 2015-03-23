@@ -1310,6 +1310,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
 //    		startService(new Intent(getApplicationContext(), CameraSyncService.class));
     		megaApi.removeTransferListener(this);
+    		megaApi.removeRequestListener(this);
     	} 
     }
     

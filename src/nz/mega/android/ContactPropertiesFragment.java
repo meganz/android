@@ -339,6 +339,16 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			MegaError e) {
 		log("onRequestTemporaryError");
 	}
+	
+	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
 
 	public static void log(String log) {
 		Util.log("ContactPropertiesFragment", log);

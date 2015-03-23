@@ -101,6 +101,16 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	ArrayList<Product> accounts;
 	
 	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
+	
+	@Override
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

@@ -313,8 +313,12 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 		super.onDestroy();    	    	
 
-		megaApi.removeGlobalListener(this);	
-		megaApi.removeTransferListener(this);
+		if(megaApi != null)
+		{
+			megaApi.removeGlobalListener(this);	
+			megaApi.removeTransferListener(this);
+			megaApi.removeRequestListener(this);
+		}
 	}
 
 	@Override

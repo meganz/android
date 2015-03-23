@@ -608,6 +608,16 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 	}
 
 	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
+	
+	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		if (adapter.isMultipleSelect()) {

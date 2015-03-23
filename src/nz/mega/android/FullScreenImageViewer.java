@@ -116,6 +116,25 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 	boolean isFolderLink = false;
 	
 	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+	        // do nothing
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
@@ -400,9 +419,11 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		    
 		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		    if(positionG < imageHandles.size())
+		    {
+		    	fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
+		    }
 		}
-		
 	}
 
 	@Override

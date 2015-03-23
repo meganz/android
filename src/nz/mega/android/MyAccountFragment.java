@@ -96,6 +96,15 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
+	
+	public void onDestroy()
+	{
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		super.onDestroy();
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -379,8 +388,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		}
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
-			if (e.getErrorCode() == MegaError.API_OK){
-				
+			if (e.getErrorCode() == MegaError.API_OK && typeAccount != null)
+			{
 				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
 				
 				int accountType = accountInfo.getProLevel();
