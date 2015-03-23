@@ -2243,7 +2243,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	protected void onDestroy(){
     	super.onDestroy();
     	
-    	megaApi.removeGlobalListener(this);
+    	if(megaApi != null)
+    	{
+    		megaApi.removeGlobalListener(this);
+    		megaApi.removeRequestListener(this);
+    	}
     }
 
 	public static void log(String message) {

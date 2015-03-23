@@ -131,6 +131,15 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	}
 	
 	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+	        // do nothing
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}  
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
@@ -160,8 +169,15 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			Intent loginIntent = new Intent(this, LoginActivity.class);
 			loginIntent.setAction(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD);
 			if (intent != null){
-				loginIntent.putExtras(intent.getExtras());
-				loginIntent.setData(intent.getData());
+				if(intent.getExtras() != null)
+				{
+					loginIntent.putExtras(intent.getExtras());
+				}
+				
+				if(intent.getData() != null)
+				{
+					loginIntent.setData(intent.getData());
+				}
 			}
 			startActivity(loginIntent);
 			finish();
@@ -877,5 +893,15 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		// TODO Auto-generated method stub
 		
 	}
-
+	
+	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+			megaApi.removeGlobalListener(this);
+		}
+		
+		super.onDestroy();
+	}
 }

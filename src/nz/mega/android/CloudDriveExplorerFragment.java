@@ -141,6 +141,12 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			nodes = megaApi.getChildren(parentNode);
 		}
 		
+		if(nodes == null)
+		{
+			parentHandle = megaApi.getRootNode().getHandle();
+			nodes = megaApi.getChildren(megaApi.getRootNode());
+		}
+		
 //		if (modeCloud == FileExplorerActivity.MOVE) {
 //			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
 //		}

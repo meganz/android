@@ -148,6 +148,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))
 			try{ wl.release(); } catch(Exception ex) {}
+		
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
 		super.onDestroy();
 	}
 	

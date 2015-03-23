@@ -376,4 +376,14 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
 }

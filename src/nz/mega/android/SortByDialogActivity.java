@@ -4,6 +4,7 @@ import nz.mega.sdk.MegaApiJava;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -13,6 +14,15 @@ import android.widget.ImageButton;
 public class SortByDialogActivity extends Activity implements OnClickListener {
 
 	public static String ACTION_SORT_BY = "ACTION_SORT_BY";
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ( keyCode == KeyEvent.KEYCODE_MENU ) {
+	        // do nothing
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}  
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

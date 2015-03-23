@@ -271,4 +271,14 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
 }

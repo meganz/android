@@ -91,6 +91,16 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	MegaUser myUser;
 	
 	@Override
+	public void onDestroy(){				
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
+	
+	@Override
 	public void onCreate (Bundle savedInstanceState){
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

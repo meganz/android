@@ -62,6 +62,16 @@ public class FileLinkActivity extends PinActivity implements MegaRequestListener
 	MegaPreferences prefs = null;
 	
 	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
+	}
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate()");
     	

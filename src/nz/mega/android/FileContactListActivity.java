@@ -413,7 +413,11 @@ public class FileContactListActivity extends PinActivity implements MegaRequestL
     protected void onDestroy(){
     	super.onDestroy();
     	
-    	megaApi.removeGlobalListener(this);
+    	if(megaApi != null)
+    	{
+    		megaApi.removeGlobalListener(this);
+    		megaApi.removeRequestListener(this);
+    	}
     }
 	
 	@Override

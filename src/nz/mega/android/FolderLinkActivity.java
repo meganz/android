@@ -247,6 +247,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	protected void onDestroy() {
 
 		if (megaApiFolder != null){
+			megaApiFolder.removeRequestListener(this);
 			megaApiFolder.logout();
 		}
 		super.onDestroy();

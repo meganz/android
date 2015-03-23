@@ -282,6 +282,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
     	
     	if (megaApi != null){
     		megaApi.removeGlobalListener(this);
+    		megaApi.removeRequestListener(this);
     	}
 	}
 	

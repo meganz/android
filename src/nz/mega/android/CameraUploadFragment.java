@@ -210,7 +210,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			adapterList.setMultipleSelect(false);
 			listView.setOnItemLongClickListener(fileBrowserFragment);
 			clearSelections();
-		}
+;		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -1567,5 +1567,15 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			MegaError e) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public void onDestroy(){
+		if(megaApi != null)
+		{	
+			megaApi.removeRequestListener(this);
+		}
+		
+		super.onDestroy();
 	}
 }
