@@ -140,8 +140,6 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 		prefs = dbH.getPreferences();
 		if (prefs == null){
 			path = new File(Environment.getExternalStorageDirectory().toString());
-			log("Not defined, so not enabled");
-			finish();
 		}
 		else{
 			String lastFolder = prefs.getLastFolderUpload();
