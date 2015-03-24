@@ -132,14 +132,18 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	
 	@Override
 	public void onDestroy() {
+		if(adapter != null);
+		{
+			adapter.destroyAdapter();
+		}
 		super.onDestroy();
 	}
-
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {  
+		
+		super.onCreateView(inflater, container, savedInstanceState);
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -150,8 +154,11 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		}
 		aB.setTitle(getString(R.string.section_transfers));
 
-		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		if(((ManagerActivity)context).getmDrawerToggle() != null)
+		{
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+		}
 		
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 		
@@ -210,13 +217,19 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
-				((ManagerActivity)context).setPauseIconVisible(false);
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					((ManagerActivity)context).setPauseIconVisible(false);
+				}
 			}
 			else{
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
-				((ManagerActivity)context).setPauseIconVisible(true);
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					((ManagerActivity)context).setPauseIconVisible(true);
+				}
 			}
 			
 			pauseImage.setVisibility(View.GONE);
