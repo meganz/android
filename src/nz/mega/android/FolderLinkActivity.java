@@ -152,6 +152,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		
 		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
 		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
+		importFolderMenuItem.setVisible(false);
 		
 		return super.onCreateOptionsMenu(menu);
 	}
