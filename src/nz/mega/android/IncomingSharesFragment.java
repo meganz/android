@@ -452,6 +452,11 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	
 	public void refresh (long _parentHandle){
 		MegaNode n = megaApi.getNodeByHandle(_parentHandle);
+		if(n == null)
+		{
+			refresh();
+			return;
+		}
 		
 		aB.setTitle(n.getName());
 		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
