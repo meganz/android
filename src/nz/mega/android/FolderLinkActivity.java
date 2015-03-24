@@ -145,6 +145,8 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenu");
+		menu.clear();
+		
 		// Inflate the menu items for use in the action bar
 	    MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.folder_link_action, menu);
@@ -153,8 +155,34 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
 		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
 		importFolderMenuItem.setVisible(false);
+		if(megaApiFolder.getRootNode() == null)
+		{
+			downloadFolderMenuItem.setVisible(false);
+		}
 		
 		return super.onCreateOptionsMenu(menu);
+	}
+	
+	public boolean onPrepareOptionsMenu(Menu menu) 
+	{
+		log("onPrepareOptionsMenu");
+		menu.clear();
+
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.folder_link_action, menu);
+		getSupportActionBar().setDisplayShowCustomEnabled(true);
+		
+		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
+		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
+		
+		importFolderMenuItem.setVisible(false);
+		if(megaApiFolder.getRootNode() == null)
+		{
+			downloadFolderMenuItem.setVisible(false);
+		}
+		
+		return super.onPrepareOptionsMenu(menu);
 	}
 	
 	@Override
@@ -242,6 +270,8 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
     			}
     		}
     	}
+    	
+    	aB.setTitle("MEGA - " + getString(R.string.general_loading));
     }
 	
 	@Override
@@ -492,11 +522,12 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 				}
 				catch(Exception ex){
 					Util.showToast(this, getString(R.string.general_error_folder_not_found)); 
+	    			finish();
 				}
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-				
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES)
+		{		
 			MegaNode rootNode = megaApiFolder.getRootNode();
 			if (rootNode != null){
 				parentHandle = rootNode.getHandle();
@@ -537,7 +568,8 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
-					Util.showToast(this, getString(R.string.general_error_folder_not_found)); 
+					Util.showToast(this, getString(R.string.general_error_folder_not_found));
+	    			finish();
 				}
 			}
 		}
