@@ -98,53 +98,46 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-		
-		String actionBarTitle = getString(R.string.section_cloud_drive);	
-		
-		if (parentHandle == -1){			
 			
+		if (parentHandle == -1)
+		{			
 			//Find in the database the last parentHandle
 			prefs = dbH.getPreferences();
-			if (prefs == null){
-				actionBarTitle = getString(R.string.section_cloud_drive);
-				parentHandle = megaApi.getRootNode().getHandle();
-				nodes = megaApi.getChildren(megaApi.getRootNode());
-			}
-			else{
-				String lastFolder=prefs.getLastFolderCloud();
-				if(lastFolder!=null){
+			if (prefs != null)
+			{
+				String lastFolder = prefs.getLastFolderCloud();
+				if(lastFolder != null)
+				{
 					parentHandle = Long.parseLong(lastFolder);
-					MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
-					if(chosenNode!=null){
-						changeButtonTitle(chosenNode.getName());
-						changeActionBarTitle(chosenNode.getName());					
-						nodes = megaApi.getChildren(chosenNode);
-					}	
-				}
-				else{
-					actionBarTitle = getString(R.string.section_cloud_drive);
-					parentHandle = megaApi.getRootNode().getHandle();
-					nodes = megaApi.getChildren(megaApi.getRootNode());
 				}
 			}
-
-			if (context instanceof FileExplorerActivity){
-				((FileExplorerActivity)context).setParentHandle(parentHandle);
-			}
-			
-		}
-		else{
-			if (context instanceof FileExplorerActivity){
-				((FileExplorerActivity)context).setParentHandle(parentHandle);
-			}
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			nodes = megaApi.getChildren(parentNode);
 		}
 		
-		if(nodes == null)
+		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
+		if(chosenNode == null)
 		{
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
+			changeButtonTitle(context.getString(R.string.section_cloud_drive));
+			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+		}
+		else
+		{
+			nodes = megaApi.getChildren(chosenNode);
+			if(chosenNode.getType() != MegaNode.TYPE_ROOT)
+			{
+				changeButtonTitle(chosenNode.getName());
+				changeActionBarTitle(chosenNode.getName());	
+			}
+			else
+			{
+				changeButtonTitle(context.getString(R.string.section_cloud_drive));
+				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+			}
+		}
+		
+		if (context instanceof FileExplorerActivity){
+			((FileExplorerActivity)context).setParentHandle(parentHandle);
 		}
 		
 //		if (modeCloud == FileExplorerActivity.MOVE) {
@@ -246,8 +239,16 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			temp = path.split("/");
 			name = temp[temp.length-1];
 
-			changeButtonTitle(name);
-			changeActionBarTitle(name);
+			if(n.getType() != MegaNode.TYPE_ROOT)
+			{
+				changeButtonTitle(name);
+				changeActionBarTitle(name);
+			}
+			else
+			{
+				changeButtonTitle(context.getString(R.string.section_cloud_drive));
+				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+			}
 			
 			parentHandle = nodes.get(position).getHandle();
 			if (context instanceof FileExplorerActivity){
