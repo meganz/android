@@ -91,6 +91,10 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 		}
 		else{
 			intent.setAction(Intent.ACTION_GET_CONTENT);
+			if(android.os.Build.VERSION.SDK_INT >= 18)
+			{
+				intent.putExtra("android.intent.extra.ALLOW_MULTIPLE", true);
+			}
 			intent.setType(item.type);
 			getActivity().startActivityForResult(Intent.createChooser(intent, null), ManagerActivity.REQUEST_CODE_GET);
 		}
