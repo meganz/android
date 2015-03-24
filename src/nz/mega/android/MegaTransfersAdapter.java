@@ -137,6 +137,13 @@ public class MegaTransfersAdapter extends BaseAdapter implements OnClickListener
 		}
 	}
 	
+	public void destroyAdapter()
+	{
+		if (megaApi != null)
+		{
+			megaApi.removeRequestListener(this);
+		}
+	}
 		
 	/*private view holder class*/
     public class ViewHolderTransfer {
