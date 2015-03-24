@@ -206,6 +206,14 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			int imageNumber = 0;
 			int index = 0;
 			File[] fList = offlineDirectory.listFiles();
+			if(fList == null)
+			{
+				//Nothing to show (folder deleted?)
+				//Close the image viewer
+				finish();
+				return;
+			}
+			
 			log("SIZE: " + fList.length);
 			for (File f : fList){
 				log("F: " + f.getAbsolutePath());
@@ -217,6 +225,14 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 					imageNumber++;
 				}
 				index++;				
+			}
+			
+			if(paths.size() == 0)
+			{
+				//No images to show (images deleted?)
+				//Close the image viewer
+				finish();
+				return;
 			}
 			
 			if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
