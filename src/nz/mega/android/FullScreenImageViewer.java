@@ -235,6 +235,12 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 				return;
 			}
 			
+			if(positionG >= paths.size())
+			{
+				//Invalid index. Show the first image
+				positionG = 0;
+			}
+			
 			if (adapterType == ManagerActivity.OFFLINE_ADAPTER){
 				adapterOffline = new MegaOfflineFullScreenImageAdapter(fullScreenImageViewer, paths);
 			}
@@ -285,6 +291,17 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 					}
 					imageNumber++;
 				}
+			}
+
+			if(imageHandles.size() == 0)
+			{
+				finish();
+				return;
+			}
+			
+			if(positionG >= imageHandles.size())
+			{
+				positionG = 0;
 			}
 			
 			adapterMega = new MegaFullScreenImageAdapter(fullScreenImageViewer,imageHandles, megaApi);
@@ -385,6 +402,17 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			}
 //			Toast.makeText(this, ""+parentNode.getName() + "_" + imageHandles.size(), Toast.LENGTH_LONG).show();
 				
+			if(imageHandles.size() == 0)
+			{
+				finish();
+				return;
+			}
+			
+			if(positionG >= imageHandles.size())
+			{
+				positionG = 0;
+			}
+			
 			adapterMega = new MegaFullScreenImageAdapter(fullScreenImageViewer,imageHandles, megaApi);
 			
 			viewPager.setAdapter(adapterMega);
@@ -435,10 +463,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		    topLayout = (RelativeLayout) findViewById(R.id.image_viewer_layout_top);
 		    
 		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
-		    if(positionG < imageHandles.size())
-		    {
-		    	fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
-		    }
+		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 		}
 	}
 
