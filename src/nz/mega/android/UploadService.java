@@ -248,7 +248,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					String sShow=file.getName() + " " + getString(R.string.general_already_uploaded);					
 					Toast.makeText(getApplicationContext(), sShow,Toast.LENGTH_SHORT).show();
 					
-					if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0)){
+					if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
 						successCount = transfersOK.size();
 						errorCount = transfersError.size();
 						onQueueComplete();
@@ -433,8 +433,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	
 	List<FolderCreation> foldersCreation = Collections.synchronizedList(new ArrayList<FolderCreation>());
 	
-	
-	
 	/*
 	 * Upload folder
 	 */
@@ -443,8 +441,6 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		File folder;
 		long parentHandle;
 		ArrayList<String> foldersPath = new ArrayList<String>();
-		boolean firstFolder = false;
-		long firstFolderHandle = -1;
 		UploadService uploadService;
 		
 		UploadFolderTask(File folder, long parentHandle, UploadService uploadService){
@@ -454,118 +450,137 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 
 		@Override
-		public void run(){
-			FolderCreation fC = new FolderCreation(folder.getAbsolutePath(), folder.getName(), megaApi.getNodePath(megaApi.getNodeByHandle(parentHandle)), parentHandle);
-			foldersCreation.add(fC);
-			log("FC: " + fC.parentFolderPath + "/" + fC.folderName);
-			createFoldersCreationArray(folder, fC.parentFolderPath + "/" + fC.folderName);
-			for (int i=0;i<foldersCreation.size();i++){
-				log("[" + i + "] PARENTPATH: " + foldersCreation.get(i).parentFolderPath +  "___ FOLDER NAME: " + foldersCreation.get(i).folderName + "____ PARENTFOLDERHANDLE: " + foldersCreation.get(i).parentFolderHandle);
-			}
-			
-			if (!foldersCreation.isEmpty()){
-				createFolderCreation(foldersCreation.get(0));
+		public void run()
+		{
+			synchronized(foldersCreation)
+			{
+				boolean firstFolder = foldersCreation.isEmpty();
+				
+				FolderCreation fC = new FolderCreation(folder.getAbsolutePath(), folder.getName(), megaApi.getNodePath(megaApi.getNodeByHandle(parentHandle)), parentHandle);
+				foldersCreation.add(fC);
+				log("FC: " + fC.parentFolderPath + "/" + fC.folderName);
+				createFoldersCreationArray(folder, fC.parentFolderPath + "/" + fC.folderName);
+				for (int i=0;i<foldersCreation.size();i++)
+				{
+					log("[" + i + "] PARENTPATH: " + foldersCreation.get(i).parentFolderPath +  "___ FOLDER NAME: " + foldersCreation.get(i).folderName + "____ PARENTFOLDERHANDLE: " + foldersCreation.get(i).parentFolderHandle);
+				}
+				
+				if(firstFolder)
+				{
+					createNextFolder();
+				}
 			}
 		}
 		
-		private void createFolderCreation(FolderCreation fC){
-			if (foldersCreation.size() > 0){
-				String nodePath = fC.parentFolderPath + "/" + fC.folderName;
-				MegaNode parentNode = megaApi.getNodeByHandle(fC.parentFolderHandle);
-				log("CURRENT NODEPATH:" + nodePath);
-				if (parentNode != null){
-					ArrayList<MegaNode> nL = megaApi.search (parentNode, fC.folderName, false);
-					if (nL.size() == 0){
-						megaApi.createFolder(fC.folderName, parentNode, this);
-					}
-					else{
-						MegaNode currentNode = nL.get(0);
-						long currentNodeHandle = currentNode.getHandle();
-						File localFolder = new File(fC.localPath);
-						if (localFolder.isDirectory()){
-							File[] files = localFolder.listFiles();
-							for (int i=0;i<files.length;i++){
-								if (canceled){
-									break;
-								}
-								
-								try {
-									Thread.sleep(300);
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}								
-								File f = files[i];
-								if (f.isFile()){
-									switch(checkFileToUpload(f, currentNodeHandle)){
-										case CHECK_FILE_TO_UPLOAD_UPLOAD:{
-											log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_UPLOAD");
-											
-											if(!wl.isHeld()){ 
-												wl.acquire();
-											}
-											if(!lock.isHeld()){
-												lock.acquire();
-											}
-											
-											megaApi.startUpload(f.getAbsolutePath(), currentNode, uploadService);
-											break;
+		private void createNextFolder()
+		{
+			if (foldersCreation.isEmpty())
+			{
+				return;
+			}
+			
+			FolderCreation fC = foldersCreation.get(0);
+			String nodePath = fC.parentFolderPath + "/" + fC.folderName;
+			MegaNode parentNode = megaApi.getNodeByHandle(fC.parentFolderHandle);
+			log("CURRENT NODEPATH:" + nodePath);
+			if (parentNode != null)
+			{
+				ArrayList<MegaNode> nL = megaApi.search(parentNode, fC.folderName, false);
+				if (nL.size() == 0)
+				{
+					megaApi.createFolder(fC.folderName, parentNode, this);
+				}
+				else
+				{
+					MegaNode currentNode = nL.get(0);
+					long currentNodeHandle = currentNode.getHandle();
+					File localFolder = new File(fC.localPath);
+					if (localFolder.isDirectory())
+					{
+						File[] files = localFolder.listFiles();
+						for (int i=0;i<files.length;i++)
+						{
+							if (canceled)
+							{
+								break;
+							}
+							
+							try 
+							{
+								Thread.sleep(300);
+							} catch (InterruptedException e) 
+							{
+								e.printStackTrace();
+							}								
+							File f = files[i];
+							if (f.isFile())
+							{
+								switch(checkFileToUpload(f, currentNodeHandle))
+								{
+									case CHECK_FILE_TO_UPLOAD_UPLOAD:{
+										log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_UPLOAD");
+										
+										if(!wl.isHeld()){ 
+											wl.acquire();
 										}
-										case CHECK_FILE_TO_UPLOAD_COPY:{
-											log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_COPY");
-											break;
+										if(!lock.isHeld()){
+											lock.acquire();
 										}
-										case CHECK_FILE_TO_UPLOAD_OVERWRITE:{
-											log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_OVERWRITE");
-											MegaNode nodeExistsInFolder = megaApi.getNodeByPath(f.getName(), currentNode);
-											megaApi.remove(nodeExistsInFolder);
-											
-											if(!wl.isHeld()){ 
-												wl.acquire();
-											}
-											if(!lock.isHeld()){
-												lock.acquire();
-											}
-											
-											megaApi.startUpload(f.getAbsolutePath(), currentNode, uploadService);
+										
+										megaApi.startUpload(f.getAbsolutePath(), currentNode, uploadService);
+										break;
+									}
+									case CHECK_FILE_TO_UPLOAD_COPY:{
+										log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_COPY");
+										break;
+									}
+									case CHECK_FILE_TO_UPLOAD_OVERWRITE:{
+										log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_OVERWRITE");
+										MegaNode nodeExistsInFolder = megaApi.getNodeByPath(f.getName(), currentNode);
+										megaApi.remove(nodeExistsInFolder);
+										
+										if(!wl.isHeld()){ 
+											wl.acquire();
+										}
+										if(!lock.isHeld()){
+											lock.acquire();
+										}
+										
+										megaApi.startUpload(f.getAbsolutePath(), currentNode, uploadService);
 
-											break;
-										}
-										case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER:{
-											log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
+										break;
+									}
+									case CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER:{
+										log(f.getName() + "__" + currentNode.getName() + "___CHECK_FILE_TO_UPLOAD_SAME_FILE_IN_FOLDER");
 //											Toast.makeText(getApplicationContext(), f.getName() + " already uploaded in folder " + currentNode.getName(), Toast.LENGTH_SHORT).show();
+
+										if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
+											successCount = transfersOK.size();
+											errorCount = transfersError.size();
 											
-											if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
-												successCount = transfersOK.size();
-												errorCount = transfersError.size();
-												
-												onQueueComplete();												
-											}
-	
-											break;					
+											onQueueComplete();												
 										}
+
+										break;					
 									}
 								}
 							}
 						}
+					}
 						
-						if (!foldersCreation.isEmpty())
+					foldersCreation.remove(0);
+					if (!foldersCreation.isEmpty())
+					{
+						for (int i=0; i<foldersCreation.size(); i++)
 						{
-							//TODO: Check why foldersCreation can be empty here
-							foldersCreation.remove(0);
+							if (nodePath.compareTo(foldersCreation.get(i).parentFolderPath) == 0)
+							{
+								foldersCreation.get(i).parentFolderHandle = currentNodeHandle;
+								log("FOLDER EXISTS: NAME" + foldersCreation.get(i).folderName + "____ PARENTPATH: " + foldersCreation.get(i).parentFolderPath + "____ HANDLE: " + foldersCreation.get(i).parentFolderHandle);
+							}
 						}
 						
-						if (!foldersCreation.isEmpty()){
-							for (int i=0; i<foldersCreation.size(); i++){
-								if (nodePath.compareTo(foldersCreation.get(i).parentFolderPath) == 0){
-									foldersCreation.get(i).parentFolderHandle = currentNodeHandle;
-									log("FOLDER EXISTS: NAME" + foldersCreation.get(i).folderName + "____ PARENTPATH: " + foldersCreation.get(i).parentFolderPath + "____ HANDLE: " + foldersCreation.get(i).parentFolderHandle);
-								}
-							}
-							
-							if (!foldersCreation.isEmpty()){
-								createFolderCreation(foldersCreation.get(0));
-							}
-						}
+						createNextFolder();
 					}
 				}
 			}
@@ -606,81 +621,77 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 
 		@Override
-		public void onRequestFinish(MegaApiJava api, MegaRequest request,
-				MegaError e) {
-			if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
-				if (foldersCreation.size() > 0){
-					log("onRequestFinish: " + request.getRequestString() + "_" + foldersCreation.get(0).folderName);
-				}
-				if (e.getErrorCode() == MegaError.API_OK){					
-					if (foldersCreation.size() > 0){
-						long currentNodeHandle = request.getNodeHandle();
-	//					MegaNode currentNode = megaApi.getNodeByHandle(currentNodeHandle);
-						
-						FolderCreation fC = foldersCreation.get(0);
-						
-						File localFolder = new File(fC.localPath);
-						
-						UploadTask uploadTask = new UploadTask(currentNodeHandle, localFolder);
-						uploadTask.start();				
-					}
+		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) 
+		{
+			if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER)
+			{
+				if (e.getErrorCode() == MegaError.API_OK)
+				{					
+					long currentNodeHandle = request.getNodeHandle();							
+					UploadTask uploadTask = new UploadTask(currentNodeHandle);
+					uploadTask.start();				
 				}
 			}
 		}
 		
-		private class UploadTask extends Thread{
-			
+		private class UploadTask extends Thread
+		{	
 			long currentNodeHandle;
 			MegaNode currentNode;
-			File localFolder;
 			
-			UploadTask(long currentNodeHandle, File localFolder){
+			UploadTask(long currentNodeHandle)
+			{
 				this.currentNodeHandle = currentNodeHandle;
 				this.currentNode = megaApi.getNodeByHandle(currentNodeHandle);
-				this.localFolder = localFolder;
 			}
 			
 			@Override
-			public void run(){
+			public void run()
+			{
+				synchronized(foldersCreation)
+				{
+					if(foldersCreation.isEmpty())
+					{
+						return;
+					}
+					
+					FolderCreation fC = foldersCreation.get(0);					
+					File localFolder = new File(fC.localPath);
+					
+					if (localFolder.isDirectory()){
+						File[] files = localFolder.listFiles();
+						for (int i=0;i<files.length;i++){
+							if (canceled){
+								break;
+							}
+							
+							try {
+								Thread.sleep(300);
+							} catch (InterruptedException exc) {
+								exc.printStackTrace();
+							}
+							File f = files[i];
+							if (f.isFile()){
+								megaApi.startUpload(f.getAbsolutePath(), currentNode, uploadService);
+							}
+						}
+					}
 				
-				if (localFolder.isDirectory()){
-					File[] files = localFolder.listFiles();
-					for (int i=0;i<files.length;i++){
-						if (canceled){
-							break;
+					foldersCreation.remove(0);
+					if (!foldersCreation.isEmpty())
+					{
+						String newFolderPath = megaApi.getNodePath(currentNode);
+						
+						for (int i=0; i<foldersCreation.size(); i++){
+							if (newFolderPath.compareTo(foldersCreation.get(i).parentFolderPath) == 0){
+								foldersCreation.get(i).parentFolderHandle = currentNodeHandle;
+								log("NEW FOLDERSCREATION: NAME___" + foldersCreation.get(i).folderName + "____ PARENTPATH: " + foldersCreation.get(i).parentFolderPath + "____ HANDLE: " + foldersCreation.get(i).parentFolderHandle);
+							}
 						}
 						
-						try {
-							Thread.sleep(300);
-						} catch (InterruptedException exc) {
-							exc.printStackTrace();
-						}
-						File f = files[i];
-						if (f.isFile()){
-							megaApi.startUpload(f.getAbsolutePath(), currentNode, uploadService);
-						}
+						createNextFolder();
 					}
 				}
-				
-				if (!foldersCreation.isEmpty())
-				{
-					//TODO: Check why foldersCreation can be empty here
-					foldersCreation.remove(0);
-				}
-				
-				if (!foldersCreation.isEmpty()){
-					String newFolderPath = megaApi.getNodePath(currentNode);
-					
-					for (int i=0; i<foldersCreation.size(); i++){
-						if (newFolderPath.compareTo(foldersCreation.get(i).parentFolderPath) == 0){
-							foldersCreation.get(i).parentFolderHandle = currentNodeHandle;
-							log("NEW FOLDERSCREATION: NAME___" + foldersCreation.get(i).folderName + "____ PARENTPATH: " + foldersCreation.get(i).parentFolderPath + "____ HANDLE: " + foldersCreation.get(i).parentFolderHandle);
-						}
-					}
-					
-					createFolderCreation(foldersCreation.get(0));
-				}
-				
 			}
 		}
 
@@ -863,7 +874,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 			
 			log("CURRENTTRANSFERS: " + currentTransfers.size() + "___ OK: " + transfersOK.size() + "___ ERROR: " + transfersError.size());
-			if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0)){
+			if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
 				successCount = transfersOK.size();
 				errorCount = transfersError.size();
 				onQueueComplete();
