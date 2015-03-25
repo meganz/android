@@ -16,15 +16,14 @@ public class OfflineActivity extends PinActivity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
-		
+		super.onCreate(savedInstanceState);
+
 		if (Util.isOnline(this)){
 			Intent onlineIntent = new Intent(this, ManagerActivity.class);
 			startActivity(onlineIntent);
 			finish();
         	return;
-		}
-		
-		super.onCreate(savedInstanceState);
+		}		
 		
 		setContentView(R.layout.activity_offline);
 		
