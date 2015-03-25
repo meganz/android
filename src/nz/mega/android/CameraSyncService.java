@@ -349,29 +349,22 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			return START_NOT_STICKY;
 		}
 		
-		if (app.getLocalIpAddress() == null){
-			app.setLocalIpAddress(Util.getLocalIpAddress());
+		String previousIP = app.getLocalIpAddress();
+		String currentIP = Util.getLocalIpAddress();
+		if (previousIP == null 
+				|| (previousIP.length() == 0) 
+				|| (previousIP.compareTo("127.0.0.1") == 0))
+		{
+			app.setLocalIpAddress(currentIP);
 		}
-		else{
-			if (app.getLocalIpAddress().compareTo("") == 0){
-				app.setLocalIpAddress(Util.getLocalIpAddress());
-			}
-			else{
-				if (app.getLocalIpAddress() != null){
-					if (Util.getLocalIpAddress() != null){
-						if (app.getLocalIpAddress().compareTo(Util.getLocalIpAddress()) != 0){
-							app.setLocalIpAddress(Util.getLocalIpAddress());
-							
-							if (megaApi.getRootNode() != null){
-								if (Util.isOnline(this)){
-									log("reconnect");
-									megaApi.reconnect();
-								}
-							}
-						}
-					}
-				}
-			}
+		else if ((currentIP != null) 
+				&& (currentIP.length() != 0) 
+				&& (currentIP.compareTo("127.0.0.1") != 0)
+				&& (currentIP.compareTo(previousIP) != 0))
+		{
+			app.setLocalIpAddress(currentIP);
+			log("reconnect");
+			megaApi.reconnect();
 		}
 		
 		int result = shouldRun();
