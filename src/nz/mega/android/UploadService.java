@@ -2,7 +2,9 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -429,7 +431,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		}
 	}
 	
-	ArrayList<FolderCreation> foldersCreation = new ArrayList<FolderCreation>();
+	List<FolderCreation> foldersCreation = Collections.synchronizedList(new ArrayList<FolderCreation>());
 	
 	
 	
