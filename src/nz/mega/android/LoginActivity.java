@@ -13,18 +13,21 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -124,10 +127,79 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 
 	}
 
+	public View getActionBarView() 
+	{
+	    int resId;
+		
+	    Window window = getWindow();
+	    if(window == null)
+	    {
+	    	return null;
+	    }
+	    
+	    View v = window.getDecorView();
+	    if(v == null)
+	    {
+	    	return null;
+	    }
+	    
+	    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) 
+	    {
+	        Resources res = getResources();
+	        if(res == null)
+	        {
+	        	return null;
+	        }
+	        
+	    	resId = res.getIdentifier("action_bar_container", "id", getPackageName());
+	    } 
+	    else 
+	    {
+	        Resources res = Resources.getSystem();
+	        if(res == null)
+	        {
+	        	return null;
+	        }
+	        
+	        resId = res.getIdentifier("action_bar_container", "id", "android");
+	    }
+	    
+	    if (resId != 0) 
+	    {
+	        return v.findViewById(resId);
+	    } 
+	    else 
+	    {
+	        return null;
+	    }
+	}
+
+	@Override
+	public void onSupportActionModeStarted(ActionMode mode) {
+	    super.onSupportActionModeStarted(mode);
+	    View actionBar = getActionBarView();
+	    if (actionBar != null) {
+	        actionBar.setVisibility(View.VISIBLE);
+	    }
+	}
+
+	@Override
+	public void onSupportActionModeFinished(ActionMode mode) {
+	    super.onSupportActionModeFinished(mode);
+	    View actionBar = getActionBarView();
+	    if (actionBar != null) {
+	        actionBar.setVisibility(View.GONE);
+	    }
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-				
+		View actionBar = getActionBarView();
+		if (actionBar != null) {
+		    actionBar.setVisibility(View.GONE);
+		}
+		
 		loginClicked = false;
 		
 		loginActivity = this;
