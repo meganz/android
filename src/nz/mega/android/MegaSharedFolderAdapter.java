@@ -294,10 +294,10 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 					if (bitmap == null) {
 						avatar.delete();
 						if (context.getExternalCacheDir() != null){
-							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+							megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 						}
 						else{
-							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+							megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 						}
 					}
 					else{
@@ -307,21 +307,21 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				}
 				else{
 					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);	
 					}
 					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);	
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);	
 					}			
 				}
 			}	
 			else{
-				if (!pendingAvatars.contains(contact.getEmail())){
-					pendingAvatars.add(contact.getEmail());
+				if (!pendingAvatars.contains(holder.contactMail)){
+					pendingAvatars.add(holder.contactMail);
 					if (context.getExternalCacheDir() != null){
-						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						megaApi.getUserAvatar(contact, context.getExternalCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 					}
 					else{
-						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + contact.getEmail() + ".jpg", listener);
+						megaApi.getUserAvatar(contact, context.getCacheDir().getAbsolutePath() + "/" + holder.contactMail + ".jpg", listener);
 					}
 				}
 			}
@@ -465,10 +465,6 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
 		int currentPosition = holder.currentPosition;
 		final MegaShare s = (MegaShare) getItem(currentPosition);
-		MegaUser c = null;
-		if (s.getUser() != null){
-			c = megaApi.getContact(s.getUser());
-		}
 				
 		switch (v.getId()){
 			case R.id.shared_folder_permissions_option_layout:{
@@ -524,6 +520,10 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			}
 			case R.id.shared_folder_remove_share_option_layout:{
 				log("En el adapter - remove");
+				MegaUser c = null;
+				if (s.getUser() != null){
+					c = megaApi.getContact(s.getUser());
+				}
 				((FileContactListActivity)context).removeShare(c);
 				positionClicked = -1;
 //				((FileContactListActivity)context).refreshView();

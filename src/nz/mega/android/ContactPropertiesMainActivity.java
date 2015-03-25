@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -249,10 +250,20 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
     		cpF = (ContactPropertiesFragment) getSupportFragmentManager().findFragmentByTag("cpF");
         	if (cpF != null){
         		MegaUser user = megaApi.getContact(cpF.getUserEmail());
+    			if(user == null)
+    			{
+    				return true;
+    			}
+    			
     			this.pickFolderToShare(user);
         	}
         	else{
         		MegaUser user = megaApi.getContact(cflF.getUserEmail());
+    			if(user == null)
+    			{
+    				return true;
+    			}
+    			
     			this.pickFolderToShare(user);   	}
 			return true;
 		}
