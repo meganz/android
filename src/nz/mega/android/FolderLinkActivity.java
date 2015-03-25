@@ -510,8 +510,13 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								dialog.dismiss();
-								Intent backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
-				    			startActivity(backIntent);
+								Intent backIntent;
+								if(folderLinkActivity != null)
+									backIntent = new Intent(folderLinkActivity, ManagerActivity.class);
+								else
+									backIntent = new Intent(FolderLinkActivity.this, ManagerActivity.class);
+								
+								startActivity(backIntent);
 				    			finish();
 							}
 						});

@@ -6007,7 +6007,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					e.printStackTrace();
 				}
 				
-				Intent uploadServiceIntent = new Intent (managerActivity, UploadService.class);
+				Intent uploadServiceIntent;
+				if(managerActivity != null)
+				{
+					uploadServiceIntent = new Intent (managerActivity, UploadService.class);
+				}
+				else
+				{
+					uploadServiceIntent = new Intent (ManagerActivity.this, UploadService.class);
+				}
+				
 				File file = new File (path);
 				if (file.isDirectory()){
 					uploadServiceIntent.putExtra(UploadService.EXTRA_FILEPATH, file.getAbsolutePath());
