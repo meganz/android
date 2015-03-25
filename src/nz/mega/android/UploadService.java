@@ -546,9 +546,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 							}
 						}
 						
-						if (!foldersCreation.isEmpty()){
+						if (!foldersCreation.isEmpty())
+						{
+							//TODO: Check why foldersCreation can be empty here
 							foldersCreation.remove(0);
 						}
+						
 						if (!foldersCreation.isEmpty()){
 							for (int i=0; i<foldersCreation.size(); i++){
 								if (nodePath.compareTo(foldersCreation.get(i).parentFolderPath) == 0){
@@ -657,7 +660,12 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 					}
 				}
 				
-				foldersCreation.remove(0);
+				if (!foldersCreation.isEmpty())
+				{
+					//TODO: Check why foldersCreation can be empty here
+					foldersCreation.remove(0);
+				}
+				
 				if (!foldersCreation.isEmpty()){
 					String newFolderPath = megaApi.getNodePath(currentNode);
 					
