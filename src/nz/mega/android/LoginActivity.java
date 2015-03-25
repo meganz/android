@@ -11,6 +11,7 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -43,7 +44,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
  
-public class LoginActivity extends ActionBarActivity implements OnClickListener, MegaRequestListenerInterface{
+public class LoginActivity extends Activity implements OnClickListener, MegaRequestListenerInterface{
 	
 	public static String ACTION_REFRESH = "ACTION_REFRESH";
 	public static String ACTION_CREATE_ACCOUNT_EXISTS = "ACTION_CREATE_ACCOUNT_EXISTS";
@@ -126,80 +127,11 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 		}
 
 	}
-
-	public View getActionBarView() 
-	{
-	    int resId;
-		
-	    Window window = getWindow();
-	    if(window == null)
-	    {
-	    	return null;
-	    }
-	    
-	    View v = window.getDecorView();
-	    if(v == null)
-	    {
-	    	return null;
-	    }
-	    
-	    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) 
-	    {
-	        Resources res = getResources();
-	        if(res == null)
-	        {
-	        	return null;
-	        }
-	        
-	    	resId = res.getIdentifier("action_bar_container", "id", getPackageName());
-	    } 
-	    else 
-	    {
-	        Resources res = Resources.getSystem();
-	        if(res == null)
-	        {
-	        	return null;
-	        }
-	        
-	        resId = res.getIdentifier("action_bar_container", "id", "android");
-	    }
-	    
-	    if (resId != 0) 
-	    {
-	        return v.findViewById(resId);
-	    } 
-	    else 
-	    {
-	        return null;
-	    }
-	}
-
-	@Override
-	public void onSupportActionModeStarted(ActionMode mode) {
-	    super.onSupportActionModeStarted(mode);
-	    View actionBar = getActionBarView();
-	    if (actionBar != null) {
-	        actionBar.setVisibility(View.VISIBLE);
-	    }
-	}
-
-	@Override
-	public void onSupportActionModeFinished(ActionMode mode) {
-	    super.onSupportActionModeFinished(mode);
-	    View actionBar = getActionBarView();
-	    if (actionBar != null) {
-	        actionBar.setVisibility(View.GONE);
-	    }
-	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		View actionBar = getActionBarView();
-		if (actionBar != null) {
-		    actionBar.setVisibility(View.GONE);
-		}
-		
+
 		loginClicked = false;
 		
 		loginActivity = this;

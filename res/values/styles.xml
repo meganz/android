@@ -92,6 +92,7 @@
   </style>
     
     <style name="login_activity" parent="@style/Theme.AppCompat.Light">
+        <item name="android:windowNoTitle">true</item>
     </style>
     
     <style name="Theme.AppCompat.Light.NoActionBar.FullScreen" parent="@style/Theme.AppCompat.Light">
