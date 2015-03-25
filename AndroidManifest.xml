@@ -3,7 +3,7 @@
     package="nz.mega.android"
     android:installLocation="auto"
     android:versionCode="72"
-    android:versionName="2.2.2_RC2" >
+    android:versionName="2.2.2" >
 
     <uses-sdk
         android:minSdkVersion="9"

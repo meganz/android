@@ -6719,18 +6719,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (isClearRubbishBin){
 					isClearRubbishBin = false;
 					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-					rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-					rbF.setNodes(nodes);
-					rbF.getListView().invalidateViews();
 					aB.setTitle(getString(R.string.section_rubbish_bin));	
 					getmDrawerToggle().setDrawerIndicatorEnabled(true);
+
+					if(rbF.isVisible())
+					{
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+						rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
 				}
 				else{
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-					rbF.setNodes(nodes);
-					rbF.setContentText();
-					rbF.getListView().invalidateViews();
+					if(rbF.isVisible())
+					{
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.setContentText();
+						rbF.getListView().invalidateViews();
+					}
 				}				
 			}
 		}
