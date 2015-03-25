@@ -314,7 +314,10 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 						if (action != null){
 							if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 								intent = new Intent(this, FileExplorerActivity.class);
-								intent.putExtras(extras);
+								if(extras != null)
+								{
+									intent.putExtras(extras);
+								}
 								intent.setData(uriData);
 							}
 							intent.setAction(action);
@@ -369,7 +372,10 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 					if (action != null){
 						if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 							intent = new Intent(this, FileExplorerActivity.class);
-							intent.putExtras(extras);
+							if(extras != null)
+							{
+								intent.putExtras(extras);
+							}
 							intent.setData(uriData);
 						}
 						intent.setAction(action);
@@ -835,7 +841,10 @@ public class LoginActivity extends ActionBarActivity implements OnClickListener,
 								if (action != null){
 									if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 										intent = new Intent(this, FileExplorerActivity.class);
-										intent.putExtras(extras);
+										if(extras != null)
+										{
+											intent.putExtras(extras);
+										}
 										intent.setData(uriData);
 									}
 									intent.setAction(action);
