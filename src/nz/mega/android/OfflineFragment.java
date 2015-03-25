@@ -76,7 +76,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);						
+						MegaNode n = megaApi.getNodeByPath(path);	
+						if(n == null)
+						{
+							continue;
+						}
 						handleList.add(n.getHandle());
 					}
 					clearSelections();
@@ -90,7 +94,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					hideMultipleSelect();
 					if (documents.size()==1){
 						String path = documents.get(0).getPath() + documents.get(0).getName();
-						MegaNode n = megaApi.getNodeByPath(path);	
+						MegaNode n = megaApi.getNodeByPath(path);
+						if(n == null)
+						{
+							break;
+						}
 						((ManagerActivity) context).showRenameDialog(n, n.getName());
 					}
 					break;
@@ -102,6 +110,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					if (documents.size()==1){
 						String path = documents.get(0).getPath() + documents.get(0).getName();
 						MegaNode n = megaApi.getNodeByPath(path);	
+						if(n == null)
+						{
+							break;
+						}
 						((ManagerActivity) context).getPublicLinkAndShareIt(n);
 					}
 					
@@ -111,7 +123,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					for (int i=0;i<documents.size();i++){
 						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);						
+						MegaNode n = megaApi.getNodeByPath(path);			
+						if(n == null)
+						{
+							continue;
+						}
 						handleList.add(n.getHandle());
 					}
 					clearSelections();
@@ -123,7 +139,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					ArrayList<Long> handleList = new ArrayList<Long>();					
 					for (int i=0;i<documents.size();i++){
 						String path = documents.get(i).getPath() + documents.get(i).getName();
-						MegaNode n = megaApi.getNodeByPath(path);						
+						MegaNode n = megaApi.getNodeByPath(path);
+						if(n == null)
+						{
+							continue;
+						}
 						handleList.add(n.getHandle());
 					}
 					clearSelections();
@@ -379,7 +399,7 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		}
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
-		if (context instanceof ManagerActivity){
+		if (context instanceof ManagerActivity && ((ManagerActivity)context).getmDrawerToggle() != null){
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
@@ -419,9 +439,9 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					
 					if (!offlineDirectory.exists()){
 						log("Path to remove A: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
-//						dbH.removeById(mOffList.get(i).getId());
-//						mOffList.remove(i);
-//						
+						//dbH.removeById(mOffList.get(i).getId());
+						mOffList.remove(i);		
+						i--;
 					}	
 				}
 				else{
@@ -436,11 +456,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 					}	
 					
 					if (!offlineDirectory.exists()){
-						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));						
-						
-//						dbH.removeById(mOffList.get(i).getId());
-//						mOffList.remove(i);
-//						
+						log("Path to remove B: "+(mOffList.get(i).getPath()+mOffList.get(i).getName()));
+						//dbH.removeById(mOffList.get(i).getId());
+						mOffList.remove(i);
+						i--;
 					}	
 					
 				}
@@ -555,6 +574,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		if (Util.isOnline(context)){
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			MegaNode node = megaApi.getNodeByPath(path);
+			if(node == null)
+			{
+				return;
+			}
+			
 			handleList.add(node.getHandle());
 			log("download "+node.getName());
 			((ManagerActivity) context).onFileClick(handleList);
@@ -700,6 +724,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 		log("showProperties: "+path);
 		
 		MegaNode n = megaApi.getNodeByHandle(Long.valueOf(handle));		
+		if(n == null)
+		{
+			return;
+		}
+		
 		Intent i = new Intent(context, FilePropertiesActivity.class);
 		i.putExtra("handle", Long.valueOf(handle));
 		i.putExtra("from", FROM_OFFLINE);
@@ -722,22 +751,42 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	public void getLink (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
+		if(n == null)
+		{
+			return;
+		}
+		
 		((ManagerActivity) context).getPublicLinkAndShareIt(n);
 
 	}
 	
 	public void shareFolder (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
+		if(n == null)
+		{
+			return;
+		}
+		
 		((ManagerActivity) context).shareFolder(n);
 	}
 	
 	public void rename (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
+		if(n == null)
+		{
+			return;
+		}
+		
 		((ManagerActivity) context).showRenameDialog(n, n.getName());
 	}
 	
 	public void move (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
+		if(n == null)
+		{
+			return;
+		}
+		
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());									
 		((ManagerActivity) context).showMove(handleList);
@@ -745,6 +794,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	public void copy (String path){
 		MegaNode n = megaApi.getNodeByPath(path);
+		if(n == null)
+		{
+			return;
+		}
+		
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());									
 		((ManagerActivity) context).showCopy(handleList);
@@ -752,6 +806,11 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	
 	public boolean isFolder(String path){
 		MegaNode n = megaApi.getNodeByPath(path);
+		if(n == null)
+		{
+			return false;
+		}
+		
 		if(n.isFile()){
 			return false;
 		}
@@ -910,9 +969,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 
 							if (!offlineDirectory.exists()){
 								//Updating the DB because the file does not exist	
-								log("Path to remove C: "+(path +mOffList.get(i).getName()));
+								log("Path to remove C: "+(path + mOffList.get(i).getName()));
 								dbH.removeById(mOffList.get(i).getId());
 								mOffList.remove(i);
+								i--;
 							}			
 						}
 					}
