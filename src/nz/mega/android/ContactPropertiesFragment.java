@@ -127,6 +127,11 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			//			infoAdded = (TextView) v.findViewById(R.id.contact_properties_info_data_added);
 
 			contact = megaApi.getContact(userEmail);
+			if(contact == null)
+			{
+				return null;
+			}
+			
 			//			contentTextView.setText(getDescription(megaApi.getInShares(contact)));
 			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
 

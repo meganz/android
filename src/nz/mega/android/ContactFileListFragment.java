@@ -277,6 +277,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
+			if(contact == null)
+			{
+				return null;
+			}
 			
 			createDefaultAvatar();
 

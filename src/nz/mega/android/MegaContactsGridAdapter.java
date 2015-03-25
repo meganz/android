@@ -553,6 +553,10 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 		log("onContactClick");
 		if (!multipleSelect){
 			MegaUser c = megaApi.getContact(holder.contactMails.get(index));
+			if(c == null)
+			{
+				return;
+			}
 			
 			Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 			i.putExtra("name", c.getEmail());
@@ -608,6 +612,10 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 	public void onPropertiesClick(ViewHolderContactsGrid holder, int positionFinal, int index, int totalPosition){
 		log("onPropertiesClick");
 		MegaUser c = megaApi.getContact(holder.contactMails.get(index));
+		if(c == null)
+		{
+			return;
+		}
 		
 		Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 		i.putExtra("name", c.getEmail());
@@ -619,6 +627,10 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 	public void onShareClick(ViewHolderContactsGrid holder, int positionFinal, int index, int totalPosition){
 		log("onShareClick");
 		MegaUser c = megaApi.getContact(holder.contactMails.get(index));
+		if(c == null)
+		{
+			return;
+		}
 		
 		List<MegaUser> user = new ArrayList<MegaUser>();
 		user.add(c);
@@ -629,6 +641,10 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 	public void onDeleteClick(ViewHolderContactsGrid holder, int positionFinal, int index, int totalPosition){
 		log("onDeleteClick");
 		MegaUser c = megaApi.getContact(holder.contactMails.get(index));
+		if(c == null)
+		{
+			return;
+		}
 		
 		((ManagerActivity) context).removeContact(c);
 		positionClicked = -1;
