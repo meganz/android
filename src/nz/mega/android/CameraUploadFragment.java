@@ -294,9 +294,12 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			return null;
 		} 
 		
-		aB.setTitle(getString(R.string.section_photo_sync));	
-		((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-		((ManagerActivity)context).supportInvalidateOptionsMenu();
+		if(((ManagerActivity)context).getmDrawerToggle() != null)
+		{
+			aB.setTitle(getString(R.string.section_photo_sync));	
+			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			((ManagerActivity)context).supportInvalidateOptionsMenu();
+		}
 		
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);
 		MegaPreferences prefs = dbH.getPreferences();
