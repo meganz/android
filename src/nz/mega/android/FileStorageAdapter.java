@@ -53,6 +53,11 @@ public class FileStorageAdapter extends BaseAdapter implements OnClickListener {
 	}
 	
 	public FileDocument getDocumentAt(int position) {
+		if(currentFiles == null || position >= currentFiles.size())
+		{
+			return null;
+		}
+		
 		return currentFiles.get(position);
 	}
 	

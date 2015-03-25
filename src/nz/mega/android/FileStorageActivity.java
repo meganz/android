@@ -339,8 +339,11 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 								if (checkedItems.valueAt(i) == true) {
 									FileDocument document = adapter.getDocumentAt(checkedItems
 											.keyAt(i));
-									File file = document.getFile();
-									files.add(file.getAbsolutePath());
+									if(document != null)
+									{
+										File file = document.getFile();
+										files.add(file.getAbsolutePath());
+									}
 								}
 							}
 							return null;	
@@ -391,6 +394,11 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 			}
 			int position = checkedItems.keyAt(i);
 			document = adapter.getDocumentAt(position);
+			if(document == null)
+			{
+				continue;
+			}
+			
 			if (document.getFile().isDirectory()) {
 				log(document.getFile().getAbsolutePath() + " of file");
 				folders++;
@@ -425,6 +433,11 @@ public class FileStorageActivity extends PinActivity implements OnClickListener,
 	public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
 		log("on item click");		
 		FileDocument document = adapter.getDocumentAt(position);
+		if(document == null)
+		{
+			return;
+		}
+		
 		if (document.isFolder()) {
 			changeFolder(document.getFile());
 		}
