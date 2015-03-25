@@ -4723,7 +4723,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 						ft.detach(fbF);
 						ft.attach(fbF);
-						ft.commit();
+						ft.commitAllowingStateLoss();
 		        	}
 		        }
 			}
