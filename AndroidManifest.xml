@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nz.mega.android"
     android:installLocation="auto"
-    android:versionCode="71"
-    android:versionName="2.2.1" >
+    android:versionCode="72"
+    android:versionName="2.2.2_RC2" >
 
     <uses-sdk
         android:minSdkVersion="9"
