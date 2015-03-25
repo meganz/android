@@ -270,7 +270,19 @@ public class IabHelper {
         List<ResolveInfo> intentServices = pm.queryIntentServices(serviceIntent, 0);
         if (intentServices != null && !intentServices.isEmpty()) {
             // service available to handle that Intent
-            mContext.bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+        	try
+        	{
+        		mContext.bindService(serviceIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+        	}
+        	catch(Exception e) 
+        	{
+        		// no service available to handle that Intent
+                if (listener != null) {
+                    listener.onIabSetupFinished(
+                            new IabResult(BILLING_RESPONSE_RESULT_BILLING_UNAVAILABLE,
+                            "Billing service unavailable on device."));
+                }
+        	}
         }
         else {
             // no service available to handle that Intent
