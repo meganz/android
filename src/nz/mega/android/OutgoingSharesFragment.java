@@ -317,17 +317,25 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				else{
 					sortByNameAscending();
 				}
-				aB.setTitle(getString(R.string.section_shared_items));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(getString(R.string.section_shared_items));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				((ManagerActivity)context).setParentHandleOutgoing(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);			
-				aB.setTitle(parentNode.getName());
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(parentNode.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 			}	
 			
 			adapterList.setPositionClicked(-1);
@@ -399,17 +407,24 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 				else{
 					sortByNameAscending();
 				}
-				aB.setTitle(getString(R.string.section_shared_items));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(getString(R.string.section_shared_items));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				((ManagerActivity)context).setParentHandleOutgoing(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);			
-				aB.setTitle(parentNode.getName());
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(parentNode.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 			}	
 			
 			adapterGrid.setPositionClicked(-1);

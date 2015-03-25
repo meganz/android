@@ -650,11 +650,14 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			topLayout.setAnimation(animTop);
 		}
 		
-		if (overflowVisible){
-			overflowMenuList.setVisibility(View.VISIBLE);
-		}
-		else{
-			overflowMenuList.setVisibility(View.GONE);
+		if(overflowMenuList != null)
+		{
+			if (overflowVisible){
+				overflowMenuList.setVisibility(View.VISIBLE);
+			}
+			else{
+				overflowMenuList.setVisibility(View.GONE);
+			}
 		}
 	}
 	

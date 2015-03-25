@@ -152,10 +152,10 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
-		aB.setTitle(getString(R.string.section_transfers));
 
 		if(((ManagerActivity)context).getmDrawerToggle() != null)
 		{
+			aB.setTitle(getString(R.string.section_transfers));
 			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}

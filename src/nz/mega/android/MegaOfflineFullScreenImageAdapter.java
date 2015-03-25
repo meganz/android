@@ -166,12 +166,20 @@ public class MegaOfflineFullScreenImageAdapter extends PagerAdapter implements O
 			
 			//Get the handle from the db
 			MegaOffline mOff = dbH.findbyPathAndName(pathFile, currentFile.getName());
+
+			long handle;
+			if(mOff != null)
+			{
+				handle = Long.parseLong(mOff.getHandle());
+			}
+			else
+			{
+				handle = -1;
+			}
 			
-			long handle = Long.parseLong(mOff.getHandle());
+			log("Handle: " + handle);
 			holder.currentHandle = handle;
-			
-			log("Handle: " + mOff.getHandle() );
-			
+
 			preview = PreviewUtils.getPreviewFromCache(handle);
 			if (preview != null){
 				holder.imgDisplay.setImageBitmap(preview);

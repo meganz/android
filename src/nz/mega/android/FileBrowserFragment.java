@@ -300,9 +300,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
-			aB.setTitle(getString(R.string.section_cloud_drive));	
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			if(((ManagerActivity)context).getmDrawerToggle() != null)
+			{
+				aB.setTitle(getString(R.string.section_cloud_drive));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
@@ -310,15 +313,18 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-				aB.setTitle(getString(R.string.section_cloud_drive));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			if(((ManagerActivity)context).getmDrawerToggle() != null)
+			{
+				if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+					aB.setTitle(getString(R.string.section_cloud_drive));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				}
+				else{
+					aB.setTitle(parentNode.getName());					
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+				}
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
 			}
-			else{
-				aB.setTitle(parentNode.getName());					
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			}
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}	
 		
 				

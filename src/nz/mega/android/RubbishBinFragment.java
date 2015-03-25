@@ -257,9 +257,13 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			parentHandle = megaApi.getRubbishNode().getHandle();
 			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-			aB.setTitle(getString(R.string.section_rubbish_bin));	
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			
+			if(((ManagerActivity)context).getmDrawerToggle() != null)
+			{
+				aB.setTitle(getString(R.string.section_rubbish_bin));	
+				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			}
 		}
 		else{
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
@@ -271,15 +275,18 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			}
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-			if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-				aB.setTitle(getString(R.string.section_rubbish_bin));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			if(((ManagerActivity)context).getmDrawerToggle() != null)
+			{
+				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
+					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				}
+				else{
+					aB.setTitle(parentNode.getName());					
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+				}
+				((ManagerActivity)context).supportInvalidateOptionsMenu();
 			}
-			else{
-				aB.setTitle(parentNode.getName());					
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-			}
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
 		}
 
 		if (isList){

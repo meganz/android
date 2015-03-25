@@ -310,9 +310,13 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 				else{
 					sortByNameAscending();
 				}
-				aB.setTitle(getString(R.string.section_shared_items));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(getString(R.string.section_shared_items));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 				adapterList.parentHandle=-1;
 			}
 			else{
@@ -328,15 +332,21 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 //					sortByNameAscending();
 //				}
 				
-				aB.setTitle(parentNode.getName());
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(parentNode.getName());
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 			}	
 
 			if (deepBrowserTree == 0){
 				contentText.setText(getInfoNode());
-				aB.setTitle(getString(R.string.section_shared_items));
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(getString(R.string.section_shared_items));
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				}
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
