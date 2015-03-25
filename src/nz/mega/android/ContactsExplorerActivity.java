@@ -442,6 +442,10 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		
 		if (megaContacts){
 			MegaUser contact = (MegaUser) adapter.getDocumentAt(position);
+			if(contact == null)
+			{
+				return;
+			}
 			ArrayList<String> emails = new ArrayList<String>();
 			emails.add(contact.getEmail());
 			setResultContacts(emails, megaContacts);
@@ -449,6 +453,11 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		}
 		else{
 			PhoneContacts contact = (PhoneContacts) adapter.getDocumentAt(position);
+			if(contact == null)
+			{
+				return;
+			}
+			
 			ArrayList<String> contacts = new ArrayList<String>();
 			if (contact.getEmail() != null){
 				contacts.add(ContactsExplorerActivity.EXTRA_EMAIL);

@@ -151,13 +151,23 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 		notifyDataSetChanged();
 	}
 	
-	public Object getDocumentAt(int position) {
-		if (megaContacts){
-			return contactsFromMEGA.get(position);
+	public Object getDocumentAt(int position) 
+	{
+		if (megaContacts)
+		{
+			if(position < contactsFromMEGA.size())
+			{	
+				return contactsFromMEGA.get(position);
+			}
 		}
-		else{
-			return contactsFromPhone.get(position);
+		else
+		{
+			if(position < contactsFromPhone.size())
+			{	
+				return contactsFromPhone.get(position);
+			}
 		}
+		return null;
 	}
 	
 	@Override
@@ -180,12 +190,21 @@ public class ContactsExplorerAdapter extends BaseAdapter implements OnClickListe
 
 	@Override
     public Object getItem(int position) {
-		if (megaContacts){
-			return contactsFromMEGA.get(position);
+		if (megaContacts)
+		{
+			if(position < contactsFromMEGA.size())
+			{	
+				return contactsFromMEGA.get(position);
+			}
 		}
-		else{
-			return contactsFromPhone.get(position);
+		else
+		{
+			if(position < contactsFromPhone.size())
+			{
+				return contactsFromPhone.get(position);
+			}
 		}
+		return null;
     }
 
 	@Override
