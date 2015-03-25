@@ -304,7 +304,11 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 		long[] hashes = new long[handleList.size()];
 		for (int i=0;i<handleList.size();i++){
 			hashes[i] = handleList.get(i);
-			size += megaApiFolder.getNodeByHandle(hashes[i]).getSize();
+			MegaNode n = megaApiFolder.getNodeByHandle(hashes[i]);
+			if(n != null)
+			{
+				size += n.getSize();
+			}
 		}
 		
 		if (dbH == null){
