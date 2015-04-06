@@ -539,7 +539,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_URL){
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT URL: " + request.getLink());
 			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
 			startActivity(browserIntent);
