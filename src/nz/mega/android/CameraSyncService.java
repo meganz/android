@@ -271,25 +271,36 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //					}
 					
 					//The "Camera Upload" folder exists?
+//					if (prefs.getCamSyncHandle() == null){
+//						cameraUploadHandle = -1;
+//					}
+//					else{
+//						cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
+//						if (megaApi.getNodeByHandle(cameraUploadHandle) == null){
+//							cameraUploadHandle = -1;
+//						}
+//						else{
+//							if (megaApi.getParentNode(megaApi.getNodeByHandle(cameraUploadHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+//								cameraUploadHandle = -1;
+//							}
+//						}
+//					}
+					
+					//Get the MEGA folder to sync the camera
 					if (prefs.getCamSyncHandle() == null){
 						cameraUploadHandle = -1;
 					}
 					else{
 						cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
-						if (megaApi.getNodeByHandle(cameraUploadHandle) == null){
-							cameraUploadHandle = -1;
-						}
-						else{
-							if (megaApi.getParentNode(megaApi.getNodeByHandle(cameraUploadHandle)).getHandle() != megaApi.getRootNode().getHandle()){
-								cameraUploadHandle = -1;
-							}
-						}
 					}
 				}
 			}
 		}
 		
+		//
+		
 		if (cameraUploadHandle == -1){
+			//Find the "Camera Uploads" folder ot the old "PhotoSync"
 			ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 			for (int i=0;i<nl.size();i++){
 				if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
@@ -303,7 +314,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 			}
 			
-			
+			//If not "Camera Uploads" or "Photosync"
 			if (cameraUploadHandle == -1){
 				log("must create the folder");
 				if (!running){
@@ -321,17 +332,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		else{
 			MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
-			if (PHOTO_SYNC.compareTo(n.getName()) == 0){
-				megaApi.renameNode(n, CAMERA_UPLOADS, this);	
-			}
-			else if (CAMERA_UPLOADS.compareTo(n.getName()) != 0){
-				dbH.setCamSyncHandle(-1);
-				if (!running){
-					running = true;
-					megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
+			if(n==null){
+				//If ERROR with the handler: Create the folder Camera Uploads
+				if (PHOTO_SYNC.compareTo(n.getName()) == 0){
+					megaApi.renameNode(n, CAMERA_UPLOADS, this);	
 				}
-				return START_NOT_STICKY;
+				else if (CAMERA_UPLOADS.compareTo(n.getName()) != 0){
+//					dbH.setCamSyncHandle(-1);
+					if (!running){
+						running = true;
+						megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
+					}
+					return START_NOT_STICKY;
+				}
 			}
+			else{
+				log("Sync Folder " + cameraUploadHandle + " Node: "+n.getName());
+			}
+			
 		}
 		
 		log("TODO OK");

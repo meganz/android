@@ -85,6 +85,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	DisplayMetrics outMetrics;
 	Display display;
 	
+	DatabaseHandler dbH;
+	MegaPreferences prefs;
+	
 	ArrayList<MegaNode> nodes;
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
@@ -267,6 +270,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		
+		dbH = DatabaseHandler.getDbHandler(context);
+		prefs = dbH.getPreferences();
+		
 		super.onCreate(savedInstanceState);
 		log("onCreate");		
 	}
@@ -669,7 +676,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				if (nodes.get(position).isFolder()){
 					MegaNode n = nodes.get(position);
 					
-					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+//					if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){
+//						((ManagerActivity)context).cameraUploadsClicked();
+//						return;
+//					}
+					prefs = dbH.getPreferences();					
+					
+					if ((n.getHandle()==Long.parseLong(prefs.getCamSyncHandle()))){
 						((ManagerActivity)context).cameraUploadsClicked();
 						return;
 					}

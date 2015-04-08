@@ -220,6 +220,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				}
 			}
 			else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
+				log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
 				mode = SELECT_CAMERA_FOLDER;
 			}	
 			else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
@@ -457,6 +458,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	}
 	
 	public void buttonClick(long handle){
+		log("buttonClick");
+		
 		folderSelected = true;
 		this.gParentHandle = handle;
 		
