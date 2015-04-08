@@ -42,8 +42,12 @@
         	android:title="@string/settings_camera_upload_charging" />
 		
 		<Preference
-	        android:key="settings_camera_upload_folder"
-	        android:title="@string/settings_camera_upload_folder" />
+	        android:key="settings_local_camera_upload_folder"
+	        android:title="@string/settings_local_camera_upload_folder" />
+		
+		<Preference
+	        android:key="settings_mega_camera_folder"
+	        android:title="@string/settings_mega_camera_upload_folder" />
 	</PreferenceCategory>
 	
     <PreferenceCategory 
