@@ -397,7 +397,8 @@
     
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
     
-    <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Camera folder</string>
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored.">Local Camera folder</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored.">Mega Camera Uploads Folder</string>
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos only</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos only</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
