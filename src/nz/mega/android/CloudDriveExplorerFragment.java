@@ -98,20 +98,26 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-			
-		if (parentHandle == -1)
-		{			
-			//Find in the database the last parentHandle
-			prefs = dbH.getPreferences();
-			if (prefs != null)
-			{
-				String lastFolder = prefs.getLastFolderCloud();
-				if(lastFolder != null)
+		
+		if(modeCloud==FileExplorerActivity.SELECT_CAMERA_FOLDER){
+			parentHandle = -1;
+			changeButtonTitle(context.getString(R.string.section_cloud_drive));
+		}
+		else{
+			if (parentHandle == -1)
+			{			
+				//Find in the database the last parentHandle
+				prefs = dbH.getPreferences();
+				if (prefs != null)
 				{
-					parentHandle = Long.parseLong(lastFolder);
+					String lastFolder = prefs.getLastFolderCloud();
+					if(lastFolder != null)
+					{
+						parentHandle = Long.parseLong(lastFolder);
+					}
 				}
 			}
-		}
+		}		
 		
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		if(chosenNode == null)
@@ -196,12 +202,15 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		else if (modeCloud == FileExplorerActivity.IMPORT){
 			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
 		}
-		else if (modeCloud == FileExplorerActivity.SELECT){
+		else if (modeCloud == FileExplorerActivity.SELECT || modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER){
 			uploadButton.setText(getString(R.string.general_select) + " " + folder);
 		}
 		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
 			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
 		}	
+		else {
+			uploadButton.setText(getString(R.string.general_select) + " " + folder);
+		}
 		
 		
 	}

@@ -52,6 +52,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
 	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
 	public static String ACTION_UPLOAD_SELFIE = "ACTION_UPLOAD_SELFIE";	
+	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	/*
 	 * Select modes:
 	 * UPLOAD - pick folder for upload
@@ -66,6 +67,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public static int IMPORT = 4;
 	public static int SELECT = 5;
 	public static int UPLOAD_SELFIE = 6;
+	public static int SELECT_CAMERA_FOLDER = 7;
 	
 	public static int CLOUD_TAB = 0;
 	public static int INCOMING_TAB = 1;
@@ -201,7 +203,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				if(cDriveExplorer!=null){
 					cDriveExplorer.setDisableNodes(list);
 				}				
-			}
+			}					
 			else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
 				mode = COPY;
 				copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
@@ -217,6 +219,9 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 					cDriveExplorer.setDisableNodes(list);
 				}
 			}
+			else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
+				mode = SELECT_CAMERA_FOLDER;
+			}	
 			else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
 				mode = IMPORT;
 			}
@@ -548,6 +553,19 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			Intent intent = new Intent();
 			intent.putExtra("SELECT", parentNode.getHandle());
 			intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+			setResult(RESULT_OK, intent);
+			finish();
+		}
+		else if (mode == SELECT_CAMERA_FOLDER){
+
+			long parentHandle = handle;
+			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+			if(parentNode == null){
+				parentNode = megaApi.getRootNode();
+			}
+
+			Intent intent = new Intent();
+			intent.putExtra("SELECT_MEGA_FOLDER", parentNode.getHandle());			
 			setResult(RESULT_OK, intent);
 			finish();
 		}
