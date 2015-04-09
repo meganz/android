@@ -26,6 +26,7 @@ public class PreviewUtils {
 			}
 			else{
 				previewDir = context.getDir("previewsMEGA", 0);
+				previewDir.mkdirs();
 			}
 		}
 		return previewDir;

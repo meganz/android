@@ -128,6 +128,9 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 		protected Integer doInBackground(Long... params){
 			handle = params[0];
 			MegaNode node = megaApi.getNodeByHandle(handle);
+			if (node == null){
+				return 3;
+			}
 			preview = PreviewUtils.getPreviewFromFolder(node, activity);
 			
 			if (preview != null){
