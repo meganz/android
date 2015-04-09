@@ -45,6 +45,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.text.format.Time;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 
 public class CameraSyncService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface{
@@ -225,6 +226,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 							log("Not defined, so not enabled");
 							finish();
 							return START_NOT_STICKY;	
+						}
+						else{
+							File checkFile = new File(localPath);
+							if(!checkFile.exists()){
+								//The local folder does not exist
+								Util.showToast(this, getString(R.string.sync_service_error_local_folder));
+							}
 						}
 					}
 					
