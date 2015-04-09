@@ -37,8 +37,8 @@
     <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">File info</string>
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
-    
-    <string name="sync_service_error_local_folder" context="Local folder Error in Sync Service">Sync Service stopped, the local folder does not exist.</string>    
+ 
+    <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">The secondary media folder does not exist, please choose a new folder.</string>   
     
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload.</string>
     
