@@ -225,14 +225,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						if ("".compareTo(localPath) == 0){
 							log("Not defined, so not enabled");
 							finish();
-							return START_NOT_STICKY;	
-						}
-						else{
-							File checkFile = new File(localPath);
-							if(!checkFile.exists()){
-								//The local folder does not exist
-								Util.showToast(this, getString(R.string.sync_service_error_local_folder));
-							}
+							return START_NOT_STICKY;					
+							
 						}
 					}
 					
