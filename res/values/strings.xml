@@ -38,6 +38,8 @@
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     
+    <string name="sync_service_error_local_folder" context="Local folder Error in Sync Service">Sync Service stopped, the local folder does not exist.</string>    
+    
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload.</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
@@ -382,6 +384,11 @@
     <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
     
+    <string name="settings_secondary_upload_on" context="settings option">Enable Secondary Media Uploads</string>
+    <string name="settings_secondary_upload_off" context="settings option">Disable Secondary Media Uploads</string>
+    
+    <string name="settings_empty_folder" context="settings option">Choose folder</string>
+    
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
         <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</item>
@@ -399,6 +406,10 @@
     
     <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored.">Local Camera folder</string>
     <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored.">Mega Camera Uploads Folder</string>
+    
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos are stored.">Local Secondary folder</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos are stored.">Mega Secondary Folder</string>
+    
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos only</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos only</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>

@@ -1,5 +1,7 @@
 package nz.mega.android;
 
+import nz.mega.android.utils.Util;
+
 public class MegaPreferences{
 	
 	String firstTime = "";
@@ -16,14 +18,16 @@ public class MegaPreferences{
 	String storageDownloadLocation = "";
 	String lastFolderUpload = "";
 	String lastFolderCloud = "";
-	
-	
+	String secondaryMediaFolderEnabled = "";
+	String localPathSecondaryFolder = "";
+	String megaHandleSecondaryFolder = "";
+		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
-			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud){
+			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -38,6 +42,9 @@ public class MegaPreferences{
 		this.camSyncCharging = camSyncCharging;
 		this.lastFolderUpload = lastFolderUpload;
 		this.lastFolderCloud = lastFolderCloud;
+		this.secondaryMediaFolderEnabled = secondaryMediaFolderEnabled;
+		this.localPathSecondaryFolder = localPathSecondaryFolder;
+		this.megaHandleSecondaryFolder = megaHandleSecondaryFolder;
 	}
 	
 	public String getFirstTime (){
@@ -156,6 +163,34 @@ public class MegaPreferences{
 	public void setLastFolderCloud(String lastFolderCloud) {
 		this.lastFolderCloud = lastFolderCloud;
 	}
+
+	public String getSecondaryMediaFolderEnabled() {
+		return secondaryMediaFolderEnabled;
+	}
+
+	public void setSecondaryMediaFolderEnabled(String secondaryMediaFolderEnabled) {
+		this.secondaryMediaFolderEnabled = secondaryMediaFolderEnabled;
+	}
+
+	public String getLocalPathSecondaryFolder() {
+		return localPathSecondaryFolder;
+	}
+
+	public void setLocalPathSecondaryFolder(String localPathSecondaryFolder) {
+		this.localPathSecondaryFolder = localPathSecondaryFolder;
+	}
+
+	public String getMegaHandleSecondaryFolder() {
+		log("getMegaHandleSecondaryFolder "+megaHandleSecondaryFolder);
+		return megaHandleSecondaryFolder;
+	}
+
+	public void setMegaHandleSecondaryFolder(String megaHandleSecondaryFolder) {
+		this.megaHandleSecondaryFolder = megaHandleSecondaryFolder;
+	}
+	private static void log(String log) {
+		Util.log("Preferences", log);
+	}
 }
 
 //import java.util.Arrays;
@@ -273,8 +308,6 @@ public class MegaPreferences{
 //		return Arrays.copyOfRange(key.getBytes(), 0, 32);
 //	}
 //	
-//	private static void log(String log) {
-//		Util.log("Preferences", log);
-//	}
+
 //
 //}

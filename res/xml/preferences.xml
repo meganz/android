@@ -48,6 +48,18 @@
 		<Preference
 	        android:key="settings_mega_camera_folder"
 	        android:title="@string/settings_mega_camera_upload_folder" />
+		
+		<Preference
+	        android:key="settings_secondary_media_folder_on"
+	        android:title="@string/settings_secondary_upload_on" />
+		
+		<Preference
+	        android:key="settings_local_secondary_media_folder"
+	        android:title="@string/settings_local_secondary_folder" />
+		
+		<Preference
+	        android:key="settings_mega_secondary_media_folder"
+	        android:title="@string/settings_mega_secondary_folder" />
 	</PreferenceCategory>
 	
     <PreferenceCategory 

@@ -280,8 +280,7 @@ public class Util {
 	 */
 	public static void showToast(Context context, String message) {
 		try { Toast.makeText(context, message, Toast.LENGTH_LONG).show(); } catch(Exception ex) {};
-	}
-	
+	}	
 	
 	public static float getScaleW(DisplayMetrics outMetrics, float density){
 		
