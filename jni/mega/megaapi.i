@@ -64,12 +64,12 @@
 %feature("director") mega::MegaLogger;
 
 
-%typemap(directorargout) (const char *time, int loglevel, const char *source, const char *message)
-%{ 
-	jenv->DeleteLocalRef(jtime); 
-	jenv->DeleteLocalRef(jsource);
-	jenv->DeleteLocalRef(jmessage); 
-%}
+//%typemap(directorargout) (const char *time, int loglevel, const char *source, const char *message)
+//%{ 
+//	jenv->DeleteLocalRef(jtime); 
+//	jenv->DeleteLocalRef(jsource);
+//	jenv->DeleteLocalRef(jmessage); 
+//%}
 
 
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
@@ -81,10 +81,10 @@
 %feature("director") mega::MegaTreeProcessor;
 %feature("director") mega::MegaGfxProcessor;
 
-%typemap(directorargout) (const char* path)
-%{ 
-	jenv->DeleteLocalRef(jpath); 
-%}
+//%typemap(directorargout) (const char* path)
+//%{ 
+//	jenv->DeleteLocalRef(jpath); 
+//%}
 
 %apply (char *STRING, size_t LENGTH) {(char *bitmapData, size_t size)};
 %typemap(directorin, descriptor="[B") (char *bitmapData, size_t size)
@@ -92,11 +92,11 @@
 	jbyteArray jb = (jenv)->NewByteArray($2);
 	$input = jb;
 %}
-%typemap(directorargout) (char *bitmapData, size_t size)
-%{ 
-	jenv->GetByteArrayRegion($input, 0, $2, (jbyte *)$1);
-	jenv->DeleteLocalRef($input);
-%}
+//%typemap(directorargout) (char *bitmapData, size_t size)
+//%{ 
+//	jenv->GetByteArrayRegion($input, 0, $2, (jbyte *)$1);
+//	jenv->DeleteLocalRef($input);
+//%}
 
 %ignore mega::MegaApi::MEGA_DEBRIS_FOLDER;
 %ignore mega::MegaNode::getNodeKey;

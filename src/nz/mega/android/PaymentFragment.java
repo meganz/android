@@ -1,5 +1,6 @@
 package nz.mega.android;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -12,10 +13,15 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -25,9 +31,14 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class PaymentFragment extends Fragment implements MegaRequestListenerInterface{
 	
@@ -99,6 +110,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	MegaApiAndroid megaApi;
 	Context context;
 	ArrayList<Product> accounts;
+	PaymentFragment paymentFragment = this;
 	
 	@Override
 	public void onDestroy(){
@@ -512,7 +524,49 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}	
 			case 4:{
-				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+				Toast.makeText(context, "PAY MONTH", Toast.LENGTH_LONG).show();
+				
+				AlertDialog paymentDialog;
+				
+//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Google Play", "Fortumo"});
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//				builder.setTitle(getString(R.string.section_photo_sync));
+				builder.setTitle("Payment method");
+				
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which){
+							case 0:{
+								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+								break;
+							}
+							case 1:{
+								Toast.makeText(context, "FORTUMOOOOO", Toast.LENGTH_SHORT).show();
+								Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
+								startActivity(intent);
+								break;
+							}
+					}
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				
+				paymentDialog = builder.create();
+				paymentDialog.show();
+				Util.brandAlertDialog(paymentDialog);
+
+//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
 				break;
 			}
 		}
@@ -538,11 +592,22 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT URL: " + request.getLink());
-			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
-			startActivity(browserIntent);
+		
+		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+			MegaPricing p = request.getPricing();
+			for (int i=0;i<p.getNumProducts();i++){
+				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+				if (account.getLevel()==4&&account.getMonths()==1){
+					long planHandle = account.handle;
+					megaApi.getPaymentId(planHandle, this);
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
+			log("PAYMENT ID: " + request.getLink());
+			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
+//			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
+//			startActivity(browserIntent);
 
 		}
 	}
