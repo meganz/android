@@ -52,6 +52,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 
 	public static String PHOTO_SYNC = "PhotoSync";
 	public static String CAMERA_UPLOADS = "Camera Uploads";
+	public static String SECONDARY_UPLOADS = "Media Uploads";
 	public static String ACTION_CANCEL = "CANCEL_SYNC";
 	public static String ACTION_STOP = "STOP_SYNC";
 	public static String ACTION_LOGOUT = "LOGOUT_SYNC";
@@ -70,9 +71,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	MegaApplication app;
 	DatabaseHandler dbH;
 	
-	UserCredentials credentials;
-	
-	long cameraUploadHandle = -1;
+	UserCredentials credentials;	
 	
 	static public boolean running = false;
 	private boolean canceled;
@@ -98,7 +97,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	private static long lastRun = 0;
 	
+	Queue<Media> cameraFiles = new LinkedList<Media>();
 	String localPath = "";
+	MegaNode cameraUploadNode = null;
+	long cameraUploadHandle = -1;
 	
 	Intent intentCreate = null;
 	
@@ -114,11 +116,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		public long timestamp;
 	}
 	
-	Thread task;
+	Thread task;	
 	
-	MegaNode cameraUploadNode = null;
-	
-	Queue<Media> cameraFiles = new LinkedList<Media>();
+	//Secondary Variables	
+	Queue<Media> cameraFilesSecondary = new LinkedList<Media>();	
+	boolean secondaryEnabled= false;
+	String localPathSecondary = "";
+	long secondaryUploadHandle = -1;
 	
 	long currentTimeStamp = 0;
 	
@@ -289,11 +293,60 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //					}
 					
 					//Get the MEGA folder to sync the camera
+					
 					if (prefs.getCamSyncHandle() == null){
 						cameraUploadHandle = -1;
 					}
 					else{
 						cameraUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
+					}
+					
+					//Check the secondary folder
+					if (prefs.getSecondaryMediaFolderEnabled() == null){
+						dbH.setSecondaryUploadEnabled(false);
+						log("Not defined, so not enabled");
+						secondaryEnabled=false;
+					}
+					else{					
+						if (!Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())){
+							log("Not enabled");
+							secondaryEnabled=false;
+						}					
+						else{
+							//Chech the corresponding folders
+							localPathSecondary = prefs.getLocalPathSecondaryFolder();
+							if (localPathSecondary == null){
+								dbH.setSecondaryUploadEnabled(false);
+								log("Not defined secondary LOCAL, so not enabled");
+								secondaryEnabled=false;
+							}
+							else{
+								if ("".compareTo(localPathSecondary) == 0){
+									log("Empty secondary LOCAL, so not enabled");
+									dbH.setSecondaryUploadEnabled(false);
+									dbH.setSecondaryFolderPath("-1");
+									secondaryEnabled=false;				
+								}
+								else 
+								{
+									if ("-1".compareTo(localPathSecondary) == 0){
+										log("-1 secondary LOCAL, so not enabled");
+										dbH.setSecondaryUploadEnabled(false);
+										secondaryEnabled=false;		
+									}
+									else{
+										secondaryEnabled=true;		
+										//Get the MEGA folder to sync the secondary media folder										
+										if (prefs.getMegaHandleSecondaryFolder() == null){
+											secondaryUploadHandle = -1;
+										}
+										else{
+											secondaryUploadHandle = Long.parseLong(prefs.getCamSyncHandle());
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -302,7 +355,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		//
 		
 		if (cameraUploadHandle == -1){
-			//Find the "Camera Uploads" folder ot the old "PhotoSync"
+			//Find the "Camera Uploads" folder of the old "PhotoSync"
 			ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 			for (int i=0;i<nl.size();i++){
 				if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
@@ -352,6 +405,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("Sync Folder " + cameraUploadHandle + " Node: "+n.getName());
 			}
 			
+		}
+		
+		if(secondaryEnabled){
+			MegaNode secondaryN = megaApi.getNodeByHandle(secondaryUploadHandle);
+			if (secondaryN==null){
+				//Create a secondary folder to sync
+				megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+				
+			}
+			else{
+				log("SECONDARY Sync Folder " + secondaryUploadHandle + " Node: "+secondaryN.getName());
+			}
 		}
 		
 		log("TODO OK");
@@ -545,11 +610,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			        media.filePath = cursor.getString(dataColumn);
 			        media.timestamp = cursor.getLong(timestampColumn) * 1000;
 			        
-			        if (!checkFile(media)){
-			        	continue;	
-			        }
+			        //Check files of the Camera Uploads
+			        if (checkFile(media,localPath)){
+			        	 cameraFiles.add(media);
+					     log("Camera Files added: "+media.filePath);
+			        }		
 			        
-			        cameraFiles.add(media);
+			      //Check files of Secondary Media Folder
+			        if (checkFile(media,localPathSecondary)){
+			        	 cameraFilesSecondary.add(media);
+					     log("-----SECONDARY MEDIA Files added: "+media.filePath);
+			        }	
 		        }	
 			}
 		}
@@ -836,6 +907,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		if (media.filePath != null){
 			if (media.filePath.startsWith(localPath)){
+				Time t = new Time(Time.getCurrentTimezone());
+				t.setToNow();
+				long timeSpent = t.toMillis(true) - media.timestamp;
+				if (timeSpent > ((5 * 60 * 1000)-1)){
+					return true;
+				}
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private boolean checkFile(Media media, String path){
+		
+		if (media.filePath != null){
+			if (media.filePath.startsWith(path)){
 				Time t = new Time(Time.getCurrentTimezone());
 				t.setToNow();
 				long timeSpent = t.toMillis(true) - media.timestamp;
