@@ -349,7 +349,7 @@
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Subidas de la Cámara en progreso</string>
     <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">¿Quieres cancelar las subidas de la Cámara?</string>
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Carpeta de destino no disponible</string>
-    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Subiendo imágenes de la cámara</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Subiendo ficheros multimedia</string>
     <string name="settings_camera_notif_error" context="notification error">Existe un problema con las subidas de la Cámara</string>
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Subidas de la Cámara completadas</string>
     
