@@ -581,14 +581,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				//MediaColumns.DATE_MODIFIED,
 				MediaColumns.DATE_MODIFIED};
 		
-		String selection = null;
+		String selectionCamera = null;
+		String selectionSecondary = null;
 		String[] selectionArgs = null;
 		
+		prefs = dbH.getPreferences();
+		
 		if (prefs != null){
-			if (prefs.getCamSyncTimeStamp() != null){
+			if (prefs.getCamSyncTimeStamp() != null){				
 				long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-				selection = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp;
-				log("SELECTION: " + selection);
+				selectionCamera = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp;
+				log("SELECTION: " + selectionCamera);
+			}
+			if(secondaryEnabled){
+				if (prefs.getSecSyncTimeStamp() != null){
+					long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
+					selectionSecondary = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp;
+					log("SELECTION: " + selectionSecondary);
+				}	
 			}
 		}
 		
@@ -620,33 +630,47 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					break;
 				}
 			}
-		}
+		}		
 		
 		for(int i=0; i<uris.size(); i++){
 			
-			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
-			if (cursor != null){
-				int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-		        int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
-		        while(cursor.moveToNext()){
+			Cursor cursorCamera = app.getContentResolver().query(uris.get(i), projection, selectionCamera, selectionArgs, order);
+			if (cursorCamera != null){
+				int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATA);
+		        int timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+		        while(cursorCamera.moveToNext()){
 		        	Media media = new Media();
-			        media.filePath = cursor.getString(dataColumn);
-			        media.timestamp = cursor.getLong(timestampColumn) * 1000;
+			        media.filePath = cursorCamera.getString(dataColumn);
+			        media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
 			        
 			        //Check files of the Camera Uploads
 			        if (checkFile(media,localPath)){
 			        	 cameraFiles.add(media);
 					     log("Camera Files added: "+media.filePath);
-			        }		
-			        if(secondaryEnabled){
-				      //Check files of Secondary Media Folder
+			        }				        
+		        }	
+			}
+			
+			//Secondary Media Folder
+			if(secondaryEnabled){
+				Cursor cursorSecondary = app.getContentResolver().query(uris.get(i), projection, selectionSecondary, selectionArgs, order);
+				if (cursorSecondary != null){
+					int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATA);
+			        int timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+			        while(cursorSecondary.moveToNext()){
+			        	Media media = new Media();
+				        media.filePath = cursorSecondary.getString(dataColumn);
+				        media.timestamp = cursorSecondary.getLong(timestampColumn) * 1000;				        
+				        
+					    //Check files of Secondary Media Folder
 				        if (checkFile(media,localPathSecondary)){
 				        	 mediaFilesSecondary.add(media);
 						     log("-----SECONDARY MEDIA Files added: "+media.filePath);
 				        }
 			        }
-		        }	
+				}	
 			}
+			
 		}
 		
 		cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
@@ -679,6 +703,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		totalToUpload = cameraFiles.size() + mediaFilesSecondary.size();
+		totalUploaded=0;
+		totalSizeUploaded=0;
 		
 		totalSizeToUpload = 0;
 		Iterator<Media> itCF = cameraFiles.iterator();
@@ -1143,16 +1169,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				currentTimeStamp = media.timestamp;
-				long parentHandle = megaApi.getParentNode(uploadNode).getHandle();
-				if(parentHandle == secondaryUploadHandle){
-					log("renameTask: Update SECONDARY Sync TimeStamp");
+//				long parentHandle = megaApi.getParentNode(uploadNode).getHandle();
+				if(uploadNode.getHandle() == secondaryUploadHandle){
+					log("renameTask: Update SECONDARY Sync TimeStamp, parentHandle= "+uploadNode.getHandle()+" secondaryHandle: "+secondaryUploadHandle);					
 					dbH.setSecSyncTimeStamp(currentTimeStamp);
 				}
 				else{
-					log("renameTask: Update Camera Sync TimeStamp");
+					log("renameTask: Update Camera Sync TimeStamp, parentHandle= "+uploadNode.getHandle()+" cameraHandle: "+cameraUploadHandle);				
 					dbH.setCamSyncTimeStamp(currentTimeStamp);
 				}
-//				dbH.setCamSyncTimeStamp(currentTimeStamp);
+				
+				log("Upoad NODE: "+uploadNode.getName());
+
 				File f = new File(media.filePath);
 				totalSizeUploaded += f.length();
 				
@@ -1585,7 +1613,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				* 100);
 		log(progressPercent + " " + progress + " " + totalSizeToUpload);
 		int left = totalToUpload - totalUploaded;
-		int current = totalToUpload - left + 1;
+		int current = totalToUpload - left;
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		
 		String message = current + " ";
