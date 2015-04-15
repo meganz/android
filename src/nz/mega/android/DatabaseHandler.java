@@ -28,7 +28,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_SESSION= "session";
     private static final String KEY_FIRST_LOGIN = "firstlogin";
     private static final String KEY_CAM_SYNC_ENABLED = "camsyncenabled";
-    private static final String KEY_SEC_FOLDER_ENABLED = "secondarymediafolderfnabled";
+    private static final String KEY_SEC_FOLDER_ENABLED = "secondarymediafolderenabled";
     private static final String KEY_SEC_FOLDER_HANDLE = "secondarymediafolderhandle";
     private static final String KEY_SEC_FOLDER_LOCAL_PATH = "secondarymediafolderlocalpath";
     private static final String KEY_CAM_SYNC_HANDLE = "camsynchandle";
@@ -51,6 +51,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_OFF_TYPE = "type";
     private static final String KEY_OFF_INCOMING = "incoming";
     private static final String KEY_OFF_HANDLE_INCOMING = "incomingHandle";
+    private static final String KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp";
 
     private static DatabaseHandler instance;
     
@@ -95,7 +96,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_PIN_LOCK_CODE + " TEXT, " + KEY_STORAGE_ASK_ALWAYS + " TEXT, " +
         		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, " + KEY_CAM_SYNC_TIMESTAMP + " TEXT, " + 
         		KEY_CAM_SYNC_CHARGING + " BOOLEAN, " + KEY_LAST_UPLOAD_FOLDER + " TEXT, "+
-        		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT" + KEY_SEC_FOLDER_ENABLED + " TEXT" + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT"+ KEY_SEC_FOLDER_HANDLE + " TEXT" + ")";
+        		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, " + KEY_SEC_FOLDER_ENABLED + " TEXT, " + KEY_SEC_FOLDER_LOCAL_PATH + 
+        		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT"+")";
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
@@ -188,9 +190,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_FOLDER_ENABLED + " TEXT;");
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_FOLDER_LOCAL_PATH + " TEXT;");
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_FOLDER_HANDLE + " TEXT;");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_SEC_SYNC_TIMESTAMP + " TEXT;");			
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_FOLDER_ENABLED + " = '" + encrypt("false") + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_FOLDER_LOCAL_PATH + " = '" + encrypt("-1") + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_FOLDER_HANDLE + " = '" + encrypt("-1") + "';");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_SYNC_TIMESTAMP + " = '" + encrypt("-1") + "';");
 		}
 	} 
 	
@@ -277,6 +281,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_SEC_FOLDER_ENABLED, encrypt(prefs.getSecondaryMediaFolderEnabled()));        
         values.put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(prefs.getLocalPathSecondaryFolder()));
         values.put(KEY_SEC_FOLDER_HANDLE, encrypt(prefs.getMegaHandleSecondaryFolder()));
+        values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(prefs.getSecSyncTimeStamp()));        
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -916,6 +921,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		cursor.close();
 	}
 	
+	public void setSecSyncTimeStamp (long secSyncTimeStamp){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_SYNC_TIMESTAMP + "= '" + encrypt(secSyncTimeStamp + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(secSyncTimeStamp + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+		
 	public void setPinLockEnabled (boolean pinLockEnabled){
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();

@@ -21,6 +21,7 @@ public class MegaPreferences{
 	String secondaryMediaFolderEnabled = "";
 	String localPathSecondaryFolder = "";
 	String megaHandleSecondaryFolder = "";
+	String secSyncTimeStamp = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -190,6 +191,14 @@ public class MegaPreferences{
 	}
 	private static void log(String log) {
 		Util.log("Preferences", log);
+	}
+
+	public String getSecSyncTimeStamp() {
+		return secSyncTimeStamp;
+	}
+
+	public void setSecSyncTimeStamp(String secSyncTimeStamp) {
+		this.secSyncTimeStamp = secSyncTimeStamp;
 	}
 }
 
