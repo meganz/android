@@ -409,14 +409,32 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		if(secondaryEnabled){
-			MegaNode secondaryN = megaApi.getNodeByHandle(secondaryUploadHandle);
+			MegaNode secondaryN = null;
+			if(secondaryUploadHandle!=-1){
+				secondaryN = megaApi.getNodeByHandle(secondaryUploadHandle);
+			}			
 			if (secondaryN==null){
 				//Create a secondary folder to sync
-				if (!running){
-					running = true;
-					log("---------------------------------------------running = true");
-					megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
-				}				
+				
+				//Find the "Camera Uploads" folder of the old "PhotoSync"
+				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+				for (int i=0;i<nl.size();i++){
+					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+						secondaryUploadHandle = nl.get(i).getHandle();
+						dbH.setSecondaryFolderHandle(secondaryUploadHandle);
+					}
+				}
+				
+				//If not "Camera Uploads" or "Photosync"
+				if (secondaryUploadHandle == -1){
+					log("must create the folder SECONDARY_UPLOADS");
+					if (!running){
+						running = true;
+						megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+					}
+					return START_NOT_STICKY;
+				}
+			
 				return START_NOT_STICKY;
 			}
 			else{
@@ -815,7 +833,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 				else{
 					currentTimeStamp = mediaSecondary.timestamp;
-					dbH.setCamSyncTimeStamp(currentTimeStamp);
+					dbH.setSecSyncTimeStamp(currentTimeStamp);
 					File f = new File(mediaSecondary.filePath);
 					totalSizeUploaded += f.length();
 					uploadNext();	
@@ -1125,7 +1143,16 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				currentTimeStamp = media.timestamp;
-				dbH.setCamSyncTimeStamp(currentTimeStamp);
+				long parentHandle = megaApi.getParentNode(uploadNode).getHandle();
+				if(parentHandle == secondaryUploadHandle){
+					log("renameTask: Update SECONDARY Sync TimeStamp");
+					dbH.setSecSyncTimeStamp(currentTimeStamp);
+				}
+				else{
+					log("renameTask: Update Camera Sync TimeStamp");
+					dbH.setCamSyncTimeStamp(currentTimeStamp);
+				}
+//				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				File f = new File(media.filePath);
 				totalSizeUploaded += f.length();
 				
@@ -1361,7 +1388,20 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){		
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("Folder created");
+				log("Folder created: "+request.getName());				
+				//Add in the database the new folder
+				String name = request.getName();
+				if(name.contains(CAMERA_UPLOADS)){
+					//Update in database
+					log("CamSync Folder UPDATED DB");
+					dbH.setCamSyncHandle(request.getNodeHandle());
+				}
+				else{
+					//Update in database
+					log("Secondary Folder UPDATED DB");
+					dbH.setSecondaryFolderHandle(request.getNodeHandle());
+				}				
+
 				retryLaterShortTime();
 			}
 		}
@@ -1374,7 +1414,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					finish();
 				}
 				else{
-					dbH.setCamSyncTimeStamp(currentTimeStamp);
+					MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+					long parentHandle = megaApi.getParentNode(node).getHandle();
+					if(parentHandle == secondaryUploadHandle){
+						log("Update SECONDARY Sync TimeStamp");
+						dbH.setSecSyncTimeStamp(currentTimeStamp);
+					}
+					else{
+						log("Update Camera Sync TimeStamp");
+						dbH.setCamSyncTimeStamp(currentTimeStamp);
+					}
+					
 					totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
 					uploadNext();					
 				}
@@ -1467,7 +1517,18 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("Image Sync OK: " + transfer.getFileName());
 				totalSizeUploaded += transfer.getTransferredBytes();
 				log("IMAGESYNCFILE: " + transfer.getPath());
-				dbH.setCamSyncTimeStamp(currentTimeStamp);
+				
+				String tempPath = transfer.getPath();
+				if(tempPath.startsWith(localPath)){
+					log("onTransferFinish: Update Camera Sync TimeStamp");
+					dbH.setCamSyncTimeStamp(currentTimeStamp);
+				}
+				else{
+					log("onTransferFinish: Update SECONDARY Sync TimeStamp");
+					dbH.setSecSyncTimeStamp(currentTimeStamp);
+				}
+				
+//				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				
 //				ArrayList<MegaNode> nLAfter = megaApi.getChildren(megaApi.getNodeByHandle(cameraUploadHandle), MegaApiJava.ORDER_ALPHABETICAL_ASC);
 //				log("SIZEEEEEE: " + nLAfter.size());
