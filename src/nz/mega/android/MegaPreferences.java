@@ -28,7 +28,7 @@ public class MegaPreferences{
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
-			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder){
+			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -46,6 +46,7 @@ public class MegaPreferences{
 		this.secondaryMediaFolderEnabled = secondaryMediaFolderEnabled;
 		this.localPathSecondaryFolder = localPathSecondaryFolder;
 		this.megaHandleSecondaryFolder = megaHandleSecondaryFolder;
+		this.secSyncTimeStamp = secSyncTimeStamp;
 	}
 	
 	public String getFirstTime (){
