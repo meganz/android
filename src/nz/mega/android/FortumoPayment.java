@@ -73,19 +73,19 @@ public class FortumoPayment extends ActionBarActivity implements MegaRequestList
 		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT ID: " + request.getLink());
 			Toast.makeText(this, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
-			PaymentRequest.PaymentRequestBuilder builder = new PaymentRequest.PaymentRequestBuilder();
-	        builder.setService(SERVICE_ID, APP_SECRET);
-	        builder.setDisplayString("TestingFromAndroidInAPP"); 
-	        builder.setProductName(request.getLink());  // non-consumable purchases are restored using this value
-//	        builder.setType(MpUtils.PRODUCT_TYPE_NON_CONSUMABLE);              // non-consumable items can be later restored
-	        builder.setType(MpUtils.PRODUCT_TYPE_SUBSCRIPTION);
-	        builder.setIcon(R.drawable.ic_launcher);
-	        PaymentRequest pr = builder.build();
-	        makePayment(pr);
+//			PaymentRequest.PaymentRequestBuilder builder = new PaymentRequest.PaymentRequestBuilder();
+//	        builder.setService(SERVICE_ID, APP_SECRET);
+//	        builder.setDisplayString("TestingFromAndroidInAPP"); 
+//	        builder.setProductName(request.getLink());  // non-consumable purchases are restored using this value
+////	        builder.setType(MpUtils.PRODUCT_TYPE_NON_CONSUMABLE);              // non-consumable items can be later restored
+//	        builder.setType(MpUtils.PRODUCT_TYPE_SUBSCRIPTION);
+//	        builder.setIcon(R.drawable.ic_launcher);
+//	        PaymentRequest pr = builder.build();
+//	        makePayment(pr);
 			
 
-//			String urlFortumo = "http://fortumo.com/mobile_payments/f250460ec5d97fd27e361afaa366db0f?cuid=" + request.getLink();
-//			myWebView.loadUrl(urlFortumo);
+			String urlFortumo = "http://fortumo.com/mobile_payments/f250460ec5d97fd27e361afaa366db0f?cuid=" + request.getLink();
+			myWebView.loadUrl(urlFortumo);
 
 //			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlFortumo));
 //			startActivity(browserIntent);

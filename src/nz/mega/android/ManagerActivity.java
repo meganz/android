@@ -699,10 +699,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		megaApi = app.getMegaApi();
 		
-		if (megaApi == null){
-			megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		}
-		
 		log("retryPendingConnections()");
 		if (megaApi != null){
 			megaApi.retryPendingConnections();

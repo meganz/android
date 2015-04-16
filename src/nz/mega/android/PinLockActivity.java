@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
@@ -60,8 +61,11 @@ public class PinLockActivity extends ActionBarActivity implements OnClickListene
 				submitForm();
 				break;
 			}
-			case R.id.pin_lock_logout:{
+			case R.id.pin_lock_logout:{ 
 				ManagerActivity.logout(this, megaApi, false);
+				Intent intent = new Intent(this, TourActivity.class);
+				startActivity(intent);
+				finish();
 				break;
 			}
 		}
