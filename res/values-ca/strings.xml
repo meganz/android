@@ -36,9 +36,9 @@
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Més opcions...</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Vols eliminar el contacte</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
     
-    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Comparticions entrants</string>
+    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Compartit amb mi</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Comparticions amb altres</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Surt</string>
     <string name="action_add" context="Menu item">Puja...</string>
@@ -47,7 +47,7 @@
     <string name="action_settings" context="Menu item">Configuració</string>
     <string name="action_search" context="Search button">Busca</string>
     <string name="action_refresh" context="Menu item">Refresca</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_sort_by" context="Menu item">Ordena per...</string>
     <string name="action_help" context="Menu item">Ajuda</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Millora el compte</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Marca\'ls tots</string>
@@ -80,7 +80,7 @@
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">descarrega</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">descarregas</item>
     </plurals>
     
     <plurals name="general_num_uploads">
@@ -132,7 +132,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Es necessita confirmació</string>
     <string name="create_account_confirm" context="">Si us plau, comprova el teu e-mail i fes clic a l\'enllaç per entrar al teu compte i confirmar-lo</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">Connectant amb el servidor: creant el compte</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Desat per a ús fora de línia</string>
@@ -140,8 +140,8 @@
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Paperera</string>
 	<string name="section_contacts" context="Title of the contact list">Contactes</string>
 	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTES</string>
-	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">SOL·LICITUDS ENVIADES</string>
-	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">SOL·LICITUDS REBUDES</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">PETICIONS ENVIADES</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">PETICIONS REBUDES</string>
 	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No s\'ha enviat cap sol·licitud</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No s\'ha rebut cap sol·licitud</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferències</string>
@@ -149,11 +149,11 @@
 	<string name="section_account" context="button to the settings of the user\'s account">El meu compte</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Pujades de la càmera</string>
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s de %2$s</string>
-	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">ENTRANTS</string>
-	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">SORTINT</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">AMB MI</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">AMB ALTRES</string>
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">No tens fitxers al disc del núvol</string>
-	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Buida la Paperera</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">La paperera és buida</string>
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No hi ha cap carpeta compartida amb mi</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No s\'està compartint cap carpeta amb ningú</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Carpeta buida</string>
@@ -300,7 +300,7 @@
     <string name="upgrade_activity" context="title of the Upgrade screen">Compte Pro</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Tria el tipus de subscripció</string>
     <string name="select_membership_1" context="the user has to decide the way of payment">Renovació mensual o anual</string>
-    <string name="select_membership_2" context="button to go to Google Play">Subscripció amb Google Play</string>
+    <string name="select_membership_2" context="button to go to Google Play">Subscripció mitjançant Google Play</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Mensual*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Anual</string>
