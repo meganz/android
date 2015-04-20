@@ -108,7 +108,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	String localSecondaryFolderPath = "";
 	Long handleSecondaryMediaFolder = null;
 	MegaNode megaNodeSecondaryMediaFolder = null;
-	String pathSecondaryMediaFolder = "";
+	String megaPathSecMediaFolder = "";
 	
 	
 	@Override
@@ -319,7 +319,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 					}
 				}
 				
-				//Check if the secondary folder is enabled
+				//Check if the secondary folders are enabled
 				if (prefs.getSecondaryMediaFolderEnabled() == null){
 					dbH.setSecondaryUploadEnabled(false);
 					secondaryUpload = false;						
@@ -338,14 +338,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 						if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
 							megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);	
 							if(megaNodeSecondaryMediaFolder!=null){
-								pathSecondaryMediaFolder = megaNodeSecondaryMediaFolder.getName();
+								megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 							}
 							else{
-								pathSecondaryMediaFolder = getString(R.string.settings_empty_folder);
+								megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 							}
 						}
 						else{
-							pathSecondaryMediaFolder = getString(R.string.settings_empty_folder);
+							megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 						}
 					}
 					else{
@@ -435,7 +435,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			localCameraUploadFolder.setSummary(camSyncLocalPath);
 			megaCameraFolder.setSummary(camSyncMegaPath);
 			localSecondaryFolder.setSummary(localSecondaryFolderPath);
-			megaSecondaryFolder.setSummary(pathSecondaryMediaFolder);
+			megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 			cameraUploadWhat.setSummary(fileUpload);
 			downloadLocation.setSummary(downloadLocationPath);
 			cameraUploadCharging.setChecked(charging);
@@ -544,14 +544,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				//Check MEGA folder
 				if(handleSecondaryMediaFolder!=null){
 					if(handleSecondaryMediaFolder==-1){
-						pathSecondaryMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 					}
 				}		
 				else{
-					pathSecondaryMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+					megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 				}
 				
-				megaSecondaryFolder.setSummary(pathSecondaryMediaFolder);			
+				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);			
 				
 				//Check local folder
 				File checkSecondaryFile = new File(localSecondaryFolderPath);
@@ -865,9 +865,9 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				
 				handleSecondaryMediaFolder = handle;
 				megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
-				pathSecondaryMediaFolder = megaNodeSecondaryMediaFolder.getName();
+				megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 				
-				megaSecondaryFolder.setSummary(pathSecondaryMediaFolder);
+				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
 				dbH.setCamSyncTimeStamp(0);
 				
 				Intent photosVideosIntent = null;
