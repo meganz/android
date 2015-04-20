@@ -793,6 +793,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				String photoFinalName;
 				do {
 					//Iterate between all files with the correct target name
+					//TODO Esto influye? Que es exactamente?
 					photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
 					possibleNode = megaApi.getChildNode(secondaryUploadNode, photoFinalName);
 					
@@ -854,20 +855,27 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 				}
 				
-				if (!photoAlreadyExists){
-					int photoIndex = 0;
-					String photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-					for (int i=0;i<nL.size();i++){
-						photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);						
-						if (nL.get(i).getName().compareTo(photoFinalName) == 0){
-							photoIndex++;
-						}
-					}
-					photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-					log("MediaFinalName: " + photoFinalName + "______" + photoIndex);
-					currentTimeStamp = mediaSecondary.timestamp;
+				if (!photoAlreadyExists){					
 					
-					megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, photoFinalName, this);
+					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+						//Keep the file names as device
+						megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, file.getName(), this);
+						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
+					}
+					else{
+						int photoIndex = 0;
+						String photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
+						for (int i=0;i<nL.size();i++){
+							photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);						
+							if (nL.get(i).getName().compareTo(photoFinalName) == 0){
+								photoIndex++;
+							}
+						}
+						photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);					
+						currentTimeStamp = mediaSecondary.timestamp;
+						megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, photoFinalName, this);
+						log("CHANGED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
+					}					
 				}
 				else{
 					currentTimeStamp = mediaSecondary.timestamp;
@@ -881,17 +889,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("NODO SECONDARY: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());				
 				if (megaApi.getParentNode(nodeExists).getHandle() != secondaryUploadHandle){
 					
-					int photoIndex = 0;
-					String photoFinalName = null;
-					do {
-						photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-						photoIndex++;
-					}while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
-					
-					log("SecondaryFinalName: " + photoFinalName + "______" + photoIndex);
-					currentTimeStamp = mediaSecondary.timestamp;
-					megaApi.copyNode(nodeExists, secondaryUploadNode, photoFinalName, this);
-					
+					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+						//Keep the file names as device
+						megaApi.copyNode(nodeExists, secondaryUploadNode, file.getName(), this);
+						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
+					}
+					else{
+						int photoIndex = 0;
+						String photoFinalName = null;
+						do {
+							photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
+							photoIndex++;
+						}while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
+		
+						currentTimeStamp = mediaSecondary.timestamp;
+						megaApi.copyNode(nodeExists, secondaryUploadNode, photoFinalName, this);
+						log("CHANGED!!!! SecondaryFinalName: " + photoFinalName + "______" + photoIndex);
+					}	
+						
 //				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
 					
 //					boolean photoAlreadyExists = false;
@@ -980,6 +995,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				String photoFinalName;
 				do {
 					//Iterate between all files with the correct target name
+					//TODO cambio?
 					photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
 					possibleNode = megaApi.getChildNode(cameraUploadNode, photoFinalName);
 					
@@ -1042,20 +1058,28 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 				
 				if (!photoAlreadyExists){
-					int photoIndex = 0;
-					String photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-					for (int i=0;i<nL.size();i++){
-						photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-						log(photoFinalName + "_S_S_S_S_S_S____" + nL.get(i).getName());
-						if (nL.get(i).getName().compareTo(photoFinalName) == 0){
-							photoIndex++;
-						}
-					}
-					photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-					log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-					currentTimeStamp = media.timestamp;
 					
-					megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, photoFinalName, this);
+					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+						//Keep the file names as device
+						megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, file.getName(), this);
+						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
+					}
+					else{
+						int photoIndex = 0;
+						String photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
+						for (int i=0;i<nL.size();i++){
+							photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
+							log(photoFinalName + "_S_S_S_S_S_S____" + nL.get(i).getName());
+							if (nL.get(i).getName().compareTo(photoFinalName) == 0){
+								photoIndex++;
+							}
+						}
+						photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
+						log("photoFinalName: " + photoFinalName + "______" + photoIndex);
+						currentTimeStamp = media.timestamp;
+						
+						megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, photoFinalName, this);
+					}		
 				}
 				else{
 					currentTimeStamp = media.timestamp;
@@ -1069,16 +1093,23 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());				
 				if (megaApi.getParentNode(nodeExists).getHandle() != cameraUploadHandle){
 					
-					int photoIndex = 0;
-					String photoFinalName = null;
-					do {
-						photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
-						photoIndex++;
-					}while(megaApi.getChildNode(cameraUploadNode, photoFinalName) != null);
-					
-					log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-					currentTimeStamp = media.timestamp;
-					megaApi.copyNode(nodeExists, cameraUploadNode, photoFinalName, this);
+					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+						//Keep the file names as device
+						megaApi.copyNode(nodeExists, cameraUploadNode, file.getName(), this);
+						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
+					}
+					else{
+						int photoIndex = 0;
+						String photoFinalName = null;
+						do {
+							photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
+							photoIndex++;
+						}while(megaApi.getChildNode(cameraUploadNode, photoFinalName) != null);
+						
+						log("photoFinalName: " + photoFinalName + "______" + photoIndex);
+						currentTimeStamp = media.timestamp;
+						megaApi.copyNode(nodeExists, cameraUploadNode, photoFinalName, this);
+					}		
 					
 //				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
 					

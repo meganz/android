@@ -41,6 +41,10 @@
             android:key="settings_camera_upload_charging"
         	android:title="@string/settings_camera_upload_charging" />
 		
+		<nz.mega.components.TwoLineCheckPreference
+            android:key="settings_keep_file_names"
+        	android:title="@string/settings_keep_file_names" />
+		
 		<Preference
 	        android:key="settings_local_camera_upload_folder"
 	        android:title="@string/settings_local_camera_upload_folder" />
