@@ -47,7 +47,7 @@
     <string name="action_settings" context="Menu item">Réglages</string>
     <string name="action_search" context="Search button">Rechercher</string>
     <string name="action_refresh" context="Menu item">Raffraîchir</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_sort_by" context="Menu item">Trier par...</string>
     <string name="action_help" context="Menu item">Aider</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Passer Pro</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Sélectionner Tous</string>
@@ -55,7 +55,7 @@
     <string name="action_grid" context="Menu item to change from list view to grid view">Vue par vignette</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Vue listée</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exporter la Clef-Maître</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Supprimé la Clef-Maître</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Supprimer la Clef-Maître</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clef-Maître a été exportée vers :</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
@@ -132,7 +132,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation requise</string>
     <string name="create_account_confirm" context="">Vérifiez vos emails et cliquez sur le lien pour vous connecter et confirmer votre compte</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">Connexion au serveur : compte en cours de création</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Sauvegardé(s) en mode Hors Ligne</string>
@@ -221,7 +221,7 @@
     <string name="context_clear_rubbish" context="Menu option">Vider la Corbeille</string>
     <string name="context_send_link" context="get the link and send it">Envoyez le lien</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Supprimer</string>
-    <string name="context_share_folder" context="menu item">Dossier partagé</string>
+    <string name="context_share_folder" context="menu item">Partager dossier</string>
     <string name="context_view_shared_folders" context="open a shared folder">Voir les dossiers partagés</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Partager</string>
     <string name="remove_all_sharing" context="status text">Supprimer tous les contacts avec qui vous partagez</string>

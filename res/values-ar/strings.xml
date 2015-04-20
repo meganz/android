@@ -4,7 +4,7 @@
     <string name="app_name" context="Not translate">MEGA</string>
     <string name="app_version" context="Not translate">2.2.2</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">سوف تكون متاحة في</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA هي سحابة تخزين تتمتع دائما بقوة الخصوصية. 50GB مجانا</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">الحجم الإجمالي</string>
@@ -36,7 +36,7 @@
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">خيارات أكثر...</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">هل تريد إزالة جهة الاتصال</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">دقيقة واحدة</string>  
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">مشاركات واردة</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">المشاركات الصادرة</string>
@@ -160,7 +160,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">مطلوب تأكيد البريد الاليكتروني</string>
     <string name="create_account_confirm" context="">يرجى التحقق من البريد الإلكتروني الخاص بك وانقر على الرابط للدخول وتأكيد حسابك</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">الاتصال بالخادم: انشاء حساب</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">حفظ الملفات للعمل دون اتصال</string>
