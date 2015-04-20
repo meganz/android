@@ -811,6 +811,20 @@ public class Util {
 		}
 
 	}
+	
+	/** Returns the consumer friendly device name */
+	public static String getDeviceName() {
+	    final String manufacturer = Build.MANUFACTURER;
+	    final String model = Build.MODEL;
+	    if (model.startsWith(manufacturer)) {
+	        return model;
+	    }
+	    if (manufacturer.equalsIgnoreCase("HTC")) {
+	        // make sure "HTC" is fully capitalized.
+	        return "HTC " + model;
+	    }
+	    return manufacturer + " " + model;
+	}
 
 	private static void log(String message) {
 		log("Util", message);
