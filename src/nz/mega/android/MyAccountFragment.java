@@ -416,6 +416,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 						break;
 					}
 					
+					case 4:{
+						typeAccount.setText(R.string.prolite_account);
+						break;
+					}
+					
 				}
 						
 				long totalStorage = accountInfo.getStorageMax();
