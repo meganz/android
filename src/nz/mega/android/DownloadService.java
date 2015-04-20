@@ -303,7 +303,22 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if (currentDir.isDirectory()){
 			log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+			
+			if(currentFile.exists()){
+				log("The file already exists!");
+				//Check the fingerprint				
+				String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
+				String megaFingerprint = megaApi.getFingerprint(currentDocument);
+
+				if(localFingerprint.compareTo(megaFingerprint)!=0)
+				{
+					log("Delete the old version");
+					currentFile.delete();					
+				}						
+			}
+
 			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+						
 		}
 		else{
 			log("currentDir is not a directory");

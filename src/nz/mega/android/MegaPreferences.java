@@ -22,13 +22,15 @@ public class MegaPreferences{
 	String localPathSecondaryFolder = "";
 	String megaHandleSecondaryFolder = "";
 	String secSyncTimeStamp = "";
+	String keepFileNames = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
 	public final static int PHOTOS_AND_VIDEOS = 1003;
 	
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
-			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp){
+			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
+			String keepFileNames){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -47,6 +49,7 @@ public class MegaPreferences{
 		this.localPathSecondaryFolder = localPathSecondaryFolder;
 		this.megaHandleSecondaryFolder = megaHandleSecondaryFolder;
 		this.secSyncTimeStamp = secSyncTimeStamp;
+		this.keepFileNames = keepFileNames;
 	}
 	
 	public String getFirstTime (){
@@ -200,6 +203,14 @@ public class MegaPreferences{
 
 	public void setSecSyncTimeStamp(String secSyncTimeStamp) {
 		this.secSyncTimeStamp = secSyncTimeStamp;
+	}
+
+	public String getKeepFileNames() {
+		return keepFileNames;
+	}
+
+	public void setKeepFileNames(String keepFileNames) {
+		this.keepFileNames = keepFileNames;
 	}
 }
 

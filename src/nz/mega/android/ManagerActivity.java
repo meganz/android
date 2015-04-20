@@ -7096,6 +7096,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
 					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
+					
 					if(localPath != null){	
 						try { 
 							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
@@ -7113,7 +7114,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //		    				this.startActivity(intentPdf);
 //							
 //						}
-//						else
+//						else						
+						
 						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
 							
 		    			    File zipFile = new File(localPath);

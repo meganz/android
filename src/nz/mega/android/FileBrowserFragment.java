@@ -680,11 +680,17 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 //						((ManagerActivity)context).cameraUploadsClicked();
 //						return;
 //					}
-					prefs = dbH.getPreferences();					
+					prefs = dbH.getPreferences();
+					String cameraSyncHandle = prefs.getCamSyncHandle();
 					
-					if ((n.getHandle()==Long.parseLong(prefs.getCamSyncHandle()))){
-						((ManagerActivity)context).cameraUploadsClicked();
-						return;
+					if(cameraSyncHandle!=null){
+						if(!(cameraSyncHandle.equals("")))
+						{
+							if ((n.getHandle()==Long.parseLong(cameraSyncHandle))){
+								((ManagerActivity)context).cameraUploadsClicked();
+								return;
+							}
+						}
 					}
 					
 					aB.setTitle(n.getName());

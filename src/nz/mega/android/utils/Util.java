@@ -577,6 +577,7 @@ public class Util {
 	}
 	
 	public static void copyFile(File source, File dest) throws IOException{
+		log("copyFile");
 
 		if (!source.getAbsolutePath().equals(dest.getAbsolutePath())){
 			FileChannel inputChannel = null;

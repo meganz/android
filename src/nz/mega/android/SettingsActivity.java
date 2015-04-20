@@ -46,6 +46,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	public static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
 	public static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
 	public static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
+	public static String KEY_KEEP_FILE_NAMES = "settings_keep_file_names";
 	public static String KEY_CAMERA_UPLOAD_WHAT_TO = "settings_camera_upload_what_to_upload";
 	public static String KEY_CAMERA_UPLOAD_CAMERA_FOLDER = "settings_local_camera_upload_folder";
 	public static String KEY_CAMERA_UPLOAD_MEGA_FOLDER = "settings_mega_camera_folder";
@@ -75,6 +76,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	ListPreference cameraUploadHow;
 	ListPreference cameraUploadWhat;
 	TwoLineCheckPreference cameraUploadCharging;
+	TwoLineCheckPreference keepFileNames;
 	Preference localCameraUploadFolder;
 	Preference megaCameraFolder;
 	Preference aboutPrivacy;
@@ -90,6 +92,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	boolean charging = false;
 	boolean pinLock = false;
 	boolean askMe = false;
+	boolean fileNames = false;
 	
 	DatabaseHandler dbH;
 	
@@ -162,6 +165,9 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		cameraUploadCharging = (TwoLineCheckPreference) findPreference(KEY_CAMERA_UPLOAD_CHARGING);
 		cameraUploadCharging.setOnPreferenceClickListener(this);
 		
+		keepFileNames = (TwoLineCheckPreference) findPreference(KEY_KEEP_FILE_NAMES);
+		keepFileNames.setOnPreferenceClickListener(this);
+		
 		localCameraUploadFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER);	
 		localCameraUploadFolder.setOnPreferenceClickListener(this);
 		
@@ -206,6 +212,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			pinLockCode.setText("");
 			cameraUpload = false;
 			charging = true;
+			fileNames = false;
 			pinLock = false;
 			askMe = true;
 		}
@@ -214,6 +221,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				dbH.setCamSyncEnabled(false);
 				cameraUpload = false;	
 				charging = true;
+				fileNames = false;
 			}
 			else{
 				cameraUpload = Boolean.parseBoolean(prefs.getCamSyncEnabled());
@@ -275,6 +283,14 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				}
 				else{
 					charging = Boolean.parseBoolean(prefs.getCamSyncCharging());
+				}
+				
+				if (prefs.getKeepFileNames() == null){
+					dbH.setKeepFileNames(false);
+					fileNames = false;
+				}
+				else{
+					fileNames = Boolean.parseBoolean(prefs.getKeepFileNames());
 				}
 				
 				if (camSyncLocalPath == null){
@@ -439,10 +455,12 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			cameraUploadWhat.setSummary(fileUpload);
 			downloadLocation.setSummary(downloadLocationPath);
 			cameraUploadCharging.setChecked(charging);
+			keepFileNames.setChecked(fileNames);
 			cameraUploadCategory.addPreference(cameraUploadHow);
 			cameraUploadCategory.addPreference(cameraUploadWhat);
 			cameraUploadCategory.addPreference(localCameraUploadFolder);
 			cameraUploadCategory.addPreference(cameraUploadCharging);
+			cameraUploadCategory.addPreference(keepFileNames);
 			
 			if(secondaryUpload){
 				//check if the local secondary folder exists
@@ -483,6 +501,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			downloadLocation.setSummary("");
 			cameraUploadCategory.removePreference(localCameraUploadFolder);
 			cameraUploadCategory.removePreference(cameraUploadCharging);
+			cameraUploadCategory.removePreference(keepFileNames);
 			cameraUploadCategory.removePreference(megaCameraFolder);
 			cameraUploadCategory.removePreference(cameraUploadHow);
 			cameraUploadCategory.removePreference(cameraUploadWhat);
@@ -703,6 +722,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				cameraUploadCategory.addPreference(cameraUploadWhat);
 				cameraUploadCategory.addPreference(localCameraUploadFolder);
 				cameraUploadCategory.addPreference(cameraUploadCharging);
+				cameraUploadCategory.addPreference(keepFileNames);
 				cameraUploadCategory.addPreference(megaCameraFolder);								
 				cameraUploadCategory.addPreference(secondaryMediaFolderOn);
 				cameraUploadCategory.removePreference(localSecondaryFolder);
@@ -725,6 +745,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				cameraUploadCategory.removePreference(cameraUploadWhat);
 				cameraUploadCategory.removePreference(localCameraUploadFolder);
 				cameraUploadCategory.removePreference(cameraUploadCharging);
+				cameraUploadCategory.removePreference(keepFileNames);
 				cameraUploadCategory.removePreference(megaCameraFolder);
 				cameraUploadCategory.removePreference(secondaryMediaFolderOn);
 				cameraUploadCategory.removePreference(localSecondaryFolder);
@@ -775,6 +796,10 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CHARGING) == 0){
 			charging = cameraUploadCharging.isChecked();
 			dbH.setCamSyncCharging(charging);
+		}
+		else if(preference.getKey().compareTo(KEY_KEEP_FILE_NAMES) == 0){
+			fileNames = keepFileNames.isChecked();
+			dbH.setKeepFileNames(fileNames);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER) == 0){
 			Intent intent = new Intent(SettingsActivity.this, FileStorageActivity.class);
