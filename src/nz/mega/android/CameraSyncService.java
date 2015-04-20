@@ -176,6 +176,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	}
 	
 	private int shouldRun(){
+		log("shouldRun");
 		
 		if (!Util.isOnline(this)){
 			log("Not online");
@@ -403,43 +404,54 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 			}
 			else{
+				//esta en la papelera? Si está, es como si fuera null. Si no, todo OK.
 				log("Sync Folder " + cameraUploadHandle + " Node: "+n.getName());
-			}
-			
+			}			
 		}
 		
 		if(secondaryEnabled){
+			log("Secondary Enabled TRUE: "+secondaryUploadHandle);
 			MegaNode secondaryN = null;
 			if(secondaryUploadHandle!=-1){
 				secondaryN = megaApi.getNodeByHandle(secondaryUploadHandle);
 			}			
 			if (secondaryN==null){
 				//Create a secondary folder to sync
+				log("secondaryN==null");
+				//Find the "Secondary Uploads" 
+				secondaryUploadHandle=-1;
 				
-				//Find the "Camera Uploads" folder of the old "PhotoSync"
 				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 				for (int i=0;i<nl.size();i++){
 					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 						secondaryUploadHandle = nl.get(i).getHandle();
 						dbH.setSecondaryFolderHandle(secondaryUploadHandle);
+						log("Found SECONDARY!!: "+nl.get(i).getName());
 					}
 				}
 				
-				//If not "Camera Uploads" or "Photosync"
 				if (secondaryUploadHandle == -1){
 					log("must create the folder SECONDARY_UPLOADS");
 					if (!running){
 						running = true;
+						log("Creating folder....");
 						megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+					}
+					else{
+						log("retryLaterShortTime....");
+						retryLaterShortTime();
 					}
 					return START_NOT_STICKY;
 				}
 			
-				return START_NOT_STICKY;
+//				return START_NOT_STICKY;
 			}
 			else{
 				log("SECONDARY Sync Folder " + secondaryUploadHandle + " Node: "+secondaryN.getName());
 			}
+		}
+		else{
+			log("Secondary NOT Enabled");
 		}
 		
 		log("shouldRun: TODO OK");
@@ -597,7 +609,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				if (prefs.getSecSyncTimeStamp() != null){
 					long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
 					selectionSecondary = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp;
-					log("SELECTION: " + selectionSecondary);
+					log("SELECTION SECONDARY: " + selectionSecondary);
 				}	
 			}
 		}
@@ -1695,7 +1707,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //		}
 		
 		if (totalUploaded == 0) {
-			log("Error totalUploaded == 0");
+			log("TotalUploaded == 0");
 		} else {
 			log("stopping service!");
 			if (success){
