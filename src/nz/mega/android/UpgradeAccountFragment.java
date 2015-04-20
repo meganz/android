@@ -18,7 +18,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -114,25 +113,9 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	}
 	
 	
-	/** Returns the consumer friendly device name */
-	public static String getDeviceName() {
-	    final String manufacturer = Build.MANUFACTURER;
-	    final String model = Build.MODEL;
-	    if (model.startsWith(manufacturer)) {
-	        return model;
-	    }
-	    if (manufacturer.equalsIgnoreCase("HTC")) {
-	        // make sure "HTC" is fully capitalized.
-	        return "HTC " + model;
-	    }
-	    return manufacturer + " " + model;
-	}
-	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		Toast.makeText(context, getDeviceName(), Toast.LENGTH_LONG).show();
-		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
