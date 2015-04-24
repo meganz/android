@@ -230,8 +230,16 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				if(tempHandle!=null){
 					camSyncHandle = Long.valueOf(tempHandle);
 					if(camSyncHandle!=-1){						
-						camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);	
-						camSyncMegaPath = camSyncMegaNode.getName();
+						camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);
+						if(camSyncMegaNode!=null){
+							camSyncMegaPath = camSyncMegaNode.getName();
+						}	
+						else
+						{
+							//The node for the Camera Sync no longer exists...
+							dbH.setCamSyncHandle(-1);
+							camSyncHandle = (long) -1;
+						}
 					}
 				}		
 				else{

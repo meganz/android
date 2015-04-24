@@ -377,7 +377,8 @@
     </string-array>
     
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Solo cargando</string>
-    
+    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Matener los nombres originales de los ficheros</string>
+          
     <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Carpeta de la Cámara</string>
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Solo Fotos</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Solo Vídeos</string>

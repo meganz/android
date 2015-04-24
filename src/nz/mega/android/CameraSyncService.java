@@ -216,7 +216,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 			else{
 				if (!Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-					log("Not enabled");
+					log("Camera Sync Not enabled");
 					finish();
 					return START_NOT_STICKY;
 				}
@@ -311,7 +311,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					}
 					else{					
 						if (!Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled())){
-							log("Not enabled");
+							log("Not enabled Secondary");
 							secondaryEnabled=false;
 						}					
 						else{
@@ -615,7 +615,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		
 		String order = MediaColumns.DATE_MODIFIED + " ASC";
-		
+				
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		if (prefs.getCamSyncFileUpload() == null){
 			dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
@@ -681,8 +681,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				        }
 			        }
 				}	
-			}
-			
+			}			
 		}
 		
 		cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
@@ -786,15 +785,28 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 			nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, secondaryUploadNode);
 			if(nodeExists == null)
-			{			
+			{		
+				log("Entroooooooo");
 				//Check if the file is already uploaded in the correct folder but without a fingerprint
 				int photoIndex = 0;
 				MegaNode possibleNode = null;
 				String photoFinalName;
-				do {
-					//Iterate between all files with the correct target name
-					//TODO Esto influye? Que es exactamente?
+				
+				//Create the final name taking into account the
+				if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+					//Keep the file names as device
+					
+					photoFinalName = mediaSecondary.filePath;
+					log("Keep the secondary name: "+photoFinalName);
+				}
+				else{				
 					photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
+					log("CHANGE the secondary name: "+photoFinalName);
+				}
+								
+				do {
+					//Iterate between all files with the correct target name					
+					
 					possibleNode = megaApi.getChildNode(secondaryUploadNode, photoFinalName);
 					
 					// If the file matches name, mtime and size, and doesn't have a fingerprint, 
@@ -859,6 +871,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					
 					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
 						//Keep the file names as device
+						currentTimeStamp = mediaSecondary.timestamp;		
 						megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, file.getName(), this);
 						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
 					}
@@ -891,6 +904,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					
 					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
 						//Keep the file names as device
+						currentTimeStamp = mediaSecondary.timestamp;
 						megaApi.copyNode(nodeExists, secondaryUploadNode, file.getName(), this);
 						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
 					}
@@ -942,13 +956,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
 //					}
 					
-					final MegaNode existingNode = nodeExists;
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
-							new LookForRenameTask(mediaSecondary, secondaryUploadNode).rename(existingNode); 
-						}
-					});
+					if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
+						//Change the file names as device
+						log("Call Look for Rename Task");
+						final MegaNode existingNode = nodeExists;
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								new LookForRenameTask(mediaSecondary, secondaryUploadNode).rename(existingNode); 
+							}
+						});						
+					}	
 				}
 			}
 		}
@@ -995,8 +1013,19 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				String photoFinalName;
 				do {
 					//Iterate between all files with the correct target name
-					//TODO cambio?
-					photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
+					
+					//Create the final name taking into account the
+					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+						//Keep the file names as device
+						
+						photoFinalName = media.filePath;
+						log("Keep the camera file name: "+photoFinalName);
+					}
+					else{				
+						photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
+						log("CHANGE the camera file name: "+photoFinalName);
+					}				
+					
 					possibleNode = megaApi.getChildNode(cameraUploadNode, photoFinalName);
 					
 					// If the file matches name, mtime and size, and doesn't have a fingerprint, 
@@ -1061,7 +1090,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					
 					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
 						//Keep the file names as device
-						megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, file.getName(), this);
+						currentTimeStamp = media.timestamp;		
+						megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, file.getName(), this);
 						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
 					}
 					else{
@@ -1076,9 +1106,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 						photoFinalName = Util.getPhotoSyncNameWithIndex(media.timestamp, media.filePath, photoIndex);
 						log("photoFinalName: " + photoFinalName + "______" + photoIndex);
-						currentTimeStamp = media.timestamp;
+						currentTimeStamp = media.timestamp;						
 						
 						megaApi.startUpload(file.getAbsolutePath(), cameraUploadNode, photoFinalName, this);
+						log("CHANGEEEEEEE: filePath: "+file.getAbsolutePath()+" Change finalName: "+photoFinalName);
 					}		
 				}
 				else{
@@ -1090,11 +1121,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 			}
 			else{
-				log("NODO: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());				
+				log("NODO EXISTS: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());				
 				if (megaApi.getParentNode(nodeExists).getHandle() != cameraUploadHandle){
 					
 					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
 						//Keep the file names as device
+						currentTimeStamp = media.timestamp;
 						megaApi.copyNode(nodeExists, cameraUploadNode, file.getName(), this);
 						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
 					}
@@ -1109,6 +1141,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						log("photoFinalName: " + photoFinalName + "______" + photoIndex);
 						currentTimeStamp = media.timestamp;
 						megaApi.copyNode(nodeExists, cameraUploadNode, photoFinalName, this);
+						log("CHANGED!!!! MediaFinalName: " + file.getName());
 					}		
 					
 //				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
@@ -1145,14 +1178,21 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 //						log("The file is in PhotoSync but with a different name");
 //						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
 //					}
-					
-					final MegaNode existingNode = nodeExists;
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
-							new LookForRenameTask(media,cameraUploadNode).rename(existingNode); 
-						}
-					});
+					if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
+						//Change the file names as device
+						log("Call Look for Rename Task");
+						final MegaNode existingNode = nodeExists;
+						handler.post(new Runnable() {
+							@Override
+							public void run() {
+								new LookForRenameTask(media,cameraUploadNode).rename(existingNode); 
+							}
+						});						
+					}
+					else{
+						uploadNext();
+					}
+	
 				}
 			}
 		}
