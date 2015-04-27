@@ -1,119 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.2.2</string>
+    <string name="app_name" context="Not translate">MEGA_COM</string>
+    <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">буде доступно через</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA — це Хмарний сервіс збереження даних з потужною системою безпеки. 50 ГБ безкоштовно</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Загальний розмір</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">з</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Так</string>
     <string name="general_no" context="Answer for confirmation dialog.">Ні</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Скасувати</string>
-    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Move to</string>
-    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copy to</string>
-    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Import to</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Перемістити до</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Копіювати до</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Імпортувати до</string>
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Вибрати</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Створити</string>
-    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Закачати файл</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Завантажити</string>
     <string name="general_add" context="button">Додати</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Спорожнити</string>
-    <string name="general_loading" context="state previous to import a file">Loading…</string>
-    <string name="general_importing" context="state while importing the file">Importing…</string>
+    <string name="general_loading" context="state previous to import a file">Завантаження…</string>
+    <string name="general_importing" context="state while importing the file">Імпортування…</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Імпорт</string>
-    <string name="general_updating" context="state while upgrading the account">Updating…</string>  
+    <string name="general_updating" context="state while upgrading the account">Оновлення…</string>  
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">сховища</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">пропускної здатності</string>
     <string name="general_error_word" context="It will be followed by the error message">Помилка</string> 
-    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Ще не реалізовано</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Вже завантажено</string>
     
-    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
-    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Ви збираєтеся видалити експортований файл майстер-ключа</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Попередження системи безпеки! Це операція з високим ризиком. Ви хочете продовжити?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options…</string> 
-    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Більше опцій…</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Ви бажаєте видалити контакт</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">1 хвилина</string>  
     
-    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Incoming Shares</string>
-    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Outgoing Shares</string>
+    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Надходження спільного доступу</string>
+    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Вихідні надання спільного доступу</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Вийти</string>
-    <string name="action_add" context="Menu item">Upload…</string>
-    <string name="action_create_folder" context="Menu item">Create new folder</string>
-    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
+    <string name="action_add" context="Menu item">Закачування…</string>
+    <string name="action_create_folder" context="Menu item">Створити нову теку</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Закачати до</string>
     <string name="action_settings" context="Menu item">Налаштування</string>
     <string name="action_search" context="Search button">Пошук</string>
-    <string name="action_refresh" context="Menu item">Refresh</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
-    <string name="action_help" context="Menu item">Help</string>
-    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade account</string>
-    <string name="action_select_all" context="Menu item to select all the elements of a list">Select All</string>
-    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
-    <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
-    <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export MasterKey</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove MasterKey</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
+    <string name="action_refresh" context="Menu item">Оновити</string>
+    <string name="action_sort_by" context="Menu item">Сортувати за…</string>
+    <string name="action_help" context="Menu item">Допомога</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Оновити обліковий запис</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Вибрати все</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Зняти вибір з усього</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Ескізи</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">Перегляд списком</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Експорт майстер-ключа</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Видалити майстер-ключ</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Майстер-ключ було експортовано до:</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
-        <item context="Singular of file. 1 file" quantity="one">file</item>
-        <item context="few" quantity="few">files</item>
-        <item context="many" quantity="many">files</item>
-        <item context="Plural of file." quantity="other">files</item>
+        <item context="Singular of file. 1 file" quantity="one">файл</item>
+        <item context="few" quantity="few">файли(ів)</item>
+        <item context="many" quantity="many">файли(ів)</item>
+        <item context="Plural of file." quantity="other">файли(ів)</item>
     </plurals>
     
      <plurals name="general_num_contacts">
-        <item quantity="one" context="referring to a contact in the contact list of the user">contact</item>
-        <item quantity="few" context="few">contacts</item>
-        <item quantity="many" context="many">contacts</item>
-        <item quantity="other" context="Title of the contact list">contacts</item>
+        <item quantity="one" context="referring to a contact in the contact list of the user">контакт</item>
+        <item quantity="few" context="few">контакти</item>
+        <item quantity="many" context="many">контакти</item>
+        <item quantity="other" context="Title of the contact list">контакти</item>
     </plurals>
     
     <plurals name="general_num_folders">
-        <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
-        <item quantity="few" context="few">folders</item>
-        <item quantity="many" context="many">folders</item>
-        <item quantity="other" context="Plural of folder/directory.">folders</item>
+        <item quantity="one" context="Singular of folder/directory. 1 folder">тека</item>
+        <item quantity="few" context="few">теки</item>
+        <item quantity="many" context="many">теки</item>
+        <item quantity="other" context="Plural of folder/directory.">теки</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
-        <item quantity="one" context="Title of the incoming shared folders of a user in singular">shared folder</item>
-        <item quantity="few" context="few">shared folders</item>
-        <item quantity="many" context="many">shared folders</item>
-        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">shared folders</item>
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">тека спільного доступу</item>
+        <item quantity="few" context="few">теки спільного доступу</item>
+        <item quantity="many" context="many">теки спільного доступу</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">теки спільного доступу</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
-        <item quantity="few" context="few">downloads</item>
-        <item quantity="many" context="many">downloads</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">завантажити</item>
+        <item quantity="few" context="few">завантажити</item>
+        <item quantity="many" context="many">завантажити</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">завантажити</item>
     </plurals>
     
     <plurals name="general_num_uploads">
-        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
-        <item quantity="few" context="few">uploads</item>
-        <item quantity="many" context="many">uploads</item>
-        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">закачати</item>
+        <item quantity="few" context="few">закачки</item>
+        <item quantity="many" context="many">закачки</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">закачки</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one" context="used for example when a folder is shared with 1 user">user</item>
-        <item quantity="few" context="few">users</item>
-        <item quantity="many" context="many">users</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">users</item>
+        <item quantity="one" context="used for example when a folder is shared with 1 user">користувач</item>
+        <item quantity="few" context="few">користувачі</item>
+        <item quantity="many" context="many">користувачі</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">користувачі</item>
     </plurals>
     
     
     <string name="login_text" context="Login button">Вхід</string>
-    <string name="email_text" context="email label">e-mail</string>
-    <string name="password_text" context="password label">password</string>
-    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirm password</string>
+    <string name="email_text" context="email label">електронна пошта</string>
+    <string name="password_text" context="password label">пароль</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Підтвердити пароль</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">АБВ</string>
-    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
+    <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">…</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Вперше на MEGA?</string>
     <string name="tour_text_1" context="Not translate. design text">Lorem ipsum dolor sit amet</string>
     <string name="tour_text_2" context="Not translate. design text">Sed ut perspiciatis unde omnis iste natus</string>
@@ -121,82 +121,82 @@
     <string name="login_logging_in" context="label when logging in to MEGA">Вхід у систему</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Будь ласка, введіть адресу вашої електронної пошти</string>
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Невірна адреса електронної пошти</string>
-    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Будь ласка, введіть пароль</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Проблема з\'єднання мережі, повторіть спробу пізніше</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Обчислення ключів шифрування</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Підключення до серверу</string>
     <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Невірна електронна пошта або пароль. Ви вже підтвердили обліковий запис?</string>    
     <string name="download_updating_filelist" context="Status text when updating the file manager">Оновлення списку файлів</string>
     <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Підтвердження облікового запису</string>
-    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Checking validation link</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Перевірка посилання підтвердження</string>
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Активація облікового запису</string>
-    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Підготовка списку файлів</string>
     
     
-    <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s Terms of Service</string>
+    <string name="create_account_text" context="button that allows the user to create an account">Створити обліковий запис</string>
+    <string name="name_text" context="Name of the user">ім\'я</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Я погоджуюсь з Умовами користування MEGA</string>
     <string name="already_account" context="Does the user already have a MEGA account">Вже маєте обліковий запис?</string>
     
-    <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service.</string>
+    <string name="create_account_no_terms" context="warning dialog">Вам слід прийняти наші Умови надання послуг.</string>
 	<string name="error_enter_username" context="Warning dialog">Будь ласка, введіть ваше ім\'я.</string>
     <string name="error_short_password" context="when creating the account">Пароль надто короткий</string>
-    <string name="error_passwords_dont_match" context="when creating the account">Passwords do not match</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Паролі не співпадають</string>
     <string name="error_email_registered" contect="when creating the account">Ця адреса електронної пошти вже зареєстрована в MEGA.</string>
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Потрібне підтвердження</string>
     <string name="create_account_confirm" context="">Будь ласка, перевірте свою електронну пошту і натисніть на посилання для входу і підтвердження облікового запису</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">Підключення до сервера: створення облікового запису</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
-	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
-	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Зберігати автономно</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Спільно зі мною</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Кошик</string>
 	<string name="section_contacts" context="Title of the contact list">Контакти</string>
-	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTS</string>
-	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">SENT REQUESTS</string>
-	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
-	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
-	<string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
+	<string name="tab_contacts" context="Title of the contact tab. Capital letters">КОНТАКТИ</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">ВІДПРАВЛЕНІ ЗАПИТИ</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">ОТРИМАНІ ЗАПИТИ</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">Немає відісланих запитів</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">Немає отриманих запитів</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Передача</string>
 
 	<string name="section_account" context="button to the settings of the user\'s account">Мій акаунт</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Закачування з камери</string>
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s з %2$s</string>
-	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
-	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">НАДХОДЖЕННЯ</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">ВИХІДНІ</string>
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Не має файлів на вашому Хмарному диску</string>
-	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
-	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
-	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Кошик для сміття порожній</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Немає вхідних тек спільного доступу</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Немає вихідних тек спільного доступу</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Порожня тека</string>
 	
 	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Властивості</string>
 	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Доступно автономно</string>
-	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
-	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
-	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Size: </string>
-	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Content: </string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ВМК</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">ВИМК</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Розмір:</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Вміст:</string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">Додано:</string>
-	<string name="file_properties_info_modified" context="when was the file modified">Modified: </string>
-	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Змінено:</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Немає публічних посилань</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Публічне посилання</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Повний доступ</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Читання і запис</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Тільки для читання</string>
-	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
-	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
-	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
-	<string name="file_properties_shared_folder_select_contact" context="menu item">Share with</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Спільно з:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Дозволи:</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">Змінити дозволи</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">Поділитися</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Спільно з</string>
-	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Надіслати</string>
 	
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">Інформація про контакт</string>
 	
 	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Суть</string>
 	
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Теки спільні з:</string>
 	
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Додати нові контакти, натиснувши кнопку внизу.</string>	
 	
@@ -205,68 +205,68 @@
 	<string name="download_failed" context="Error message">Завантаження не вдалася</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">завантажено</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Завантаження</string>
-	<string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Підготовка файлів</string>
     <string name="download_began" context="message when the download starts">Завантаження розпочато</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Ви хочете скасувати завантаження?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Натисніть щоб скасувати завантаження</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">Більшість пристроїв не можу завантажити файли розміром більше 4 ГБ. Ймовірно ваше завантаження буде невдалими.</string>
-    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">There isn\'t any available app to execute this file on your device</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">На вашому пристрої не існує додатків для запуску цього файлу</string>
 	
-    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
-    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Поділитись зображенням за допомогою</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Поділитися посиланням</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Отримати посилання</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Перейменувати</string>
     <string name="context_renaming" context="while renaming a file or folder">Перейменування</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Завантажити</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Перемістити</string>
-    <string name="context_moving" context="while moving a file or folder">Moving</string>
-    <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
+    <string name="context_moving" context="while moving a file or folder">Переміщення</string>
+    <string name="context_sharing" context="while sharing a folder">Тека спільного доступу</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Копіювати</string>
-    <string name="context_copying" context="while copying a file or folder">Copying</string>
+    <string name="context_copying" context="while copying a file or folder">Копіювання</string>
     <string name="context_creating_link" context="status text">Створення посилання</string>
     <string name="context_moving_to_trash" context="status text">Перенесення у кошик</string>
     <string name="context_move_to_trash" context="menu item">Перемістити у кошик для сміття</string>
-    <string name="context_delete_from_mega" context="menu item">Delete from MEGA</string>
+    <string name="context_delete_from_mega" context="menu item">Видалити з MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Назва теки</string>
-    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Contact email</string>
-    <string name="context_creating_folder" context="status">Creating folder…</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Електронна пошта контакту</string>
+    <string name="context_creating_folder" context="status">Створення теки…</string>
     <string name="context_adding_contact" context="Adding a new relationship (contact)">Додавання контакту</string>
     <string name="context_download_to" context="Menu item">Зберегти до</string>
     <string name="context_clear_rubbish" context="Menu option">Очистити кошик</string>
-    <string name="context_send_link" context="get the link and send it">Send link</string>
+    <string name="context_send_link" context="get the link and send it">Надіслати посилання</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Видалити</string>
-    <string name="context_share_folder" context="menu item">Share folder</string>
-    <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
+    <string name="context_share_folder" context="menu item">Спільний доступ до теки</string>
+    <string name="context_view_shared_folders" context="open a shared folder">Переглянути спільні теки</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Спільний доступ</string>
-    <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
-	<string name="leave_incoming_share" context="status text">Leaving shared folder</string>
+    <string name="remove_all_sharing" context="status text">Видалити всі контакти спільного доступу</string>
+	<string name="leave_incoming_share" context="status text">Залишення загальної теки</string>
     <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Тека камери</string>
-    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Contacts</string>
-    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
-    <string name="context_delete" context="menu item">Delete</string>
-    <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
-    <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
-    <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
-    <string name="context_permissions_not_changed" context="error message">Error. Permissions not changed</string>
-    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
-    <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Контакти</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Контакти телефону</string>
+    <string name="context_delete" context="menu item">Видалити</string>
+    <string name="context_contact_added" context="success message when adding a contact">Контакт додано</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Контакт видалено</string>
+    <string name="context_contact_not_removed" context="error message">Помилка. Контакт не видалено</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">Дозволи змінено</string>
+    <string name="context_permissions_not_changed" context="error message">Помилка. Дозволи не надано</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Тека вже існує</string>
+    <string name="context_folder_created" context="success message when creating a folder">Теку створено</string>
     
-    <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
-    <string name="context_no_renamed" context="error message">Error. Not renamed</string>
-    <string name="context_correctly_copied" context="success message when copying a node">Correctly copied</string>
-    <string name="context_no_copied" context="error message">Error. Not copied</string>
-    <string name="context_correctly_moved" context="success message when moving a node">Correctly moved</string>
-    <string name="context_no_moved" context="error message">Error. Not moved</string>
-    <string name="context_correctly_shared" context="success message when sharing a folder">Correctly shared</string>
-    <string name="context_no_shared" context="error message">Error. Not shared</string>
-    <string name="context_no_link" context="error message">Impossible to get the link</string>
-    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correctly removed from MEGA</string>
-    <string name="context_no_removed" context="error message">Error. Not removed from MEGA</string>
-    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">Перейменовано вірно</string>
+    <string name="context_no_renamed" context="error message">Помилка. Не перейменовано</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Скопійовано вірно</string>
+    <string name="context_no_copied" context="error message">Помилка. Не скопійовано</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Переміщено вірно</string>
+    <string name="context_no_moved" context="error message">Помилка. Не переміщено</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Вірне надання загального доступу</string>
+    <string name="context_no_shared" context="error message">Помилка. Не надано спільного доступу</string>
+    <string name="context_no_link" context="error message">Неможливо отримати посилання</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Вірно видалено з MEGA</string>
+    <string name="context_no_removed" context="error message">Помилка. Не видалено з MEGA </string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Вірно направлено до:</string>
     
-    <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share correctly removed</string>
+    <string name="context_node_private" context="success message after removing the public link of a folder">Тека наразі приватна</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Спільний доступ видалений вірно</string>
   
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Нова тека</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Додати контакт</string>
@@ -286,11 +286,11 @@
 	<string name="error_temporary_unavaible" context="error message when downloading a file">Ресурс тимчасово недоступний, повторіть спробу пізніше</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Не можу відкрити вибраний файл</string>
 	<string name="upload_began" context="when an upload starts, a message is shown to the user">Закачування розпочато</string>
-	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Розархівований файл</string>
 		
 	<string name="error_io_problem" context="error message while browsing the local filesystem">Проблема файлової системи</string>
 	
-	<string name="full_screen_image_viewer_label" context="title of the image gallery">Image Viewer</string>
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Перегляд зображень</string>
 	
 	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Невірний формат посилання</string>
 	
@@ -298,10 +298,10 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Дисковий простір</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Вільний простір</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Використано простору</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade now!</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Оновити зараз!</string>
     <string name="my_account_change_password" context="menu item">Змінити пароль</string>
     
-    <string name="my_account_last_session" context="when did the last session happen">Last session:</string>
+    <string name="my_account_last_session" context="when did the last session happen">Остання сесія:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Зв\'язок:</string>
     
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Зміна паролю</string>
@@ -312,50 +312,50 @@
     <string name="my_account_change_password_OK" context="Success text">Пароль успішно змінено</string>
     
     <string name="upgrade_activity" context="title of the Upgrade screen">Pro членство</string>
-    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Select membership</string>
-    <string name="select_membership_1" context="the user has to decide the way of payment">Monthly or annual recurring</string>
-    <string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Виберіть членство</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">Щомісячне або щорічне повторення</string>
+    <string name="select_membership_2" context="button to go to Paypal">Підписка Paypal</string>
     
-    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Щомісячно*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Щорічно*</string>
     
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* поновлення підписки може бути скасовано у будь-який момент до дати поновлення.</string>
     
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">Посилання було скопійовано в буфер обміну</string>
     
-    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait.</string>
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Попередній перегляд ще не завантажено. Будь ласка, зачекайте.</string>
     
-    <string name="import_correct" context="success message after import a file">Imported correctly</string>
+    <string name="import_correct" context="success message after import a file">Імпортовано вірно</string>
     
-    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">No active transfers</string>
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">Немає активних передач</string>
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Усі завантаження припинено</string>
-    <string name="menu_pause_transfers" context="menu item">Pause transfers</string>
-    <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
+    <string name="menu_pause_transfers" context="menu item">Припинити передачу</string>
+    <string name="menu_restart_transfers" context="menu item">Перезапуск передачі</string>
     
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Тільки Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi або тарифний план</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">ОК</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Пропустити</string>
     <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Процес закачування з камери</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera Uploads?</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Ви бажаєте відмінити завантаження з камери?</string>
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Тека призначення недоступна</string>
-    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading camera images</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Закачування зображень з камери</string>
     <string name="settings_camera_notif_error" context="notification error">Проблема закачування з камери</string>
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Закачування з камери завершено</string>
     
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">сховища</string>
-    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">Код блокування</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Типове розташування завантаження</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Завжди запитувати за місце завантаження</string>
     
-    <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
-    <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
-    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
+    <string name="settings_camera_upload_on" context="settings option">Увімкнути завантаження з камери</string>
+    <string name="settings_camera_upload_off" context="settings option">Відключення завантаження з камери</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Як закачати</string>
     
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi або тарифний план</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Тільки Wi-Fi</item>
     </string-array>
     
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Закачати файл</string>
@@ -363,18 +363,18 @@
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
         <item context="the options of what to upload.">Тільки фото</item>
         <item context="the options of what to upload.">Тільки відео</item>
-        <item context="the options of what to upload.">Photos and videos</item>
+        <item context="the options of what to upload.">Фото і відео</item>
     </string-array>
     
     <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Тека камери</string>
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Тільки фото</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Тільки відео</string>
-    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Фото і відео</string>
     
-    <string name="settings_pin_lock_on" context="settings of the pin lock">Enable PIN Lock</string>
-    <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
-    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string> 
-    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
+    <string name="settings_pin_lock_on" context="settings of the pin lock">Увімкнути блокування кодом</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">Відключення блокування кодом</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN код</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Не встановлено</string>
     
     <string name="pin_lock_enter" context="Button after the pin code input field">Увійти</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Невірний код</string>
@@ -395,7 +395,7 @@
     <string name="november">Листопад</string>
     <string name="december">Грудень</string>
     
-    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">MEGA PDF Viewer</string>
+    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">MEGA PDF переглядач</string>
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP Browser</string>
     
     <string name="my_account_title" context="title of the My Account screen">Тип облікового запису:</string>
@@ -406,7 +406,7 @@
     
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Створено теку для закачування з камери</string>
     
-    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The zip file will be downloaded and unzipped</string>
-    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The zip file will be unzipped </string>
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">ZIP-файл буде завантажено і розкрито</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">ZIP-файл буде розкрито</string>
     
 </resources>

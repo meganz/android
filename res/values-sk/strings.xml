@@ -47,7 +47,7 @@
     <string name="action_settings" context="Menu item">Nastavenia</string>
     <string name="action_search" context="Search button">Vyhľadávanie</string>
     <string name="action_refresh" context="Menu item">Obnoviť</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_sort_by" context="Menu item">Usporiadať podľa</string>
     <string name="action_help" context="Menu item">Pomoc</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade účtu</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Vybrať všetko</string>
@@ -139,7 +139,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Vyžadované potvrdenie</string>
     <string name="create_account_confirm" context="">Prosím, skontrolujte si e-mail a kliknite na linku pre prihlásenie a overenie vášho účtu.</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">Pripájanie k serveru: vytváranie účtu</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Uložené pre Offline</string>

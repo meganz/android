@@ -1,103 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.2.2</string>
+    <string name="app_name" context="Not translate">MEGA_COM</string>
+    <string name="app_version" context="Not translate">0.43</string>
     
-    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
-    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
+    <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">vil være tilgjengelig om</string>
+    <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA er skylagring med kraftig ende-til-ende kryptering. 50GB gratis</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Total størrelse</string>
     <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">av</string>
     <string name="general_yes" context="Answer for confirmation dialog.">Ja</string>
     <string name="general_no" context="Answer for confirmation dialog.">Nei</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Avbryt</string>
-    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Move to</string>
-    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copy to</string>
-    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Import to</string>
+    <string name="general_move_to" context="When moving a file to a location in MEGA. This is the text of the button after selection the destination">Flytt til</string>
+    <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Kopiér til</string>
+    <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Importèr til</string>
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Velg</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Lag</string>
-    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
+    <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Last opp fil</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Last ned</string>
     <string name="general_add" context="button">Legg til</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Tom</string>
-    <string name="general_loading" context="state previous to import a file">Loading…</string>
-    <string name="general_importing" context="state while importing the file">Importing…</string>
+    <string name="general_loading" context="state previous to import a file">Laster...</string>
+    <string name="general_importing" context="state while importing the file">Importerer...</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importer</string>
-    <string name="general_updating" context="state while upgrading the account">Updating…</string>  
+    <string name="general_updating" context="state while upgrading the account">Oppdaterer...</string>  
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Lagring</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Båndbredde</string>
     <string name="general_error_word" context="It will be followed by the error message">Feil</string> 
-    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Not yet implemented</string>
+    <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Ikke implementert enda</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Allerede lastet ned</string>
     
-    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
-    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Du fjerner nå filen med den eksporterte hovednøkkelen</string>  
+    <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Sikkerhetsadvarsel! Denne handlingen kan medføre høy risiko. Ønsker du å fortsette?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options…</string> 
-    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Do you want to remove the contact</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mer...</string> 
+    <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Ønsker du å fjerne kontakten</string>    
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">1 minutt</string>  
     
-    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Incoming Shares</string>
-    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Outgoing Shares</string>
+    <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Innkommende delinger</string>
+    <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Utgående delte filer</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logg ut</string>
-    <string name="action_add" context="Menu item">Upload…</string>
-    <string name="action_create_folder" context="Menu item">Create new folder</string>
-    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
+    <string name="action_add" context="Menu item">Last opp...</string>
+    <string name="action_create_folder" context="Menu item">Ny mappe</string>
+    <string name="action_upload" context="Button text when choosing the destination location in MEGA">Last opp til</string>
     <string name="action_settings" context="Menu item">Innstillinger</string>
     <string name="action_search" context="Search button">Søk</string>
-    <string name="action_refresh" context="Menu item">Refresh</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
-    <string name="action_help" context="Menu item">Help</string>
-    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade account</string>
-    <string name="action_select_all" context="Menu item to select all the elements of a list">Select All</string>
-    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
-    <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
-    <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
-    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export MasterKey</string>
-    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove MasterKey</string>
-    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
+    <string name="action_refresh" context="Menu item">Oppdater</string>
+    <string name="action_sort_by" context="Menu item">Sortèr etter...</string>
+    <string name="action_help" context="Menu item">Hjelp</string>
+    <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Oppgradèr konto</string>
+    <string name="action_select_all" context="Menu item to select all the elements of a list">Velg alle</string>
+    <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Fjern alle markeringer</string>
+    <string name="action_grid" context="Menu item to change from list view to grid view">Miniatyrbilder</string>
+    <string name="action_list" context="Menu item to change from grid view to list view">Listevisning</string>
+    <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Eksportèr hovednøkkel</string>
+    <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Fjern hovednøkkel</string>
+    <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">Din hovednøkkel har blitt eksportert til:</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
-        <item context="Singular of file. 1 file" quantity="one">file</item>
-        <item context="Plural of file. 2 files" quantity="other">files</item>
+        <item context="Singular of file. 1 file" quantity="one">fl</item>
+        <item context="Plural of file. 2 files" quantity="other">filer</item>
     </plurals>
     
      <plurals name="general_num_contacts">
-        <item quantity="one" context="referring to a contact in the contact list of the user">contact</item>
-        <item quantity="other" context="Title of the contact list">contacts</item>
+        <item quantity="one" context="referring to a contact in the contact list of the user">kontakt</item>
+        <item quantity="other" context="Title of the contact list">kontakter</item>
     </plurals>
     
     <plurals name="general_num_folders">
-        <item quantity="one" context="Singular of folder/directory. 1 folder">folder</item>
-        <item quantity="other" context="Plural of folder/directory. 2 folders">folders</item>
+        <item quantity="one" context="Singular of folder/directory. 1 folder">mappe</item>
+        <item quantity="other" context="Plural of folder/directory. 2 folders">mapper</item>
     </plurals>
     
    <plurals name="general_num_shared_folders">
-        <item quantity="one" context="Title of the incoming shared folders of a user in singular">shared folder</item>
-        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">shared folders</item>
+        <item quantity="one" context="Title of the incoming shared folders of a user in singular">delt mappe</item>
+        <item quantity="other" context="Title of the incoming shared folders of a user in plural.">delte mapper</item>
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">last ned</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$5850]</item>
     </plurals>
     
     <plurals name="general_num_uploads">
-        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
-        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">last opp</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">opplastinger</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
-        <item quantity="one" context="used for example when a folder is shared with 1 user">user</item>
-        <item quantity="other" context="used for example when a folder is shared with 2 or more users">users</item>
+        <item quantity="one" context="used for example when a folder is shared with 1 user">bruker</item>
+        <item quantity="other" context="used for example when a folder is shared with 2 or more users">brukere</item>
     </plurals>
     
     
     <string name="login_text" context="Login button">Logg inn</string>
-    <string name="email_text" context="email label">e-mail</string>
-    <string name="password_text" context="password label">password</string>
-    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirm password</string>
+    <string name="email_text" context="email label">e-post</string>
+    <string name="password_text" context="password label">passord</string>
+    <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Bekreft passord</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>
     <string name="dots" context="in the password edittext the user can see the password or asterisks. ··· shows asterisks instead of letters">···</string>
     <string name="new_to_mega" context="This question applies to users that do not have an account on MEGA yet">Interessert i MEGA?</string>
@@ -107,82 +107,82 @@
     <string name="login_logging_in" context="label when logging in to MEGA">Logger inn</string>
     <string name="error_enter_email" context="when the user tries to log in MEGA without typing the email">Vennligst oppgi din e-postadresse</string>
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Ugyldig e-postadresse</string>
-    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Please enter your password</string>
+    <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Vennligst oppgi passordet ditt</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Nettverksfeil, vennligst prøv igjen senere</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">Beregner krypteringsnøkler</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">Kobler til tjener</string>
     <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">Ugyldig e-postadresse eller passord. Har du bekreftet e-adressen din?</string>    
     <string name="download_updating_filelist" context="Status text when updating the file manager">Oppdaterer fillisten</string>
     <string name="login_confirm_account" context="title of the screen after creating an account when the user has to confirm the password to confirm the account">Bekreft konto</string>
-    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Checking validation link</string>
+    <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Kontrollerer valideringslenken</string>
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Aktiverer konto</string>
-    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
+    <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Henter listen over filer</string>
     
     
-    <string name="create_account_text" context="button that allows the user to create an account">Create account</string>
-    <string name="name_text" context="Name of the user">name</string>
-    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">I agree with MEGA\'s Terms of Service</string>
-    <string name="already_account" context="Does the user already have a MEGA account">Already have an account?</string>
+    <string name="create_account_text" context="button that allows the user to create an account">Opprett brukerkonto</string>
+    <string name="name_text" context="Name of the user">navn</string>
+    <string name="tos" context="text placed on the checkbox of acceptation of the Terms of Service">Jeg har lest og forstått MEGAs brukervilkår</string>
+    <string name="already_account" context="Does the user already have a MEGA account">Har du allerde en konto?</string>
     
-    <string name="create_account_no_terms" context="warning dialog">You have to accept our Terms of Service.</string>
+    <string name="create_account_no_terms" context="warning dialog">Du må godta bruksvilkårene</string>
 	<string name="error_enter_username" context="Warning dialog">Vennligst skriv inn navnet ditt.</string>
     <string name="error_short_password" context="when creating the account">Passordet er for kort</string>
-    <string name="error_passwords_dont_match" context="when creating the account">Passwords do not match</string>
+    <string name="error_passwords_dont_match" context="when creating the account">Passordene er ikke like</string>
     <string name="error_email_registered" contect="when creating the account">Denne e-postadressen er allerede registrert med en konto hos MEGA.</string>
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Bekreftelse påkrevd</string>
     <string name="create_account_confirm" context="">Vennligst sjekk din e-postkonto, og klikk på lenken for  logge inn og bekrefte din konto</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">Kobler til server: oppretter konto</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
-	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
-	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
+	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Tilgjengelig frakoblet</string>
+	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Delt med meg</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papirkurv</string>
 	<string name="section_contacts" context="Title of the contact list">Kontakter</string>
-	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTS</string>
-	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">SENT REQUESTS</string>
-	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">RECEIVED REQUESTS</string>
-	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No sent requests</string>
-	<string name="received_requests_empty" context="the user has not received any contact request from other users">No received requests</string>
+	<string name="tab_contacts" context="Title of the contact tab. Capital letters">KONTAKTER</string>
+	<string name="tab_sent_requests" context="Title of the sent requests tab. Capital letters">SENDTE FORESPØRSLER</string>
+	<string name="tab_received_requests" context="Title of the received requests tab. Capital letters">MOTTATTE FORESPØRSLER</string>
+	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">Ingen sendte forespørsler</string>
+	<string name="received_requests_empty" context="the user has not received any contact request from other users">Ingen mottatte forespørsler</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Overføringer</string>
 
 	<string name="section_account" context="button to the settings of the user\'s account">Min konto</string>
-	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
+	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Kameraopplastinger</string>
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s av %2$s</string>
-	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
-	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">OUTGOING</string>
+	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">INNKOMMENDE</string>
+	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">UTGÅENDE</string>
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Ingen filer i Skydisken</string>
-	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Empty Rubbish Bin</string>
-	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
-	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
+	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Tøm papirkurv</string>
+	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">Ingen innkommende delte mapper</string>
+	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">Ingen utgående delte mapper</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Tom mappe</string>
 	
 	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Egenskaper</string>
 	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Tilgjengelig offline</string>
-	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">ON</string>
-	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">OFF</string>
-	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Size: </string>
-	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Content: </string>
+	<string name="file_properties_available_offline_on" context="Button state when a file can be saved for offline.(Capital letters)">PÅ</string>
+	<string name="file_properties_available_offline_off" context="Button state when a file is already saved for offline. (Capital letters)">AV</string>
+	<string name="file_properties_info_size_file" context="Refers to the size of a file.">Størrelse:</string>
+	<string name="file_properties_info_content" context="header of a status field for what content a user has shared to you">Innhold:</string>
 	<string name="file_properties_info_added" context="when was the file added in MEGA">Lagt til:</string>
-	<string name="file_properties_info_modified" context="when was the file modified">Modified: </string>
-	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">No public link</string>
+	<string name="file_properties_info_modified" context="when was the file modified">Endret:</string>
+	<string name="file_properties_shared_folder_private_folder" context="the folder is private. A public user can\'t access the folder">Ingen offentlige lenker</string>
 	<string name="file_properties_shared_folder_public_link" context="the label when a folder can be accesed by public users">Offentlig lenke</string>
 	<string name="file_properties_shared_folder_full_access" context="Refers to access rights for a file folder.">Full tilgang</string>
-	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Read &amp; write</string>
+	<string name="file_properties_shared_folder_read_write" context="Refers to access rights for a file folder. (with the &amp; needed. Don\'t use the symbol itself. Use &amp;)">Les &amp; skrive</string>
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Skrivebeskyttet</string>
-	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
-	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
-	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
-	<string name="file_properties_shared_folder_select_contact" context="menu item">Share with</string>
+	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Delt med:</string>
+	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Rettigheter:</string>
+	<string name="file_properties_shared_folder_change_permissions" context="menu item">Endre tilganger</string>
+	<string name="file_properties_shared_folder_select_contact" context="menu item">Del med</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Delt med</string>
-	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
+	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send til</string>
 	
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
+	<string name="contact_properties_activity" context="title of the contact properties screen">Kontakt informasjon</string>
 	
 	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Innhold</string>
 	
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Delte mapper med:</string>
 	
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Legg til nye kontakter med knappene under</string>	
 	
@@ -191,68 +191,68 @@
 	<string name="download_failed" context="Error message">Nedlasting mislykket</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">lasted ned</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Laster ned</string>
-	<string name="download_preparing_files" context="message before the download or upload start ">Preparing files</string>
+	<string name="download_preparing_files" context="message before the download or upload start ">Forbereder</string>
     <string name="download_began" context="message when the download starts">Nedlastingen har startet</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">Vil du avbryte nedlastingen?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Trykk for å avbryte nedlastingen</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">De fleste enheter kan ikke laste ned filer som er større en 4GB. Nedlastingen  vil mest sannsynlig være mislykket.</string>
-    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">There isn\'t any available app to execute this file on your device</string>
+    <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">Det er ingen apper som kan åpne denne filen</string>
 	
-    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Share image using</string>
-    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Share link</string>
+    <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Del bilde via</string>
+    <string name="context_get_link" context="create a link of a file and send it using an app from the device">Del lenke</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Hent link</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Gi nytt navn</string>
     <string name="context_renaming" context="while renaming a file or folder">Gir nytt navn</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Last ned</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Flytt</string>
-    <string name="context_moving" context="while moving a file or folder">Moving</string>
-    <string name="context_sharing" context="while sharing a folder">Sharing folder</string>
+    <string name="context_moving" context="while moving a file or folder">Flytter</string>
+    <string name="context_sharing" context="while sharing a folder">Deler mappe</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Kopier</string>
-    <string name="context_copying" context="while copying a file or folder">Copying</string>
+    <string name="context_copying" context="while copying a file or folder">Kopierer</string>
     <string name="context_creating_link" context="status text">Oppretter lenke</string>
     <string name="context_moving_to_trash" context="status text">Flytter til søppelkurven</string>
     <string name="context_move_to_trash" context="menu item">Flytt til søppelkurv</string>
-    <string name="context_delete_from_mega" context="menu item">Delete from MEGA</string>
+    <string name="context_delete_from_mega" context="menu item">Slett fra MEGA</string>
     <string name="context_new_folder_name" context="Input field description in the create folder dialog.">Mappenavn</string>
-    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Contact email</string>
-    <string name="context_creating_folder" context="status">Creating folder…</string>
-    <string name="context_adding_contact" context="Adding a new relationship (contact)">Adding contact</string>
+    <string name="context_new_contact_name" context="when adding a new contact. in the dialog">Kontakt e-post</string>
+    <string name="context_creating_folder" context="status">Opretter mappe...</string>
+    <string name="context_adding_contact" context="Adding a new relationship (contact)">Legg til kontakt</string>
     <string name="context_download_to" context="Menu item">Lagre til</string>
     <string name="context_clear_rubbish" context="Menu option">Tøm Papirkurv</string>
-    <string name="context_send_link" context="get the link and send it">Send link</string>
+    <string name="context_send_link" context="get the link and send it">Send lenke</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Slett</string>
-    <string name="context_share_folder" context="menu item">Share folder</string>
-    <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
+    <string name="context_share_folder" context="menu item">Del mappe</string>
+    <string name="context_view_shared_folders" context="open a shared folder">Vis delte mapper</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Deling</string>
-    <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
-	<string name="leave_incoming_share" context="status text">Leaving shared folder</string>
+    <string name="remove_all_sharing" context="status text">Fjerner alle delte kontakter</string>
+	<string name="leave_incoming_share" context="status text">Forlat delt mappe</string>
     <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Bildemappe</string>
-    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Contacts</string>
-    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
-    <string name="context_delete" context="menu item">Delete</string>
-    <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
-    <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
-    <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
-    <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
-    <string name="context_permissions_not_changed" context="error message">Error. Permissions not changed</string>
-    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
-    <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
+    <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Kontakter</string>
+    <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Telefonkontakter</string>
+    <string name="context_delete" context="menu item">Slett</string>
+    <string name="context_contact_added" context="success message when adding a contact">Kontakten ble lagt til</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Kontakten ble fjernet</string>
+    <string name="context_contact_not_removed" context="error message">Feil. Kontakten ble ikke fjernet</string>
+    <string name="context_permissions_changed" context="success message when chaning the permissionss">Rettighetene er oppdatert</string>
+    <string name="context_permissions_not_changed" context="error message">Feil. Tilgangene ble ikke endret</string>
+    <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Mappen finnes allerede</string>
+    <string name="context_folder_created" context="success message when creating a folder">Mappen ble opprettet</string>
     
-    <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
-    <string name="context_no_renamed" context="error message">Error. Not renamed</string>
-    <string name="context_correctly_copied" context="success message when copying a node">Correctly copied</string>
-    <string name="context_no_copied" context="error message">Error. Not copied</string>
-    <string name="context_correctly_moved" context="success message when moving a node">Correctly moved</string>
-    <string name="context_no_moved" context="error message">Error. Not moved</string>
-    <string name="context_correctly_shared" context="success message when sharing a folder">Correctly shared</string>
-    <string name="context_no_shared" context="error message">Error. Not shared</string>
-    <string name="context_no_link" context="error message">Impossible to get the link</string>
-    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correctly removed from MEGA</string>
-    <string name="context_no_removed" context="error message">Error. Not removed from MEGA</string>
-    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
+    <string name="context_correctly_renamed" context="success message when renaming a node">Navneendringen er fullført</string>
+    <string name="context_no_renamed" context="error message">Feil. Ikke omdøpt</string>
+    <string name="context_correctly_copied" context="success message when copying a node">Kopiert</string>
+    <string name="context_no_copied" context="error message">Feil. Ikke kopiert</string>
+    <string name="context_correctly_moved" context="success message when moving a node">Flyttet</string>
+    <string name="context_no_moved" context="error message">Feil. Ikke flyttet</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Delingen var vellykket</string>
+    <string name="context_no_shared" context="error message">Feil. Ikke delt</string>
+    <string name="context_no_link" context="error message">Kunne ikke hente lenke</string>
+    <string name="context_correctly_removed" context="success message when removing a node from MEGA">Fjernet fra MEGA</string>
+    <string name="context_no_removed" context="error message">Feil. Ikke fjernet fra MEGA</string>
+    <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Vellykket sendt til:</string>
     
-    <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
-    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share correctly removed</string>
+    <string name="context_node_private" context="success message after removing the public link of a folder">Denne mappen er nå privat</string>
+    <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Delingen ble fjernet</string>
   
     <string name="menu_new_folder" context="Menu option to create a new folder in the file manager.">Ny mappe</string>
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Legg til kontakt</string>
@@ -272,11 +272,11 @@
 	<string name="error_temporary_unavaible" context="error message when downloading a file">Ressursen du forsøkte å nå er midlertidlig utilgjengelig. Vennligst prøv igjen senere</string>
 	<string name="upload_can_not_open" context="Error message when the selected file cannot be opened">Kan ikke åpne valgt fil</string>
 	<string name="upload_began" context="when an upload starts, a message is shown to the user">Opplastingen har startet</string>
-	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
+	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Pakker opp fil</string>
 		
 	<string name="error_io_problem" context="error message while browsing the local filesystem">Feil med filsystemet</string>
 	
-	<string name="full_screen_image_viewer_label" context="title of the image gallery">Image Viewer</string>
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Bildeviser</string>
 	
 	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Feil lenkeformat</string>
 	
@@ -284,10 +284,10 @@
     <string name="my_account_total_space" context="Headline for the amount of total storage space">Lagringsplass</string>
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Ledig plass:</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Brukt plass</string>
-    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Upgrade now!</string>
+    <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Oppgradèr nå!</string>
     <string name="my_account_change_password" context="menu item">Endre passord</string>
     
-    <string name="my_account_last_session" context="when did the last session happen">Last session:</string>
+    <string name="my_account_last_session" context="when did the last session happen">Siste aktivitet:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Tilkoblinger:</string>
     
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Endrer passord</string>
@@ -298,50 +298,50 @@
     <string name="my_account_change_password_OK" context="Success text">Passordet ble endret</string>
     
     <string name="upgrade_activity" context="title of the Upgrade screen">Medlemskap Pro</string>
-    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Select membership</string>
-    <string name="select_membership_1" context="the user has to decide the way of payment">Monthly or annual recurring</string>
-    <string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>
+    <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Velg kontotype</string>
+    <string name="select_membership_1" context="the user has to decide the way of payment">Månedlig eller årlig</string>
+    <string name="select_membership_2" context="button to go to Paypal">PayPal abonnement</string>
     
-    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
-    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>
+    <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Månedlig*</string>
+    <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Årlig*</string>
     
-    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* recurring subscription can be cancelled any time before renewal date.</string>
+    <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* Løpende abonnement kan avbrytes når som helst før fornyelsesdatoen.</string>
     
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">Lenken er kopiert til utklippstavlen</string>
     
-    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">The preview has not been downloaded yet. Please wait.</string>
+    <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">Forhåndsvisningen har ikke blitt lastet ned enda. Vennligst vent.</string>
     
-    <string name="import_correct" context="success message after import a file">Imported correctly</string>
+    <string name="import_correct" context="success message after import a file">Importeringen er ferdig</string>
     
-    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">No active transfers</string>
-    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">All transfers are paused</string>
-    <string name="menu_pause_transfers" context="menu item">Pause transfers</string>
-    <string name="menu_restart_transfers" context="menu item">Restart transfers</string>
+    <string name="transfers_empty" context="message shown in the screen when there are not any active transfer">Ingen aktive overføringer</string>
+    <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Alle overføringer er midlertidig stanset</string>
+    <string name="menu_pause_transfers" context="menu item">Pause overføringer</string>
+    <string name="menu_restart_transfers" context="menu item">Start overføringene på nytt</string>
     
-    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</string>
-    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</string>
+    <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Kun Wi-Fi</string>
+    <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi eller mobildata</string>
     <string name="cam_sync_ok" context="Answer for confirmation dialog.">OK</string>
     <string name="cam_sync_skip" context="skip the step of camera upload">Hopp over</string>
-    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Camera Upload in progress</string>
-    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Do you want to cancel Camera Uploads?</string>
+    <string name="cam_sync_syncing" context="The upload of the user\'s photos orvideos from their specified album is in progress.">Kameraopplastinger pågår</string>
+    <string name="cam_sync_cancel_sync" context="confirmation question for cancelling the camera uploads">Ønsker du å deaktivere Kameraopplastinger</string>
     <string name="settings_camera_notif_error_no_folder" context="Error message when an unavailable destination folder was selected">Målmappen er utilgjengelig</string>
-    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading camera images</string>
-    <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
-    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads complete</string>
+    <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Laster opp kamerabilder</string>
+    <string name="settings_camera_notif_error" context="notification error">Problem med Kameraopplasting </string>
+    <string name="settings_camera_notif_complete" context="notification camera uploads complete">Kameraopplastingen er ferdig</string>
     
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Lagring</string>
-    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
+    <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN-kodelås</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Plassering for nedlasting</string>
-    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask download location</string>
+    <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Spør bestandig hvor nedlastede filer skal lagres</string>
     
-    <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
-    <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
-    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
+    <string name="settings_camera_upload_on" context="settings option">Aktiver Kameraopplastinger</string>
+    <string name="settings_camera_upload_off" context="settings option">Deaktiver Kameraopplastinger</string>
+    <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Hvordan laste opp</string>
     
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
-        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi or data plan</item>
-        <item context="how to upload the camera images. only when Wi-Fi connected">Wi-Fi only</item>
+        <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi eller mobildata</item>
+        <item context="how to upload the camera images. only when Wi-Fi connected">Kun Wi-Fi</item>
     </string-array>
     
     <string name="settings_camera_upload_what_to_upload" context="What kind of files are going to be uploaded: images, videos or both">Filopplasting</string>
@@ -349,24 +349,24 @@
     <string-array name="settings_camera_upload_file_upload_entries" context="the options of what to upload in an array. Needed for the settings">
         <item context="the options of what to upload.">Kun bilder</item>
         <item context="the options of what to upload.">Kun video</item>
-        <item context="the options of what to upload.">Photos and videos</item>
+        <item context="the options of what to upload.">Bilder og videoer</item>
     </string-array>
     
     <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Bildemappe</string>
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Kun bilder</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Kun video</string>
-    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos and videos</string>
+    <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Bilder og videoer</string>
     
-    <string name="settings_pin_lock_on" context="settings of the pin lock">Enable PIN Lock</string>
-    <string name="settings_pin_lock_off" context="settings of the pin lock">Disable PIN Lock</string>
-    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN Code</string> 
-    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Not set</string>
+    <string name="settings_pin_lock_on" context="settings of the pin lock">Aktiver kodelås</string>
+    <string name="settings_pin_lock_off" context="settings of the pin lock">Slå av Kodelås</string>
+    <string name="settings_pin_lock_code" context="settings of the pin lock">PIN-kode</string> 
+    <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">Ikke satt</string>
     
     <string name="pin_lock_enter" context="Button after the pin code input field">Utfør</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Feil kode</string>
     
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Om</string>
-    <string name="settings_about_app_version" context="App means &quot;Application&quot;">App version</string>
+    <string name="settings_about_app_version" context="App means &quot;Application&quot;">App-versjon</string>
     
     <string name="january">Januar</string>
     <string name="february">Februar</string>
@@ -381,8 +381,8 @@
     <string name="november">November</string>
     <string name="december">Desember</string>
     
-    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">MEGA PDF Viewer</string>
-    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP Browser</string>
+    <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">MEGA PDF-viser</string>
+    <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">ZIP-leser</string>
     
     <string name="my_account_title" context="title of the My Account screen">Kontotype:</string>
     <string name="free_account">GRATIS</string>
@@ -390,9 +390,9 @@
     <string name="pro2_account" context="Not translate">PRO II</string>
     <string name="pro3_account" context="Not translate">PRO III</string>
     
-    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Camera Uploads folder created</string>
+    <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Mappe for Kameraopplasting ble opprettet</string>
     
-    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The zip file will be downloaded and unzipped</string>
-    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The zip file will be unzipped </string>
+    <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">Den komprimerte filen vil bli lastet ned og pakket opp</string>
+    <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">Den komprimerte filen vil bli pakket opp</string>
     
 </resources>

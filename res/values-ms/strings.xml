@@ -47,7 +47,7 @@
     <string name="action_settings" context="Menu item">Tetapan</string>
     <string name="action_search" context="Search button">Cari</string>
     <string name="action_refresh" context="Menu item">Segar semula</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_sort_by" context="Menu item">Susun dengan</string>
     <string name="action_help" context="Menu item">Bantuan</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Naik taraf akaun</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Pilih Semua</string>
@@ -80,7 +80,7 @@
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">muat turun</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">muat turun</item>
     </plurals>
     
     <plurals name="general_num_uploads">
@@ -132,7 +132,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Pengesahan diperlukan</string>
     <string name="create_account_confirm" context="">Sila semak emel anda dan klik pada pautan yang tersedia untuk melog masuk dan mengesahkan akaun anda</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">Menyambung ke pelayan: membuat akaun</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Disimpan untuk Luar talian</string>
