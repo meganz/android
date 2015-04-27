@@ -36,7 +36,7 @@
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">その他のオプション</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">知り合いを削除する</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">共有フォルダ受信</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">共有送信</string>
@@ -47,7 +47,7 @@
     <string name="action_settings" context="Menu item">設定</string>
     <string name="action_search" context="Search button">検索</string>
     <string name="action_refresh" context="Menu item">リフレッシュ</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_sort_by" context="Menu item">ソートする</string>
     <string name="action_help" context="Menu item">ヘルプ</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">アカウントをアップグレードする</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">すべてを選択する</string>
@@ -80,7 +80,7 @@
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
         <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">ダウンロード</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">[$2222]</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">ダウンロード</item>
     </plurals>
     
     <plurals name="general_num_uploads">
@@ -132,7 +132,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">要確認</string>
     <string name="create_account_confirm" context="">メールを見てリンクをクリックし、アカウントを確認してください。</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">サーバーに接続:アカウント開設中</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">オフラインで保存</string>

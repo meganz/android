@@ -36,7 +36,7 @@
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">עוד אפשרויות...</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">האם ברצונך למחוק את איש הקשר</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">שיתופים נכנסים</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">שיתופים יוצאים</string>
@@ -47,7 +47,7 @@
     <string name="action_settings" context="Menu item">הגדרות</string>
     <string name="action_search" context="Search button">חפש</string>
     <string name="action_refresh" context="Menu item">רענן</string>
-    <string name="action_sort_by" context="Menu item">Sort by</string>
+    <string name="action_sort_by" context="Menu item">מיין לפי</string>
     <string name="action_help" context="Menu item">עזרה</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">שדרג חשבון</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">בחר הכל</string>
@@ -146,7 +146,7 @@
     
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">אימות נדרש</string>
     <string name="create_account_confirm" context="">אנא בדוק את תיבת הדוא\"ל שלך ולחץ על הקישור להתחברות ואימות החשבון</string>
-    <string name="create_account_creating_account">[$2243]</string>
+    <string name="create_account_creating_account">מתחבר לשרת: יוצר חשבון.</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">נשמר עבור שימוש באופן לא מקוון</string>
