@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA_COM</string>
-    <string name="app_version" context="Not translate">0.43</string>
+    <string name="app_version" context="Not translate">2.3</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">буде доступно через</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA — це Хмарний сервіс збереження даних з потужною системою безпеки. 50 ГБ безкоштовно</string>

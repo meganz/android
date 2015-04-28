@@ -524,48 +524,50 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}	
 			case 4:{
-				Toast.makeText(context, "PAY MONTH", Toast.LENGTH_LONG).show();
-				
-				AlertDialog paymentDialog;
-				
-//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Google Play", "Fortumo"});
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//				builder.setTitle(getString(R.string.section_photo_sync));
-				builder.setTitle("Payment method");
-				
-				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which){
-							case 0:{
-								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-								break;
-							}
-							case 1:{
-								Toast.makeText(context, "FORTUMOOOOO", Toast.LENGTH_SHORT).show();
-								Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
-								startActivity(intent);
-								break;
-							}
-					}
-						dialog.dismiss();
-					}
-				});
-				
-				builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-				
-				paymentDialog = builder.create();
-				paymentDialog.show();
-				Util.brandAlertDialog(paymentDialog);
+				//THIS IS WHEN FORTUMO
+//				Toast.makeText(context, "PAY MONTH", Toast.LENGTH_LONG).show();
+//				
+//				AlertDialog paymentDialog;
+//				
+////				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
+//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Google Play", "Fortumo"});
+//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+////				builder.setTitle(getString(R.string.section_photo_sync));
+//				builder.setTitle("Payment method");
+//				
+//				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+//					
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						switch (which){
+//							case 0:{
+//								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+//								break;
+//							}
+//							case 1:{
+////								Toast.makeText(context, "FORTUMOOOOO", Toast.LENGTH_SHORT).show();
+////								Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
+////								startActivity(intent);
+//								break;
+//							}
+//					}
+//						dialog.dismiss();
+//					}
+//				});
+//				
+//				builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+//					
+//					@Override
+//					public void onClick(DialogInterface dialog, int which) {
+//						dialog.dismiss();
+//					}
+//				});
+//				
+//				paymentDialog = builder.create();
+//				paymentDialog.show();
+//				Util.brandAlertDialog(paymentDialog);
 
+				//THIS IS ONLY WITH GOOGLEPLAY
 //				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
 				break;
 			}
