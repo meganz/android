@@ -27,7 +27,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 {
 	final String TAG = "MegaApplication";
 	static final String APP_KEY = "U5NE3TxD";
-	static final String USER_AGENT = "MEGAAndroid/2.1";
+	static final String USER_AGENT = "MEGAAndroid/2.3";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -93,7 +93,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_INFO);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
 		
 //		initializeGA();
 		
