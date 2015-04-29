@@ -361,6 +361,43 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     int levelInventory = -1;
     
     
+    /*
+	 * Background task to emptying the Rubbish Bin
+	 */
+	private class ClearRubbisBinTask extends AsyncTask<String, Void, Void> {
+		Context context;
+		
+		ClearRubbisBinTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected Void doInBackground(String... params) {
+			log("doInBackground-Async Task ClearRubbisBinTask");
+			
+			if (rbF != null){
+				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+				
+//				ProgressDialog temp = null;
+//				try{
+//					temp = new ProgressDialog(this);
+//					temp.setMessage(getString(R.string.context_delete_from_mega));
+//					temp.show();
+//				}
+//				catch(Exception e){
+//					return;
+//				}
+//				statusDialog = temp;
+				
+				isClearRubbishBin = true;
+				for (int i=0; i<rubbishNodes.size(); i++){
+					megaApi.remove(rubbishNodes.get(i), managerActivity);
+				}
+			}
+			return null;
+		}		
+	}
+    
     // (arbitrary) request code for the purchase flow
     public static final int RC_REQUEST = 10001;
     String orderId = "";
@@ -5680,25 +5717,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	private void clearRubbishBin(){
 		log("clearRubbishBin");
-		if (rbF != null){
-			ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-			
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_delete_from_mega));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
-			
-			isClearRubbishBin = true;
-			for (int i=0; i<rubbishNodes.size(); i++){
-				megaApi.remove(rubbishNodes.get(i), this);
-			}
-		}
+		ClearRubbisBinTask clearRubbishBinTask = new ClearRubbisBinTask(this);
+		clearRubbishBinTask.execute();
 	}
 	
 	public void addContact(String contactEmail){
