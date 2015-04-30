@@ -343,40 +343,21 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 					}
 				}
 				
-				//Check if the secondary folders are enabled
+				//Check if the secondary sync is enabled
 				if (prefs.getSecondaryMediaFolderEnabled() == null){
 					dbH.setSecondaryUploadEnabled(false);
 					secondaryUpload = false;						
 				}
 				else{
 					secondaryUpload = Boolean.parseBoolean(prefs.getSecondaryMediaFolderEnabled());
+					log("onCreate, secondary is: "+secondaryUpload);
 					
-					localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-					if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-						localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-					}					
-
-					String secHandle = prefs.getMegaHandleSecondaryFolder();
-					if(secHandle!=null){
-						handleSecondaryMediaFolder = Long.valueOf(secHandle);
-						if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
-							megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);	
-							if(megaNodeSecondaryMediaFolder!=null){
-								megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
-							}
-							else{
-								megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
-							}
-						}
-						else{
-							megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
-						}
+					if(secondaryUpload){
+						secondaryUpload=true;						
 					}
 					else{
-						dbH.setSecondaryFolderHandle(-1);
-						handleSecondaryMediaFolder = (long) -1;
+						secondaryUpload=false;
 					}
-					
 				}
 			}
 			
@@ -471,22 +452,51 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			cameraUploadCategory.addPreference(keepFileNames);
 			
 			if(secondaryUpload){
-				//check if the local secondary folder exists
-				File checkSecondaryFile = new File(localSecondaryFolderPath);
-				if(!checkSecondaryFile.exists()){
-					dbH.setSecondaryUploadEnabled(true);
-					dbH.setSecondaryFolderPath("-1");
-					//If the secondary folder does not exist
-					Util.showToast(this, getString(R.string.secondary_media_service_error_local_folder));
-					prefs = dbH.getPreferences();
-					localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-					log("Sencondary folder in database: "+localSecondaryFolderPath);
-					if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-						localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-						localSecondaryFolder.setSummary(localSecondaryFolderPath);
-					}			
+				
+				//Check if the node exists in MEGA
+				String secHandle = prefs.getMegaHandleSecondaryFolder();
+				if(secHandle!=null){
+					handleSecondaryMediaFolder = Long.valueOf(secHandle);
+					if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
+						megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);	
+						if(megaNodeSecondaryMediaFolder!=null){
+							megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
+						}
+						else{
+							megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+						}
+					}
+					else{
+						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+					}
+				}
+				else{
+					dbH.setSecondaryFolderHandle(-1);
+					handleSecondaryMediaFolder = (long) -1;
 				}
 				
+				//check if the local secondary folder exists				
+				localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
+				if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
+					log("secondary ON: invalid localSecondaryFolderPath");
+					localSecondaryFolderPath = getString(R.string.settings_empty_folder);
+					Util.showToast(this, getString(R.string.secondary_media_service_error_local_folder));					
+				}
+				else
+				{
+					File checkSecondaryFile = new File(localSecondaryFolderPath);
+					if(!checkSecondaryFile.exists()){
+						log("secondary ON: the local folder does not exist");
+						dbH.setSecondaryFolderPath("-1");
+						//If the secondary folder does not exist
+						Util.showToast(this, getString(R.string.secondary_media_service_error_local_folder));
+						localSecondaryFolderPath = getString(R.string.settings_empty_folder);					
+
+					}
+				}
+				
+				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
+				localSecondaryFolder.setSummary(localSecondaryFolderPath);
 				secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));
 				cameraUploadCategory.addPreference(localSecondaryFolder);
 				cameraUploadCategory.addPreference(megaSecondaryFolder);
@@ -563,7 +573,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
 			log("Changing the secondaty uploads");
-			dbH.setSecSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);			
 			secondaryUpload = !secondaryUpload;
 			if (secondaryUpload){
 				dbH.setSecondaryUploadEnabled(true);
@@ -591,13 +601,22 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 					log("Secondary folder in database: "+localSecondaryFolderPath);
 					if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
 						localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-						localSecondaryFolder.setSummary(localSecondaryFolderPath);
-					}
-					
+						
+					}					
 				}
+				localSecondaryFolder.setSummary(localSecondaryFolderPath);
 				
 				cameraUploadCategory.addPreference(localSecondaryFolder);
-				cameraUploadCategory.addPreference(megaSecondaryFolder);	
+				cameraUploadCategory.addPreference(megaSecondaryFolder);
+				
+				handler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						log("Now I start the service");
+						startService(new Intent(preferencesActivity, CameraSyncService.class));		
+					}
+				}, 5 * 1000);
 				
 			}
 			else{				
@@ -873,7 +892,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			
 			dbH.setSecondaryFolderPath(secondaryPath);
 			localSecondaryFolder.setSummary(secondaryPath);
-			dbH.setCamSyncTimeStamp(0);
+			dbH.setSecSyncTimeStamp(0);
 			
 			Intent photosVideosIntent = null;
 			photosVideosIntent = new Intent(getApplicationContext(), CameraSyncService.class);
@@ -901,7 +920,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
 				
 				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
-				dbH.setCamSyncTimeStamp(0);
+				dbH.setSecSyncTimeStamp(0);
 				
 				Intent photosVideosIntent = null;
 				photosVideosIntent = new Intent(getApplicationContext(), CameraSyncService.class);
