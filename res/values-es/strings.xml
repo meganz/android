@@ -145,6 +145,7 @@
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta.</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
+    <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Disponible sin conexión</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartida</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papelera</string>

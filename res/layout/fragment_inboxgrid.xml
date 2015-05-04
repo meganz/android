@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InboxListFragment"
+	android:background="@color/fragment_background">
+    
+    <TextView
+	    android:id="@+id/inbox_content_grid_text"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingLeft="8dp"
+	    android:textColor="@color/black"
+	    android:background="@color/content_text_folder"
+	    android:textSize="14sp"/>
+
+    <ListView 
+        android:id="@+id/inbox_grid_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:dividerHeight="0dp"
+		android:divider="@null"
+		android:layout_below="@id/inbox_content_grid_text">
+    </ListView>
+    
+    <ImageView
+	    android:id="@+id/inbox_grid_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true" />
+    
+    <TextView
+	    android:id="@+id/inbox_grid_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/inbox_grid_empty_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
