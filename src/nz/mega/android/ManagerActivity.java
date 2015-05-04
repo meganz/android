@@ -121,12 +121,13 @@ import android.widget.Toast;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, SHARED_WITH_ME, CONTACTS, TRANSFERS, RUBBISH_BIN, SETTINGS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, INBOX, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, SHARED_WITH_ME, CONTACTS, TRANSFERS, RUBBISH_BIN, SETTINGS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
 			{
 				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
+				case INBOX: return context.getString(R.string.section_inbox);
 				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
 				case SHARED_WITH_ME: return context.getString(R.string.section_shared_items);
@@ -252,12 +253,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	long parentHandleIncoming;
 	long parentHandleOutgoing;
 	long parentHandleSearch;
+	long parentHandleInbox;
 	private boolean isListCloudDrive = true;
 	private boolean isListContacts = true;
 	private boolean isListRubbishBin = true;
 	private boolean isListSharedWithMe = true;
 	private boolean isListOffline = true;
 	private boolean isListCameraUpload = false;
+	private boolean isListInbox = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
 	private RubbishBinFragment rbF;
@@ -270,6 +273,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private CameraUploadFragment psF;
     private UpgradeAccountFragment upAF;
     private PaymentFragment pF;
+    private InboxFragment iF;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -1093,6 +1097,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			parentHandleIncoming = -1;
 			parentHandleIncoming = -1;
 			parentHandleSearch = -1;
+			parentHandleInbox = -1;
 			orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 			if (savedInstanceState != null){
 				firstTime = false;
@@ -1103,6 +1108,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				parentHandleIncoming = savedInstanceState.getLong("parentHandleIncoming");
 				parentHandleOutgoing = savedInstanceState.getLong("parentHandleIncoming");
 				parentHandleSearch = savedInstanceState.getLong("parentHandleSearch");
+				parentHandleInbox = savedInstanceState.getLong("parentHandleInbox");
 				switch (visibleFragment){
 					case 1:{
 						drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -1110,7 +1116,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						break;
 					}
 					case 2:{
-						drawerItem = DrawerItem.CLOUD_DRIVE;
+						drawerItem = DrawerItem.INBOX;
 						isListCloudDrive = false;
 						break;
 					}
@@ -1168,6 +1174,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					case 13:{
 						drawerItem = DrawerItem.CAMERA_UPLOADS;
 						isListCameraUpload = false;
+						break;
+					}
+					case 14:{
+						drawerItem = DrawerItem.INBOX;
+						isListInbox = true;
+						break;
+					}
+					case 15:{
+						drawerItem = DrawerItem.INBOX;
+						isListInbox = false;
 						break;
 					}
 					
@@ -1236,6 +1252,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	long pHRubbish = -1;
     	long pHSharedWithMe = -1;
     	long pHSearch = -1;
+    	long pHInbox = -1;
     	int visibleFragment = -1;
     	String pathOffline = this.pathNavigation;
     	
@@ -1264,10 +1281,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     		}
     	}
-    	
-    	if (rbF != null){
+    	if (drawerItem == DrawerItem.RUBBISH_BIN)
+    	{
     		pHRubbish = rbF.getParentHandle();
-    		if (drawerItem == DrawerItem.RUBBISH_BIN){
+    		if (rbF != null){
     			if (isListRubbishBin){
     				visibleFragment = 5;
     			}
@@ -1275,7 +1292,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				visibleFragment = 6;
     			}
     		}
-    	}
+    	}    	
     	
     	if (inSF != null){
     		pHSharedWithMe = inSF.getParentHandle();
@@ -1324,12 +1341,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
     	
+    	if (drawerItem == DrawerItem.INBOX)
+    	{
+    		pHInbox = iF.getParentHandle();
+    		if (rbF != null){
+    			if (isListInbox){
+    				visibleFragment = 14;
+    			}
+    			else{
+    				visibleFragment = 15;
+    			}
+    		}
+    	}
+    	
     	outState.putInt("orderGetChildren", order);
     	outState.putInt("visibleFragment", visibleFragment);
     	outState.putLong("parentHandleBrowser", pHBrowser);
     	outState.putLong("parentHandleRubbish", pHRubbish);
     	outState.putLong("parentHandleSharedWithMe", pHSharedWithMe);
     	outState.putLong("parentHandleSearch", pHSearch);
+    	outState.putLong("parentHandleInbox", pHInbox);
     }
     
     @Override
@@ -1804,6 +1835,69 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			clearRubbishBinMenuitem.setVisible(false);
     			}
     			
+    			break;
+    		}
+    		case INBOX:{
+   			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (iF == null){
+    				iF = new InboxFragment();
+    				iF.setParentHandle(megaApi.getInboxNode().getHandle());
+    				parentHandleInbox = megaApi.getInboxNode().getHandle();
+    				iF.setIsList(isListInbox);
+    				iF.setOrder(orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+    				iF.setNodes(nodes);
+    			}
+    			else{
+    				iF.setIsList(isListInbox);
+    				iF.setParentHandle(parentHandleRubbish);
+    				iF.setOrder(orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
+    				iF.setNodes(nodes);
+    			}
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, iF, "iF");
+    			ft.commit();
+    			
+    			customSearch.setVisibility(View.VISIBLE);
+    			viewPagerContacts.setVisibility(View.GONE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				//Show				
+        			sortByMenuItem.setVisible(true);
+        			selectMenuItem.setVisible(true);            			
+        			
+    				//Hide
+        			refreshMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+    				pauseRestartTransfersItem.setVisible(false);
+    				createFolderMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			addContactMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(false);
+        			unSelectMenuItem.setVisible(false);
+        			addMenuItem.setEnabled(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+        			importLinkMenuItem.setVisible(false);
+        			takePicture.setVisible(false);
+        			refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+    				settingsMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+        			clearRubbishBinMenuitem.setVisible(false);
+        			rubbishBinMenuItem.setVisible(false);
+	    		}
+
     			break;
     		}
     		case CONTACTS:{
@@ -2433,6 +2527,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     		}
     	}
 		
+		if (drawerItem == DrawerItem.INBOX){
+			if (iF != null){			
+				if (iF.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItem(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
+					return;
+				}
+			}
+		}
+		
 		if (drawerItem == DrawerItem.CONTACTS){
 			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
 			cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
@@ -2782,9 +2889,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		
-		if (rbF != null){
-			if (drawerItem == DrawerItem.RUBBISH_BIN){
-				
+		
+		if (drawerItem == DrawerItem.RUBBISH_BIN){
+			if (rbF != null){	
 				//Show
 				refreshMenuItem.setVisible(true);
     			sortByMenuItem.setVisible(true);
@@ -2819,6 +2926,38 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			rubbishBinMenuItem.setVisible(false);
     			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
     			clearRubbishBinMenuitem.setVisible(true);
+			}
+		}
+		
+		
+		if (drawerItem == DrawerItem.INBOX){
+			if (iF != null){	
+				//Show				
+    			sortByMenuItem.setVisible(true);
+    			selectMenuItem.setVisible(true);    			
+    			    			
+				//Hide
+    			refreshMenuItem.setVisible(false);
+    			thumbViewMenuItem.setVisible(false);
+				pauseRestartTransfersItem.setVisible(false);
+				createFolderMenuItem.setVisible(false);
+    			addMenuItem.setVisible(false);
+    			addContactMenuItem.setVisible(false);
+    			upgradeAccountMenuItem.setVisible(false);
+    			unSelectMenuItem.setVisible(false);
+    			addMenuItem.setEnabled(false);
+    			changePass.setVisible(false); 
+    			exportMK.setVisible(false); 
+    			removeMK.setVisible(false); 
+    			importLinkMenuItem.setVisible(false);
+    			takePicture.setVisible(false);
+    			refreshMenuItem.setVisible(false);
+				helpMenuItem.setVisible(false);
+				settingsMenuItem.setVisible(false);
+    			thumbViewMenuItem.setVisible(false);
+//    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
+    			clearRubbishBinMenuitem.setVisible(false);
+    			rubbishBinMenuItem.setVisible(false);
 			}
 		}
 
@@ -3328,6 +3467,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 	    				oF.selectAll();
 	    				if (oF.showSelectMenuItem()){
+	        				selectMenuItem.setVisible(true);
+	        				unSelectMenuItem.setVisible(false);
+	        			}
+	        			else{
+	        				selectMenuItem.setVisible(false);
+	        				unSelectMenuItem.setVisible(true);
+	        			}
+	        		}
+    			}
+	        	if (drawerItem == DrawerItem.INBOX){
+	        		if (iF != null){	        		
+	    				iF.selectAll();
+	    				if (iF.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
 	        			}
@@ -6496,7 +6648,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
 				if (parentNode != null){
 					if (inSF != null){					
-						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSF.setNodes(nodes);
 						inSF.getListView().invalidateViews();						
@@ -6504,7 +6656,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				else{
 					if (inSF != null){						
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSF.setNodes(nodes);
 						inSF.getListView().invalidateViews();						
@@ -6584,7 +6736,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				else{
 					if (inSF != null){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
 						inSF.setOrder(orderGetChildren);
 						//TODO: ojo con los hijos
 //							inSF.setNodes(nodes);
