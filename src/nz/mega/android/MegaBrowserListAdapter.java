@@ -111,6 +111,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
+		this.type = type;
 		
 		switch (type) {
 		case ManagerActivity.FILE_BROWSER_ADAPTER: {
@@ -142,6 +143,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			incoming=true;
 			dbH = DatabaseHandler.getDbHandler(context);
 			((ManagerActivity) context).setParentHandleIncoming(-1);
+			break;
+		}
+		case ManagerActivity.INBOX_ADAPTER: {
+			//Empty
 			break;
 		}
 		default: {
@@ -524,6 +529,21 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //							Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 					
 				}	
+				else if (type == ManagerActivity.INBOX_ADAPTER) {
+					//Visible
+					log("ManagerActivity.INBOX_ADAPTER");
+					holder.optionDownload.setVisibility(View.VISIBLE);
+					holder.optionProperties.setVisibility(View.VISIBLE);				
+					holder.optionDelete.setVisibility(View.VISIBLE);					
+					holder.optionMore.setVisibility(View.VISIBLE);
+					//Hide
+					holder.optionClearShares.setVisibility(View.GONE);
+					holder.optionPublicLink.setVisibility(View.GONE);
+					holder.optionRemoveTotal.setVisibility(View.GONE);
+					holder.optionShare.setVisibility(View.GONE);
+					holder.optionPermissions.setVisibility(View.GONE);
+					holder.optionMoveTo.setVisibility(View.GONE);
+				}
 				else if (type == ManagerActivity.SEARCH_ADAPTER){
 					holder.optionDownload.setVisibility(View.VISIBLE);
 					holder.optionProperties.setVisibility(View.VISIBLE);	
@@ -957,10 +977,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				
 				String [] optionsString = null;
 				if (n.isFolder()){
-					optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)}; 
+					optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)}; 
 				}
 				else{
-					optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
+					optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_file_inbox)};
 				}
 				
 				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
@@ -1002,12 +1022,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 								((ManagerActivity) context).showCopy(handleList);
 								break;
 							}
-//							case 4:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								((ManagerActivity) context).getPublicLinkAndShareIt(n);
-//								break;
-//							}
+							case 4:{
+								log("Selected send file");
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).sentToInbox(n);
+								break;
+							}
 						}
 
 						dialog.dismiss();
@@ -1027,7 +1048,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				Util.brandAlertDialog(moreOptionsDialog);
 			}
 			
-			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER) {
+			else if (type == ManagerActivity.INCOMING_SHARES_ADAPTER) {
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
 				
@@ -1074,7 +1095,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				Util.brandAlertDialog(moreOptionsDialog);
 			}
 			
-			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
+			else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
 				
@@ -1100,6 +1121,64 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 								ArrayList<Long> handleList = new ArrayList<Long>();
 								handleList.add(n.getHandle());									
 								((ContactPropertiesMainActivity) context).showCopy(handleList);
+								break;
+							}
+						}
+
+						dialog.dismiss();
+					}
+				});
+				
+				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+
+				moreOptionsDialog = builder.create();
+				moreOptionsDialog.show();
+				Util.brandAlertDialog(moreOptionsDialog);
+			}
+			else if ((type == ManagerActivity.INBOX_ADAPTER)) {
+//				((ManagerActivity) context).showOverflowMenu(n);
+				AlertDialog moreOptionsDialog;
+				
+				String [] optionsString = null;
+
+				optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};				
+				
+				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle(R.string.more_options_overflow);
+				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						
+						switch (which){
+							
+							case 0:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								((ManagerActivity) context).showRenameDialog(n, n.getName());
+								break;
+							}
+							case 1:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showMove(handleList);
+								break;
+							}
+							case 2:{
+								setPositionClicked(-1);
+								notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(n.getHandle());									
+								((ManagerActivity) context).showCopy(handleList);
 								break;
 							}
 						}

@@ -192,6 +192,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int ZIP_ADAPTER = 2008;
 	final public static int OUTGOING_SHARES_ADAPTER = 2009;
 	final public static int INCOMING_SHARES_ADAPTER = 2010;
+	final public static int INBOX_ADAPTER = 2011;
 	
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
@@ -295,7 +296,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog alertNotPermissionsUpload;
     private Handler handler;    
-    private boolean moveToRubbish = false;    
+    private boolean moveToRubbish = false;
+    private boolean sendToInbox = false;
     private boolean isClearRubbishBin = false;
     
     ProgressDialog statusDialog;
@@ -4791,7 +4793,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@SuppressLint("NewApi")
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
-		log("onRequestFinish: "  + request.getRequestString());
+		log("---------onRequestFinish: "  + request.getRequestString());
+		
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
@@ -4953,20 +4956,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
-					if (fbF != null){
-						if (drawerItem == DrawerItem.CLOUD_DRIVE){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-							fbF.setNodes(nodes);
-							fbF.getListView().invalidateViews();
-						}
-					}
-					if (rbF != null){
-						if (drawerItem == DrawerItem.RUBBISH_BIN){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
-						}
-					}										
 				}
 				else{
 					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
@@ -4977,34 +4966,54 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
-					if (fbF != null){
-						if (drawerItem == DrawerItem.CLOUD_DRIVE){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-							fbF.setNodes(nodes);
-							fbF.getListView().invalidateViews();
-						}
-					}
-					if (rbF != null){
-						if (drawerItem == DrawerItem.RUBBISH_BIN){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
-						}
-					}
-					if (inSF != null){
-						if (drawerItem == DrawerItem.SHARED_WITH_ME){
-							//TODO: ojo con los hijos
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-//							inSF.setNodes(nodes);
-//							inSF.getListView().invalidateViews();
-						}
-					}
 				}
 				else{
 					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
 				}
+			
 				log("move nodes request finished");
 			}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+//				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbF != null){
+					
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+						fbF.setNodes(nodes);
+						fbF.getListView().invalidateViews();
+					}
+				}
+				if (drawerItem == DrawerItem.INBOX){
+					if (iF != null){
+//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iF.getParentHandle()), orderGetChildren);
+//							rbF.setNodes(nodes);
+						iF.refresh();
+					}
+				}	
+				if (drawerItem == DrawerItem.RUBBISH_BIN){
+					if (rbF != null){
+					
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
+				}
+				if (drawerItem == DrawerItem.SHARED_WITH_ME){
+					if (inSF != null){
+						//TODO: ojo con los hijos
+//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+//							inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();
+					}
+					if (outSF != null){
+						//TODO: ojo con los hijos
+//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(outSF.getParentHandle()), orderGetChildren);
+//							inSF.setNodes(nodes);
+						outSF.getListView().invalidateViews();
+					}
+				}
+			}	
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			
@@ -5179,45 +5188,67 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		} 
 		else if (request.getType() == MegaRequest.TYPE_COPY){
-			try { 
-				statusDialog.dismiss();	
-			} 
-			catch (Exception ex) {}
-			
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
-				if (fbF != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
-						fbF.setNodes(nodes);
-						fbF.getListView().invalidateViews();
+			log("TYPE_COPY");
+			if(sendToInbox){
+				log("sendToInbox");
+				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE){
+					if(iF!=null){
+						sendToInbox=false;
+						if (e.getErrorCode() == MegaError.API_OK){
+							Toast.makeText(this, getString(R.string.context_correctly_sent), Toast.LENGTH_SHORT).show();
+						}
+						else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+							log("OVERQUOTA ERROR: "+e.getErrorCode());
+							showOverquotaAlert();
+						}
+						else
+						{
+							Toast.makeText(this, getString(R.string.context_no_sent), Toast.LENGTH_LONG).show();
+						}
 					}
-				}
-				if (rbF != null){
-					if (drawerItem == DrawerItem.RUBBISH_BIN){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
-					}
-				}
-				if (inSF != null){
-					if (drawerItem == DrawerItem.SHARED_WITH_ME){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-						//TODO: ojo con los hijos
-//						inSF.setNodes(nodes);
-//						inSF.getListView().invalidateViews();
-					}
-				}
+				}				
 			}
 			else{
-				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());
-					showOverquotaAlert();
+				try { 
+					statusDialog.dismiss();	
+				} 
+				catch (Exception ex) {}
+				
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
+					if (fbF != null){
+						if (drawerItem == DrawerItem.CLOUD_DRIVE){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
+							fbF.setNodes(nodes);
+							fbF.getListView().invalidateViews();
+						}
+					}
+					if (rbF != null){
+						if (drawerItem == DrawerItem.RUBBISH_BIN){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
+					if (inSF != null){
+						if (drawerItem == DrawerItem.SHARED_WITH_ME){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+							//TODO: ojo con los hijos
+//							inSF.setNodes(nodes);
+//							inSF.getListView().invalidateViews();
+						}
+					}
 				}
-				else
-				{
-					Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
-				}
+				else{
+					if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+						log("OVERQUOTA ERROR: "+e.getErrorCode());
+						showOverquotaAlert();
+					}
+					else
+					{
+						Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+					}
+				}			
 			}			
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
@@ -6323,138 +6354,148 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);			
 			final boolean megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
+			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 			
 			if (megaContacts){
 				
-				//Just one folder to share
-				if(multiselectIntent==0){
-
+				if(sentToInbox==0){
+					//Just one folder to share
+					if(multiselectIntent==0){
+	
+						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
+						
+						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int item) {
+								ProgressDialog temp = null;
+								try{
+									temp = new ProgressDialog(managerActivity);
+									temp.setMessage(getString(R.string.context_sharing_folder));
+									temp.show();
+								}
+								catch(Exception e){
+									return;
+								}
+								statusDialog = temp;
+								permissionsDialog.dismiss();
+								
+								switch(item) {
+				                    case 0:{
+				                    	for (int i=0;i<contactsData.size();i++){
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
+				                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
+				                    	}
+				                    	break;
+				                    }
+				                    case 1:{
+				                    	for (int i=0;i<contactsData.size();i++){
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+				                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+				                    	}
+				                        break;
+				                    }
+				                    case 2:{
+				                    	for (int i=0;i<contactsData.size();i++){
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+				                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+				                    	}		                    	
+				                        break;
+				                    }
+				                }
+							}
+						});
+						permissionsDialog = dialogBuilder.create();
+						permissionsDialog.show();
+						Resources resources = permissionsDialog.getContext().getResources();
+						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+				        alertTitle.setTextColor(resources.getColor(R.color.mega));
+						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+						titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+					}
+					else if(multiselectIntent==1){
+						//Several folder to share
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+						
+							
+						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int item) {
+								ProgressDialog temp = null;
+								try{
+									temp = new ProgressDialog(managerActivity);
+									temp.setMessage(getString(R.string.context_sharing_folder));
+									temp.show();
+								}
+								catch(Exception e){
+									return;
+								}
+								statusDialog = temp;
+								permissionsDialog.dismiss();
+								
+								switch(item) {
+				                    case 0:{
+				                    	for (int i=0;i<contactsData.size();i++){
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
+				                    		for(int j=0; j<nodeHandles.length;j++){						
+				            					
+				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+				        						megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
+				                    		}
+				                    	}
+				                    	break;
+				                    }
+				                    case 1:{
+				                    	for (int i=0;i<contactsData.size();i++){
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+				                    		for(int j=0; j<nodeHandles.length;j++){						
+				            					
+				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+				        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+				                    		}
+	//			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+				                    	}
+				                        break;
+				                    }
+				                    case 2:{
+				                    	for (int i=0;i<contactsData.size();i++){
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
+				                    		for(int j=0; j<nodeHandles.length;j++){						
+				            					
+				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+				        						megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+				                    		}
+	//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
+				                    	}		                    	
+				                        break;
+				                    }
+				                }
+							}
+						});
+						permissionsDialog = dialogBuilder.create();
+						permissionsDialog.show();
+						Resources resources = permissionsDialog.getContext().getResources();
+						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+				        alertTitle.setTextColor(resources.getColor(R.color.mega));
+						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+						titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+						
+					}
+				}
+				else if (sentToInbox==1){
+					//Send file
 					final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
 					final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
-					
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							ProgressDialog temp = null;
-							try{
-								temp = new ProgressDialog(managerActivity);
-								temp.setMessage(getString(R.string.context_sharing_folder));
-								temp.show();
-							}
-							catch(Exception e){
-								return;
-							}
-							statusDialog = temp;
-							permissionsDialog.dismiss();
-							
-							switch(item) {
-			                    case 0:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
-			                    	}
-			                    	break;
-			                    }
-			                    case 1:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-			                    	}
-			                        break;
-			                    }
-			                    case 2:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-			                    	}		                    	
-			                        break;
-			                    }
-			                }
-						}
-					});
-					permissionsDialog = dialogBuilder.create();
-					permissionsDialog.show();
-					Resources resources = permissionsDialog.getContext().getResources();
-					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-			        alertTitle.setTextColor(resources.getColor(R.color.mega));
-					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-				}
-				else if(multiselectIntent==1){
-					//Several folder to share
-					final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
-					
-						
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int item) {
-							ProgressDialog temp = null;
-							try{
-								temp = new ProgressDialog(managerActivity);
-								temp.setMessage(getString(R.string.context_sharing_folder));
-								temp.show();
-							}
-							catch(Exception e){
-								return;
-							}
-							statusDialog = temp;
-							permissionsDialog.dismiss();
-							
-							switch(item) {
-			                    case 0:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
-			                    		for(int j=0; j<nodeHandles.length;j++){						
-			            					
-			        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-			        						megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
-			                    		}
-			                    	}
-			                    	break;
-			                    }
-			                    case 1:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		for(int j=0; j<nodeHandles.length;j++){						
-			            					
-			        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-			        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-			                    		}
-//			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-			                    	}
-			                        break;
-			                    }
-			                    case 2:{
-			                    	for (int i=0;i<contactsData.size();i++){
-			                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-			                    		for(int j=0; j<nodeHandles.length;j++){						
-			            					
-			        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-			        						megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-			                    		}
-//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-			                    	}		                    	
-			                        break;
-			                    }
-			                }
-						}
-					});
-					permissionsDialog = dialogBuilder.create();
-					permissionsDialog.show();
-					Resources resources = permissionsDialog.getContext().getResources();
-					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-			        alertTitle.setTextColor(resources.getColor(R.color.mega));
-					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-					
+					MegaUser u = megaApi.getContact(contactsData.get(0));
+					megaApi.sendFileToUser(node, u, this);
 				}
 
 			}
@@ -6872,14 +6913,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		} 
 		catch (Exception ex) {}
 		
-		if (fbF != null){
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			if (fbF != null){
+			
 				if (fbF.isVisible()){
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbF.getParentHandle()), orderGetChildren);
 					fbF.setNodes(nodes);
 					fbF.setContentText();
 					fbF.getListView().invalidateViews();
 				}
+			}
+		}
+		if (drawerItem == DrawerItem.INBOX){
+			log("INBOX shown");
+			if (iF != null){
+				iF.refresh();
+//				iF.getListView().invalidateViews();
 			}
 		}
 		if (rbF != null){
@@ -7478,6 +7527,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, handles);
 	    	//Multiselect=1 (multiple folders)
 	    	intent.putExtra("MULTISELECT", 1);
+	    	intent.putExtra("SEND_FILE",0);
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
 	}
@@ -7491,6 +7541,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.setClass(this, ContactsExplorerActivity.class);
 	    	//Multiselect=0
 	    	intent.putExtra("MULTISELECT", 0);
+	    	intent.putExtra("SEND_FILE",0);
+	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
+	}
+	
+	public void sentToInbox(MegaNode node){
+		log("sentToInbox MegaNode");
+		
+		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+			sendToInbox = true;			
+			Intent intent = new Intent(ContactsExplorerActivity.ACTION_PICK_CONTACT_SEND_FILE);
+	    	intent.setClass(this, ContactsExplorerActivity.class);
+	    	//Multiselect=0
+	    	intent.putExtra("MULTISELECT", 0);
+	    	intent.putExtra("SEND_FILE",1);
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
