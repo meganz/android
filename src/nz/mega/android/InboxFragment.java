@@ -49,7 +49,7 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 	MegaBrowserListAdapter adapterList;
 	MegaBrowserNewGridAdapter adapterGrid;
 	public InboxFragment inboxFragment = this;
-	
+	MegaNode inboxNode;
 	boolean isList = true;
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -249,6 +249,7 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		log("onCreateView");
 		
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
@@ -256,7 +257,7 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 		
 
 		parentHandle = megaApi.getInboxNode().getHandle();
-		MegaNode inboxNode = megaApi.getInboxNode();		
+		inboxNode = megaApi.getInboxNode();		
 //		((ManagerActivity)context).setParentHandleRubbish(parentHandle);
 		nodes = megaApi.getChildren(inboxNode, orderGetChildren);
 		
@@ -282,7 +283,7 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 			if (adapterList == null){
-				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.RUBBISH_BIN_ADAPTER);
+				adapterList = new MegaBrowserListAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.INBOX_ADAPTER);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -335,7 +336,7 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);
 			
 			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.RUBBISH_BIN_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
+				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.INBOX_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
@@ -348,6 +349,22 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 			setNodes(nodes);
 			
 			return v;	
+		}
+	}
+	
+	public void refresh(){
+		log("refresh");
+		nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+		setNodes(nodes);
+		if (isList){
+			if(adapterList!=null){				
+				adapterList.notifyDataSetChanged();
+			}
+		}
+		else{
+			if(adapterGrid!=null){
+				adapterGrid.notifyDataSetChanged();
+			}
 		}
 	}
 	
@@ -605,13 +622,9 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getInboxNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+					
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);					
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);
@@ -627,13 +640,9 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 					listView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getInboxNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+					
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
 				else{
 					listView.setVisibility(View.VISIBLE);

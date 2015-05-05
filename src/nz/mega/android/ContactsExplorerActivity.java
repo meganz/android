@@ -49,6 +49,7 @@ import android.widget.Toast;
 public class ContactsExplorerActivity extends PinActivity implements OnClickListener, OnItemClickListener, OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
 	public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
+	public static String ACTION_PICK_CONTACT_SEND_FILE = "ACTION_PICK_CONTACT_SEND_FILE";
 	
 	public static String EXTRA_NODE_HANDLE = "node_handle";
 	public static String EXTRA_MEGA_CONTACTS = "mega_contacts";
@@ -61,7 +62,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	boolean megaContacts = true;
 	
 	int multipleSelectIntent;
-	
+	int sendToInbox;
 	private TextView windowTitle;
 	private Button button;
 	private ListView listView;
@@ -270,6 +271,8 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 			nodeHandles=intent.getLongArrayExtra(EXTRA_NODE_HANDLE);
 		}
 		
+		sendToInbox= intent.getIntExtra("SEND_FILE", -1);
+				
 		button.setOnClickListener(this);
 		addContactButton.setOnClickListener(this);
 		megaPhoneContacts.setOnClickListener(this);
@@ -486,7 +489,15 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		else if(multipleSelectIntent==1){
 			intent.putExtra(EXTRA_NODE_HANDLE, nodeHandles);
 			intent.putExtra("MULTISELECT", 1);
-		}		
+		}	
+		
+		if(sendToInbox==0){
+			intent.putExtra("SEND_FILE",0);
+		}
+		else
+		{
+			intent.putExtra("SEND_FILE",1);
+		}
 		intent.putExtra(EXTRA_MEGA_CONTACTS, megaContacts);
 		setResult(RESULT_OK, intent);
 		finish();
