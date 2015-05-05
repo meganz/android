@@ -362,6 +362,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 		if(secondaryEnabled){
+			secondaryUploadHandle= Long.parseLong(prefs.getMegaHandleSecondaryFolder());
 			if (secondaryUploadHandle == -1){				
 				for (int i=0;i<nl.size();i++){
 					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
