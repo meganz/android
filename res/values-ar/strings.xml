@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.3</string>
+    <string name="app_version" context="Not translate">2.3.1</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">سوف تكون متاحة في</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA هي سحابة تخزين تتمتع دائما بقوة الخصوصية. 50GB مجانا</string>
@@ -176,7 +176,6 @@
 
 	<string name="section_account" context="button to the settings of the user\'s account">حسابي</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">رفع الألبوم</string>
-	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s من %2$s</string>
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">واردة</string>
 	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">الصادرة</string>
 	

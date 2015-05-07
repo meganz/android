@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -98,6 +99,9 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+		
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) listView.getLayoutParams();
+		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
 		
 		if (adapter == null){
 			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
