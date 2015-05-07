@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.android.AndroidAuthSession;
+
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -223,6 +226,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem exportMK;
 	private MenuItem removeMK;
 	private MenuItem takePicture;
+//	private MenuItem fromDropbox;
 	
 	public int accountFragment;
 	
@@ -239,6 +243,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private TextView usedSpace;
 	private ImageView usedSpaceWarning;
 	private int usedPerc=0;
+	
+//	private DropboxAPI<AndroidAuthSession> mDBApi;
 	
 	ProgressBar usedSpaceBar;
 	
@@ -2786,6 +2792,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		removeMK = menu.findItem(R.id.action_menu_remove_MK);
 		
 		takePicture = menu.findItem(R.id.action_take_picture);
+//		fromDropbox = menu.findItem(R.id.action_from_Dropbox);
 		
 //		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		if (fbF != null){
@@ -3315,6 +3322,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    	this.takePicture();
 		    	return true;
 		    }
+//		    case R.id.action_from_Dropbox:{
+//		    	
+//		    	return true;
+//		    }
 	        case R.id.action_search:{
 	        	mSearchView.setIconified(false);
 	        	return true;

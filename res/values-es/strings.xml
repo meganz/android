@@ -54,6 +54,8 @@
     <string name="action_add" context="Menu item">Subir&#8230;</string>
     <string name="action_create_folder" context="Menu item">Nueva carpeta</string>
     <string name="action_open_link" context="Menu item">Abrir link&#8230;</string>
+    <string name="action_from_Dropbox" context="Menu item">Importar desde Dropbox</string>
+    
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Subir a</string>
     <string name="action_settings" context="Menu item">Configuración</string>
     <string name="action_search" context="Search button">Buscar</string>

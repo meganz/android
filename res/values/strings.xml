@@ -58,6 +58,7 @@
     <string name="action_add" context="Menu item">Upload&#8230;</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
     <string name="action_open_link" context="Menu item">Open link&#8230;</string>
+    <string name="action_from_Dropbox" context="Menu item">Import from Dropbox</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
