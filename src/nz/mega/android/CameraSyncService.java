@@ -1410,9 +1410,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			public void run() {
 				onStartCommand(null, 0, 0);
 			}
-		}, 10 * 1000);
-		
-		//cAMBIAR 5 * 60 * 1000
+		}, 5 * 60 * 1000);
 	}
 	
 	public void retryLaterShortTime(){

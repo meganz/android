@@ -464,7 +464,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 					}
 				}
 				
-		        String usedSpaceString = getString(R.string.used_space, used, total);
+//		        String usedSpaceString = getString(R.string.used_space, used, total);
+				String usedSpaceString = used + " / " + total;
 		        usedSpace.setText(usedSpaceString);
 		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
 		       		       
@@ -485,8 +486,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		        }	             
 		        
 		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 4, used.length() + 4 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 3, used.length() + 3 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		        usedSpace.setText(wordtoSpan);        
 			        
 			}

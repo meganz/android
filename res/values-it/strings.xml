@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" context="Not translate">MEGA_COM</string>
-    <string name="app_version" context="Not translate">2.3</string>
+    <string name="app_name" context="Not translate">MEGA</string>
+    <string name="app_version" context="Not translate">2.3.1</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">sarà disponibile in</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA e un servizio di stoccaggio datti online crittografato e con 50 GB di spazio gratis</string>
@@ -147,7 +147,7 @@
 
 	<string name="section_account" context="button to the settings of the user\'s account">Account</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
-	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$ di %2$</string>
+	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s di %2$s</string>
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">IN ARRIVO</string>
 	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">IN USCITA</string>
 	
