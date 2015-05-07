@@ -6877,11 +6877,35 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		long parentHandle = -1;
+		MegaNode parentNode = null;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			parentHandle = fbF.getParentHandle();
+			parentNode = megaApi.getNodeByHandle(parentHandle);
+		}
+		else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==1){				
+				//OUTGOING				
+				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				log("Tag: "+ cFTag2);
+				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSF != null){					
+					parentHandleOutgoing = outSF.getParentHandle();
+					parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
+				}
+			}
+			else{			
+				//InCOMING
+				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+				log("Tag: "+ cFTag1);
+				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSF != null){					
+					parentHandleIncoming = inSF.getParentHandle();	
+					parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
+				}				
+			}	
 		}
 		
-		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle); 
 		if(parentNode == null){
 			Util.showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
 			return;
