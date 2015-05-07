@@ -72,17 +72,17 @@ public class NavigationDrawerAdapter extends BaseAdapter{
 			case 0:
 				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cloud_drive,0,0,0);
 				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
-				break;
+				break;			
 			case 1:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_cloud_drive,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_saved_for_offline,0,0,0);
 				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
 				break;
 			case 2:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_saved_for_offline,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
 				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background_odd));
 				break;
 			case 3:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_photo_sync,0,0,0);
+				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_inbox,0,0,0);
 				holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
 				break;
 			case 4:
