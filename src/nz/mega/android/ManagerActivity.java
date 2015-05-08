@@ -13,10 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -124,15 +120,15 @@ import android.widget.Toast;
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 			
 	public enum DrawerItem {
-		CLOUD_DRIVE, INBOX, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, SHARED_WITH_ME, CONTACTS, TRANSFERS, RUBBISH_BIN, SETTINGS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_WITH_ME, CONTACTS, TRANSFERS, RUBBISH_BIN, SETTINGS, ACCOUNT, SEARCH;
 
 		public String getTitle(Context context) {
 			switch(this)
 			{
-				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);
-				case INBOX: return context.getString(R.string.section_inbox);
+				case CLOUD_DRIVE: return context.getString(R.string.section_cloud_drive);				
 				case SAVED_FOR_OFFLINE: return context.getString(R.string.section_saved_for_offline);
 				case CAMERA_UPLOADS: return context.getString(R.string.section_photo_sync);
+				case INBOX: return context.getString(R.string.section_inbox);
 				case SHARED_WITH_ME: return context.getString(R.string.section_shared_items);
 				case CONTACTS: return context.getString(R.string.section_contacts);
 				case TRANSFERS: return context.getString(R.string.section_transfers);
