@@ -282,7 +282,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
-					generatingKeysText.setVisibility(View.VISIBLE);
+//					generatingKeysText.setVisibility(View.VISIBLE);
 //					megaApi.fastLogin(gSession, this);
 					
 					loginProgressBar.setVisibility(View.VISIBLE);
@@ -356,7 +356,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						queryingSignupLinkText.setVisibility(View.GONE);
 						confirmingAccountText.setVisibility(View.GONE);
 						loginLoggingIn.setVisibility(View.VISIBLE);
-						generatingKeysText.setVisibility(View.VISIBLE);
+//						generatingKeysText.setVisibility(View.VISIBLE);
 						loginProgressBar.setVisibility(View.VISIBLE);
 						loginFetchNodesProgressBar.setVisibility(View.GONE);
 						loggingInText.setVisibility(View.VISIBLE);
@@ -423,7 +423,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 					loginLoggingIn.setVisibility(View.VISIBLE);
-					generatingKeysText.setVisibility(View.VISIBLE);
+//					generatingKeysText.setVisibility(View.VISIBLE);
 					loginProgressBar.setVisibility(View.VISIBLE);
 					loginFetchNodesProgressBar.setVisibility(View.GONE);
 					loggingInText.setVisibility(View.VISIBLE);
@@ -442,7 +442,7 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
-				generatingKeysText.setVisibility(View.VISIBLE);
+//				generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
