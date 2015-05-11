@@ -74,6 +74,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 	private MegaOfflineFullScreenImageAdapter adapterOffline;
 	private int positionG;
 	private ArrayList<Long> imageHandles;
+	private boolean fromShared = false;
 	
 	private TextView fileNameTextView;
 	private ImageView actionBarIcon;
@@ -187,6 +188,7 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		imageHandles = new ArrayList<Long>();
 		paths = new ArrayList<String>();
 		long parentNodeHandle = intent.getLongExtra("parentNodeHandle", -1);
+		fromShared = intent.getBooleanExtra("fromShared", false);
 		MegaNode parentNode;		
 		
 		adapterType = intent.getIntExtra("adapterType", 0);
@@ -389,6 +391,14 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 			}
 			
 			ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			if (fromShared){
+				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+					nodes = sortByNameDescending(nodes);
+				}
+				else{
+					nodes = sortByNameAscending(nodes);
+				}
+			}
 			int imageNumber = 0;
 			for (int i=0;i<nodes.size();i++){
 				MegaNode n = nodes.get(i);
@@ -465,6 +475,101 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		    fileNameTextView = (TextView) findViewById(R.id.full_image_viewer_file_name);
 		    fileNameTextView.setText(megaApi.getNodeByHandle(imageHandles.get(positionG)).getName());
 		}
+	}
+	
+	public ArrayList<MegaNode> sortByNameAscending(ArrayList<MegaNode> nodes){
+		log("sortByNameAscending");
+		
+		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+		
+		for (int i=0;i<nodes.size();i++){
+			if (nodes.get(i).isFolder()){
+				folderNodes.add(nodes.get(i));
+			}
+			else{
+				fileNodes.add(nodes.get(i));
+			}
+		}
+		
+		for (int i=0;i<folderNodes.size();i++){
+			for (int j=0;j<folderNodes.size()-1;j++){
+				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) > 0){
+					MegaNode nAuxJ = folderNodes.get(j);
+					MegaNode nAuxJ_1 = folderNodes.get(j+1);
+					folderNodes.remove(j+1);
+					folderNodes.remove(j);
+					folderNodes.add(j, nAuxJ_1);
+					folderNodes.add(j+1, nAuxJ);
+				}
+			}
+		}
+		
+		for (int i=0;i<fileNodes.size();i++){
+			for (int j=0;j<fileNodes.size()-1;j++){
+				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) > 0){
+					MegaNode nAuxJ = fileNodes.get(j);
+					MegaNode nAuxJ_1 = fileNodes.get(j+1);
+					fileNodes.remove(j+1);
+					fileNodes.remove(j);
+					fileNodes.add(j, nAuxJ_1);
+					fileNodes.add(j+1, nAuxJ);
+				}
+			}
+		}
+		
+		nodes.clear();
+		nodes.addAll(folderNodes);
+		nodes.addAll(fileNodes);
+		
+		return nodes;
+	}
+	
+	public ArrayList<MegaNode> sortByNameDescending(ArrayList<MegaNode> nodes){
+		
+		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+		
+		for (int i=0;i<nodes.size();i++){
+			if (nodes.get(i).isFolder()){
+				folderNodes.add(nodes.get(i));
+			}
+			else{
+				fileNodes.add(nodes.get(i));
+			}
+		}
+		
+		for (int i=0;i<folderNodes.size();i++){
+			for (int j=0;j<folderNodes.size()-1;j++){
+				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) < 0){
+					MegaNode nAuxJ = folderNodes.get(j);
+					MegaNode nAuxJ_1 = folderNodes.get(j+1);
+					folderNodes.remove(j+1);
+					folderNodes.remove(j);
+					folderNodes.add(j, nAuxJ_1);
+					folderNodes.add(j+1, nAuxJ);
+				}
+			}
+		}
+		
+		for (int i=0;i<fileNodes.size();i++){
+			for (int j=0;j<fileNodes.size()-1;j++){
+				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) < 0){
+					MegaNode nAuxJ = fileNodes.get(j);
+					MegaNode nAuxJ_1 = fileNodes.get(j+1);
+					fileNodes.remove(j+1);
+					fileNodes.remove(j);
+					fileNodes.add(j, nAuxJ_1);
+					fileNodes.add(j+1, nAuxJ);
+				}
+			}
+		}
+		
+		nodes.clear();
+		nodes.addAll(folderNodes);
+		nodes.addAll(fileNodes);
+		
+		return nodes;
 	}
 
 	@Override
