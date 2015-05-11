@@ -661,8 +661,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 						}
 						intent.putExtra("orderGetChildren", orderGetChildren);
+						intent.putExtra("fromShared", true);
 						startActivity(intent);
-								
 					}
 					else if (MimeTypeList.typeForName(nodes.get(position).getName()).isVideo() || MimeTypeList.typeForName(nodes.get(position).getName()).isAudio() ){
 						MegaNode file = nodes.get(position);
@@ -1101,52 +1101,48 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	
 	public void sortByNameDescending(){
 		
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
 		
-		
-		for(int k = 0; k < nodes.size() ; k++) {
-			MegaNode node = nodes.get(k);
-			if(node.isFolder()){
-				foldersOrder.add(node.getName());
+		for (int i=0;i<nodes.size();i++){
+			if (nodes.get(i).isFolder()){
+				folderNodes.add(nodes.get(i));
 			}
 			else{
-				filesOrder.add(node.getName());
+				fileNodes.add(nodes.get(i));
 			}
 		}
 		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(foldersOrder);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.reverse(filesOrder);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = foldersOrder.get(k);
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
+		for (int i=0;i<folderNodes.size();i++){
+			for (int j=0;j<folderNodes.size()-1;j++){
+				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) < 0){
+					MegaNode nAuxJ = folderNodes.get(j);
+					MegaNode nAuxJ_1 = folderNodes.get(j+1);
+					folderNodes.remove(j+1);
+					folderNodes.remove(j);
+					folderNodes.add(j, nAuxJ_1);
+					folderNodes.add(j+1, nAuxJ);
+				}
 			}
-			
 		}
 		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = filesOrder.get(k);
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));					
-				}				
+		for (int i=0;i<fileNodes.size();i++){
+			for (int j=0;j<fileNodes.size()-1;j++){
+				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) < 0){
+					MegaNode nAuxJ = fileNodes.get(j);
+					MegaNode nAuxJ_1 = fileNodes.get(j+1);
+					fileNodes.remove(j+1);
+					fileNodes.remove(j);
+					fileNodes.add(j, nAuxJ_1);
+					fileNodes.add(j+1, nAuxJ);
+				}
 			}
-			
 		}
 		
 		nodes.clear();
-		nodes.addAll(tempOffline);
-
+		nodes.addAll(folderNodes);
+		nodes.addAll(fileNodes);
+		
 		if (isList){
 			adapterList.setNodes(nodes);
 		}
@@ -1158,47 +1154,49 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	
 	public void sortByNameAscending(){
 		log("sortByNameAscending");
-		ArrayList<String> foldersOrder = new ArrayList<String>();
-		ArrayList<String> filesOrder = new ArrayList<String>();
-		ArrayList<MegaNode> tempOffline = new ArrayList<MegaNode>();
-				
-		for(int k = 0; k < nodes.size() ; k++) {
-			MegaNode node = nodes.get(k);
-			if(node.isFolder()){
-				foldersOrder.add(node.getName());
+		
+		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
+		ArrayList<MegaNode> fileNodes = new ArrayList<MegaNode>();
+		
+		for (int i=0;i<nodes.size();i++){
+			if (nodes.get(i).isFolder()){
+				folderNodes.add(nodes.get(i));
 			}
 			else{
-				filesOrder.add(node.getName());
+				fileNodes.add(nodes.get(i));
 			}
-		}		
-	
-		Collections.sort(foldersOrder, String.CASE_INSENSITIVE_ORDER);
-		Collections.sort(filesOrder, String.CASE_INSENSITIVE_ORDER);
-
-		for(int k = 0; k < foldersOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = foldersOrder.get(k);
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
-			}			
 		}
 		
-		for(int k = 0; k < filesOrder.size() ; k++) {
-			for(int j = 0; j < nodes.size() ; j++) {
-				String name = filesOrder.get(k);
-				String nameOffline = nodes.get(j).getName();
-				if(name.equals(nameOffline)){
-					tempOffline.add(nodes.get(j));
-				}				
+		for (int i=0;i<folderNodes.size();i++){
+			for (int j=0;j<folderNodes.size()-1;j++){
+				if (folderNodes.get(j).getName().compareTo(folderNodes.get(j+1).getName()) > 0){
+					MegaNode nAuxJ = folderNodes.get(j);
+					MegaNode nAuxJ_1 = folderNodes.get(j+1);
+					folderNodes.remove(j+1);
+					folderNodes.remove(j);
+					folderNodes.add(j, nAuxJ_1);
+					folderNodes.add(j+1, nAuxJ);
+				}
 			}
-			
+		}
+		
+		for (int i=0;i<fileNodes.size();i++){
+			for (int j=0;j<fileNodes.size()-1;j++){
+				if (fileNodes.get(j).getName().compareTo(fileNodes.get(j+1).getName()) > 0){
+					MegaNode nAuxJ = fileNodes.get(j);
+					MegaNode nAuxJ_1 = fileNodes.get(j+1);
+					fileNodes.remove(j+1);
+					fileNodes.remove(j);
+					fileNodes.add(j, nAuxJ_1);
+					fileNodes.add(j+1, nAuxJ);
+				}
+			}
 		}
 		
 		nodes.clear();
-		nodes.addAll(tempOffline);
-
+		nodes.addAll(folderNodes);
+		nodes.addAll(fileNodes);
+				
 		if (isList){
 			adapterList.setNodes(nodes);
 		}
