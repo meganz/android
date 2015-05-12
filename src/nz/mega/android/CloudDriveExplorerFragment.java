@@ -112,12 +112,12 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			{			
 				//Find in the database the last parentHandle
 				prefs = dbH.getPreferences();
-				if (prefs != null)
-				{
+				if (prefs != null) {
 					String lastFolder = prefs.getLastFolderCloud();
-					if(lastFolder != null)
-					{
-						parentHandle = Long.parseLong(lastFolder);
+					if(lastFolder != null) {
+						if (lastFolder.compareTo("") != 0){
+							parentHandle = Long.parseLong(lastFolder);
+						}
 					}
 				}
 			}
