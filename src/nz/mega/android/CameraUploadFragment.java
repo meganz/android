@@ -581,7 +581,19 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 						photosyncHandle = -1;
 					}
 					else{
-						if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+						MegaNode pshNode = megaApi.getNodeByHandle(photosyncHandle);
+						if (pshNode != null){
+							MegaNode pspNode = megaApi.getParentNode(pshNode);
+							if (pspNode != null){
+								if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
+									photosyncHandle = -1;
+								}
+							}
+							else{
+								photosyncHandle = -1;
+							}
+						}
+						else{
 							photosyncHandle = -1;
 						}
 					}
