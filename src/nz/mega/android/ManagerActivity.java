@@ -5028,12 +5028,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			log("requestFinish "+MegaRequest.TYPE_REMOVE);
 			if (e.getErrorCode() == MegaError.API_OK){
-				if (statusDialog.isShowing()){
-					try { 
-						statusDialog.dismiss();	
-					} 
-					catch (Exception ex) {}
-					Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
+				if (statusDialog != null){
+					if (statusDialog.isShowing()){
+						try { 
+							statusDialog.dismiss();	
+						} 
+						catch (Exception ex) {}
+						Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
+					}
 				}
 				
 				if (fbF != null){
