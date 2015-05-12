@@ -196,10 +196,20 @@ public class ShareInfo {
 				}
 				
 				if (context.getExternalCacheDir() != null){
-					file = new File(context.getExternalCacheDir(), title);
+					if (title != null){
+						file = new File(context.getExternalCacheDir(), title);
+					}
+					else{
+						return;
+					}
 				}
 				else{
-					file = new File(context.getCacheDir(), title);
+					if (title != null){
+						file = new File(context.getCacheDir(), title);
+					}
+					else{
+						return;
+					}
 				}
 				OutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
 				int bufferSize = 1024;
