@@ -8,6 +8,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import nz.mega.android.utils.PreviewUtils;
+import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -1724,6 +1726,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					log("onTransferFinish: Update SECONDARY Sync TimeStamp");
 					dbH.setSecSyncTimeStamp(currentTimeStamp);
 				}
+				
+				File previewDir = PreviewUtils.getPreviewFolder(this);
+				File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+				File thumbDir = ThumbnailUtils.getThumbFolder(this);
+				File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+				megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 				
 //				dbH.setCamSyncTimeStamp(currentTimeStamp);
 				

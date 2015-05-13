@@ -3191,13 +3191,35 @@ public class MegaApiJava
 	}
 
 	/**
-     * @brief Unescape a file name escaped with MegaApi::nameToLocal
+     * Unescape a file name escaped with MegaApi::nameToLocal
      *
      * @param name Escaped name to convert
      * @return Converted name
      */
 	public String localToName(String localName) {
 		return megaApi.localToName(localName);
+	}
+	
+	/**
+     * Create a thumbnail for an image
+     * 
+     * @param imagePath Image path
+     * @param dstPath Destination path for the thumbnail (including the file name)
+     * @return True if the thumbnail was successfully created, otherwise false.
+     */
+	public boolean createThumbnail(String imagePath, String dstPath) {
+		return megaApi.createThumbnail(imagePath, dstPath);
+	}
+	
+	/**
+     * Create a preview for an image
+     * 
+     * @param imagePath Image path
+     * @param dstPath Destination path for the preview (including the file name)
+     * @return True if the preview was successfully created, otherwise false.
+     */
+	public boolean createPreview(String imagePath, String dstPath) {
+		return megaApi.createPreview(imagePath, dstPath);
 	}
 	
 	/**
