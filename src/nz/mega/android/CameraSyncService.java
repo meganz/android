@@ -362,41 +362,76 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 		if(secondaryEnabled){
-			secondaryUploadHandle= Long.parseLong(prefs.getMegaHandleSecondaryFolder());
-			if (secondaryUploadHandle == -1){				
-				for (int i=0;i<nl.size();i++){
-					if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-						secondaryUploadHandle = nl.get(i).getHandle();
-						dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-					}					
-				}
-				
-				//If not "Media Uploads"
-				if (secondaryUploadHandle == -1){
-					log("must create the folder");
-					if (!running){
-						running = true;
-						megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
-					}
-					else{
-						if (megaApi != null){
-							megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+			String temp = prefs.getMegaHandleSecondaryFolder();
+			if (temp != null){
+				if (temp.compareTo("") != 0){
+					secondaryUploadHandle= Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+					if (secondaryUploadHandle == -1){				
+						for (int i=0;i<nl.size();i++){
+							if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+								secondaryUploadHandle = nl.get(i).getHandle();
+								dbH.setSecondaryFolderHandle(secondaryUploadHandle);
+							}					
+						}
+						
+						//If not "Media Uploads"
+						if (secondaryUploadHandle == -1){
+							log("must create the folder");
+							if (!running){
+								running = true;
+								megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+							}
+							else{
+								if (megaApi != null){
+									megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+									return START_NOT_STICKY;
+								}
+							}
 							return START_NOT_STICKY;
 						}
 					}
-					return START_NOT_STICKY;
+					else{
+						MegaNode n = megaApi.getNodeByHandle(secondaryUploadHandle);
+						//If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads
+						if(n==null){				
+							//Find the "Camera Uploads" folder of the old "PhotoSync"
+							for (int i=0;i<nl.size();i++){
+								if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+									secondaryUploadHandle = nl.get(i).getHandle();
+									dbH.setSecondaryFolderHandle(secondaryUploadHandle);
+								}						
+							}
+							
+							//If not "Media Uploads"
+							if (secondaryUploadHandle == -1){
+								log("must create the folder");
+								if (!running){
+									running = true;
+									megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
+								}
+								else{
+									if (megaApi != null){
+										megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+										return START_NOT_STICKY;
+									}
+								}
+								return START_NOT_STICKY;
+							}				
+						}
+						else{
+							log("Secondary Folder " + secondaryUploadHandle + " Node: "+n.getName());
+							secondaryUploadNode=megaApi.getNodeByHandle(secondaryUploadHandle);
+						}			
+					}
 				}
-			}
-			else{
-				MegaNode n = megaApi.getNodeByHandle(secondaryUploadHandle);
-				//If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads
-				if(n==null){				
-					//Find the "Camera Uploads" folder of the old "PhotoSync"
+				else{
+					//If empty string as SecondaryHandle
+					secondaryUploadHandle=-1;
 					for (int i=0;i<nl.size();i++){
 						if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 							secondaryUploadHandle = nl.get(i).getHandle();
 							dbH.setSecondaryFolderHandle(secondaryUploadHandle);
-						}						
+						}					
 					}
 					
 					//If not "Media Uploads"
@@ -413,12 +448,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 							}
 						}
 						return START_NOT_STICKY;
-					}				
+					}
 				}
-				else{
-					log("Secondary Folder " + secondaryUploadHandle + " Node: "+n.getName());
-					secondaryUploadNode=megaApi.getNodeByHandle(secondaryUploadHandle);
-				}			
 			}
 		}
 		else{
