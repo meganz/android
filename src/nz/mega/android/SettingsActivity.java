@@ -239,12 +239,20 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 							//The node for the Camera Sync no longer exists...
 							dbH.setCamSyncHandle(-1);
 							camSyncHandle = (long) -1;
+							//Meanwhile is not created, set just the name
+							camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
 						}
+					}
+					else{
+						//Meanwhile is not created, set just the name
+						camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
 					}
 				}		
 				else{
 					dbH.setCamSyncHandle(-1);
 					camSyncHandle = (long) -1;
+					//Meanwhile is not created, set just the name
+					camSyncMegaPath = CameraSyncService.CAMERA_UPLOADS;
 				}				
 				
 				if (prefs.getCamSyncFileUpload() == null){
@@ -456,23 +464,33 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				//Check if the node exists in MEGA
 				String secHandle = prefs.getMegaHandleSecondaryFolder();
 				if(secHandle!=null){
-					handleSecondaryMediaFolder = Long.valueOf(secHandle);
-					if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
-						megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);	
-						if(megaNodeSecondaryMediaFolder!=null){
-							megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
+					if (secHandle.compareTo("") != 0){
+						log("handleSecondaryMediaFolder NOT empty");
+						handleSecondaryMediaFolder = Long.valueOf(secHandle);
+						if(handleSecondaryMediaFolder!=null && handleSecondaryMediaFolder!=-1){
+							megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);	
+							if(megaNodeSecondaryMediaFolder!=null){
+								megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
+							}
+							else{
+								megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
+							}
 						}
 						else{
 							megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 						}
 					}
 					else{
+						log("handleSecondaryMediaFolder empty string");
 						megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
-					}
+					}	
+					
 				}
 				else{
+					log("handleSecondaryMediaFolder Null");
 					dbH.setSecondaryFolderHandle(-1);
 					handleSecondaryMediaFolder = (long) -1;
+					megaPathSecMediaFolder = CameraSyncService.SECONDARY_UPLOADS;
 				}
 				
 				//check if the local secondary folder exists				
