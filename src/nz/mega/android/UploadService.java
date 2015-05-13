@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import nz.mega.android.utils.PreviewUtils;
+import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -827,6 +829,13 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				long currentSizeUploaded = transfersUploadedSize.get(transfer.getTag());
 				totalSizeUploaded += (transfer.getTotalBytes()-currentSizeUploaded);
 				transfersUploadedSize.put(transfer.getTag(), transfer.getTotalBytes());
+				
+				File previewDir = PreviewUtils.getPreviewFolder(this);
+				File preview = new File(previewDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+				File thumbDir = ThumbnailUtils.getThumbFolder(this);
+				File thumb = new File(thumbDir, MegaApiAndroid.handleToBase64(transfer.getNodeHandle())+".jpg");
+				megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
+				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 			}
 			else{
 				log("Upload Error: " + transfer.getFileName() + "_" + error.getErrorCode() + "___" + error.getErrorString());
