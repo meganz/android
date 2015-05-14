@@ -294,11 +294,13 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				}	
 				
 				if (prefs.getCamSyncCharging() == null){
+					log("Charging NULLL");
 					dbH.setCamSyncCharging(true);
 					charging = true;
 				}
 				else{
 					charging = Boolean.parseBoolean(prefs.getCamSyncCharging());
+					log("Charging: "+charging);
 				}
 				
 				if (prefs.getKeepFileNames() == null){
@@ -714,6 +716,10 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				wifi = getString(R.string.cam_sync_wifi);
 				cameraUploadHow.setValueIndex(1);
 				
+				dbH.setCamSyncCharging(true);
+				charging = true;
+				cameraUploadCharging.setChecked(charging);
+				
 				dbH.setCamSyncEnabled(true);
 				
 				handler.postDelayed(new Runnable() {
@@ -727,8 +733,8 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
 				cameraUploadHow.setSummary(wifi);
-				localCameraUploadFolder.setSummary(camSyncLocalPath);
-						
+				localCameraUploadFolder.setSummary(camSyncLocalPath);				
+				
 				/*
 				
 				if(secondaryUpload){
