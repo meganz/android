@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.3.2</string>
+    <string name="app_version" context="Not translate">2.3.3</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">سوف تكون متاحة في</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA هي سحابة تخزين تتمتع دائما بقوة الخصوصية. 50GB مجانا</string>
