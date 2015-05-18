@@ -170,6 +170,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
+	public static int REQUEST_DROPBOX_ENTRIES =1011;
 	
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -205,8 +206,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int MODE_OUT = 1;
 	
 	private DropboxAPI<AndroidAuthSession> mDBApi;
-	final static private String APP_KEY = "6tioyn8ka5l6hty";
-	final static private String APP_SECRET = "hfzgdtrma231qdm";
+//	final static private String APP_KEY = "6tioyn8ka5l6hty";
+//	final static private String APP_SECRET = "hfzgdtrma231qdm";
 	String accessToken;
 	boolean requestLoginDropbox;
 	
@@ -418,55 +419,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			return null;
 		}		
-	}
+	}	
 	
-    /*
-	 * Background task to emptying the Rubbish Bin
-	 */
-	private class ListDropboxFiles extends AsyncTask<String, Void, Void> {
-		Context context;
-		
-		ListDropboxFiles(Context context){
-			this.context = context;
-		}
-		
-		@Override
-		protected Void doInBackground(String... params) {
-			log("doInBackground-Async Task ListDropboxFiles");
-			
-			int i=0;
-	        String[] fnames = null;
-	        Entry dirent;
-			try {
-				if(mDBApi!=null){
-					dirent = mDBApi.metadata("/", 1000, null, true, null);
-					ArrayList<Entry> files = new ArrayList<Entry>();
-		            ArrayList<String> dir=new ArrayList<String>();
-		            for (Entry ent: dirent.contents) 
-		            {
-		                files.add(ent);// Add it to the list of thumbs we can choose from                       
-		                //dir = new ArrayList<String>();
-		                dir.add(new String(files.get(i++).path));
-		            }
-		            i=0;
-		            fnames=dir.toArray(new String[dir.size()]);
-		            for(int j=0;j<fnames.length;j++)
-		            {
-		            	log("Lista: "+fnames[j]);
-		            }
-				}
-				else{
-					log("MDBApi NUUUUUULLLLLL");
-				}
-				
-			} catch (DropboxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return null;
-		}		
-	}
-    
     // (arbitrary) request code for the purchase flow
     public static final int RC_REQUEST = 10001;
     String orderId = "";
@@ -1473,14 +1427,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	super.onPause();
     }
     
-    public void listDropboxFiles(){
-    	log("listDropboxFiles");
-    	
-    	ListDropboxFiles listDropboxFilesTask = new ListDropboxFiles(this);
-    	listDropboxFilesTask.execute();
-    	
-    	
-    }
+//    public void listDropboxFiles(){
+//    	log("listDropboxFiles");
+//    	
+//    	ListDropboxFiles listDropboxFilesTask = new ListDropboxFiles(this);
+//    	listDropboxFilesTask.execute();
+//    	
+//    	
+//    }
     @Override
 	protected void onResume() {
     	log("onResume ");
@@ -1496,7 +1450,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		                mDBApi.getSession().finishAuthentication();
 		                //See SharedPreferences
 		                accessToken = mDBApi.getSession().getOAuth2AccessToken();
-		                listDropboxFiles();
+		                
+		                //Start service to import files
+		                log("Llamo a DropboxService");
+		                startService(new Intent(this, DropboxImportService.class));		
+
 		            } catch (IllegalStateException e) {
 		                Log.i("DbAuthLog", "Error authenticating", e);
 		            }      
@@ -3409,11 +3367,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    	return true;
 		    }
 		    case R.id.action_from_Dropbox:{
-		    	AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-		    	AndroidAuthSession session = new AndroidAuthSession(appKeys);
+		    	
+		    	//Lanzar intent a DropboxExplorerAtivity
+//	            Intent intent = new Intent();
+//				startActivityForResult(intent, REQUEST_DROPBOX_ENTRIES);	
 				
 				// Initialize DropboxAPI object
-				mDBApi = new DropboxAPI<AndroidAuthSession>(session);
+
+				if(mDBApi==null){
+					mDBApi = app.getDropboxApi();
+				}				
+				
 				mDBApi.getSession().startOAuth2Authentication(this);
 				requestLoginDropbox=true;
 		    	return true;

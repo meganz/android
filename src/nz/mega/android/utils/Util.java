@@ -76,6 +76,7 @@ public class Util {
 	public static boolean DEBUG = true;
 	
 	public static String offlineDIR = "MEGA/MEGA Offline"; 
+	public static String dropboxDIR = "MEGA/Dropbox Import"; 
 	public static String downloadDIR ="MEGA/MEGA Downloads";
 	public static String temporalPicDIR ="MEGA/MEGA Selfies";
 	public static String logDIR = "MEGA/MEGA Logs";
