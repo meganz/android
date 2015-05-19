@@ -87,8 +87,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	private int totalToUpload;
 	private long totalSizeUploaded;
 	private int successCount;
-	private ConcurrentLinkedQueue<Media> filesToUpload = new ConcurrentLinkedQueue<Media>();
-	private ConcurrentLinkedQueue<Media> filesUploaded = new ConcurrentLinkedQueue<Media>();
 	
 	Object transferFinished = new Object();
 	
@@ -1418,8 +1416,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		totalToUpload = 0;
 		totalSizeUploaded = 0;
 		successCount = 0;
-		filesToUpload.clear();
-		filesUploaded.clear();
 	}
 	
 	private void cancel() {
