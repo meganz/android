@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -18,10 +19,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
 import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -48,12 +54,154 @@ import android.widget.Toast;
 
 
 public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListener {
+
+	private class Media {
+		public String filePath;
+		public long timestamp;
+	}
+	
+	private class MediaDBTask extends AsyncTask<MegaNode, Void, String> {
+		
+		Context context;
+		MegaApplication app;
+		ViewHolderBrowserList holder;
+		MegaApiAndroid megaApi;
+		MegaBrowserListAdapter adapter;
+		MegaNode node;
+		Bitmap thumb = null;
+		
+		public MediaDBTask(Context context, ViewHolderBrowserList holder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter) {
+			this.context = context;
+			this.app = (MegaApplication)(((Activity)(this.context)).getApplication());
+			this.holder = holder;
+			this.megaApi = megaApi;
+			this.adapter = adapter;
+		}
+		@Override
+		protected String doInBackground(MegaNode... params) {
+			this.node = params[0];
+			
+			if (this.node == null){
+				return null;
+			}
+			
+			if (app == null){
+				return null;
+			}
+			
+			String projection[] = {	MediaColumns.DATA, 
+					//MediaColumns.MIME_TYPE, 
+					//MediaColumns.DATE_MODIFIED,
+					MediaColumns.DATE_MODIFIED};
+			String selection = "(abs(" + MediaColumns.DATE_MODIFIED + "-" + node.getModificationTime() + ") < 10) OR ("+ MediaColumns.DATA + " LIKE '%" + node.getName() + "%')";
+//			String selection = "";
+			log("SELECTION: " + selection);
+			ArrayList<Uri> uris = new ArrayList<Uri>();
+			uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);	
+			String order = MediaColumns.DATE_MODIFIED + " ASC";
+			String[] selectionArgs = null;
+			
+			for(int i=0; i<uris.size(); i++){
+				Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
+				if (cursor != null){
+					int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+					int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+					while(cursor.moveToNext()){
+						Media media = new Media();
+				        media.filePath = cursor.getString(dataColumn);
+				        media.timestamp = cursor.getLong(timestampColumn);
+				        
+				        if (megaApi.getFingerprint(node).compareTo(megaApi.getFingerprint(media.filePath)) == 0){
+				        	log("SAME FINGERPRINT!!! " +  media.filePath);
+				        	File previewDir = PreviewUtils.getPreviewFolder(context);
+							File previewFile = new File(previewDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
+							File thumbDir = ThumbnailUtils.getThumbFolder(context);
+							File thumbFile = new File(thumbDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
+							megaApi.createThumbnail(media.filePath, thumbFile.getAbsolutePath());
+//							megaApi.createPreview(media.filePath, previewFile.getAbsolutePath());
+				        	return media.filePath;
+				        }
+				        else{
+				        	log("DIFFERENT FINGERPRINT!!! " + media.filePath);
+				        }
+				        
+				        log("FILEPATH: " + media.filePath + "____TIMESTAMP: " + media.timestamp + "______ TIME: " + node.getModificationTime());
+				        
+					}
+				}
+			}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(String res) {
+			if (res == null){
+				if (this.node != null){
+					try {
+						log("megaApi.getThumbnail");
+						thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, adapter);
+					} catch (Exception e) {
+					} // Too many AsyncTasks
+	
+					if (thumb != null) {
+						if(!multipleSelect){
+							if ((holder.document == node.getHandle())){
+								holder.imageView.setImageBitmap(thumb);
+							}
+						}
+						else{
+							if ((holder.document == node.getHandle())){
+								holder.imageView.setImageBitmap(thumb);
+							}
+						}
+					}
+				}
+			}
+			else{
+				if (this.node != null){
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					if (thumb != null) {
+						if(!multipleSelect){
+							if ((holder.document == node.getHandle())){
+								holder.imageView.setImageBitmap(thumb);
+							}
+						}
+						else{
+							if ((holder.document == node.getHandle())){
+								holder.imageView.setImageBitmap(thumb);
+							}
+						}
+					} else {
+						thumb = ThumbnailUtils
+								.getThumbnailFromFolder(node, context);
+						if (thumb != null) {
+							if(!multipleSelect){
+								if ((holder.document == node.getHandle())){
+									holder.imageView.setImageBitmap(thumb);
+								}
+							}
+							else{
+								if ((holder.document == node.getHandle())){
+									holder.imageView.setImageBitmap(thumb);
+								}
+							}
+						}
+					}
+				}
+				//HE ENCONTRADO LA IMAGEN Y LA PUEDO LEER
+			}
+//			onKeysGenerated(key[0], key[1]);
+		}		
+	}
 	
 	static int FROM_FILE_BROWSER = 13;
 	static int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
 
 	Context context;
+	MegaApplication app;
 	MegaApiAndroid megaApi;
 
 	int positionClicked;
@@ -366,12 +514,14 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							holder.imageView.setImageBitmap(thumb);
 						}
 					} else {
+//						new MediaDBTask(context, holder, megaApi, this).execute(node);
 						try {
+							log("megaApi.getThumbnail");
 							thumb = ThumbnailUtils.getThumbnailFromMegaList(
 									node, context, holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
-
+		
 						if (thumb != null) {
 							if(!multipleSelect){
 								holder.imageView.setImageBitmap(thumb);
@@ -1362,3 +1512,4 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		Util.log("MegaBrowserListAdapter", log);
 	}
 }
+

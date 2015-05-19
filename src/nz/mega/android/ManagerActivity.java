@@ -21,7 +21,6 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.WebAuthSession;
 import nz.mega.android.FileStorageActivity.Mode;
-import nz.mega.android.utils.DropboxAuthTest;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
