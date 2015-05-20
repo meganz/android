@@ -379,6 +379,10 @@
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads complete</string>
     
+    <string name="dropbox_import_notif_title" context="title of the notification when when importing from Dropbox">Importing files from Dropbox</string>
+    <string name="dropbox_import_notif_complete" context="notification import from Dropbox complete">Dropbox files correctly imported</string>
+    <string name="dropbox_import_notif_error" context="notification error">Dropbox Import Error</string>
+    
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>
     

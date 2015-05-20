@@ -4,20 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
-import com.dropbox.client2.DropboxAPI.Entry;
-import com.dropbox.client2.ProgressListener;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
 
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -32,34 +23,31 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore;
-import android.provider.MediaStore.MediaColumns;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
-import android.text.format.Time;
 import android.widget.RemoteViews;
-import android.widget.Toast;
+
+import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxFileInfo;
+import com.dropbox.client2.DropboxAPI.Entry;
+import com.dropbox.client2.ProgressListener;
+import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
 
 
 public class DropboxImportService extends Service implements MegaRequestListenerInterface, MegaTransferListenerInterface, MegaGlobalListenerInterface{
@@ -100,7 +88,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	private long totalSizeToImport;
 	private int totalToImport;
 	private long totalSizeImported;
-	private int successCount;
 	private Queue<Entry> filesToUpload = new LinkedList<Entry>();
 	private Queue<Entry> filesToDownload = new LinkedList<Entry>();
 	private Queue<Entry> filesUploaded = new LinkedList<Entry>();
@@ -121,42 +108,24 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	
 	MegaPreferences prefs;
 	
-	boolean newFileList = false;
+//	boolean newFileList = false;
 	boolean stopped = false;
 	
-	Thread task;		
+	Thread task;	
+	Thread importTask;
 
-//	boolean waitForOnNodesUpdate = false;
-	
 	static DropboxImportService dropboxImportService;
 	
     ProgressListener mProgressListener = new ProgressListener() {
 
-//        @Override
-//        public void onProgress(long arg0, long arg1) {
-//            // TODO Auto-generated method stub
-//            tmpFile = new File(cachePath);
-//            OnDownloadProgressDropboxChecked(FileHandler.PROGRESS_STATUS_ONPROGRESS, (int) (arg0 * 100 / arg1));
-//            Log.d("Dolphin got interval", String.valueOf(tmpFile.length() + " - " + arg0 + " - " + arg1));
-//        }
-//
-//        @Override
-//        public long progressInterval() {
-//            return 100;
     	 @Override
-         public void onProgress(long uploaded, long total) {
+         public void onProgress(long downloaded, long total) {
              // TODO Auto-generated method stub
-    		 log("long arg0: "+uploaded+" long arg1: "+total);
+    		 log("long downloaded: "+downloaded+" long arg1: "+total);
     		 
-    		 if(uploaded==total){
+    		 if(downloaded==total){
     			 log("FINISH!!");
     		 }
-         }
-
-         @Override
-         public long progressInterval() {
-        	 log("progressInterval");
-             return 100;
          }
     };
 	
@@ -189,7 +158,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		
 		handler = new Handler();
 		canceled = false;
-		newFileList = false;
 //		waitForOnNodesUpdate = false;
 		
 		try{
@@ -241,81 +209,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			return START_NOT_STICKY;
 		}
 		
-//		if(dropboxHandle==-1){
-//			return START_NOT_STICKY;
-//		}
-//					
-	/*
-		if (cameraUploadHandle == -1){
-			//Find the "Camera Uploads" folder of the old "PhotoSync"			
-			for (int i=0;i<nl.size();i++){
-				if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-					cameraUploadHandle = nl.get(i).getHandle();
-					dbH.setCamSyncHandle(cameraUploadHandle);
-				}
-				else if((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-					cameraUploadHandle = nl.get(i).getHandle();
-					dbH.setCamSyncHandle(cameraUploadHandle);
-					megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);					
-				}
-			}
-			
-			//If not "Camera Uploads" or "Photosync"
-			if (cameraUploadHandle == -1){
-				log("must create the folder");
-				if (!running){
-					running = true;
-					megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
-				}
-				else{
-					if (megaApi != null){
-						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-						return START_NOT_STICKY;
-					}
-				}
-				return START_NOT_STICKY;
-			}
-		}
-		else{
-			MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
-			//If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads
-			if(n==null){				
-				//Find the "Camera Uploads" folder of the old "PhotoSync"
-				for (int i=0;i<nl.size();i++){
-					if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-						cameraUploadHandle = nl.get(i).getHandle();
-						dbH.setCamSyncHandle(cameraUploadHandle);
-					}
-					else if((PHOTO_SYNC.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-						cameraUploadHandle = nl.get(i).getHandle();
-						dbH.setCamSyncHandle(cameraUploadHandle);
-						megaApi.renameNode(nl.get(i), CAMERA_UPLOADS, this);					
-					}
-				}
-				
-				//If not "Camera Uploads" or "Photosync"
-				if (cameraUploadHandle == -1){
-					log("must create the folder");
-					if (!running){
-						running = true;
-						megaApi.createFolder(CAMERA_UPLOADS, megaApi.getRootNode(), this);
-					}
-					else{
-						if (megaApi != null){
-							megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-							return START_NOT_STICKY;
-						}
-					}
-					return START_NOT_STICKY;
-				}				
-			}
-			else{
-				log("Sync Folder " + cameraUploadHandle + " Node: "+n.getName());
-			}			
-		}
-	
-		log("shouldRun: TODO OK");*/
-		
 		return 0;
 	}
 	
@@ -363,7 +256,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					intent.setAction(null);
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-						dbH.setCamSyncEnabled(false);
 						return START_NOT_STICKY;
 					}
 					else{
@@ -376,20 +268,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					intent.setAction(null);
 					stopped = true;
 					if (megaApi != null){
-						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
-						dbH.setCamSyncEnabled(false);
-						return START_NOT_STICKY;
-					}
-					else{
-						finish();
-						return START_NOT_STICKY;
-					}
-				}
-				else if (intent.getAction().equals(ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER)){
-					log("List photos and videos intent");
-					intent.setAction(null);
-					if (megaApi != null){
-						newFileList = true;
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 						return START_NOT_STICKY;
 					}
@@ -411,12 +289,8 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					}
 				}
 			}
-		}
-		
-		if (newFileList){
-			return START_NOT_STICKY;
-		}
-		
+		}		
+	
 		if (!running){
 			running = true;
 			canceled = false;
@@ -472,25 +346,19 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			}
 			
 			Entry ent = foldersCreation.get(0);
-			//Remove the filename of the path
-//			String pathParent = ent.path;
-//			pathParent = pathParent.replace(ent.fileName(),"");
 			
 			String pathParent = "/"+DROPBOX_IMPORT+ent.parentPath();
 			log("pathNoName: "+pathParent);
 			
 			MegaNode parentNode = megaApi.getNodeByPath(pathParent);
 			if(parentNode==null){
-				//Create the folder
-				
-				log("No tengo creado el padre");
+				//Create the folder				
+				log("No parent");
 			}
 			else{
 				log("Create the folder: "+ent.fileName()+"in the node: "+pathParent);
 				megaApi.createFolder(ent.fileName(), parentNode, this);
 			}
-			
-
 		}
 		
 		@Override
@@ -525,7 +393,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			
 		}
 	}
-	
+		
 	void initSync(){
 		log("initSync");
 		
@@ -542,14 +410,16 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			file.mkdirs();
 		}
 		
-		int i=0;
-        String[] fnames = null;
+		totalToImport = filesToDownload.size();
+		totalImported=0;
+		totalSizeImported=0;		
+		totalSizeToImport = 0;
+
         Entry dirent;
 		try {
 			if(mDBApi!=null){
 				dirent = mDBApi.metadata("/", 1000, null, true, null);
 				ArrayList<Entry> files = new ArrayList<Entry>();
-	            ArrayList<String> dir=new ArrayList<String>();
 	            for (Entry ent: dirent.contents) 
 	            {
 	                files.add(ent);// Add it to the list of thumbs we can choose from                       
@@ -559,17 +429,11 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	                }
 	                else{
 	                	filesToDownload.add(ent);
-//	            		importFile(ent);
+	                	totalSizeToImport = totalSizeToImport + ent.bytes;
 	                	log("Added: "+ent.path);
 	                }
-//	                dir.add(new String(files.get(i++).path));
 	            }
-//	            i=0;
-//	            fnames=dir.toArray(new String[dir.size()]);
-//	            for(int j=0;j<fnames.length;j++)
-//	            {
-//	            	log("Lista: "+fnames[j]);
-//	            }     
+     
 	            log("   "+filesToDownload.size());
 	            
 			}
@@ -585,19 +449,9 @@ public class DropboxImportService extends Service implements MegaRequestListener
 //		Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
 		
 		totalToImport = filesToDownload.size();
-		totalImported=0;
-		totalSizeImported=0;//		
-		totalSizeToImport = 0;
-		
-		Iterator<Entry> itCF = filesToDownload.iterator();
-		while (itCF.hasNext()){
-			Entry m = itCF.next();
-			File f = new File(m.size);
-			totalSizeToImport = totalSizeToImport + f.length();
-		}	
 		
 		//Start the thread to create the folder tree
-		log("Voy a crear el hilo para las folders");
+		log("Start CreateFolderTreeTask");
 		createFolderTreeTask = new CreateFolderTreeTask(this);
 		createFolderTreeTask.start();
 		
@@ -607,30 +461,21 @@ public class DropboxImportService extends Service implements MegaRequestListener
                 createFolderTreeTask.wait();
             }catch(InterruptedException e){
                 e.printStackTrace();
-            }
- 
-            
+            }            
         }
 		
-		log("TERMINOOOOO");
-	
-//		while (itCF.hasNext()){
-//			Entry entry = itCF.next();
-//			importFile(entry);
-//		}
+		log("Start ImportTask");
 		
-		
-//		uploadNextImage();
-//		log("Time for secondary media folder!");
-//		uploadNextMediaFile();
-		
-//		uploadNext();
-//		try {
-//			Thread.sleep(100);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		importTask = new Thread()
+		{
+			@Override
+			public void run()
+			{
+				log("Run: initSyn");
+				importFile();
+			}
+		};
+		importTask.start();
 	}
 	
 	public void startDownload(Entry ent){
@@ -655,46 +500,62 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		}
 	}
 	
-	public void importFile(Entry entry){		
+	private void importFile(){		
 		log("importFile");
 		
-		String destination2 = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.dropboxDIR + "/" + entry.fileName();		
-		File file2 = new File(destination2);
+		int result = shouldRun();
+		if (result != 0){
+			retryLater();
+			return;
+		}		
 		
-		log("destination: "+destination2);
-		
-		FileOutputStream outputStream;
-		try {
-			outputStream = new FileOutputStream(file2);
+		if (filesToDownload.isEmpty())
+		{
+			onQueueComplete(true, totalImported);			
+		}
+		else{
+			//Get the first element of the queue
+			Entry entry = filesToDownload.element();
+			log("Time to import: "+entry.fileName());
+			
+			String destination2 = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.dropboxDIR + "/" + entry.fileName();		
+			File file2 = new File(destination2);
+			
+			log("destination: "+destination2);
+			
+			FileOutputStream outputStream;
+			try {
+				outputStream = new FileOutputStream(file2);
 
-			DropboxFileInfo info = mDBApi.getFile(entry.path, null, outputStream, mProgressListener);
-			
-			//Upload in the corresponding folder
-			log("Upload the file: "+entry.fileName()+" in the folder: "+entry.path);
-			
-			//Remove the filename of the path
-			String parentPath = entry.path;
-			parentPath = parentPath.replace(entry.fileName(),"");
-			
-			parentPath = "/"+DROPBOX_IMPORT+parentPath;
-			log("parentPath: "+parentPath);
-			
-			MegaNode parent = megaApi.getNodeByPath(parentPath);
-			
-			//Si el parent es null
-			
-			megaApi.startUpload(destination2, parent, entry.fileName(), this);
-		} 
-		catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				DropboxFileInfo info = mDBApi.getFile(entry.path, null, outputStream, mProgressListener);				
+				
+				//Remove the filename of the path
+				String parentPath = entry.path;
+				parentPath = parentPath.replace(entry.fileName(),"");
+				
+				parentPath = "/"+DROPBOX_IMPORT+parentPath;
+				log("parentPath: "+parentPath);
+				
+				MegaNode parent = megaApi.getNodeByPath(parentPath);
+				
+				//Upload in the corresponding folder
+				log("Upload the file: "+entry.fileName()+" in the folder: "+entry.path);
+				
+				if(parent!=null){
+					megaApi.startUpload(destination2, parent, entry.fileName(), this);
+				}				
+			} 
+			catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (DropboxException e) {
+				e.printStackTrace();
+			}
 		}
-		catch (DropboxException e) {
-			e.printStackTrace();
-		}
-		
 	}
 	
+		
 	public void listDirectory(Entry entry){
 		log("listDirectory: "+entry.path);
 		
@@ -732,44 +593,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	}
 	
 	/*
-	private boolean checkFile(Media media){
-		
-		if (media.filePath != null){
-			if (media.filePath.startsWith(localPath)){
-				Time t = new Time(Time.getCurrentTimezone());
-				t.setToNow();
-				long timeSpent = t.toMillis(true) - media.timestamp;
-				if (timeSpent > ((5 * 60 * 1000)-1)){
-					return true;
-				}
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	private boolean checkFile(Media media, String path){
-		
-		if (media.filePath != null){
-			if (path != null){
-				if (path.compareTo("") != 0){
-					if (media.filePath.startsWith(path)){
-						Time t = new Time(Time.getCurrentTimezone());
-						t.setToNow();
-						long timeSpent = t.toMillis(true) - media.timestamp;
-						if (timeSpent > ((5 * 60 * 1000)-1)){
-							return true;
-						}
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
-	}	
-	
+
 	public void retryLaterShortTime(){
 		log("retryLaterShortTime");
 		stopped = true;
@@ -792,7 +616,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				getResources().getQuantityString(R.plurals.general_num_files,
 						totalImported), getString(R.string.upload_uploaded),
 				Formatter.formatFileSize(DropboxImportService.this, totalSizeImported));
-		String title = getString(R.string.settings_camera_notif_complete);
+		String title = getString(R.string.dropbox_import_notif_complete);
 		Intent intent = new Intent(DropboxImportService.this, ManagerActivity.class);
 		intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, dropboxHandle);
 
@@ -807,7 +631,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	}
 
 	private void finish(){
-		log("finish CameraSyncService");
+		log("finish DropboxImportService");
 		
 		if(running){
 			handler.removeCallbacksAndMessages(null);
@@ -822,7 +646,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		totalSizeToImport = 0;
 		totalToImport = 0;
 		totalSizeImported = 0;
-		successCount = 0;
 		filesToUpload.clear();
 		filesUploaded.clear();
 	}
@@ -854,10 +677,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	public void onDestroy(){
 		log("onDestroy");
 		running = false;
-		
-		if (!stopped){
-			retryLater();
-		}		
 
 		if(megaApi != null)
 		{
@@ -884,7 +703,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				mBuilderCompat
 					.setSmallIcon(R.drawable.ic_stat_camera_sync)
 					.setContentIntent(PendingIntent.getActivity(DropboxImportService.this, 0, intent, 0))
-					.setContentTitle(getString(R.string.settings_camera_notif_error))
+					.setContentTitle(getString(R.string.dropbox_import_notif_error))
 					.setContentText(getString(errResId))
 					.setOngoing(false);
 		
@@ -1038,26 +857,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			MegaError e) {
 		log("onRequestTemporaryError: " + request.getRequestString());
 	}
-	
-	public static void runIfNecessary(final Context context) {
-		long time = System.currentTimeMillis();
-		if (time - lastRun > 5  * 1000) {
-			log("should start");
-			lastRun = time;
-			new Handler().postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					if (context != null) {
-						context.startService(new Intent(context,
-								DropboxImportService.class));
-					}
-				}
-			}, 2000);
-
-		} else {
-			log("no need");
-		}
-	}
 
 	@Override
 	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
@@ -1091,15 +890,27 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				megaApi.createThumbnail(transfer.getPath(), thumb.getAbsolutePath());
 				megaApi.createPreview(transfer.getPath(), preview.getAbsolutePath());
 				
-//				dbH.setCamSyncTimeStamp(currentTimeStamp);
-				
-//				ArrayList<MegaNode> nLAfter = megaApi.getChildren(megaApi.getNodeByHandle(cameraUploadHandle), MegaApiJava.ORDER_ALPHABETICAL_ASC);
-//				log("SIZEEEEEE: " + nLAfter.size());
+				//Delete the file in the queue
+				Entry entry = filesToDownload.remove();
+				log("Deleted: "+entry.path);
 				
 				//Delete the local file
 				String pathFile = transfer.getPath();						
 				File f = new File(pathFile);
 				f.delete();	
+				log("Deleted from the device: "+f.getAbsolutePath());
+				
+				//Import next file
+				importTask = new Thread()
+				{
+					@Override
+					public void run()
+					{
+						log("Run: initSyn");
+						importFile();
+					}
+				};
+				importTask.start();
 			}
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -1147,9 +958,8 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	@SuppressLint("NewApi")
 	private void updateProgressNotification(final long progress) {
 //		log("updateProgressNotification");
-		int progressPercent = (int) Math.round((double) progress / totalSizeToImport
-				* 100);
-		log(progressPercent + " " + progress + " " + totalSizeToImport);
+		int progressPercent = (int) Math.round((double) progress / totalSizeToImport* 100);
+		log("updateProgressNotification: " +progressPercent + " " + progress + " " + totalSizeToImport);
 		int left = totalToImport - totalImported;
 		int current = totalToImport - left;
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -1187,7 +997,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				.setOngoing(true)
 				.setContentTitle(message)
 				.setContentInfo(info)
-				.setContentText(getString(R.string.settings_camera_notif_title))
+				.setContentText(getString(R.string.dropbox_import_notif_title))
 				.setOnlyAlertOnce(true);
 			notification = mBuilder.getNotification();
 //					notification = mBuilder.build();
@@ -1215,8 +1025,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	
 	private void onQueueComplete(boolean success, int totalImported) {
 		log("onQueueComplete");
-		log("Stopping foreground!");
-		log("stopping service! success: " + successCount + " total: " + totalToImport);
+		log("Stopping foreground service!");
 		megaApi.resetTotalUploads();
 		
 		if((lock != null) && (lock.isHeld()))
@@ -1242,6 +1051,13 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				}
 			}
 		}
+		
+		//Delete the folder Dropbox in device
+		//Delete the local file
+		String pathFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.dropboxDIR; 						
+		File f = new File(pathFile);
+		f.delete();	
+		log("Deleted from the device: "+f.getAbsolutePath());		
 				
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");
 		isForeground = false;
