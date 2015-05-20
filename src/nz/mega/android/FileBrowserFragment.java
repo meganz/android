@@ -275,7 +275,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		prefs = dbH.getPreferences();
 		
 		super.onCreate(savedInstanceState);
-		log("onCreate");		
+		log("onCreate");	
 	}
 	
 	@Override
@@ -333,6 +333,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				((ManagerActivity)context).supportInvalidateOptionsMenu();
 			}
 		}	
+		
+		if (context != null){
+			Intent intent = new Intent(context, CreateThumbPreviewService.class);
+			intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
+			context.startService(intent);
+		}
 		
 				
 		if (isList){
@@ -705,6 +711,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
+					
+					if (context != null){
+						Intent intent = new Intent(context, CreateThumbPreviewService.class);
+						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
+						context.startService(intent);
+					}
 					
 					//If folder has no files
 					if (adapterList.getCount() == 0){

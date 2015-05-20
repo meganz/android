@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -12,6 +13,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -60,6 +62,42 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		public long timestamp;
 	}
 	
+	HashMap<Long, String> initDBHM(){
+		HashMap<Long, String> hm = new HashMap<Long, String>();
+		
+		String projection[] = {	MediaColumns.DATA, 
+				//MediaColumns.MIME_TYPE, 
+				//MediaColumns.DATE_MODIFIED,
+				MediaColumns.DATE_MODIFIED};
+//		String selection = "(abs(" + MediaColumns.DATE_MODIFIED + "-" + n.getModificationTime() + ") < 3) OR ("+ MediaColumns.DATA + " LIKE '%" + n.getName() + "%')";
+		String selection = "";
+		log("SELECTION: " + selection);
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);	
+		String order = MediaColumns.DATE_MODIFIED + " ASC";
+		String[] selectionArgs = null;
+		
+		for(int i=0; i<uris.size(); i++){
+			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
+			if (cursor != null){
+				int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+				int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+				while(cursor.moveToNext()){
+					Media media = new Media();
+			        media.filePath = cursor.getString(dataColumn);
+			        media.timestamp = cursor.getLong(timestampColumn);
+			        
+			        hm.put(media.timestamp, media.filePath);
+				}
+			}
+		}
+		
+		return hm;	
+	}
+	
+	HashMap<Long, String> hm;
+	
 	private class MediaDBTask extends AsyncTask<MegaNode, Void, String> {
 		
 		Context context;
@@ -81,6 +119,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		protected String doInBackground(MegaNode... params) {
 			this.node = params[0];
 			
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			if (this.node == null){
 				return null;
 			}
@@ -89,46 +134,140 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				return null;
 			}
 			
-			String projection[] = {	MediaColumns.DATA, 
-					//MediaColumns.MIME_TYPE, 
-					//MediaColumns.DATE_MODIFIED,
-					MediaColumns.DATE_MODIFIED};
-			String selection = "(abs(" + MediaColumns.DATE_MODIFIED + "-" + node.getModificationTime() + ") < 10) OR ("+ MediaColumns.DATA + " LIKE '%" + node.getName() + "%')";
-//			String selection = "";
-			log("SELECTION: " + selection);
-			ArrayList<Uri> uris = new ArrayList<Uri>();
-			uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-			uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);	
-			String order = MediaColumns.DATE_MODIFIED + " ASC";
-			String[] selectionArgs = null;
+			if (hm == null){
+				return null;
+			}
 			
-			for(int i=0; i<uris.size(); i++){
-				Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
-				if (cursor != null){
-					int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
-					int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
-					while(cursor.moveToNext()){
-						Media media = new Media();
-				        media.filePath = cursor.getString(dataColumn);
-				        media.timestamp = cursor.getLong(timestampColumn);
-				        
-				        if (megaApi.getFingerprint(node).compareTo(megaApi.getFingerprint(media.filePath)) == 0){
-				        	log("SAME FINGERPRINT!!! " +  media.filePath);
-				        	File previewDir = PreviewUtils.getPreviewFolder(context);
-							File previewFile = new File(previewDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
-							File thumbDir = ThumbnailUtils.getThumbFolder(context);
-							File thumbFile = new File(thumbDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
-							megaApi.createThumbnail(media.filePath, thumbFile.getAbsolutePath());
-//							megaApi.createPreview(media.filePath, previewFile.getAbsolutePath());
-				        	return media.filePath;
-				        }
-				        else{
-				        	log("DIFFERENT FINGERPRINT!!! " + media.filePath);
-				        }
-				        
-				        log("FILEPATH: " + media.filePath + "____TIMESTAMP: " + media.timestamp + "______ TIME: " + node.getModificationTime());
-				        
+			boolean thumbCreated = false;
+			boolean previewCreated = false;
+			
+			File previewDir = PreviewUtils.getPreviewFolder(context);
+			File thumbDir = ThumbnailUtils.getThumbFolder(context);
+			File previewFile = new File(previewDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
+			File thumbFile = new File(thumbDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
+							
+			if (!thumbFile.exists()){
+		
+				log("n.getName(): " + node.getName() + "____" + node.getModificationTime());
+				String filePath = hm.get(node.getModificationTime());
+				if (filePath != null){
+					File f = new File(filePath);
+					if (f != null){
+						if (f.length() == node.getSize()){
+							log("IDEM: " + filePath + "____" + node.getName());
+							thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+							if (!node.hasThumbnail()){
+								log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+								megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+							}
+							else{
+								log("Thumbnail OK: " + node.getName() + "___" + thumbFile.getAbsolutePath());
+							}
+							
+							if (!previewFile.exists()){
+								previewCreated = MegaUtils.createPreview(f, previewFile);
+								if (!node.hasPreview()){
+									log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+									megaApi.setPreview(node, previewFile.getAbsolutePath());
+								}
+							}
+							else{
+								if (!node.hasPreview()){
+									log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+									megaApi.setPreview(node, previewFile.getAbsolutePath());
+								}
+							}
+						}
 					}
+				}
+				else{
+					List<String> paths = new ArrayList<String>(hm.values());
+					for (int i=0;i<paths.size();i++){
+						if (paths.get(i).contains(node.getName())){
+							filePath = paths.get(i);
+							File f = new File(filePath);
+							if (f != null){
+								if (f.length() == node.getSize()){
+									log("IDEM(por nombre): " + filePath + "____" + node.getName());
+									thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+									if (!node.hasThumbnail()){
+										log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+										megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+									}
+									else{
+										log("Thumbnail OK: " + node.getName() + "___" + thumbFile.getAbsolutePath());
+									}
+									
+									if (!previewFile.exists()){
+										previewCreated = MegaUtils.createPreview(f, previewFile);
+										if (!node.hasPreview()){
+											log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+											megaApi.setPreview(node, previewFile.getAbsolutePath());
+										}
+									}
+									else{
+										if (!node.hasPreview()){
+											log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+											megaApi.setPreview(node, previewFile.getAbsolutePath());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				thumbCreated = true;
+				if (!node.hasThumbnail()){
+					log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+					megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+				}
+				else{
+					log("Thumbnail OK: " + node.getName() + "___" + thumbFile.getAbsolutePath());
+				}
+			}
+			
+			if (!previewFile.exists()){
+				log("n.getName(): " + node.getName() + "____" + node.getModificationTime());
+				String filePath = hm.get(node.getModificationTime());
+				if (filePath != null){
+					File f = new File(filePath);
+					if (f != null){
+						if (f.length() == node.getSize()){
+							log("IDEM: " + filePath + "____" + node.getName());
+							previewCreated = MegaUtils.createPreview(f, previewFile);
+							if (!node.hasPreview()){
+								log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+								megaApi.setPreview(node, previewFile.getAbsolutePath());
+							}
+							if (!thumbFile.exists()){
+								thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+								if (!node.hasThumbnail()){
+									log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+									megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+								}
+							}
+							else{
+								if (!node.hasThumbnail()){
+									log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+									megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				if (!node.hasPreview()){
+					log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+					megaApi.setPreview(node, previewFile.getAbsolutePath());
+				}
+			}
+			
+			if (thumbCreated){
+				if (thumbFile != null){
+					return thumbFile.getAbsolutePath();
 				}
 			}
 			
@@ -138,11 +277,12 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		@Override
 		protected void onPostExecute(String res) {
 			if (res == null){
+				log("megaApi.getThumbnail");
 				if (this.node != null){
 					try {
-						log("megaApi.getThumbnail");
 						thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, adapter);
-					} catch (Exception e) {
+					} 
+					catch (Exception e) {
 					} // Too many AsyncTasks
 	
 					if (thumb != null) {
@@ -160,6 +300,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				}
 			}
 			else{
+				log("From folder");
 				if (this.node != null){
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
@@ -314,6 +455,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			megaApi = ((MegaApplication) ((Activity) context).getApplication())
 					.getMegaApi();
 		}
+		
+		this.app = ((MegaApplication) ((Activity) context).getApplication());
+		this.hm = initDBHM();
 	}
 
 	public void setNodes(ArrayList<MegaNode> nodes) {
@@ -514,13 +658,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							holder.imageView.setImageBitmap(thumb);
 						}
 					} else {
-//						new MediaDBTask(context, holder, megaApi, this).execute(node);
-						try {
-							log("megaApi.getThumbnail");
-							thumb = ThumbnailUtils.getThumbnailFromMegaList(
-									node, context, holder, megaApi, this);
-						} catch (Exception e) {
-						} // Too many AsyncTasks
+						new MediaDBTask(context, holder, megaApi, this).execute(node);
+//						try {
+//							log("megaApi.getThumbnail");
+//							thumb = ThumbnailUtils.getThumbnailFromMegaList(
+//									node, context, holder, megaApi, this);
+//						} catch (Exception e) {
+//						} // Too many AsyncTasks
 		
 						if (thumb != null) {
 							if(!multipleSelect){
