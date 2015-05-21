@@ -47,6 +47,7 @@
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Eliminar completamente de MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
     
+    <string name="confirmation_continue_without_Wifi" context="confirmation message before importing from Dropbox without Wifi">No hay conexión Wifi.Esta operación implica un consumo de datos, ¿desea continuar?</string>
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Entrantes</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Salientes</string>
@@ -358,6 +359,9 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Subiendo ficheros multimedia</string>
     <string name="settings_camera_notif_error" context="notification error">Existe un problema con las subidas de la Cámara</string>
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Subidas de la Cámara completadas</string>
+   
+    <string name="importing_dropbox_files" context="operation import Dropbox files in progress">Importando ficheros de Dropbox</string>
+    <string name="cancel_importing_dropbox_files" context="confirmation question for cancelling the Dropbox imports">¿Quieres cancelar la operación?</string>
     
     <string name="dropbox_import_notif_title" context="title of the notification when importing from Dropbox">Importando ficheros de Dropbox</string>
     <string name="dropbox_import_notif_complete" context="notification import from Dropbox complete">Ficheros de Dropbox importados correctamente</string>
