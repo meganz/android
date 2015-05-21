@@ -318,10 +318,10 @@ public class CreateThumbPreviewService extends Service {
 									if (f.length() == n.getSize()){
 										log("IDEM(por nombre): " + filePath + "____" + n.getName());
 										boolean thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
-//										if (!n.hasThumbnail()){
+										if (!n.hasThumbnail()){
 											log("Upload thumbnail -> " + n.getName() + "___" + thumbFile.getAbsolutePath());
 											megaApi.setThumbnail(n, thumbFile.getAbsolutePath());
-//										}
+										}
 										if (!previewFile.exists()){
 											boolean previewCreated = MegaUtils.createPreview(f, previewFile);
 											if (!n.hasPreview()){
