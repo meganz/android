@@ -430,7 +430,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	                else{
 	                	filesToDownload.add(ent);
 	                	totalSizeToImport = totalSizeToImport + ent.bytes;
-	                	log("Added: "+ent.path);
+//	                	log("Added: "+ent.path+"size: "+ent.size+"totalSize: "+totalSizeToImport+"bytes: "+ent.bytes);
 	                }
 	            }
      
@@ -583,6 +583,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	            }
 	            else{
 	            	filesToDownload.add(ent);
+	            	totalSizeToImport = totalSizeToImport + ent.bytes;
 	            	log("Added: "+ent.path);
 	            }
 	        }
