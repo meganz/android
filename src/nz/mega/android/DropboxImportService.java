@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -25,13 +24,11 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -80,6 +77,8 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	
 	CreateFolderTreeTask createFolderTreeTask;
 	
+	public String dropboxFolder;
+	
 	static public boolean running = false;
 	private boolean canceled;
 	
@@ -105,7 +104,6 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	private static long lastRun = 0;
 	
 	String localPath = "";
-	long dropboxHandle = -1;
 	
 	Intent intentCreate = null;
 	
@@ -176,14 +174,26 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		
 		megaApi.addGlobalListener(this);
 		
-		MegaNode parentDropbox = megaApi.getNodeByPath("/"+DROPBOX_IMPORT);
-		if(parentDropbox==null){
-			megaApi.createFolder(DROPBOX_IMPORT, megaApi.getRootNode(), this);
-		}
-		else{
-			dropboxHandle=parentDropbox.getHandle();
-		}
-				
+		dropboxFolder=DROPBOX_IMPORT;
+		MegaNode parentDropbox = megaApi.getNodeByPath("/"+dropboxFolder);
+		int index = 0;
+		
+		while(parentDropbox!=null)
+		{
+			index=index+1;
+			//If not index, put - if index, change
+			if(index==1){
+				dropboxFolder = DROPBOX_IMPORT+"_"+index;
+			}
+			else{
+				dropboxFolder = dropboxFolder.substring(0, dropboxFolder.length()-1);
+				dropboxFolder = dropboxFolder + index;
+			}
+
+			parentDropbox = megaApi.getNodeByPath("/"+dropboxFolder);			
+		}	
+		log("The new folder for Dropbox is: "+"/"+dropboxFolder);
+		megaApi.createFolder(dropboxFolder, megaApi.getRootNode(), this);				
 	}
 	
 	private int shouldRun(){
@@ -353,18 +363,18 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			
 			Entry ent = foldersCreation.get(0);
 			
-			String pathParent = "/"+DROPBOX_IMPORT+ent.parentPath();
+			String pathParent = "/"+dropboxFolder+ent.parentPath();
 			log("pathNoName: "+pathParent);
 			
 			MegaNode parentNode = megaApi.getNodeByPath(pathParent);
 			if(parentNode==null){
-				//Create the folder				
 				log("No parent");
 			}
 			else{
 				log("Create the folder: "+ent.fileName()+"in the node: "+pathParent);
 				megaApi.createFolder(ent.fileName(), parentNode, this);
 			}
+
 		}
 		
 		@Override
@@ -541,7 +551,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				String parentPath = entry.path;
 				parentPath = parentPath.replace(entry.fileName(),"");
 				
-				parentPath = "/"+DROPBOX_IMPORT+parentPath;
+				parentPath = "/"+dropboxFolder+parentPath;
 				log("parentPath: "+parentPath);
 				
 				MegaNode parent = megaApi.getNodeByPath(parentPath);
@@ -626,7 +636,8 @@ public class DropboxImportService extends Service implements MegaRequestListener
 				Formatter.formatFileSize(DropboxImportService.this, totalSizeImported));
 		String title = getString(R.string.dropbox_import_notif_complete);
 		Intent intent = new Intent(DropboxImportService.this, ManagerActivity.class);
-		intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, dropboxHandle);
+		MegaNode dropboxNode= megaApi.getNodeByPath("/"+dropboxFolder);
+		intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, dropboxNode.getHandle());
 
 		mBuilderCompat
 			.setSmallIcon(R.drawable.ic_stat_camera_sync)
@@ -750,7 +761,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					log("Folder created: "+request.getName());				
 					//Add in the database the new folder
 					String name = request.getName();
-					if(name.equals(DROPBOX_IMPORT)){
+					if(name.equals(dropboxFolder)){
 						log("Dropbox folder created");						
 					}
 
