@@ -79,6 +79,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		String[] selectionArgs = null;
 		
 		for(int i=0; i<uris.size(); i++){
+			if (app == null){
+				app = ((MegaApplication) ((Activity) context).getApplication());
+			}
 			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
 			if (cursor != null){
 				int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
