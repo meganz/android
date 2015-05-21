@@ -372,7 +372,7 @@ public class MegaApiJava
 	/**
      * Reconnect and retry also transfers
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void reconnect(){
 		megaApi.retryPendingConnections(true, true);
@@ -409,7 +409,7 @@ public class MegaApiJava
      *
      * @param email Email of the user
      * @param password Password
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void login(String email, String password, MegaRequestListenerInterface listener)
 	{
@@ -439,7 +439,7 @@ public class MegaApiJava
      * - MegaRequest::getLink - Returns the public link to the folder
      *
      * @param Public link to a folder in MEGA
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void loginToFolder(String megaFolderLink, MegaRequestListenerInterface listener)
 	{
@@ -474,7 +474,7 @@ public class MegaApiJava
      * @param email Email of the user
      * @param stringHash Hash of the email returned by MegaApi::getStringHash
      * @param base64pwkey Private key calculated using MegaApi::getBase64PwKey
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void fastLogin(String email, String stringHash, String base64pwkey, MegaRequestListenerInterface listener)
 	{
@@ -501,7 +501,7 @@ public class MegaApiJava
      * - MegaRequest::getSessionKey - Returns the session key
      *
      * @param session Session key previously dumped with MegaApi::dumpSession
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void fastLogin(String session, MegaRequestListenerInterface listener)
 	{
@@ -678,7 +678,7 @@ public class MegaApiJava
      * @param email Email for the account
      * @param password Password for the account
      * @param name Name of the user
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void createAccount(String email, String password, String name, MegaRequestListenerInterface listener)
 	{
@@ -713,7 +713,7 @@ public class MegaApiJava
      * @param email Email for the account
      * @param base64pwkey Private key calculated with MegaApi::getBase64PwKey
      * @param name Name of the user
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void fastCreateAccount(String email, String base64pwkey, String name, MegaRequestListenerInterface listener)
 	{
@@ -745,7 +745,7 @@ public class MegaApiJava
      * - MegaRequest::getName - Returns the name associated with the confirmation link
      *
      * @param link Confirmation link
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void querySignupLink(String link, MegaRequestListenerInterface listener)
 	{
@@ -777,7 +777,7 @@ public class MegaApiJava
      *
      * @param link Confirmation link
      * @param password Password for the account
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void confirmAccount(String link, String password, MegaRequestListenerInterface listener)
 	{
@@ -810,7 +810,7 @@ public class MegaApiJava
      *
      * @param link Confirmation link
      * @param base64pwkey Private key precomputed with MegaApi::getBase64PwKey
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void fastConfirmAccount(String link, String base64pwkey, MegaRequestListenerInterface listener)
 	{
@@ -972,7 +972,7 @@ public class MegaApiJava
      *
      * @param name Name of the new folder
      * @param parent Parent folder
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void createFolder(String name, MegaNode parent, MegaRequestListenerInterface listener)
 	{
@@ -1000,7 +1000,7 @@ public class MegaApiJava
      *
      * @param node Node to move
      * @param newParent New parent for the node
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void moveNode(MegaNode node, MegaNode newParent, MegaRequestListenerInterface listener)
 	{
@@ -1033,7 +1033,7 @@ public class MegaApiJava
      *
      * @param node Node to copy
      * @param newParent Parent for the new node
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void copyNode(MegaNode node, MegaNode newParent, MegaRequestListenerInterface listener)
 	{
@@ -1105,7 +1105,7 @@ public class MegaApiJava
      *
      * @param node Node to modify
      * @param newName New name for the node
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void renameNode(MegaNode node, String newName, MegaRequestListenerInterface listener)
 	{
@@ -1134,7 +1134,7 @@ public class MegaApiJava
      * - MegaRequest::getNodeHandle - Returns the handle of the node to remove
      *
      * @param node Node to remove
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void remove(MegaNode node, MegaRequestListenerInterface listener)
 	{
@@ -1161,7 +1161,7 @@ public class MegaApiJava
      *
      * @param node Node to send
      * @param user User that receives the node
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void sendFileToUser(MegaNode node, MegaUser user, MegaRequestListenerInterface listener)
 	{
@@ -1203,7 +1203,7 @@ public class MegaApiJava
      * - MegaShare::ACCESS_FULL = 2
      * - MegaShare::ACCESS_OWNER = 3
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void share(MegaNode node, MegaUser user, int level, MegaRequestListenerInterface listener)
 	{
@@ -1259,7 +1259,7 @@ public class MegaApiJava
      * - MegaShare::ACCESS_FULL = 2
      * - MegaShare::ACCESS_OWNER = 3
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void share(MegaNode node, String email, int level, MegaRequestListenerInterface listener)
 	{
@@ -1305,7 +1305,7 @@ public class MegaApiJava
      *
      * @param megaFileLink Public link to a file in MEGA
      * @param parent Parent folder for the imported file
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void importFileLink(String megaFileLink, MegaNode parent, MegaRequestListenerInterface listener)
 	{
@@ -1337,7 +1337,7 @@ public class MegaApiJava
      * - MegaRequest::getPublicMegaNode - Public MegaNode corresponding to the public link
      *
      * @param megaFileLink Public link to a file in MEGA
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void getPublicNode(String megaFileLink, MegaRequestListenerInterface listener)
 	{
@@ -1374,7 +1374,7 @@ public class MegaApiJava
      * will be used as the file name inside that folder. If the path doesn't finish with
      * one of these characters, the file will be downloaded to a file in that path.
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void getThumbnail(MegaNode node, String dstFilePath, MegaRequestListenerInterface listener)
 	{
@@ -1416,7 +1416,7 @@ public class MegaApiJava
      * will be used as the file name inside that folder. If the path doesn't finish with
      * one of these characters, the file will be downloaded to a file in that path.
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void getPreview(MegaNode node, String dstFilePath, MegaRequestListenerInterface listener)
 	{
@@ -1454,7 +1454,7 @@ public class MegaApiJava
      * will be used as the file name inside that folder. If the path doesn't finish with
      * one of these characters, the file will be downloaded to a file in that path.
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void getUserAvatar(MegaUser user, String dstFilePath, MegaRequestListenerInterface listener)
 	{
@@ -1476,6 +1476,92 @@ public class MegaApiJava
 	}
 	
 	/**
+     * Get an attribute of a MegaUser.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - Returns the value of the attribute
+     *
+     * @param user MegaUser to get the attribute
+     * @param type Attribute type
+     *
+     * Valid values are:
+     *
+     * MegaApi::USER_ATTR_FIRSTNAME = 1
+     * Get the firstname of the user
+     * MegaApi::USER_ATTR_LASTNAME = 2
+     * Get the lastname of the user
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void getUserAttribute(MegaUser user, int type, MegaRequestListenerInterface listener) {
+		megaApi.getUserAttribute(user, type, createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Get an attribute of a MegaUser.
+     *
+     * @param user MegaUser to get the attribute
+     * @param type Attribute type
+     *
+     * Valid values are:
+     *
+     * MegaApi::USER_ATTR_FIRSTNAME = 1
+     * Get the firstname of the user
+     * MegaApi::USER_ATTR_LASTNAME = 2
+     * Get the lastname of the user
+     */
+	public void getUserAttribute(MegaUser user, int type) {
+		megaApi.getUserAttribute(user, type);
+	}
+	
+	/**
+     * Get an attribute of the current account.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getText - Returns the value of the attribute
+     *
+     * @param type Attribute type
+     *
+     * Valid values are:
+     *
+     * MegaApi::USER_ATTR_FIRSTNAME = 1
+     * Get the firstname of the user
+     * MegaApi::USER_ATTR_LASTNAME = 2
+     * Get the lastname of the user
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void getUserAttribute(int type, MegaRequestListenerInterface listener) {
+		megaApi.getUserAttribute(type, createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Get an attribute of the current account.
+     *
+     * @param type Attribute type
+     *
+     * Valid values are:
+     *
+     * MegaApi::USER_ATTR_FIRSTNAME = 1
+     * Get the firstname of the user
+     * MegaApi::USER_ATTR_LASTNAME = 2
+     * Get the lastname of the user
+     */
+	public void getUserAttribute(int type) {
+		megaApi.getUserAttribute(type);
+	}
+	
+	/**
      * Cancel the retrieval of a thumbnail
      *
      * The associated request type with this request is MegaRequest::TYPE_CANCEL_ATTR_FILE
@@ -1484,7 +1570,7 @@ public class MegaApiJava
      * - MegaRequest::getParamType - Returns MegaApi::ATTR_TYPE_THUMBNAIL
      *
      * @param node Node to cancel the retrieval of the thumbnail
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      *
      * @see MegaApi::getThumbnail
      */
@@ -1512,7 +1598,7 @@ public class MegaApiJava
      * - MegaRequest::getParamType - Returns MegaApi::ATTR_TYPE_PREVIEW
      *
      * @param node Node to cancel the retrieval of the preview
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      *
      * @see MegaApi::getPreview
      */
@@ -1542,7 +1628,7 @@ public class MegaApiJava
      *
      * @param node MegaNode to set the thumbnail
      * @param srcFilePath Source path of the file that will be set as thumbnail
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void setThumbnail(MegaNode node, String srcFilePath, MegaRequestListenerInterface listener)
 	{
@@ -1571,7 +1657,7 @@ public class MegaApiJava
      *
      * @param node MegaNode to set the preview
      * @param srcFilePath Source path of the file that will be set as preview
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void setPreview(MegaNode node, String srcFilePath, MegaRequestListenerInterface listener)
 	{
@@ -1597,7 +1683,7 @@ public class MegaApiJava
      * - MegaRequest::getFile - Returns the source path
      *
      * @param srcFilePath Source path of the file that will be set as avatar
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void setAvatar(String srcFilePath, MegaRequestListenerInterface listener){
 		megaApi.setAvatar(srcFilePath, createDelegateRequestListener(listener));
@@ -1667,7 +1753,7 @@ public class MegaApiJava
      * - MegaRequest::getLink - Public link
      *
      * @param node MegaNode to get the public link
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void exportNode(MegaNode node, MegaRequestListenerInterface listener)
 	{
@@ -1693,7 +1779,7 @@ public class MegaApiJava
      * - MegaRequest::getAccess - Returns false
      *
      * @param node MegaNode to stop sharing
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void disableExport(MegaNode node, MegaRequestListenerInterface listener)
 	{
@@ -1718,7 +1804,7 @@ public class MegaApiJava
      *
      * The associated request type with this request is MegaRequest::TYPE_FETCH_NODES
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void fetchNodes(MegaRequestListenerInterface listener)
 	{
@@ -1745,7 +1831,7 @@ public class MegaApiJava
      * is MegaError::API_OK:
      * - MegaRequest::getMegaAccountDetails - Details of the MEGA account
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void getAccountDetails(MegaRequestListenerInterface listener)
 	{
@@ -1771,7 +1857,7 @@ public class MegaApiJava
      * is MegaError::API_OK:
      * - MegaRequest::getMegaAccountDetails - Details of the MEGA account
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void getExtendedAccountDetails(boolean sessions, boolean purchases, boolean transactions, MegaRequestListenerInterface listener) {
 		megaApi.getExtendedAccountDetails(sessions, purchases, transactions, createDelegateRequestListener(listener));
@@ -1827,7 +1913,7 @@ public class MegaApiJava
      * is MegaError::API_OK:
      * - MegaRequest::getPricing - MegaPricing object with all pricing plans
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      *
      * @see MegaApi::getPaymentUrl
      */
@@ -1861,7 +1947,7 @@ public class MegaApiJava
      * - MegaRequest::getLink - Payment link
      *
      * @param productHandle Handle of the product (see MegaApi::getPricing)
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      *
      * @see MegaApi::getPricing
      */
@@ -1886,7 +1972,7 @@ public class MegaApiJava
      * Send the Google Play receipt after a correct purchase of a subscription
      *
      * @param receipt String The complete receipt from Google Play
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      * 
      */
 	public void submitPurchaseReceipt(String receipt, MegaRequestListenerInterface listener) {
@@ -1929,7 +2015,7 @@ public class MegaApiJava
      *
      * @param oldPassword Old password
      * @param newPassword New password
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void changePassword(String oldPassword, String newPassword, MegaRequestListenerInterface listener)
 	{
@@ -1955,7 +2041,7 @@ public class MegaApiJava
      * - MegaRequest::getEmail - Returns the email of the contact
      *
      * @param email Email of the new contact
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void addContact(String email, MegaRequestListenerInterface listener)
 	{
@@ -1980,7 +2066,7 @@ public class MegaApiJava
      * - MegaRequest::getEmail - Returns the email of the contact
      *
      * @param email Email of the contact
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void removeContact (MegaUser user, MegaRequestListenerInterface listener){
 		megaApi.removeContact(user, createDelegateRequestListener(listener));
@@ -2000,7 +2086,7 @@ public class MegaApiJava
      *
      * The associated request type with this request is MegaRequest::TYPE_LOGOUT
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void logout(MegaRequestListenerInterface listener)
 	{
@@ -2020,7 +2106,7 @@ public class MegaApiJava
      *
      * The associated request type with this request is MegaRequest::TYPE_LOGOUT
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void localLogout(MegaRequestListenerInterface listener){
 		megaApi.localLogout(createDelegateRequestListener(listener));
@@ -2047,7 +2133,7 @@ public class MegaApiJava
      *
      * @param rating Integer to rate the app. Valid values: from 1 to 5.
      * @param comment Comment about the app
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      *
      * @deprecated This function is for internal usage of MEGA apps. This feedback
      * is sent to MEGA servers.
@@ -2086,7 +2172,7 @@ public class MegaApiJava
      * - MegaRequest::getText - Retuns the debug message
      *
      * @param text Debug message
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      *
      * @deprecated This function is for internal usage of MEGA apps. This feedback
      * is sent to MEGA servers.
@@ -2283,7 +2369,7 @@ public class MegaApiJava
      * You can get this object in any MegaTransferListener callback or any MegaListener callback
      * related to transfers.
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void cancelTransfer(MegaTransfer transfer, MegaRequestListenerInterface listener)
 	{
@@ -2317,7 +2403,7 @@ public class MegaApiJava
      * @param transferTag tag that identifies the transfer
      * You can get this tag using MegaTransfer::getTag
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void cancelTransferByTag(int transferTag, MegaRequestListenerInterface listener) {
 		megaApi.cancelTransferByTag(transferTag, createDelegateRequestListener(listener));
@@ -2345,7 +2431,7 @@ public class MegaApiJava
      * - MegaTransfer::TYPE_DOWNLOAD = 0
      * - MegaTransfer::TYPE_UPLOAD = 1
      *
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void cancelTransfers(int direction, MegaRequestListenerInterface listener)
 	{
@@ -2373,7 +2459,7 @@ public class MegaApiJava
      * - MegaRequest::getFlag - Returns the first parameter
      *
      * @param pause true to pause all transfers / false to resume all transfers
-     * @param listener MegaRequestListener to track this request
+     * @param listener MegaRequestListenerInterface to track this request
      */
 	public void pauseTransfers(boolean pause, MegaRequestListenerInterface listener)
 	{
