@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,11 +25,13 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -180,7 +183,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		else{
 			dropboxHandle=parentDropbox.getHandle();
 		}
-		
+				
 	}
 	
 	private int shouldRun(){
@@ -207,7 +210,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			running = true;
 			megaApi.fastLogin(gSession, this);
 			return START_NOT_STICKY;
-		}
+		}		
 		
 		return 0;
 	}
@@ -256,6 +259,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					intent.setAction(null);
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						finish();
 						return START_NOT_STICKY;
 					}
 					else{
@@ -269,6 +273,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					stopped = true;
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						finish();
 						return START_NOT_STICKY;
 					}
 					else{
@@ -281,6 +286,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 					stopped = true;
 					if (megaApi != null){
 						megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
+						finish();
 						return START_NOT_STICKY;
 					}
 					else{
@@ -446,6 +452,8 @@ public class DropboxImportService extends Service implements MegaRequestListener
 			finish();
 		}
 		
+		updateProgressNotification(totalSizeImported);
+		
 //		Log.i("DbExampleLog", "The file's rev is: " + info.getMetadata().rev);
 		
 		totalToImport = filesToDownload.size();
@@ -576,8 +584,7 @@ public class DropboxImportService extends Service implements MegaRequestListener
 	        ArrayList<String> dir=new ArrayList<String>();
 	        for (Entry ent: dirent.contents) 
 	        {
-	            files.add(ent);// Add it to the list of thumbs we can choose from                       
-	            //dir = new ArrayList<String>();
+	            files.add(ent);
 	            if(ent.isDir){
 	            	listDirectory(ent);
 	            }
@@ -966,24 +973,31 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 		
 		String message = current + " ";
-		if (totalToImport == 1) {
-			message += getResources().getQuantityString(
-					R.plurals.general_num_files, 1);
-		} else {
-			message += getString(R.string.general_x_of_x)
-					+ " "
-					+ totalToImport;
-			
-			if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB)
-			{
-				message += " "
-					+ getResources().getQuantityString(
-							R.plurals.general_num_files, totalToImport);
+		if(progress>1)
+		{
+			if (totalToImport == 1) {
+				message += getResources().getQuantityString(
+						R.plurals.general_num_files, 1);
+			} else {
+				message += getString(R.string.general_x_of_x)
+						+ " "
+						+ totalToImport;
+				
+				if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB)
+				{
+					message += " "
+						+ getResources().getQuantityString(
+								R.plurals.general_num_files, totalToImport);
+				}
 			}
 		}
+		else{
+			message = getString(R.string.download_preparing_files);
+		}
+			
 
 		Intent intent = new Intent(DropboxImportService.this, ManagerActivity.class);
-		intent.setAction(ManagerActivity.ACTION_CANCEL_CAM_SYNC);	
+		intent.setAction(ManagerActivity.ACTION_CANCEL_DROPBOX_IMPORT);	
 		String info = Util.getProgressSize(DropboxImportService.this, progress, totalSizeToImport);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(DropboxImportService.this, 0, intent, 0);
@@ -1057,7 +1071,14 @@ public class DropboxImportService extends Service implements MegaRequestListener
 		//Delete the local file
 		String pathFile = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.dropboxDIR; 						
 		File f = new File(pathFile);
-		f.delete();	
+		try {
+			Util.deleteFolderAndSubfolders(this,f);
+			log("Deleted from the device: "+f.getAbsolutePath());	
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			log("Not deleted ERROR!");	
+		}
 		log("Deleted from the device: "+f.getAbsolutePath());		
 				
 		log("stopping service!!!!!!!!!!:::::::::::::::!!!!!!!!!!!!");

@@ -187,6 +187,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
 	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
+	public static String ACTION_CANCEL_DROPBOX_IMPORT = "ACTION_CANCEL_DROPBOX_IMPORT";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -311,6 +312,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private AlertDialog addContactDialog;
     private AlertDialog clearRubbishBinDialog;
     private AlertDialog alertNotPermissionsUpload;
+    private AlertDialog alertPermissionWiFi;
     private Handler handler;    
     private boolean moveToRubbish = false;
     private boolean sendToInbox = false;
@@ -901,7 +903,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						finish();	
 						return;
 					}
-					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC) || getIntent().getAction().equals(ACTION_CANCEL_DROPBOX_IMPORT)){
 						Intent intent = new Intent(managerActivity, LoginActivity.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
@@ -1602,6 +1604,32 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 												downloadPlay = true;
 											}
 										}	
+										startService(cancelIntent);						
+									}
+								});
+						builder.setNegativeButton(getString(R.string.general_no), null);
+						final AlertDialog dialog = builder.create();
+						try {
+							dialog.show(); 
+						}
+						catch(Exception ex)	{ 
+							startService(cancelIntent); 
+						}
+					}
+	    			else if (intent.getAction().equals(ACTION_CANCEL_DROPBOX_IMPORT)){
+	    				log("ACTION_CANCEL_DROPBOX_IMPORT");
+						Intent tempIntent = null;
+						tempIntent = new Intent(this, DropboxImportService.class);
+						tempIntent.setAction(DropboxImportService.ACTION_CANCEL);
+						String title = getString(R.string.importing_dropbox_files);
+						String text = getString(R.string.cancel_importing_dropbox_files);
+					
+						final Intent cancelIntent = tempIntent;
+						AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+								title, text, null);
+						builder.setPositiveButton(getString(R.string.general_yes),
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int whichButton) {
 										startService(cancelIntent);						
 									}
 								});
@@ -3369,16 +3397,48 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    	
 		    	//Lanzar intent a DropboxExplorerAtivity
 //	            Intent intent = new Intent();
-//				startActivityForResult(intent, REQUEST_DROPBOX_ENTRIES);	
-				
-				// Initialize DropboxAPI object
+//				startActivityForResult(intent, REQUEST_DROPBOX_ENTRIES);
+		    	
+		    	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+				    @Override
+				    public void onClick(DialogInterface dialog, int which) {
+				        switch (which){
+				        case DialogInterface.BUTTON_POSITIVE:
+							// Initialize DropboxAPI object
 
-				if(mDBApi==null){
-					mDBApi = app.getDropboxApi();
-				}				
+							if(mDBApi==null){
+								mDBApi = app.getDropboxApi();
+							}				
+							
+							mDBApi.getSession().startOAuth2Authentication(managerActivity);
+							requestLoginDropbox=true;
+
+				        case DialogInterface.BUTTON_NEGATIVE:
+				            break;
+				        }
+				    }
+				};
 				
-				mDBApi.getSession().startOAuth2Authentication(this);
-				requestLoginDropbox=true;
+				boolean isWifi = Util.isOnWifi(this);
+				if(!isWifi){
+
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					String message= getResources().getString(R.string.confirmation_continue_without_Wifi);
+					builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+				    	.setNegativeButton(R.string.general_no, dialogClickListener);
+					alertPermissionWiFi = builder.create();
+					alertPermissionWiFi.show();
+					Util.brandAlertDialog(alertPermissionWiFi);
+				}
+				else{
+					if(mDBApi==null){
+						mDBApi = app.getDropboxApi();
+					}				
+					
+					mDBApi.getSession().startOAuth2Authentication(managerActivity);
+					requestLoginDropbox=true;
+				}							
+
 		    	return true;
 		    }
 	        case R.id.action_search:{
