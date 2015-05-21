@@ -1481,6 +1481,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    		log("intent not null! "+intent.getAction());
 	    		// Open folder from the intent
 				if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
+					log("INTENT: EXTRA_OPEN_FOLDER");
 					parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
 					intent.removeExtra(EXTRA_OPEN_FOLDER);
 					setIntent(null);
