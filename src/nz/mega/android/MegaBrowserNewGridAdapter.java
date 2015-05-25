@@ -565,6 +565,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 		this.app = ((MegaApplication) ((Activity) context).getApplication());
+		this.hm = initDBHM();
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
