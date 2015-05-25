@@ -119,7 +119,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 		MegaBrowserNewGridAdapter adapter;
 		MegaNode node;
 		Bitmap thumb = null;
-		int indice;
+		int index;
 		
 		public MediaDBTask(Context context, ViewHolderBrowserNewGrid holder, MegaApiAndroid megaApi, MegaBrowserNewGridAdapter adapter, int i) {
 			this.context = context;
@@ -127,7 +127,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 			this.holder = holder;
 			this.megaApi = megaApi;
 			this.adapter = adapter;
-			this.indice = i;
+			this.index = i;
 		}
 		@Override
 		protected String doInBackground(MegaNode... params) {
@@ -300,7 +300,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 //					} // Too many AsyncTasks
 					
 					try{
-						thumb = ThumbnailUtils.getThumbnailFromMegaNewGrid(node, context, holder, megaApi, adapter, indice);
+						thumb = ThumbnailUtils.getThumbnailFromMegaNewGrid(node, context, holder, megaApi, adapter, index);
 					}
 					catch(Exception e) {}
 	
@@ -314,14 +314,14 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 				if (this.node != null){
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
-						if (holder.documents.get(indice) == this.node.getHandle()){
-							holder.imageViews.get(indice).setImageBitmap(thumb);
+						if (holder.documents.get(index) == this.node.getHandle()){
+							holder.imageViews.get(index).setImageBitmap(thumb);
 						}
 					} else {
 						thumb = ThumbnailUtils
 								.getThumbnailFromFolder(node, context);
-						if (holder.documents.get(indice) == this.node.getHandle()){
-							holder.imageViews.get(indice).setImageBitmap(thumb);
+						if (holder.documents.get(index) == this.node.getHandle()){
+							holder.imageViews.get(index).setImageBitmap(thumb);
 						}
 					}
 				}
