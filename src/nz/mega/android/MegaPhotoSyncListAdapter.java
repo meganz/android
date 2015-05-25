@@ -293,33 +293,20 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 				}
 			}
 			else{
-				log("From folder");
+				log("From folder: " + res);
 				if (this.node != null){
 					thumb = ThumbnailUtils.getThumbnailFromCache(node);
 					if (thumb != null) {
-						if(!multipleSelect){
-							if ((holder.document == node.getHandle())){
-								holder.imageView.setImageBitmap(thumb);
-							}
+						if ((holder.document == node.getHandle())){
+							holder.imageView.setImageBitmap(thumb);
 						}
-						else{
-							if ((holder.document == node.getHandle())){
-								holder.imageView.setImageBitmap(thumb);
-							}
-						}
-					} else {
+					} 
+					else {
 						thumb = ThumbnailUtils
 								.getThumbnailFromFolder(node, context);
 						if (thumb != null) {
-							if(!multipleSelect){
-								if ((holder.document == node.getHandle())){
-									holder.imageView.setImageBitmap(thumb);
-								}
-							}
-							else{
-								if ((holder.document == node.getHandle())){
-									holder.imageView.setImageBitmap(thumb);
-								}
+							if ((holder.document == node.getHandle())){
+								holder.imageView.setImageBitmap(thumb);
 							}
 						}
 					}

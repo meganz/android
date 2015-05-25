@@ -1,10 +1,13 @@
 package nz.mega.android;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -12,14 +15,19 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
+import nz.mega.sdk.MegaUtils;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -43,7 +51,283 @@ import android.widget.Toast;
 
 public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 	
+	
+	private class Media {
+		public String filePath;
+		public long timestamp;
+	}
+	
+	HashMap<Long, String> initDBHM(){
+		HashMap<Long, String> hm = new HashMap<Long, String>();
+		
+		String projection[] = {	MediaColumns.DATA, 
+				//MediaColumns.MIME_TYPE, 
+				//MediaColumns.DATE_MODIFIED,
+				MediaColumns.DATE_MODIFIED};
+//		String selection = "(abs(" + MediaColumns.DATE_MODIFIED + "-" + n.getModificationTime() + ") < 3) OR ("+ MediaColumns.DATA + " LIKE '%" + n.getName() + "%')";
+		String selection = "";
+		log("SELECTION: " + selection);
+		ArrayList<Uri> uris = new ArrayList<Uri>();
+		uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+		uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);	
+		String order = MediaColumns.DATE_MODIFIED + " ASC";
+		String[] selectionArgs = null;
+		
+		for(int i=0; i<uris.size(); i++){
+			if (app == null){
+				app = ((MegaApplication) ((Activity) context).getApplication());
+			}
+			Cursor cursor = app.getContentResolver().query(uris.get(i), projection, selection, selectionArgs, order);
+			if (cursor != null){
+				int dataColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+				int timestampColumn = cursor.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+				while(cursor.moveToNext()){
+					Media media = new Media();
+			        media.filePath = cursor.getString(dataColumn);
+			        media.timestamp = cursor.getLong(timestampColumn);
+			        
+			        hm.put(media.timestamp, media.filePath);
+				}
+			}
+		}
+		
+		return hm;	
+	}
+	
+	HashMap<Long, String> hm;
+	
+	private class MediaDBTask extends AsyncTask<MegaNode, Void, String> {
+		
+		Context context;
+		MegaApplication app;
+		ViewHolderPhotoSyncGrid holder;
+		MegaApiAndroid megaApi;
+		MegaPhotoSyncGridAdapter adapter;
+		MegaNode node;
+		Bitmap thumb = null;
+		int index;
+		
+		public MediaDBTask(Context context, ViewHolderPhotoSyncGrid holder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapter adapter, int index) {
+			this.context = context;
+			this.app = (MegaApplication)(((Activity)(this.context)).getApplication());
+			this.holder = holder;
+			this.megaApi = megaApi;
+			this.adapter = adapter;
+			this.index = index;
+		}
+		@Override
+		protected String doInBackground(MegaNode... params) {
+			this.node = params[0];
+			
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if (this.node == null){
+				return null;
+			}
+			
+			if (app == null){
+				return null;
+			}
+			
+			if (hm == null){
+				return null;
+			}
+			
+			boolean thumbCreated = false;
+			boolean previewCreated = false;
+			
+			File previewDir = PreviewUtils.getPreviewFolder(context);
+			File thumbDir = ThumbnailUtils.getThumbFolder(context);
+			File previewFile = new File(previewDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
+			File thumbFile = new File(thumbDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
+							
+			if (!thumbFile.exists()){
+		
+				log("n.getName(): " + node.getName() + "____" + node.getModificationTime());
+				String filePath = hm.get(node.getModificationTime());
+				if (filePath != null){
+					File f = new File(filePath);
+					if (f != null){
+						if (f.length() == node.getSize()){
+							log("IDEM: " + filePath + "____" + node.getName());
+							thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+							if (!node.hasThumbnail()){
+								log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+								megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+							}
+							else{
+								log("Thumbnail OK: " + node.getName() + "___" + thumbFile.getAbsolutePath());
+							}
+							
+							if (!previewFile.exists()){
+								previewCreated = MegaUtils.createPreview(f, previewFile);
+								if (!node.hasPreview()){
+									log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+									megaApi.setPreview(node, previewFile.getAbsolutePath());
+								}
+							}
+							else{
+								if (!node.hasPreview()){
+									log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+									megaApi.setPreview(node, previewFile.getAbsolutePath());
+								}
+							}
+						}
+					}
+				}
+				else{
+					List<String> paths = new ArrayList<String>(hm.values());
+					for (int i=0;i<paths.size();i++){
+						if (paths.get(i).contains(node.getName())){
+							filePath = paths.get(i);
+							File f = new File(filePath);
+							if (f != null){
+								if (f.length() == node.getSize()){
+									log("IDEM(por nombre): " + filePath + "____" + node.getName());
+									thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+									if (!node.hasThumbnail()){
+										log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+										megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+									}
+									else{
+										log("Thumbnail OK: " + node.getName() + "___" + thumbFile.getAbsolutePath());
+									}
+									
+									if (!previewFile.exists()){
+										previewCreated = MegaUtils.createPreview(f, previewFile);
+										if (!node.hasPreview()){
+											log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+											megaApi.setPreview(node, previewFile.getAbsolutePath());
+										}
+									}
+									else{
+										if (!node.hasPreview()){
+											log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+											megaApi.setPreview(node, previewFile.getAbsolutePath());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				thumbCreated = true;
+				if (!node.hasThumbnail()){
+					log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+					megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+				}
+				else{
+					log("Thumbnail OK: " + node.getName() + "___" + thumbFile.getAbsolutePath());
+				}
+			}
+			
+			if (!previewFile.exists()){
+				log("n.getName(): " + node.getName() + "____" + node.getModificationTime());
+				String filePath = hm.get(node.getModificationTime());
+				if (filePath != null){
+					File f = new File(filePath);
+					if (f != null){
+						if (f.length() == node.getSize()){
+							log("IDEM: " + filePath + "____" + node.getName());
+							previewCreated = MegaUtils.createPreview(f, previewFile);
+							if (!node.hasPreview()){
+								log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+								megaApi.setPreview(node, previewFile.getAbsolutePath());
+							}
+							if (!thumbFile.exists()){
+								thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+								if (!node.hasThumbnail()){
+									log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+									megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+								}
+							}
+							else{
+								if (!node.hasThumbnail()){
+									log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
+									megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
+								}
+							}
+						}
+					}
+				}
+			}
+			else{
+				if (!node.hasPreview()){
+					log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
+					megaApi.setPreview(node, previewFile.getAbsolutePath());
+				}
+			}
+			
+			if (thumbCreated){
+				if (thumbFile != null){
+					return thumbFile.getAbsolutePath();
+				}
+			}
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(String res) {
+			if (res == null){
+				log("megaApi.getThumbnail");
+				if (this.node != null){
+					try {
+						thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(node, context, holder, megaApi, adapter, index);
+					} 
+					catch (Exception e) {
+					} // Too many AsyncTasks
+	
+					if (this.node != null){
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null) {
+							if (holder.documents.get(index) == this.node.getHandle()){
+								holder.imageViews.get(index).setImageBitmap(thumb);
+							}
+						} else {
+							thumb = ThumbnailUtils
+									.getThumbnailFromFolder(node, context);
+							if (holder.documents.get(index) == this.node.getHandle()){
+								holder.imageViews.get(index).setImageBitmap(thumb);
+							}
+						}
+					}
+				}
+			}
+			else{
+				log("From folder: " + res);
+				if (this.node != null){
+					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					if (this.node != null){
+						thumb = ThumbnailUtils.getThumbnailFromCache(node);
+						if (thumb != null) {
+							if (holder.documents.get(index) == this.node.getHandle()){
+								holder.imageViews.get(index).setImageBitmap(thumb);
+							}
+						} else {
+							thumb = ThumbnailUtils
+									.getThumbnailFromFolder(node, context);
+							if (holder.documents.get(index) == this.node.getHandle()){
+								holder.imageViews.get(index).setImageBitmap(thumb);
+							}
+						}
+					}
+				}
+				//HE ENCONTRADO LA IMAGEN Y LA PUEDO LEER
+			}
+//			onKeysGenerated(key[0], key[1]);
+		}		
+	}
+	
 	Context context;
+	MegaApplication app;
 	
 	ArrayList<MegaNode> nodes;
 	ArrayList<MegaMonthPic> monthPics;
@@ -225,6 +509,7 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
+		this.hm = initDBHM();
 	}
 	
 	public void setNodes(ArrayList<MegaMonthPic> monthPics, ArrayList<MegaNode> nodes){
@@ -382,11 +667,12 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 								if (thumb != null){
 									holder.imageViews.get(i).setImageBitmap(thumb);
 								}
-								else{ 
-									try{
-										thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
-									}
-									catch(Exception e){} //Too many AsyncTasks
+								else{
+									new MediaDBTask(context, holder, megaApi, this, i).execute(n);
+//									try{
+//										thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
+//									}
+//									catch(Exception e){} //Too many AsyncTasks
 									
 									if (thumb != null){
 										holder.imageViews.get(i).setImageBitmap(thumb);
@@ -475,10 +761,11 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 								holder.imageViews.get(i).setImageBitmap(thumb);
 							}
 							else{ 
-								try{
-									thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
-								}
-								catch(Exception e){} //Too many AsyncTasks
+								new MediaDBTask(context, holder, megaApi, this, i).execute(n);
+//								try{
+//									thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
+//								}
+//								catch(Exception e){} //Too many AsyncTasks
 								
 								if (thumb != null){
 									holder.imageViews.get(i).setImageBitmap(thumb);
