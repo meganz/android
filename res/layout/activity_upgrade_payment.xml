@@ -2,7 +2,6 @@
 
    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"  
-    android:weightSum="15"
     android:layout_width="fill_parent"  
     android:layout_height="fill_parent"
     android:background="#ffffff" >
@@ -14,14 +13,14 @@
             android:gravity="center_vertical"
             android:background="#ffffff"
             android:onClick="onUpgrade1Click"
-            android:layout_weight="6">
+            android:layout_weight="8">
             <ImageView 
                 android:id="@+id/pro_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/standard_margin"
                 android:src="@drawable/ic_pro_1"
-                />
+                android:layout_alignParentTop="true"/>
             <TextView
                 android:id="@+id/pro_title"
                 android:layout_width="wrap_content"
@@ -88,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:layout_weight="4"
+            android:layout_weight="2"
             android:background="@color/mega">
 
             <TextView
@@ -168,6 +167,33 @@
             
         </RelativeLayout>
         
+        <RelativeLayout
+            android:id="@+id/payment_credit_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginRight="20dp"
+            android:background="#ffffff">
+            
+            <ImageView 
+                android:id="@+id/credit_card_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/cc_ic"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"/>
+            
+            <TextView
+                android:id="@+id/credit_card_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/payment_method_credit_card"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/credit_card_icon"
+                android:layout_marginLeft="20dp"/>
+        </RelativeLayout>
+        
         <include layout="@layout/delimiter" />
         
         <!-- Per year -->
@@ -211,6 +237,33 @@
                 android:layout_alignParentRight="true"/>
         </RelativeLayout>
         
+        <RelativeLayout
+            android:id="@+id/payment_fortumo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginRight="20dp"
+            android:background="#ffffff">
+            
+            <ImageView 
+                android:id="@+id/fortumo_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/fortumo_ic"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"/>
+            
+            <TextView
+                android:id="@+id/fortumo_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/payment_method_fortumo"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/fortumo_icon"
+                android:layout_marginLeft="20dp"/>
+        </RelativeLayout>
+        
         <include layout="@layout/delimiter" />
         
         <!-- Comment -->
@@ -219,7 +272,8 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:layout_weight="2"
-            android:background="#ffffff">
+            android:background="#ffffff"
+            android:id="@+id/payment_upgrade_comment">
             <TextView
                 android:id="@+id/comment"
                 android:layout_width="wrap_content"
@@ -227,6 +281,33 @@
                 android:textSize="12sp"
                 android:text="@string/upgrade_comment" />
             
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/payment_google_wallet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:layout_marginRight="20dp"
+            android:background="#ffffff">
+            
+            <ImageView 
+                android:id="@+id/google_wallet_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/google_wallet_ic"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"/>
+            
+            <TextView
+                android:id="@+id/google_wallet_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/payment_method_google_wallet"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/google_wallet_icon"
+                android:layout_marginLeft="20dp"/>
         </RelativeLayout>
         
     </LinearLayout>

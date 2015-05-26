@@ -353,6 +353,11 @@
     <string name="select_membership_1" context="the user has to decide the way of payment">Monthly or annual recurring</string>
     <string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>
     
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">Fortumo</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
+    
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>
     
@@ -487,4 +492,18 @@
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest first</string>
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
+    
+    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your billing details:</string>
+    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Address 1</string>
+    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Address 2 (optional)</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">City</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State / Province</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Country</string>
+    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postal code</string>
+    
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your payment details:</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">First Name</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Last Name</string>
+    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Credit Card Number</string>
+    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
 </resources>
