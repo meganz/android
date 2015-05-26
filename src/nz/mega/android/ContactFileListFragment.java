@@ -87,6 +87,11 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 	Stack<Long> parentHandleStack = new Stack<Long>();
 
 	private ActionMode actionMode;
+	
+	private boolean name = false;
+	private boolean firstName = false;
+	String nameText;
+	String firstNameText;
 
 	ProgressDialog statusDialog;
 
@@ -281,6 +286,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 			{
 				return null;
 			}
+			name=false;
+			firstName=false;
+			megaApi.getUserAttribute(contact, 1, this);
+			megaApi.getUserAttribute(contact, 2, this);
 			
 			createDefaultAvatar();
 
@@ -565,10 +574,10 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestFinish");
+		log("onRequestFinish: "+request.getType());
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER) {
 			if (e.getErrorCode() == MegaError.API_OK) {
-				File avatar = null;
+				File avatar = null;				
 				if (context.getExternalCacheDir() != null) {
 					avatar = new File(context.getExternalCacheDir().getAbsolutePath(),
 							request.getEmail() + ".jpg");
@@ -592,6 +601,21 @@ public class ContactFileListFragment extends Fragment implements OnItemClickList
 						}
 					}
 				}
+				if(request.getParamType()==1){
+					log("(1)request.getText(): "+request.getText());
+					nameText=request.getText();
+					name=true;
+				}
+				else if(request.getParamType()==2){
+					log("(2)request.getText(): "+request.getText());
+					firstNameText = request.getText();
+					firstName = true;
+				}
+				if(name&&firstName){
+					nameView.setText(nameText+" "+firstNameText);
+					name= false;
+					firstName = false;
+				}				
 			}
 		} 
 	}

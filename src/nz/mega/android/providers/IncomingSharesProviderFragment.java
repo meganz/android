@@ -1,7 +1,10 @@
-package nz.mega.android;
+package nz.mega.android.providers;
 
 import java.util.ArrayList;
 
+import nz.mega.android.MegaApplication;
+import nz.mega.android.MegaExplorerAdapter;
+import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -27,7 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-public class IncomingSharesExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
+public class IncomingSharesProviderFragment extends Fragment implements OnClickListener, OnItemClickListener{
 
 	Context context;
 	MegaApiAndroid megaApi;
@@ -36,19 +39,14 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	
 	MegaExplorerAdapter adapter;
 	
-	int modeCloud;
-	
 	public String name;
 	
 //	boolean first = false;
 //	private boolean folderSelected = false;
-	private Button uploadButton;
 	ListView listView;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
-	LinearLayout buttonsLayout;
-	LinearLayout outSpaceLayout=null;
 	int deepBrowserTree = 0;
 
 	@Override
@@ -67,38 +65,24 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		nodes = new ArrayList<MegaNode>();
 		deepBrowserTree=0;
 		parentHandle = -1;
-		
-		Bundle bundle = this.getArguments();
-		if (bundle != null) {
-		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);		    
-		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
-				
-		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);		
+	
+		View v = inflater.inflate(R.layout.fragment_clouddriveprovider, container, false);		
 		
-		listView = (ListView) v.findViewById(R.id.file_list_view_browser);
+		listView = (ListView) v.findViewById(R.id.provider_list_view_browser);
 		listView.setOnItemClickListener(this);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		listView.setItemsCanFocus(false);
 		
-		contentText = (TextView) v.findViewById(R.id.content_text);
+		contentText = (TextView) v.findViewById(R.id.provider_content_text);
 		contentText.setVisibility(View.GONE);
-		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-		buttonsLayout.setVisibility(View.GONE);
 		
-		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-		outSpaceLayout.setVisibility(View.GONE);
-		
-		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
-		uploadButton.setOnClickListener(this);
-		uploadButton.setVisibility(View.VISIBLE);
-		
-		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
-		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+		emptyImageView = (ImageView) v.findViewById(R.id.provider_list_empty_image);
+		emptyTextView = (TextView) v.findViewById(R.id.provider_list_empty_text);
 		
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
@@ -115,11 +99,10 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		
 		if (parentHandle == -1){			
 			findNodes();	
-			adapter.parentHandle=-1;
-			uploadButton.setText(getString(R.string.choose_folder_explorer));
+			adapter.setParentHandle(-1);
 		}
 		else{
-			adapter.parentHandle=parentHandle;
+			adapter.setParentHandle(parentHandle);
 			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 			nodes = megaApi.getChildren(parentNode);
 		}	
@@ -162,34 +145,9 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		
 	}
 	
-	public void changeButtonTitle(String folder){
-		log("changeButtonTitle "+folder);
-//		windowTitle.setText(folder);
-		
-		if (modeCloud == FileExplorerActivity.MOVE) {
-			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivity.COPY){
-			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivity.UPLOAD){
-			uploadButton.setText(getString(R.string.action_upload));
-		}
-		else if (modeCloud == FileExplorerActivity.IMPORT){
-			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivity.SELECT){
-			uploadButton.setText(getString(R.string.general_select) + " " + folder);
-		}
-		else if(modeCloud == FileExplorerActivity.UPLOAD_SELFIE){
-			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
-		}	
-		
-		
-	}
 	
 	public void changeActionBarTitle(String folder){
-		((FileExplorerActivity) context).changeTitle(folder);
+		((FileProviderActivity) context).changeTitle(folder);
 	}
 	
 	@Override
@@ -201,9 +159,9 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.file_explorer_button:{
-				((FileExplorerActivity) context).buttonClick(parentHandle);
-			}
+//			case R.id.file_explorer_button:{
+//				((FileProviderActivity) context).buttonClick(parentHandle);
+//			}
 		}
 	}
 
@@ -223,7 +181,6 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			temp = path.split("/");
 			name = temp[temp.length-1];
 
-			changeButtonTitle(name);
 			changeActionBarTitle(name);
 			
 			parentHandle = nodes.get(position).getHandle();
@@ -261,7 +218,6 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		if(deepBrowserTree==0){
 			parentHandle=-1;
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
-			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
 			
 			adapter.setNodes(nodes);

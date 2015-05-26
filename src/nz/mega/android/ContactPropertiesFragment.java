@@ -57,8 +57,14 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 	String userEmail;	
 	Context context;
 	ActionBar aB;
+	
 	//	private ListView overflowMenuList;
 	private boolean overflowVisible = false; 
+	private boolean name = false;
+	private boolean firstName = false;
+	String nameText;
+	String firstNameText;
+	
 	MegaApiAndroid megaApi;
 	MegaUser contact;
 
@@ -121,20 +127,20 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 			sharedFoldersButton.setOnClickListener(this);
 
 
-			infoEmail.setText(userEmail);
-			userNameTextView.setText(userEmail);
-
-			//			infoAdded = (TextView) v.findViewById(R.id.contact_properties_info_data_added);
-
 			contact = megaApi.getContact(userEmail);
 			if(contact == null)
 			{
 				return null;
 			}
 			
-			//			contentTextView.setText(getDescription(megaApi.getInShares(contact)));
-			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
+			infoEmail.setText(userEmail);
+			userNameTextView.setText(userEmail);
+			name=false;
+			firstName=false;
+			megaApi.getUserAttribute(contact, 1, this);
+			megaApi.getUserAttribute(contact, 2, this);
 
+			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
 
 			String menuOptions[] = new String[2];
 			menuOptions[0] = getString(R.string.context_share_folder);
@@ -309,8 +315,10 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestFinish");
+		log("onRequestFinish: "+request.getType());
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+
+			log("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK){
 				File avatar = null;
 				if (context.getExternalCacheDir() != null){
@@ -335,7 +343,33 @@ public class ContactPropertiesFragment extends Fragment implements OnClickListen
 						}
 					}
 				}
+				if(request.getParamType()==1){
+					log("(1)request.getText(): "+request.getText());
+					nameText=request.getText();
+					name=true;
+				}
+				else if(request.getParamType()==2){
+					log("(2)request.getText(): "+request.getText());
+					firstNameText = request.getText();
+					firstName = true;
+				}
+				if(name&&firstName){
+					userNameTextView.setText(nameText+" "+firstNameText);
+					name= false;
+					firstName = false;
+				}
+				
 			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA) {
+			if (e.getErrorCode() == MegaError.API_OK) {
+				log("MegaRequest.TYPE_GET_USER_DATA: "+request.getName());
+				log("ParamType: "+request.getParamType());
+				userNameTextView.setText(request.getName());
+			}
+		}
+		else{
+			log("Otro finish");
 		}
 	}
 

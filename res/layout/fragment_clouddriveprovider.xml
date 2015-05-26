@@ -1,0 +1,45 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    tools:context=".CloudDriveProviderFragment" >
+
+     <TextView
+	    android:id="@+id/provider_content_text"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingLeft="8dp"
+	    android:paddingTop="3dp"
+	    android:paddingBottom="3dp"
+	    android:textColor="@color/white"
+	    android:background="@color/content_text_folder"
+	    android:textSize="14sp"/>
+    
+   <ImageView
+	    android:id="@+id/provider_list_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="100dp"
+	    android:layout_centerHorizontal="true" 
+	    android:gravity="center_horizontal"/>
+    
+    <TextView
+	    android:id="@+id/provider_list_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/provider_list_empty_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>  
+            		 
+	 <ListView
+        android:id="@+id/provider_list_view_browser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:choiceMode="multipleChoice"
+        android:layout_below="@id/provider_content_text">
+    </ListView>      
+
+</RelativeLayout>
