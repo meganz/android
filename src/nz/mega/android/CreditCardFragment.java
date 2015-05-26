@@ -34,6 +34,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
@@ -41,7 +42,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class PaymentFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
+public class CreditCardFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
 	
 	public enum AccountType {
 		
@@ -93,29 +94,40 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	private TextView packageName;
 	private TextView storage;
 	private TextView bandwidth;
-	private TextView perMonth;
-	private TextView perYear;
+	private TextView billingDetails;
+	private EditText address1Edit;
+	private EditText address2Edit;
+	private EditText cityEdit;
+	private EditText stateEdit;
+	private EditText postalCodeEdit;
+	private TextView paymentDetails;
+	private EditText firstNameEdit;
+	private EditText lastNameEdit;
+	private EditText creditCardNumberEdit;
+	private EditText cvvEdit;
+	//	private TextView perMonth;
+//	private TextView perYear;
 	private TextView pricingFrom;
 	private ArrayList<Long> handleUrl;
 	private TextView storageTitle;
 	private TextView bandwithTitle;
-	private TextView selectMemberShip;
-	private TextView selectRecurring;
-	private TextView googlePlaySubscription;
-	private TextView perMonthTitle;
-	private TextView perYearTitle;
-	private TextView comment;
-	private RelativeLayout paymentPerMonth;
-	private RelativeLayout paymentCreditCard;
-	private RelativeLayout paymentPerYear;
-	private RelativeLayout paymentFortumo;
-	private RelativeLayout paymentUpgradeComment;
-	private RelativeLayout paymentGoogleWallet;
+//	private TextView selectMemberShip;
+//	private TextView selectRecurring;
+//	private TextView googlePlaySubscription;
+//	private TextView perMonthTitle;
+//	private TextView perYearTitle;
+//	private TextView comment;
+//	private RelativeLayout paymentPerMonth;
+//	private RelativeLayout paymentCreditCard;
+//	private RelativeLayout paymentPerYear;
+//	private RelativeLayout paymentFortumo;
+//	private RelativeLayout paymentUpgradeComment;
+//	private RelativeLayout paymentGoogleWallet;
 	int parameterType;	
 	MegaApiAndroid megaApi;
 	Context context;
 	ArrayList<Product> accounts;
-	PaymentFragment paymentFragment = this;
+	CreditCardFragment paymentFragment = this;
 	int paymentMonth = -1;
 	
 	@Override
@@ -163,102 +175,102 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		float scaleH = Util.getScaleH(outMetrics, density);
 
 		View v = null;
-		v = inflater.inflate(R.layout.activity_upgrade_payment, container, false);
+		v = inflater.inflate(R.layout.activity_credit_card_payment, container, false);
 
-		packageIcon = (ImageView) v.findViewById(R.id.pro_image);
+		packageIcon = (ImageView) v.findViewById(R.id.pro_image_cc);
 
 		packageIcon.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
 		packageIcon.getLayoutParams().height = Util.px2dp((100*scaleW), outMetrics);
 
-		packageName = (TextView) v.findViewById(R.id.pro_title);
-		pricingFrom = (TextView) v.findViewById(R.id.pricing_from);
+		packageName = (TextView) v.findViewById(R.id.pro_title_cc);
+		pricingFrom = (TextView) v.findViewById(R.id.pricing_from_cc);
 
-		perMonthTitle = (TextView) v.findViewById(R.id.per_month);
-		perMonth = (TextView) v.findViewById(R.id.per_month_price);
-		perYear = (TextView) v.findViewById(R.id.per_year_price);
-		perYearTitle = (TextView) v.findViewById(R.id.per_year);
-
+//		perMonthTitle = (TextView) v.findViewById(R.id.per_month);
+//		perMonth = (TextView) v.findViewById(R.id.per_month_price);
+//		perYear = (TextView) v.findViewById(R.id.per_year_price);
+//		perYearTitle = (TextView) v.findViewById(R.id.per_year);
+//
 		accountType = AccountType.getById(parameterType);
-
+//
 		packageIcon.setImageResource(accountType.getImageResource());
 		packageName.setText(accountType.getNameResource());
 		packageName.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
 
 		pricingFrom.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 
-		storageTitle = (TextView) v.findViewById(R.id.pro_storage_title);
+		storageTitle = (TextView) v.findViewById(R.id.pro_storage_title_cc);
 		storageTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 
-		storage = (TextView) v.findViewById(R.id.pro_storage);
+		storage = (TextView) v.findViewById(R.id.pro_storage_cc);
 		storage.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 
-		bandwithTitle = (TextView) v.findViewById(R.id.pro_bandwidth_title);
+		bandwithTitle = (TextView) v.findViewById(R.id.pro_bandwidth_title_cc);
 		bandwithTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
 
-		bandwidth = (TextView) v.findViewById(R.id.pro_bandwidth);
+		bandwidth = (TextView) v.findViewById(R.id.pro_bandwidth_cc);
 		bandwidth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-
-		selectMemberShip = (TextView) v.findViewById(R.id.select_membership);
-		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
-
-		selectRecurring = (TextView) v.findViewById(R.id.select_recurring);
-		selectRecurring.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
-		selectRecurring.setVisibility(View.VISIBLE);
-
-		googlePlaySubscription = (TextView) v.findViewById(R.id.google_play_subscription);
-		googlePlaySubscription.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
-		googlePlaySubscription.setVisibility(View.VISIBLE);
-
-		perMonth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		perMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-
-		perYear.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-		perYearTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
-
-		comment = (TextView) v.findViewById(R.id.comment);
-		comment.setTextSize(TypedValue.COMPLEX_UNIT_SP, (12*scaleH));
 		
-		paymentPerMonth = (RelativeLayout) v.findViewById(R.id.payment_per_month);
-		paymentPerYear = (RelativeLayout) v.findViewById(R.id.payment_per_year);
-		paymentUpgradeComment = (RelativeLayout) v.findViewById(R.id.payment_upgrade_comment);
-		paymentPerMonth.setVisibility(View.VISIBLE);
-		paymentPerYear.setVisibility(View.VISIBLE);		
-		paymentUpgradeComment.setVisibility(View.VISIBLE);
+		billingDetails = (TextView) v.findViewById(R.id.billing_details_cc);
+		billingDetails.setText(getString(R.string.billing_details));
+		billingDetails.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleH));
 		
-		paymentCreditCard = (RelativeLayout) v.findViewById(R.id.payment_credit_card);
-		paymentCreditCard.setVisibility(View.GONE);
+		address1Edit = (EditText) v.findViewById(R.id.address1_cc);
+		address2Edit = (EditText) v.findViewById(R.id.address2_cc);
+		cityEdit = (EditText) v.findViewById(R.id.city_cc);
+		stateEdit = (EditText) v.findViewById(R.id.state_cc);
+		postalCodeEdit = (EditText) v.findViewById(R.id.postal_code_cc);
 		
-		paymentFortumo = (RelativeLayout) v.findViewById(R.id.payment_fortumo);
-		paymentFortumo.setVisibility(View.GONE);
+		paymentDetails = (TextView) v.findViewById(R.id.payment_details_cc);
+		paymentDetails.setText(getString(R.string.payment_details));
+		paymentDetails.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleH));
 		
-		paymentGoogleWallet = (RelativeLayout) v.findViewById(R.id.payment_google_wallet);
-		paymentGoogleWallet.setVisibility(View.GONE);
-		
-		paymentCreditCard.setOnClickListener(this);
-		paymentFortumo.setOnClickListener(this);
-		paymentGoogleWallet.setOnClickListener(this);
-		
+		firstNameEdit = (EditText) v.findViewById(R.id.first_name_cc);
+		lastNameEdit = (EditText) v.findViewById(R.id.last_name_cc);
+		creditCardNumberEdit = (EditText) v.findViewById(R.id.credit_card_number_cc);
+		cvvEdit = (EditText) v.findViewById(R.id.cvv_cc);
+//
+//		selectMemberShip = (TextView) v.findViewById(R.id.select_membership);
+//		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
+//
+//		selectRecurring = (TextView) v.findViewById(R.id.select_recurring);
+//		selectRecurring.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+//		selectRecurring.setVisibility(View.VISIBLE);
+//
+//		googlePlaySubscription = (TextView) v.findViewById(R.id.google_play_subscription);
+//		googlePlaySubscription.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleH));
+//		googlePlaySubscription.setVisibility(View.VISIBLE);
+//
+//		perMonth.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+//		perMonthTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+//
+//		perYear.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+//		perYearTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleH));
+//
+//		comment = (TextView) v.findViewById(R.id.comment);
+//		comment.setTextSize(TypedValue.COMPLEX_UNIT_SP, (12*scaleH));
+//		
+//		paymentPerMonth = (RelativeLayout) v.findViewById(R.id.payment_per_month);
+//		paymentPerYear = (RelativeLayout) v.findViewById(R.id.payment_per_year);
+//		paymentUpgradeComment = (RelativeLayout) v.findViewById(R.id.payment_upgrade_comment);
+//		paymentPerMonth.setVisibility(View.VISIBLE);
+//		paymentPerYear.setVisibility(View.VISIBLE);		
+//		paymentUpgradeComment.setVisibility(View.VISIBLE);
+//		
+//		paymentCreditCard = (RelativeLayout) v.findViewById(R.id.payment_credit_card);
+//		paymentCreditCard.setVisibility(View.GONE);
+//		
+//		paymentFortumo = (RelativeLayout) v.findViewById(R.id.payment_fortumo);
+//		paymentFortumo.setVisibility(View.GONE);
+//		
+//		paymentGoogleWallet = (RelativeLayout) v.findViewById(R.id.payment_google_wallet);
+//		paymentGoogleWallet.setVisibility(View.GONE);
+//		
+//		paymentCreditCard.setOnClickListener(this);
+//		paymentFortumo.setOnClickListener(this);
+//		paymentGoogleWallet.setOnClickListener(this);
+//		
 		switch (parameterType) {
 			case 1:{
-//				aB.setTitle(getString(R.string.pro1_account));
-//				storage.setText("500 GB");
-//				bandwidth.setText("12 TB");
-//				double saving1 = 9999/12.00/100.00;
-//				String saving1String =df.format(saving1);
-//				pricingFrom.setText("from " + saving1String + " € per month");
-//				
-//				double perYearF=9999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=999/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.VISIBLE);
 				
 				for (int i=0;i<accounts.size();i++){
 	
@@ -267,19 +279,11 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					if(account.getLevel()==1){
 						aB.setTitle(getString(R.string.pro1_account));
 	
-						storage.setText(account.getStorage()+"GB");		            
-						
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
+						if(account.getMonths()==1){
+							storage.setText(account.getStorage()+"GB");		            
+							
 							double perMonthF=account.getAmount()/100.00;
 							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
 							bandwidth.setText(account.getTransfer()/1024 + " TB");
 							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
@@ -289,26 +293,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 			case 2:{
-				
-//				aB.setTitle(getString(R.string.pro2_account));
-//				storage.setText("2 TB");
-//				bandwidth.setText("48 TB");
-//				double saving2 = 1999/100.00;
-//				String saving2String =df.format(saving2);
-//				pricingFrom.setText("from " + saving2String + " € per month");
-//				
-//				double perYearF=19999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=1999/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.INVISIBLE);
 	
 				for (int i=0;i<accounts.size();i++){
 	
@@ -317,19 +301,11 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					if(account.getLevel()==2){
 						aB.setTitle(getString(R.string.pro2_account));
 	
-						storage.setText(account.getStorage()/1024+"TB");		            
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
+						if(account.getMonths()==1){
+							storage.setText(account.getStorage()/1024+"TB");		            
 							double perMonthF=account.getAmount()/100.00;
 							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
+		
 							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
 							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
@@ -339,27 +315,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 			case 3:{
-				
-//				aB.setTitle(getString(R.string.pro2_account));
-//				storage.setText("2 TB");
-//				bandwidth.setText("96 TB");
-//				double saving3 = 2999/100.00;
-//				String saving3String =df.format(saving3);
-//				pricingFrom.setText("from " + saving3String + " € per month");
-//				
-//				double perYearF=29999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=2999/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.INVISIBLE);
-				
 				for (int i=0;i<accounts.size();i++){
 	
 					Product account = accounts.get(i);
@@ -367,19 +322,11 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					if(account.getLevel()==3){
 						aB.setTitle(getString(R.string.pro3_account));
 	
-						storage.setText(account.getStorage()/1024+"TB");            
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
+						if(account.getMonths()==1){
+							storage.setText(account.getStorage()/1024+"TB");            
+		
 							double perMonthF=account.getAmount()/100.00;
 							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
 							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
 							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
@@ -390,26 +337,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			
 			case 4:{
 				
-//				aB.setTitle(getString(R.string.prolite_account));
-//				storage.setText("200 GB");
-//				bandwidth.setText("12 TB");
-//				double savingLite = 4999/12.00/100.00;
-//				String savingLiteString =df.format(savingLite);
-//				pricingFrom.setText("from " + savingLiteString + " € per month");
-//				
-//				double perYearF=4999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=499/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.VISIBLE);
-				
 				for (int i=0;i<accounts.size();i++){
 	
 					Product account = accounts.get(i);
@@ -417,19 +344,11 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					if(account.getLevel()==4){
 						aB.setTitle(getString(R.string.prolite_account));
 	
-						storage.setText(account.getStorage()+"GB");		            
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
+						if(account.getMonths()==1){
+							storage.setText(account.getStorage()+"GB");		            
 							double perMonthF=account.getAmount()/100.00;
 							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
+		
 							bandwidth.setText(account.getTransfer()/1024 + " TB");
 							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
 						}
@@ -438,8 +357,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 		}
-
-		//		megaApi.getPricing(this);	
+//
+//		//		megaApi.getPricing(this);	
 
 		return v;
 	}	
@@ -499,127 +418,135 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	}
 	
 	public void payMonth() {
-		log("monthly");
-		
-		paymentMonth = 1;
-		
-		selectMemberShip.setText(getString(R.string.select_payment_method));
-		selectRecurring.setVisibility(View.GONE);
-		googlePlaySubscription.setVisibility(View.GONE);
-		
-		switch(parameterType){
-			case 4:{
-				paymentPerMonth.setVisibility(View.GONE);
-				paymentPerYear.setVisibility(View.GONE);
-				paymentUpgradeComment.setVisibility(View.GONE);
-				paymentCreditCard.setVisibility(View.VISIBLE);
-				paymentFortumo.setVisibility(View.VISIBLE);
-				paymentGoogleWallet.setVisibility(View.VISIBLE);
-				break;
-			}
-		}
-
-//		switch(parameterType){
+//		log("monthly");
 //		
-//			case 1:{
-//				
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
-//				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==1&&account.getMonths()==1){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//
-//			}
-//			case 2:{
-//				
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
-//				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==2&&account.getMonths()==1){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//
-//			}
-//			case 3:{
-//				
-//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
-//				
-////				for (int i=0;i<accounts.size();i++){
-////					
-////					Product account = accounts.get(i);
-////	
-////					if(account.getLevel()==3&&account.getMonths()==1){
-////						
-////						megaApi.getPaymentUrl(account.getHandle(),this);	
-////					}
-////				}
-//				break;
-//			}	
+//		paymentMonth = 1;
+//		
+//		selectMemberShip.setText(getString(R.string.select_payment_method));
+//		selectRecurring.setVisibility(View.GONE);
+//		googlePlaySubscription.setVisibility(View.GONE);
+//		
+//		switch(parameterType){
 //			case 4:{
-//				Toast.makeText(context, "PAY MONTH", Toast.LENGTH_LONG).show();
-//				
-//				AlertDialog paymentDialog;
-//				
-////				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
-//				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Google Play", "Fortumo"});
-//				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-////				builder.setTitle(getString(R.string.section_photo_sync));
-//				builder.setTitle("Payment method");
-//				
-//				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-//					
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						switch (which){
-//							case 0:{
-//								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-//								break;
-//							}
-//							case 1:{
-//								Toast.makeText(context, "FORTUMOOOOO", Toast.LENGTH_SHORT).show();
-//								Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
-//								startActivity(intent);
-//								break;
-//							}
-//					}
-//						dialog.dismiss();
-//					}
-//				});
-//				
-//				builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-//					
-//					@Override
-//					public void onClick(DialogInterface dialog, int which) {
-//						dialog.dismiss();
-//					}
-//				});
-//				
-//				paymentDialog = builder.create();
-//				paymentDialog.show();
-//				Util.brandAlertDialog(paymentDialog);
-//
-////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+//				paymentPerMonth.setVisibility(View.GONE);
+//				paymentPerYear.setVisibility(View.GONE);
+//				paymentUpgradeComment.setVisibility(View.GONE);
+//				paymentCreditCard.setVisibility(View.VISIBLE);
+//				paymentFortumo.setVisibility(View.VISIBLE);
+//				paymentGoogleWallet.setVisibility(View.VISIBLE);
 //				break;
 //			}
 //		}
+//
+////		switch(parameterType){
+////		
+////			case 1:{
+////				
+////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
+////				
+//////				for (int i=0;i<accounts.size();i++){
+//////					
+//////					Product account = accounts.get(i);
+//////	
+//////					if(account.getLevel()==1&&account.getMonths()==1){
+//////						
+//////						megaApi.getPaymentUrl(account.getHandle(),this);	
+//////					}
+//////				}
+////				break;
+////
+////			}
+////			case 2:{
+////				
+////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
+////				
+//////				for (int i=0;i<accounts.size();i++){
+//////					
+//////					Product account = accounts.get(i);
+//////	
+//////					if(account.getLevel()==2&&account.getMonths()==1){
+//////						
+//////						megaApi.getPaymentUrl(account.getHandle(),this);	
+//////					}
+//////				}
+////				break;
+////
+////			}
+////			case 3:{
+////				
+////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
+////				
+//////				for (int i=0;i<accounts.size();i++){
+//////					
+//////					Product account = accounts.get(i);
+//////	
+//////					if(account.getLevel()==3&&account.getMonths()==1){
+//////						
+//////						megaApi.getPaymentUrl(account.getHandle(),this);	
+//////					}
+//////				}
+////				break;
+////			}	
+////			case 4:{
+////				Toast.makeText(context, "PAY MONTH", Toast.LENGTH_LONG).show();
+////				
+////				AlertDialog paymentDialog;
+////				
+//////				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
+////				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {"Google Play", "Fortumo"});
+////				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//////				builder.setTitle(getString(R.string.section_photo_sync));
+////				builder.setTitle("Payment method");
+////				
+////				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+////					
+////					@Override
+////					public void onClick(DialogInterface dialog, int which) {
+////						switch (which){
+////							case 0:{
+////								((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+////								break;
+////							}
+////							case 1:{
+////								Toast.makeText(context, "FORTUMOOOOO", Toast.LENGTH_SHORT).show();
+////								Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
+////								startActivity(intent);
+////								break;
+////							}
+////					}
+////						dialog.dismiss();
+////					}
+////				});
+////				
+////				builder.setPositiveButton(context.getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
+////					
+////					@Override
+////					public void onClick(DialogInterface dialog, int which) {
+////						dialog.dismiss();
+////					}
+////				});
+////				
+////				paymentDialog = builder.create();
+////				paymentDialog.show();
+////				Util.brandAlertDialog(paymentDialog);
+////
+//////				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
+////				break;
+////			}
+////		}
 	}
 	
 	public void setInfo (int _type, ArrayList<Product> _accounts){
 		this.accounts = _accounts;
 		this.parameterType = _type;
+	}
+	
+	public ArrayList<Product> getAccounts(){
+		return accounts;
+	}
+	
+	public int getParameterType(){
+		return parameterType;
 	}
 	
 
@@ -739,7 +666,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 			case R.id.payment_credit_card:{
-				((ManagerActivity)context).showCC(parameterType, accounts);
 				break;
 			}
 		}

@@ -125,7 +125,7 @@ import android.widget.Toast;
 
 
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
-			
+	
 	public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_WITH_ME, CONTACTS, TRANSFERS, RUBBISH_BIN, SETTINGS, ACCOUNT, SEARCH;
 
@@ -157,6 +157,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
 	final public static int PAYMENT_FRAGMENT = 5002;
 	final public static int OVERQUOTA_ALERT = 5003;
+	final public static int CC_FRAGMENT = 5004;
 	
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -292,6 +293,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private UpgradeAccountFragment upAF;
     private PaymentFragment pF;
     private InboxFragment iF;
+    private CreditCardFragment ccF;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -2725,6 +2727,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case PAYMENT_FRAGMENT:{
 					showUpAF();
 					return;					
+				}
+				case CC_FRAGMENT:{
+					if (ccF != null){
+						int parameterType = ccF.getParameterType();
+						ArrayList<Product> accounts = ccF.getAccounts();
+						showpF(parameterType, accounts);
+					}
+					else{
+						showUpAF();
+					}
+					return;
 				}
 				case OVERQUOTA_ALERT:{
 					if (upAF != null){						
@@ -7849,6 +7862,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void onMonthlyClick(View view) {
 		log("monthly");
 		pF.payMonth();		
+	}
+	
+	public void showCC(int type, ArrayList<Product> accounts){
+		accountFragment = CC_FRAGMENT;
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (ccF == null){
+			ccF = new CreditCardFragment();
+			ccF.setInfo(type, accounts);
+			ft.replace(R.id.fragment_container, ccF, "ccF");
+			ft.commit();
+		}
+		else{			
+			ccF.setInfo(type, accounts);			
+			ft.replace(R.id.fragment_container, ccF, "ccF");
+			ft.commit();
+		}
 	}
 	
 	public int getUsedPerc()
