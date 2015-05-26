@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".FileExplorerActivity" >
+    tools:context=".FileProviderActivity" >
 
     <RelativeLayout
         android:id="@+id/file_explorer_toolbar"

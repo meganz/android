@@ -52,6 +52,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 	ListView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
+
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -159,6 +160,10 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         RelativeLayout optionRemove;
         int currentPosition;
         String contactMail;
+//    	boolean name = false;
+//    	boolean firstName = false;
+//    	String nameText;
+//    	String firstNameText;
     }
 
 	@Override

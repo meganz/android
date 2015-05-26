@@ -86,6 +86,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	MegaApiAndroid megaApi;
 	String myEmail;
 	MegaUser myUser;
+	
+	private boolean name = false;
+	private boolean firstName = false;
+	String nameText;
+	String firstNameText;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -178,6 +183,11 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		
 		userNameTextView.setText(myEmail);		
 		myUser = megaApi.getContact(myEmail);		
+		
+		name=false;
+		firstName=false;
+		megaApi.getUserAttribute(1, this);
+		megaApi.getUserAttribute(2, this);
 
 		logoutButton.setText(R.string.action_logout);
 		lastSession.setText(R.string.general_not_yet_implemented);
@@ -380,6 +390,21 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 						}
 					}
 				}
+				if(request.getParamType()==1){
+					log("(1)request.getText(): "+request.getText());
+					nameText=request.getText();
+					name=true;
+				}
+				else if(request.getParamType()==2){
+					log("(2)request.getText(): "+request.getText());
+					firstNameText = request.getText();
+					firstName = true;
+				}
+				if(name&&firstName){
+					userNameTextView.setText(nameText+" "+firstNameText);
+					name= false;
+					firstName = false;
+				}				
 			}
 		}
 		if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){

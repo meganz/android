@@ -37,6 +37,8 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 				"song.mp3").getIconResourceId(), "audio/*"));
 		items.add(new ListItem(R.string.upload_to_video, MimeTypeList.typeForName(
 				"film.mkv").getIconResourceId(), "video/*"));
+		items.add(new ListItem(R.string.upload_to_other, MimeTypeList.typeForName(
+				"film.mkv").getIconResourceId(), "*/*"));
 		items.add(new ListItem(R.string.upload_to_filesystem,
 				R.drawable.ic_folder_list, null));
 	}
