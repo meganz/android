@@ -138,7 +138,9 @@
                 android:id="@+id/country_cc"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
-                />
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="1" />
             <!-- <EditText
 		        android:id="@+id/state_cc1"
 		        android:layout_width="wrap_content"
@@ -199,25 +201,21 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             
-            <EditText
-		        android:id="@+id/month_cc"
-		        android:layout_width="wrap_content"
-		        android:layout_height="fill_parent"
-		        android:hint="Month"
-		        android:imeOptions="actionNext"
-		        android:layout_gravity="center" 
-		        style="@style/InputFieldCC"
-		        android:layout_weight="1" />
+            <Spinner 
+                android:id="@+id/month_cc"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="1" />
             
-            <EditText
-		        android:id="@+id/year_cc"
-		        android:layout_width="wrap_content"
-		        android:layout_height="fill_parent"
-		        android:hint="Year"
-		        android:imeOptions="actionNext"
-		        android:layout_gravity="center" 
-		        style="@style/InputFieldCC"
-		        android:layout_weight="1" />
+            <Spinner 
+                android:id="@+id/year_cc"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="1" />
             
             <EditText
 		        android:id="@+id/cvv_cc"
@@ -227,9 +225,37 @@
 		        android:imeOptions="actionNext"
 		        android:layout_gravity="center" 
 		        style="@style/InputFieldCC"
-		        android:layout_weight="1" />
+		        android:layout_weight="1"
+		        android:inputType="number" />
             
         </LinearLayout>
+        
+        <LinearLayout
+	         android:id="@+id/cam_buttons_layout"
+	    	 android:layout_width="match_parent"
+	    	 android:layout_height="wrap_content"
+	    	 android:layout_gravity="center|fill_horizontal"
+	    	 android:layout_marginTop="10dp"
+	    	 android:orientation="horizontal">
+
+	        <Button
+	            android:id="@+id/cancel_cc"
+	            android:layout_width="fill_parent"
+	      		android:layout_height="48dp"
+	      		android:layout_weight="1"
+	            android:background="@drawable/grey_btn_default_holo_light"
+	            android:textColor="@color/button_text"
+	            android:text="@string/general_cancel" />
+	        
+	        <Button
+	            android:id="@+id/proceed_cc"
+	            android:layout_width="fill_parent"
+	      		android:layout_height="48dp"
+	      		android:layout_weight="1"
+	            android:background="@drawable/btn_default_holo_light_without_corners"
+	            android:textColor="@color/button_text"
+	            android:text="@string/proceed_cc" />
+	     </LinearLayout>
         
     </LinearLayout>
 

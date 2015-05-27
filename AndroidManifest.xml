@@ -13,6 +13,9 @@
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <!-- If your app doesn't need to make phone calls, you can add this, so the app
+	could be installed on tablets. -->
+	<uses-feature android:name="android.hardware.telephony" android:required="false" />
     
     <supports-screens android:resizeable="true"
               android:smallScreens="true"
@@ -29,6 +32,17 @@
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     
     <uses-permission android:name="com.android.vending.BILLING" />
+    
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    
+    <!-- Define your own permission to protect payment broadcast -->
+  	<permission android:name="nz.mega.android.PAYMENT_BROADCAST_PERMISSION"
+    	android:label="Read payment status"  
+        android:protectionLevel="signature" />
+  	<!-- "signature" permission granted automatically by system, without notifying user. -->
+  	<uses-permission android:name="nz.mega.android.PAYMENT_BROADCAST_PERMISSION" />
         
     <application
         android:name="MegaApplication"
@@ -309,6 +323,11 @@
             android:screenOrientation="portrait" >
         </activity>
         
+        <activity
+            android:name="FortumoPayment"
+            android:label="Fortumo Payment">
+        </activity>
+        
         <service
             android:name="CameraSyncService"
             android:exported="false" >
@@ -399,6 +418,26 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
+        <!-- Declare these objects, this is part of Fortumo SDK, and should not be called directly -->
+		<receiver android:name="mp.MpSMSReceiver">
+			<intent-filter>
+				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
+			</intent-filter>
+		</receiver>
+		<service android:name="mp.MpService" />
+		<service android:name="mp.StatusUpdateService" />
+		<activity android:name="mp.MpActivity" 
+			android:theme="@android:style/Theme.Translucent.NoTitleBar"
+		    android:configChanges="orientation|keyboardHidden|screenSize" />
+		
+		<!-- Implement you own BroadcastReceiver
+		to track payment status, should be protected by "signature" permission -->
+		<receiver android:name="nz.mega.android.receivers.PaymentStatusReceiver" 
+        	android:permission="nz.mega.android.PAYMENT_BROADCAST_PERMISSION">
+  			<intent-filter>
+  				<action android:name="mp.info.PAYMENT_STATUS_CHANGED" />
+			</intent-filter>
+		</receiver>
         
     </application>
 
