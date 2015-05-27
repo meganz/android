@@ -2,16 +2,20 @@ package nz.mega.android.providers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.IncomingSharesExplorerFragment;
+import nz.mega.android.DownloadService;
 import nz.mega.android.LoginActivity;
 import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
+import nz.mega.android.MimeTypeList;
 import nz.mega.android.PinActivity;
 import nz.mega.android.R;
 import nz.mega.android.TabsAdapter;
+import nz.mega.android.ZipBrowserActivity;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -20,6 +24,8 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaTransfer;
+import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
 import android.app.AlertDialog;
@@ -28,9 +34,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.StatFs;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -51,7 +60,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class FileProviderActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
+public class FileProviderActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
 	
 //	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 //	
@@ -79,6 +88,8 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	
 	public static int CLOUD_TAB = 0;
 	public static int INCOMING_TAB = 1;
+	
+	String SD_CACHE_PATH = "/Android/data/nz.mega.android/cache/files";
 
 	private TextView windowTitle;
 	private ImageButton newFolderButton;
@@ -87,10 +98,6 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	MegaApplication app;
 //	private int mode;
 	
-	private long[] moveFromHandles;
-	private long[] copyFromHandles;
-	private String[] selectedContacts;
-	private String imagePath;
 	String actionBarTitle;
 	private boolean folderSelected = false;
 	
@@ -99,7 +106,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	private int tabShown = CLOUD_TAB;
 	
 	private CloudDriveProviderFragment cDriveExplorer;
-	private IncomingSharesExplorerFragment iSharesExplorer;
+	private IncomingSharesProviderFragment iSharesProvider;
 	
 	private static int EDIT_TEXT_ID = 2;
 	
@@ -109,7 +116,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	
 	private TabHost mTabHostProvider;
 	TabsAdapter mTabsAdapterProvider;
-    ViewPager viewPagerExplorer; 
+    ViewPager viewPagerProvider; 
 	
 	ArrayList<MegaNode> nodes;
 	
@@ -231,7 +238,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		
 		mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
 		mTabHostProvider.setup();
-        viewPagerExplorer = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+        viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
         
         //Create tabs
         mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
@@ -240,7 +247,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		
 		
 		if (mTabsAdapterProvider == null){
-			mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerExplorer);   	
+			mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
 			
 			TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
 			tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
@@ -250,7 +257,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
 	                	          				
 			mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-			mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesExplorerFragment.class, null);
+			mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
 			
 		}
 		
@@ -280,14 +287,14 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
             		
             		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
             		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-    				iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+    				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
     		
-    				if(iSharesExplorer!=null){
-    					if(iSharesExplorer.getDeepBrowserTree()==0){
+    				if(iSharesProvider!=null){
+    					if(iSharesProvider.getDeepBrowserTree()==0){
     						changeTitle(getString(R.string.title_incoming_shares_explorer));
     					}
     					else{
-    						changeTitle(iSharesExplorer.name);
+    						changeTitle(iSharesProvider.name);
     					}    					
     				}        			                      	
                 }
@@ -300,7 +307,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 				
 				@Override
 				public void onClick(View v) {
-					viewPagerExplorer.setCurrentItem(index);							
+					viewPagerProvider.setCurrentItem(index);							
 				}
 			});
 		}
@@ -337,6 +344,79 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	
 	public void finishActivity(){
 		finish();
+	}
+	
+	public void downloadTo(long size, long [] hashes){
+		log("downloadTo");
+		
+		String pathToDownload = Environment.getExternalStorageDirectory() + SD_CACHE_PATH;
+		File destination = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			destination = new File(pathToDownload);
+		}
+		else{
+			destination = getFilesDir();
+		}
+
+		if(!destination.exists()){
+			destination.mkdirs();
+		}		
+				
+		double availableFreeSpace = Double.MAX_VALUE;
+		try{
+			StatFs stat = new StatFs(pathToDownload);
+			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
+		}
+		catch(Exception ex){}		
+
+		if (hashes != null&&hashes.length>0){			
+
+			for (long hash : hashes) {
+
+				MegaNode tempNode = megaApi.getNodeByHandle(hash);
+//				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
+//					log("ISFILE");
+				String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), pathToDownload);
+
+				if(localPath != null){	
+					try { 
+						Util.copyFile(new File(localPath), new File(pathToDownload, tempNode.getName())); 
+						return;
+					}
+					catch(Exception e) {}
+				}
+
+//				}
+//				else{
+
+
+				if(tempNode != null){
+					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
+//						if (node.getType() == MegaNode.TYPE_FOLDER) {
+//							getDlList(dlFiles, node, new File(pathToDownload, new String(node.getName())));
+//						} else {
+						dlFiles.put(tempNode, pathToDownload);
+//						}
+
+					for (MegaNode document : dlFiles.keySet()) {
+
+						String path = dlFiles.get(document);
+
+						if(availableFreeSpace < document.getSize()){
+							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							continue;
+						}
+
+						Intent service = new Intent(this, DownloadService.class);
+						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
+						service.putExtra(DownloadService.EXTRA_SIZE, document.getSize());
+						service.putExtra(DownloadService.EXTRA_PATH, path);
+						startService(service);
+					}
+				}
+			}
+//			}
+		}
 	}
 	
 	@Override
@@ -389,10 +469,10 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		else if(tabShown==INCOMING_TAB){
 			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-			iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+			iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		
-			if(iSharesExplorer!=null){
-				if (iSharesExplorer.onBackPressed() == 0){
+			if(iSharesProvider!=null){
+				if (iSharesProvider.onBackPressed() == 0){
 					super.onBackPressed();
 					return;
 				}
@@ -645,14 +725,14 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 			}
 		}
 		else if (tabShown == INCOMING_TAB){
-			if (iSharesExplorer != null){
-				parentHandle = iSharesExplorer.getParentHandle();
+			if (iSharesProvider != null){
+				parentHandle = iSharesProvider.getParentHandle();
 			}
 			else{
 				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-				iSharesExplorer = (IncomingSharesExplorerFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
-				if (iSharesExplorer != null){
-					parentHandle = iSharesExplorer.getParentHandle();
+				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
+				if (iSharesProvider != null){
+					parentHandle = iSharesProvider.getParentHandle();
 				}	
 			}
 		}
@@ -705,7 +785,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	}
 	
 	public static void log(String log) {
-		Util.log("FileExplorerActivity", log);
+		Util.log("FileProviderActivity", log);
 	}
 
 	@Override
@@ -798,5 +878,39 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		}
 		
 		super.onDestroy();
+	}
+
+	@Override
+	public void onTransferStart(MegaApiJava api, MegaTransfer transfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
+			MegaError e) {
+		log("onTransferFinish");
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTransferTemporaryError(MegaApiJava api,
+			MegaTransfer transfer, MegaError e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onTransferData(MegaApiJava api, MegaTransfer transfer,
+			byte[] buffer) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
