@@ -1,22 +1,18 @@
 package nz.mega.android.providers;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import nz.mega.android.DatabaseHandler;
+import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
-import nz.mega.android.MegaExplorerAdapter;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
-
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,11 +20,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -39,7 +32,7 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 	ArrayList<MegaNode> nodes;
 	long parentHandle = -1;
 	
-	MegaExplorerAdapter adapter;
+	MegaProviderAdapter adapter;
 	
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
@@ -52,6 +45,8 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+	
+	long [] hashes;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -145,7 +140,7 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 //		}	
 //				
 		if (adapter == null){
-			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
+			adapter = new MegaProviderAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
@@ -227,6 +222,13 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
+		else{
+			//File selected to download
+			MegaNode n = nodes.get(position);
+			hashes = new long[1];
+			hashes[0]=n.getHandle();
+			((FileProviderActivity) context).downloadTo(n.getSize(), hashes);
+		}
 	}	
 
 	public int onBackPressed(){
@@ -271,15 +273,9 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 		}
 	}
 	
-	/*
-	 * Disable nodes from the list
-	 */
-	public void setDisableNodes(ArrayList<Long> disabledNodes) {
-		adapter.setDisableNodes(disabledNodes);
-	}
 	
 	private static void log(String log) {
-		Util.log("CloudDriveExplorerFragment", log);
+		Util.log("CloudDriveProviderFragment", log);
 	}
 	
 	public long getParentHandle(){

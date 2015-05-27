@@ -3,7 +3,6 @@ package nz.mega.android.providers;
 import java.util.ArrayList;
 
 import nz.mega.android.MegaApplication;
-import nz.mega.android.MegaExplorerAdapter;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -37,7 +36,7 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 	ArrayList<MegaNode> nodes;
 	long parentHandle = -1;
 	
-	MegaExplorerAdapter adapter;
+	MegaProviderAdapter adapter;
 	
 	public String name;
 	
@@ -88,7 +87,7 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
 		
 		if (adapter == null){
-			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
+			adapter = new MegaProviderAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
@@ -121,7 +120,6 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 	public void findNodes(){
 		deepBrowserTree=0;
 		ArrayList<MegaUser> contacts = megaApi.getContacts();
-		ArrayList<Long> disabledNodes = new ArrayList<Long>();
 		nodes.clear();
 		for (int i=0;i<contacts.size();i++){			
 			ArrayList<MegaNode> nodeContact=megaApi.getInShares(contacts.get(i));
@@ -132,16 +130,16 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 			}			
 		}
 		
-		for (int i=0;i<nodes.size();i++){	
-			MegaNode folder = nodes.get(i);
-			int accessLevel = megaApi.getAccess(folder);
-			
-			if(accessLevel==MegaShare.ACCESS_READ) {
-				disabledNodes.add(folder.getHandle());
-			}
-		}
-		
-		this.setDisableNodes(disabledNodes);
+//		for (int i=0;i<nodes.size();i++){	
+//			MegaNode folder = nodes.get(i);
+//			int accessLevel = megaApi.getAccess(folder);
+//			
+//			if(accessLevel==MegaShare.ACCESS_READ) {
+//				disabledNodes.add(folder.getHandle());
+//			}
+//		}
+//		
+//		this.setDisableNodes(disabledNodes);
 		
 	}
 	
@@ -263,15 +261,8 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 		}
 	}
 	
-	/*
-	 * Disable nodes from the list
-	 */
-	public void setDisableNodes(ArrayList<Long> disabledNodes) {
-		adapter.setDisableNodes(disabledNodes);
-	}
-	
 	private static void log(String log) {
-		Util.log("IncomingSharesExplorerFragment", log);
+		Util.log("IncomingSharesProviderFragment", log);
 	}
 	
 	public long getParentHandle(){
