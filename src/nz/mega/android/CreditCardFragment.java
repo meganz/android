@@ -1,8 +1,8 @@
 package nz.mega.android;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -13,15 +13,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -33,16 +28,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
-public class CreditCardFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener{
+public class CreditCardFragment extends Fragment implements MegaRequestListenerInterface, OnClickListener, OnItemSelectedListener{
 	
 	public enum AccountType {
 		
@@ -99,12 +94,17 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	private EditText address2Edit;
 	private EditText cityEdit;
 	private EditText stateEdit;
+	private Spinner countrySpinner;
 	private EditText postalCodeEdit;
 	private TextView paymentDetails;
 	private EditText firstNameEdit;
 	private EditText lastNameEdit;
 	private EditText creditCardNumberEdit;
+	private Spinner monthSpinner;
+	private Spinner yearSpinner;
 	private EditText cvvEdit;
+	private Button cancelButton;
+	private Button proceedButton;
 	//	private TextView perMonth;
 //	private TextView perYear;
 	private TextView pricingFrom;
@@ -220,6 +220,37 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 		stateEdit = (EditText) v.findViewById(R.id.state_cc);
 		postalCodeEdit = (EditText) v.findViewById(R.id.postal_code_cc);
 		
+		countrySpinner = (Spinner) v.findViewById(R.id.country_cc);
+		List<String> countryList = Util.getCountryList(context);
+		// Populate the spinner using a customized ArrayAdapter that hides the first (dummy) entry
+		ArrayAdapter<String> countryAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, countryList){
+			@Override
+			public View getDropDownView(int position, View convertView, ViewGroup parent){
+				View v = null;
+				
+				// If this is the initial dummy entry, make it hidden
+		        if (position == 0) {
+		            TextView tv = new TextView(getContext());
+		            tv.setHeight(0);
+		            tv.setVisibility(View.GONE);
+		            v = tv;
+		        }
+		        else {
+		            // Pass convertView as null to prevent reuse of special case views
+		            v = super.getDropDownView(position, null, parent);
+		            ((TextView)v).setTextColor(Color.BLACK);
+		        }
+		        
+		        // Hide scroll bar because it appears sometimes unnecessarily, this does not prevent scrolling 
+		        parent.setVerticalScrollBarEnabled(false);
+		        return v;
+			}
+			
+		};
+		countrySpinner.setOnItemSelectedListener(this);
+		countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		countrySpinner.setAdapter(countryAdapter);
+		
 		paymentDetails = (TextView) v.findViewById(R.id.payment_details_cc);
 		paymentDetails.setText(getString(R.string.payment_details));
 		paymentDetails.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleH));
@@ -227,7 +258,76 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 		firstNameEdit = (EditText) v.findViewById(R.id.first_name_cc);
 		lastNameEdit = (EditText) v.findViewById(R.id.last_name_cc);
 		creditCardNumberEdit = (EditText) v.findViewById(R.id.credit_card_number_cc);
+		
+		monthSpinner = (Spinner) v.findViewById(R.id.month_cc);
+		List<String> monthList = Util.getMonthListInt(context);
+		// Populate the spinner using a customized ArrayAdapter that hides the first (dummy) entry
+		ArrayAdapter<String> monthAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, monthList){
+			@Override
+			public View getDropDownView(int position, View convertView, ViewGroup parent){
+				View v = null;
+				
+				// If this is the initial dummy entry, make it hidden
+		        if (position == 0) {
+		            TextView tv = new TextView(getContext());
+		            tv.setHeight(0);
+		            tv.setVisibility(View.GONE);
+		            v = tv;
+		        }
+		        else {
+		            // Pass convertView as null to prevent reuse of special case views
+		            v = super.getDropDownView(position, null, parent);
+		            ((TextView)v).setTextColor(Color.BLACK);
+		        }
+		        
+		        // Hide scroll bar because it appears sometimes unnecessarily, this does not prevent scrolling 
+		        parent.setVerticalScrollBarEnabled(false);
+		        return v;
+			}
+			
+		};
+		monthSpinner.setOnItemSelectedListener(this);
+		monthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		monthSpinner.setAdapter(monthAdapter);
+		
+		yearSpinner = (Spinner) v.findViewById(R.id.year_cc);
+		List<String> yearList = Util.getYearListInt(context);
+		// Populate the spinner using a customized ArrayAdapter that hides the first (dummy) entry
+		ArrayAdapter<String> yearAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, yearList){
+			@Override
+			public View getDropDownView(int position, View convertView, ViewGroup parent){
+				View v = null;
+				
+				// If this is the initial dummy entry, make it hidden
+		        if (position == 0) {
+		            TextView tv = new TextView(getContext());
+		            tv.setHeight(0);
+		            tv.setVisibility(View.GONE);
+		            v = tv;
+		        }
+		        else {
+		            // Pass convertView as null to prevent reuse of special case views
+		            v = super.getDropDownView(position, null, parent);
+		            ((TextView)v).setTextColor(Color.BLACK);
+		        }
+		        
+		        // Hide scroll bar because it appears sometimes unnecessarily, this does not prevent scrolling 
+		        parent.setVerticalScrollBarEnabled(false);
+		        return v;
+			}
+			
+		};
+		yearSpinner.setOnItemSelectedListener(this);
+		yearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		yearSpinner.setAdapter(yearAdapter);
+		
 		cvvEdit = (EditText) v.findViewById(R.id.cvv_cc);
+		
+		cancelButton = (Button) v.findViewById(R.id.cancel_cc);
+		cancelButton.setOnClickListener(this);
+		proceedButton = (Button) v.findViewById(R.id.proceed_cc);
+		proceedButton.setOnClickListener(this);
+		
 //
 //		selectMemberShip = (TextView) v.findViewById(R.id.select_membership);
 //		selectMemberShip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleH));
@@ -608,7 +708,7 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	}
 	
 	public int onBackPressed(){
-		((ManagerActivity)context).showUpAF();
+		((ManagerActivity)context).showpF(parameterType, accounts);
 		return 3;
 	}
 	
@@ -626,48 +726,54 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.payment_google_wallet:{
-				switch(parameterType){
-					case 1:{
-						if (paymentMonth == 1){
-							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_MONTH);
-						}
-						else if (paymentMonth == 0){
-							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
-						}
-						break;
-					}
-					case 2:{
-						if (paymentMonth == 1){
-							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_II_MONTH);
-						}
-					}
-					case 3:{
-						if (paymentMonth == 1){
-							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_III_MONTH);
-						}
-					}
-					case 4:{
-						if (paymentMonth == 1){
-							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
-						}
-						else if (paymentMonth == 0){
-							((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
-						}
-					}
-				}
+			case R.id.proceed_cc:{
 				break;
 			}
-			case R.id.payment_fortumo:{
-				if (parameterType == 4 && paymentMonth == 1){
-					Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
-					startActivity(intent);
-				}
-				break;
-			}
-			case R.id.payment_credit_card:{
+			case R.id.cancel_cc:{
+				onBackPressed();
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int position,
+			long id) {
+		// An item was selected. You can retrieve the selected item using
+        // parent.getItemAtPosition(pos)
+		switch(parent.getId()){
+			case R.id.country_cc:{
+				if (position == 0){
+					if (view != null){
+						((TextView) view).setTextColor(Color.GRAY);
+						((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+					}
+				}
+				break;
+			}
+			case R.id.month_cc:{
+				if (position == 0){
+					if (view != null){
+						((TextView) view).setTextColor(Color.GRAY);
+						((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+					}
+				}
+				break;
+			}
+			case R.id.year_cc:{
+				if (position == 0){
+					if (view != null){
+						((TextView) view).setTextColor(Color.GRAY);
+						((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// Another interface callback
 	}
 }

@@ -12,8 +12,10 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -811,7 +813,7 @@ public class Util {
 		} else {
 			return status == BatteryManager.BATTERY_PLUGGED_AC || status == BatteryManager.BATTERY_PLUGGED_USB || status == BatteryManager.BATTERY_PLUGGED_WIRELESS;
 		}
-
+		
 	}
 	
 	/** Returns the consumer friendly device name */
@@ -826,6 +828,60 @@ public class Util {
 	        return "HTC " + model;
 	    }
 	    return manufacturer + " " + model;
+	}
+	
+	public static ArrayList<String> getCountryList(Context context){
+		ArrayList<String> countryList = new ArrayList<String>();
+		
+		Locale[] locale = Locale.getAvailableLocales();
+		String country;
+		for (Locale loc : locale){
+			country = loc.getDisplayCountry();
+			if (country.length() > 0 && !countryList.contains(country)){
+				countryList.add(country);
+			}
+		}
+		
+		Collections.sort(countryList, String.CASE_INSENSITIVE_ORDER);
+		countryList.add(0, context.getString(R.string.country_cc));
+		
+		return countryList;
+	}
+	
+	public static ArrayList<String> getMonthListInt(Context context){
+		ArrayList<String> monthList = new ArrayList<String>();
+		
+		monthList.add(context.getString(R.string.month_cc));
+		
+		monthList.add("01");
+		monthList.add("02");
+		monthList.add("03");
+		monthList.add("04");
+		monthList.add("05");
+		monthList.add("06");
+		monthList.add("07");
+		monthList.add("08");
+		monthList.add("09");
+		monthList.add("10");
+		monthList.add("11");
+		monthList.add("12");
+		
+		return monthList;
+	}
+	
+	public static ArrayList<String> getYearListInt(Context context){
+		ArrayList<String> yearList = new ArrayList<String>();
+		
+		yearList.add(context.getString(R.string.year_cc));
+		
+		Calendar calendar = Calendar.getInstance();
+		int year = calendar.get(Calendar.YEAR);
+		
+		for (int i=year;i<=(year+20);i++){
+			yearList.add(i+"");
+		}
+		
+		return yearList;
 	}
 
 	private static void log(String message) {

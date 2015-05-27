@@ -505,5 +505,9 @@
     <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">First Name</string>
     <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Last Name</string>
     <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Credit Card Number</string>
+    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Month</string>
+    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Year</string>
     <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
+    
+    <string name="proceed_cc" context="Text of the button which proceeds the payment">Proceed</string>
 </resources>
