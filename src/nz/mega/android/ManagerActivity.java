@@ -2725,7 +2725,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					return;
 				}
 				case PAYMENT_FRAGMENT:{
-					showUpAF();
+					if (pF != null){
+						pF.onBackPressed();
+					}
 					return;					
 				}
 				case CC_FRAGMENT:{
@@ -7826,6 +7828,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showpF(int type, ArrayList<Product> accounts){
+		showpF(type, accounts, false);
+	}
+	
+	public void showpF(int type, ArrayList<Product> accounts, boolean refresh){
 		
 		accountFragment=PAYMENT_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
@@ -7833,19 +7839,39 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if(pF==null){			
-			pF = new PaymentFragment();
-//			Bundle args = new Bundle();
-//			args.putInt("type", type);
-//			f.setArguments(args);
-			pF.setInfo(type, accounts);
-			ft.replace(R.id.fragment_container, pF, "pF");
-			ft.commit();
+		if (!refresh){
+			if(pF==null){			
+				pF = new PaymentFragment();
+				pF.setInfo(type, accounts);
+				ft.replace(R.id.fragment_container, pF, "pF");
+				ft.commit();
+			}
+			else{			
+				pF.setInfo(type, accounts);			
+				ft.replace(R.id.fragment_container, pF, "pF");
+				ft.commit();
+			}
 		}
-		else{			
-			pF.setInfo(type, accounts);			
-			ft.replace(R.id.fragment_container, pF, "pF");
-			ft.commit();
+		else{
+			Fragment tempF = getSupportFragmentManager().findFragmentByTag("pF");
+			if (tempF != null){
+				ft.detach(tempF);
+				ft.attach(tempF);
+				ft.commit();
+			}
+			else{
+				if(pF==null){			
+					pF = new PaymentFragment();
+					pF.setInfo(type, accounts);
+					ft.replace(R.id.fragment_container, pF, "pF");
+					ft.commit();
+				}
+				else{			
+					pF.setInfo(type, accounts);			
+					ft.replace(R.id.fragment_container, pF, "pF");
+					ft.commit();
+				}
+			}
 		}
 	}
 	
@@ -7876,22 +7902,49 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showCC(int type, ArrayList<Product> accounts){
+		showCC(type, accounts, false);
+	}
+	
+	public void showCC(int type, ArrayList<Product> accounts, boolean refresh){
 		accountFragment = CC_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
 		mTabHostShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if (ccF == null){
-			ccF = new CreditCardFragment();
-			ccF.setInfo(type, accounts);
-			ft.replace(R.id.fragment_container, ccF, "ccF");
-			ft.commit();
+		if (!refresh){
+			if (ccF == null){
+				ccF = new CreditCardFragment();
+				ccF.setInfo(type, accounts);
+				ft.replace(R.id.fragment_container, ccF, "ccF");
+				ft.commit();
+			}
+			else{			
+				ccF.setInfo(type, accounts);			
+				ft.replace(R.id.fragment_container, ccF, "ccF");
+				ft.commit();
+			}
 		}
-		else{			
-			ccF.setInfo(type, accounts);			
-			ft.replace(R.id.fragment_container, ccF, "ccF");
-			ft.commit();
+		else{
+			Fragment tempF = getSupportFragmentManager().findFragmentByTag("ccF");
+			if (tempF != null){
+				ft.detach(tempF);
+				ft.attach(tempF);
+				ft.commit();
+			}
+			else{
+				if (ccF == null){
+					ccF = new CreditCardFragment();
+					ccF.setInfo(type, accounts);
+					ft.replace(R.id.fragment_container, ccF, "ccF");
+					ft.commit();
+				}
+				else{			
+					ccF.setInfo(type, accounts);			
+					ft.replace(R.id.fragment_container, ccF, "ccF");
+					ft.commit();
+				}
+			}
 		}
 	}
 	

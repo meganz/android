@@ -69,6 +69,9 @@ public class MegaApiJava
 	public final static int EVENT_DEBUG = EVENT_FEEDBACK + 1;
 	public final static int EVENT_INVALID = EVENT_DEBUG + 1;
 	
+	public final static int PAYMENT_METHOD_BALANCE = MegaApi.PAYMENT_METHOD_BALANCE;
+	public final static int PAYMENT_METHOD_CREDIT_CARD = MegaApi.PAYMENT_METHOD_CREDIT_CARD;
+	
 	/**
      * Constructor suitable for most applications
      * 
@@ -1969,6 +1972,53 @@ public class MegaApiJava
 	}
 	
 	/**
+     * Upgrade an account
+     * @param productHandle Product handle to purchase
+     *
+     * It's possible to get all pricing plans with their product handles using
+     * MegaApi::getPricing
+     *
+     * The associated request type with this request is MegaRequest::TYPE_UPGRADE_ACCOUNT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the product
+     * - MegaRequest::getNumber - Returns the payment method
+     *
+     * @param paymentMethod Payment method
+     * Valid values are:
+     * - MegaApi::PAYMENT_METHOD_BALANCE = 0
+     * Use the account balance for the payment
+     *
+     * - MegaApi::PAYMENT_METHOD_CREDIT_CARD = 8
+     * Complete the payment with your credit card. Use MegaApi::creditCardStore to add
+     * a credit card to your account
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+	public void upgradeAccount(long productHandle, int paymentMethod, MegaRequestListenerInterface listener) {
+		megaApi.upgradeAccount(productHandle, paymentMethod, createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Upgrade an account
+     * @param productHandle Product handle to purchase
+     *
+     * It's possible to get all pricing plans with their product handles using
+     * MegaApi::getPricing
+     *
+     * @param paymentMethod Payment method
+     * Valid values are:
+     * - MegaApi::PAYMENT_METHOD_BALANCE = 0
+     * Use the account balance for the payment
+     *
+     * - MegaApi::PAYMENT_METHOD_CREDIT_CARD = 8
+     * Complete the payment with your credit card. Use MegaApi::creditCardStore to add
+     * a credit card to your account
+     */
+	public void upgradeAccount(long productHandle, int paymentMethod) {
+		megaApi.upgradeAccount(productHandle, paymentMethod);
+	}
+	
+	/**
      * Send the Google Play receipt after a correct purchase of a subscription
      *
      * @param receipt String The complete receipt from Google Play
@@ -1988,7 +2038,91 @@ public class MegaApiJava
 	public void submitPurchaseReceipt(String receipt) {
 		megaApi.submitPurchaseReceipt(receipt);
     }
+	
+	/**
+     * Store a credit card
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREDIT_CARD_STORE
+     *
+     * @param address1 Billing address
+     * @param address2 Second line of the billing address (optional)
+     * @param city City of the billing address
+     * @param province Province of the billing address
+     * @param country Contry of the billing address
+     * @param postalcode Postal code of the billing address
+     * @param firstname Firstname of the owner of the credit card
+     * @param lastname Lastname of the owner of the credit card
+     * @param creditcard Credit card number. Only digits, no spaces nor dashes
+     * @param expire_month Expire month of the credit card. Must have two digits ("03" for example)
+     * @param expire_year Expire year of the credit card. Must have four digits ("2010" for example)
+     * @param cv2 Security code of the credit card (3 digits)
+     * @param listener MegaRequestListener to track this request
+     */
+	public void creditCardStore(String address1, String address2, String city, String province, String country, String postalcode, String firstname, String lastname, String creditcard, String expire_month, String expire_year, String cv2, MegaRequestListenerInterface listener) {
+	    megaApi.creditCardStore(address1, address2, city, province, country, postalcode, firstname, lastname, creditcard, expire_month, expire_year, cv2, createDelegateRequestListener(listener));
+	}
 
+	/**
+     * Store a credit card
+     *
+     * @param address1 Billing address
+     * @param address2 Second line of the billing address (optional)
+     * @param city City of the billing address
+     * @param province Province of the billing address
+     * @param country Contry of the billing address
+     * @param postalcode Postal code of the billing address
+     * @param firstname Firstname of the owner of the credit card
+     * @param lastname Lastname of the owner of the credit card
+     * @param creditcard Credit card number. Only digits, no spaces nor dashes
+     * @param expire_month Expire month of the credit card. Must have two digits ("03" for example)
+     * @param expire_year Expire year of the credit card. Must have four digits ("2010" for example)
+     * @param cv2 Security code of the credit card (3 digits)
+     */
+	public void creditCardStore(String address1, String address2, String city, String province, String country, String postalcode, String firstname, String lastname, String creditcard, String expire_month, String expire_year, String cv2) {
+		megaApi.creditCardStore(address1, address2, city, province, country, postalcode, firstname, lastname, creditcard, expire_month, expire_year, cv2);
+	}
+
+	/**
+     * Get the credit card subscriptions of the account
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNumber - Number of credit card subscriptions
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+	public void creditCardQuerySubscriptions(MegaRequestListenerInterface listener) {
+		megaApi.creditCardQuerySubscriptions(createDelegateRequestListener(listener));
+	}
+	
+	/**
+     * Get the credit card subscriptions of the account
+     *
+     */
+	public void creditCardQuerySubscriptions() {
+		  megaApi.creditCardQuerySubscriptions();
+	}
+	
+	/**
+     * Cancel credit card subscriptions if the account
+     *
+     * The associated request type with this request is MegaRequest::TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+	public void creditCardCancelSubscriptions(MegaRequestListenerInterface listener) {
+		megaApi.creditCardCancelSubscriptions(createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Cancel credit card subscriptions if the account
+     */
+	public void creditCardCancelSubscriptions() {
+		megaApi.creditCardCancelSubscriptions();
+	}
+	
 	/**
      * Export the master key of the account
      *

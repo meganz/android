@@ -14,7 +14,6 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -91,20 +90,34 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	private TextView bandwidth;
 	private TextView billingDetails;
 	private EditText address1Edit;
+	String address1String = "";
 	private EditText address2Edit;
+	String address2String = "";
 	private EditText cityEdit;
+	String cityString = "";
 	private EditText stateEdit;
+	String stateString = "";
 	private Spinner countrySpinner;
+	String countryString = "";
 	private EditText postalCodeEdit;
+	String postalCodeString = "";
 	private TextView paymentDetails;
 	private EditText firstNameEdit;
+	String firstNameString = "";
 	private EditText lastNameEdit;
+	String lastNameString = "";
 	private EditText creditCardNumberEdit;
+	String creditCardNumberString = "";
 	private Spinner monthSpinner;
+	String monthString = "";
 	private Spinner yearSpinner;
+	String yearString = "";
 	private EditText cvvEdit;
+	String cvvString = "";
 	private Button cancelButton;
 	private Button proceedButton;
+	private String productHandle = null;
+	private long productHandleLong;
 	//	private TextView perMonth;
 //	private TextView perYear;
 	private TextView pricingFrom;
@@ -665,23 +678,52 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
-		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-			MegaPricing p = request.getPricing();
-			for (int i=0;i<p.getNumProducts();i++){
-				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-				if (account.getLevel()==4&&account.getMonths()==1){
-					long planHandle = account.handle;
-					megaApi.getPaymentId(planHandle, this);
-				}
+		log("REQUEST: " + request.getName() + "__" + request.getRequestString());
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
+			if (e.getErrorCode() == MegaError.API_OK){
+				
 			}
 		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
-			log("PAYMENT ID: " + request.getLink());
-			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
-//			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
-//			startActivity(browserIntent);
-
+		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_STORE){
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("API_OK!!");
+				log("VOY A PAGAR CON ESTE PRODUCTHANDLE: " + productHandleLong);
+				megaApi.upgradeAccount(productHandleLong, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD, this);
+			}
+			else if (e.getErrorCode() == MegaError.API_EEXIST){
+				log("API_EEXIST");
+			}
+			else{
+				log("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
+			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_UPGRADE_ACCOUNT){
+			log("EOEOEOEOEOE: " + e.getErrorCode() + "___" + e.getErrorString());
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(context, "YUJUUUUUUUU!!!!!!", Toast.LENGTH_LONG).show();
+			}
+			else{
+				Toast.makeText(context, "LIADAAAAA: ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
+			}
+		}
+		
+//		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+//			MegaPricing p = request.getPricing();
+//			for (int i=0;i<p.getNumProducts();i++){
+//				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+//				if (account.getLevel()==4&&account.getMonths()==1){
+//					long planHandle = account.handle;
+//					megaApi.getPaymentId(planHandle, this);
+//				}
+//			}
+//		}
+//		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
+//			log("PAYMENT ID: " + request.getLink());
+//			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
+////			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
+////			startActivity(browserIntent);
+//
+//		}
 	}
 	
 	public String sizeTranslation(long size, int type) {
@@ -727,6 +769,26 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	public void onClick(View v) {
 		switch(v.getId()){
 			case R.id.proceed_cc:{
+				address1String = address1Edit.getText().toString();
+				address2String = address2Edit.getText().toString();
+				cityString = cityEdit.getText().toString();
+				stateString = stateEdit.getText().toString();
+				postalCodeString = postalCodeEdit.getText().toString();
+				firstNameString = firstNameEdit.getText().toString();
+				lastNameString = lastNameEdit.getText().toString();
+				creditCardNumberString = creditCardNumberEdit.getText().toString();
+				cvvString = cvvEdit.getText().toString();
+				countryString = "ES";
+				log(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryString + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
+				for (int i=0;i<accounts.size();i++){
+					Product account = accounts.get(i);
+					if (account.getLevel()==4&&account.getMonths()==1){
+						productHandleLong = account.handle;
+						log("PRODUCT HANDLE CC: " + productHandleLong);
+						megaApi.creditCardStore(address1String, address2String, cityString, stateString, countryString, postalCodeString, firstNameString, lastNameString, creditCardNumberString, monthString, yearString, cvvString, this);
+//						megaApi.getPaymentId(planHandle, this);
+					}
+				}
 				break;
 			}
 			case R.id.cancel_cc:{
@@ -749,6 +811,9 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 						((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
 					}
 				}
+				else{
+					countryString = parent.getItemAtPosition(position).toString(); 
+				}
 				break;
 			}
 			case R.id.month_cc:{
@@ -758,6 +823,9 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 						((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
 					}
 				}
+				else{
+					monthString = parent.getItemAtPosition(position).toString(); 
+				}
 				break;
 			}
 			case R.id.year_cc:{
@@ -766,6 +834,9 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 						((TextView) view).setTextColor(Color.GRAY);
 						((TextView) view).setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
 					}
+				}
+				else{
+					yearString = parent.getItemAtPosition(position).toString(); 
 				}
 				break;
 			}
