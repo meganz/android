@@ -28,6 +28,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -40,6 +41,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -161,10 +163,19 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
 		megaApi.addGlobalListener(this);
+		megaApi.addTransferListener(this);
 		
 		setContentView(R.layout.activity_file_explorer);
         		
 		Intent intent = getIntent();
+		
+		if (intent != null){
+			Toast.makeText(this, "INTENT DISTINTO" + intent.getAction(), Toast.LENGTH_LONG).show();
+		}
+		else{
+			Toast.makeText(this, "INTENT NULL", Toast.LENGTH_LONG).show();
+		}
+		
 		if (megaApi.getRootNode() == null){
 			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
 			Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -349,22 +360,28 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	public void downloadTo(long size, long [] hashes){
 		log("downloadTo");
 		
-		String pathToDownload = Environment.getExternalStorageDirectory() + SD_CACHE_PATH;
+//		String pathToDownload = null;
 		File destination = null;
-		if (Environment.getExternalStorageDirectory() != null){
-			destination = new File(pathToDownload);
-		}
-		else{
-			destination = getFilesDir();
-		}
-
-		if(!destination.exists()){
-			destination.mkdirs();
-		}		
+//		if (Environment.getExternalStorageDirectory() != null){
+//			pathToDownload = Environment.getExternalStorageDirectory().getPath()+"/files";
+//			destination = new File(pathToDownload);
+////			destination = Environment.getExternalStorageDirectory();
+//		}
+//		else{
+//			pathToDownload = getFilesDir().getPath()+"/files";
+//			destination = new File(pathToDownload);
+//		}
+//
+//		if(!destination.exists()){
+//			destination.mkdirs();
+//		}		
+		
+		destination=getCacheDir();
+		String pathToDownload = destination.getPath();
 				
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
-			StatFs stat = new StatFs(pathToDownload);
+			StatFs stat = new StatFs(destination.getPath());
 			availableFreeSpace = (double)stat.getAvailableBlocks() * (double)stat.getBlockSize();
 		}
 		catch(Exception ex){}		
@@ -428,26 +445,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	protected void onResume() {
 		super.onResume();
-//		if (getIntent() != null){
-//			if (mode == UPLOAD) {
-//				if (folderSelected){
-//					if (filePreparedInfos == null){
-//						FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-//						filePrepareTask.execute(getIntent());
-//						ProgressDialog temp = null;
-//						try{
-//							temp = new ProgressDialog(this);
-//							temp.setMessage(getString(R.string.upload_prepare));
-//							temp.show();
-//						}
-//						catch(Exception e){
-//							return;
-//						}
-//						statusDialog = temp;
-//					}
-//				}
-//			}
-//		}
+
 	}
 	
 	@Override
@@ -530,114 +528,8 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 
 	@Override
 	public void onClick(View v) {
-		switch(v.getId()){/*
-			case R.id.file_explorer_button:{
-				log("button clicked!");
-				folderSelected = true;
-				
-				if (mode == Mode.MOVE) {
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-					
-					Intent intent = new Intent();
-					intent.putExtra("MOVE_TO", parentNode.getHandle());
-					intent.putExtra("MOVE_HANDLES", moveFromHandles);
-					setResult(RESULT_OK, intent);
-					log("finish!");
-					finish();
-				}
-				else if (mode == Mode.COPY){
-					
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-					
-					Intent intent = new Intent();
-					intent.putExtra("COPY_TO", parentNode.getHandle());
-					intent.putExtra("COPY_HANDLES", copyFromHandles);
-					setResult(RESULT_OK, intent);
-					log("finish!");
-					finish();
-				}
-				else if(mode == Mode.UPLOAD_SELFIE){
-				
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-				
-					Intent intent = new Intent(this, UploadService.class);
-					File selfie = new File(imagePath);
-					intent.putExtra(UploadService.EXTRA_FILEPATH, selfie.getAbsolutePath());
-					intent.putExtra(UploadService.EXTRA_NAME, selfie.getName());
-					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-					intent.putExtra(UploadService.EXTRA_SIZE, selfie.length());
-					startService(intent);
-					
-					Intent intentResult = new Intent();
-					setResult(RESULT_OK, intentResult);
-					log("----------------------------------------finish!");
-					finish();
-					
-				}
-				else if (mode == Mode.UPLOAD){
-					if (filePreparedInfos == null){
-						FilePrepareTask filePrepareTask = new FilePrepareTask(this);
-						filePrepareTask.execute(getIntent());
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(this);
-							temp.setMessage(getString(R.string.upload_prepare));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-					}
-					else{
-						onIntentProcessed();
-					}
-				}
-				else if (mode == Mode.IMPORT){
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-					
-					Intent intent = new Intent();
-					intent.putExtra("IMPORT_TO", parentNode.getHandle());
-					setResult(RESULT_OK, intent);
-					log("finish!");
-					finish();
-				}
-				else if (mode == Mode.SELECT){
+		switch(v.getId()){
 
-					long parentHandle = cDriveExplorer.getParentHandle();
-					MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-					if(parentNode == null){
-						parentNode = megaApi.getRootNode();
-					}
-
-					Intent intent = new Intent();
-					intent.putExtra("SELECT", parentNode.getHandle());
-					intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-				break;
-			}*/
-//			case R.id.file_explorer_new_folder:{
-//				showNewFolderDialog(null);
-//				break;
-//			}
 		}
 	}
 	
@@ -796,38 +688,34 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
-		log("onRequestFinish");
-		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+		log("onRequestFinish: "+request.getFile());
+		if (request.getType() == MegaRequest.TYPE_COPY){
 			try { 
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
-				if(tabShown==CLOUD_TAB){
-					long parentHandle;
-					if (cDriveExplorer != null){
-						parentHandle = cDriveExplorer.getParentHandle();
-						if (megaApi.getNodeByHandle(parentHandle) != null){
-							nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-							cDriveExplorer.setNodes(nodes);
-							cDriveExplorer.getListView().invalidateViews();
-						}					
-					}
-					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-						cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(gcFTag);
-						if (cDriveExplorer != null){
-							parentHandle = cDriveExplorer.getParentHandle();
-							if (megaApi.getNodeByHandle(parentHandle) != null){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-								cDriveExplorer.setNodes(nodes);
-								cDriveExplorer.getListView().invalidateViews();
-							}
-						}	
-					}
+				File fileToShare = new File(request.getFile());
+//				File newFile = new File(fileToShare, "default_image.jpg");
+				Uri contentUri = FileProvider.getUriForFile(this, "nz.mega.android.providers.fileprovider", fileToShare);
+				grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				log("CONTENT URI: "+contentUri);
+				//Send it
+				Intent result = new Intent();
+				result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+				result.setData(contentUri);
+				result.setAction(Intent.ACTION_GET_CONTENT);
+				
+				
+				if (getParent() == null) {
+				    setResult(Activity.RESULT_OK, result);
+				} else {
+					Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
+				    getParent().setResult(Activity.RESULT_OK, result);
 				}
+
+				finish();		
 			}
 		}
 	}
@@ -874,6 +762,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		if(megaApi != null)
 		{	
 			megaApi.removeRequestListener(this);
+			megaApi.removeTransferListener(this);
 			megaApi.removeGlobalListener(this);
 		}
 		
@@ -889,9 +778,29 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
 			MegaError e) {
-		log("onTransferFinish");
-		// TODO Auto-generated method stub
+		log("onTransferFinish: "+transfer.getPath());
 		
+		//Get the URI of the file
+		File fileToShare = new File(transfer.getPath());
+//		File newFile = new File(fileToShare, "default_image.jpg");
+		Uri contentUri = FileProvider.getUriForFile(this, "nz.mega.android.providers.fileprovider", fileToShare);
+		grantUriPermission("*", contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		log("CONTENT URI: "+contentUri);
+		//Send it
+		Intent result = new Intent();
+		result.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+		result.setData(contentUri);
+		result.setAction(Intent.ACTION_GET_CONTENT);
+		
+		
+		if (getParent() == null) {
+		    setResult(Activity.RESULT_OK, result);
+		} else {
+			Toast.makeText(this, "ENTROOO parent no null", Toast.LENGTH_LONG).show();
+		    getParent().setResult(Activity.RESULT_OK, result);
+		}
+
+		finish();		
 	}
 
 	@Override
@@ -903,7 +812,8 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onTransferTemporaryError(MegaApiJava api,
 			MegaTransfer transfer, MegaError e) {
-		// TODO Auto-generated method stub
+
+		//Answer to the Intent GET_CONTENT with null
 		
 	}
 
