@@ -63,7 +63,7 @@ public class FortumoPayment extends ActionBarActivity implements MegaRequestList
 			MegaPricing p = request.getPricing();
 			for (int i=0;i<p.getNumProducts();i++){
 				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-				if (account.getLevel()==1&&account.getMonths()==1){
+				if (account.getLevel()==4&account.getMonths()==1){
 					long planHandle = account.handle;
 					megaApi.getPaymentId(planHandle, this);
 					log("megaApi.getPaymentId(" + planHandle + ")");

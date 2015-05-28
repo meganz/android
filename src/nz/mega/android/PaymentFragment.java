@@ -240,22 +240,6 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		switch (parameterType) {
 			case 1:{
-//				aB.setTitle(getString(R.string.pro1_account));
-//				storage.setText("500 GB");
-//				bandwidth.setText("12 TB");
-//				double saving1 = 9999/12.00/100.00;
-//				String saving1String =df.format(saving1);
-//				pricingFrom.setText("from " + saving1String + " € per month");
-//				
-//				double perYearF=9999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=999/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
 				
 				paymentPerMonth.setVisibility(View.VISIBLE);
 				paymentPerYear.setVisibility(View.VISIBLE);
@@ -290,25 +274,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			}
 			case 2:{
 				
-//				aB.setTitle(getString(R.string.pro2_account));
-//				storage.setText("2 TB");
-//				bandwidth.setText("48 TB");
-//				double saving2 = 1999/100.00;
-//				String saving2String =df.format(saving2);
-//				pricingFrom.setText("from " + saving2String + " € per month");
-//				
-//				double perYearF=19999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=1999/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
 				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.INVISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
 	
 				for (int i=0;i<accounts.size();i++){
 	
@@ -340,25 +307,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			}
 			case 3:{
 				
-//				aB.setTitle(getString(R.string.pro2_account));
-//				storage.setText("2 TB");
-//				bandwidth.setText("96 TB");
-//				double saving3 = 2999/100.00;
-//				String saving3String =df.format(saving3);
-//				pricingFrom.setText("from " + saving3String + " € per month");
-//				
-//				double perYearF=29999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=2999/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
 				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.INVISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
 				
 				for (int i=0;i<accounts.size();i++){
 	
@@ -389,24 +339,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			}
 			
 			case 4:{
-				
-//				aB.setTitle(getString(R.string.prolite_account));
-//				storage.setText("200 GB");
-//				bandwidth.setText("12 TB");
-//				double savingLite = 4999/12.00/100.00;
-//				String savingLiteString =df.format(savingLite);
-//				pricingFrom.setText("from " + savingLiteString + " € per month");
-//				
-//				double perYearF=4999/100.00;
-//				String perYearString =df.format(perYearF);
-//
-//				perYear.setText(perYearString+" €");
-//				
-//				double perMonthF=499/100.00;
-//				String perMonthString =df.format(perMonthF);
-//
-//				perMonth.setText(perMonthString+" €");
-				
+	
 				paymentPerMonth.setVisibility(View.VISIBLE);
 				paymentPerYear.setVisibility(View.VISIBLE);
 				
@@ -516,6 +449,33 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				paymentFortumo.setVisibility(View.VISIBLE);
 				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;
+			}
+			case 1:{
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);
+				paymentUpgradeComment.setVisibility(View.GONE);
+				paymentCreditCard.setVisibility(View.VISIBLE);
+				paymentFortumo.setVisibility(View.GONE);
+				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				break;	
+			}
+			case 2:{
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);
+				paymentUpgradeComment.setVisibility(View.GONE);
+				paymentCreditCard.setVisibility(View.VISIBLE);
+				paymentFortumo.setVisibility(View.GONE);
+				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				break;	
+			}
+			case 3:{
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);
+				paymentUpgradeComment.setVisibility(View.GONE);
+				paymentCreditCard.setVisibility(View.VISIBLE);
+				paymentFortumo.setVisibility(View.GONE);
+				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				break;	
 			}
 		}
 
@@ -681,7 +641,13 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	}
 	
 	public int onBackPressed(){
-		((ManagerActivity)context).showUpAF();
+		if (paymentMonth == -1){
+			((ManagerActivity)context).showUpAF();
+		}
+		else{
+			paymentMonth = -1;
+			((ManagerActivity)context).showpF(parameterType, accounts, true);
+		}
 		return 3;
 	}
 	
@@ -729,6 +695,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 					}
 				}
+				paymentMonth = -1;
 				break;
 			}
 			case R.id.payment_fortumo:{
@@ -736,10 +703,12 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
 					startActivity(intent);
 				}
+				paymentMonth = -1;
 				break;
 			}
 			case R.id.payment_credit_card:{
-				((ManagerActivity)context).showCC(parameterType, accounts);
+				((ManagerActivity)context).showCC(parameterType, accounts, true);
+				paymentMonth = -1;
 				break;
 			}
 		}
