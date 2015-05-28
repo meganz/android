@@ -6387,7 +6387,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("onActivityResult "+requestCode);
+		log("onActivityResult "+requestCode + "____" + resultCode);
+		
+		if (requestCode == REQUEST_CODE_GET){
+			log("resultCode = " + resultCode);
+			if (intent == null){
+				log("INTENT NULL");
+			}
+			else{
+				log("URI: " + intent.getData());
+			}
+		}
 		
 		if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			if (intent == null) {			
@@ -6396,6 +6406,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			Uri uri = intent.getData();
+			log("EOEOEOEOE: " + uri);
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
