@@ -1,10 +1,9 @@
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:background="#ffffff"
-    android:stackFromBottom="true"
     android:id="@+id/scroll_view_credit_card_payment">
    
    <LinearLayout
@@ -18,8 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:background="#ffffff"
-            android:onClick="onUpgrade1Click">
+            android:background="#ffffff">
             <ImageView 
                 android:id="@+id/pro_image_cc"
                 android:layout_width="wrap_content"
@@ -96,38 +94,42 @@
         <EditText
 	        android:id="@+id/address1_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/address1_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true" />
         
         <EditText
 	        android:id="@+id/address2_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/address2_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true" />
         
         <EditText
 	        android:id="@+id/city_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/city_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true" />
         
         <EditText
 	        android:id="@+id/state_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/state_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true" />
         
         <LinearLayout 
             android:layout_width="match_parent"
@@ -146,7 +148,6 @@
 		        android:layout_width="wrap_content"
 		        android:layout_height="fill_parent"
 		        android:hint="Adios"
-		        android:imeOptions="actionNext"
 		        android:layout_gravity="center" 
 		        style="@style/InputFieldCC"
 		        android:layout_weight="1" />
@@ -154,12 +155,13 @@
             <EditText
 		        android:id="@+id/postal_code_cc"
 		        android:layout_width="wrap_content"
-		        android:layout_height="fill_parent"
+		        android:layout_height="wrap_content"
 		        android:hint="@string/postal_code_cc"
-		        android:imeOptions="actionNext"
 		        android:layout_gravity="center" 
 		        style="@style/InputFieldCC"
-		        android:layout_weight="1" />
+		        android:layout_weight="1"
+		        android:imeOptions="actionNext"
+	        	android:singleLine="true" />
             
         </LinearLayout>
         
@@ -172,29 +174,33 @@
         <EditText
 	        android:id="@+id/first_name_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/first_name_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true" />
         
         <EditText
 	        android:id="@+id/last_name_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/last_name_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true" />
         
         <EditText
 	        android:id="@+id/credit_card_number_cc"
 	        android:layout_width="fill_parent"
-	        android:layout_height="fill_parent"
+	        android:layout_height="wrap_content"
 	        android:hint="@string/credit_card_number_cc"
-	        android:imeOptions="actionNext"
 	        android:layout_gravity="center" 
-	        style="@style/InputFieldCC" />
+	        style="@style/InputFieldCC"
+	        android:imeOptions="actionNext"
+	        android:singleLine="true"
+	        android:inputType="number" />
         
         <LinearLayout 
             android:layout_width="match_parent"
@@ -204,7 +210,7 @@
             <Spinner 
                 android:id="@+id/month_cc"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="20dp"
                 android:layout_weight="1" />
@@ -212,21 +218,24 @@
             <Spinner 
                 android:id="@+id/year_cc"
                 android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="20dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:imeOptions="actionNext"
+	        	android:singleLine="true" />
             
             <EditText
 		        android:id="@+id/cvv_cc"
 		        android:layout_width="wrap_content"
-		        android:layout_height="fill_parent"
+		        android:layout_height="wrap_content"
 		        android:hint="@string/cvv_cc"
-		        android:imeOptions="actionNext"
 		        android:layout_gravity="center" 
 		        style="@style/InputFieldCC"
 		        android:layout_weight="1"
-		        android:inputType="number" />
+		        android:inputType="number"
+		        android:imeOptions="actionDone"
+	        	android:singleLine="true" />
             
         </LinearLayout>
         

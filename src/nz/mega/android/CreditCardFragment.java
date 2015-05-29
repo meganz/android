@@ -779,7 +779,7 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 				creditCardNumberString = creditCardNumberEdit.getText().toString();
 				cvvString = cvvEdit.getText().toString();
 				countryString = "ES";
-				log(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryString + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
+				Toast.makeText(context, address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryString + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString, Toast.LENGTH_LONG).show();
 				for (int i=0;i<accounts.size();i++){
 					Product account = accounts.get(i);
 					if (account.getLevel()==4&&account.getMonths()==1){
@@ -812,7 +812,10 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 					}
 				}
 				else{
-					countryString = parent.getItemAtPosition(position).toString(); 
+					String countryString = parent.getItemAtPosition(position).toString();
+					Toast.makeText(context, "CountryString: " + countryString, Toast.LENGTH_LONG).show();
+					countryString = Util.getCountryCode(countryString);
+					Toast.makeText(context, "CountryCode: " + countryString, Toast.LENGTH_LONG).show();
 				}
 				break;
 			}
