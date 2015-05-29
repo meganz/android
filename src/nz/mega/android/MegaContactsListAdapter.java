@@ -103,6 +103,22 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 						}
 					}
 					
+					if(request.getParamType()==1){
+						log("(1)request.getText(): "+request.getText());
+						holder.nameText=request.getText();
+						holder.name=true;
+					}
+					else if(request.getParamType()==2){
+						log("(2)request.getText(): "+request.getText());
+						holder.firstNameText = request.getText();
+						holder.firstName = true;
+					}
+					if(holder.name&&holder.firstName){
+						holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
+						holder.name= false;
+						holder.firstName = false;
+					}
+					
 //					if (!avatarExists){
 //						createDefaultAvatar();
 //					}
@@ -160,10 +176,10 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
         RelativeLayout optionRemove;
         int currentPosition;
         String contactMail;
-//    	boolean name = false;
-//    	boolean firstName = false;
-//    	String nameText;
-//    	String firstNameText;
+    	boolean name = false;
+    	boolean firstName = false;
+    	String nameText;
+    	String firstNameText;
     }
 
 	@Override
@@ -234,7 +250,13 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		createDefaultAvatar(holder);
 		
 		UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+	
 		holder.textViewContactName.setText(contact.getEmail());
+		holder.name=false;
+		holder.firstName=false;
+		megaApi.getUserAttribute(contact, 1, listener);
+		megaApi.getUserAttribute(contact, 2, listener);
+		
 		File avatar = null;
 		if (context.getExternalCacheDir() != null){
 			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
