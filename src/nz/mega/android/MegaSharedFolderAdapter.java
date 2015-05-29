@@ -118,6 +118,22 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 							}
 						}
 					}
+					
+					if(request.getParamType()==1){
+						log("(1)request.getText(): "+request.getText());
+						holder.nameText=request.getText();
+						holder.name=true;
+					}
+					else if(request.getParamType()==2){
+						log("(2)request.getText(): "+request.getText());
+						holder.firstNameText = request.getText();
+						holder.firstName = true;
+					}
+					if(holder.name&&holder.firstName){
+						holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
+						holder.name= false;
+						holder.firstName = false;
+					}
 				}
 			}
 			else{
@@ -180,6 +196,10 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
         RelativeLayout optionRemoveShare;
         int currentPosition;
         String contactMail;
+    	boolean name = false;
+    	boolean firstName = false;
+    	String nameText;
+    	String firstNameText;
     } 
 
 	@Override
@@ -251,13 +271,13 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 		MegaShare share = (MegaShare) getItem(position);
 		if (share.getUser() == null){
 			holder.contactMail = context.getString(R.string.file_properties_shared_folder_public_link);
-			holder.textViewContactName.setText(holder.contactMail);
 		}
 		else{
 			holder.contactMail = share.getUser();
-			MegaUser contact = megaApi.getContact(holder.contactMail);
-			holder.textViewContactName.setText(holder.contactMail);
+			MegaUser contact = megaApi.getContact(holder.contactMail);	
 			
+			holder.textViewContactName.setText(holder.contactMail);
+						
 			createDefaultAvatar(holder);
 			
 			int accessLevel = share.getAccess();
@@ -277,6 +297,12 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			}
 			
 			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+			
+			holder.name=false;
+			holder.firstName=false;
+			megaApi.getUserAttribute(contact, 1, listener);
+			megaApi.getUserAttribute(contact, 2, listener);
+			
 			File avatar = null;
 			if (context.getExternalCacheDir() != null){
 				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
@@ -613,6 +639,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				}
 			}
 		}
+		
 	}
 	
 	public void setMultipleSelect(boolean multipleSelect) {
