@@ -385,9 +385,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		switch(parameterType){
 		
 			case 1:{
-				
-				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
-				
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_I_YEAR);
+//				
 //				for (int i=0;i<accounts.size();i++){
 //					
 //					Product account = accounts.get(i);
@@ -400,6 +400,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 			case 2:{
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
 //				for (int i=0;i<accounts.size();i++){
 //					
 //					Product account = accounts.get(i);
@@ -412,6 +413,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 			case 3:{
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
 //				for (int i=0;i<accounts.size();i++){
 //					
 //					Product account = accounts.get(i);
@@ -424,7 +426,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}			
 			case 4:{
-				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_YEAR);
 				break;
 			}
 			
@@ -442,39 +445,43 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		switch(parameterType){
 			case 4:{
-				paymentPerMonth.setVisibility(View.GONE);
-				paymentPerYear.setVisibility(View.GONE);
-				paymentUpgradeComment.setVisibility(View.GONE);
-				paymentCreditCard.setVisibility(View.VISIBLE);
-				paymentFortumo.setVisibility(View.VISIBLE);
-				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				paymentPerMonth.setVisibility(View.GONE);
+//				paymentPerYear.setVisibility(View.GONE);
+//				paymentUpgradeComment.setVisibility(View.GONE);
+//				paymentCreditCard.setVisibility(View.VISIBLE);
+//				paymentFortumo.setVisibility(View.VISIBLE);
+//				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;
 			}
 			case 1:{
-				paymentPerMonth.setVisibility(View.GONE);
-				paymentPerYear.setVisibility(View.GONE);
-				paymentUpgradeComment.setVisibility(View.GONE);
-				paymentCreditCard.setVisibility(View.VISIBLE);
-				paymentFortumo.setVisibility(View.GONE);
-				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				paymentPerMonth.setVisibility(View.GONE);
+//				paymentPerYear.setVisibility(View.GONE);
+//				paymentUpgradeComment.setVisibility(View.GONE);
+//				paymentCreditCard.setVisibility(View.VISIBLE);
+//				paymentFortumo.setVisibility(View.GONE);
+//				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;	
 			}
 			case 2:{
-				paymentPerMonth.setVisibility(View.GONE);
-				paymentPerYear.setVisibility(View.GONE);
-				paymentUpgradeComment.setVisibility(View.GONE);
-				paymentCreditCard.setVisibility(View.VISIBLE);
-				paymentFortumo.setVisibility(View.GONE);
-				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				paymentPerMonth.setVisibility(View.GONE);
+//				paymentPerYear.setVisibility(View.GONE);
+//				paymentUpgradeComment.setVisibility(View.GONE);
+//				paymentCreditCard.setVisibility(View.VISIBLE);
+//				paymentFortumo.setVisibility(View.GONE);
+//				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;	
 			}
 			case 3:{
-				paymentPerMonth.setVisibility(View.GONE);
-				paymentPerYear.setVisibility(View.GONE);
-				paymentUpgradeComment.setVisibility(View.GONE);
-				paymentCreditCard.setVisibility(View.VISIBLE);
-				paymentFortumo.setVisibility(View.GONE);
-				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				paymentPerMonth.setVisibility(View.GONE);
+//				paymentPerYear.setVisibility(View.GONE);
+//				paymentUpgradeComment.setVisibility(View.GONE);
+//				paymentCreditCard.setVisibility(View.VISIBLE);
+//				paymentFortumo.setVisibility(View.GONE);
+//				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;	
 			}
 		}
@@ -707,7 +714,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				break;
 			}
 			case R.id.payment_credit_card:{
-				((ManagerActivity)context).showCC(parameterType, accounts, true);
+				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
 				paymentMonth = -1;
 				break;
 			}

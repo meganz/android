@@ -64,13 +64,17 @@
     <string name="action_sort_by" context="Menu item">Ordenar por&#8230;</string>
     <string name="action_help" context="Menu item">Ayuda</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Ampliar cuenta</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Realizando pago</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Seleccionar Todo</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Deseleccionar Todo</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista miniaturas</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Ver como lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar Clave Maestra</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Eliminar la Clave Maestra</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancelar subscripción</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">La Clave Maestra ha sido exportada en:</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">La subscripción ha sido cancelada correctamente</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">Ha habido algún problema cancelando la subscripción. Por favor, contacta con support\@mega.co.nz para cancelar la subscripción</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">archivo</item>
@@ -441,4 +445,5 @@
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string>
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mes</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">al año</string>
 </resources>

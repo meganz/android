@@ -98,7 +98,7 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	private EditText stateEdit;
 	String stateString = "";
 	private Spinner countrySpinner;
-	String countryString = "";
+	String countryCode = "";
 	private EditText postalCodeEdit;
 	String postalCodeString = "";
 	private TextView paymentDetails;
@@ -392,13 +392,27 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 					if(account.getLevel()==1){
 						aB.setTitle(getString(R.string.pro1_account));
 	
-						if(account.getMonths()==1){
-							storage.setText(account.getStorage()+"GB");		            
-							
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-							bandwidth.setText(account.getTransfer()/1024 + " TB");
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						if (paymentMonth == 1){
+							if(account.getMonths()==1){
+								storage.setText(account.getStorage()+"GB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
+						}
+						else if (paymentMonth == 0){
+							if (account.getMonths() == 1){
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+							}
+							if(account.getMonths()==12){
+								storage.setText(account.getStorage()+"GB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_year));
+							}
 						}
 					}
 				}
@@ -414,13 +428,27 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 					if(account.getLevel()==2){
 						aB.setTitle(getString(R.string.pro2_account));
 	
-						if(account.getMonths()==1){
-							storage.setText(account.getStorage()/1024+"TB");		            
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-		
-							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						if (paymentMonth == 1){
+							if(account.getMonths()==1){
+								storage.setText(account.getStorage()/1024+"TB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
+						}
+						else if (paymentMonth == 0){
+							if (account.getMonths() == 1){
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+							}
+							if(account.getMonths()==12){
+								storage.setText(account.getStorage()/1024+"TB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_year));
+							}
 						}
 					}
 				}
@@ -435,13 +463,27 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 					if(account.getLevel()==3){
 						aB.setTitle(getString(R.string.pro3_account));
 	
-						if(account.getMonths()==1){
-							storage.setText(account.getStorage()/1024+"TB");            
-		
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						if (paymentMonth == 1){
+							if(account.getMonths()==1){
+								storage.setText(account.getStorage()/1024+"TB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
+						}
+						else if (paymentMonth == 0){
+							if (account.getMonths() == 1){
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+							}
+							if(account.getMonths()==12){
+								storage.setText(account.getStorage()/1024+"TB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_year));
+							}
 						}
 					}
 				}
@@ -457,13 +499,27 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 					if(account.getLevel()==4){
 						aB.setTitle(getString(R.string.prolite_account));
 	
-						if(account.getMonths()==1){
-							storage.setText(account.getStorage()+"GB");		            
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-		
-							bandwidth.setText(account.getTransfer()/1024 + " TB");
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						if (paymentMonth == 1){
+							if(account.getMonths()==1){
+								storage.setText(account.getStorage()+"GB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
+						}
+						else if (paymentMonth == 0){
+							if (account.getMonths() == 1){
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+							}
+							if(account.getMonths()==12){
+								storage.setText(account.getStorage()+"GB");		            
+								
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_year));
+							}
 						}
 					}
 				}
@@ -649,9 +705,10 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 ////		}
 	}
 	
-	public void setInfo (int _type, ArrayList<Product> _accounts){
+	public void setInfo (int _type, ArrayList<Product> _accounts, int _paymentMonth){
 		this.accounts = _accounts;
 		this.parameterType = _type;
+		this.paymentMonth = _paymentMonth;
 	}
 	
 	public ArrayList<Product> getAccounts(){
@@ -692,18 +749,24 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 			}
 			else if (e.getErrorCode() == MegaError.API_EEXIST){
 				log("API_EEXIST");
+				megaApi.upgradeAccount(productHandleLong, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD, this);
 			}
 			else{
 				log("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
+				((ManagerActivity)context).dismissStatusDialog();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_UPGRADE_ACCOUNT){
-			log("EOEOEOEOEOE: " + e.getErrorCode() + "___" + e.getErrorString());
+			((ManagerActivity)context).dismissStatusDialog();
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(context, "YUJUUUUUUUU!!!!!!", Toast.LENGTH_LONG).show();
+				Toast.makeText(context, "Account successfully upgraded!", Toast.LENGTH_LONG).show();
+				((ManagerActivity)context).getNumerOfSubscriptions();
+				((ManagerActivity)context).showMyAccount();
 			}
 			else{
-				Toast.makeText(context, "LIADAAAAA: ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
+				Toast.makeText(context, "The operation hasn't finished correctly. The credit card will not be charged. ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
+				((ManagerActivity)context).getNumerOfSubscriptions();
+				((ManagerActivity)context).showMyAccount();
 			}
 		}
 		
@@ -778,19 +841,43 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 				lastNameString = lastNameEdit.getText().toString();
 				creditCardNumberString = creditCardNumberEdit.getText().toString();
 				cvvString = cvvEdit.getText().toString();
-				countryString = "ES";
-				Toast.makeText(context, address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryString + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString, Toast.LENGTH_LONG).show();
+//				countryString = "ES";
+//				Toast.makeText(context, address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString, Toast.LENGTH_LONG).show();
+				log(address1String + "__" + address2String + "__" + cityString + "__" + stateString + "__" + countryCode + "__" + postalCodeString + "__" + firstNameString + "__" + lastNameString + "__" + creditCardNumberString + "__" + monthString + "__" + yearString + "__" + cvvString);
 				for (int i=0;i<accounts.size();i++){
 					Product account = accounts.get(i);
-					if (account.getLevel()==4&&account.getMonths()==1){
-						productHandleLong = account.handle;
-						log("PRODUCT HANDLE CC: " + productHandleLong);
-						megaApi.creditCardStore(address1String, address2String, cityString, stateString, countryString, postalCodeString, firstNameString, lastNameString, creditCardNumberString, monthString, yearString, cvvString, this);
-//						megaApi.getPaymentId(planHandle, this);
+					
+					if(account.getLevel() == parameterType){
+						if (paymentMonth == 1){
+							if(account.getMonths()==1){
+								productHandleLong = account.handle;
+							}
+						}
+						else if (paymentMonth == 0){
+							if(account.getMonths()==12){
+								productHandleLong = account.handle;
+							}
+						}
 					}
+					megaApi.creditCardStore(address1String, address2String, cityString, stateString, countryCode, postalCodeString, firstNameString, lastNameString, creditCardNumberString, monthString, yearString, cvvString, this);
+					((ManagerActivity)context).showStatusDialog(getString(R.string.upgrading_account_message));
+//					((ManagerActivity)context).showMyAccount();
 				}
+				log("PRODUCT HANDLE CC: " + productHandleLong);
+//				Toast.makeText(context, "PRODUCT HANDLE CC: " + productHandleLong, Toast.LENGTH_LONG).show();
 				break;
 			}
+//				for (int i=0;i<accounts.size();i++){
+//					Product account = accounts.get(i);
+//					if (account.getLevel()==4&&account.getMonths()==1){
+//						productHandleLong = account.handle;
+//						log("PRODUCT HANDLE CC: " + productHandleLong);
+//						megaApi.creditCardStore(address1String, address2String, cityString, stateString, countryString, postalCodeString, firstNameString, lastNameString, creditCardNumberString, monthString, yearString, cvvString, this);
+////						megaApi.getPaymentId(planHandle, this);
+//					}
+//				}
+//				
+//			}
 			case R.id.cancel_cc:{
 				onBackPressed();
 				break;
@@ -813,9 +900,9 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 				}
 				else{
 					String countryString = parent.getItemAtPosition(position).toString();
-					Toast.makeText(context, "CountryString: " + countryString, Toast.LENGTH_LONG).show();
-					countryString = Util.getCountryCode(countryString);
-					Toast.makeText(context, "CountryCode: " + countryString, Toast.LENGTH_LONG).show();
+//					Toast.makeText(context, "CountryString: " + countryString, Toast.LENGTH_LONG).show();
+					countryCode = Util.getCountryCode(countryString);
+//					Toast.makeText(context, "CountryCode: " + countryString, Toast.LENGTH_LONG).show();
 				}
 				break;
 			}

@@ -204,6 +204,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 		
 		megaApi.getAccountDetails(this);
+		((ManagerActivity)context).getNumerOfSubscriptions();
 
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
