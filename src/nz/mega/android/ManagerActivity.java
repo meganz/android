@@ -189,6 +189,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
 	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
 	public static String ACTION_CANCEL_DROPBOX_IMPORT = "ACTION_CANCEL_DROPBOX_IMPORT";
+	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;

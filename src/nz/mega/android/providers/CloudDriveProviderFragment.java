@@ -232,9 +232,6 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 			hashes[0]=n.getHandle();
 			((FileProviderActivity) context).downloadTo(n.getSize(), hashes);
 		}
-		
-//		((FileProviderActivity) context).sendIntent();
-
 	}	
 
 	public int onBackPressed(){

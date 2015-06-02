@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.util.Locale;
 
+import nz.mega.android.providers.FileProviderActivity;
 import nz.mega.android.utils.Util;
 import nz.mega.components.MySwitch;
 import nz.mega.sdk.MegaApiAndroid;
@@ -311,6 +312,12 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						extras = intentReceived.getExtras();
 						url = null;
 					}
+					else if (intentReceived.getAction().equals(ManagerActivity.ACTION_FILE_PROVIDER)){
+						action = ManagerActivity.ACTION_FILE_PROVIDER;
+						uriData = intentReceived.getData();
+						extras = intentReceived.getExtras();
+						url = null;
+					}
 					
 					MegaNode rootNode = megaApi.getRootNode();
 					if (rootNode != null){
@@ -318,6 +325,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 						if (action != null){
 							if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 								intent = new Intent(this, FileExplorerActivity.class);
+								if(extras != null)
+								{
+									intent.putExtras(extras);
+								}
+								intent.setData(uriData);
+							}
+							if (action.equals(ManagerActivity.ACTION_FILE_PROVIDER)){
+								intent = new Intent(this, FileProviderActivity.class);
 								if(extras != null)
 								{
 									intent.putExtras(extras);
@@ -382,6 +397,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 							}
 							intent.setData(uriData);
 						}
+						if (action.equals(ManagerActivity.ACTION_FILE_PROVIDER)){
+							intent = new Intent(this, FileProviderActivity.class);
+							if(extras != null)
+							{
+								intent.putExtras(extras);
+							}
+							intent.setData(uriData);
+						}
 						intent.setAction(action);
 						if (url != null){
 							intent.setData(Uri.parse(url));
@@ -435,6 +458,21 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		else{
+			if ((intentReceived != null) && (intentReceived.getAction() != null)){
+				Intent intent;
+				if (intentReceived.getAction().equals(ManagerActivity.ACTION_FILE_PROVIDER)){
+					intent = new Intent(this, FileProviderActivity.class);
+					if(extras != null)
+					{
+						intent.putExtras(extras);
+					}
+					intent.setData(uriData);
+				
+					intent.setAction(action);
+					
+					action = ManagerActivity.ACTION_FILE_PROVIDER;
+				}
+			}
 			if (OldPreferences.getOldCredentials(this) != null){
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
@@ -845,6 +883,14 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 								if (action != null){
 									if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
 										intent = new Intent(this, FileExplorerActivity.class);
+										if(extras != null)
+										{
+											intent.putExtras(extras);
+										}
+										intent.setData(uriData);
+									}
+									if (action.equals(ManagerActivity.ACTION_FILE_PROVIDER)){
+										intent = new Intent(this, FileProviderActivity.class);
 										if(extras != null)
 										{
 											intent.putExtras(extras);

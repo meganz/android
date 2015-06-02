@@ -231,6 +231,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Abrir link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renombrando</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file">Preparando el archivo...</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mover</string>
     <string name="context_moving" context="while moving a file or folder">Moviendo</string>

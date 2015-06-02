@@ -63,6 +63,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
+	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
 	
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";	
@@ -77,6 +78,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isFolderLink = false;
 	private boolean fromContactFile = false;
 	private String pathFileToOpen;
+	
+	private boolean openFile = true;
 	
 	ArrayList<MegaNode> dTreeList = null;
 
@@ -245,6 +248,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isOffline = intent.getBooleanExtra(EXTRA_OFFLINE, false);
 		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
 		fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
+		openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+		
 		if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
 			pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
 		}
@@ -407,75 +412,84 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		else
 		{
-			if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-				
-				if (fromContactFile){
-					log("FROM CONTACT FILE");
-					Intent intentPdf = new Intent(this, ContactPropertiesMainActivity.class);
-					intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
-					intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
-				    startActivity(intentPdf);
-				}
-				else{
-					Intent intentPdf = new Intent(this, ManagerActivity.class);
-					intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
-					intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
-				    startActivity(intentPdf);				
-				}
-			}
-			else if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
-				log("Download success of zip file!");				
-				
-				if(pathFileToOpen!=null){
-					Intent intentZip = new Intent(this, ZipBrowserActivity.class);
-					intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
-					intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-					intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-					startActivity(intentZip);
+			if (openFile){
+				log("openFile true");
+				if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
 					
+					if (fromContactFile){
+						log("FROM CONTACT FILE");
+						Intent intentPdf = new Intent(this, ContactPropertiesMainActivity.class);
+						intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+						intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+					    startActivity(intentPdf);
+					}
+					else{
+						Intent intentPdf = new Intent(this, ManagerActivity.class);
+						intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+						intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+					    startActivity(intentPdf);				
+					}
+				}
+				else if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+					log("Download success of zip file!");				
+					
+					if(pathFileToOpen!=null){
+						Intent intentZip = new Intent(this, ZipBrowserActivity.class);
+						intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
+						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+						intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+						startActivity(intentZip);
+						
+					}
+					else{
+						Intent intentZip = new Intent(this, ManagerActivity.class);
+						intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
+						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						startActivity(intentZip);
+					}
+					
+					//intentZip.putExtra(ManagerActivity.ZIP_FILE_TO_OPEN, pathFileToOpen);
+				    
+					log("Lanzo intent al manager.....");
+				}
+				else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					if (ManagerActivity.isIntentAvailable(this, viewIntent))
+						startActivity(viewIntent);
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						startActivity(intentShare);
+					}
 				}
 				else{
-					Intent intentZip = new Intent(this, ManagerActivity.class);
-					intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
-					intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-					startActivity(intentZip);
-				}
-				
-				//intentZip.putExtra(ManagerActivity.ZIP_FILE_TO_OPEN, pathFileToOpen);
-			    
-				log("Lanzo intent al manager.....");
-			}
-			else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
-				Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-				viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-				viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				if (ManagerActivity.isIntentAvailable(this, viewIntent))
-					startActivity(viewIntent);
-				else{
-					Intent intentShare = new Intent(Intent.ACTION_SEND);
-					intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-					intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					startActivity(intentShare);
+					intent = new Intent(Intent.ACTION_VIEW);
+					intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
+							.getType());
+					
+					if (!ManagerActivity.isIntentAvailable(DownloadService.this, intent)){
+						intent.setAction(Intent.ACTION_SEND);
+						intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
+								.getType());
+					}
 				}
 			}
-			log("Current File: " + currentFile.getAbsolutePath());
-			intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
-					.getType());
-			
-			if (!ManagerActivity.isIntentAvailable(DownloadService.this, intent)){
-				intent.setAction(Intent.ACTION_SEND);
-				intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
-						.getType());
+			else{
+				intent = new Intent(getApplicationContext(), ManagerActivity.class);
 			}
-				
+			log("Current File: " + currentFile.getAbsolutePath());	
 		}
 		
+		
+		log("Show notification");
 		mBuilderCompat
 		.setSmallIcon(R.drawable.ic_stat_notify_download)
 		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))

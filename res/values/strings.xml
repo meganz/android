@@ -247,6 +247,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file">Preparing file...</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Import folder</string>
