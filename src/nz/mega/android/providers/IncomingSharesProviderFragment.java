@@ -36,6 +36,8 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 	ArrayList<MegaNode> nodes;
 	long parentHandle = -1;
 	
+	long [] hashes;
+	
 	MegaProviderAdapter adapter;
 	
 	public String name;
@@ -205,6 +207,13 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+		}
+		else{
+			//File selected to download
+			MegaNode n = nodes.get(position);
+			hashes = new long[1];
+			hashes[0]=n.getHandle();
+			((FileProviderActivity) context).downloadTo(n.getSize(), hashes);
 		}
 	}	
 
