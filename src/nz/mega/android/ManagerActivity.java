@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.Entry;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.exception.DropboxException;
-import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.WebAuthSession;
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -207,11 +201,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
 	
-	private DropboxAPI<AndroidAuthSession> mDBApi;
-//	final static private String APP_KEY = "6tioyn8ka5l6hty";
-//	final static private String APP_SECRET = "hfzgdtrma231qdm";
 	String accessToken;
-	boolean requestLoginDropbox;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -239,7 +229,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem exportMK;
 	private MenuItem removeMK;
 	private MenuItem takePicture;
-	private MenuItem fromDropbox;
 	private MenuItem cancelSubscription;
 	
 	public int accountFragment;
@@ -1449,216 +1438,166 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	super.onResume();
     	managerActivity = this;
     	
-    	if(requestLoginDropbox){
-	    	if(mDBApi!=null){
-		    	if (mDBApi.getSession().authenticationSuccessful()) {
-		    		log("Login Dropbox Successfully");
-		            try {
-		                // Required to complete auth, sets the access token on the session
-		                mDBApi.getSession().finishAuthentication();
-		                //See SharedPreferences
-		                accessToken = mDBApi.getSession().getOAuth2AccessToken();
-		                
-		                //Start service to import files
-		                log("Llamo a DropboxService");
-		                startService(new Intent(this, DropboxImportService.class));		
-
-		            } catch (IllegalStateException e) {
-		                Log.i("DbAuthLog", "Error authenticating", e);
-		            }      
-		            
-		        }
-	    	}
-	    	requestLoginDropbox=false;
-    	}
-    	else{
+    	Intent intent = getIntent(); 
     	
-	    	Intent intent = getIntent(); 
-	    	
-	//    	dbH = new DatabaseHandler(getApplicationContext());
-	    	dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-	    	if(dbH.getCredentials() == null){	
-	    		if (!openLink){
-	    			logout(this, megaApi, false);
-	    			return;
-	    		}			
+//    	dbH = new DatabaseHandler(getApplicationContext());
+    	dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+    	if(dbH.getCredentials() == null){	
+    		if (!openLink){
+    			logout(this, megaApi, false);
+    			return;
+    		}			
+		}
+    	   	
+    	if (intent != null) {  
+    		log("intent not null! "+intent.getAction());
+    		// Open folder from the intent
+			if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
+				log("INTENT: EXTRA_OPEN_FOLDER");
+				parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
+				intent.removeExtra(EXTRA_OPEN_FOLDER);
+				setIntent(null);
 			}
-	    	   	
-	    	if (intent != null) {  
-	    		log("intent not null! "+intent.getAction());
-	    		// Open folder from the intent
-				if (intent.hasExtra(EXTRA_OPEN_FOLDER)) {
-					log("INTENT: EXTRA_OPEN_FOLDER");
-					parentHandleBrowser = intent.getLongExtra(EXTRA_OPEN_FOLDER, -1);
-					intent.removeExtra(EXTRA_OPEN_FOLDER);
-					setIntent(null);
+    					
+    		if (intent.getAction() != null){ 
+    			log("intent action");
+    			
+    			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
+
+    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
+    				
+    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);    				
+    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
+    			    startActivity(intentZip);   				
+    				
+    			}
+//    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
+//
+//    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
+//    			    
+//    			    File pdfFile = new File(pathPdf);
+//    			    
+//    			    Intent intentPdf = new Intent();
+//    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
+//    			    intentPdf.setClass(this, OpenPDFActivity.class);
+//    			    intentPdf.setAction("android.intent.action.VIEW");
+//    				this.startActivity(intentPdf);	
+//    				
+//    			}    			
+    			else if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
+					Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
+					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					loginIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+					loginIntent.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(loginIntent);
+					finish();	
+					return;
 				}
-	    					
-	    		if (intent.getAction() != null){ 
-	    			log("intent action");
-	    			
-	    			if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
-	
-	    				String pathZip=intent.getExtras().getString(EXTRA_PATH_ZIP);    				
-	    				
-	    				Intent intentZip = new Intent(managerActivity, ZipBrowserActivity.class);    				
-	    				intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, pathZip);
-	    			    startActivity(intentZip);   				
-	    				
-	    			}
-	//    			else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){    				
-	//
-	//    				String pathPdf=intent.getExtras().getString(EXTRA_PATH_PDF);
-	//    			    
-	//    			    File pdfFile = new File(pathPdf);
-	//    			    
-	//    			    Intent intentPdf = new Intent();
-	//    			    intentPdf.setDataAndType(Uri.fromFile(pdfFile), "application/pdf");
-	//    			    intentPdf.setClass(this, OpenPDFActivity.class);
-	//    			    intentPdf.setAction("android.intent.action.VIEW");
-	//    				this.startActivity(intentPdf);	
-	//    				
-	//    			}    			
-	    			else if (getIntent().getAction().equals(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES)){
-						Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
-						loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						loginIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
-						loginIntent.setData(Uri.parse(getIntent().getDataString()));
-						startActivity(loginIntent);
-						finish();	
-						return;
-					}
-					else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
-						Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivity.class);
-						fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-						fileLinkIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
-						fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
-						startActivity(fileLinkIntent);
-						finish();	
-						return;
-					}
-	    			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
-	    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
-	    				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-	    				intentFolderLink.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
-	    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
-						startActivity(intentFolderLink);
-						finish();
-	    			}
-	    			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
-	    				
-	    				parentHandleBrowser = intent.getLongExtra("parentHandle", -1);    				
-	    				intent.removeExtra("parentHandle");
-	    				setParentHandleBrowser(parentHandleBrowser);
-	    				
-	    				if (fbF != null){
-							fbF.setParentHandle(parentHandleBrowser);
-	    					fbF.setIsList(isListCloudDrive);
-	    					fbF.setOrder(orderGetChildren);
-	    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
-	    					fbF.setNodes(nodes);
-	    					if (!fbF.isVisible()){
-	    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
-	    					}
-	    				}	
-	    				else{
-	    					fbF = new FileBrowserFragment();
-	    					fbF.setParentHandle(parentHandleBrowser);
-	    					fbF.setIsList(isListCloudDrive);
-	    					fbF.setOrder(orderGetChildren);
-	    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
-	    					fbF.setNodes(nodes);
-	    					if (!fbF.isVisible()){
-	    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
-	    					}
-	    				}
-	    			}
-	    			else if(intent.getAction().equals(ACTION_OVERQUOTA_ALERT)){
-		    			showOverquotaAlert();
-		    		}
-	    			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
-	    				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
-						Intent tempIntent = null;
-						String title = null;
-						String text = null;
-						if(intent.getAction().equals(ACTION_CANCEL_UPLOAD)){
-							tempIntent = new Intent(this, UploadService.class);
-							tempIntent.setAction(UploadService.ACTION_CANCEL);
-							title = getString(R.string.upload_uploading);
-							text = getString(R.string.upload_cancel_uploading);
-						} 
-						else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
-							tempIntent = new Intent(this, DownloadService.class);
-							tempIntent.setAction(DownloadService.ACTION_CANCEL);
-							title = getString(R.string.download_downloading);
-							text = getString(R.string.download_cancel_downloading);
-						}
-						else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
-							tempIntent = new Intent(this, CameraSyncService.class);
-							tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
-							title = getString(R.string.cam_sync_syncing);
-							text = getString(R.string.cam_sync_cancel_sync);
-						}
-						
-						final Intent cancelIntent = tempIntent;
-						AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-								title, text, null);
-						builder.setPositiveButton(getString(R.string.general_yes),
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int whichButton) {
-										if (tF != null){
-											if (tF.isVisible()){
-												tF.setNoActiveTransfers();
-												downloadPlay = true;
-											}
-										}	
-										startService(cancelIntent);						
-									}
-								});
-						builder.setNegativeButton(getString(R.string.general_no), null);
-						final AlertDialog dialog = builder.create();
-						try {
-							dialog.show(); 
-						}
-						catch(Exception ex)	{ 
-							startService(cancelIntent); 
-						}
-					}
-	    			else if (intent.getAction().equals(ACTION_CANCEL_DROPBOX_IMPORT)){
-	    				log("ACTION_CANCEL_DROPBOX_IMPORT");
-						Intent tempIntent = null;
-						tempIntent = new Intent(this, DropboxImportService.class);
-						tempIntent.setAction(DropboxImportService.ACTION_CANCEL);
-						String title = getString(R.string.importing_dropbox_files);
-						String text = getString(R.string.cancel_importing_dropbox_files);
-					
-						final Intent cancelIntent = tempIntent;
-						AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-								title, text, null);
-						builder.setPositiveButton(getString(R.string.general_yes),
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int whichButton) {
-										startService(cancelIntent);						
-									}
-								});
-						builder.setNegativeButton(getString(R.string.general_no), null);
-						final AlertDialog dialog = builder.create();
-						try {
-							dialog.show(); 
-						}
-						catch(Exception ex)	{ 
-							startService(cancelIntent); 
-						}
-					}
-	    			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
-	    				log("Intent take selfie");
-	    				takePicture();
-	    			}
-	    			intent.setAction(null);
-					setIntent(null);
+				else if (getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_MEGA_LINK)){
+					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivity.class);
+					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+					fileLinkIntent.setAction(ManagerActivity.ACTION_IMPORT_LINK_FETCH_NODES);
+					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(fileLinkIntent);
+					finish();	
+					return;
+				}
+    			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
+    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
+    				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    				intentFolderLink.setAction(ManagerActivity.ACTION_OPEN_MEGA_FOLDER_LINK);
+    				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
+					startActivity(intentFolderLink);
+					finish();
+    			}
+    			else if (intent.getAction().equals(ACTION_REFRESH_PARENTHANDLE_BROWSER)){
+    				
+    				parentHandleBrowser = intent.getLongExtra("parentHandle", -1);    				
+    				intent.removeExtra("parentHandle");
+    				setParentHandleBrowser(parentHandleBrowser);
+    				
+    				if (fbF != null){
+						fbF.setParentHandle(parentHandleBrowser);
+    					fbF.setIsList(isListCloudDrive);
+    					fbF.setOrder(orderGetChildren);
+    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    					fbF.setNodes(nodes);
+    					if (!fbF.isVisible()){
+    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
+    					}
+    				}	
+    				else{
+    					fbF = new FileBrowserFragment();
+    					fbF.setParentHandle(parentHandleBrowser);
+    					fbF.setIsList(isListCloudDrive);
+    					fbF.setOrder(orderGetChildren);
+    					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    					fbF.setNodes(nodes);
+    					if (!fbF.isVisible()){
+    						getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fbF, "fbF").commit();
+    					}
+    				}
+    			}
+    			else if(intent.getAction().equals(ACTION_OVERQUOTA_ALERT)){
+	    			showOverquotaAlert();
 	    		}
-	    	}
+    			else if (intent.getAction().equals(ACTION_CANCEL_UPLOAD) || intent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+    				log("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC");
+					Intent tempIntent = null;
+					String title = null;
+					String text = null;
+					if(intent.getAction().equals(ACTION_CANCEL_UPLOAD)){
+						tempIntent = new Intent(this, UploadService.class);
+						tempIntent.setAction(UploadService.ACTION_CANCEL);
+						title = getString(R.string.upload_uploading);
+						text = getString(R.string.upload_cancel_uploading);
+					} 
+					else if (intent.getAction().equals(ACTION_CANCEL_DOWNLOAD)){
+						tempIntent = new Intent(this, DownloadService.class);
+						tempIntent.setAction(DownloadService.ACTION_CANCEL);
+						title = getString(R.string.download_downloading);
+						text = getString(R.string.download_cancel_downloading);
+					}
+					else if (intent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
+						tempIntent = new Intent(this, CameraSyncService.class);
+						tempIntent.setAction(CameraSyncService.ACTION_CANCEL);
+						title = getString(R.string.cam_sync_syncing);
+						text = getString(R.string.cam_sync_cancel_sync);
+					}
+					
+					final Intent cancelIntent = tempIntent;
+					AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
+							title, text, null);
+					builder.setPositiveButton(getString(R.string.general_yes),
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int whichButton) {
+									if (tF != null){
+										if (tF.isVisible()){
+											tF.setNoActiveTransfers();
+											downloadPlay = true;
+										}
+									}	
+									startService(cancelIntent);						
+								}
+							});
+					builder.setNegativeButton(getString(R.string.general_no), null);
+					final AlertDialog dialog = builder.create();
+					try {
+						dialog.show(); 
+					}
+					catch(Exception ex)	{ 
+						startService(cancelIntent); 
+					}
+				}    			
+    			else if (intent.getAction().equals(ACTION_TAKE_SELFIE)){
+    				log("Intent take selfie");
+    				takePicture();
+    			}
+    			intent.setAction(null);
+				setIntent(null);
+    		}
     	}
+    	
     }
     
 	/*
@@ -2887,7 +2826,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		removeMK = menu.findItem(R.id.action_menu_remove_MK);
 		
 		takePicture = menu.findItem(R.id.action_take_picture);
-		fromDropbox = menu.findItem(R.id.action_from_Dropbox);
 		
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		cancelSubscription.setVisible(false);
@@ -3422,54 +3360,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    case R.id.action_take_picture:{
 		    	
 		    	this.takePicture();
-		    	return true;
-		    }
-		    case R.id.action_from_Dropbox:{
-		    	
-		    	//Lanzar intent a DropboxExplorerAtivity
-//	            Intent intent = new Intent();
-//				startActivityForResult(intent, REQUEST_DROPBOX_ENTRIES);
-		    	
-		    	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				        switch (which){
-				        case DialogInterface.BUTTON_POSITIVE:
-							// Initialize DropboxAPI object
-
-							if(mDBApi==null){
-								mDBApi = app.getDropboxApi();
-							}				
-							
-							mDBApi.getSession().startOAuth2Authentication(managerActivity);
-							requestLoginDropbox=true;
-
-				        case DialogInterface.BUTTON_NEGATIVE:
-				            break;
-				        }
-				    }
-				};
-				
-				boolean isWifi = Util.isOnWifi(this);
-				if(!isWifi){
-
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
-					String message= getResources().getString(R.string.confirmation_continue_without_Wifi);
-					builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-				    	.setNegativeButton(R.string.general_no, dialogClickListener);
-					alertPermissionWiFi = builder.create();
-					alertPermissionWiFi.show();
-					Util.brandAlertDialog(alertPermissionWiFi);
-				}
-				else{
-					if(mDBApi==null){
-						mDBApi = app.getDropboxApi();
-					}				
-					
-					mDBApi.getSession().startOAuth2Authentication(managerActivity);
-					requestLoginDropbox=true;
-				}							
-
 		    	return true;
 		    }
 	        case R.id.action_search:{
