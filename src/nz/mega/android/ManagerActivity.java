@@ -4879,7 +4879,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						break;
 					}
 				}
-				
+
 				accountDetailsFinished = true;
 				
 				if (inventoryFinished){
@@ -7901,7 +7901,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	showUpAF();
 	}
 
-	public long getNumerOfSubscriptions(){
+	public long getNumberOfSubscriptions(){
 		if (cancelSubscription != null){
 			cancelSubscription.setVisible(false);
 		}
