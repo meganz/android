@@ -447,4 +447,22 @@
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mes</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">al año</string>
+    
+    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Introduce tus datos de facturación:</string>
+    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Dirección 1</string>
+    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Dirección 2 (opcional)</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">Ciudad</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">Región / Provincia</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">País</string>
+    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Código postal</string>
+    
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Introduce tus datos de pago:</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">Nombre</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Apellidos</string>
+    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Número de Tarjeta de Crédito</string>
+    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Mes</string>
+    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Año</string>
+    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
+    
+    <string name="proceed_cc" context="Text of the button which proceeds the payment">Pagar</string>
 </resources>

@@ -357,7 +357,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
-			outSpaceButton.setVisibility(View.INVISIBLE);
+//			outSpaceButton.setVisibility(View.INVISIBLE);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
 			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);			

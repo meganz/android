@@ -648,13 +648,13 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	}
 	
 	public int onBackPressed(){
-		if (paymentMonth == -1){
+//		if (paymentMonth == -1){
 			((ManagerActivity)context).showUpAF();
-		}
-		else{
+//		}
+//		else{
 			paymentMonth = -1;
-			((ManagerActivity)context).showpF(parameterType, accounts, true);
-		}
+//			((ManagerActivity)context).showpF(parameterType, accounts, true);
+//		}
 		return 3;
 	}
 	

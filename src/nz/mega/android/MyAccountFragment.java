@@ -86,6 +86,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	MegaApiAndroid megaApi;
 	String myEmail;
 	MegaUser myUser;
+	long numberOfSubscriptions = -1;
 	
 	private boolean name = false;
 	private boolean firstName = false;
@@ -167,16 +168,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		myEmail=megaApi.getMyEmail();
 		infoEmail.setText(myEmail);
 		
-//		if (myEmail.compareTo("android102@yopmail.com") == 0){
-			upgradeButton.setVisibility(View.VISIBLE);
-//		}
-//		else{
-//			upgradeButton.setVisibility(View.INVISIBLE);
-//		}
 		logoutButton = (Button) v.findViewById(R.id.my_account_logout);
 		logoutButton.setOnClickListener(this);
-		
-//		upgradeButton.setVisibility(View.INVISIBLE);
 		
 		//My Name
 		megaApi.getUserData(this);
@@ -204,8 +197,16 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 		
 		megaApi.getAccountDetails(this);
-		((ManagerActivity)context).getNumerOfSubscriptions();
+		numberOfSubscriptions = ((ManagerActivity)context).getNumberOfSubscriptions();
 
+		upgradeButton.setVisibility(View.INVISIBLE);
+//		if (numberOfSubscriptions > 0){
+//			upgradeButton.setVisibility(View.INVISIBLE);
+//		}
+//		else if (numberOfSubscriptions == 0){
+//			upgradeButton.setVisibility(View.VISIBLE);
+//		}
+		
 		Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
@@ -448,6 +449,12 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 						break;
 					}
 					
+				}
+				
+				if (upgradeButton != null){
+					if (accountType == 0){
+						upgradeButton.setVisibility(View.VISIBLE);
+					}
 				}
 						
 				long totalStorage = accountInfo.getStorageMax();

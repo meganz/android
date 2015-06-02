@@ -760,12 +760,12 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 			((ManagerActivity)context).dismissStatusDialog();
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(context, "Account successfully upgraded!", Toast.LENGTH_LONG).show();
-				((ManagerActivity)context).getNumerOfSubscriptions();
+				((ManagerActivity)context).getNumberOfSubscriptions();
 				((ManagerActivity)context).showMyAccount();
 			}
 			else{
 				Toast.makeText(context, "The operation hasn't finished correctly. The credit card will not be charged. ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
-				((ManagerActivity)context).getNumerOfSubscriptions();
+				((ManagerActivity)context).getNumberOfSubscriptions();
 				((ManagerActivity)context).showMyAccount();
 			}
 		}
@@ -813,7 +813,8 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	}
 	
 	public int onBackPressed(){
-		((ManagerActivity)context).showpF(parameterType, accounts);
+//		((ManagerActivity)context).showpF(parameterType, accounts);
+		((ManagerActivity)context).showpF(parameterType, accounts, true);
 		return 3;
 	}
 	
