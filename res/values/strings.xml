@@ -68,13 +68,17 @@
     <string name="action_sort_by" context="Menu item">Sort by&#8230;</string>
     <string name="action_help" context="Menu item">Help</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Upgrade your account</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrading account</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Select All</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Unselect All</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Thumbnail view</string>
     <string name="action_list" context="Menu item to change from grid view to list view">List view</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Export MasterKey</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove MasterKey</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been canceled correctly</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">The subscription has not been canceled correctly. Please contact support\@mega.co.nz to cancel your subscription</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">file</item>
@@ -492,6 +496,7 @@
     <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest first</string>
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
     
     <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your billing details:</string>
     <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Address 1</string>

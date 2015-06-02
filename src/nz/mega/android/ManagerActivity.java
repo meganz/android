@@ -239,6 +239,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem fromDropbox;
+	private MenuItem cancelSubscription;
 	
 	public int accountFragment;
 	
@@ -385,6 +386,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     int levelAccountDetails = -1;
     int levelInventory = -1;
+    
+    long numberOfSubscriptions = -1;
     
     
     /*
@@ -1050,6 +1053,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			bottomControlBar.setVisibility(View.GONE);
 	        
 	        megaApi.getAccountDetails(this);
+	        megaApi.creditCardQuerySubscriptions(this);
 	        
 	        List<String> items = new ArrayList<String>();
 			for (DrawerItem item : DrawerItem.values()) {
@@ -2317,6 +2321,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
 	    			changePass.setVisible(true); 
+	    			if (numberOfSubscriptions > 0){
+	    				cancelSubscription.setVisible(true);
+	    			}
 	    			
 	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 	    			log("Export in: "+path);
@@ -2881,6 +2888,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		takePicture = menu.findItem(R.id.action_take_picture);
 		fromDropbox = menu.findItem(R.id.action_from_Dropbox);
 		
+		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
+		cancelSubscription.setVisible(false);
+		
 //		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		if (fbF != null){
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -3163,6 +3173,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			importLinkMenuItem.setVisible(false);
     			takePicture.setVisible(false);
 				settingsMenuItem.setVisible(false);
+				
+				if (numberOfSubscriptions > 0){
+					cancelSubscription.setVisible(true);
+				}
     			
     			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
     			log("Export in: "+path);
@@ -4552,6 +4566,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi, false);
 //	        	return true;
 //	        }
+	        case R.id.action_menu_cancel_subscriptions:{
+	        	if (megaApi != null){
+	        		megaApi.creditCardCancelSubscriptions(this);
+	        	}
+	        	return true;
+	        }
             default:{
 	            return super.onOptionsItemSelected(item);
             }
@@ -5058,6 +5078,33 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        	}
 		        }
 			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				numberOfSubscriptions = request.getNumber();
+				log("NUMBER OF SUBS: " + numberOfSubscriptions);
+				if (cancelSubscription != null){
+					cancelSubscription.setVisible(false);
+				}
+				if (numberOfSubscriptions > 0){
+					if (cancelSubscription != null){
+						if (drawerItem == DrawerItem.ACCOUNT){
+							if (maF != null){
+								cancelSubscription.setVisible(true);
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.cancel_subscription_ok), Toast.LENGTH_SHORT).show();
+			}
+			else{
+				Toast.makeText(this, getString(R.string.cancel_subscription_error), Toast.LENGTH_SHORT).show();
+			}
+			megaApi.creditCardQuerySubscriptions(this);
 		}
 		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
 			log("logout finished");
@@ -7898,14 +7945,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void onMonthlyClick(View view) {
 		log("monthly");
-		pF.payMonth();		
+		pF.payMonth();	
 	}
 	
-	public void showCC(int type, ArrayList<Product> accounts){
-		showCC(type, accounts, false);
+	public void showMyAccount(){
+		drawerItem = DrawerItem.ACCOUNT;
+		selectDrawerItem(drawerItem);
 	}
 	
-	public void showCC(int type, ArrayList<Product> accounts, boolean refresh){
+	public void showCC(int type, ArrayList<Product> accounts, int payMonth){
+		showCC(type, accounts, payMonth, false);
+	}
+	
+	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh){
 		accountFragment = CC_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
@@ -7915,12 +7967,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (!refresh){
 			if (ccF == null){
 				ccF = new CreditCardFragment();
-				ccF.setInfo(type, accounts);
+				ccF.setInfo(type, accounts, payMonth);
 				ft.replace(R.id.fragment_container, ccF, "ccF");
 				ft.commit();
 			}
 			else{			
-				ccF.setInfo(type, accounts);			
+				ccF.setInfo(type, accounts, payMonth);			
 				ft.replace(R.id.fragment_container, ccF, "ccF");
 				ft.commit();
 			}
@@ -7935,12 +7987,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				if (ccF == null){
 					ccF = new CreditCardFragment();
-					ccF.setInfo(type, accounts);
+					ccF.setInfo(type, accounts, payMonth);
 					ft.replace(R.id.fragment_container, ccF, "ccF");
 					ft.commit();
 				}
 				else{			
-					ccF.setInfo(type, accounts);			
+					ccF.setInfo(type, accounts, payMonth);			
 					ft.replace(R.id.fragment_container, ccF, "ccF");
 					ft.commit();
 				}
@@ -7958,4 +8010,45 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	showUpAF();
 	}
 
+	public long getNumerOfSubscriptions(){
+		if (cancelSubscription != null){
+			cancelSubscription.setVisible(false);
+		}
+		if (numberOfSubscriptions > 0){
+			if (cancelSubscription != null){
+				if (drawerItem == DrawerItem.ACCOUNT){
+					if (maF != null){
+						cancelSubscription.setVisible(true);
+					}
+				}
+			}
+		}
+		return numberOfSubscriptions;
+	}
+	
+	public void setNumberOfSubscriptions(long numberOfSubscriptions){
+		this.numberOfSubscriptions = numberOfSubscriptions;
+	}
+	
+	public void showStatusDialog(String text){
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(managerActivity);
+			temp.setMessage(text);
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+	}
+	
+	public void dismissStatusDialog(){
+		if (statusDialog != null){
+			try{
+				statusDialog.dismiss();
+			}
+			catch(Exception ex){}
+		}
+	}
 }

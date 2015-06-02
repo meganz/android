@@ -1106,7 +1106,7 @@ public class Util {
 			}
 		}
 		
-		Toast.makeText(context, "CONTRYLIST: " + countryList.size() + "___ " + countryCodes.size(), Toast.LENGTH_LONG).show();
+//		Toast.makeText(context, "CONTRYLIST: " + countryList.size() + "___ " + countryCodes.size(), Toast.LENGTH_LONG).show();
 		Collections.sort(countryList, String.CASE_INSENSITIVE_ORDER);
 		countryList.add(0, context.getString(R.string.country_cc));
 		
