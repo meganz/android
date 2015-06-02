@@ -6,10 +6,6 @@ package nz.mega.android;
 
 import java.util.ArrayList;
 
-import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.android.AndroidAuthSession;
-import com.dropbox.client2.session.AppKeyPair;
-
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -35,7 +31,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
 	BackgroundRequestListener requestListener;
-	private DropboxAPI<AndroidAuthSession> mDBApi;
 	final static private String APP_KEY = "6tioyn8ka5l6hty";
 	final static private String APP_SECRET = "hfzgdtrma231qdm";
 	
@@ -168,44 +163,6 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		
 		return megaApi;
 	}
-	
-	public DropboxAPI<AndroidAuthSession> getDropboxApi()
-	{
-		if(mDBApi == null)
-		{
-//			log("MEGAAPI = null");
-//			PackageManager m = getPackageManager();
-//			String s = getPackageName();
-//			PackageInfo p;
-//			String path = null;
-//			try
-//			{
-//				p = m.getPackageInfo(s, 0);
-//				path = p.applicationInfo.dataDir + "/";
-//			}
-//			catch (NameNotFoundException e)
-//			{
-//				e.printStackTrace();
-//			}
-//			
-//			Log.d(TAG, "Database path: " + path);
-			AppKeyPair appKeys = new AppKeyPair(APP_KEY, APP_SECRET);
-	    	AndroidAuthSession session = new AndroidAuthSession(appKeys);
-			
-			// Initialize DropboxAPI object
-			mDBApi = new DropboxAPI<AndroidAuthSession>(session);
-			
-//			requestListener = new BackgroundRequestListener();
-//			log("ADD REQUESTLISTENER");
-//			megaApi.addRequestListener(requestListener);
-//			megaApi.addListener(this);
-		}
-		
-		return mDBApi;
-	}
-	
-	
-	
 	
 //	synchronized Tracker getTracker(TrackerName trackerId) {
 //		if (!mTrackers.containsKey(trackerId)) {

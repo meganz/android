@@ -707,8 +707,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			}
 			case R.id.payment_fortumo:{
 				if (parameterType == 4 && paymentMonth == 1){
-					Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
-					startActivity(intent);
+//					Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
+//					startActivity(intent);
 				}
 				paymentMonth = -1;
 				break;
