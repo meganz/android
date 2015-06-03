@@ -17,6 +17,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -30,11 +31,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -49,6 +53,11 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 	MegaBrowserListAdapter adapterList;
 	MegaBrowserNewGridAdapter adapterGrid;
 	public RubbishBinFragment rubbishBinFragment = this;
+	
+	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	Button outSpaceButton;
+	int usedSpacePerc;
 	
 	boolean isList = true;
 	long parentHandle = -1;
@@ -312,6 +321,53 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 				adapterList.setNodes(nodes);
 			}
 			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_rubbish);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_rubbish);
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
+				
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+			}
+			
+			
+			
+			
+			
+			
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				aB.setTitle(getString(R.string.section_rubbish_bin));
 				MegaNode infoNode = megaApi.getRubbishNode();
@@ -368,6 +424,49 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_content_grid_text);
 			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid_rubbish);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid_rubbish);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid_rubbish);
+			outSpaceButton.setVisibility(View.VISIBLE);
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
+				
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+			}			
+		
 			if (adapterGrid == null){
 				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.RUBBISH_BIN_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
 			}
@@ -409,7 +508,10 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 	public void onClick(View v) {
 
 		switch(v.getId()){
-
+		 	case R.id.out_space_btn_grid_rubbish:
+			case R.id.out_space_btn_rubbish:
+				((ManagerActivity)getActivity()).upgradeAccountButton();
+				break;
 		}
 	}
 	
