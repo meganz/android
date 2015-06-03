@@ -82,6 +82,9 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	MegaPhotoSyncGridAdapter adapterGrid;
 	CameraUploadFragment fileBrowserFragment = this;
 	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	Button outSpaceButton;
+	int usedSpacePerc;;
 	MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
@@ -357,29 +360,20 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			final Button turnOnOff = (Button) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_on));
+			boolean camEnabled = false;
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 						turnOnOff.setVisibility(View.GONE);
-//						turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_off));
+						camEnabled = true;
+					}
+					else{
+						camEnabled = false;
 					}
 				}
 			}
 			turnOnOff.setOnClickListener(this);
-			Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
-				
-									@Override
-									public void run() {
-										log("BUTTON DISAPPEAR");
-										TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-										animTop.setDuration(1000);
-										animTop.setFillAfter( true );
-										turnOnOff.setAnimation(animTop);
-										turnOnOff.setVisibility(View.GONE);
-									}
-								}, 30 * 1000);
-			
+	
 			contentText = (TextView) v.findViewById(R.id.content_text);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			
@@ -387,7 +381,66 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			buttonsLayout.setVisibility(View.GONE);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceLayout.setVisibility(View.GONE);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
+			outSpaceButton.setVisibility(View.VISIBLE);
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+				buttonsLayout.setVisibility(View.GONE);				
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
+				
+				Handler handler2 = new Handler();
+				handler2.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+				
+				if(!camEnabled){
+					turnOnOff.setOnClickListener(this);
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable() {
+						
+											@Override
+											public void run() {
+												log("BUTTON DISAPPEAR");
+												TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+												animTop.setDuration(1000);
+												animTop.setFillAfter( true );
+												turnOnOff.setAnimation(animTop);
+												turnOnOff.setVisibility(View.GONE);
+											}
+										}, 30 * 1000);
+				}
+				
+			}
 			
 			listView = (ListView) v.findViewById(R.id.file_list_view_browser);
 			listView.setOnItemClickListener(this);
@@ -535,28 +588,86 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			final Button turnOnOff = (Button) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
 			turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_on));
+			boolean camEnabled = false;
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 						turnOnOff.setVisibility(View.GONE);
 						turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_off));
+						camEnabled = true;
+					}
+					else{
+						camEnabled = false;
 					}
 				}
 			}
 			turnOnOff.setOnClickListener(this);
-			Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
+			outSpaceButton.setVisibility(View.VISIBLE);
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+				buttonsLayout.setVisibility(View.GONE);				
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
 				
-									@Override
-									public void run() {
-										log("BUTTON DISAPPEAR");
-										TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-										animTop.setDuration(1000);
-										animTop.setFillAfter( true );
-										turnOnOff.setAnimation(animTop);
-										turnOnOff.setVisibility(View.GONE);
-									}
-								}, 30 * 1000);
+				Handler handler2 = new Handler();
+				handler2.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+				
+				if(!camEnabled){
+					turnOnOff.setOnClickListener(this);
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable() {
+						
+											@Override
+											public void run() {
+												log("BUTTON DISAPPEAR");
+												TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+												animTop.setDuration(1000);
+												animTop.setFillAfter( true );
+												turnOnOff.setAnimation(animTop);
+												turnOnOff.setVisibility(View.GONE);
+											}
+										}, 30 * 1000);
+				}
+				
+			}
+			
+			
+			
+			
 			
 			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			
@@ -928,6 +1039,11 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					wifiDialog.show();
 					Util.brandAlertDialog(wifiDialog);
 				}
+				break;
+			}
+			case R.id.out_space_btn_grid:
+			case R.id.out_space_btn:{
+				((ManagerActivity)getActivity()).upgradeAccountButton();
 				break;
 			}
 			case R.id.cam_sync_button_ok:{

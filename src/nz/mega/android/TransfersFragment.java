@@ -23,11 +23,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -45,6 +48,11 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	TextView emptyText;
 	ImageView pauseImage;
 	TextView pauseText;
+	
+	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	Button outSpaceButton;
+	int usedSpacePerc;
 	
 	boolean pause = false;
 	
@@ -76,10 +84,7 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 					clearSelections();
 					hideMultipleSelect();
 					break;
-				}
-				
-				
-				
+				}				
 			}
 			return false;
 		}
@@ -187,6 +192,50 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 		adapter = new MegaTransfersAdapter(context, tL, aB);
 		adapter.setPositionClicked(-1);
 		
+		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_tranfers);
+		outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_tranfers);
+		outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_tranfers);
+		outSpaceButton.setVisibility(View.VISIBLE);
+		outSpaceButton.setOnClickListener(this);
+		
+		usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+		
+		if(usedSpacePerc>95){
+			//Change below of ListView
+			log("usedSpacePerc>95");
+//			RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//			p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//			listView.setLayoutParams(p);
+			outSpaceLayout.setVisibility(View.VISIBLE);
+			outSpaceLayout.bringToFront();
+			
+			Handler handler = new Handler();
+			handler.postDelayed(new Runnable() {					
+				
+				@Override
+				public void run() {
+					log("BUTTON DISAPPEAR");
+					log("altura: "+outSpaceLayout.getHeight());
+					
+					TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+					animTop.setDuration(2000);
+					animTop.setFillAfter(true);
+					outSpaceLayout.setAnimation(animTop);
+				
+					outSpaceLayout.setVisibility(View.GONE);
+					outSpaceLayout.invalidate();
+//					RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//					p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//					listView.setLayoutParams(p);
+				}
+			}, 15 * 1000);
+			
+		}	
+		else{
+			outSpaceLayout.setVisibility(View.GONE);
+		}
+		
+		
 		adapter.setMultipleSelect(false);
 		
 		listView.setAdapter(adapter);
@@ -266,7 +315,9 @@ public class TransfersFragment extends Fragment implements OnClickListener, OnIt
 	public void onClick(View v) {
 
 		switch(v.getId()){
-
+			case R.id.out_space_btn_tranfers:
+				((ManagerActivity)getActivity()).upgradeAccountButton();
+				break;
 		}
 	}
 	

@@ -16,6 +16,7 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -27,11 +28,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -60,6 +64,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
 	MegaApiAndroid megaApi;
+	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	Button outSpaceButton;
+	int usedSpacePerc;
 	
 	private ActionMode actionMode;
 	
@@ -418,6 +426,49 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
 					
 			contentText = (TextView) v.findViewById(R.id.offline_content_text);
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.offline_out_space);
+			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text);
+			outSpaceButton = (Button) v.findViewById(R.id.offline_out_space_btn);
+			
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
+				
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+			}
 
 			mOffList=dbH.findByPath(pathNavigation);
 			
@@ -892,7 +943,10 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
-
+		case R.id.offline_out_space_btn:
+			log("Click Account Button");
+			((ManagerActivity)getActivity()).upgradeAccountButton();
+			break;
 		}
 	}
 	

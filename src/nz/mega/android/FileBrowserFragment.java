@@ -352,11 +352,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-			contentText = (TextView) v.findViewById(R.id.content_text);
+			contentText = (TextView) v.findViewById(R.id.content_text);			
 			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 //			outSpaceButton.setVisibility(View.INVISIBLE);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
@@ -365,6 +362,9 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
 			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			outSpaceButton.setOnClickListener(this);
 			
 			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
@@ -606,10 +606,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		log("PERCENTA: "+usedSpacePerc);
 				
 	}
-	
-
-	
-	
+		
 	@Override
 	public void onClick(View v) {
 

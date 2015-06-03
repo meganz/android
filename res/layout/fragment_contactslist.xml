@@ -23,6 +23,40 @@
 	    android:layout_centerHorizontal="true"
 	    android:gravity="center_horizontal"/>
 
+    <LinearLayout
+         android:id="@+id/out_space_contacts"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:layout_centerHorizontal="true"
+    	 android:orientation="vertical">
+
+		<TextView
+		    android:id="@+id/out_space_text_contacts"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/white"
+		    android:textStyle="bold"
+		    android:paddingTop="20dp"
+		    android:paddingBottom="20dp"
+		    android:paddingLeft="20dp"
+		    android:paddingRight="20dp"
+		    android:gravity="center"
+		    android:background="@color/navigation_drawer_background"
+		    android:textSize="16sp"
+		    android:text="@string/warning_out_space"/>  
+         
+         <Button
+            android:id="@+id/out_space_btn_contacts"
+       		android:layout_height="48dp"       		
+       		android:layout_width="fill_parent"
+            android:background="@drawable/btn_default_holo_light_without_corners"
+            android:textColor="@color/button_text"
+            android:text="@string/my_account_upgrade_pro" />
+     </LinearLayout>          
+    
+    
     <ListView
         android:id="@+id/contacts_list_view"
         android:layout_width="match_parent"

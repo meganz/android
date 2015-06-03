@@ -1647,9 +1647,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			errorIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(errorIntent);
 		}
-		
-
-
 	}
 	
 	
@@ -7897,6 +7894,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void upgradeAccountButton(){
+		log("upgradeAccountButton");
 		drawerItem = DrawerItem.ACCOUNT;
     	showUpAF();
 	}

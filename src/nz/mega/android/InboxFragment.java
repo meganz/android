@@ -17,6 +17,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -30,11 +31,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -53,6 +57,10 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 	boolean isList = true;
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
+	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	Button outSpaceButton;
+	int usedSpacePerc;
 	
 	ArrayList<MegaNode> nodes;
 	
@@ -288,7 +296,51 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 			else{
 				adapterList.setParentHandle(parentHandle);
 				adapterList.setNodes(nodes);
-			}			
+			}	
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_inbox);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_inbox);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_inbox);
+			
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
+				
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+			}
+
 
 			adapterList.setPositionClicked(-1);
 			adapterList.setMultipleSelect(false);
@@ -379,7 +431,9 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 	public void onClick(View v) {
 
 		switch(v.getId()){
-
+		case R.id.out_space_btn_inbox:
+			((ManagerActivity)getActivity()).upgradeAccountButton();
+			break;
 		}
 	}
 	
