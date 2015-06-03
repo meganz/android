@@ -72,7 +72,8 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 	TextView contentText;
 
 	LinearLayout outSpaceLayout=null;
-
+	LinearLayout getProLayout=null;
+	
 	MegaApiAndroid megaApi;
 		
 	long parentHandle = -1;
@@ -298,6 +299,9 @@ public class OutgoingSharesFragment extends Fragment implements OnClickListener,
 			buttonsLayout.setVisibility(View.GONE);
 			leftNewFolder.setVisibility(View.GONE);
 			rightUploadButton.setVisibility(View.GONE);
+			
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+			getProLayout.setVisibility(View.GONE);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);

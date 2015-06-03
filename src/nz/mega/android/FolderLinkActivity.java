@@ -66,6 +66,7 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 	
 	LinearLayout outSpaceLayout=null;
 	LinearLayout buttonsLayout=null;
+	LinearLayout getProLayout=null;
 	MegaBrowserListAdapter adapterList;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -253,6 +254,9 @@ public class FolderLinkActivity extends PinActivity implements MegaRequestListen
 
 		outSpaceLayout = (LinearLayout) findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
+		
+		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
+		getProLayout.setVisibility(View.GONE);
 		
 		buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
 		buttonsLayout.setVisibility(View.GONE);	

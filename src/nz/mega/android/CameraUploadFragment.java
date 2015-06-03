@@ -82,6 +82,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 	MegaPhotoSyncGridAdapter adapterGrid;
 	CameraUploadFragment fileBrowserFragment = this;
 	LinearLayout outSpaceLayout=null;
+	LinearLayout getProLayout=null;
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;;
@@ -379,6 +380,8 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			
 			contentText.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+			getProLayout.setVisibility(View.GONE);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
@@ -665,10 +668,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				
 			}
 			
-			
-			
-			
-			
 			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
@@ -678,7 +677,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyImageView.setImageResource(R.drawable.media_empty_image);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			emptyImageView.setVisibility(View.VISIBLE);

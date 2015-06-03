@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import nz.mega.android.utils.Util;
+import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
+import nz.mega.sdk.MegaRequest;
+import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaUser;
@@ -53,7 +56,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
+public class FileBrowserFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener, MegaRequestListenerInterface{
 
 	public static int GRID_WIDTH =400;
 	
@@ -73,6 +76,11 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;
+	
+	LinearLayout getProLayout=null;
+	TextView getProText;
+	Button leftCancelButton;
+	Button rightUpgradeButton;
 	
 	MegaApiAndroid megaApi;
 		
@@ -340,6 +348,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			context.startService(intent);
 		}
 		
+		megaApi.getAccountDetails(this);
 				
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -367,9 +376,19 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			outSpaceButton.setOnClickListener(this);
 			
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
+			leftCancelButton = (Button) v.findViewById(R.id.btnLeft_cancel);
+			rightUpgradeButton = (Button) v.findViewById(R.id.btnRight_upgrade);
+			leftCancelButton.setOnClickListener(this);
+			rightUpgradeButton.setOnClickListener(this);
+			
 			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
 			
+			getProLayout.setVisibility(View.GONE);
+			
 			if(usedSpacePerc>95){
+				
 				//Change below of ListView
 				log("usedSpacePerc>95");
 				buttonsLayout.setVisibility(View.GONE);				
@@ -398,11 +417,10 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 //						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
 //						listView.setLayoutParams(p);
 					}
-				}, 15 * 1000);
-				
+				}, 15 * 1000);				
 			}	
 			else{
-				outSpaceLayout.setVisibility(View.GONE);
+				outSpaceLayout.setVisibility(View.GONE);	    	   
 			}
 
 			if (adapterList == null){
@@ -626,8 +644,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				((ManagerActivity)getActivity()).uploadFile();
 				break;
 				
+			case R.id.btnRight_upgrade:	
 			case R.id.out_space_btn:
 				((ManagerActivity)getActivity()).upgradeAccountButton();
+				break;
+				
+			case R.id.btnLeft_cancel:
+				getProLayout.setVisibility(View.GONE);
 				break;
 		}
 	}
@@ -1265,5 +1288,58 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				aB.setTitle(infoNode.getName());
 			}
 		}
+	}
+
+	@Override
+	public void onRequestStart(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRequestFinish(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+			log ("account_details request");
+			if (e.getErrorCode() == MegaError.API_OK)
+			{
+				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+				
+				int accountType = accountInfo.getProLevel();
+				switch(accountType){				
+				
+					case 0:{	
+						log("account FREE");
+						if(usedSpacePerc<96){
+							log("usedSpacePerc<96");
+							if(Util.showMessageRandom()){
+					    		log("Random: TRUE");
+					    		getProLayout.setVisibility(View.VISIBLE);
+					    		getProLayout.bringToFront();
+					    	}
+					    	else{
+					    		log("Random: FALSO");
+					    		getProLayout.setVisibility(View.GONE);
+					    	}			 
+						}
+						break;
+					}			
+					
+				}
+			}
+		}		
+	}
+
+	@Override
+	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
+			MegaError e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
