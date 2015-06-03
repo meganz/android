@@ -668,11 +668,11 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 									holder.imageViews.get(i).setImageBitmap(thumb);
 								}
 								else{
-									new MediaDBTask(context, holder, megaApi, this, i).execute(n);
-//									try{
-//										thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
-//									}
-//									catch(Exception e){} //Too many AsyncTasks
+//									new MediaDBTask(context, holder, megaApi, this, i).execute(n);
+									try{
+										thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
+									}
+									catch(Exception e){} //Too many AsyncTasks
 									
 									if (thumb != null){
 										holder.imageViews.get(i).setImageBitmap(thumb);
@@ -761,11 +761,11 @@ public class MegaPhotoSyncGridAdapter extends BaseAdapter {
 								holder.imageViews.get(i).setImageBitmap(thumb);
 							}
 							else{ 
-								new MediaDBTask(context, holder, megaApi, this, i).execute(n);
-//								try{
-//									thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
-//								}
-//								catch(Exception e){} //Too many AsyncTasks
+//								new MediaDBTask(context, holder, megaApi, this, i).execute(n);
+								try{
+									thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
+								}
+								catch(Exception e){} //Too many AsyncTasks
 								
 								if (thumb != null){
 									holder.imageViews.get(i).setImageBitmap(thumb);

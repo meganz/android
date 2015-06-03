@@ -505,11 +505,11 @@ public class MegaPhotoSyncListAdapter extends BaseAdapter implements OnClickList
 							holder.imageView.setImageBitmap(thumb);
 						}
 						else{ 
-							new MediaDBTask(context, holder, megaApi, this).execute(node);
-//							try{
-//								thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
-//							}
-//							catch(Exception e){} //Too many AsyncTasks
+//							new MediaDBTask(context, holder, megaApi, this).execute(node);
+							try{
+								thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
+							}
+							catch(Exception e){} //Too many AsyncTasks
 							
 							if (thumb != null){
 								holder.imageView.setImageBitmap(thumb);
