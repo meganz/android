@@ -762,8 +762,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    float density  = getResources().getDisplayMetrics().density;
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
-	    
+	    float scaleH = Util.getScaleH(outMetrics, density);	    
+   
 	    if (dbH.getCredentials() == null){
 			
 			if (OldPreferences.getOldCredentials(this) != null){

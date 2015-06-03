@@ -50,6 +50,7 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 	MegaBrowserListAdapter adapterList;
 	LinearLayout buttonsLayout;
 	LinearLayout outSpaceLayout=null;
+	LinearLayout getProLayout=null;
 	SearchFragment searchFragment = this;
 	TextView contentText;
 	
@@ -260,6 +261,9 @@ public class SearchFragment extends Fragment implements OnClickListener, OnItemC
 		
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
+		
+		getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+		getProLayout.setVisibility(View.GONE);
 				
 		listView.setItemsCanFocus(false);
 		contentText = (TextView) v.findViewById(R.id.content_text);

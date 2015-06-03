@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Random;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -164,6 +165,18 @@ public class Util {
 	
 	public static void showErrorAlertDialog(int errorCode, Activity activity) {
 		showErrorAlertDialog(MegaError.getErrorString(errorCode), false, activity);
+	}
+	
+	public static boolean showMessageRandom(){
+		Random r = new Random(System.currentTimeMillis());
+		int randomInt = r.nextInt(100) + 1;
+		
+		if(randomInt<5){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {

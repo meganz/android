@@ -71,6 +71,7 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 	MegaApiAndroid megaApi;
 
 	LinearLayout outSpaceLayout=null;
+	LinearLayout getProLayout=null;
 
 	long parentHandle = -1;
 	int deepBrowserTree = 0;
@@ -284,6 +285,8 @@ public class IncomingSharesFragment extends Fragment implements OnClickListener,
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+			getProLayout.setVisibility(View.GONE);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);

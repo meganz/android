@@ -50,6 +50,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	TextView contentText;
 	LinearLayout buttonsLayout;
 	LinearLayout outSpaceLayout=null;
+	LinearLayout getProLayout=null;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -92,6 +93,9 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
+		
+		getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+		getProLayout.setVisibility(View.GONE);
 		
 		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
 		uploadButton.setOnClickListener(this);
