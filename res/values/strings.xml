@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.5</string>
-    <string name="sdk_version" context="Not translate">5de0744</string>
+    <string name="app_version" context="Not translate">2.5.1</string>
+    <string name="sdk_version" context="Not translate">b53cb18</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -463,6 +463,7 @@
     <string name="new_account" context="in login screen to create a new account">Create one account now!</string>
     
     <string name="my_account_title" context="title of the My Account screen">Account Type:</string>
+    <string name="expires_on" context="title of the Expiration Date">Expires on </string>
     <string name="free_account">FREE</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">Pro I</string>

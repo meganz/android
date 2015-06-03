@@ -129,7 +129,7 @@
 		             android:textColor="@color/file_properties_info_menu"
 					 android:textStyle="bold"
 					 android:paddingTop="10dp"
-					 android:paddingBottom="10dp" />   
+					 android:paddingBottom="4dp" />   
 		             
 		        <TextView
 		             android:id="@+id/my_account_type_account"
@@ -139,7 +139,29 @@
 		             android:textColor="@color/white"			 
 					 android:paddingLeft="4dp"
 					 android:paddingTop="10dp"
-					 android:paddingBottom="10dp" />   
+					 android:paddingBottom="10dp" /> 
+					 
+		        <TextView
+		             android:id="@+id/my_account_expires_on"
+		             android:layout_width="wrap_content"
+		             android:layout_height="wrap_content"
+		             android:text="@string/expires_on"
+		             android:textColor="@color/file_properties_info_menu"
+					 android:textStyle="bold"
+					 android:paddingTop="4dp"
+					 android:paddingBottom="4dp"
+					 android:layout_below="@id/my_account_title" />  
+					 
+		        <TextView 
+		            android:id="@+id/my_account_expiration"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_below="@id/my_account_title"
+		            android:layout_toRightOf="@id/my_account_expires_on"
+		            android:textColor="@color/white"			 
+					android:paddingLeft="4dp"
+					android:paddingTop="4dp"
+					android:paddingBottom="4dp" />
 	 
 	         </RelativeLayout>     
 	 
@@ -167,7 +189,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:layout_below="@id/button_upgrade">
+                android:layout_below="@id/button_upgrade"
+                android:visibility="invisible">
 		                   
 	            <TextView
 		             android:id="@+id/my_last_session_title"

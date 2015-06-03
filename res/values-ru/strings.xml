@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.5</string>
+    <string name="app_version" context="Not translate">2.5.1</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">будет доступно через</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA - это облачное хранилище данных с мощным и постоянно включенным режимом конфиденциальности. 50 ГБ дискового пространства бесплатно</string>
