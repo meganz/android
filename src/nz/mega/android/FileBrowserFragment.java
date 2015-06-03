@@ -499,7 +499,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
-			outSpaceButton.setVisibility(View.INVISIBLE);
+//			outSpaceButton.setVisibility(View.INVISIBLE);
 			outSpaceButton.setOnClickListener(this);
 			
 			usedSpacePerc=((ManagerActivity)context).getUsedPerc();

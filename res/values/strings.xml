@@ -52,15 +52,12 @@
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
     
-    <string name="confirmation_continue_without_Wifi" context="confirmation message before importing from Dropbox without Wifi">No Wifi Connection. This operation involves data consumption, do you to continue?</string>
-    
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Incoming Shares</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Outgoing Shares</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Logout</string>
     <string name="action_add" context="Menu item">Upload&#8230;</string>
     <string name="action_create_folder" context="Menu item">Create new folder</string>
     <string name="action_open_link" context="Menu item">Open link&#8230;</string>
-    <string name="action_from_Dropbox" context="Menu item">Import from Dropbox</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
@@ -391,13 +388,6 @@
     <string name="settings_camera_notif_title" context="title of the notification when camera upload is enabled">Uploading files of media folders</string>
     <string name="settings_camera_notif_error" context="notification error">Camera Uploads problem</string>
     <string name="settings_camera_notif_complete" context="notification camera uploads complete">Camera Uploads complete</string>
-    
-    <string name="importing_dropbox_files" context="operation import Dropbox files in progress">Importing Dropbox Files</string>
-    <string name="cancel_importing_dropbox_files" context="confirmation question for cancelling the Dropbox imports">Do you want to cancel the operation?</string>
-    
-    <string name="dropbox_import_notif_title" context="title of the notification when when importing from Dropbox">Importing files from Dropbox</string>
-    <string name="dropbox_import_notif_complete" context="notification import from Dropbox complete">Dropbox files correctly imported</string>
-    <string name="dropbox_import_notif_error" context="notification error">Dropbox Import Error</string>
     
     <string name="settings_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="settings_pin_lock" context="settings category title. Below this title, the pin lock settings start">PIN Lock</string>

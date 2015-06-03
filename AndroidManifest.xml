@@ -301,11 +301,6 @@
             android:exported="false" >
         </service>
         
-         <service
-            android:name="DropboxImportService"
-            android:exported="false" >
-        </service>
-        
         <service
             android:name="DownloadService"
             android:exported="false" >
