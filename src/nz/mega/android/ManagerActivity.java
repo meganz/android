@@ -164,7 +164,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
-	public static int REQUEST_DROPBOX_ENTRIES =1011;
 	
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -182,7 +181,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static String EXTRA_PATH_ZIP = "PATH_ZIP";
 	public static String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
 	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
-	public static String ACTION_CANCEL_DROPBOX_IMPORT = "ACTION_CANCEL_DROPBOX_IMPORT";
 	public static String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
@@ -246,8 +244,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private TextView usedSpace;
 	private ImageView usedSpaceWarning;
 	private int usedPerc=0;
-	
-//	private DropboxAPI<AndroidAuthSession> mDBApi;
 	
 	ProgressBar usedSpaceBar;
 	
@@ -898,7 +894,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						finish();	
 						return;
 					}
-					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC) || getIntent().getAction().equals(ACTION_CANCEL_DROPBOX_IMPORT)){
+					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)){
 						Intent intent = new Intent(managerActivity, LoginActivity.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
@@ -1424,14 +1420,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	super.onPause();
     }
     
-//    public void listDropboxFiles(){
-//    	log("listDropboxFiles");
-//    	
-//    	ListDropboxFiles listDropboxFilesTask = new ListDropboxFiles(this);
-//    	listDropboxFilesTask.execute();
-//    	
-//    	
-//    }
     @Override
 	protected void onResume() {
     	log("onResume ");

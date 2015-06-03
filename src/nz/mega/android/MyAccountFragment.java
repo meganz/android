@@ -32,6 +32,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
@@ -51,6 +52,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MyAccountFragment extends Fragment implements OnClickListener, MegaRequestListenerInterface {
@@ -79,6 +81,8 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	ProgressBar usedSpaceBar;  
 	TextView titleTypeAccount;
 	TextView typeAccount;
+	TextView expiresOn;
+	TextView expirationAccount;
 	TextView titleLastSession;
 	TextView lastSession;
 	TextView titleConnections;
@@ -156,12 +160,15 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	    
 		titleTypeAccount = (TextView) v.findViewById(R.id.my_account_title);	  
 		typeAccount = (TextView) v.findViewById(R.id.my_account_type_account);	 
+		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
+		expiresOn = (TextView) v.findViewById(R.id.my_account_expires_on);
+		expirationAccount.setVisibility(View.GONE);
+		expiresOn.setVisibility(View.GONE);
 		titleLastSession = (TextView) v.findViewById(R.id.my_last_session_title);	
 		lastSession= (TextView) v.findViewById(R.id.my_last_session);	
 		titleConnections = (TextView) v.findViewById(R.id.my_connections_title);	
 		connections = (TextView) v.findViewById(R.id.my_connections);	
-		
-	
+			
 		upgradeButton = (Button) v.findViewById(R.id.btn_upgrade); 
 		upgradeButton.setOnClickListener(this); 
 
@@ -430,30 +437,54 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 					}
 						
 					case 1:{
-						typeAccount.setText(R.string.pro1_account);
+						typeAccount.setText(getString(R.string.pro1_account));
+						expirationAccount.setVisibility(View.VISIBLE);
+						expiresOn.setVisibility(View.VISIBLE);
+						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 2:{
-						typeAccount.setText(R.string.pro2_account);
+						typeAccount.setText(getString(R.string.pro2_account));
+						expirationAccount.setVisibility(View.VISIBLE);
+						expiresOn.setVisibility(View.VISIBLE);
+						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 3:{
-						typeAccount.setText(R.string.pro3_account);
+						typeAccount.setText(getString(R.string.pro3_account));
+						expirationAccount.setVisibility(View.VISIBLE);
+						expiresOn.setVisibility(View.VISIBLE);
+						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 4:{
-						typeAccount.setText(R.string.prolite_account);
+						typeAccount.setText(getString(R.string.prolite_account));
+						expirationAccount.setVisibility(View.VISIBLE);
+						expiresOn.setVisibility(View.VISIBLE);
+						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 				}
 				
 				if (upgradeButton != null){
-					if (accountType == 0){
-						upgradeButton.setVisibility(View.VISIBLE);
+//					if (accountType == 0){
+//						upgradeButton.setVisibility(View.VISIBLE);
+//					}
+					if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+						Time now = new Time();
+						now.setToNow();
+						if (accountType != 0){
+							if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
+								upgradeButton.setVisibility(View.VISIBLE);
+							}
+						}
+						else{
+							upgradeButton.setVisibility(View.VISIBLE);
+						}
 					}
 				}
 						
