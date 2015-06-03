@@ -815,11 +815,11 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 								holder.imageViews.get(i).setImageBitmap(thumb);
 							}
 							else{ 
-								new MediaDBTask(context, holder, megaApi, this, i).execute(node);
-//								try{
-//									thumb = ThumbnailUtils.getThumbnailFromMegaNewGrid(node, context, holder, megaApi, this, i);
-//								}
-//								catch(Exception e) {}
+//								new MediaDBTask(context, holder, megaApi, this, i).execute(node);
+								try{
+									thumb = ThumbnailUtils.getThumbnailFromMegaNewGrid(node, context, holder, megaApi, this, i);
+								}
+								catch(Exception e) {}
 								
 								if (thumb != null){
 									holder.imageViews.get(i).setImageBitmap(thumb);

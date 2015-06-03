@@ -661,13 +661,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							holder.imageView.setImageBitmap(thumb);
 						}
 					} else {
-						new MediaDBTask(context, holder, megaApi, this).execute(node);
-//						try {
-//							log("megaApi.getThumbnail");
-//							thumb = ThumbnailUtils.getThumbnailFromMegaList(
-//									node, context, holder, megaApi, this);
-//						} catch (Exception e) {
-//						} // Too many AsyncTasks
+//						new MediaDBTask(context, holder, megaApi, this).execute(node);
+						try {
+							log("megaApi.getThumbnail");
+							thumb = ThumbnailUtils.getThumbnailFromMegaList(
+									node, context, holder, megaApi, this);
+						} catch (Exception e) {
+						} // Too many AsyncTasks
 		
 						if (thumb != null) {
 							if(!multipleSelect){
