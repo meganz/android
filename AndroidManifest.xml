@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nz.mega.android"
     android:installLocation="auto"
-    android:versionCode="81"
-    android:versionName="2.3.3" >
+    android:versionCode="82"
+    android:versionName="2.5" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -29,8 +29,6 @@
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     
     <uses-permission android:name="com.android.vending.BILLING" />
-    
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
         
     <application
         android:name="MegaApplication"

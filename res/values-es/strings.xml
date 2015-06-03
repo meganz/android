@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.3.3</string>
+    <string name="app_version" context="Not translate">2.5</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.Your data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.The cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.Search, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.For more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA es Almacenamiento en la Nube con Potenhte Privacidad Contínuamente Activa. 50GB gratis</string>
@@ -465,4 +465,8 @@
     <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
     
     <string name="proceed_cc" context="Text of the button which proceeds the payment">Pagar</string>
+    
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">El pago se ha realizado correctamente</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">La operación no finalizó correctamente. No se realizará el pago.</string>
+    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">La información de la tarjeta de crédito no es correcta. No se realizará el pago.</string>
 </resources>
