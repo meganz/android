@@ -753,18 +753,25 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 			}
 			else{
 				log("ERROR: " + e.getErrorCode() + "__" + e.getErrorString());
+				Toast.makeText(context, getString(R.string.credit_card_information_error) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
 				((ManagerActivity)context).dismissStatusDialog();
+				((ManagerActivity)context).getNumberOfSubscriptions();
+				((ManagerActivity)context).showMyAccount();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_UPGRADE_ACCOUNT){
 			((ManagerActivity)context).dismissStatusDialog();
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(context, "Account successfully upgraded!", Toast.LENGTH_LONG).show();
+				log("OK payment!!!");
+				Toast.makeText(context, getString(R.string.account_successfully_upgraded), Toast.LENGTH_LONG).show();
+				((ManagerActivity)context).dismissStatusDialog();
 				((ManagerActivity)context).getNumberOfSubscriptions();
 				((ManagerActivity)context).showMyAccount();
 			}
 			else{
-				Toast.makeText(context, "The operation hasn't finished correctly. The credit card will not be charged. ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
+				log("NOOOOOOOOO___" + e.getErrorCode() + "___" + e.getErrorString());
+				Toast.makeText(context, getString(R.string.account_error_upgraded) + " ERROR (" + e.getErrorCode() + ")_" + e.getErrorString(), Toast.LENGTH_LONG).show();
+				((ManagerActivity)context).dismissStatusDialog();
 				((ManagerActivity)context).getNumberOfSubscriptions();
 				((ManagerActivity)context).showMyAccount();
 			}
@@ -860,10 +867,11 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 							}
 						}
 					}
-					megaApi.creditCardStore(address1String, address2String, cityString, stateString, countryCode, postalCodeString, firstNameString, lastNameString, creditCardNumberString, monthString, yearString, cvvString, this);
-					((ManagerActivity)context).showStatusDialog(getString(R.string.upgrading_account_message));
-//					((ManagerActivity)context).showMyAccount();
 				}
+				megaApi.creditCardStore(address1String, address2String, cityString, stateString, countryCode, postalCodeString, firstNameString, lastNameString, creditCardNumberString, monthString, yearString, cvvString, this);
+				((ManagerActivity)context).showStatusDialog(getString(R.string.upgrading_account_message));
+//				Toast.makeText(context, getString(R.string.upgrading_account_message), Toast.LENGTH_LONG).show();
+//					((ManagerActivity)context).showMyAccount();
 				log("PRODUCT HANDLE CC: " + productHandleLong);
 //				Toast.makeText(context, "PRODUCT HANDLE CC: " + productHandleLong, Toast.LENGTH_LONG).show();
 				break;
