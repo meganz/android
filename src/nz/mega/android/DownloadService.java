@@ -409,30 +409,39 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		if(successCount != 1)
 		{		
 			intent = new Intent(getApplicationContext(), ManagerActivity.class);
+			log("Show notification");
+			mBuilderCompat
+			.setSmallIcon(R.drawable.ic_stat_notify_download)
+			.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+			.setAutoCancel(true).setTicker(notificationTitle)
+			.setContentTitle(notificationTitle).setContentText(size)
+			.setOngoing(false);
+
+			mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 		}
 		else
 		{
 			if (openFile){
 				log("openFile true");
-				if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
-					
-					if (fromContactFile){
-						log("FROM CONTACT FILE");
-						Intent intentPdf = new Intent(this, ContactPropertiesMainActivity.class);
-						intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
-						intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
-					    startActivity(intentPdf);
-					}
-					else{
-						Intent intentPdf = new Intent(this, ManagerActivity.class);
-						intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
-						intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
-					    startActivity(intentPdf);				
-					}
-				}
-				else if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
+//				if (MimeTypeList.typeForName(currentFile.getName()).isPdf()){
+//					
+//					if (fromContactFile){
+//						log("FROM CONTACT FILE");
+//						Intent intentPdf = new Intent(this, ContactPropertiesMainActivity.class);
+//						intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+//						intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//						intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+//					    startActivity(intentPdf);
+//					}
+//					else{
+//						Intent intentPdf = new Intent(this, ManagerActivity.class);
+//						intentPdf.setAction(ManagerActivity.ACTION_OPEN_PDF);
+//						intentPdf.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//						intentPdf.putExtra(ManagerActivity.EXTRA_PATH_PDF, currentFile.getAbsolutePath());			    
+//					    startActivity(intentPdf);				
+//					}
+//				}
+				if (MimeTypeList.typeForName(currentFile.getName()).isZip()){
 					log("Download success of zip file!");				
 					
 					if(pathFileToOpen!=null){
@@ -480,24 +489,32 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 								.getType());
 					}
+					
+					log("Show notification");
+					mBuilderCompat
+					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+					.setAutoCancel(true).setTicker(notificationTitle)
+					.setContentTitle(notificationTitle).setContentText(size)
+					.setOngoing(false);
+
+					mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 				}
 			}
 			else{
 				intent = new Intent(getApplicationContext(), ManagerActivity.class);
+				log("Show notification");
+				mBuilderCompat
+				.setSmallIcon(R.drawable.ic_stat_notify_download)
+				.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
+				.setAutoCancel(true).setTicker(notificationTitle)
+				.setContentTitle(notificationTitle).setContentText(size)
+				.setOngoing(false);
+
+				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 			}
 			log("Current File: " + currentFile.getAbsolutePath());	
 		}
-		
-		
-		log("Show notification");
-		mBuilderCompat
-		.setSmallIcon(R.drawable.ic_stat_notify_download)
-		.setContentIntent(PendingIntent.getActivity(getApplicationContext(), 0, intent, 0))
-		.setAutoCancel(true).setTicker(notificationTitle)
-		.setContentTitle(notificationTitle).setContentText(size)
-		.setOngoing(false);
-
-		mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 	}
 	
 	/*
