@@ -431,44 +431,50 @@ public class OfflineFragment extends Fragment implements OnClickListener, OnItem
 			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text);
 			outSpaceButton = (Button) v.findViewById(R.id.offline_out_space_btn);
 			
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
+			if (context instanceof ManagerActivity){
 				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
+				outSpaceButton.setOnClickListener(this);
+				usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+				
+				if(usedSpacePerc>95){
+					//Change below of ListView
+					log("usedSpacePerc>95");
+//					RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//					p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//					listView.setLayoutParams(p);
+					outSpaceLayout.setVisibility(View.VISIBLE);
+					outSpaceLayout.bringToFront();
 					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
+					Handler handler = new Handler();
+					handler.postDelayed(new Runnable() {					
 						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
+						@Override
+						public void run() {
+							log("BUTTON DISAPPEAR");
+							log("altura: "+outSpaceLayout.getHeight());
+							
+							TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+							animTop.setDuration(2000);
+							animTop.setFillAfter(true);
+							outSpaceLayout.setAnimation(animTop);
+						
+							outSpaceLayout.setVisibility(View.GONE);
+							outSpaceLayout.invalidate();
+//							RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//							p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//							listView.setLayoutParams(p);
+						}
+					}, 15 * 1000);
 					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
+				}	
+				else{
+					outSpaceLayout.setVisibility(View.GONE);
+				}
+			}
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
-			}
+			}		
+			
 
 			mOffList=dbH.findByPath(pathNavigation);
 			
