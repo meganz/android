@@ -514,6 +514,13 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			leftNewFolder.setOnClickListener(this);
 			rightUploadButton.setOnClickListener(this);
 			
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
+			getProText= (TextView) v.findViewById(R.id.get_pro_account_text_grid);
+			leftCancelButton = (Button) v.findViewById(R.id.btnLeft_cancel_grid);
+			rightUpgradeButton = (Button) v.findViewById(R.id.btnRight_upgrade_grid);
+			leftCancelButton.setOnClickListener(this);
+			rightUpgradeButton.setOnClickListener(this);
+			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
@@ -645,10 +652,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 				break;
 				
 			case R.id.btnRight_upgrade:	
+			case R.id.btnRight_upgrade_grid:	
 			case R.id.out_space_btn:
 				((ManagerActivity)getActivity()).upgradeAccountButton();
 				break;
 				
+			case R.id.btnLeft_cancel_grid:	
 			case R.id.btnLeft_cancel:
 				getProLayout.setVisibility(View.GONE);
 				break;

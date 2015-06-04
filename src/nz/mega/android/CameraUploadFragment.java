@@ -583,10 +583,12 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
 			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
 			
 			contentText.setVisibility(View.GONE);
 			buttonsLayout.setVisibility(View.GONE);
 			outSpaceLayout.setVisibility(View.GONE);
+			getProLayout.setVisibility(View.GONE);
 			
 			final Button turnOnOff = (Button) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
