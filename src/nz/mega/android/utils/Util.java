@@ -177,6 +177,7 @@ public class Util {
 		else{
 			return false;
 		}
+//		return true;
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
