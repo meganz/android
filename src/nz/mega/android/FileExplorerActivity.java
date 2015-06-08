@@ -35,6 +35,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -72,6 +73,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public static int CLOUD_TAB = 0;
 	public static int INCOMING_TAB = 1;
 
+	private ImageView windowBack;
+	private boolean backVisible = false;
 	private TextView windowTitle;
 	private ImageButton newFolderButton;
 	
@@ -278,9 +281,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
     				if(cDriveExplorer!=null){
     					if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
     						changeTitle(getString(R.string.section_cloud_drive));
+    						changeBackVisibility(false);
     					}
     					else{
     						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
+    						changeBackVisibility(true);
     					}    					
     				}	
                 }
@@ -295,9 +300,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
     				if(iSharesExplorer!=null){
     					if(iSharesExplorer.deepBrowserTree==0){
     						changeTitle(getString(R.string.title_incoming_shares_explorer));
+    						changeBackVisibility(false);
     					}
     					else{
     						changeTitle(iSharesExplorer.name);
+    						changeBackVisibility(true);
     					}    					
     				}        			                      	
                 }
@@ -310,7 +317,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				
 				@Override
 				public void onClick(View v) {
-					viewPagerExplorer.setCurrentItem(index);							
+					viewPagerExplorer.setCurrentItem(index);
 				}
 			});
 		}
@@ -321,8 +328,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
 		actionBarTitle = getString(R.string.section_cloud_drive);
 		windowTitle.setText(actionBarTitle);
-
 		
+		windowBack = (ImageView) findViewById(R.id.file_explorer_back);
+		windowBack.setOnClickListener(this);
+		windowTitle.setOnClickListener(this);
+
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 	}
@@ -335,8 +345,22 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
         return view;
     }
 	
+	public void changeBackVisibility(boolean backVisible){
+		this.backVisible = backVisible;
+		if (windowBack != null){
+			if (!backVisible){
+				windowBack.setVisibility(View.INVISIBLE);
+			}
+			else{
+				windowBack.setVisibility(View.VISIBLE);
+			}
+		}
+	}
+	
 	public void changeTitle (String title){
-		windowTitle.setText(title);
+		if (windowTitle != null){
+			windowTitle.setText(title);
+		}
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
@@ -683,6 +707,16 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			case R.id.file_explorer_new_folder:{
 				showNewFolderDialog(null);
 				break;
+			}
+			case R.id.file_explorer_back:{
+				onBackPressed();
+				break;
+			}
+			case R.id.file_explorer_window_title:{
+				if (backVisible){
+					onBackPressed();
+					break;
+				}
 			}
 		}
 	}
