@@ -105,6 +105,7 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+			changeBackVisibility(false);
 		}
 		else
 		{
@@ -112,10 +113,12 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 			if(chosenNode.getType() != MegaNode.TYPE_ROOT)
 			{
 				changeActionBarTitle(chosenNode.getName());	
+				changeBackVisibility(true);
 			}
 			else
 			{
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeBackVisibility(false);
 			}
 		}
 		
@@ -166,6 +169,10 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 	
 	public void changeActionBarTitle(String folder){
 		((FileProviderActivity) context).changeTitle(folder);
+	}
+	
+	public void changeBackVisibility(boolean backVisibility){
+		((FileProviderActivity) context).changeBackVisibility(backVisibility);
 	}
 	
 	@Override
@@ -245,6 +252,7 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeBackVisibility(false);
 			}
 			else{
 				String path=parentNode.getName();	
@@ -252,6 +260,7 @@ public class CloudDriveProviderFragment extends Fragment implements OnClickListe
 				temp = path.split("/");
 				name = temp[temp.length-1];
 				changeActionBarTitle(name);
+				changeBackVisibility(true);
 				
 				parentHandle = parentNode.getHandle();
 			}

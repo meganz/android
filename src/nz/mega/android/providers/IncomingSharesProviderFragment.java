@@ -150,6 +150,10 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 		((FileProviderActivity) context).changeTitle(folder);
 	}
 	
+	public void changeBackVisibility(boolean backVisibility){
+		((FileProviderActivity) context).changeBackVisibility(backVisibility);
+	}
+	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -182,6 +186,7 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 			name = temp[temp.length-1];
 
 			changeActionBarTitle(name);
+			changeBackVisibility(true);
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
@@ -225,6 +230,7 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 		if(deepBrowserTree==0){
 			parentHandle=-1;
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
+			changeBackVisibility(false);
 			findNodes();
 			
 			adapter.setNodes(nodes);
@@ -249,7 +255,8 @@ public class IncomingSharesProviderFragment extends Fragment implements OnClickL
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 
-				changeActionBarTitle(parentNode.getName());		
+				changeActionBarTitle(parentNode.getName());
+				changeBackVisibility(true);	
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);

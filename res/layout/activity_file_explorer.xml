@@ -35,16 +35,24 @@
                 android:src="@drawable/ic_create_folder" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/file_explorer_window_title"
-            android:layout_width="match_parent"
+        <ImageView 
+            android:id="@+id/file_explorer_back"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/file_explorer_button_bar"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_action_navigation_previous_item"/>
+        
+        <TextView
+            android:id="@+id/file_explorer_window_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/file_explorer_back"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            />
+            android:textAppearance="@android:style/TextAppearance.Large" />        
+        
     </RelativeLayout>
 
     <View

@@ -134,6 +134,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			nodes = megaApi.getChildren(megaApi.getRootNode());
 			changeButtonTitle(context.getString(R.string.section_cloud_drive));
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+			changeBackVisibility(false);
 		}
 		else
 		{
@@ -142,11 +143,13 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			{
 				changeButtonTitle(chosenNode.getName());
 				changeActionBarTitle(chosenNode.getName());	
+				changeBackVisibility(true);
 			}
 			else
 			{
 				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeBackVisibility(false);
 			}
 		}
 		
@@ -227,6 +230,10 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		((FileExplorerActivity) context).changeTitle(folder);
 	}
 	
+	public void changeBackVisibility(boolean backVisibility){
+		((FileExplorerActivity) context).changeBackVisibility(backVisibility);
+	}
+	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -260,11 +267,13 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 			{
 				changeButtonTitle(name);
 				changeActionBarTitle(name);
+				changeBackVisibility(true);
 			}
 			else
 			{
 				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeBackVisibility(false);
 			}
 			
 			parentHandle = nodes.get(position).getHandle();
@@ -309,6 +318,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 				parentHandle=-1;
 				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				changeBackVisibility(false);
 			}
 			else{
 				String path=parentNode.getName();	
@@ -318,6 +328,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 
 				changeButtonTitle(name);
 				changeActionBarTitle(name);
+				changeBackVisibility(true);
 				
 				parentHandle = parentNode.getHandle();
 			}

@@ -129,6 +129,8 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	
 	String SD_CACHE_PATH = "/Android/data/nz.mega.android/cache/files";
 
+	private ImageView windowBack;
+	private boolean backVisible = false;
 	private TextView windowTitle;
 	private ImageButton newFolderButton;
 	
@@ -454,9 +456,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	    				if(cDriveExplorer!=null){
 	    					if(cDriveExplorer.getParentHandle()==-1|| cDriveExplorer.getParentHandle()==megaApi.getRootNode().getHandle()){
 	    						changeTitle(getString(R.string.section_cloud_drive));
+	    						changeBackVisibility(false);
 	    					}
 	    					else{
 	    						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
+	    						changeBackVisibility(true);
 	    					}    					
 	    				}	
 	                }
@@ -471,9 +475,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	    				if(iSharesProvider!=null){
 	    					if(iSharesProvider.getDeepBrowserTree()==0){
 	    						changeTitle(getString(R.string.title_incoming_shares_explorer));
+	    						changeBackVisibility(false);
 	    					}
 	    					else{
 	    						changeTitle(iSharesProvider.name);
+	    						changeBackVisibility(true);
 	    					}    					
 	    				}        			                      	
 	                }
@@ -498,7 +504,10 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 			windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
 			actionBarTitle = getString(R.string.section_cloud_drive);
 			windowTitle.setText(actionBarTitle);
-	
+			
+			windowBack = (ImageView) findViewById(R.id.file_explorer_back);
+			windowBack.setOnClickListener(this);
+			windowTitle.setOnClickListener(this);	
 			
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 			getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -515,7 +524,21 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
     }
 	
 	public void changeTitle (String title){
-		windowTitle.setText(title);
+		if (windowTitle != null){
+			windowTitle.setText(title);
+		}
+	}
+	
+	public void changeBackVisibility(boolean backVisible){
+		this.backVisible = backVisible;
+		if (windowBack != null){
+			if (!backVisible){
+				windowBack.setVisibility(View.INVISIBLE);
+			}
+			else{
+				windowBack.setVisibility(View.VISIBLE);
+			}
+		}
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
@@ -712,10 +735,21 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.button_login_login:
+			case R.id.button_login_login:{
 //				loginClicked = true;
 				onLoginClick(v);
 				break;
+			}
+			case R.id.file_explorer_back:{
+				onBackPressed();
+				break;
+			}
+			case R.id.file_explorer_window_title:{
+				if (backVisible){
+					onBackPressed();
+					break;
+				}
+			}
 		}
 	}
 	
@@ -1069,9 +1103,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	    				if(cDriveExplorer!=null){
 	    					if(cDriveExplorer.getParentHandle()==-1|| cDriveExplorer.getParentHandle()==megaApi.getRootNode().getHandle()){
 	    						changeTitle(getString(R.string.section_cloud_drive));
+	    						changeBackVisibility(false);
 	    					}
 	    					else{
 	    						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
+	    						changeBackVisibility(true);
 	    					}    					
 	    				}	
 	                }
@@ -1086,9 +1122,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	    				if(iSharesProvider!=null){
 	    					if(iSharesProvider.getDeepBrowserTree()==0){
 	    						changeTitle(getString(R.string.title_incoming_shares_explorer));
+	    						changeBackVisibility(false);
 	    					}
 	    					else{
 	    						changeTitle(iSharesProvider.name);
+	    						changeBackVisibility(true);
 	    					}    					
 	    				}        			                      	
 	                }
