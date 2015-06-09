@@ -49,6 +49,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.provider.MediaStore.Video;
@@ -178,6 +179,29 @@ public class Util {
 			return false;
 		}
 //		return true;
+	}
+	
+	public static long getFreeExternalMemorySize() {
+		log("getFreeExternalMemorySize");
+        String secStore = System.getenv("SECONDARY_STORAGE");
+        File path = new File(secStore);
+        log("getFreeExternalMemorySize: "+path.getAbsolutePath());
+        
+        StatFs stat = new StatFs(path.getPath());
+
+        long blockSize = stat.getBlockSize();
+        long availableBlocks = stat.getAvailableBlocks();
+
+        return availableBlocks * blockSize;
+	}
+	
+	public static String getExternalCardPath() {
+		log("getFreeExternalMemorySize");
+        String secStore = System.getenv("SECONDARY_STORAGE");
+        File path = new File(secStore);
+        log("getFreeExternalMemorySize: "+path.getAbsolutePath());
+
+        return path.getAbsolutePath();
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {

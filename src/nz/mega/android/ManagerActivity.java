@@ -37,6 +37,7 @@ import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -3268,6 +3269,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    return super.onCreateOptionsMenu(menu);
 	}
 	
+	private static final int WRITE_SD_CARD_REQUEST_CODE = 1999;
+			
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	public void copyToSDCard (){
+		log("copyToSDCard");
+		String externalPath = Util.getExternalCardPath();
+		File newFile =  new File(externalPath+"/"+"prueba.txt");
+		Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+	    // Filter to only show results that can be "opened", such as
+	    // a file (as opposed to a list of contacts or timezones).
+	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+	    // Create a file with the requested MIME type.
+	    String mimeType = MimeTypeList.getMimeType(newFile);
+	    intent.setType(mimeType);
+	    intent.putExtra(Intent.EXTRA_TITLE, newFile.getAbsolutePath());
+	    startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);		
+		
+	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -3344,7 +3365,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    }
 		    case R.id.action_take_picture:{
 		    	
-		    	this.takePicture();
+//		    	this.takePicture();
+		    	this.copyToSDCard();
 		    	return true;
 		    }
 	        case R.id.action_search:{
@@ -5830,7 +5852,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				cF.notifyDataSetChanged();
 			}
 		}
-
 		
 		String text;
 		if ((editText == null) || editText.equals("")){
@@ -6345,6 +6366,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				return;
 			}
 			statusDialog = temp;
+		}
+		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
+			
+			Uri treeUri = intent.getData();
+			log("--------------Create the document : "+treeUri);			
+			
+			
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			
