@@ -1,5 +1,6 @@
 package nz.mega.android;
 
+import java.io.File;
 import java.util.HashMap;
 
 import nz.mega.android.utils.Util;
@@ -7,6 +8,7 @@ import nz.mega.android.utils.Util;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
@@ -113,6 +115,15 @@ public class MimeTypeList {
 		boolean r = type.startsWith("application/pdf") || type.startsWith("application/msword") || type.startsWith("application/vnd.ms-excel") || type.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || type.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml.document") || type.startsWith("application/rtf") || type.startsWith("text/plain");
 		
 		return r;
+	}
+	
+	public static String getMimeType (File file){
+		
+		Uri selectedUri = Uri.fromFile(file);
+	     String fileExtension = MimeTypeMap.getFileExtensionFromUrl(selectedUri.toString());
+	     String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+	 
+	     return mimeType;
 	}
 	
 	/*

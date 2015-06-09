@@ -288,7 +288,7 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-		log("onCreateView");
+		log("onCreateView");		
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
