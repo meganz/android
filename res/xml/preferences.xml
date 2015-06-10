@@ -75,6 +75,10 @@
             android:key="settings_storage_ask_me_always"
         	android:title="@string/settings_storage_ask_me_always" />
         
+        <nz.mega.components.TwoLineCheckPreference
+            android:key="settings_storage_advanced_devices"
+        	android:title="@string/settings_storage_advanced_devices" />
+        
 		<Preference
 	        android:key="settings_storage_download_location"
 	        android:title="@string/settings_storage_download_location" />

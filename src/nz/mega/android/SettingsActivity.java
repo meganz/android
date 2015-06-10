@@ -43,6 +43,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
 	public static String KEY_STORAGE_DOWNLOAD_LOCATION = "settings_storage_download_location";
 	public static String KEY_STORAGE_ASK_ME_ALWAYS = "settings_storage_ask_me_always";
+	public static String KEY_STORAGE_ADVANCED_DEVICES = "settings_storage_advanced_devices";
 	public static String KEY_CAMERA_UPLOAD_ON = "settings_camera_upload_on";
 	public static String KEY_CAMERA_UPLOAD_HOW_TO = "settings_camera_upload_how_to_upload";
 	public static String KEY_CAMERA_UPLOAD_CHARGING = "settings_camera_upload_charging";
@@ -86,6 +87,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	Preference megaSecondaryFolder;
 	
 	TwoLineCheckPreference storageAskMeAlways;
+	TwoLineCheckPreference storageAdvancedDevices;
 	
 	boolean cameraUpload = false;
 	boolean secondaryUpload = false;
@@ -93,6 +95,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 	boolean pinLock = false;
 	boolean askMe = false;
 	boolean fileNames = false;
+	boolean advancedDevices = false;
 	
 	DatabaseHandler dbH;
 	
@@ -153,6 +156,9 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		storageAskMeAlways = (TwoLineCheckPreference) findPreference(KEY_STORAGE_ASK_ME_ALWAYS);
 		storageAskMeAlways.setOnPreferenceClickListener(this);
 		
+		storageAdvancedDevices = (TwoLineCheckPreference) findPreference(KEY_STORAGE_ADVANCED_DEVICES); 
+		storageAdvancedDevices.setOnPreferenceClickListener(this);
+		
 		cameraUploadOn = findPreference(KEY_CAMERA_UPLOAD_ON);
 		cameraUploadOn.setOnPreferenceClickListener(this);
 		
@@ -209,6 +215,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			dbH.setSecondaryUploadEnabled(false);
 			dbH.setPinLockEnabled(false);
 			dbH.setPinLockCode("");
+			dbH.setStorageAdvancedDevices(false);
 			pinLockCode.setText("");
 			cameraUpload = false;
 			charging = true;
@@ -389,7 +396,7 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			
 			if (prefs.getStorageAskAlways() == null){
 				dbH.setStorageAskAlways(false);
-				
+								
 				File defaultDownloadLocation = null;
 				if (Environment.getExternalStorageDirectory() != null){
 					defaultDownloadLocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.downloadDIR + "/");
@@ -440,6 +447,19 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 						
 						downloadLocationPath = defaultDownloadLocation.getAbsolutePath();
 					}
+				}
+			}
+			
+			if (prefs.getStorageAdvancedDevices() == null){
+				dbH.setStorageAdvancedDevices(false);
+			}
+			else{
+				if(askMe){
+					advancedDevices = Boolean.parseBoolean(prefs.getStorageAdvancedDevices());
+				}
+				else{
+					advancedDevices = false;
+					dbH.setStorageAdvancedDevices(false);
 				}
 			}
 		}		
@@ -573,10 +593,15 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		if (storageAskMeAlways.isChecked()){
 			downloadLocation.setEnabled(false);
 			downloadLocation.setSummary("");
+			
+			storageAdvancedDevices.setChecked(advancedDevices);
 		}
 		else{
 			downloadLocation.setEnabled(true);
 			downloadLocation.setSummary(downloadLocationPath);
+			
+			storageAdvancedDevices.setEnabled(false);
+			storageAdvancedDevices.setChecked(false);
 		}
 		
 //		cameraUploadHow.setEnabled(false);
@@ -647,6 +672,13 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 				cameraUploadCategory.removePreference(localSecondaryFolder);
 				cameraUploadCategory.removePreference(megaSecondaryFolder);
 			}			
+		}
+		else if (preference.getKey().compareTo(KEY_STORAGE_ADVANCED_DEVICES) == 0){
+			log("Changing the advances devices preference");
+			
+			advancedDevices = !advancedDevices;
+			dbH.setStorageAdvancedDevices(advancedDevices);
+
 		}
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
 			Intent intent = new Intent(SettingsActivity.this, FileStorageActivity.class);
@@ -839,9 +871,11 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 			dbH.setStorageAskAlways(askMe);
 			if (storageAskMeAlways.isChecked()){
 				downloadLocation.setEnabled(false);
+				storageAdvancedDevices.setEnabled(true);
 			}
 			else{
 				downloadLocation.setEnabled(true);
+				storageAdvancedDevices.setEnabled(false);
 			}
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CHARGING) == 0){

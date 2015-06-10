@@ -17,7 +17,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 13; 
+	private static final int DATABASE_VERSION = 14; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -53,6 +53,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_OFF_INCOMING = "incoming";
     private static final String KEY_OFF_HANDLE_INCOMING = "incomingHandle";
     private static final String KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp";
+    private static final String KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices";
 
     private static DatabaseHandler instance;
     
@@ -98,7 +99,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_STORAGE_DOWNLOAD_LOCATION + " TEXT, " + KEY_CAM_SYNC_TIMESTAMP + " TEXT, " + 
         		KEY_CAM_SYNC_CHARGING + " BOOLEAN, " + KEY_LAST_UPLOAD_FOLDER + " TEXT, "+
         		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, " + KEY_SEC_FOLDER_ENABLED + " TEXT, " + KEY_SEC_FOLDER_LOCAL_PATH + 
-        		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN"+")";
+        		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN, "+
+        		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN"+")";
+        
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
@@ -199,6 +202,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_SEC_SYNC_TIMESTAMP + " = '" + encrypt("0") + "';");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_KEEP_FILE_NAMES + " = '" + encrypt("false") + "';");
 		}
+		
+		if (oldVersion <=13){
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ADVANCED_DEVICES + " = '" + encrypt("false") + "';");
+		}
 	} 
 	
 	public static String encrypt(String original) {
@@ -284,7 +292,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_SEC_FOLDER_ENABLED, encrypt(prefs.getSecondaryMediaFolderEnabled()));        
         values.put(KEY_SEC_FOLDER_LOCAL_PATH, encrypt(prefs.getLocalPathSecondaryFolder()));
         values.put(KEY_SEC_FOLDER_HANDLE, encrypt(prefs.getMegaHandleSecondaryFolder()));
-        values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(prefs.getSecSyncTimeStamp()));        
+        values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(prefs.getSecSyncTimeStamp())); 
+        values.put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(prefs.getStorageAdvancedDevices()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -315,10 +324,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String secondaryHandle = decrypt(cursor.getString(17));
 			String secSyncTimeStamp = decrypt(cursor.getString(18));
 			String keepFileNames = decrypt(cursor.getString(19));
+			String storageAdvancedDevices= decrypt(cursor.getString(20));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
-					secSyncTimeStamp, keepFileNames);
+					secSyncTimeStamp, keepFileNames, storageAdvancedDevices);
 		}
 		cursor.close();
 		
@@ -1004,6 +1014,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 	        values.put(KEY_STORAGE_ASK_ALWAYS, encrypt(storageAskAlways + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setStorageAdvancedDevices (boolean storageAdvancedDevices){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ADVANCED_DEVICES + "= '" + encrypt(storageAdvancedDevices + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC ENABLED: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(storageAdvancedDevices + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();
