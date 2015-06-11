@@ -445,12 +445,12 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		
 		switch(parameterType){
 			case 4:{
-				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
-//				paymentPerMonth.setVisibility(View.GONE);
-//				paymentPerYear.setVisibility(View.GONE);
-//				paymentUpgradeComment.setVisibility(View.GONE);
-//				paymentCreditCard.setVisibility(View.VISIBLE);
-//				paymentFortumo.setVisibility(View.VISIBLE);
+//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);
+				paymentUpgradeComment.setVisibility(View.GONE);
+				paymentCreditCard.setVisibility(View.VISIBLE);
+				paymentFortumo.setVisibility(View.VISIBLE);
 //				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;
 			}
@@ -666,7 +666,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	}
 	
 	public static void log(String message) {
-		Util.log("UpgradePaymentActivity", message);
+		Util.log("PaymentFragment", message);
 	}
 
 	@Override
@@ -707,6 +707,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 			}
 			case R.id.payment_fortumo:{
 				if (parameterType == 4 && paymentMonth == 1){
+					((ManagerActivity)context).showFortumo();
 //					Intent intent = new Intent(((ManagerActivity)context), FortumoPayment.class);
 //					startActivity(intent);
 				}

@@ -153,6 +153,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int PAYMENT_FRAGMENT = 5002;
 	final public static int OVERQUOTA_ALERT = 5003;
 	final public static int CC_FRAGMENT = 5004;
+	final public static int FORTUMO_FRAGMENT = 5005;
 	
 	public static int REQUEST_CODE_GET = 1000;
 	public static int REQUEST_CODE_SELECT_MOVE_FOLDER = 1001;
@@ -282,6 +283,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private PaymentFragment pF;
     private InboxFragment iF;
     private CreditCardFragment ccF;
+    private FortumoFragment fF;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -1777,8 +1779,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //    			
 //    			megaApi.getPricing(this);
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			    			
-				if (fbF == null){
+    			if (fbF == null){
 					fbF = new FileBrowserFragment();
 					if (parentHandleBrowser == -1){
 						fbF.setParentHandle(megaApi.getRootNode().getHandle());
@@ -1800,7 +1801,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
 					fbF.setNodes(nodes);
 				}
-				
+								
 				mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
@@ -1864,12 +1865,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			else{
     				iF.setIsList(isListInbox);
-    				iF.setParentHandle(parentHandleRubbish);
+    				iF.setParentHandle(parentHandleInbox);
     				iF.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
     				iF.setNodes(nodes);
     			}
-    			
+    			    			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
@@ -7176,6 +7177,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public void setParentHandleInbox(long parentHandleInbox){
+		log("setParentHandleInbox");
+		this.parentHandleInbox = parentHandleInbox;
+	}
+	
 	public void setParentHandleRubbish(long parentHandleRubbish){
 		log("setParentHandleRubbish");
 		this.parentHandleRubbish = parentHandleRubbish;
@@ -7904,6 +7910,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public void showFortumo(){
+		accountFragment = FORTUMO_FRAGMENT;
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (fF == null){
+			fF = new FortumoFragment();
+			ft.replace(R.id.fragment_container,  fF, "fF");
+			ft.commit();
+		}
+		else{
+			ft.replace(R.id.fragment_container, fF, "fF");
+			ft.commit();
+		}
+	}
+	
 	public int getUsedPerc()
 	{
 		return usedPerc;
@@ -7955,5 +7979,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			catch(Exception ex){}
 		}
+	}
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
 	}
 }

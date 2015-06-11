@@ -438,7 +438,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			break;
 		}
 		case ManagerActivity.INBOX_ADAPTER: {
-			//Empty
+			((ManagerActivity) context).setParentHandleInbox(parentHandle);
 			break;
 		}
 		default: {
@@ -1609,6 +1609,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 			log("setParentHandleBrowser -ManagerActivity.OUTGOING_SHARES_ADAPTER");
 			//TODO necesito algo?
 			((ManagerActivity) context).setParentHandleOutgoing(parentHandle);
+			break;
+		}
+		case ManagerActivity.INBOX_ADAPTER:{
+			((ManagerActivity) context).setParentHandleInbox(parentHandle);
 			break;
 		}
 		default: {

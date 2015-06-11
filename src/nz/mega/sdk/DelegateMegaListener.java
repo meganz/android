@@ -180,4 +180,19 @@ class DelegateMegaListener extends MegaListener
 			});
 		}
 	}
+	
+	@Override
+	public void onAccountUpdate(MegaApi api)
+	{
+		if(listener != null)
+		{
+			megaApi.runCallback(new Runnable()
+			{
+			    public void run() 
+			    {
+			    	listener.onAccountUpdate(megaApi);
+			    }
+			});
+		}
+	}
 }

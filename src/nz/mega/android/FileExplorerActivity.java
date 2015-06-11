@@ -959,4 +959,10 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		
 		super.onDestroy();
 	}
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
 }

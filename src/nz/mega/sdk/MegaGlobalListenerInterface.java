@@ -7,4 +7,5 @@ public interface MegaGlobalListenerInterface
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users);
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes);
 	public void onReloadNeeded(MegaApiJava api);
+	public void onAccountUpdate(MegaApiJava api);
 }

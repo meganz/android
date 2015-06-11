@@ -1914,4 +1914,10 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
 }

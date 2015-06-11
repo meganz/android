@@ -302,4 +302,12 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -1262,4 +1262,10 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
 }

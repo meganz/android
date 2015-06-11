@@ -833,7 +833,7 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	}
 	
 	public static void log(String message) {
-		Util.log("UpgradePaymentActivity", message);
+		Util.log("CreditCardFragment", message);
 	}
 
 	@Override

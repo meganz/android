@@ -652,8 +652,8 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
 		if (isList){
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(parentHandle);
+			if (adapterList != null){
+				adapterList.setParentHandle(parentHandle);
 			}
 		}
 		else{
