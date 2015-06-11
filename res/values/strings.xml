@@ -357,8 +357,8 @@
     <string name="select_membership_2" context="button to go to Google Play">Google Play subscription</string>
     
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
-    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card</string>
-    <string name="payment_method_fortumo" context="one of the payment methods">Fortumo</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
     <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>

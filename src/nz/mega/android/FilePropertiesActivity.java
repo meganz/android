@@ -2367,4 +2367,11 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			}
 		}
 	}
+
+
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
 }

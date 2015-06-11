@@ -1241,5 +1241,11 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		log("onRequestTemporaryError");
 	}
 
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

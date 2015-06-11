@@ -660,4 +660,10 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 		log("onReloadNeeded");
 	}
 
+	@Override
+	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
