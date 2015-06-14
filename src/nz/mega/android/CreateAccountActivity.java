@@ -328,8 +328,7 @@ public class CreateAccountActivity extends Activity implements OnClickListener, 
 				finish();
 				return;
 			}
-			Util.showErrorAlertDialog(message, false, CreateAccountActivity.this);
-			
+			Util.showErrorAlertDialog(message, false, CreateAccountActivity.this);			
 			
 			createAccountLayout.setVisibility(View.VISIBLE);
 			createAccountLoginLayout.setVisibility(View.VISIBLE);

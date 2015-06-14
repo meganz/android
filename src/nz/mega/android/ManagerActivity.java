@@ -166,6 +166,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
+	private static int WRITE_SD_CARD_REQUEST_CODE = 1011;
 	
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -1204,19 +1205,51 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					
 				}
 			}
-			
+
 			if (drawerItem == null) {
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				Intent intent = getIntent();
 				if (intent != null){
-					firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", false);
-					if (firstTimeCam){
-						firstTimeCam = true;
-						drawerItem = DrawerItem.CAMERA_UPLOADS;
-						setIntent(null);
+					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
+					if(upgradeAccount){
+						int accountType = getIntent().getIntExtra("accountType", 0);
+						switch (accountType){
+							case 0:{
+								log("intent firstTime==true");
+								firstTimeCam = true;
+								drawerItem = DrawerItem.CAMERA_UPLOADS;
+								setIntent(null);
+								break;
+							}
+							case 1:{							
+								//showpF(1, null);
+								break;
+							}
+							case 2:{
+								//showpF(2, null);
+								break;
+							}
+							case 3:{
+								//showpF(3, null);
+								break;
+							}	
+							case 4:{
+								//showpF(4, null);
+								break;
+							}	
+						}					
+						
 					}
+					else{
+						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", false);
+						if (firstTimeCam){
+							log("intent firstTime==true");
+							firstTimeCam = true;
+							drawerItem = DrawerItem.CAMERA_UPLOADS;
+							setIntent(null);
+						}
+					}					
 				}
-				
 			}
 			else{
 				mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -3268,12 +3301,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	    	    
 	    return super.onCreateOptionsMenu(menu);
-	}
+	}	
 	
-	private static final int WRITE_SD_CARD_REQUEST_CODE = 1999;
-			
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public void copyToSDCard (){
+	public void copyToSDCard (long[] hashes){
 		log("copyToSDCard");
 		String externalPath = Util.getExternalCardPath();
 		File newFile =  new File(externalPath+"/"+"prueba.txt");
@@ -3366,8 +3397,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    }
 		    case R.id.action_take_picture:{
 		    	
-//		    	this.takePicture();
-		    	this.copyToSDCard();
+		    	this.takePicture();
 		    	return true;
 		    }
 	        case R.id.action_search:{
@@ -5624,11 +5654,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		
 		boolean askMe = true;
+		boolean advancedDevices=false;
 		String downloadLocationDefaultPath = Util.downloadDIR;
 		prefs = dbH.getPreferences();		
 		if (prefs != null){
 			if (prefs.getStorageAskAlways() != null){
 				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
+					//askMe==false
 					if (prefs.getStorageDownloadLocation() != null){
 						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
 							askMe = false;
@@ -5636,16 +5668,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}
 					}
 				}
+				else
+				{
+					//askMe=true
+					if (prefs.getStorageAdvancedDevices() != null){
+						advancedDevices = Boolean.parseBoolean(prefs.getStorageAdvancedDevices());						
+					}
+					
+				}
 			}
 		}		
 			
 		if (askMe){
-			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-			intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
-			intent.setClass(this, FileStorageActivity.class);
-			intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
-			startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);	
+			
+			if(advancedDevices){
+				//Launch Intent to SAF
+		    	this.copyToSDCard(hashes);
+			}
+			else{
+				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
+				intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+				intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
+				intent.setClass(this, FileStorageActivity.class);
+				intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
+				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
+			}				
 		}
 		else{
 			File defaultPathF = new File(downloadLocationDefaultPath);

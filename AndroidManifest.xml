@@ -68,6 +68,14 @@
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait" >            
         </activity>    
+        
+         <activity
+            android:name="ChooseAccountActivity"
+            android:label="@string/choose_account_activity" 
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" >            
+        </activity>    
 
         <activity
             android:name="CreateAccountActivity"
