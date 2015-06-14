@@ -178,6 +178,8 @@
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No hay carpetas compartidas contigo</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No hay carpetas compartidas con otros</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Carpeta vacía</string>
+    
+    <string name="choose_account_activity" context="Title of the activity Choose Account">Escoge Tipo de Cuenta</string>
 	
 	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Propiedades</string>
 	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Disponible sin conexión</string>
@@ -367,6 +369,7 @@
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Destino descarga por defecto</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Preguntar siempre la ruta de descarga</string>
+    <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Mostrar dispositivos avanzados</string>
     
     <string name="settings_camera_upload_on" context="settings option">Activar Subidas de la Cámara</string>
     <string name="settings_camera_upload_off" context="settings option">Desactivar las Subidas de la Cámara</string>
@@ -426,10 +429,13 @@
     
     <string name="my_account_title" context="title of the My Account screen">Tipo de Cuenta</string>
     <string name="expires_on" context="title of the Expiration Date">Expira el </string>
-    <string name="free_account">GRATIS</string>
+    <string name="free_account">Gratis</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
     <string name="pro2_account" context="Not translate">PRO II</string>
     <string name="pro3_account" context="Not translate">PRO III</string>
+    
+    <string name="free_storage" context="Not translate">50 GB</string>   
+    <string name="free_bandwidth" context="Free bandwich account details">Limitado</string>
     
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Carpeta para Subidas de la Cámara creada</string>
     

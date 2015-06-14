@@ -190,6 +190,8 @@
 	<string name="file_browser_empty_incoming_shares" context="message when there are no incoming shared folders">No incoming shared folders</string>
 	<string name="file_browser_empty_outgoing_shares" context="message when there are no outgoing shared folders">No outgoing shared folders</string>
     <string name="file_browser_empty_folder" context="Text that indicates that a folder is currently empty">Empty Folder</string>
+    
+    <string name="choose_account_activity" context="Title of the activity Choose Account">Choose Account</string>
 	
 	<string name="file_properties_activity" context="Menu item to show the properties dialog of files and or folders.">Properties</string>
 	<string name="file_properties_available_offline" context="The files are available &quot;offline&quot; (without a network Wi-Fi mobile data connection)">Available offline</string>
@@ -466,11 +468,14 @@
     
     <string name="my_account_title" context="title of the My Account screen">Account Type:</string>
     <string name="expires_on" context="title of the Expiration Date">Expires on </string>
-    <string name="free_account">FREE</string>
+    <string name="free_account">Free</string>
     <string name="prolite_account" context="Not translate">Lite</string>
     <string name="pro1_account" context="Not translate">Pro I</string>
     <string name="pro2_account" context="Not translate">Pro II</string>
     <string name="pro3_account" context="Not translate">Pro III</string>
+    
+    <string name="free_storage" context="Not translate">50 GB</string>   
+    <string name="free_bandwidth" context="Free bandwich account details">Limited</string>
     
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Camera Uploads folder created</string>
     
