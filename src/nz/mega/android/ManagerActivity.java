@@ -1212,35 +1212,46 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (intent != null){
 					boolean upgradeAccount = getIntent().getBooleanExtra("upgradeAccount", false);
 					if(upgradeAccount){
+						log("upgradeAccount true");
+						mDrawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
+						log("accountType: "+accountType);
 						switch (accountType){
 							case 0:{
 								log("intent firstTime==true");
 								firstTimeCam = true;
 								drawerItem = DrawerItem.CAMERA_UPLOADS;
 								setIntent(null);
-								break;
+								return;
 							}
-							case 1:{							
-								//showpF(1, null);
-								break;
+							case 1:{	
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItem(drawerItem);
+								showpF(1, null);
+								return;
 							}
 							case 2:{
-								//showpF(2, null);
-								break;
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItem(drawerItem);
+								showpF(2, null);
+								return;
 							}
 							case 3:{
-								//showpF(3, null);
-								break;
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItem(drawerItem);
+								showpF(3, null);
+								return;
 							}	
 							case 4:{
-								//showpF(4, null);
-								break;
+								drawerItem = DrawerItem.ACCOUNT;
+								selectDrawerItem(drawerItem);
+								showpF(4, null);
+								return;
 							}	
-						}					
-						
+						}							
 					}
 					else{
+						log("upgradeAccount false");
 						firstTimeCam = getIntent().getBooleanExtra("firstTimeCam", false);
 						if (firstTimeCam){
 							log("intent firstTime==true");
@@ -2250,7 +2261,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			break;
     		}
     		case ACCOUNT:{
-
+    			
+    			if (nDA != null){
+					nDA.setPositionClicked(-1);
+				}
+    			
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
@@ -2271,7 +2286,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			if (createFolderMenuItem != null){
     				createFolderMenuItem.setVisible(false);
-//    				rubbishBinMenuItem.setVisible(false);
+//        				rubbishBinMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(false);
@@ -2297,17 +2312,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    			removeMK.setVisible(false); 		
 	    			}
 	    			
-//	    			logoutMenuItem.setVisible(true);
-//	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
-//	    			rubbishBinMenuItem.setEnabled(false);
-//	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//    	    			logoutMenuItem.setVisible(true);
+//    	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//    	    			rubbishBinMenuItem.setEnabled(false);
+//    	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			addMenuItem.setEnabled(false);
-//	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//    	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
 	    			createFolderMenuItem.setEnabled(false);
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
         			settingsMenuItem.setVisible(false);
 	    		}
+    			
     			
     			break;
     		}
@@ -2662,9 +2678,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					return;
 				}
 			}
-		}
-		
-		
+		}		
 		if (drawerItem == DrawerItem.ACCOUNT){
 			
 			switch(accountFragment){
@@ -2685,7 +2699,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						drawerItem = DrawerItem.ACCOUNT;
 						selectDrawerItem(drawerItem);
 						if(nDA!=null){
-							nDA.setPositionClicked(0);
+							nDA.setPositionClicked(-1);
 							
 						}					
 					}
@@ -7836,8 +7850,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showpF(int type, ArrayList<Product> accounts, boolean refresh){
+		log("showpF");
 		
 		accountFragment=PAYMENT_FRAGMENT;
+		
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
@@ -7880,19 +7896,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void onUpgrade1Click(View view) {
-		showpF(1, upAF.getAccounts());
+		if (upAF != null){
+			showpF(1, upAF.getAccounts());
+		}
 	}
 
 	public void onUpgrade2Click(View view) {
-		showpF(2, upAF.getAccounts());
+		if (upAF != null){
+			showpF(2, upAF.getAccounts());
+		}
 	}
 
 	public void onUpgrade3Click(View view) {
-		showpF(3, upAF.getAccounts());
+		if (upAF != null){
+			showpF(3, upAF.getAccounts());
+		}
 	}
 	
 	public void onUpgradeLiteClick(View view){
-		showpF(4, upAF.getAccounts());
+		if (upAF != null){
+			showpF(4, upAF.getAccounts());
+		}
 	}
 	
 	public void onYearlyClick(View view) {
