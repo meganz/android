@@ -182,7 +182,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		storage2 = (TextView) findViewById(R.id.pro2_storage);
 		storage3 = (TextView) findViewById(R.id.pro3_storage);
 		
-		freeBandwithTitle = (TextView) findViewById(R.id.prolite_bandwidth_title);
+		freeBandwithTitle = (TextView) findViewById(R.id.free_bandwidth_title);
 		proBandwithLite = (TextView) findViewById(R.id.prolite_bandwidth_title);
 		proBandwith1 = (TextView) findViewById(R.id.pro1_bandwidth_title);
 		proBandwith2 = (TextView) findViewById(R.id.pro2_bandwidth_title);
@@ -193,6 +193,10 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		bandwidth1 = (TextView) findViewById(R.id.pro1_bandwidth);
 		bandwidth2 = (TextView) findViewById(R.id.pro2_bandwidth);
 		bandwidth3 = (TextView) findViewById(R.id.pro3_bandwidth);
+		
+		RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) freeBandwith.getLayoutParams();
+		p.addRule(RelativeLayout.ALIGN_BOTTOM, freeBandwithTitle.getId());
+		freeBandwith.setLayoutParams(p);
 		
 		pricingPerMonthFree = (TextView) findViewById(R.id.princingfree_from);
 		pricingPerMonthLite = (TextView) findViewById(R.id.princinglite_from);
@@ -224,7 +228,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		proBandwith2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		proBandwith3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-		freeBandwith.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		freeBandwith.setTextSize(TypedValue.COMPLEX_UNIT_SP, (17*scaleText));
 		bandwidthLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		bandwidth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		bandwidth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
@@ -236,12 +240,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		
-//		megaApi.getAccountDetails(this);
-
 		megaApi.getPricing(this);
-		
-//		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-//		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 	}
 	
 	public void onFreeClick (View view){

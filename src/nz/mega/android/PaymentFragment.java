@@ -238,139 +238,146 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		paymentFortumo.setOnClickListener(this);
 		paymentGoogleWallet.setOnClickListener(this);
 		
-		switch (parameterType) {
-			case 1:{
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.VISIBLE);
-				
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==1){
-						aB.setTitle(getString(R.string.pro1_account));
-	
-						storage.setText(account.getStorage()+"GB");		            
-						
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-							bandwidth.setText(account.getTransfer()/1024 + " TB");
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
-						}
-					}
-				}
-	
-				break;
-			}
-			case 2:{
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.VISIBLE);
-	
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==2){
-						aB.setTitle(getString(R.string.pro2_account));
-	
-						storage.setText(account.getStorage()/1024+"TB");		            
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+		if(accounts == null){
+			megaApi.getPricing(this);
+		}
+		else{
+			switch (parameterType) {
+				case 1:{
+					
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.VISIBLE);
+					
+					for (int i=0;i<accounts.size();i++){
+		
+						Product account = accounts.get(i);
+		
+						if(account.getLevel()==1){
+							aB.setTitle(getString(R.string.pro1_account));
+		
+							storage.setText(account.getStorage()+"GB");		            
+							
+							if(account.getMonths()==12){
+								double perYearF=account.getAmount()/100.00;
+								String perYearString =df.format(perYearF);
+		
+								perYear.setText(perYearString+" €");
+							}
+							else if(account.getMonths()==1){
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+		
+								perMonth.setText(perMonthString+" €");
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
 						}
 					}
+		
+					break;
 				}
-	
-				break;
-			}
-			case 3:{
-				
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.VISIBLE);
-				
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==3){
-						aB.setTitle(getString(R.string.pro3_account));
-	
-						storage.setText(account.getStorage()/1024+"TB");            
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+				case 2:{
+					
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.VISIBLE);
+		
+					for (int i=0;i<accounts.size();i++){
+		
+						Product account = accounts.get(i);
+		
+						if(account.getLevel()==2){
+							aB.setTitle(getString(R.string.pro2_account));
+		
+							storage.setText(account.getStorage()/1024+"TB");		            
+		
+							if(account.getMonths()==12){
+								double perYearF=account.getAmount()/100.00;
+								String perYearString =df.format(perYearF);
+		
+								perYear.setText(perYearString+" €");
+							}
+							else if(account.getMonths()==1){
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+		
+								perMonth.setText(perMonthString+" €");
+								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
 						}
 					}
+		
+					break;
 				}
-				break;
-			}
-			
-			case 4:{
-	
-				paymentPerMonth.setVisibility(View.VISIBLE);
-				paymentPerYear.setVisibility(View.VISIBLE);
-				
-				for (int i=0;i<accounts.size();i++){
-	
-					Product account = accounts.get(i);
-	
-					if(account.getLevel()==4){
-						aB.setTitle(getString(R.string.prolite_account));
-	
-						storage.setText(account.getStorage()+"GB");		            
-	
-						if(account.getMonths()==12){
-							double perYearF=account.getAmount()/100.00;
-							String perYearString =df.format(perYearF);
-	
-							perYear.setText(perYearString+" €");
-						}
-						else if(account.getMonths()==1){
-							double perMonthF=account.getAmount()/100.00;
-							String perMonthString =df.format(perMonthF);
-	
-							perMonth.setText(perMonthString+" €");
-							bandwidth.setText(account.getTransfer()/1024 + " TB");
-							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+				case 3:{
+					
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.VISIBLE);
+					
+					for (int i=0;i<accounts.size();i++){
+		
+						Product account = accounts.get(i);
+		
+						if(account.getLevel()==3){
+							aB.setTitle(getString(R.string.pro3_account));
+		
+							storage.setText(account.getStorage()/1024+"TB");            
+		
+							if(account.getMonths()==12){
+								double perYearF=account.getAmount()/100.00;
+								String perYearString =df.format(perYearF);
+		
+								perYear.setText(perYearString+" €");
+							}
+							else if(account.getMonths()==1){
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+		
+								perMonth.setText(perMonthString+" €");
+								bandwidth.setText(sizeTranslation(account.getTransfer(),0));
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
 						}
 					}
+					break;
 				}
-				break;
+				
+				case 4:{
+		
+					paymentPerMonth.setVisibility(View.VISIBLE);
+					paymentPerYear.setVisibility(View.VISIBLE);
+					
+					for (int i=0;i<accounts.size();i++){
+		
+						Product account = accounts.get(i);
+		
+						if(account.getLevel()==4){
+							aB.setTitle(getString(R.string.prolite_account));
+		
+							storage.setText(account.getStorage()+"GB");		            
+		
+							if(account.getMonths()==12){
+								double perYearF=account.getAmount()/100.00;
+								String perYearString =df.format(perYearF);
+		
+								perYear.setText(perYearString+" €");
+							}
+							else if(account.getMonths()==1){
+								double perMonthF=account.getAmount()/100.00;
+								String perMonthString =df.format(perMonthF);
+		
+								perMonth.setText(perMonthString+" €");
+								bandwidth.setText(account.getTransfer()/1024 + " TB");
+								pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+							}
+						}
+					}
+					break;
+				}
 			}
 		}
+		
+
 
 		//		megaApi.getPricing(this);	
 
@@ -605,22 +612,176 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
-		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
-			MegaPricing p = request.getPricing();
-			for (int i=0;i<p.getNumProducts();i++){
-				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
-				if (account.getLevel()==4&&account.getMonths()==1){
-					long planHandle = account.handle;
-					megaApi.getPaymentId(planHandle, this);
-				}
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
+//		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+//			MegaPricing p = request.getPricing();
+//			for (int i=0;i<p.getNumProducts();i++){
+//				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+//				if (account.getLevel()==4&&account.getMonths()==1){
+//					long planHandle = account.handle;
+//					megaApi.getPaymentId(planHandle, this);
+//				}
+//			}
+//		}
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT ID: " + request.getLink());
 			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
 //			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(request.getLink()));
 //			startActivity(browserIntent);
 
+		}
+		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
+			MegaPricing p = request.getPricing();
+			DecimalFormat df = new DecimalFormat("#.##"); 
+			
+			accounts = new ArrayList<Product>(); 
+
+			for (int i=0;i<p.getNumProducts();i++){
+				log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
+
+				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
+				accounts.add(account);				
+			}    
+			
+			switch (parameterType) {
+			case 1:{
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
+				
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==1){
+						aB.setTitle(getString(R.string.pro1_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+						
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(account.getTransfer()/1024 + " TB");
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						}
+					}
+				}
+	
+				break;
+			}
+			case 2:{
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
+	
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==2){
+						aB.setTitle(getString(R.string.pro2_account));
+	
+						storage.setText(account.getStorage()/1024+"TB");		            
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						}
+					}
+				}
+	
+				break;
+			}
+			case 3:{
+				
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
+				
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==3){
+						aB.setTitle(getString(R.string.pro3_account));
+	
+						storage.setText(account.getStorage()/1024+"TB");            
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(sizeTranslation(account.getTransfer(),0));
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						}
+					}
+				}
+				break;
+			}			
+			case 4:{
+	
+				paymentPerMonth.setVisibility(View.VISIBLE);
+				paymentPerYear.setVisibility(View.VISIBLE);
+				
+				for (int i=0;i<accounts.size();i++){
+	
+					Product account = accounts.get(i);
+	
+					if(account.getLevel()==4){
+						aB.setTitle(getString(R.string.prolite_account));
+	
+						storage.setText(account.getStorage()+"GB");		            
+	
+						if(account.getMonths()==12){
+							double perYearF=account.getAmount()/100.00;
+							String perYearString =df.format(perYearF);
+	
+							perYear.setText(perYearString+" €");
+						}
+						else if(account.getMonths()==1){
+							double perMonthF=account.getAmount()/100.00;
+							String perMonthString =df.format(perMonthF);
+	
+							perMonth.setText(perMonthString+" €");
+							bandwidth.setText(account.getTransfer()/1024 + " TB");
+							pricingFrom.setText(perMonthString + " € " + getString(R.string.per_month));
+						}
+					}
+				}
+				break;
+			}
+		}
+			
+//			/*RESULTS
+//	            p[0] = 1560943707714440503__999___500___1___1___1024 - PRO 1 montly
+//        		p[1] = 7472683699866478542__9999___500___12___1___12288 - PRO 1 annually
+//        		p[2] = 7974113413762509455__1999___2048___1___2___4096  - PRO 2 montly
+//        		p[3] = 370834413380951543__19999___2048___12___2___49152 - PRO 2 annually
+//        		p[4] = -2499193043825823892__2999___4096___1___3___8192 - PRO 3 montly
+//        		p[5] = 7225413476571973499__29999___4096___12___3___98304 - PRO 3 annually*/
 		}
 	}
 	

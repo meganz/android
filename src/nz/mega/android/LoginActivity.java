@@ -820,105 +820,105 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
-//			if(confirmLink==null){
-//				if (error.getErrorCode() != MegaError.API_OK) {
-//					String errorMessage;
-//					errorMessage = error.getErrorString();
-//					loginLoggingIn.setVisibility(View.GONE);
-//					loginLogin.setVisibility(View.VISIBLE);
-//					loginDelimiter.setVisibility(View.VISIBLE);
-//					loginCreateAccount.setVisibility(View.VISIBLE);
-//					generatingKeysText.setVisibility(View.GONE);
-//					loggingInText.setVisibility(View.GONE);
-//					fetchingNodesText.setVisibility(View.GONE);
-//					prepareNodesText.setVisibility(View.GONE);
-//					queryingSignupLinkText.setVisibility(View.GONE);
-//					confirmingAccountText.setVisibility(View.GONE);
-//					
-//					Util.showErrorAlertDialog(errorMessage, false, loginActivity);
-//				}
-//				else{
-//					if (!backWhileLogin){
-//						
-//						if (parentHandle != -1){
-//							Intent intent = new Intent();
-//							intent.putExtra("PARENT_HANDLE", parentHandle);
-//							setResult(RESULT_OK, intent);
-//							finish();
-//						}
-//						else{
-//							Intent intent = null;
-//							if (firstTime){
-////							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
-//								intent = new Intent(loginActivity,ManagerActivity.class);
-//								intent.putExtra("firstTimeCam", true);
-//							}
-//							else{
-//								boolean initialCam = false;
-////								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
-//								DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-//								MegaPreferences prefs = dbH.getPreferences();
-//								prefs = dbH.getPreferences();
-//								if (prefs.getCamSyncEnabled() != null){
-//									if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-//										log("Enciendo el servicio de la camara");
-//										handler.postDelayed(new Runnable() {
-//											
-//											@Override
-//											public void run() {
-//												log("Now I start the service");
-//												startService(new Intent(getApplicationContext(), CameraSyncService.class));		
-//											}
-//										}, 30 * 1000);
-//									}
-//								}
-//								else{
-////									intent = new Intent(loginActivity, InitialCamSyncActivity.class);
-//									intent = new Intent(loginActivity,ManagerActivity.class);
-//									intent.putExtra("firstTimeCam", true);
-//									initialCam = true;								
-//								}
-//
-//								if (!initialCam){
-//									intent = new Intent(loginActivity,ManagerActivity.class);
-//									if (action != null){
-//										if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
-//											intent = new Intent(this, FileExplorerActivity.class);
-//											if(extras != null)
-//											{
-//												intent.putExtras(extras);
-//											}
-//											intent.setData(uriData);
-//										}
-//										if (action.equals(ManagerActivity.ACTION_FILE_PROVIDER)){
-//											intent = new Intent(this, FileProviderActivity.class);
-//											if(extras != null)
-//											{
-//												intent.putExtras(extras);
-//											}
-//											intent.setData(uriData);
-//										}
-//										intent.setAction(action);
-//										if (url != null){
-//											intent.setData(Uri.parse(url));
-//										}
-//									}
-//								}
-//								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//							}
-//							
-//							startActivity(intent);
-//							finish();
-//						}
-//					}
-//				}
-//			}
-//			else{
+			if(confirmLink==null){
+				if (error.getErrorCode() != MegaError.API_OK) {
+					String errorMessage;
+					errorMessage = error.getErrorString();
+					loginLoggingIn.setVisibility(View.GONE);
+					loginLogin.setVisibility(View.VISIBLE);
+					loginDelimiter.setVisibility(View.VISIBLE);
+					loginCreateAccount.setVisibility(View.VISIBLE);
+					generatingKeysText.setVisibility(View.GONE);
+					loggingInText.setVisibility(View.GONE);
+					fetchingNodesText.setVisibility(View.GONE);
+					prepareNodesText.setVisibility(View.GONE);
+					queryingSignupLinkText.setVisibility(View.GONE);
+					confirmingAccountText.setVisibility(View.GONE);
+					
+					Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+				}
+				else{
+					if (!backWhileLogin){
+						
+						if (parentHandle != -1){
+							Intent intent = new Intent();
+							intent.putExtra("PARENT_HANDLE", parentHandle);
+							setResult(RESULT_OK, intent);
+							finish();
+						}
+						else{
+							Intent intent = null;
+							if (firstTime){
+//							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+								intent = new Intent(loginActivity,ManagerActivity.class);
+								intent.putExtra("firstTimeCam", true);
+							}
+							else{
+								boolean initialCam = false;
+//								DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+								DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+								MegaPreferences prefs = dbH.getPreferences();
+								prefs = dbH.getPreferences();
+								if (prefs.getCamSyncEnabled() != null){
+									if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+										log("Enciendo el servicio de la camara");
+										handler.postDelayed(new Runnable() {
+											
+											@Override
+											public void run() {
+												log("Now I start the service");
+												startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+											}
+										}, 30 * 1000);
+									}
+								}
+								else{
+//									intent = new Intent(loginActivity, InitialCamSyncActivity.class);
+									intent = new Intent(loginActivity,ManagerActivity.class);
+									intent.putExtra("firstTimeCam", true);
+									initialCam = true;								
+								}
+
+								if (!initialCam){
+									intent = new Intent(loginActivity,ManagerActivity.class);
+									if (action != null){
+										if (action.equals(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD)){
+											intent = new Intent(this, FileExplorerActivity.class);
+											if(extras != null)
+											{
+												intent.putExtras(extras);
+											}
+											intent.setData(uriData);
+										}
+										if (action.equals(ManagerActivity.ACTION_FILE_PROVIDER)){
+											intent = new Intent(this, FileProviderActivity.class);
+											if(extras != null)
+											{
+												intent.putExtras(extras);
+											}
+											intent.setData(uriData);
+										}
+										intent.setAction(action);
+										if (url != null){
+											intent.setData(Uri.parse(url));
+										}
+									}
+								}
+								intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+							}
+							
+							startActivity(intent);
+							finish();
+						}
+					}
+				}
+			}
+			else{
 				Intent intent = new Intent();
 				intent = new Intent(this,ChooseAccountActivity.class);
 				startActivity(intent);
 				finish();				
-//			}
+			}
 	
 		}
 		else if (request.getType() == MegaRequest.TYPE_QUERY_SIGNUP_LINK){

@@ -73,8 +73,11 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:text="@string/free_bandwidth"
-                android:layout_margin="@dimen/standard_margin"
+                android:layout_marginLeft="@dimen/standard_margin"
+                android:layout_marginRight="@dimen/standard_margin"
+                android:layout_marginTop="12dp"
                 android:layout_toRightOf="@id/free_bandwidth_title"
+                android:layout_alignBottom="@id/free_bandwidth_title"
                 android:layout_below="@id/free_storage"/>
             
             <TextView
