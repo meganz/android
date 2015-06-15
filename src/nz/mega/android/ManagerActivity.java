@@ -257,6 +257,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	AlertDialog permissionsDialog;
 	private boolean firstTime = true;
 	
+	long handleToDownload=0;
+	
 	long parentHandleBrowser;
 	long parentHandleRubbish;
 	long parentHandleIncoming;
@@ -3318,22 +3320,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}	
 	
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public void copyToSDCard (long[] hashes){
-		log("copyToSDCard");
+	public void openAdvancedDevices (long handle){
+		log("openAdvancedDevices");
+		handleToDownload = handle;
 		String externalPath = Util.getExternalCardPath();
-		File newFile =  new File(externalPath+"/"+"prueba.txt");
-		Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+		MegaNode node = megaApi.getNodeByHandle(handle);
+		if(node!=null){
+			
+//			File newFile =  new File(externalPath+"/"+node.getName());
+			File newFile =  new File(node.getName());
+			log("File: "+newFile.getPath());
+			Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
 
-	    // Filter to only show results that can be "opened", such as
-	    // a file (as opposed to a list of contacts or timezones).
-	    intent.addCategory(Intent.CATEGORY_OPENABLE);
+		    // Filter to only show results that can be "opened", such as
+		    // a file (as opposed to a list of contacts or timezones).
+		    intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-	    // Create a file with the requested MIME type.
-	    String mimeType = MimeTypeList.getMimeType(newFile);
-	    intent.setType(mimeType);
-	    intent.putExtra(Intent.EXTRA_TITLE, newFile.getAbsolutePath());
-	    startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);		
-		
+		    // Create a file with the requested MIME type.
+		    String mimeType = MimeTypeList.getMimeType(newFile);
+		    log("Mimetype: "+mimeType);
+		    intent.setType(mimeType);
+		    intent.putExtra(Intent.EXTRA_TITLE, node.getName());
+		    startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);			
+		}
 	}
 	
 	@Override
@@ -5697,7 +5706,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if(advancedDevices){
 				//Launch Intent to SAF
-		    	this.copyToSDCard(hashes);
+				if(hashes.length==1){
+					downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
+					this.openAdvancedDevices(hashes[0]);
+				}
+				else
+				{
+					//Show error message, just one file
+				}
+				
+		    	
 			}
 			else{
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
@@ -6414,7 +6432,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			Uri uri = intent.getData();
-			log("EOEOEOEOE: " + uri);
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);
@@ -6432,9 +6449,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 			
 			Uri treeUri = intent.getData();
-			log("--------------Create the document : "+treeUri);			
+			log("--------------Create the document : "+treeUri);
 			
+			//Now, call to the DownloadService 
 			
+			if(handleToDownload!=0 && handleToDownload!=-1){
+				Intent service = new Intent(this, DownloadService.class);
+				service.putExtra(DownloadService.EXTRA_HASH, handleToDownload);
+				service.putExtra(DownloadService.EXTRA_CONTENT_URI, treeUri.toString());
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/";
+				File tempDownDirectory = new File(path);
+				if(!tempDownDirectory.exists()){
+					tempDownDirectory.mkdirs();
+				}				
+				service.putExtra(DownloadService.EXTRA_PATH, path);				
+				startService(service);				
+			}			
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			
