@@ -64,6 +64,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	public static String EXTRA_CONTACT_ACTIVITY = "CONTACT_ACTIVITY";
 	public static String EXTRA_ZIP_FILE_TO_OPEN = "FILE_TO_OPEN";
 	public static String EXTRA_OPEN_FILE = "OPEN_FILE";
+	public static String EXTRA_CONTENT_URI = "CONTENT_URI";
 	
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";	
@@ -78,6 +79,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	private boolean isFolderLink = false;
 	private boolean fromContactFile = false;
 	private String pathFileToOpen;
+	private Uri contentUri;
 	
 	private boolean openFile = true;
 	
@@ -94,6 +96,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	MegaNode currentDocument;
 	
 	DatabaseHandler dbH = null;
+	
+	HashMap<Long, Uri> storeToAdvacedDevices;
 	
 	private int notificationId = 2;
 	private int notificationIdFinal = 4;
@@ -137,6 +141,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		isForeground = false;
 		canceled = false;
+		
+		storeToAdvacedDevices = new HashMap<Long, Uri>();
 		
 		currentTransfers = new SparseArray<MegaTransfer>();
 		transfersOK = new SparseArray<MegaTransfer>();
@@ -249,6 +255,9 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
 		fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
 		openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
+		contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));		
+		
+		log("-----------------------CONTENTURI: "+contentUri.toString());
 		
 		if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
 			pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
@@ -306,28 +315,47 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			lock.acquire();
 		}
 		
-		if (currentDir.isDirectory()){
-			log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+		if(contentUri!=null){
+			//Descargo en la localizacion por defecto, lo meto en un array de pendientes y luego copio en TRansferFinish
+			log("Download to advanced devices checked");
+			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
 			
-			if(currentFile.exists()){
-				log("The file already exists!");
-				//Check the fingerprint				
-				String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
-				String megaFingerprint = megaApi.getFingerprint(currentDocument);
-
-				if(localFingerprint.compareTo(megaFingerprint)!=0)
-				{
-					log("Delete the old version");
-					currentFile.delete();					
-				}						
+			if (currentDir.isDirectory()){
+				log("To download(dir): " + currentDir.getAbsolutePath() + "/");
 			}
-
+			else{
+				log("currentDir is not a directory");
+			}	
+			storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
+			log("The action is: download the: "+currentDocument.getName()+" to "+ currentDir.getAbsolutePath()+" and copy to: "+contentUri.toString());
+			
 			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
-						
 		}
 		else{
-			log("currentDir is not a directory");
-		}
+			if (currentDir.isDirectory()){
+				log("To download(dir): " + currentDir.getAbsolutePath() + "/");
+				
+				if(currentFile.exists()){
+					log("The file already exists!");
+					//Check the fingerprint				
+					String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
+					String megaFingerprint = megaApi.getFingerprint(currentDocument);
+
+					if(localFingerprint.compareTo(megaFingerprint)!=0)
+					{
+						log("Delete the old version");
+						currentFile.delete();					
+					}						
+				}
+
+				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
+							
+			}
+			else{
+				log("currentDir is not a directory");
+			}			
+		}		
+		
 //		else{
 //			log("To download(file): " + currentDir.getAbsolutePath());
 //			megaApi.startDownload(document, currentDir.getAbsolutePath(), this);
@@ -666,7 +694,11 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				File f = new File(filePath);
 			    Uri contentUri = Uri.fromFile(f);
 			    mediaScanIntent.setData(contentUri);
-			    this.sendBroadcast(mediaScanIntent);
+			    this.sendBroadcast(mediaScanIntent);			    
+			    
+			    if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
+			    	log("Now copy the file to the SD Card");
+			    }
 			    
 			    if(isOffline){
 					dbH = DatabaseHandler.getDbHandler(getApplicationContext());

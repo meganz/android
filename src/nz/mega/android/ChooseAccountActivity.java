@@ -122,11 +122,9 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		
 //		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		
+		megaApi = ((MegaApplication)getApplication()).getMegaApi();		
 	
-		setContentView(R.layout.activity_choose_account);        		
-
+		setContentView(R.layout.activity_choose_account);   		
 		
 //		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
 		
