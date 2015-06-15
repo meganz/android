@@ -1,6 +1,11 @@
 package nz.mega.android;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +37,7 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.os.PowerManager.WakeLock;
@@ -507,6 +513,19 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						startActivity(intentShare);
 					}
 				}
+				else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					if (ManagerActivity.isIntentAvailable(this, viewIntent))
+						startActivity(viewIntent);
+					else{
+						Intent intentShare = new Intent(Intent.ACTION_SEND);
+						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						startActivity(intentShare);
+					}
+				}
 				else{
 					intent = new Intent(Intent.ACTION_VIEW);
 					intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
@@ -698,6 +717,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			    
 			    if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
 			    	log("Now copy the file to the SD Card");
+			    	
+			    	Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
+			    	MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
+			    	alterDocument(tranfersUri, node.getName());   	
 			    }
 			    
 			    if(isOffline){
@@ -740,6 +763,45 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				onQueueComplete();
 			}
 		}		
+	}
+	
+	private void alterDocument(Uri uri, String fileName) {
+		log("alterUri");
+	    try {
+	    	
+	    	String sourceLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/"+fileName;
+	    	
+	    	log("Voy a copiar: "+sourceLocation);
+	    	
+	        ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "w");
+	        FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+	    	
+	    	InputStream in = new FileInputStream(sourceLocation);
+//
+//	        OutputStream out = new FileOutputStream(targetLocation);
+//
+	        // Copy the bits from instream to outstream
+	        byte[] buf = new byte[1024];
+	        int len;
+	        while ((len = in.read(buf)) > 0) {
+	        	fileOutputStream.write(buf, 0, len);
+	        }
+	        in.close();
+//	        out.close();
+	    	
+
+//	        fileOutputStream.write(("Overwritten by MyCloud at " + System.currentTimeMillis() + "\n").getBytes());
+	        // Let the document provider know you're done by closing the stream.
+	        fileOutputStream.close();
+	        pfd.close();
+	        
+	        File deleteTemp = new File(sourceLocation);
+	        deleteTemp.delete();
+	    } catch (FileNotFoundException e) {
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 	}
 	
 	public void saveOffline (MegaNode node, String path){
