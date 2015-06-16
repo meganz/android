@@ -2110,17 +2110,46 @@ public class MegaApiJava
      *
      * The associated request type with this request is MegaRequest::TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS
      *
+     * @param reason Reason for the cancellation. It can be NULL.
      * @param listener MegaRequestListener to track this request
      */
-	public void creditCardCancelSubscriptions(MegaRequestListenerInterface listener) {
-		megaApi.creditCardCancelSubscriptions(createDelegateRequestListener(listener));
+	public void creditCardCancelSubscriptions(String reason, MegaRequestListenerInterface listener) {
+		megaApi.creditCardCancelSubscriptions(reason, createDelegateRequestListener(listener));
 	}
 
 	/**
      * Cancel credit card subscriptions if the account
+     * 
+     * @param reason Reason for the cancellation. It can be NULL.
+     * 
      */
-	public void creditCardCancelSubscriptions() {
-		megaApi.creditCardCancelSubscriptions();
+	public void creditCardCancelSubscriptions(String reason) {
+		megaApi.creditCardCancelSubscriptions(reason);
+	}
+	
+	/**
+     * Get the available payment methods
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_PAYMENT_METHODS
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getNumber - Bitfield with available payment methods
+     *
+     * To know if a payment method is available, you can do a check like this one:
+     * request->getNumber() & (1 << MegaApi::PAYMENT_METHOD_CREDIT_CARD)
+     *
+     * @param listener MegaRequestListener to track this request
+     */
+	public void getPaymentMethods(MegaRequestListenerInterface listener) {
+		megaApi.getPaymentMethods(createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Get the available payment methods
+     */
+	public void getPaymentMethods() {
+		megaApi.getPaymentMethods();
 	}
 	
 	/**

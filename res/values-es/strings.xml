@@ -286,6 +286,12 @@
     <string name="context_no_removed" context="error message">Error. No se pudo borrar de MEGA</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Enviado correctamente a:</string>
     
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí...</string>
+    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Atrás</string>
+    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Enviar</string>
+    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancelar Subscripción</string>
+        
     <string name="context_node_private" context="success message after removing the public link of a folder">Esta carpeta es ahora privada</string>
     <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Compartición eliminada con éxito</string>
   

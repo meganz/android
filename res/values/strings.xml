@@ -246,7 +246,7 @@
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renaming</string>
-    <string name="context_preparing_provider" context="while file provider is downloading a file">Preparing file...</string>
+    <string name="context_preparing_provider" context="while file provider is downloading a file">Preparing file&#8230;</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Download</string>
     <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
     <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Import folder</string>
@@ -300,6 +300,14 @@
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correctly removed from MEGA</string>
     <string name="context_no_removed" context="error message">Error. Not removed from MEGA</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
+    
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your Mega subscription. Please let us know, if there is anything we can do to help change your mind.</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here...</string>
+    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Dismiss</string>
+    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Send</string>
+    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancel Subscription</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your Mega subscription?</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been canceled. Please, provide a reason to cancel.</string>
     
     <string name="context_node_private" context="success message after removing the public link of a folder">The folder is now private</string>
     <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Share correctly removed</string>
