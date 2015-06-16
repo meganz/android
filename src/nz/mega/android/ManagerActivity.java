@@ -203,6 +203,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int MODE_OUT = 1;
 	
 	String accessToken;
+	String feedback;
 	
 	private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -4520,7 +4521,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //	        }
 	        case R.id.action_menu_cancel_subscriptions:{
 	        	if (megaApi != null){
-	        		megaApi.creditCardCancelSubscriptions(this);
+	        		//Show the message
+	        		showCancelMessage();	        		
 	        	}
 	        	return true;
 	        }
@@ -4528,6 +4530,83 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	            return super.onOptionsItemSelected(item);
             }
 	    }
+	}
+	
+	public void showCancelMessage(){
+		AlertDialog cancelDialog;
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.title_cancel_subscriptions));
+		
+		LayoutInflater inflater = getLayoutInflater();
+		View dialogLayout = inflater.inflate(R.layout.dialog_cancel_subscriptions, null);
+		TextView message = (TextView) dialogLayout.findViewById(R.id.dialog_cancel_text);
+		final EditText text = (EditText) dialogLayout.findViewById(R.id.dialog_cancel_feedback);
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		float density = getResources().getDisplayMetrics().density;
+
+		float scaleW = Util.getScaleW(outMetrics, density);
+		float scaleH = Util.getScaleH(outMetrics, density);
+		
+		message.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+		text.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+		
+		builder.setView(dialogLayout);
+		
+		builder.setPositiveButton(getString(R.string.send_cancel_subscriptions), new android.content.DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				feedback = text.getText().toString();
+				if(feedback.matches("")||feedback.isEmpty()){
+					Toast.makeText(managerActivity, getString(R.string.reason_cancel_subscriptions), Toast.LENGTH_SHORT).show();
+				}
+				else{
+					showCancelConfirmation(feedback);			
+				}								
+			}
+		});
+		
+		builder.setNegativeButton(getString(R.string.dismiss_cancel_subscriptions), new android.content.DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+
+			}
+		});
+		
+		cancelDialog = builder.create();
+		cancelDialog.show();
+		Util.brandAlertDialog(cancelDialog);
+	}
+	
+	public void showCancelConfirmation(final String feedback){
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+			        case DialogInterface.BUTTON_POSITIVE:
+			        {
+			        	log("Feedback: "+feedback);
+			        	megaApi.creditCardCancelSubscriptions(feedback, managerActivity);
+			        	break;
+			        }
+			        case DialogInterface.BUTTON_NEGATIVE:
+			        {
+			            //No button clicked
+			        	log("Feedback: "+feedback);
+			            break;
+			        }
+		        }
+		    }
+		};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
+		    .setNegativeButton(R.string.general_no, dialogClickListener).show();		
+		
 	}
 	
 	public void selectSortByContacts(int _orderContacts){

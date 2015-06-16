@@ -1,0 +1,25 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    
+    <TextView 
+        android:id="@+id/dialog_cancel_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/dialog_cancel_subscriptions"
+        android:layout_centerHorizontal="true"/>
+    
+   <EditText 
+	    android:id="@+id/dialog_cancel_feedback"
+	    android:gravity="top|left" 
+	    android:inputType="textMultiLine"
+	    style="@style/InputField"
+	    android:layout_marginTop="0dp"
+	    android:lines="5"
+	    android:layout_below="@id/dialog_cancel_text" 
+	    android:hint="@string/hint_cancel_subscriptions"
+	    android:scrollHorizontally="false" />
+    
+</RelativeLayout>
