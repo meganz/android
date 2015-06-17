@@ -1556,12 +1556,18 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
 	    shareFolderMenuItem = menu.findItem(R.id.action_file_properties_share_folder);
 	    
-	    if (node.isFolder()){
-	    	shareFolderMenuItem.setVisible(true);
+	    if(node!=null){
+	    	 if (node.isFolder()){
+	 	    	shareFolderMenuItem.setVisible(true);
+	 	    }
+	 	    else{
+	 	    	shareFolderMenuItem.setVisible(false);
+	 	    }
 	    }
-	    else{
-	    	shareFolderMenuItem.setVisible(false);
-	    }
+	    else
+	    {
+	    	onBackPressed();
+	    }	   
 	    
 	    if(publicLink){
 	    	getLinkMenuItem.setVisible(false);
