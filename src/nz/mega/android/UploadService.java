@@ -826,7 +826,10 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				totalUploaded++;
 				currentTransfers.remove(transfer.getTag());
 				transfersOK.put(transfer.getTag(), transfer);
-				long currentSizeUploaded = transfersUploadedSize.get(transfer.getTag());
+				long currentSizeUploaded = 0;
+				if (transfersUploadedSize.get(transfer.getTag()) != null){
+					currentSizeUploaded = transfersUploadedSize.get(transfer.getTag());
+				}
 				totalSizeUploaded += (transfer.getTotalBytes()-currentSizeUploaded);
 				transfersUploadedSize.put(transfer.getTag(), transfer.getTotalBytes());
 				
