@@ -283,7 +283,7 @@
     <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
-    <string name="context_permissions_not_changed" context="error message">Error. Permissions not changed</string>
+    <string name="context_permissions_not_changed" context="error message">Error. Permissions did not change</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
@@ -319,7 +319,7 @@
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
-	<string name="upload_to_other" context="upload to. Then choose a Video file">Other File</string>
+	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Other File</string>
 	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Pick from File System</string>
 	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Select file type</string>
 	<string name="upload_uploading" context="status text">Uploading</string>

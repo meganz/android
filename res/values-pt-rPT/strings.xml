@@ -8,7 +8,7 @@
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">O MEGA é um poderoso armazenamento na Cloud, com a sua privacidade acima de tudo. 50 GB totalmente grátis.</string>
     
     <string name="general_total_size" context="label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation)">Tamanho total</string>
-    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10.">de</string>
+    <string name="general_x_of_x" context="Showing progress of elements. Example: 2 of 10."> de </string>
     <string name="general_yes" context="Answer for confirmation dialog.">Sim</string>
     <string name="general_no" context="Answer for confirmation dialog.">Não</string>
     <string name="general_cancel" context="Answer for confirmation dialog.">Cancelar</string>
@@ -21,28 +21,42 @@
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Transferir</string>
     <string name="general_add" context="button">Adicionar</string>
     <string name="general_empty" context="Button to delete the contents of the trashbin. Can also be translated as &quot;clear&quot;">Vazio</string>
-    <string name="general_loading" context="state previous to import a file">A carregar...</string>
-    <string name="general_importing" context="state while importing the file">A importar...</string>
+    <string name="general_loading" context="state previous to import a file">A carregar&#8230;</string>
+    <string name="general_importing" context="state while importing the file">A importar&#8230;</string>
     <string name="general_import" context="Import button. When the user clicks this button the file will be imported to his account.">Importar</string>
-    <string name="general_updating" context="state while upgrading the account">A atualizar...</string>  
+    <string name="general_updating" context="state while upgrading the account">A atualizar&#8230;</string>  
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Armazenamento</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Dados</string>
     <string name="general_error_word" context="It will be followed by the error message">Erro</string> 
+    <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">File link not found</string>
+    <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">Folder link not found</string>
     <string name="general_not_yet_implemented" context="when clicking into a menu whose functionality is not yet implemented">Ainda não foi implementada</string>
     <string name="general_already_downloaded" context="when trying to download a file that is already downloaded in the device">Já descarregado</string>
+    <string name="general_already_uploaded" context="when trying to upload a file that is already uploaded in the folder">already uploaded</string>
+    <string name="general_file_info" context="Label of the option menu. When clicking this button, the app shows the info of the file">File info</string>
+    <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
+    <string name="general_menu" context="Title when the left menu is opened">Menu</string>
+ 
+    <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">The secondary media folder does not exist, please choose a new folder.</string>   
+    
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload.</string>    
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vais remover o ficheiro exportado da chave mestra</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Aviso de segurança! Esta operação é bastante arriscada. Tens a certeza que queres continuar?</string> 
      
-    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mais opções...</string> 
+    <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Mais opções&#8230;</string> 
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">Desejas remover o contacto?</string>    
-    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want these contacts?</string>  
+    <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">Do you want to remove these contacts?</string>  
+    <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">Move to the Rubbish bin?</string>
+    <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA?</string>
+    <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Partilhas a Receber</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Partilhas a Enviar</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Sair</string>
-    <string name="action_add" context="Menu item">Transferir...</string>
+    <string name="action_add" context="Menu item">Transferir&#8230;</string>
     <string name="action_create_folder" context="Menu item">Criar nova pasta</string>
+    <string name="action_open_link" context="Menu item">Open link&#8230;</string>
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Transferir para</string>
     <string name="action_settings" context="Menu item">Definições</string>
     <string name="action_search" context="Search button">Procurar</string>
@@ -50,13 +64,17 @@
     <string name="action_sort_by" context="Menu item">Ordenar por</string>
     <string name="action_help" context="Menu item">Ajuda</string>
     <string name="action_upgrade_account" context="Change from a free account to paying MEGA">Fazer upgrade da conta</string>
+    <string name="upgrading_account_message" context="Message while proceeding to upgrade the account">Upgrading account</string>
     <string name="action_select_all" context="Menu item to select all the elements of a list">Escolher Todos</string>
     <string name="action_unselect_all" context="Menu item to unselect all the elements of a list">Remover todas as seleções</string>
     <string name="action_grid" context="Menu item to change from list view to grid view">Vista de miniaturas</string>
     <string name="action_list" context="Menu item to change from grid view to list view">Ver em Lista</string>
     <string name="action_export_master_key" context="Menu item to let the user export the MasterKey">Exportar a Chave Mestra</string>
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remover a Chave Mestra</string>
+    <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">A Chave Mestra foi exportada para:</string>
+    <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been canceled correctly</string>
+    <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">The subscription has not been canceled correctly. Please contact support\@mega.co.nz to cancel your subscription</string>
         
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">ficheiro</item>
@@ -79,13 +97,13 @@
     </plurals>
     
     <plurals name="general_num_downloads" context="in the notification. When downloading the notification is like 3 downloads.">
-        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">transferir</item>
-        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">transferir</item>
+        <item quantity="one" context="Item menu option upon clicking on one or multiple files. Singular">download</item>
+        <item quantity="other" context="Item menu option upon clicking on one or multiple files. Plural">downloads</item>
     </plurals>
     
     <plurals name="general_num_uploads">
-        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">transferir</item>
-        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">transferências</item>
+        <item quantity="one" context="Transfer type description in the active file transfer panel, can either be upload or download. Singular">upload</item>
+        <item quantity="other" context="Transfer type description in the active file transfer panel, can either be upload or download. Plural">uploads</item>
     </plurals>
     
      <plurals name="general_num_users" context="used for example when a folder is shared with 1 user or 2 users">
@@ -109,6 +127,7 @@
     <string name="error_invalid_email" context="error when logging in to MEGA with an invalid email">Endereço de correio electrónico inválido</string>
     <string name="error_enter_password" context="when the user tries to log in MEGA without typing the password">Por favor, introduz a tua palavra-chave</string>
     <string name="error_server_connection_problem" context="when the user tries to log in to MEGA without a network connection">Problema de ligação à rede, tente novamente mais tarde</string>
+    <string name="error_server_expired_session" context="when the user tries to log in to MEGA without a valid session">You have been logged out on this device from another location</string>
     <string name="login_generating_key" context="the first step when logging in is calculate the private and public encryption keys">A calcular chaves de encriptação</string>
     <string name="login_connecting_to_server" context="Message displayed while the app is connecting to a MEGA server">A conectar ao servidor</string>
     <string name="error_incorrect_email_or_password" context="Error message when a login attempt fails.">E-mail ou password incorrecta. Validou a sua conta de e-mail?</string>    
@@ -118,6 +137,14 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">A ativar conta</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">A preparar lista de ficheiros</string>
     
+    <string name="tour_space_title">MEGA SPACE</string>
+    <string name="tour_speed_title">MEGA SPEED</string>
+    <string name="tour_privacy_title">MEGA PRIVACY</string>
+    <string name="tour_access_title">MEGA ACCESS</string>
+    <string name="tour_space_text">Register now and get 50 GB of free space</string>
+    <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
+    <string name="tour_privacy_text">Keep all you files safe with MEGA\'s end-to-end encryption</string>
+    <string name="tour_access_text">Get fully encrypted access anywhere, anytime</string>
     
     <string name="create_account_text" context="button that allows the user to create an account">Criar conta</string>
     <string name="name_text" context="Name of the user">nome</string>
@@ -137,6 +164,7 @@
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Guardado para offline</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Partilhadas comigo:</string>
+	<string name="section_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Lixo</string>
 	<string name="section_contacts" context="Title of the contact list">Contactos</string>
 	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTOS</string>
@@ -151,6 +179,11 @@
 	<string name="used_space" context="Used space &quot;5MB of 100MB&quot;.">%1$s de %2$s</string>
 	<string name="tab_incoming_shares" context="Capital letters. Incoming shared folders. The title of a tab">A RECEBER</string>
 	<string name="tab_outgoing_shares" context="Capital letters. Outgoing shared folders. The title of a tab">A ENVIAR</string>
+	
+	<string name="tab_cloud_drive_explorer" context="Capital letters. Incoming shared folders. The title of a tab">CLOUD DRIVE</string>
+	<string name="tab_incoming_shares_explorer" context="Capital letters. Incoming shared folders. The title of a tab">INCOMING</string>
+	<string name="title_incoming_shares_explorer" context="Title of the file explorer in tab InCOMING">Incoming Shares</string>
+	<string name="choose_folder_explorer" context="Title of the button in Incoming Shares tabs">Choose folder</string>
 	
 	<string name="file_browser_empty_cloud_drive" context="message when there are no files in the Cloud Drive">Não existem ficheiros na tua Cloud Drive</string>
 	<string name="file_browser_empty_rubbish_bin" context="message when there are no files in the Rubbish Bin">Esvaziar o Lixo</string>
@@ -177,6 +210,7 @@
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Partilhar com</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Partilhado com</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar para</string>
+	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
 	
 	<string name="contact_properties_activity" context="title of the contact properties screen">Informações do contacto</string>
 	
@@ -201,9 +235,18 @@
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Partilhar imagem no</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Partilhar hiperligação</string>
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Endereço</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Manage link</string>
+    <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
+    <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Remove</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renomear</string>
+    <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Open</string>
+    <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Open link</string>
     <string name="context_renaming" context="while renaming a file or folder">A renomear</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Transferir</string>
+    <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Download folder</string>
+    <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Import folder</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mover</string>
     <string name="context_moving" context="while moving a file or folder">A mover</string>
     <string name="context_sharing" context="while sharing a folder">A transferir pasta</string>
@@ -220,6 +263,8 @@
     <string name="context_download_to" context="Menu item">Guardar para</string>
     <string name="context_clear_rubbish" context="Menu option">Esvaziar o Lixo</string>
     <string name="context_send_link" context="get the link and send it">Enviar hiperligação</string>
+    <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>
+    <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remover</string>
     <string name="context_share_folder" context="menu item">Partilhar pasta</string>
     <string name="context_view_shared_folders" context="open a shared folder">Visualizar as pastas partilhadas</string>
@@ -230,6 +275,7 @@
     <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">MEGA Contactos</string>
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Contactos do telefone</string>
     <string name="context_delete" context="menu item">Apagar</string>
+    <string name="context_more" context="menu item">More</string>
     <string name="context_contact_added" context="success message when adding a contact">Contacto adicionado</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contacto removido</string>
     <string name="context_contact_not_removed" context="error message">Erro. O contacto não foi removido</string>
@@ -261,6 +307,7 @@
     <string name="upload_to_image" context="upload to. Then choose an Image file">Imagem</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Áudio</string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
+	<string name="upload_to_other" context="upload to. Then choose a Video file">Other File</string>
 	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Escolher do sistema de ficheiros</string>
 	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Seleccione o tipo de ficheiro</string>
 	<string name="upload_uploading" context="status text">A carregar</string>
@@ -287,6 +334,12 @@
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">Fazer upgrade agora!</string>
     <string name="my_account_change_password" context="menu item">Alterar palavra-chave</string>
     
+    <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">You\'re running out of space!\n Do you want to upgrade your account?</string>
+    <string name="get_pro_account" context="Message to promote PRO accounts">You can be a PRO user!\n Do you want to upgrade your account?</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Overquota Alert!</string>
+     <string name="overquota_alert_text" context="Dialod text overquota error">Operation not allowed, you will exceed the storage limit of your account. Do you want to upgrade your account?</string>
+    
+    <string name="op_not_allowed" context="Dialod text overquota error">Operation not allowed</string>    
     <string name="my_account_last_session" context="when did the last session happen">Última sessão:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Ligações:</string>
     
@@ -302,12 +355,18 @@
     <string name="select_membership_1" context="the user has to decide the way of payment">Recurrente mensalmente ou anualmente</string>
     <string name="select_membership_2" context="button to go to Google Play">Subscrição do Google Play</string>
     
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Select payment method</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
+    
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Mensalmente*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Anualmente*</string>
     
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* subscrições recurrentes podem ser canceladas a qualquer altura, mesmo antes da data de renovação.</string>
     
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">O link foi copiado para a área de transferência</string>
+    <string name="file_properties_remove_link" context="the user can remove the public link">The link has been removed</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">A pré-visualização ainda não foi descarregada. Por favor aguarda.</string>
     
@@ -317,6 +376,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Todas as transferências estão em pausa</string>
     <string name="menu_pause_transfers" context="menu item">Pausar transferências</string>
     <string name="menu_restart_transfers" context="menu item">Reiniciar transferências</string>
+    <string name="menu_take_picture" context="menu item">Take picture</string>
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Apenas Wi-Fi</string>
     <string name="cam_sync_data" context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-Fi ou plano de dados</string>
@@ -352,7 +412,20 @@
         <item context="the options of what to upload.">Fotos e vídeos</item>
     </string-array>
     
-    <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Pasta da câmara</string>
+    <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
+    <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
+    
+    <string name="settings_empty_folder" context="settings option. Showing this message when a folder is not chosen yet">Choose folder</string>
+    
+    <string name="settings_secondary_upload_on" context="settings option">Enable Secondary Media Uploads</string>
+    <string name="settings_secondary_upload_off" context="settings option">Disable Secondary Media Uploads</string>
+    
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored.">Pasta da câmara</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored.">Mega Camera Uploads Folder</string>
+    
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos are stored.">Local Secondary folder</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos are stored.">Mega Secondary Folder</string>
+    
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Apenas fotos</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Apenas videos</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotos e vídeos</string>
@@ -366,7 +439,10 @@
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código incorrecto</string>
     
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre</string>
+    <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
+    <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Terms of Service</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versão da app</string>
+    <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">MEGA SDK version</string>
     
     <string name="january">Janeiro</string>
     <string name="february">Fevereiro</string>
@@ -384,7 +460,10 @@
     <string name="pdf_file_viewer_activity" context="title of the screen that shows the pdf files">Visualizador de PDF do MEGA</string>
     <string name="zip_browser_activity" context="title of the screen that shows the ZIP files">Browser de ZIP</string>
     
+    <string name="new_account" context="in login screen to create a new account">Create one account now!</string>
+    
     <string name="my_account_title" context="title of the My Account screen">Tipo de Conta:</string>
+    <string name="expires_on" context="title of the Expiration Date">Expires on </string>
     <string name="free_account">GRÁTIS</string>
     <string name="pro1_account" context="Not translate">PRO I</string>
     <string name="pro2_account" context="Not translate">PRO II</string>
@@ -395,4 +474,40 @@
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">O ficheiro zip vai ser descarregado e expandido</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">O ficheiro zip vai ser expandido</string>
     
+    <string name="sortby_name" context="category in sort by action">By name</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
+    
+    <string name="sortby_date" context="category in sort by action">By date</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
+    
+    <string name="sortby_size" context="category in sort by action">By size</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">largest first</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest first</string>
+    
+    <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
+    <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
+    
+    <string name="billing_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your billing details:</string>
+    <string name="address1_cc" context="Hint text of the address1 edittext, which is the first line (of two) of the address">Address 1</string>
+    <string name="address2_cc" context="Hint text of the address2 edittext, which is the second line (of two) of the address">Address 2 (optional)</string>
+    <string name="city_cc" context="Hint text of the city edittext for billing purposes">City</string>
+    <string name="state_cc" context="Hint text of the state or province edittext for billing purposes">State / Province</string>
+    <string name="country_cc" context="Hint text of the country edittext for billing purposes">Country</string>
+    <string name="postal_code_cc" context="Hint text of the postal code edittext for billing purposes">Postal code</string>
+    
+    <string name="payment_details" context="Contextual text in the beginning of the Credit Card Payment">Enter your payment details:</string>
+    <string name="first_name_cc" context="Hint text of the first name of the credit card edittext for payment purposes">First Name</string>
+    <string name="last_name_cc" context="Hint text of the last name of the credit card edittext for payment purposes">Last Name</string>
+    <string name="credit_card_number_cc" context="Hint text of the credit card number edittext for payment purposes">Credit Card Number</string>
+    <string name="month_cc" context="Hint text of the expiration month of the credit card for payment purposes">Month</string>
+    <string name="year_cc" context="Hint text of the expiration year of the credit card for payment purposes">Year</string>
+    <string name="cvv_cc" context="Hint text of the CVV edittext for payment purposes">CVV</string>
+    
+    <string name="proceed_cc" context="Text of the button which proceeds the payment">Proceed</string>
+    
+    <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account successfully upgraded!</string>
+    <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation has not finished correctly. The credit card will not be charged.</string>
+    <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">The credit card information is not correct. The credit card will not be charged.</string>
 </resources>
