@@ -261,9 +261,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false);
 		fromContactFile = intent.getBooleanExtra(EXTRA_CONTACT_ACTIVITY, false);
 		openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
-		contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));		
-		
-		log("-----------------------CONTENTURI: "+contentUri.toString());
+		if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
+			contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));	
+			log("-----------------------CONTENTURI: "+contentUri.toString());
+		}			
 		
 		if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
 			pathFileToOpen = intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN);
