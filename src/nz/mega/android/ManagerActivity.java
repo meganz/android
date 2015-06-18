@@ -139,8 +139,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				case ACCOUNT: return context.getString(R.string.section_account);				
 				case SEARCH: return context.getString(R.string.action_search);
 			}
-			return null;
-			
+			return null;			
 		}
 	}
 	
