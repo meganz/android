@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
@@ -41,6 +42,7 @@ import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.os.StatFs;
 import android.os.PowerManager.WakeLock;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.text.format.Formatter;
 import android.util.SparseArray;
@@ -323,10 +325,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		}
 		
 		if(contentUri!=null){
-			//Descargo en la localizacion por defecto, lo meto en un array de pendientes y luego copio en TRansferFinish
+			//To download to Advanced Devices
 			log("Download to advanced devices checked");
 			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
-			
+
 			if (currentDir.isDirectory()){
 				log("To download(dir): " + currentDir.getAbsolutePath() + "/");
 			}
@@ -367,8 +369,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 //			log("To download(file): " + currentDir.getAbsolutePath());
 //			megaApi.startDownload(document, currentDir.getAbsolutePath(), this);
 //		}
-	}
-	
+	}	
+
 	private File getDir(MegaNode document, Intent intent) {
 		boolean toDownloads = (intent.hasExtra(EXTRA_PATH) == false);
 		File destDir;
@@ -502,6 +504,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Lanzo intent al manager.....");
 				}
 				else if (MimeTypeList.typeForName(currentFile.getName()).isDocument()){
+					log("Download is document");
+					
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -515,6 +519,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 				}
 				else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
+					log("Download is IMAGE");
+				
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -528,6 +534,8 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					}
 				}
 				else{
+					
+					log("Download is OTHER FILE");
 					intent = new Intent(Intent.ACTION_VIEW);
 					intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 							.getType());
@@ -550,6 +558,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				}
 			}
 			else{
+				openFile=true; //Set the openFile to the default
 				intent = new Intent(getApplicationContext(), ManagerActivity.class);
 				log("Show notification");
 				mBuilderCompat
@@ -718,7 +727,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			    
 			    if(storeToAdvacedDevices.containsKey(transfer.getNodeHandle())){
 			    	log("Now copy the file to the SD Card");
-			    	
+			    	openFile=false;
 			    	Uri tranfersUri = storeToAdvacedDevices.get(transfer.getNodeHandle());
 			    	MegaNode node = megaApi.getNodeByHandle(transfer.getNodeHandle());
 			    	alterDocument(tranfersUri, node.getName());   	
