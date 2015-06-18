@@ -153,6 +153,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		if (aB == null){
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
+		
+		megaApi.getPaymentMethods(this);
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -612,6 +614,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
+		log("onRequestFinish: " + request.getRequestString());
+		
 //		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 //			MegaPricing p = request.getPricing();
 //			for (int i=0;i<p.getNumProducts();i++){
@@ -622,6 +626,11 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 //				}
 //			}
 //		}
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+//			if (request.getNumber() & (1 << MegaApiJava.PAYMENT_METHOD_CREDIT_CARD)){
+//				Toast.makeText(context, "EOEOEOE", Toast.LENGTH_LONG).show();
+//			}
+		}		
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT ID: " + request.getLink());
 			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
