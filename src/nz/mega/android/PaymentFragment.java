@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -111,12 +112,13 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	private RelativeLayout paymentFortumo;
 	private RelativeLayout paymentUpgradeComment;
 	private RelativeLayout paymentGoogleWallet;
-	int parameterType;	
+	int parameterType=-1;	
 	MegaApiAndroid megaApi;
 	Context context;
 	ArrayList<Product> accounts;
 	PaymentFragment paymentFragment = this;
 	int paymentMonth = -1;
+	BitSet paymentBitSet = null;
 	
 	@Override
 	public void onDestroy(){
@@ -239,6 +241,8 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		paymentCreditCard.setOnClickListener(this);
 		paymentFortumo.setOnClickListener(this);
 		paymentGoogleWallet.setOnClickListener(this);
+		
+		paymentMonth=-1;
 		
 		if(accounts == null){
 			megaApi.getPricing(this);
@@ -455,42 +459,69 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		switch(parameterType){
 			case 4:{
 //				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+				
+				//Si ha llegado el bit de pago, lo pongo ya si no espero.
 				paymentPerMonth.setVisibility(View.GONE);
-				paymentPerYear.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);				
 				paymentUpgradeComment.setVisibility(View.GONE);
-				paymentCreditCard.setVisibility(View.VISIBLE);
-				paymentFortumo.setVisibility(View.VISIBLE);
+				
+				if(paymentBitSet!=null){
+					checkBitSet();
+				}
+//				paymentCreditCard.setVisibility(View.VISIBLE);
+//				paymentFortumo.setVisibility(View.VISIBLE);
 //				paymentGoogleWallet.setVisibility(View.VISIBLE);
 				break;
 			}
 			case 1:{
-				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
 //				paymentPerMonth.setVisibility(View.GONE);
 //				paymentPerYear.setVisibility(View.GONE);
 //				paymentUpgradeComment.setVisibility(View.GONE);
 //				paymentCreditCard.setVisibility(View.VISIBLE);
 //				paymentFortumo.setVisibility(View.GONE);
 //				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);				
+				paymentUpgradeComment.setVisibility(View.GONE);
+				
+				if(paymentBitSet!=null){
+					checkBitSet();
+				}
 				break;	
 			}
 			case 2:{
-				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
 //				paymentPerMonth.setVisibility(View.GONE);
 //				paymentPerYear.setVisibility(View.GONE);
 //				paymentUpgradeComment.setVisibility(View.GONE);
 //				paymentCreditCard.setVisibility(View.VISIBLE);
 //				paymentFortumo.setVisibility(View.GONE);
 //				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);				
+				paymentUpgradeComment.setVisibility(View.GONE);
+				
+				if(paymentBitSet!=null){
+					checkBitSet();
+				}
 				break;	
 			}
 			case 3:{
-				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
+//				((ManagerActivity)context).showCC(parameterType, accounts, paymentMonth, true);
 //				paymentPerMonth.setVisibility(View.GONE);
 //				paymentPerYear.setVisibility(View.GONE);
 //				paymentUpgradeComment.setVisibility(View.GONE);
 //				paymentCreditCard.setVisibility(View.VISIBLE);
 //				paymentFortumo.setVisibility(View.GONE);
 //				paymentGoogleWallet.setVisibility(View.VISIBLE);
+				paymentPerMonth.setVisibility(View.GONE);
+				paymentPerYear.setVisibility(View.GONE);				
+				paymentUpgradeComment.setVisibility(View.GONE);
+				
+				if(paymentBitSet!=null){
+					checkBitSet();
+				}
 				break;	
 			}
 		}
@@ -610,7 +641,48 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public static BitSet convertToBitSet(long value) {
+	    BitSet bits = new BitSet();
+	    int index = 0;
+	    while (value != 0L) {
+	      if (value % 2L != 0) {
+	        bits.set(index);
+	      }
+	      ++index;
+	      value = value >>> 1;
+	    }
+	    return bits;
+	}
 
+	public void checkBitSet()
+	{
+		log("checkBitSet, paymentMonth: "+paymentMonth+" parameterType: "+parameterType);
+				
+		for(int i=0; i< paymentBitSet.length();i++){
+			if(paymentBitSet.get(i)){
+				log("1 position: "+i);
+				switch (i)
+				{
+					case MegaApiAndroid.PAYMENT_METHOD_FORTUMO:
+					{
+						if(paymentMonth==1 && parameterType==4){
+							log("PAYMENT_METHOD_FORTUMO");
+							paymentFortumo.setVisibility(View.VISIBLE);
+						}
+						break;
+					}	
+					case MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD:
+					{
+						log("PAYMENT_METHOD_CREDIT_CARD");
+						paymentCreditCard.setVisibility(View.VISIBLE);
+						break;
+					}
+				}
+					
+			}
+		}	
+	}
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		
@@ -630,6 +702,15 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 //			if (request.getNumber() & (1 << MegaApiJava.PAYMENT_METHOD_CREDIT_CARD)){
 //				Toast.makeText(context, "EOEOEOE", Toast.LENGTH_LONG).show();
 //			}
+			paymentBitSet = convertToBitSet(request.getNumber());
+			
+			//Set the FORTUMO bit to 1
+//			paymentBitSet.set(6); 
+			
+			if(paymentMonth!=-1 && parameterType!=-1){
+				checkBitSet();  
+			}
+			
 		}		
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT ID: " + request.getLink());
@@ -819,6 +900,7 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 	
 	public int onBackPressed(){
 //		if (paymentMonth == -1){
+			paymentCreditCard.setVisibility(View.GONE);
 			((ManagerActivity)context).showUpAF();
 //		}
 //		else{
