@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.security.Principal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -31,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 
 public class ChooseAccountActivity extends PinActivity implements MegaRequestListenerInterface, OnClickListener{
@@ -87,6 +89,8 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 	private RelativeLayout pro1Layout;
 	private RelativeLayout pro3Layout;
 	private RelativeLayout pro2Layout;
+	
+	long paymentBitSetLong;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -237,7 +241,8 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		pricingPerMonth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
 		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		
+
+		megaApi.getPaymentMethods(this);
 		megaApi.getPricing(this);
 	}
 	
@@ -260,6 +265,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		intent = new Intent(this,ManagerActivity.class);
 		intent.putExtra("upgradeAccount", true);
 		intent.putExtra("accountType", 1);
+		intent.putExtra("paymentBitSetLong", paymentBitSetLong);
 		startActivity(intent);
 		finish();
 	}
@@ -272,6 +278,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		intent = new Intent(this,ManagerActivity.class);
 		intent.putExtra("upgradeAccount", true);
 		intent.putExtra("accountType", 2);
+		intent.putExtra("paymentBitSetLong", paymentBitSetLong);
 		startActivity(intent);
 		finish();
 	}
@@ -284,6 +291,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		intent = new Intent(this,ManagerActivity.class);
 		intent.putExtra("upgradeAccount", true);
 		intent.putExtra("accountType", 3);
+		intent.putExtra("paymentBitSetLong", paymentBitSetLong);
 		startActivity(intent);
 		finish();
 	}
@@ -296,6 +304,7 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 		intent = new Intent(this,ManagerActivity.class);
 		intent.putExtra("upgradeAccount", true);
 		intent.putExtra("accountType", 4);
+		intent.putExtra("paymentBitSetLong", paymentBitSetLong);
 		startActivity(intent);
 		finish();
 	}
@@ -338,6 +347,9 @@ public class ChooseAccountActivity extends PinActivity implements MegaRequestLis
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		DecimalFormat df = new DecimalFormat("#.##");
 
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+			paymentBitSetLong = request.getNumber();
+		}
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 			MegaPricing p = request.getPricing();
 

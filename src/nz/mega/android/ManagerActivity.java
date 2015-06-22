@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -380,7 +381,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     int levelInventory = -1;
     
     long numberOfSubscriptions = -1;
-    
     
     /*
 	 * Background task to emptying the Rubbish Bin
@@ -1044,6 +1044,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			bottomControlBar.setVisibility(View.GONE);
 	        
+			megaApi.getPaymentMethods(this);
 	        megaApi.getAccountDetails(this);
 	        megaApi.creditCardQuerySubscriptions(this);
 	        
@@ -1218,6 +1219,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						mDrawerLayout.closeDrawer(Gravity.LEFT);
 						int accountType = getIntent().getIntExtra("accountType", 0);
 						log("accountType: "+accountType);
+						long paymentBitSetLong = getIntent().getLongExtra("paymentBitSetLong", 0);
+						BitSet paymentBitSet = Util.convertToBitSet(paymentBitSetLong);;
 						switch (accountType){
 							case 0:{
 								log("intent firstTime==true");
@@ -1229,25 +1232,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							case 1:{	
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItem(drawerItem);
-								showpF(1, null);
+								showpF(1, null, paymentBitSet);
 								return;
 							}
 							case 2:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItem(drawerItem);
-								showpF(2, null);
+								showpF(2, null, paymentBitSet);
 								return;
 							}
 							case 3:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItem(drawerItem);
-								showpF(3, null);
+								showpF(3, null, paymentBitSet);
 								return;
 							}	
 							case 4:{
 								drawerItem = DrawerItem.ACCOUNT;
 								selectDrawerItem(drawerItem);
-								showpF(4, null);
+								showpF(4, null, paymentBitSet);
 								return;
 							}	
 						}							
@@ -1876,7 +1879,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -1933,7 +1936,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				//Show				
         			sortByMenuItem.setVisible(true);
         			selectMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
         			
     				//Hide
         			refreshMenuItem.setVisible(false);
@@ -2040,7 +2043,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
@@ -2097,7 +2100,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(true);
 	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			settingsMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(true);
@@ -2216,7 +2219,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				selectMenuItem.setVisible(true);
     				sortByMenuItem.setVisible(true);
     				thumbViewMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
 
     				
         			//Hide
@@ -2293,7 +2296,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(true);
 	    			sortByMenuItem.setVisible(false);
 	    			helpMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
@@ -2353,7 +2356,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (createFolderMenuItem != null){
     				//Show
     				pauseRestartTransfersItem.setVisible(true);
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
         			
     				//Hide
     				createFolderMenuItem.setVisible(false);
@@ -2416,7 +2419,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2472,7 +2475,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
         			sortByMenuItem.setVisible(false);
-        			upgradeAccountMenuItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2527,7 +2530,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			createFolderMenuItem.setVisible(false);
 	    			addMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(true);
@@ -2717,10 +2720,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (ccF != null){
 						int parameterType = ccF.getParameterType();
 						ArrayList<Product> accounts = ccF.getAccounts();
-						showpF(parameterType, accounts);
+						BitSet paymentBitSet = ccF.getPaymentBitSet();
+						showpF(parameterType, accounts, paymentBitSet);
 					}
 					else{
-						showUpAF();
+						showUpAF(null);
 					}
 					return;
 				}
@@ -2877,7 +2881,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				sortByMenuItem.setVisible(true);
 				thumbViewMenuItem.setVisible(true);
 				rubbishBinMenuItem.setVisible(false);				
-    			upgradeAccountMenuItem.setVisible(true);    			
+    			upgradeAccountMenuItem.setVisible(false);    			
     			importLinkMenuItem.setVisible(true);
     			takePicture.setVisible(true);
     			
@@ -2915,7 +2919,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
-	    			upgradeAccountMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
 	    			
 	    			//Hide	
 	    			pauseRestartTransfersItem.setVisible(false);
@@ -2945,7 +2949,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			else{
 				//Show
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			
     			//Hide	
     			addContactMenuItem.setVisible(false);
@@ -2984,7 +2988,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
@@ -3024,7 +3028,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
     			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
@@ -3050,7 +3054,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (inSF != null){
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(false);
 
 					addMenuItem.setEnabled(true);
 					addMenuItem.setVisible(true);
@@ -3091,7 +3095,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(true);
+					upgradeAccountMenuItem.setVisible(false);
 
 
 					log("parentHandleOutgoing: "+parentHandleOutgoing);
@@ -3129,7 +3133,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//Show
 				refreshMenuItem.setVisible(true);
 				helpMenuItem.setVisible(true);
-				upgradeAccountMenuItem.setVisible(true);
+				upgradeAccountMenuItem.setVisible(false);
 				changePass.setVisible(true); 
 				
 				//Hide
@@ -3172,7 +3176,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.TRANSFERS){
 				//Show
 				pauseRestartTransfersItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			
 				//Hide
 				createFolderMenuItem.setVisible(false);
@@ -3214,7 +3218,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			sortByMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(false); //TODO
     			selectMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -3250,7 +3254,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (createFolderMenuItem != null){
 					
 					//Show
-	    			upgradeAccountMenuItem.setVisible(true);	    			
+	    			upgradeAccountMenuItem.setVisible(false);	    			
 
 					//Hide
 	    			thumbViewMenuItem.setVisible(false);
@@ -3282,7 +3286,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 				
 				//Show
-    			upgradeAccountMenuItem.setVisible(true);
+    			upgradeAccountMenuItem.setVisible(false);
     			selectMenuItem.setVisible(true);
     			takePicture.setVisible(true);
 
@@ -4426,7 +4430,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	}
 	        case R.id.action_menu_upgrade_account:{
 	        	drawerItem = DrawerItem.ACCOUNT;
-	        	showUpAF();
+	        	showUpAF(null);
 				return true;
 	        }
 	        case R.id.action_menu_settings:{
@@ -7923,7 +7927,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}		
 	}
 	
-	public void showUpAF(){
+	public void showUpAF(BitSet paymentBitSet){
 		
 //		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("maF");
 //        FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -7944,20 +7948,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if(upAF==null){
 			upAF = new UpgradeAccountFragment();
+			upAF.setInfo(paymentBitSet);
 			ft.replace(R.id.fragment_container, upAF, "upAF");
 			ft.commit();
 		}
-		else{			
+		else{
+			upAF.setInfo(paymentBitSet);
 			ft.replace(R.id.fragment_container, upAF, "upAF");
 			ft.commit();
 		}
 	}
 	
-	public void showpF(int type, ArrayList<Product> accounts){
-		showpF(type, accounts, false);
+	public void showpF(int type, ArrayList<Product> accounts, BitSet paymentBitSet){
+		showpF(type, accounts, false, paymentBitSet);
 	}
 	
-	public void showpF(int type, ArrayList<Product> accounts, boolean refresh){
+	public void showpF(int type, ArrayList<Product> accounts, boolean refresh, BitSet paymentBitSet){
 		log("showpF");
 		
 		accountFragment=PAYMENT_FRAGMENT;
@@ -7970,12 +7976,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (!refresh){
 			if(pF==null){			
 				pF = new PaymentFragment();
-				pF.setInfo(type, accounts);
+				pF.setInfo(type, accounts, paymentBitSet);
 				ft.replace(R.id.fragment_container, pF, "pF");
 				ft.commit();
 			}
 			else{			
-				pF.setInfo(type, accounts);			
+				pF.setInfo(type, accounts, paymentBitSet);			
 				ft.replace(R.id.fragment_container, pF, "pF");
 				ft.commit();
 			}
@@ -7990,12 +7996,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				if(pF==null){			
 					pF = new PaymentFragment();
-					pF.setInfo(type, accounts);
+					pF.setInfo(type, accounts, paymentBitSet);
 					ft.replace(R.id.fragment_container, pF, "pF");
 					ft.commit();
 				}
 				else{			
-					pF.setInfo(type, accounts);			
+					pF.setInfo(type, accounts, paymentBitSet);			
 					ft.replace(R.id.fragment_container, pF, "pF");
 					ft.commit();
 				}
@@ -8005,25 +8011,25 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void onUpgrade1Click(View view) {
 		if (upAF != null){
-			showpF(1, upAF.getAccounts());
+			showpF(1, upAF.getAccounts(), upAF.getPaymentBitSet());
 		}
 	}
 
 	public void onUpgrade2Click(View view) {
 		if (upAF != null){
-			showpF(2, upAF.getAccounts());
+			showpF(2, upAF.getAccounts(), upAF.getPaymentBitSet());
 		}
 	}
 
 	public void onUpgrade3Click(View view) {
 		if (upAF != null){
-			showpF(3, upAF.getAccounts());
+			showpF(3, upAF.getAccounts(), upAF.getPaymentBitSet());
 		}
 	}
 	
 	public void onUpgradeLiteClick(View view){
 		if (upAF != null){
-			showpF(4, upAF.getAccounts());
+			showpF(4, upAF.getAccounts(), upAF.getPaymentBitSet());
 		}
 	}
 	
@@ -8042,11 +8048,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		selectDrawerItem(drawerItem);
 	}
 	
-	public void showCC(int type, ArrayList<Product> accounts, int payMonth){
-		showCC(type, accounts, payMonth, false);
+	public void showCC(int type, ArrayList<Product> accounts, int payMonth, BitSet paymentBitSet){
+		showCC(type, accounts, payMonth, false, paymentBitSet);
 	}
 	
-	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh){
+	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh, BitSet paymentBitSet){
 		accountFragment = CC_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
@@ -8056,12 +8062,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		if (!refresh){
 			if (ccF == null){
 				ccF = new CreditCardFragment();
-				ccF.setInfo(type, accounts, payMonth);
+				ccF.setInfo(type, accounts, payMonth, paymentBitSet);
 				ft.replace(R.id.fragment_container, ccF, "ccF");
 				ft.commit();
 			}
 			else{			
-				ccF.setInfo(type, accounts, payMonth);			
+				ccF.setInfo(type, accounts, payMonth, paymentBitSet);			
 				ft.replace(R.id.fragment_container, ccF, "ccF");
 				ft.commit();
 			}
@@ -8076,12 +8082,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				if (ccF == null){
 					ccF = new CreditCardFragment();
-					ccF.setInfo(type, accounts, payMonth);
+					ccF.setInfo(type, accounts, payMonth, paymentBitSet);
 					ft.replace(R.id.fragment_container, ccF, "ccF");
 					ft.commit();
 				}
 				else{			
-					ccF.setInfo(type, accounts, payMonth);			
+					ccF.setInfo(type, accounts, payMonth, paymentBitSet);			
 					ft.replace(R.id.fragment_container, ccF, "ccF");
 					ft.commit();
 				}
@@ -8115,7 +8121,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void upgradeAccountButton(){
 		log("upgradeAccountButton");
 		drawerItem = DrawerItem.ACCOUNT;
-    	showUpAF();
+//    	showUpAF();
 	}
 
 	public long getNumberOfSubscriptions(){

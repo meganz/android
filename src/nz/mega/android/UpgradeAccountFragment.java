@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaAccountDetails;
@@ -90,6 +91,8 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	Context context;
 	MegaUser myUser;
 	
+	BitSet paymentBitSet = null;
+	
 	@Override
 	public void onDestroy(){				
 		if(megaApi != null)
@@ -110,6 +113,10 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		
 		super.onCreate(savedInstanceState);
 		log("onCreate");
+	}
+	
+	public void setInfo (BitSet paymentBitSet){
+		this.paymentBitSet = paymentBitSet;
 	}
 	
 	
@@ -259,6 +266,9 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 //		double saving3 = 2999/100.00;	    	            
 //		String saving3String =df.format(saving3);
 //		pricingPerMonth3.setText("from " + saving3String +" € per month");
+		if (paymentBitSet == null){
+			megaApi.getPaymentMethods(this);
+		}
 		
 		megaApi.getAccountDetails(this);
 
@@ -268,19 +278,27 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	}	
 
 	public void onUpgrade1Click(View view) {
-		((ManagerActivity)context).showpF(1, accounts);
+		if (paymentBitSet != null){
+			((ManagerActivity)context).showpF(1, accounts, paymentBitSet);
+		}
 	}
 
 	public void onUpgrade2Click(View view) {
-		((ManagerActivity)context).showpF(2, accounts);
+		if (paymentBitSet != null){
+			((ManagerActivity)context).showpF(2, accounts, paymentBitSet);
+		}
 	}
 
 	public void onUpgrade3Click(View view) {
-		((ManagerActivity)context).showpF(3, accounts);
+		if (paymentBitSet != null){
+			((ManagerActivity)context).showpF(3, accounts, paymentBitSet);
+		}
 	}
 	
 	public void onUpgradeLiteClick(View view){
-		((ManagerActivity)context).showpF(4, accounts);
+		if (paymentBitSet != null){
+			((ManagerActivity)context).showpF(4, accounts, paymentBitSet);
+		}
 	}
 
 	@Override
@@ -299,6 +317,11 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
 		DecimalFormat df = new DecimalFormat("#.##");
 
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				paymentBitSet = Util.convertToBitSet(request.getNumber());
+			}
+		}
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 			MegaPricing p = request.getPricing();
 
@@ -474,6 +497,10 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	
 	public ArrayList<Product> getAccounts(){
 		return accounts;
+	}
+	
+	public BitSet getPaymentBitSet(){
+		return paymentBitSet;
 	}
 	
 	@Override

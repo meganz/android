@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import nz.mega.android.utils.Util;
@@ -142,6 +143,7 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	ArrayList<Product> accounts;
 	CreditCardFragment paymentFragment = this;
 	int paymentMonth = -1;
+	BitSet paymentBitSet = null;
 	
 	@Override
 	public void onDestroy(){
@@ -705,10 +707,11 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 ////		}
 	}
 	
-	public void setInfo (int _type, ArrayList<Product> _accounts, int _paymentMonth){
+	public void setInfo (int _type, ArrayList<Product> _accounts, int _paymentMonth, BitSet _paymentBitSet){
 		this.accounts = _accounts;
 		this.parameterType = _type;
 		this.paymentMonth = _paymentMonth;
+		this.paymentBitSet = _paymentBitSet;
 	}
 	
 	public ArrayList<Product> getAccounts(){
@@ -717,6 +720,10 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	
 	public int getParameterType(){
 		return parameterType;
+	}
+	
+	public BitSet getPaymentBitSet(){
+		return paymentBitSet;
 	}
 	
 
@@ -821,7 +828,7 @@ public class CreditCardFragment extends Fragment implements MegaRequestListenerI
 	
 	public int onBackPressed(){
 //		((ManagerActivity)context).showpF(parameterType, accounts);
-		((ManagerActivity)context).showpF(parameterType, accounts, true);
+		((ManagerActivity)context).showpF(parameterType, accounts, true, paymentBitSet);
 		return 3;
 	}
 	
