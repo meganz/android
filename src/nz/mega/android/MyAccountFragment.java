@@ -2,6 +2,7 @@ package nz.mega.android;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Locale;
 
 import nz.mega.android.ManagerActivity.DrawerItem;
@@ -96,6 +97,14 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	private boolean firstName = false;
 	String nameText;
 	String firstNameText;
+	
+	long paymentBitSetLong;
+	BitSet paymentBitSet = null;
+	int accountType;
+	MegaAccountDetails accountInfo = null;
+	
+	boolean getPaymentMethodsBoolean = false;
+	boolean accountDetailsBoolean = false;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -203,6 +212,9 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 		}		
 		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
 		
+		getPaymentMethodsBoolean = false;
+		accountDetailsBoolean = false;
+		megaApi.getPaymentMethods(this);
 		megaApi.getAccountDetails(this);
 		numberOfSubscriptions = ((ManagerActivity)context).getNumberOfSubscriptions();
 
@@ -326,7 +338,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 //					((ManagerActivity)context).paySubs();
 //				}				
 				
-				((ManagerActivity)context).showUpAF();
+				((ManagerActivity)context).showUpAF(paymentBitSet);
 				break;
 			}
 		}
@@ -421,13 +433,43 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 				userNameTextView.setText(request.getName());
 			}
 		}
+		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				paymentBitSetLong = request.getNumber();
+				paymentBitSet = Util.convertToBitSet(request.getNumber());
+				getPaymentMethodsBoolean = true;
+				if (accountDetailsBoolean == true){
+					if (upgradeButton != null){
+						if (accountInfo != null){
+							if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+								Time now = new Time();
+								now.setToNow();
+								if (accountType != 0){
+									if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
+										if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+											upgradeButton.setVisibility(View.VISIBLE);
+										}
+									}
+								}
+								else{
+									if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+										upgradeButton.setVisibility(View.VISIBLE);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK && typeAccount != null)
 			{
-				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+				accountInfo = request.getMegaAccountDetails();
 				
-				int accountType = accountInfo.getProLevel();
+				accountType = accountInfo.getProLevel();
+				accountDetailsBoolean = true;
 				switch(accountType){				
 				
 					case 0:{	  
@@ -470,20 +512,23 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 					
 				}
 				
-				if (upgradeButton != null){
-//					if (accountType == 0){
-//						upgradeButton.setVisibility(View.VISIBLE);
-//					}
-					if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
-						Time now = new Time();
-						now.setToNow();
-						if (accountType != 0){
-							if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
-								upgradeButton.setVisibility(View.VISIBLE);
+				if (getPaymentMethodsBoolean == true){
+					if (upgradeButton != null){
+						if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+							Time now = new Time();
+							now.setToNow();
+							if (accountType != 0){
+								if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
+									if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+										upgradeButton.setVisibility(View.VISIBLE);
+									}
+								}
 							}
-						}
-						else{
-							upgradeButton.setVisibility(View.VISIBLE);
+							else{
+								if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+									upgradeButton.setVisibility(View.VISIBLE);
+								}
+							}
 						}
 					}
 				}
