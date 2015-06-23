@@ -11,6 +11,7 @@ import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -1202,6 +1203,33 @@ public class Util {
 		}
 		
 		return yearList;
+	}
+	
+	public static BitSet convertToBitSet(long value) {
+	    BitSet bits = new BitSet();
+	    int index = 0;
+	    while (value != 0L) {
+	      if (value % 2L != 0) {
+	        bits.set(index);
+	      }
+	      ++index;
+	      value = value >>> 1;
+	    }
+	    return bits;
+	}
+	
+	public static boolean checkBitSet(BitSet paymentBitSet, int position){
+		if (paymentBitSet != null){
+			if (paymentBitSet.get(position)){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else{
+			return false;
+		}
 	}
 
 	private static void log(String message) {
