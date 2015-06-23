@@ -3,6 +3,7 @@ package nz.mega.android;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -660,7 +661,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		String projection[] = {	MediaColumns.DATA, 
 				//MediaColumns.MIME_TYPE, 
-				//MediaColumns.DATE_MODIFIED,
+				MediaColumns.DATE_ADDED,
 				MediaColumns.DATE_MODIFIED};
 		
 		String selectionCamera = null;
@@ -672,13 +673,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if (prefs != null){
 			if (prefs.getCamSyncTimeStamp() != null){				
 				long camSyncTimeStamp = Long.parseLong(prefs.getCamSyncTimeStamp());
-				selectionCamera = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp;
+				selectionCamera = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + camSyncTimeStamp + " OR " + "(" + MediaColumns.DATE_ADDED + "*1000) > " + camSyncTimeStamp;
 				log("SELECTION: " + selectionCamera);
 			}
 			if(secondaryEnabled){
 				if (prefs.getSecSyncTimeStamp() != null){
 					long secondaryTimeStamp = Long.parseLong(prefs.getSecSyncTimeStamp());
-					selectionSecondary = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp;
+					selectionSecondary = "(" + MediaColumns.DATE_MODIFIED + "*1000) > " + secondaryTimeStamp + " OR " + "(" + MediaColumns.DATE_ADDED + "*1000) > " + secondaryTimeStamp;
 					log("SELECTION SECONDARY: " + selectionSecondary);
 				}	
 			}
@@ -718,11 +719,22 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			
 			Cursor cursorCamera = app.getContentResolver().query(uris.get(i), projection, selectionCamera, selectionArgs, order);
 			if (cursorCamera != null){
+				
 				int dataColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATA);
-		        int timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+				int timestampColumn = 0;
+				if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
+					timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+				}
+				else
+				{
+					timestampColumn = cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+				}
+		        
 		        while(cursorCamera.moveToNext()){
+   	
 		        	Media media = new Media();
 			        media.filePath = cursorCamera.getString(dataColumn);
+//			        log("Tipo de fichero:--------------------------: "+media.filePath);
 			        media.timestamp = cursorCamera.getLong(timestampColumn) * 1000;
 			        
 			        //Check files of the Camera Uploads
@@ -740,7 +752,14 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("SecondaryEnabled en initsync COUNT: "+cursorSecondary.getCount());
 				if (cursorSecondary != null){
 					int dataColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATA);
-			        int timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+			        int timestampColumn = 0;
+			        if(cursorCamera.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED)==0){
+			        	timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_MODIFIED);
+					}
+					else
+					{
+						timestampColumn = cursorSecondary.getColumnIndexOrThrow(MediaColumns.DATE_ADDED);
+					}
 			        while(cursorSecondary.moveToNext()){
 			        	Media media = new Media();
 				        media.filePath = cursorSecondary.getString(dataColumn);
@@ -762,7 +781,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			finish();
 			return;
 		}
-		
+	
 //		if(secondaryEnabled){
 //			if(secondaryUploadHandle==-1){
 //				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
@@ -817,7 +836,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void uploadNext(){
 		try {
 			Thread.sleep(100);
