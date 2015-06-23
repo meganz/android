@@ -415,20 +415,22 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 					}
 					
 					prefs = dbH.getPreferences();
-					if (prefs.getCamSyncEnabled() != null){
-						if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-							log("Enciendo el servicio de la camara");
-							handler.postDelayed(new Runnable() {
-								
-								@Override
-								public void run() {
-									log("Now I start the service");
-									startService(new Intent(getApplicationContext(), CameraSyncService.class));		
-								}
-							}, 30 * 1000);
+					if(prefs!=null)
+					{
+						if (prefs.getCamSyncEnabled() != null){
+							if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+								log("Enciendo el servicio de la camara");
+								handler.postDelayed(new Runnable() {
+									
+									@Override
+									public void run() {
+										log("Now I start the service");
+										startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+									}
+								}, 30 * 1000);
+							}
 						}
 					}
-					
 					this.startActivity(intent);
 					this.finish();
 					return;
