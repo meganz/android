@@ -124,6 +124,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		
 		@Override
 		protected List<ShareInfo> doInBackground(Intent... params) {
+			log("FilePrepareTask: doInBackground");
 			return ShareInfo.processIntent(params[0], context);
 		}
 
@@ -538,6 +539,8 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 			
 		}
 		else if (mode == UPLOAD){
+			log("mode UPLOAD");
+			
 			if (filePreparedInfos == null){
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(getIntent());
