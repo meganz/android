@@ -103,7 +103,7 @@ public class ShareInfo {
 				for (String key : extras.keySet()) {
 					log("Key " + key);
 				}
-				return null;
+				return processIntentMultiple(intent, context);
 			}
 		// Get File info from Data URI
 		} else {
@@ -129,7 +129,9 @@ public class ShareInfo {
 	 */
 	public static List<ShareInfo> processIntentMultiple(Intent intent,
 			Context context) {
+		log("processIntentMultiple");
 		ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+
 		if (imageUris == null || imageUris.size() == 0) {
 			return null;
 		}
@@ -137,7 +139,7 @@ public class ShareInfo {
 		for (Uri uri : imageUris) {
 			if (uri == null)
 				continue;
-			log(uri.toString());
+			log("----: "+uri.toString());
 			ShareInfo info = new ShareInfo();
 			info.processUri(uri, context);
 			if (info.file == null) {
