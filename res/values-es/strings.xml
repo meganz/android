@@ -286,6 +286,8 @@
     <string name="context_no_removed" context="error message">Error. No se pudo borrar de MEGA</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Enviado correctamente a:</string>
     
+    <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>
+    
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí...</string>
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Atrás</string>

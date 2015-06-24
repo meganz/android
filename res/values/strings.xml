@@ -301,6 +301,8 @@
     <string name="context_no_removed" context="error message">Error. Not removed from MEGA</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
     
+    <string name="context_select_one_file" context="option available for just one file">Select just one file.</string>
+    
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your Mega subscription. Please let us know, if there is anything we can do to help change your mind.</string>
     <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here...</string>
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Dismiss</string>
