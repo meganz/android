@@ -1,10 +1,13 @@
 package nz.mega.android.utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.nio.channels.FileChannel;
@@ -50,6 +53,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Environment;
 import android.os.StatFs;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
@@ -442,11 +446,62 @@ public class Util {
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
+		File logFile=null;
 		if (DEBUG) {
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
+			
+			//Send the log to a file
+			/*
+			String dir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/";
+//			String file = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+logDIR+"/log.txt";
+			File dirFile = new File(dir);
+			if(!dirFile.exists()){
+				dirFile.mkdirs();
+				logFile = new File(dirFile, "log.txt");
+				if(!logFile.exists()){
+					try {
+						logFile.createNewFile();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}				
+			}
+			else{
+				logFile = new File(dirFile, "log.txt");
+				if(!logFile.exists()){
+					try {
+						logFile.createNewFile();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}		
+			}
+
+			if(logFile!=null&&logFile.exists()){
+				appendStringToFile(origin+": "+message+"\n", logFile);
+			}*/
+				
 //			Log.e(origin, message + "");
 		}
 	}
+	
+	public static boolean appendStringToFile(final String appendContents, final File file) {
+	      boolean result = false;
+	      try {
+            if (file != null && file.canWrite()) {
+               file.createNewFile(); // ok if returns false, overwrite
+               Writer out = new BufferedWriter(new FileWriter(file, true), 1024);
+               out.write(appendContents);
+               out.close();   
+               result = true;
+            }
+	      } catch (IOException e) {
+	      //   Log.e(Constants.LOG_TAG, "Error appending string data to file " + e.getMessage(), e);
+	      }
+	      return result;
+	   }
 	
 	public static void brandAlertDialog(AlertDialog dialog) {
 	    try {

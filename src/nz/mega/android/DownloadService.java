@@ -194,6 +194,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		log("onStartCommand");
 		
 		if(intent == null){
+			log("intent==null");
 			return START_NOT_STICKY;
 		}
 		
@@ -283,25 +284,31 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			megaApi = app.getMegaApi();
 		}
 		
-		currentDocument = megaApi.getNodeByHandle(hash);
+		currentDocument = megaApi.getNodeByHandle(hash);		
 	
 		if((currentDocument == null) && (url == null)){
 			log("Node not found");
 			return;
 		}
+		else{
+			log("currentDocument: "+currentDocument.getName());
+		}
 		
 		if(url != null){
 			log("Public node");
 			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
+			log("currentDir: "+currentDir.getName());
 			megaApi.getPublicNode(url, this);
 			return;
 		}
 		
 		currentDir = getDir(currentDocument, intent);
 		if (currentDir.isDirectory()){
+			log("currentDir is Directory");
 			currentFile = new File(currentDir, megaApi.nameToLocal(currentDocument.getName()));
 		}
 		else{
+			log("currentDir is File");
 			currentFile = currentDir;
 		}
 		log("dir: " + currentDir.getAbsolutePath() + " file: " + currentDocument.getName() + "  Size: " + currentDocument.getSize());
@@ -372,6 +379,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}	
 
 	private File getDir(MegaNode document, Intent intent) {
+		log("getDir");
 		boolean toDownloads = (intent.hasExtra(EXTRA_PATH) == false);
 		File destDir;
 		if (toDownloads) {
@@ -384,6 +392,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 	
 	boolean checkCurrentFile(MegaNode document)	{
+		log("checkCurrentFile");
 		if(currentFile.exists() && (document.getSize() == currentFile.length())){
 			
 			currentFile.setReadable(true, false);
@@ -655,6 +664,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	 * Cancel download
 	 */
 	private void cancel() {
+		log("cancel");
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
@@ -781,7 +791,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	    	
 	    	String sourceLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.advancesDevicesDIR + "/"+fileName;
 	    	
-	    	log("Voy a copiar: "+sourceLocation);
+	    	log("Gonna copy: "+sourceLocation);
 	    	
 	        ParcelFileDescriptor pfd = getContentResolver().openFileDescriptor(uri, "w");
 	        FileOutputStream fileOutputStream = new FileOutputStream(pfd.getFileDescriptor());
@@ -847,6 +857,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	}
 	
 	private void getDlList(Map<MegaNode, String> dlFiles, MegaNode parent, File folder) {
+		log("getDlList");
 		
 		if (megaApi.getRootNode() == null)
 			return;
@@ -1301,6 +1312,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("onRequestFinish");
 		
 		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
 			log("cancel_transfers received");
