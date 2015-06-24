@@ -446,7 +446,7 @@ public class Util {
 	 * Global log handler
 	 */
 	public static void log(String origin, String message) {
-		File logFile=null;
+//		File logFile=null;
 		if (DEBUG) {
 			MegaApiAndroid.log(MegaApiAndroid.LOG_LEVEL_INFO, message, origin);
 			
