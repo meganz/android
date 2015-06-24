@@ -873,68 +873,68 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					log("ManagerActivity.CONTACT_FILE_ADAPTER: "+accessLevel);					
 					
 					switch (accessLevel) {
-					case MegaShare.ACCESS_FULL: {
-
-						holder.optionDownload.setVisibility(View.VISIBLE);
-						holder.optionProperties.setVisibility(View.VISIBLE);
-						
-						if(node.isFile()){
-							holder.optionLeaveShare.setVisibility(View.GONE);
+						case MegaShare.ACCESS_FULL: {
+	
+							holder.optionDownload.setVisibility(View.VISIBLE);
+							holder.optionProperties.setVisibility(View.VISIBLE);
+							
+							if(node.isFile()){
+								holder.optionLeaveShare.setVisibility(View.GONE);
+							}
+							else {
+								holder.optionLeaveShare.setVisibility(View.VISIBLE);
+							}
+							holder.optionPublicLink.setVisibility(View.GONE);
+							holder.optionRemoveTotal.setVisibility(View.GONE);
+							holder.optionClearShares.setVisibility(View.GONE);
+							holder.optionRename.setVisibility(View.VISIBLE);
+							holder.optionDelete.setVisibility(View.GONE);
+							holder.optionMoveTo.setVisibility(View.GONE);
+	
+							break;
 						}
-						else {
-							holder.optionLeaveShare.setVisibility(View.VISIBLE);
+						case MegaShare.ACCESS_READ: {
+							log("read");
+							holder.optionDownload.setVisibility(View.VISIBLE);
+							holder.optionProperties.setVisibility(View.VISIBLE);	
+							holder.optionPublicLink.setVisibility(View.GONE);
+							holder.optionRename.setVisibility(View.GONE);
+							holder.optionDelete.setVisibility(View.GONE);
+							holder.optionRemoveTotal.setVisibility(View.GONE);
+							holder.optionClearShares.setVisibility(View.GONE);
+							holder.optionMore.setVisibility(View.GONE);
+							holder.optionMoveTo.setVisibility(View.GONE);
+							
+							if(node.isFile()){
+								holder.optionLeaveShare.setVisibility(View.GONE);
+							}
+							else {
+								holder.optionLeaveShare.setVisibility(View.VISIBLE);
+							}						
+							break;
 						}
-						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRemoveTotal.setVisibility(View.GONE);
-						holder.optionClearShares.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.VISIBLE);
-						holder.optionDelete.setVisibility(View.GONE);
-						holder.optionMoveTo.setVisibility(View.GONE);
-
-						break;
-					}
-					case MegaShare.ACCESS_READ: {
-						log("read");
-						holder.optionDownload.setVisibility(View.VISIBLE);
-						holder.optionProperties.setVisibility(View.VISIBLE);	
-						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.GONE);
-						holder.optionDelete.setVisibility(View.GONE);
-						holder.optionRemoveTotal.setVisibility(View.GONE);
-						holder.optionClearShares.setVisibility(View.GONE);
-						holder.optionMore.setVisibility(View.GONE);
-						holder.optionMoveTo.setVisibility(View.GONE);
-						
-						if(node.isFile()){
-							holder.optionLeaveShare.setVisibility(View.GONE);
+						case MegaShare.ACCESS_READWRITE: {
+							log("readwrite");
+							holder.optionDownload.setVisibility(View.VISIBLE);
+							holder.optionProperties.setVisibility(View.VISIBLE);
+							//						holder.shareDisabled.setVisibility(View.VISIBLE);
+							holder.optionPublicLink.setVisibility(View.GONE);
+							holder.optionRename.setVisibility(View.GONE);
+							holder.optionDelete.setVisibility(View.GONE);
+							holder.optionRemoveTotal.setVisibility(View.GONE);
+							holder.optionClearShares.setVisibility(View.GONE);
+							holder.optionMoveTo.setVisibility(View.GONE);
+							if(node.isFile()){
+								holder.optionLeaveShare.setVisibility(View.GONE);
+							}
+							else {
+								holder.optionLeaveShare.setVisibility(View.VISIBLE);
+							}
+							
+							holder.optionMore.setVisibility(View.VISIBLE);
+	
+							break;
 						}
-						else {
-							holder.optionLeaveShare.setVisibility(View.VISIBLE);
-						}						
-						break;
-					}
-					case MegaShare.ACCESS_READWRITE: {
-						log("readwrite");
-						holder.optionDownload.setVisibility(View.VISIBLE);
-						holder.optionProperties.setVisibility(View.VISIBLE);
-						//						holder.shareDisabled.setVisibility(View.VISIBLE);
-						holder.optionPublicLink.setVisibility(View.GONE);
-						holder.optionRename.setVisibility(View.VISIBLE);
-						holder.optionDelete.setVisibility(View.GONE);
-						holder.optionRemoveTotal.setVisibility(View.GONE);
-						holder.optionClearShares.setVisibility(View.GONE);
-						holder.optionMoveTo.setVisibility(View.GONE);
-						if(node.isFile()){
-							holder.optionLeaveShare.setVisibility(View.GONE);
-						}
-						else {
-							holder.optionLeaveShare.setVisibility(View.VISIBLE);
-						}
-						
-						holder.optionMore.setVisibility(View.VISIBLE);
-
-						break;
-					}
 					}
 				} 
 				else if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER) {
@@ -1349,49 +1349,103 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
 				
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle(R.string.more_options_overflow);
-				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which){
-							case 0:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ManagerActivity) context).showMove(handleList);
-								break;
-							}
-							case 1:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ManagerActivity) context).showCopy(handleList);
-								break;
-							}
-						}
-
-						dialog.dismiss();
-					}
-				});
+				//Differenciate FullAccess and Read&Write
+				MegaNode folder;
 				
-				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
+				if (n.isFile())
+					folder = megaApi.getParentNode(n);
+				else
+					folder = n;
 
-				moreOptionsDialog = builder.create();
-				moreOptionsDialog.show();
-				Util.brandAlertDialog(moreOptionsDialog);
-			}
-			
+				int accessLevel = megaApi.getAccess(folder);
+
+				switch (accessLevel) {
+					case MegaShare.ACCESS_FULL: {
+						log("more access full");
+						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setTitle(R.string.more_options_overflow);
+						builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which){
+									case 0:{
+										setPositionClicked(-1);
+										notifyDataSetChanged();
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(n.getHandle());									
+										((ManagerActivity) context).showMove(handleList);
+										break;
+									}
+									case 1:{
+										setPositionClicked(-1);
+										notifyDataSetChanged();
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(n.getHandle());									
+										((ManagerActivity) context).showCopy(handleList);
+										break;
+									}
+								}
+
+								dialog.dismiss();
+							}
+						});					
+						
+						builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+
+						moreOptionsDialog = builder.create();
+						moreOptionsDialog.show();
+						Util.brandAlertDialog(moreOptionsDialog);
+						
+						break;
+					}
+					case MegaShare.ACCESS_READWRITE: {
+						log("more readwrite");
+						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_copy)});
+						AlertDialog.Builder builder = new AlertDialog.Builder(context);
+						builder.setTitle(R.string.more_options_overflow);
+						builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								switch (which){
+									case 0:{
+										setPositionClicked(-1);
+										notifyDataSetChanged();
+										ArrayList<Long> handleList = new ArrayList<Long>();
+										handleList.add(n.getHandle());									
+										((ManagerActivity) context).showCopy(handleList);
+										break;
+									}
+								}
+
+								dialog.dismiss();
+							}
+						});					
+						
+						builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
+							
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+
+						moreOptionsDialog = builder.create();
+						moreOptionsDialog.show();
+						Util.brandAlertDialog(moreOptionsDialog);
+	
+						break;
+					}
+				}	
+			}			
 			else if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
 //				((ManagerActivity) context).showOverflowMenu(n);
 				AlertDialog moreOptionsDialog;
