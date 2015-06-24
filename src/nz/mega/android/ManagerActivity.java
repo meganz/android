@@ -342,7 +342,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	String pathNavigation = "/";	
 	long lastTimeOnTransferUpdate = -1;	
 	boolean firstTimeCam = false;
-	
+	int accountType = -1;
+	long usedGbStorage = -1;
 	AlertDialog overquotaDialog;
 	
 	String titleAB = "";
@@ -4998,7 +4999,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
 				
 				
-				int accountType = accountInfo.getProLevel();
+				accountType = accountInfo.getProLevel();
 				
 				switch (accountType){
 					case 0:{
@@ -5034,7 +5035,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				
 				long totalStorage = accountInfo.getStorageMax();
-				long usedStorage = accountInfo.getStorageUsed();
+				long usedStorage = accountInfo.getStorageUsed();;
 				boolean totalGb = false;				
 		        
 		        bottomControlBar.setVisibility(View.VISIBLE);
@@ -5058,16 +5059,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
 				String used = "";
 				if(totalGb){
-					
-					used = used + usedStorage + " GB";
-					
+					usedGbStorage = usedStorage;
+					used = used + usedStorage + " GB";					
 				}
 				else{
 					if (usedStorage >= 1024){
+						usedGbStorage = usedStorage;
 						usedStorage = usedStorage / 1024;
+
 						used = used + usedStorage + " TB";
 					}
 					else{
+						usedGbStorage = usedStorage;
 						used = used + usedStorage + " GB";
 					}
 				}
@@ -5745,7 +5748,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	File destination;
 	
 	public void onFileClick(ArrayList<Long> handleList){
-		log("onFileClick");
+		log("onFileClick: "+handleList.size()+" files to download");
 		long size = 0;
 		long[] hashes = new long[handleList.size()];
 		for (int i=0;i<handleList.size();i++){
@@ -5763,9 +5766,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		String downloadLocationDefaultPath = Util.downloadDIR;
 		prefs = dbH.getPreferences();		
 		if (prefs != null){
-			if (prefs.getStorageAskAlways() != null){
+			log("prefs != null");
+			if (prefs.getStorageAskAlways() != null){				
 				if (!Boolean.parseBoolean(prefs.getStorageAskAlways())){
-					//askMe==false
+					log("askMe==false");
 					if (prefs.getStorageDownloadLocation() != null){
 						if (prefs.getStorageDownloadLocation().compareTo("") != 0){
 							askMe = false;
@@ -5775,6 +5779,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				else
 				{
+					log("askMe==true");
 					//askMe=true
 					if (prefs.getStorageAdvancedDevices() != null){
 						advancedDevices = Boolean.parseBoolean(prefs.getStorageAdvancedDevices());						
@@ -5785,8 +5790,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}		
 			
 		if (askMe){
-			
+			log("askMe");
 			if(advancedDevices){
+				log("advancedDevices");
 				//Launch Intent to SAF
 				if(hashes.length==1){
 					downloadLocationDefaultPath = prefs.getStorageDownloadLocation();
@@ -5795,11 +5801,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else
 				{
 					//Show error message, just one file
-				}
-				
-		    	
+					Toast.makeText(this, getString(R.string.context_select_one_file), Toast.LENGTH_LONG).show();
+				}		    	
 			}
 			else{
+				log("NOT advancedDevices");
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
 				intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 				intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
@@ -5809,6 +5815,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}				
 		}
 		else{
+			log("NOT askMe");
 			File defaultPathF = new File(downloadLocationDefaultPath);
 			defaultPathF.mkdirs();
 			downloadTo(downloadLocationDefaultPath, null, size, hashes);
@@ -6908,16 +6915,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_LOCAL_FOLDER && resultCode == RESULT_OK) {
-			
+			log("onActivityResult: REQUEST_CODE_SELECT_LOCAL_FOLDER");
 			if (intent == null) {			
 				log("Return.....");
 				return;						
 			}
 			
 			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
+			log("parentPath: "+parentPath);
 			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
+			log("url: "+url);
 			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
+			log("size: "+size);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
+			log("hashes size: "+hashes.length);
 			
 			downloadTo (parentPath, url, size, hashes);
 			Util.showToast(this, R.string.download_began);
@@ -7599,7 +7610,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
-		log("downloadTo");
+		log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
+		log("files to download: ");
+		if (hashes != null){
+			for (long hash : hashes) {
+				MegaNode node = megaApi.getNodeByHandle(hash);
+				log("Node: "+ node.getName());
+			}
+		}
+		
 		double availableFreeSpace = Double.MAX_VALUE;
 		try{
 			StatFs stat = new StatFs(parentPath);
@@ -7608,9 +7627,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		catch(Exception ex){}		
 		
 		if (hashes == null){
+			log("hashes is null");
 			if(url != null) {
+				log("url NOT null");
 				if(availableFreeSpace < size) {
 					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+					log("Not enough space");
 					return;
 				}
 				
@@ -7622,17 +7644,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else{
+			log("hashes is NOT null");
 			if(hashes.length == 1){
+				log("hashes.length == 1");
 				MegaNode tempNode = megaApi.getNodeByHandle(hashes[0]);
 				if((tempNode != null) && tempNode.getType() == MegaNode.TYPE_FILE){
 					log("ISFILE");
 					String localPath = Util.getLocalFile(this, tempNode.getName(), tempNode.getSize(), parentPath);
 					
-					if(localPath != null){	
+					if(localPath != null){
+						log("localPath != null");
 						try { 
+							log("Call to copyFile");
 							Util.copyFile(new File(localPath), new File(parentPath, tempNode.getName())); 
 						}
-						catch(Exception e) {}
+						catch(Exception e) {
+							log("Exception!!");
+						}
 												
 //						if(MimeType.typeForName(tempNode.getName()).isPdf()){
 //							
@@ -7648,7 +7676,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //						else						
 						
 						if(MimeTypeList.typeForName(tempNode.getName()).isZip()){
-							
+							log("MimeTypeList ZIP");
 		    			    File zipFile = new File(localPath);
 		    			    
 		    			    Intent intentZip = new Intent();
@@ -7659,16 +7687,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    				this.startActivity(intentZip);
 							
 						}
-						else{							
+						else{		
+							log("MimeTypeList other file");
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (isIntentAvailable(this, viewIntent))
+							if (isIntentAvailable(this, viewIntent)){
+								log("if isIntentAvailable");
 								startActivity(viewIntent);
+							}								
 							else{
+								log("ELSE isIntentAvailable");
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
-								if (isIntentAvailable(this, intentShare))
+								if (isIntentAvailable(this, intentShare)){
+									log("call to startActivity(intentShare)");
 									startActivity(intentShare);
+								}									
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
 							}								
@@ -7679,24 +7713,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			
 			for (long hash : hashes) {
+				log("hashes.length more than 1");
 				MegaNode node = megaApi.getNodeByHandle(hash);
 				if(node != null){
+					log("node NOT null");
 					Map<MegaNode, String> dlFiles = new HashMap<MegaNode, String>();
 					if (node.getType() == MegaNode.TYPE_FOLDER) {
+						log("MegaNode.TYPE_FOLDER");
 						getDlList(dlFiles, node, new File(parentPath, new String(node.getName())));
 					} else {
+						log("MegaNode.TYPE_FILE");
 						dlFiles.put(node, parentPath);
 					}
 					
 					for (MegaNode document : dlFiles.keySet()) {
 						
 						String path = dlFiles.get(document);
+						log("path of the file: "+path);
 						
 						if(availableFreeSpace < document.getSize()){
+							log("Not enough space");
 							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
 							continue;
 						}
 						
+						log("start service");
 						Intent service = new Intent(this, DownloadService.class);
 						service.putExtra(DownloadService.EXTRA_HASH, document.getHandle());
 						service.putExtra(DownloadService.EXTRA_URL, url);
@@ -7706,11 +7747,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 				else if(url != null) {
+					log("URL NOT null");
 					if(availableFreeSpace < size) {
+						log("Not enough space");
 						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
 						continue;
 					}
-					
+					log("start service");
 					Intent service = new Intent(this, DownloadService.class);
 					service.putExtra(DownloadService.EXTRA_HASH, hash);
 					service.putExtra(DownloadService.EXTRA_URL, url);
@@ -7719,7 +7762,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					startService(service);
 				}
 				else {
-					log("node not found");
+					log("node NOT fOUND!!!!!");
 				}
 			}
 		}
@@ -8164,6 +8207,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 			catch(Exception ex){}
 		}
+	}
+	
+	public int getAccountType(){
+		return accountType;
+	}
+	
+	public long getUsedGbStorage(){
+		return usedGbStorage;
 	}
 
 	@Override

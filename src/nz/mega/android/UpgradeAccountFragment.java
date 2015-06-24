@@ -92,6 +92,8 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 	MegaUser myUser;
 	
 	BitSet paymentBitSet = null;
+	int accountType = -1;
+	long usedStorage = -1;
 	
 	@Override
 	public void onDestroy(){				
@@ -270,12 +272,52 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 			megaApi.getPaymentMethods(this);
 		}
 		
-		megaApi.getAccountDetails(this);
+//		if(accountType!=-1){
+//			checkAccountType();
+//		}
+//		else{
+//			megaApi.getAccountDetails(this);
+//		}
+		
+		accountType = ((ManagerActivity)context).getAccountType();
+		usedStorage = ((ManagerActivity)context).getUsedGbStorage();
+		
+		checkAvailableAccount();
 
 		megaApi.getPricing(this);
 		
 		return v;
 	}	
+	
+	public void checkAvailableAccount(){
+		
+		log("usedStorage: "+usedStorage);
+		switch(accountType){		
+			case 1:{
+				hideProLite();
+				hideProI();
+				break;
+			}	
+			case 2:{
+				hideProLite();
+				hideProI();
+				hideProII();
+				break;
+			}	
+			case 3:{
+				hideProLite();
+				hideProI();
+				hideProII();
+				hideProIII();
+				break;
+			}
+			
+			case 4:{
+				hideProLite();
+				break;
+			}
+		}
+	}
 
 	public void onUpgrade1Click(View view) {
 		if (paymentBitSet != null){
@@ -324,6 +366,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 		}
 		if (request.getType() == MegaRequest.TYPE_GET_PRICING){
 			MegaPricing p = request.getPricing();
+//			usedStorage = 501;
 
 			for (int i=0;i<p.getNumProducts();i++){
 				log("p["+ i +"] = " + p.getHandle(i) + "__" + p.getAmount(i) + "___" + p.getGBStorage(i) + "___" + p.getMonths(i) + "___" + p.getProLevel(i) + "___" + p.getGBTransfer(i));
@@ -332,6 +375,10 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 
 				if(account.getLevel()==1&&account.getMonths()==1){
 					storage1.setText(account.getStorage()+"GB");
+					log("PRO1: "+account.getStorage());
+					if(usedStorage>account.getStorage()){
+						hideProI();
+					}
 					bandwidth1.setText(account.getTransfer()/1024 + " TB");
 					double saving1 = account.getAmount()/100.00;	    	            
 					String saving1String =df.format(saving1);
@@ -339,13 +386,21 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 				}
 				else if(account.getLevel()==2&&account.getMonths()==1){
 					storage2.setText(sizeTranslation(account.getStorage(),0));
+					log("PRO2: "+account.getStorage());
+					if(usedStorage>account.getStorage()){
+						hideProII();
+					}
 					double saving2 = account.getAmount()/100.00;
 					String saving2String =df.format(saving2);
 					pricingPerMonth2.setText(saving2String +" € " + getString(R.string.per_month));
 					bandwidth2.setText(sizeTranslation(account.getTransfer(),0));
 				}
 				else if(account.getLevel()==3&&account.getMonths()==1){	                	 
-					storage3.setText(sizeTranslation(account.getStorage(),0));         
+					storage3.setText(sizeTranslation(account.getStorage(),0));  
+					log("PRO3: "+account.getStorage());
+					if(usedStorage>account.getStorage()){
+						hideProIII();
+					}
 					double saving3 = account.getAmount()/100.00;
 					String saving3String =df.format(saving3);
 					pricingPerMonth3.setText(saving3String +" € " + getString(R.string.per_month));
@@ -353,6 +408,10 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 				}
 				else if (account.getLevel()==4&&account.getMonths()==1){
 					storageLite.setText(account.getStorage()+"GB");
+					log("Lite: "+account.getStorage());
+					if(usedStorage>account.getStorage()){
+						hideProLite();
+					}
 					bandwidthLite.setText(account.getTransfer()/1024 + " TB");
 					double savingLite = account.getAmount()/100.00;	    	            
 					String savingLiteString =df.format(savingLite);
@@ -374,7 +433,7 @@ public class UpgradeAccountFragment extends Fragment implements MegaRequestListe
 
 				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
 
-				int accountType = accountInfo.getProLevel();
+				accountType = accountInfo.getProLevel();
 				switch(accountType){				
 	
 					case 1:{
