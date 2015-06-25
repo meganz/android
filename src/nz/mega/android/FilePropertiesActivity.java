@@ -474,6 +474,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 							log("Node: "+node.getName());
 																					
 							switch(accessLevel){
+								case MegaShare.ACCESS_OWNER:
 								case MegaShare.ACCESS_FULL:{
 									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));	
 									break;
@@ -642,6 +643,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						log("Node: "+node.getName());
 						
 						switch(accessLevel){
+							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_FULL:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
 								break;
@@ -1592,6 +1594,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			
 			switch(accessLevel){
 			
+				case MegaShare.ACCESS_OWNER:
 				case MegaShare.ACCESS_FULL:{
 					renameMenuItem.setVisible(true);
 					moveMenuItem.setVisible(true);
@@ -2143,6 +2146,7 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 						log("Node: "+node.getName());
 						
 						switch(accessLevel){
+							case MegaShare.ACCESS_OWNER:
 							case MegaShare.ACCESS_FULL:{
 								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));								
 								break;

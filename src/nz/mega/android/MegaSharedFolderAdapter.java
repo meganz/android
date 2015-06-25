@@ -282,6 +282,7 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 			
 			int accessLevel = share.getAccess();
 			switch(accessLevel){
+				case MegaShare.ACCESS_OWNER:
 				case MegaShare.ACCESS_FULL:{
 					holder.textViewPermissions.setText(context.getString(R.string.file_properties_shared_folder_full_access));
 					break;
