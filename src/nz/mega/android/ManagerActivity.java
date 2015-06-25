@@ -383,6 +383,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     long numberOfSubscriptions = -1;
     
+    BitSet paymentBitSet = null;
+    
     /*
 	 * Background task to emptying the Rubbish Bin
 	 */
@@ -5116,6 +5118,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        }
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				paymentBitSet = Util.convertToBitSet(request.getNumber());
+			}
+		}
 		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				numberOfSubscriptions = request.getNumber();
@@ -7981,6 +7988,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //        fragTransaction.attach(currentFragment);
 //        fragTransaction.commit();
 		
+		if (paymentBitSet == null){
+			if (this.paymentBitSet != null){
+				paymentBitSet = this.paymentBitSet;
+			}
+		}
+		
 		accountFragment=UPGRADE_ACCOUNT_FRAGMENT;
 		
 		mTabHostContacts.setVisibility(View.GONE);    			
@@ -8008,6 +8021,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public void showpF(int type, ArrayList<Product> accounts, boolean refresh, BitSet paymentBitSet){
 		log("showpF");
+		
+		if (paymentBitSet == null){
+			if (this.paymentBitSet != null){
+				paymentBitSet = this.paymentBitSet;
+			}
+		}
 		
 		accountFragment=PAYMENT_FRAGMENT;
 		
@@ -8096,6 +8115,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh, BitSet paymentBitSet){
+		
+		if (paymentBitSet == null){
+			if (this.paymentBitSet != null){
+				paymentBitSet = this.paymentBitSet;
+			}
+		}
+		
 		accountFragment = CC_FRAGMENT;
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 

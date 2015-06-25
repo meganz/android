@@ -873,6 +873,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					log("ManagerActivity.CONTACT_FILE_ADAPTER: "+accessLevel);					
 					
 					switch (accessLevel) {
+						case MegaShare.ACCESS_OWNER:
 						case MegaShare.ACCESS_FULL: {
 	
 							holder.optionDownload.setVisibility(View.VISIBLE);
@@ -892,6 +893,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							holder.optionMoveTo.setVisibility(View.GONE);
 	
 							break;
+
 						}
 						case MegaShare.ACCESS_READ: {
 							log("read");
