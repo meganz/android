@@ -76,7 +76,10 @@
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been canceled correctly</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">The subscription has not been canceled correctly. Please contact support\@mega.co.nz to cancel your subscription</string>
-        
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close all sessions</string>
+    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been successfully closed</string>
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
+    
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">file</item>
         <item context="Plural of file. 2 files" quantity="other">files</item>

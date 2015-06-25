@@ -232,6 +232,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem cancelSubscription;
+	private MenuItem killAllSessions;
 	
 	public int accountFragment;
 	
@@ -2307,6 +2308,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			if (numberOfSubscriptions > 0){
 	    				cancelSubscription.setVisible(true);
 	    			}
+	    			killAllSessions.setVisible(true);
 	    			
 	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
 	    			log("Export in: "+path);
@@ -2873,6 +2875,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		cancelSubscription = menu.findItem(R.id.action_menu_cancel_subscriptions);
 		cancelSubscription.setVisible(false);
 		
+		killAllSessions = menu.findItem(R.id.action_menu_kill_all_sessions);
+		killAllSessions.setVisible(false);
+		
 //		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		if (fbF != null){
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -2899,6 +2904,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
+				killAllSessions.setVisible(false);
     			
     			if (isListCloudDrive){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3159,6 +3165,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (numberOfSubscriptions > 0){
 					cancelSubscription.setVisible(true);
 				}
+				
+				killAllSessions.setVisible(true);
     			
     			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
     			log("Export in: "+path);
@@ -3439,6 +3447,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		showNewContactDialog(null);
 	        	}
 	        	
+	        	return true;
+	        }
+	        case R.id.action_menu_kill_all_sessions:{
+	        	megaApi.killSession(-1, this);
 	        	return true;
 	        }
 	        case R.id.action_new_folder:{
@@ -5248,6 +5260,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 			}	
+		}
+		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.success_kill_all_sessions), Toast.LENGTH_SHORT).show();
+			}
+			else
+			{
+				log("error when killing sessions: "+e.getErrorString());
+				Toast.makeText(this, getString(R.string.error_kill_all_sessions), Toast.LENGTH_SHORT).show();
+			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
 			
