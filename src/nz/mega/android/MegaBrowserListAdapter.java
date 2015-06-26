@@ -898,13 +898,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						case MegaShare.ACCESS_READ: {
 							log("read");
 							holder.optionDownload.setVisibility(View.VISIBLE);
-							holder.optionProperties.setVisibility(View.VISIBLE);	
+							holder.optionProperties.setVisibility(View.VISIBLE);
+							holder.optionMore.setVisibility(View.VISIBLE);
 							holder.optionPublicLink.setVisibility(View.GONE);
 							holder.optionRename.setVisibility(View.GONE);
 							holder.optionDelete.setVisibility(View.GONE);
 							holder.optionRemoveTotal.setVisibility(View.GONE);
 							holder.optionClearShares.setVisibility(View.GONE);
-							holder.optionMore.setVisibility(View.GONE);
 							holder.optionMoveTo.setVisibility(View.GONE);
 							
 							if(node.isFile()){
@@ -1408,7 +1408,9 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 						
 						break;
 					}
-					case MegaShare.ACCESS_READWRITE: {
+					case MegaShare.ACCESS_READWRITE: 
+					case MegaShare.ACCESS_READ: 
+					{
 						log("more readwrite");
 						final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_copy)});
 						AlertDialog.Builder builder = new AlertDialog.Builder(context);

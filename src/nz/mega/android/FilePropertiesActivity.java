@@ -161,7 +161,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	MenuItem moveMenuItem;
 	MenuItem renameMenuItem;
 	ImageView statusImageView;
-
+	MenuItem copyMenuItem;
+	MenuItem removeMenuItem;
+	
 	boolean shareIt = true;
 	int imageId;
 	int from;
@@ -1356,8 +1358,9 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	}
 	
 	public void moveToTrash(){
+		log("moveToTrash");
 		
-		long handle = node.getHandle();
+		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -1368,45 +1371,75 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 			return;	
 		}
 		
-		MegaNode rubbishNode = megaApi.getRubbishNode();
-
-		//Check if the node is not yet in the rubbish bin (if so, remove it)
+		final MegaNode rubbishNode = megaApi.getRubbishNode();
+		
 		MegaNode parent = megaApi.getNodeByHandle(handle);
 		while (megaApi.getParentNode(parent) != null){
 			parent = megaApi.getParentNode(parent);
 		}
-			
+		
 		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-			moveToRubbish = true;
-			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, this);
+			moveToRubbish = true;			
 		}
 		else{
-			megaApi.remove(megaApi.getNodeByHandle(handle), this);
+			moveToRubbish = false;
 		}
 		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	//TODO remove the outgoing shares
+		    		//Check if the node is not yet in the rubbish bin (if so, remove it)			
+		    		
+		    		if (moveToRubbish){
+		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, filePropertiesActivity);
+		    			ProgressDialog temp = null;
+		    			try{
+		    				temp = new ProgressDialog(filePropertiesActivity);
+		    				temp.setMessage(getString(R.string.context_move_to_trash));
+		    				temp.show();
+		    			}
+		    			catch(Exception e){
+		    				return;
+		    			}
+		    			statusDialog = temp;
+		    		}
+		    		else{
+		    			megaApi.remove(megaApi.getNodeByHandle(handle), filePropertiesActivity);
+		    			ProgressDialog temp = null;
+		    			try{
+		    				temp = new ProgressDialog(filePropertiesActivity);
+		    				temp.setMessage(getString(R.string.context_delete_from_mega));
+		    				temp.show();
+		    			}
+		    			catch(Exception e){
+		    				return;
+		    			}
+		    			statusDialog = temp;
+		    		}
+		        	
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		
 		if (moveToRubbish){
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_move_to_trash));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
+			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_delete_from_mega));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			String message= getResources().getString(R.string.confirmation_delete_from_mega);
+			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 	}
 	
@@ -1551,15 +1584,18 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 		getLinkMenuItem = menu.findItem(R.id.action_file_properties_get_link);
 		manageLinkMenuItem = menu.findItem(R.id.action_file_properties_manage_link);
 		removeLinkMenuItem = menu.findItem(R.id.action_file_properties_remove_link);
+		removeMenuItem = menu.findItem(R.id.action_file_properties_remove);
 		leaveShareMenuItem = menu.findItem(R.id.action_file_properties_leave_share);
 		moveMenuItem = menu.findItem(R.id.action_file_properties_move);
 		renameMenuItem = menu.findItem(R.id.action_file_properties_rename);
-			   
+		copyMenuItem = menu.findItem(R.id.action_file_properties_copy);			   
 	    downloadMenuItem = menu.findItem(R.id.action_file_properties_download);
 	    shareFolderMenuItem = menu.findItem(R.id.action_file_properties_share_folder);
 	    
+	    removeMenuItem.setVisible(true);
+	    
 	    if(node!=null){
-	    	 if (node.isFolder()){
+	    	if (node.isFolder()){
 	 	    	shareFolderMenuItem.setVisible(true);
 	 	    }
 	 	    else{
@@ -1580,41 +1616,81 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 	    	getLinkMenuItem.setVisible(true);
 	    	removeLinkMenuItem.setVisible(false);
 	    	manageLinkMenuItem.setVisible(false);
-	    }
-    
-    
-	    if(from==FROM_INCOMING_SHARES){
-	    	shareFolderMenuItem.setVisible(false);
-	    	getLinkMenuItem.setVisible(false);
+	    }   
+	    
+		MegaNode parent = megaApi.getNodeByHandle(handle);
+		while (megaApi.getParentNode(parent) != null){
+			parent = megaApi.getParentNode(parent);
+		}
+		
+		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+			//Not Rubbish Bin
+		    if(from==FROM_INCOMING_SHARES){
+		    	downloadMenuItem.setVisible(true);
+		    	shareFolderMenuItem.setVisible(false);
+		    	getLinkMenuItem.setVisible(false);
+		    	removeLinkMenuItem.setVisible(false);
+		    	manageLinkMenuItem.setVisible(false);
+		    	
+		    	if (node.isFolder()){
+		    		leaveShareMenuItem.setVisible(true);
+		 	    }
+		 	    else{
+		 	    	leaveShareMenuItem.setVisible(false);
+		 	    }
+		    	
+		    	int accessLevel= megaApi.getAccess(node);
+				log("Node: "+node.getName());
+				
+				switch(accessLevel){
+				
+					case MegaShare.ACCESS_OWNER:
+					case MegaShare.ACCESS_FULL:{
+						renameMenuItem.setVisible(true);
+						moveMenuItem.setVisible(true);
+						copyMenuItem.setVisible(true); 
+						removeMenuItem.setTitle(R.string.context_move_to_trash);
+						removeMenuItem.setVisible(true); 
+						break;
+					}
+					case MegaShare.ACCESS_READ:{
+						copyMenuItem.setVisible(true); 
+						renameMenuItem.setVisible(false);
+						moveMenuItem.setVisible(false);
+						removeMenuItem.setVisible(false);
+						break;
+					}
+					case MegaShare.ACCESS_READWRITE:{
+						copyMenuItem.setVisible(true); 
+						renameMenuItem.setVisible(false);
+						moveMenuItem.setVisible(false);
+						removeMenuItem.setVisible(false);
+						break;
+					}
+				}
+		    }
+		    else{
+		    	leaveShareMenuItem.setVisible(false);
+		    	downloadMenuItem.setVisible(true);
+		    	renameMenuItem.setVisible(true); 
+		    	copyMenuItem.setVisible(true); 
+		    	removeMenuItem.setTitle(R.string.context_move_to_trash);
+		    	removeMenuItem.setVisible(true); 
+		    }
+
+		}
+		else{
+			//File in the Rubbish Bin
+			getLinkMenuItem.setVisible(false);
 	    	removeLinkMenuItem.setVisible(false);
 	    	manageLinkMenuItem.setVisible(false);
-	    	leaveShareMenuItem.setVisible(true);
-	    	int accessLevel= megaApi.getAccess(node);
-			log("Node: "+node.getName());
-			
-			switch(accessLevel){
-			
-				case MegaShare.ACCESS_OWNER:
-				case MegaShare.ACCESS_FULL:{
-					renameMenuItem.setVisible(true);
-					moveMenuItem.setVisible(true);
-					break;
-				}
-				case MegaShare.ACCESS_READ:{
-					renameMenuItem.setVisible(false);
-					moveMenuItem.setVisible(false);
-					break;
-				}
-				case MegaShare.ACCESS_READWRITE:{
-					renameMenuItem.setVisible(false);
-					moveMenuItem.setVisible(false);
-					break;
-				}
-			}
-	    }
-	    else{
+	    	downloadMenuItem.setVisible(false);
+	    	renameMenuItem.setVisible(false); 
+	    	copyMenuItem.setVisible(false); 
+	    	removeMenuItem.setTitle(R.string.context_delete);
 	    	leaveShareMenuItem.setVisible(false);
-	    }
+//	    	removeMenuItem.setVisible(true); 
+		} 
 	 
 		return super.onCreateOptionsMenu(menu);
 	}

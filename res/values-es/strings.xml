@@ -37,6 +37,10 @@
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     
+    <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">La carpeta secundaria no existe, por favor, elija una nueva.</string>   
+    
+    <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">La carpeta es sólo de lectura. No tiene permisos para subir contenido.</string>
+    
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Desea continuar?</string> 
      
@@ -239,6 +243,7 @@
     <string name="context_moving" context="while moving a file or folder">Moviendo</string>
     <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Gestionar enlace</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Eliminar enlace</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">El enlace público a este fichero se eliminará.</string>
     <string name="context_sharing" context="while sharing a folder">Compartiendo carpeta</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copiar</string>
     <string name="context_copying" context="while copying a file or folder">Copiando</string>
@@ -332,6 +337,10 @@
     <string name="my_account_change_password" context="menu item">Modificar contraseña</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Te estás quedando sin espacio libre.\n ¿Quieres mejorar tu cuenta?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Podrías ser un usuario PRO.\n ¿Quieres mejorar tu cuenta?</string>
+    <string name="overquota_alert_title" context="Title dialog overquota error">Alerta!Superada la cuota de almacenamiento!</string>
+    <string name="overquota_alert_text" context="Dialod text overquota error">Operación no permitida, excederá el límite de almacenamiento de su cuenta. Desea mejorar su tipo de cuenta?</string>
+    
+    <string name="op_not_allowed" context="Dialod text overquota error">Operación no permitida</string>
     <string name="my_account_last_session" context="when did the last session happen">Última sesión:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones:</string>
     
@@ -347,12 +356,18 @@
     <string name="select_membership_1" context="the user has to decide the way of payment">Pago Anual o Mensual</string>
     <string name="select_membership_2" context="button to go to Google Play">Subscripción Google Play</string>
     
+    <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Seleccione método de pago</string>
+    <string name="payment_method_credit_card" context="one of the payment methods">Tarjeta de crédito (subscripción)</string>
+    <string name="payment_method_fortumo" context="one of the payment methods">Factura Telefónica (puntual)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
+    
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Mensual*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Anual*</string>
     
     <string name="upgrade_comment" context="the meaning of the asterisk in monthly* and annually* payment">* la suscripción periódica se puede cancelar en cualquier momento antes de la fecha de renovación.</string>
     
     <string name="file_properties_get_link" context="the user can get the link and it\'s copied to the clipboard">El enlace se ha copiado al portapapeles</string>
+    <string name="file_properties_remove_link" context="the user can remove the public link">El enlace se ha eliminado correctamente.</string>
     
     <string name="full_image_viewer_not_preview" context="before sharing an image, the preview has to be downloaded">La vista previa aún no ha sido descargada. Por favor espere.</string>
     
