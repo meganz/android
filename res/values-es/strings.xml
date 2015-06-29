@@ -38,7 +38,7 @@
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
     
     <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">La carpeta secundaria no existe, por favor, elija una nueva.</string>   
-    
+    <string name="no_external_SD_card_detected" context="when no external card exists">Ninguna tarjeta externa SD detectada</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">La carpeta es sólo de lectura. No tiene permisos para subir contenido.</string>
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra</string>  

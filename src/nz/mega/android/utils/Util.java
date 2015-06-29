@@ -202,12 +202,17 @@ public class Util {
 	}
 	
 	public static String getExternalCardPath() {
-		log("getFreeExternalMemorySize");
+		
         String secStore = System.getenv("SECONDARY_STORAGE");
+        log("getExternalCardPath secStore: "+secStore);
         File path = new File(secStore);
-        log("getFreeExternalMemorySize: "+path.getAbsolutePath());
+        log("getFreeSize: "+path.getUsableSpace());
+        if(path.getUsableSpace()>0)
+        {
+        	return path.getAbsolutePath();
+        }
 
-        return path.getAbsolutePath();
+        return null;
 	}
 	
 	public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
