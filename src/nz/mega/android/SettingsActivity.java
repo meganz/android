@@ -675,10 +675,16 @@ public class SettingsActivity extends PinPreferenceActivity implements OnPrefere
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ADVANCED_DEVICES) == 0){
 			log("Changing the advances devices preference");
-			
 			advancedDevices = !advancedDevices;
+			if(advancedDevices){
+				if(Util.getExternalCardPath()==null){
+					Util.showToast(this, getString(R.string.no_external_SD_card_detected));
+					storageAdvancedDevices.setChecked(false);
+					advancedDevices = !advancedDevices;
+				}
+			}
+			
 			dbH.setStorageAdvancedDevices(advancedDevices);
-
 		}
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
 			Intent intent = new Intent(SettingsActivity.this, FileStorageActivity.class);

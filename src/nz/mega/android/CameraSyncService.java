@@ -363,6 +363,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
 		if(secondaryEnabled){
+			log("the secondary uploads are enabled");
 			String temp = prefs.getMegaHandleSecondaryFolder();
 			if (temp != null){
 				if (temp.compareTo("") != 0){
@@ -392,10 +393,12 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 					}
 					else{
+						log("SecondaryUploadHandle: "+secondaryUploadHandle);
 						MegaNode n = megaApi.getNodeByHandle(secondaryUploadHandle);
-						//If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads
-						if(n==null){				
-							//Find the "Camera Uploads" folder of the old "PhotoSync"
+						//If ERROR with the handler (the node may not longer exist): Create the folder MEdia Uploads
+						if(n==null){
+							secondaryUploadHandle=-1;
+							log("The secondary media folder may not longer exists!!!");
 							for (int i=0;i<nl.size();i++){
 								if ((SECONDARY_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
 									secondaryUploadHandle = nl.get(i).getHandle();
@@ -411,6 +414,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 									megaApi.createFolder(SECONDARY_UPLOADS, megaApi.getRootNode(), this);
 								}
 								else{
+									log("cancel transfers");
 									if (megaApi != null){
 										megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this);
 										return START_NOT_STICKY;
@@ -858,11 +862,13 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 	}
 	
-	void uploadNextMediaFile(){
+	void uploadNextMediaFile(){	
+
+		//Check problem with secondary
 		
 		totalUploaded++;
 		log("------------------------------------------------uploadNextMediaFile: "+totalUploaded +" of "+totalToUpload);
-		
+				
 		int result = shouldRun();
 		if (result != 0){
 			retryLater();
@@ -877,6 +883,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				uploadNext();
 			}
 			
+			log("mediaSecondary.filePath: "+mediaSecondary.filePath);
 			String localFingerPrint = megaApi.getFingerprint(mediaSecondary.filePath);
 			
 			MegaNode nodeExists = null;
@@ -884,6 +891,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			File sourceFile = new File(mediaSecondary.filePath);
 	
 			nodeExists = megaApi.getNodeByFingerprint(localFingerPrint, secondaryUploadNode);
+//			if(nodeExists == null){
+//				log("Soy null");
+//			}
+//			else{
+//				log("No soy null: "+nodeExists.getName());
+//				if(nodeExists.getHandle()!=-1){
+//					log("Y el handle es: "+nodeExists.getHandle());
+//					MegaNode prueba = megaApi.getNodeByHandle(nodeExists.getHandle());
+//					if(prueba!=null){
+//						log("Lo encuentro por handle: "+prueba.getName());
+//					}
+//					else{
+//						log("Por handle no lo encuentro");
+//					}
+//				}
+//			}
+							
+			
 			if(nodeExists == null)
 			{		
 				log("nodeExists1==null");
@@ -913,6 +938,7 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						sourceFile.length() == possibleNode.getSize() &&
 						megaApi.getFingerprint(possibleNode) == null)
 					{
+						log("nodeExists = possibleNode: "+possibleNode);
 						nodeExists = possibleNode;
 						break;
 					}
@@ -984,9 +1010,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						}
 						photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);					
 						currentTimeStamp = mediaSecondary.timestamp;
-						log("Voy a subir: "+file.getAbsolutePath());
-						log(" secondaryNode: "+secondaryUploadNode.getName());
-						log(" photoName: "+photoFinalName);
+//						log("Voy a subir: "+file.getAbsolutePath());
+//						log(" secondaryNode: "+secondaryUploadNode.getName());
+//						log(" photoName: "+photoFinalName);
 						
 						megaApi.startUpload(file.getAbsolutePath(), secondaryUploadNode, photoFinalName, this);
 						log("CHANGED!!!! MediaFinalName: " + photoFinalName + "______" + photoIndex);
@@ -1001,74 +1027,110 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				}
 			}
 			else{
-				log("NODO SECONDARY: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());				
-				if (megaApi.getParentNode(nodeExists).getHandle() != secondaryUploadHandle){
-					
-					if(Boolean.parseBoolean(prefs.getKeepFileNames())){
-						//Keep the file names as device
-						currentTimeStamp = mediaSecondary.timestamp;
-						megaApi.copyNode(nodeExists, secondaryUploadNode, file.getName(), this);
-						log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
-					}
-					else{
-						int photoIndex = 0;
-						String photoFinalName = null;
-						do {
-							photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
-							photoIndex++;
-						}while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
-		
-						currentTimeStamp = mediaSecondary.timestamp;
-						megaApi.copyNode(nodeExists, secondaryUploadNode, photoFinalName, this);
-						log("CHANGED!!!! SecondaryFinalName: " + photoFinalName + "______" + photoIndex);
-					}	
-						
-//				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
-					
-//					boolean photoAlreadyExists = false;
-//					ArrayList<MegaNode> nL = megaApi.getChildren(cameraUploadNode);
-//					for (int i=0;i<nL.size();i++){
-//						if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
-//							photoAlreadyExists = true;
+				log("nodeExists=!null");
+				
+//				if(megaApi.getParentNode(nodeExists)!=null){
+//					log("NODO SECONDARY: getParent!=null");
+//					
+//					if(megaApi.getParentNode(nodeExists).getName()!=null){
+//						log("NODO SECONDARY: " + megaApi.getParentNode(nodeExists).getName());
+//						
+//						if(nodeExists.getName()!=null){
+//							log("NODO SECONDARY: " + megaApi.getParentNode(nodeExists).getName() + "___" + nodeExists.getName());
 //						}
+//						
+//					}
+//					else{
+//						log("NULLL");
 //					}
 //					
-//					if (!photoAlreadyExists){
-//						currentTimeStamp = media.timestamp;
-//						megaApi.copyNode(nodeExists, cameraUploadNode, this);
+//				}
+//				else{
+//					log("NODO SECONDARY: getParent==null");
+//					log("nodeExists: "+nodeExists.getName());
+//					String path = megaApi.getNodePath(nodeExists);
+//					if(path!=null){
+//						log("el path: "+path);
 //					}
 //					else{
-//						currentTimeStamp = media.timestamp;
-//						dbH.setCamSyncTimeStamp(currentTimeStamp);
-//						File f = new File(media.filePath);
-//						totalSizeUploaded += f.length();
-//						uploadNextImage();	
+//						log("Path NULL");
 //					}
+//					
+//				}			
+				
+				if(megaApi.getParentNode(nodeExists)!=null){
+					if (megaApi.getParentNode(nodeExists).getHandle() != secondaryUploadHandle){
+						
+						if(Boolean.parseBoolean(prefs.getKeepFileNames())){
+							//Keep the file names as device
+							currentTimeStamp = mediaSecondary.timestamp;
+							megaApi.copyNode(nodeExists, secondaryUploadNode, file.getName(), this);
+							log("NOOOT CHANGED!!!! MediaFinalName: " + file.getName());
+						}
+						else{
+							int photoIndex = 0;
+							String photoFinalName = null;
+							do {
+								photoFinalName = Util.getPhotoSyncNameWithIndex(mediaSecondary.timestamp, mediaSecondary.filePath, photoIndex);
+								photoIndex++;
+							}while(megaApi.getChildNode(secondaryUploadNode, photoFinalName) != null);
+			
+							currentTimeStamp = mediaSecondary.timestamp;
+							megaApi.copyNode(nodeExists, secondaryUploadNode, photoFinalName, this);
+							log("CHANGED!!!! SecondaryFinalName: " + photoFinalName + "______" + photoIndex);
+						}	
+							
+	//				if (megaApi.getNodeByPath("/" + CAMERA_UPLOADS + "/" + nodeExists.getName()) == null){
+						
+	//					boolean photoAlreadyExists = false;
+	//					ArrayList<MegaNode> nL = megaApi.getChildren(cameraUploadNode);
+	//					for (int i=0;i<nL.size();i++){
+	//						if (nL.get(i).getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
+	//							photoAlreadyExists = true;
+	//						}
+	//					}
+	//					
+	//					if (!photoAlreadyExists){
+	//						currentTimeStamp = media.timestamp;
+	//						megaApi.copyNode(nodeExists, cameraUploadNode, this);
+	//					}
+	//					else{
+	//						currentTimeStamp = media.timestamp;
+	//						dbH.setCamSyncTimeStamp(currentTimeStamp);
+	//						File f = new File(media.filePath);
+	//						totalSizeUploaded += f.length();
+	//						uploadNextImage();	
+	//					}
+					}
+					else{
+	//					if (nodeExists.getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
+	//						currentTimeStamp = media.timestamp;
+	//						dbH.setCamSyncTimeStamp(currentTimeStamp);
+	//						File f = new File(media.filePath);
+	//						totalSizeUploaded += f.length();
+	//						uploadNextImage();	
+	//					}
+	//					else{
+	//						log("The file is in PhotoSync but with a different name");
+	//						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
+	//					}
+						
+						if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
+							//Change the file names as device
+							log("Call Look for Rename Task");
+							final MegaNode existingNode = nodeExists;
+							handler.post(new Runnable() {
+								@Override
+								public void run() {
+									new LookForRenameTask(mediaSecondary, secondaryUploadNode).rename(existingNode); 
+								}
+							});						
+						}	
+					}
 				}
 				else{
-//					if (nodeExists.getName().compareTo(Util.getPhotoSyncName(media.timestamp, media.filePath)) == 0){
-//						currentTimeStamp = media.timestamp;
-//						dbH.setCamSyncTimeStamp(currentTimeStamp);
-//						File f = new File(media.filePath);
-//						totalSizeUploaded += f.length();
-//						uploadNextImage();	
-//					}
-//					else{
-//						log("The file is in PhotoSync but with a different name");
-//						megaApi.renameNode(nodeExists, Util.getPhotoSyncName(media.timestamp, media.filePath), this);
-//					}
-					
-					if(!(Boolean.parseBoolean(prefs.getKeepFileNames()))){
-						//Change the file names as device
-						log("Call Look for Rename Task");
-						final MegaNode existingNode = nodeExists;
-						handler.post(new Runnable() {
-							@Override
-							public void run() {
-								new LookForRenameTask(mediaSecondary, secondaryUploadNode).rename(existingNode); 
-							}
-						});						
-					}	
+					//What if the parent node is null
+					log("This is an error!!!");
 				}
 			}
 		}
@@ -1627,16 +1689,22 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 					finish();
 				}
 				else{
-					MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
-					long parentHandle = megaApi.getParentNode(node).getHandle();
-					if(parentHandle == secondaryUploadHandle){
-						log("Update SECONDARY Sync TimeStamp");
-						dbH.setSecSyncTimeStamp(currentTimeStamp);
+					MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());					
+					if(megaApi.getParentNode(node)!=null){
+						long parentHandle = megaApi.getParentNode(node).getHandle();
+						if(parentHandle == secondaryUploadHandle){
+							log("Update SECONDARY Sync TimeStamp");
+							dbH.setSecSyncTimeStamp(currentTimeStamp);
+						}
+						else{
+							log("Update Camera Sync TimeStamp");
+							dbH.setCamSyncTimeStamp(currentTimeStamp);
+						}
 					}
-					else{
-						log("Update Camera Sync TimeStamp");
-						dbH.setCamSyncTimeStamp(currentTimeStamp);
-					}
+					else
+					{
+						retryLaterShortTime();
+					}					
 					
 					totalSizeUploaded += megaApi.getNodeByHandle(request.getNodeHandle()).getSize();
 					uploadNext();					
