@@ -357,11 +357,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					String localFingerprint = megaApi.getFingerprint(currentFile.getAbsolutePath());
 					String megaFingerprint = megaApi.getFingerprint(currentDocument);
 
-					if(localFingerprint.compareTo(megaFingerprint)!=0)
+					if((localFingerprint!=null) && (!localFingerprint.isEmpty()) && (megaFingerprint!=null) && (!megaFingerprint.isEmpty()))
 					{
-						log("Delete the old version");
-						currentFile.delete();					
-					}						
+						if(localFingerprint.compareTo(megaFingerprint)!=0)
+						{
+							log("Delete the old version");
+							currentFile.delete();					
+						}	
+					}
 				}
 
 				megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
