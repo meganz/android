@@ -3255,8 +3255,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				else{
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}
-    			
+    			}    			
 			}
 		}
 		

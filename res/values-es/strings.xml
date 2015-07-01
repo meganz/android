@@ -145,7 +145,7 @@
     <string name="tour_access_title">ACCESO A MEGA</string>
     <string name="tour_space_text">Regístrate ahora y consigue 50 GB de espacio gratis</string>
     <string name="tour_speed_text">Subidas rápidas. Compartir ficheros rápidamente con todo el mundo</string>
-    <string name="tour_privacy_text">Mantén todos tus ficheros a salvo con el cifrado punto apunto de MEGA</string>
+    <string name="tour_privacy_text">Mantén todos tus ficheros a salvo con el cifrado punto a punto de MEGA</string>
     <string name="tour_access_text">Consigue acceso totalmente encriptado en cualquier sitio, a cualquier hora</string>
     
     <string name="create_account_text" context="button that allows the user to create an account">Crear cuenta</string>
@@ -372,6 +372,7 @@
     <string name="select_membership_2" context="button to go to Google Play">Subscripción Google Play</string>
     
     <string name="select_payment_method" context="after choosing one PRO plan, the user have to choose the payment method: credit card, fortumo, etc">Seleccione método de pago</string>
+    <string name="no_available_payment_method" context="choose the payment method option when no method is available">En este momento, no hay disponible ningún método de pago para este plan</string>
     <string name="payment_method_credit_card" context="one of the payment methods">Tarjeta de crédito (subscripción)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">Factura Telefónica (puntual)</string>
     <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>

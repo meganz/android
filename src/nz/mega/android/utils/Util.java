@@ -1279,6 +1279,7 @@ public class Util {
 	}
 	
 	public static boolean checkBitSet(BitSet paymentBitSet, int position){
+		log("checkBitSet");
 		if (paymentBitSet != null){
 			if (paymentBitSet.get(position)){
 				return true;
@@ -1288,6 +1289,38 @@ public class Util {
 			}
 		}
 		else{
+			return false;
+		}
+	}
+	
+	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
+		
+		if (paymentBitSet != null){			
+			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
+				if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+					return false;
+				}
+				else
+				{
+					log("PAYMENT_METHOD_FORTUMO TRUE");
+					if(plan!=4){
+						log("PLAN NO LITE");
+						return false;
+					}
+					else{
+						log("PLAN LITE");
+						return true;
+					}					
+				}
+			}
+			else
+			{
+				log("PAYMENT_METHOD_CREDIT_CARD TRUE");
+				return true;
+			}
+		}
+		else{
+			log("isPaymentMethod FALSE");
 			return false;
 		}
 	}

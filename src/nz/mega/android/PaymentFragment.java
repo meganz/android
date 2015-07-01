@@ -299,6 +299,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						}
 					}
 		
 					break;
@@ -334,6 +337,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					if(paymentBitSet!=null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
+						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
 						}
 					}
 		
@@ -371,6 +377,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						}
 					}
 					break;
 				}
@@ -407,6 +416,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 							paymentFortumo.setVisibility(View.VISIBLE);
+						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
 						}
 					}
 					break;
@@ -643,15 +655,15 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 					paymentCreditCard.setVisibility(View.VISIBLE);
 				}
-			}
-			if(paymentBitSet!=null){
 				if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 					if (parameterType == 4){
 						paymentFortumo.setVisibility(View.VISIBLE);
 					}
 				}
+				if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+					selectMemberShip.setText(getString(R.string.no_available_payment_method));
+				}
 			}
-			
 		}		
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_ID){
 			log("PAYMENT ID: " + request.getLink());
@@ -711,6 +723,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						}
 					}
 		
 					break;
@@ -755,6 +770,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 					if(paymentBitSet!=null){
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
+						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
 						}
 					}
 		
@@ -801,6 +819,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
 							paymentCreditCard.setVisibility(View.VISIBLE);
 						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
+						}
 					}
 					break;
 				}			
@@ -846,6 +867,9 @@ public class PaymentFragment extends Fragment implements MegaRequestListenerInte
 						}
 						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
 							paymentFortumo.setVisibility(View.VISIBLE);
+						}
+						if(!Util.isPaymentMethod(paymentBitSet, parameterType)){
+							selectMemberShip.setText(getString(R.string.no_available_payment_method));
 						}
 					}
 					break;
