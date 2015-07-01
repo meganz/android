@@ -139,6 +139,14 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activando cuenta</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparando lista de archivos</string>
     
+    <string name="tour_space_title">ESPACIO EN MEGA</string>
+    <string name="tour_speed_title">VELOCIDAD DE MEGA</string>
+    <string name="tour_privacy_title">PRIVACIDAD EN MEGA</string>
+    <string name="tour_access_title">ACCESO A MEGA</string>
+    <string name="tour_space_text">Regístrate ahora y consigue 50 GB de espacio gratis</string>
+    <string name="tour_speed_text">Subidas rápidas. Compartir ficheros rápidamente con todo el mundo</string>
+    <string name="tour_privacy_text">Mantén todos tus ficheros a salvo con el cifrado punto apunto de MEGA</string>
+    <string name="tour_access_text">Consigue acceso totalmente encriptado en cualquier sitio, a cualquier hora</string>
     
     <string name="create_account_text" context="button that allows the user to create an account">Crear cuenta</string>
     <string name="name_text" context="Name of the user">nombre</string>
@@ -159,6 +167,7 @@
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Disponible sin conexión</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartida</string>
+	<string name="section_shared_items" context="title of the screen that shows all the shared items">Carpetas compartidas</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Papelera</string>
 	<string name="section_contacts" context="Title of the contact list">Contactos</string>
 	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTOS</string>
@@ -167,7 +176,6 @@
 	<string name="sent_requests_empty" context="the user has not sent any contact request to other users">No ha enviado solicitudes</string>
 	<string name="received_requests_empty" context="the user has not received any contact request from other users">No ha recibido solicitudes</string>
 	<string name="section_transfers" context="Title for the file transfer screen (with the up &amp; download)">Transferencias</string>
-	<string name="section_shared_items" context="title of the screen that shows all the shared items">Carpetas compartidas</string>
 
 	<string name="section_account" context="button to the settings of the user\'s account">Mi Cuenta</string>
 	<string name="section_photo_sync" context="title of the screen where the camera images are uploaded">Camera Uploads</string>
@@ -207,6 +215,7 @@
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Compartido con</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
+	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propietario</string>
 	
 	<string name="contact_properties_activity" context="title of the contact properties screen">Info</string>
 	
@@ -230,20 +239,22 @@
 	
     <string name="context_share_image" context="to share an image using Facebook, Whatsapp, etc">Compartir imagen usando</string>
     <string name="context_get_link" context="create a link of a file and send it using an app from the device">Compartir enlace</string>
-    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Enlace</string>
+    <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Obtener enlace</string>
+    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Gestionar enlace</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Abandonar</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">No compartir</string>
+    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Eliminar enlace</string>
+    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">El enlace público a este fichero se eliminará.</string>
     <string name="context_rename" context="Item menu option upon right click on one or multiple files.">Renombrar</string>
     <string name="context_open_link" context="Item menu option upon right click on one or multiple files.">Abrir</string>
     <string name="context_open_link_title" context="Item menu option upon right click on one or multiple files.">Abrir link</string>
     <string name="context_renaming" context="while renaming a file or folder">Renombrando</string>
     <string name="context_preparing_provider" context="while file provider is downloading a file">Preparando el archivo...</string>
     <string name="context_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>
+    <string name="download_folder" context="Item menu option upon right click on one or multiple files.">Descargar carpeta</string>
+    <string name="import_folder" context="Item menu option upon right click on one or multiple files.">Importar carpeta</string>
     <string name="context_move" context="Item menu option upon right click on one or multiple files.">Mover</string>
     <string name="context_moving" context="while moving a file or folder">Moviendo</string>
-    <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Gestionar enlace</string>
-    <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Eliminar enlace</string>
-    <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">El enlace público a este fichero se eliminará.</string>
     <string name="context_sharing" context="while sharing a folder">Compartiendo carpeta</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copiar</string>
     <string name="context_copying" context="while copying a file or folder">Copiando</string>
@@ -265,7 +276,7 @@
     <string name="context_view_shared_folders" context="open a shared folder">Ver carpetas compartidas</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Compartir</string>
     <string name="remove_all_sharing" context="status text">Eliminando todos los contactos compartidos</string>
-	<string name="leave_incoming_share" context="status text">Abandonando la carpeta compartida</string>
+    <string name="leave_incoming_share" context="status text">Abandonando la carpeta compartida</string>
     <string name="context_camera_folder" context="The location of where the user has the photos/videos stored.">Carpeta de la Cámara</string>
     <string name="context_mega_contacts" context="when sharing a folder, the user can choose a contact from MEGA">Contactos MEGA</string>
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Contactos del teléfono</string>
@@ -278,7 +289,6 @@
     <string name="context_permissions_not_changed" context="error message">Error. No se pudo cambiar</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">La carpeta ya existe</string>
     <string name="context_folder_created" context="success message when creating a folder">Carpeta creada</string>
-    
     <string name="context_correctly_renamed" context="success message when renaming a node">Renombrado correctamente</string>
     <string name="context_no_renamed" context="error message">Error. No se pudo renombrar</string>
     <string name="context_correctly_copied" context="success message when copying a node">Copiado correctamente</string>
@@ -301,6 +311,8 @@
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Atrás</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Enviar</string>
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancelar Subscripción</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Gracias por tu mensaje! ¿Estás seguro de que quieres cancelar la subscripción?</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Tu subscripción no ha sido cancelada. Por favor, comparte con nosotros la razón de tu cancelación.</string>
         
     <string name="context_node_private" context="success message after removing the public link of a folder">Esta carpeta es ahora privada</string>
     <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Compartición eliminada con éxito</string>
@@ -312,6 +324,7 @@
     <string name="upload_to_image" context="upload to. Then choose an Image file">Imagen</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio </string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Vídeo</string>
+	<string name="upload_to_other" context="upload to. Then choose a file which is not an Image, an Audio or a Video">Otro fichero</string>
 	<string name="upload_to_filesystem" context="upload to. Then choose to browse the file system to choose a file">Elegir del Sistema de Ficheros</string>
 	<string name="upload_select_file_type" context="title of the dialog for choosing if a user wants to upload an image, an audio, a video or a file from the system">Selecciona el tipo de archivo</string>
 	<string name="upload_uploading" context="status text">Subiendo</string>
@@ -325,7 +338,9 @@
 	<string name="upload_began" context="when an upload starts, a message is shown to the user">La subida ha comenzado</string>
 	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Descomprimiendo archivo</string>
 		
-	<string name="error_io_problem" context="error message while browsing the local filesystem">Error en el sistema de ficheros</string>	
+	<string name="error_io_problem" context="error message while browsing the local filesystem">Error en el sistema de ficheros</string>
+
+	<string name="full_screen_image_viewer_label" context="title of the image gallery">Visor de imágenes</string>	
 
 	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Formato de enlace incorrecto</string>
 	
@@ -401,6 +416,11 @@
     <string name="settings_camera_upload_off" context="settings option">Desactivar las Subidas de la Cámara</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">Como subir</string>
     
+    <string name="settings_secondary_upload_on" context="settings option">Activar Subida Multimedia Secundaria</string>
+    <string name="settings_secondary_upload_off" context="settings option">Desactivar Subida Multimedia Secundaria</string>
+
+    <string name="settings_empty_folder" context="settings option">Elija carpeta</string>
+
     <string-array name="settings_camera_upload_how_to_entries" context="the options of how to upload, but in an array. needed for the settings">
         <item context="how to upload the camera images. when Wi-Fi connected and using data plan">Wi-fi o plan de datos</item>
         <item context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</item>
@@ -416,8 +436,13 @@
     
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Solo cargando</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Matener los nombres originales de los ficheros</string>
-          
-    <string name="settings_camera_upload_folder" context="The location of where the user photos or videos are stored.">Carpeta de la Cámara</string>
+
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored.">Carpeta local de la Cámara</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored.">Carpeta de MEGA de la Cámara</string>
+    
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos are stored.">Carpeta local secundaria</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos are stored.">Carpeta de MEGA secundaria</string>
+
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Solo Fotos</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Solo Vídeos</string>
     <string name="settings_camera_upload_photos_and_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Fotos y videos</string>
@@ -429,11 +454,12 @@
     
     <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
     <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código incorrecto</string>
-    
+
+    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>    
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>
     <string name="settings_about_terms_of_service" context="App means &quot;Application&quot;">Términos de uso</string>
-    <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>
     <string name="settings_about_app_version" context="App means &quot;Application&quot;">Versión de App</string>
+    <string name="settings_about_sdk_version" context="App means &quot;Application&quot;">Versión del SDK de MEGA</string>
     
     <string name="january">Enero</string>
     <string name="february">Febrero</string>
@@ -467,6 +493,18 @@
     
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">El fichero zip será descargado y descomprimido</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string>
+
+    <string name="sortby_name" context="category in sort by action">Por nombre</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascendente</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">descendente</string>
+    
+    <string name="sortby_date" context="category in sort by action">Por fecha</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">la más reciente</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">la más antigua</string>
+    
+    <string name="sortby_size" context="category in sort by action">Por tamaño</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">más grande</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">más pequeña</string>
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mes</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">al año</string>
