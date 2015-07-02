@@ -38,7 +38,7 @@
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
  
     <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">A pasta de mídia secundária não existe, por favor escolha uma nova pasta.</string>   
-   	<string name="no_external_SD_card_detected" context="when no external card exists">No external SD card detected</string>    
+   	<string name="no_external_SD_card_detected" context="when no external card exists">Nenhum cartão SD externo detetado</string>    
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">Esta pasta é apenas de leitura. Não tem permissão para fazer upload.</string>    
     
     <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vais remover o ficheiro exportado da chave mestra</string>  
@@ -75,9 +75,9 @@
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">A Chave Mestra foi exportada para:</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">A subscrição foi cancelada corretamente</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">A subscrição não foi cancelada corretamente. Entre em contato com a nossa equipa de apoio\@mega.co.nz para cancelar a sua subscrição</string>
- 	<string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close all sessions</string>
-    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been successfully closed</string>
-    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
+ 	<string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Feche todas as sessões</string>
+    <string name="success_kill_all_sessions" context="Message after kill all opened sessions">As restantes sessões foram encerradas com sucesso</string>
+    <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Erro ao fechar as sessões abertas</string>    
     
      <plurals name="general_num_files" context="this is used for example when downloading 1 file or 2 files">
         <item context="Singular of file. 1 file" quantity="one">ficheiro</item>
@@ -300,15 +300,15 @@
     <string name="context_no_removed" context="error message">Erro. Não foi removido do MEGA</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Enviado corretamente para:</string>
     
-    <string name="context_select_one_file" context="option available for just one file">Select just one file.</string>
+    <string name="context_select_one_file" context="option available for just one file">Selecione apenas um ficheiro</string>
     
-    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your Mega subscription. Please let us know, if there is anything we can do to help change your mind.</string>
-    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Type feedback here...</string>
-    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Dismiss</string>
-    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Send</string>
-    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancel Subscription</string>
-    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Thank you for your feedback! Are you sure you want to cancel your Mega subscription?</string>
-    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">Your subscription has not been canceled. Please, provide a reason to cancel.</string>
+    <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Está prestes a cancelar a sua subscrição Mega. Por favor, diga-nos se há algo que possamos fazer para o ajudar a mudar de opinião.</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escreva aqui o seu feedback...</string>
+    <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Ignorar</string>
+    <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Enviar</string>
+    <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancelar Subscrição</string>
+    <string name="confirmation_cancel_subscriptions" context="confirmation cancel subscriptions dialog">Obrigado pelo seu feedback! Tem a certeza que quer cancelar a sua subscrição Mega?</string>
+    <string name="reason_cancel_subscriptions" context="provide a reason to cancel subscriptions dialog">A sua subscrição não foi cancelada. Por favor, indique-nos o motivo do seu cancelamento.</string>
         
     <string name="context_node_private" context="success message after removing the public link of a folder">A pasta é agora privada</string>
     <string name="context_share_correctly_removed" context="success message after removing a share of a folder. a contact has no access to the folder now">Partilha removida corretamente</string>
@@ -407,7 +407,7 @@
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Local de download padrão</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Perguntar sempre a localização das transferências</string>
-    <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
+    <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Mostrar dispositivos avançados (SD externo)</string>
         
     <string name="settings_camera_upload_on" context="settings option">Ativar as Transferências da Câmara</string>
     <string name="settings_camera_upload_off" context="settings option">Desativar as Transferências da Câmara</string>
@@ -483,7 +483,7 @@
     <string name="pro2_account" context="Not translate">PRO II</string>
     <string name="pro3_account" context="Not translate">PRO III</string>
     
-    <string name="free_bandwidth" context="Free bandwich account details">Limited</string>
+    <string name="free_bandwidth" context="Free bandwich account details">Limitado</string>
     
     <string name="camera_uploads_created" context="info message shown to the user when the Camera Uploads folder has been created">Pasta das Transferências da Câmara criada</string>
     
