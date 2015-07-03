@@ -26,7 +26,7 @@ import android.util.Log;
 public class MegaApplication extends Application implements MegaListenerInterface
 {
 	final String TAG = "MegaApplication";
-	static final String USER_AGENT = "MEGAAndroid/2.6";
+	static final String USER_AGENT = "MEGAAndroid/2.6.3";
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	String localIpAddress = "";
@@ -94,15 +94,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_INFO);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_FATAL);
 
 		
 //		initializeGA();
 		
 //		new MegaTest(getMegaApi()).start();
-	}
-	
-	
+	}	
 	
 //	private void initializeGA(){
 //		// Set the log level to verbose.
