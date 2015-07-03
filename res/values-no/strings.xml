@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGA</string>
-    <string name="app_version" context="Not translate">2.6</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">vil være tilgjengelig om</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA er skylagring med kraftig ende-til-ende kryptering. 50GB gratis</string>
