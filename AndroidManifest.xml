@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nz.mega.android"
     android:installLocation="auto"
-    android:versionCode="85"
-    android:versionName="2.6" >
+    android:versionCode="91"
+    android:versionName="2.6.3" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -116,6 +116,13 @@
                 <category android:name="android.intent.category.DEFAULT" ></category>
                 <category android:name="android.intent.category.BROWSABLE" ></category>
                 <data android:host="mega.co.nz" android:scheme="https" > </data>
+            </intent-filter>
+            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" ></action>
+                <category android:name="android.intent.category.DEFAULT" ></category>
+                <category android:name="android.intent.category.BROWSABLE" ></category>
+                <data android:host="mega.nz" android:scheme="https" > </data>
             </intent-filter>
             
             <intent-filter>

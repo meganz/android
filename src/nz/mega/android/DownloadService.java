@@ -266,7 +266,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		openFile = intent.getBooleanExtra(EXTRA_OPEN_FILE, true);
 		if(intent.getStringExtra(EXTRA_CONTENT_URI)!=null){
 			contentUri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));	
-			log("-----------------------CONTENTURI: "+contentUri.toString());
 		}			
 		
 		if(intent.getStringExtra(EXTRA_ZIP_FILE_TO_OPEN)!=null){
@@ -275,7 +274,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		else{
 			pathFileToOpen=null;
 		}
-		log("en DownloadService saco el path del file: "+pathFileToOpen);
 		
 		if (isFolderLink){
 			megaApi = app.getMegaApiFolder();
@@ -290,14 +288,10 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			log("Node not found");
 			return;
 		}
-		else{
-			log("currentDocument: "+currentDocument.getName());
-		}
 		
 		if(url != null){
 			log("Public node");
 			currentDir = new File(intent.getStringExtra(EXTRA_PATH));
-			log("currentDir: "+currentDir.getName());
 			megaApi.getPublicNode(url, this);
 			return;
 		}
@@ -343,7 +337,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("currentDir is not a directory");
 			}	
 			storeToAdvacedDevices.put(currentDocument.getHandle(), contentUri);
-			log("The action is: download the: "+currentDocument.getName()+" to "+ currentDir.getAbsolutePath()+" and copy to: "+contentUri.toString());
 			
 			megaApi.startDownload(currentDocument, currentDir.getAbsolutePath() + "/", this);
 		}
@@ -582,7 +575,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 				mNotificationManager.notify(notificationIdFinal, mBuilderCompat.build());
 			}
-			log("Current File: " + currentFile.getAbsolutePath());	
 		}
 	}
 	
