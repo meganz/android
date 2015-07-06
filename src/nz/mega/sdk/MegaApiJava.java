@@ -2211,6 +2211,8 @@ public class MegaApiJava
      *
      * @param email Email of the new contact
      * @param listener MegaRequestListenerInterface to track this request
+     * 
+     * @deprecated: This way to add contacts will be removed in future updates. Please use MegaApi::inviteContact.
      */
 	public void addContact(String email, MegaRequestListenerInterface listener)
 	{
@@ -2221,10 +2223,85 @@ public class MegaApiJava
      * Add a new contact to the MEGA account
      *
      * @param email Email of the new contact
+     * 
+     * @deprecated: This way to add contacts will be removed in future updates. Please use MegaApi::inviteContact.
      */
 	public void addContact(String email)
 	{
 		megaApi.addContact(email);
+	}
+	
+	/**
+     * Invite another person to be your MEGA contact
+     *
+     * The user doesn't need to be registered on MEGA. If the email isn't associated with
+     * a MEGA account, an invitation email will be sent with the text in the "message" parameter.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_INVITE_CONTACT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getEmail - Returns the email of the contact
+     * - MegaRequest::getText - Returns the text of the invitation
+     *
+     * @param email Email of the new contact
+     * @param message Message for the user (can be NULL)
+     * @param action Action for this contact request. Valid values are:
+     * - MegaContactRequest::INVITE_ACTION_ADD = 0
+     * - MegaContactRequest::INVITE_ACTION_DELETE = 1
+     * - MegaContactRequest::INVITE_ACTION_REMIND = 2
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void inviteContact(String email, String message, int action, MegaRequestListenerInterface listener) {
+		megaApi.inviteContact(email, message, action, createDelegateRequestListener(listener));
+	}
+	
+	/**
+     * Invite another person to be your MEGA contact
+     *
+     * The user doesn't need to be registered on MEGA. If the email isn't associated with
+     * a MEGA account, an invitation email will be sent with the text in the "message" parameter.
+	 *
+     * @param email Email of the new contact
+     * @param message Message for the user (can be NULL)
+     * @param action Action for this contact request. Valid values are:
+     * - MegaContactRequest::INVITE_ACTION_ADD = 0
+     * - MegaContactRequest::INVITE_ACTION_DELETE = 1
+     * - MegaContactRequest::INVITE_ACTION_REMIND = 2
+     */
+	public void inviteContact(String email, String message, int action) {
+		megaApi.inviteContact(email, message, action);
+	}
+	
+	/**
+     * Reply to a contact request
+     * @param request Contact request. You can get your pending contact requests using MegaApi::getIncomingContactRequests
+     * @param action Action for this contact request. Valid values are:
+     * - MegaContactRequest::REPLY_ACTION_ACCEPT = 0
+     * - MegaContactRequest::REPLY_ACTION_DENY = 1
+     * - MegaContactRequest::REPLY_ACTION_IGNORE = 2
+     *
+     * The associated request type with this request is MegaRequest::TYPE_REPLY_CONTACT_REQUEST
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the contact request
+     * - MegaRequest::getNumber - Returns the action
+     *
+     * @param listener MegaRequestListenerInterface to track this request
+     */
+	public void replyContactRequest(MegaContactRequest request, int action, MegaRequestListenerInterface listener) {
+		megaApi.replyContactRequest(request, action, createDelegateRequestListener(listener));
+	}
+
+	/**
+     * Reply to a contact request
+     * @param request Contact request. You can get your pending contact requests using MegaApi::getIncomingContactRequests
+     * @param action Action for this contact request. Valid values are:
+     * - MegaContactRequest::REPLY_ACTION_ACCEPT = 0
+     * - MegaContactRequest::REPLY_ACTION_DENY = 1
+     * - MegaContactRequest::REPLY_ACTION_IGNORE = 2
+     *
+     */
+	public void replyContactRequest(MegaContactRequest request, int action) {
+		megaApi.replyContactRequest(request, action);
 	}
 	
 	/**
@@ -3084,6 +3161,20 @@ public class MegaApiJava
 	}
 	
 	/**
+     * Get the MegaContactRequest that has a specific handle
+     *
+     * You can get the handle of a MegaContactRequest using MegaContactRequest::getHandle.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param handle Contact request handle to check
+     * @return MegaContactRequest object with the handle, otherwise NULL
+     */
+	public MegaContactRequest getContactRequestByHandle(long handle) {
+		return megaApi.getContactRequestByHandle(handle);
+	}
+	
+	/**
      * Get all contacts of this MEGA account
      *
      * @return List of MegaUser object with all contacts of this account
@@ -3163,6 +3254,44 @@ public class MegaApiJava
 	{
 		return shareListToArray(megaApi.getOutShares(node));		
 	}
+	
+	/**
+     * Get a list with all pending outbound sharings
+     *
+     * @return List of MegaShare objects
+     */
+	public ArrayList<MegaShare> getPendingOutShares() {
+		return shareListToArray(megaApi.getPendingOutShares());
+	}
+	
+	/**
+     * Get a list with all pending outbound sharings
+     *
+     * @param node MegaNode to check
+     *
+     * @return List of MegaShare objects
+     */
+	public ArrayList<MegaShare> getPendingOutShares(MegaNode node) {
+		return shareListToArray(megaApi.getPendingOutShares(node));
+	}
+	
+	/**
+     * Get a list with all incoming contact requests
+     *
+     * @return List of MegaContactRequest objects
+     */
+	public ArrayList<MegaContactRequest> getIncomingContactRequests() {
+		return contactRequestListToArray(megaApi.getIncomingContactRequests());
+	}
+	
+	/**
+     * Get a list with all outgoing contact requests
+     *
+     * @return List of MegaContactRequest objects
+     */
+	 public ArrayList<MegaContactRequest> getOutgoingContactRequests() {
+		 return contactRequestListToArray(megaApi.getOutgoingContactRequests());
+	 }
 	
 	/**
      * Get the access level of a MegaNode
@@ -3591,6 +3720,22 @@ public class MegaApiJava
 		for(int i=0; i<shareList.size(); i++)
 		{
 			result.add(shareList.get(i).copy());
+		}
+		
+		return result;
+	}
+	
+	static ArrayList<MegaContactRequest> contactRequestListToArray(MegaContactRequestList contactRequestList)
+	{
+		if (contactRequestList == null)
+		{
+			return null;
+		}
+		
+		ArrayList<MegaContactRequest> result = new ArrayList<MegaContactRequest>(contactRequestList.size());
+		for(int i=0; i<contactRequestList.size(); i++)
+		{
+			result.add(contactRequestList.get(i).copy());
 		}
 		
 		return result;
