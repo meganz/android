@@ -1,36 +1,42 @@
+#ifdef SWIGJAVA
 #define __ANDROID__
-#define USE_EXTERNAL_GFX
+#endif
 
 %module(directors="1") mega
 %{
 #include "megaapi.h"
 %}
 
+#ifdef SWIGJAVA
+
 //Automatic load of the native library
 %pragma(java) jniclasscode=%{
-  static 
-  {
-    try { System.loadLibrary("mega"); } 
-    catch (UnsatisfiedLinkError e1) 
-    {
-		try { System.load(System.getProperty("user.dir")+"/libmega.so"); }
-		catch(UnsatisfiedLinkError e2)
-		{
-			System.err.println("Native code library failed to load. \n" + e2);
-			System.exit(1);
-		}
+  static {
+        try {
+            System.loadLibrary("mega");
+        } catch (UnsatisfiedLinkError e1) {
+            try {
+                System.load(System.getProperty("user.dir") + "/libmega.so");
+            } catch (UnsatisfiedLinkError e2) {
+                try {
+                    System.load(System.getProperty("user.dir") + "/libs/libmegajava.so");
+                } catch (UnsatisfiedLinkError e3) {
+                    try {
+                        System.load(System.getProperty("user.dir") + "/libs/mega.dll");
+                    } catch (UnsatisfiedLinkError e4) {
+                        System.err.println("Native code library failed to load. \n" + e1 + "\n" + e2 + "\n" + e3 + "\n" + e4);
+                        System.exit(1);
+                    }
+                }
+            }
+        }
     }
-  }
-%}
-
-%insert("runtime") %{
-#define SWIG_JAVA_ATTACH_CURRENT_THREAD_AS_DAEMON
-#define SWIG_JAVA_NO_DETACH_CURRENT_THREAD
 %}
 
 //Use compilation-time constants in Java
-#ifdef SWIGJAVA
 %javaconst(1);
+
+//Reduce the visibility of internal classes
 %typemap(javaclassmodifiers) mega::MegaApi "class";
 %typemap(javaclassmodifiers) mega::MegaListener "class";
 %typemap(javaclassmodifiers) mega::MegaRequestListener "class";
@@ -43,6 +49,7 @@
 %typemap(javaclassmodifiers) mega::ShareList "class";
 %typemap(javaclassmodifiers) mega::UserList "class";
 
+//Make the "delete" method protected
 %typemap(javadestruct, methodname="delete", methodmodifiers="protected synchronized") SWIGTYPE 
 {   
     if (swigCPtr != 0) {
@@ -64,8 +71,9 @@
 %feature("director") mega::MegaLogger;
 
 
+#ifdef SWIGJAVA
 %typemap(directorargout) (const char *time, int loglevel, const char *source, const char *message)
-%{ 
+%{
 	jenv->DeleteLocalRef(jtime); 
 	jenv->DeleteLocalRef(jsource);
 	jenv->DeleteLocalRef(jmessage); 
@@ -75,12 +83,16 @@
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
 %typemap(directorargout) (char *buffer, size_t size)
 %{ jenv->DeleteLocalRef($input); %}
+#endif
+
 
 %feature("director") mega::MegaGlobalListener;
 %feature("director") mega::MegaListener;
 %feature("director") mega::MegaTreeProcessor;
 %feature("director") mega::MegaGfxProcessor;
 
+
+#ifdef SWIGJAVA
 %typemap(directorargout) (const char* path)
 %{ 
 	jenv->DeleteLocalRef(jpath); 
@@ -92,11 +104,31 @@
 	jbyteArray jb = (jenv)->NewByteArray($2);
 	$input = jb;
 %}
-//%typemap(directorargout) (char *bitmapData, size_t size)
-//%{ 
-//	jenv->GetByteArrayRegion($input, 0, $2, (jbyte *)$1);
-//	jenv->DeleteLocalRef($input);
-//%}
+%typemap(directorargout) (char *bitmapData, size_t size)
+%{ 
+	jenv->GetByteArrayRegion($input, 0, $2, (jbyte *)$1);
+	jenv->DeleteLocalRef($input);
+%}
+#endif
+
+#ifdef SWIGPHP
+
+//Disable the management of director parameters
+//to workaround several SWIG bugs
+%typemap(directorin) SWIGTYPE* %{ %}
+%typemap(directorout) SWIGTYPE* %{ %}
+
+//Rename some overloaded functions to workaround a bug in SWIG
+%rename (getInSharesAll, fullname=1) mega::MegaApi::getInShares();
+%rename (getOutSharesAll, fullname=1) mega::MegaApi::getOutShares();
+%rename (getTransfersAll, fullname=1) mega::MegaApi::getTransfers();
+%rename ("$ignore", fullname=1) mega::MegaApi::startUpload(const char*, MegaNode*, int64_t, MegaTransferListener*);
+%rename ("$ignore", fullname=1) mega::MegaApi::startUpload(const char*, MegaNode*, int64_t);
+%rename ("$ignore", fullname=1) mega::MegaApi::startUpload(const char*, MegaNode*, const char*, MegaTransferListener*);
+%rename ("$ignore", fullname=1) mega::MegaApi::startUpload(const char*, MegaNode*, const char*);
+%rename ("$ignore", fullname=1) mega::MegaApi::startUpload(const char*, MegaNode*, const char*, int64_t, MegaTransferListener*);
+%rename ("$ignore", fullname=1) mega::MegaApi::startUpload(const char*, MegaNode*, const char*, int64_t);
+#endif
 
 %ignore mega::MegaApi::MEGA_DEBRIS_FOLDER;
 %ignore mega::MegaNode::getNodeKey;
@@ -110,9 +142,15 @@
 %newobject mega::MegaError::copy;
 %newobject mega::MegaRequest::copy;
 %newobject mega::MegaTransfer::copy;
+%newobject mega::MegaTransferList::copy;
 %newobject mega::MegaNode::copy;
+%newobject mega::MegaNodeList::copy;
 %newobject mega::MegaShare::copy;
+%newobject mega::MegaShareList::copy;
 %newobject mega::MegaUser::copy;
+%newobject mega::MegaUserList::copy;
+%newobject mega::MegaContactRequest::copy;
+%newobject mega::MegaContactRequestList::copy;
 %newobject mega::MegaRequest::getPublicMegaNode;
 %newobject mega::MegaTransfer::getPublicMegaNode;
 %newobject mega::MegaNode::getBase64Handle;
@@ -129,6 +167,7 @@
 %newobject mega::MegaApi::search;
 %newobject mega::MegaApi::ebcEncryptKey;
 %newobject mega::MegaApi::getMyEmail;
+%newobject mega::MegaApi::getMyUserHandle;
 %newobject mega::MegaApi::dumpSession;
 %newobject mega::MegaApi::getNodeByPath;
 %newobject mega::MegaApi::getNodeByHandle;
@@ -140,8 +179,18 @@
 %newobject mega::MegaApi::getNodeByFingerprint;
 %newobject mega::MegaApi::hasFingerprint;
 %newobject mega::MegaApi::exportMasterKey;
+%newobject mega::MegaApi::getTransferByTag;
+%newobject mega::MegaApi::getCRC;
+%newobject mega::MegaApi::getNodeByCRC;
+%newobject mega::MegaApi::getSessionTransferURL;
+%newobject mega::MegaApi::getIncomingContactRequests;
+%newobject mega::MegaApi::getOutgoingContactRequests;
+%newobject mega::MegaApi::getPendingOutShares;
+%newobject mega::MegaApi::getContactRequestByHandle;
 %newobject mega::MegaRequest::getMegaAccountDetails;
 %newobject mega::MegaRequest::getPricing;
+%newobject mega::MegaAccountDetails::getSubscriptionMethod;
+%newobject mega::MegaAccountDetails::getSubscriptionCycle;
 
 typedef long long time_t;
 typedef long long uint64_t;
