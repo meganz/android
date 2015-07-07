@@ -313,28 +313,34 @@ public class CreateThumbPreviewService extends Service {
 						if(paths!=null && paths.size()>0)
 						{
 							for (int i=0;i<paths.size();i++){
-								if (paths.get(i).contains(n.getName())){
-									filePath = paths.get(i);
-									File f = new File(filePath);
-									if (f != null){
-										if (f.length() == n.getSize()){
-											log("IDEM(por nombre): " + filePath + "____" + n.getName());
-											boolean thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
-											if (!n.hasThumbnail()){
-												log("Upload thumbnail -> " + n.getName() + "___" + thumbFile.getAbsolutePath());
-												megaApi.setThumbnail(n, thumbFile.getAbsolutePath());
-											}
-											if (!previewFile.exists()){
-												boolean previewCreated = MegaUtils.createPreview(f, previewFile);
-												if (!n.hasPreview()){
-													log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
-													megaApi.setPreview(n, previewFile.getAbsolutePath());
-												}
-											}
-											else{
-												if (!n.hasPreview()){
-													log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
-													megaApi.setPreview(n, previewFile.getAbsolutePath());
+								if (paths.get(i) != null){
+									if (n != null){
+										if (n.getName() != null){
+											if (paths.get(i).contains(n.getName())){
+												filePath = paths.get(i);
+												File f = new File(filePath);
+												if (f != null){
+													if (f.length() == n.getSize()){
+														log("IDEM(by name): " + filePath + "____" + n.getName());
+														boolean thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+														if (!n.hasThumbnail()){
+															log("Upload thumbnail -> " + n.getName() + "___" + thumbFile.getAbsolutePath());
+															megaApi.setThumbnail(n, thumbFile.getAbsolutePath());
+														}
+														if (!previewFile.exists()){
+															boolean previewCreated = MegaUtils.createPreview(f, previewFile);
+															if (!n.hasPreview()){
+																log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
+																megaApi.setPreview(n, previewFile.getAbsolutePath());
+															}
+														}
+														else{
+															if (!n.hasPreview()){
+																log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
+																megaApi.setPreview(n, previewFile.getAbsolutePath());
+															}
+														}
+													}
 												}
 											}
 										}
