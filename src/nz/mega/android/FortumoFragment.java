@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
@@ -181,5 +182,12 @@ public class FortumoFragment extends Fragment implements MegaRequestListenerInte
 	public void onAccountUpdate(MegaApiJava api) {
 		Toast.makeText(context, "ON ACCOUNT UPDATE!!!!", Toast.LENGTH_LONG).show();
 		((ManagerActivity)context).onBackPressed();
+	}
+
+	@Override
+	public void onContactRequestsUpdate(MegaApiJava api,
+			ArrayList<MegaContactRequest> requests) {
+		// TODO Auto-generated method stub
+		
 	}
 }

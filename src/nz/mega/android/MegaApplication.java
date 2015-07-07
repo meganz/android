@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaListenerInterface;
 import nz.mega.sdk.MegaNode;
@@ -94,7 +95,7 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 		super.onCreate();
 		
 		MegaApiAndroid.setLoggerObject(new AndroidLogger());
-		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_MAX);
+		MegaApiAndroid.setLogLevel(MegaApiAndroid.LOG_LEVEL_INFO);
 
 		
 //		initializeGA();
@@ -305,6 +306,13 @@ public class MegaApplication extends Application implements MegaListenerInterfac
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onContactRequestsUpdate(MegaApiJava api,
+			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
 	}

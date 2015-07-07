@@ -216,13 +216,10 @@
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
-	
-	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>
-	
-	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>
-	
-	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>
-	
+	<string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>	
+	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
+	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>	
+	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>	
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Add new contacts using the button below.</string>	
 	
 	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>

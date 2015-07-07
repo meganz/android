@@ -79,4 +79,20 @@ class DelegateMegaGlobalListener extends MegaGlobalListener
 			});
 		}
 	}
+	
+	@Override
+	public void onContactRequestsUpdate(MegaApi api, MegaContactRequestList contactRequestList) 
+	{
+		if(listener != null)
+		{
+			final ArrayList<MegaContactRequest> requests = MegaApiJava.contactRequestListToArray(contactRequestList);
+			megaApi.runCallback(new Runnable()
+			{
+			    public void run() 
+			    {
+			    	listener.onContactRequestsUpdate(megaApi, requests);
+			    }
+			});
+		}
+	}
 }
