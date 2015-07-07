@@ -8,4 +8,5 @@ public interface MegaGlobalListenerInterface
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes);
 	public void onReloadNeeded(MegaApiJava api);
 	public void onAccountUpdate(MegaApiJava api);
+	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests);
 }

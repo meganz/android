@@ -8,19 +8,39 @@
     android:orientation="vertical"
     android:background="#eaecee">
            
-	    <TextView
-		    android:id="@+id/empty_text_contacts_requests"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:textColor="@color/text_secondary"
-		    android:textSize="16sp"		    
-		    android:layout_marginTop="@dimen/standard_margin"
-		    android:layout_centerHorizontal="true"/>
+    <TextView
+	    android:id="@+id/empty_text_contacts_requests"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"		    
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>
+    
+    <ImageView
+	    android:id="@+id/empty_image_contacts_requests"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true" />
 	    
-	    <ImageView
-		    android:id="@+id/empty_image_contacts_requests"
-		    android:layout_width="wrap_content"
-		    android:layout_height="wrap_content"
-		    android:layout_centerInParent="true" />
+	<ListView
+        android:id="@+id/incoming_contacts_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/invite_contact_button">
+    </ListView>
+    
+    
+	<Button
+       	android:id="@+id/invite_contact_button"
+       	android:layout_gravity="center"
+       	android:layout_height="48dp"
+       	android:layout_width="fill_parent"
+       	android:layout_alignParentBottom="true"
+       	android:background="@drawable/btn_default_holo_light_without_corners"
+       	android:textColor="@color/button_text"
+       	android:text="@string/menu_add_contact" >
+    </Button>
 
 </RelativeLayout>

@@ -15,6 +15,7 @@ import nz.mega.components.MySwitch;
 import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
@@ -2457,6 +2458,14 @@ public class FilePropertiesActivity extends PinActivity implements OnClickListen
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void onContactRequestsUpdate(MegaApiJava api,
+			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
 	}

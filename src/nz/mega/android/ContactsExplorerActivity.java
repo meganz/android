@@ -6,6 +6,7 @@ import nz.mega.android.ContactsExplorerAdapter.OnItemCheckClickListener;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
@@ -662,6 +663,13 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onContactRequestsUpdate(MegaApiJava api,
+			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
 	}
