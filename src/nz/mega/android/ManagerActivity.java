@@ -3358,7 +3358,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			    log("Mimetype: "+mimeType);
 			    intent.setType(mimeType);
 			    intent.putExtra(Intent.EXTRA_TITLE, node.getName());
-			    startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);			
+			    try{
+			    	startActivityForResult(intent, WRITE_SD_CARD_REQUEST_CODE);			
+			    }
+			    catch(Exception e){
+			    	log("Exception in External SDCARD");
+			    	Environment.getExternalStorageDirectory();
+					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
+					toast.show();
+			    }
 			}
 		}
 		else{
