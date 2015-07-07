@@ -83,7 +83,7 @@ public class Util {
 	public static double percScreenLoginReturning = 0.8;
 	
 	// Debug flag to enable logging and some other things
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 	
 	public static String offlineDIR = "MEGA/MEGA Offline"; 
 	public static String downloadDIR ="MEGA/MEGA Downloads";
@@ -204,12 +204,20 @@ public class Util {
 	public static String getExternalCardPath() {
 		
         String secStore = System.getenv("SECONDARY_STORAGE");
-        log("getExternalCardPath secStore: "+secStore);
-        File path = new File(secStore);
-        log("getFreeSize: "+path.getUsableSpace());
-        if(path.getUsableSpace()>0)
-        {
-        	return path.getAbsolutePath();
+        if (secStore == null){
+        	return null;
+        }
+        else{
+        	if (secStore.compareTo("") == 0){
+        		return null;
+        	}
+	        log("getExternalCardPath secStore: "+secStore);
+	        File path = new File(secStore);
+	        log("getFreeSize: "+path.getUsableSpace());
+	        if(path.getUsableSpace()>0)
+	        {
+	        	return path.getAbsolutePath();
+	        }
         }
 
         return null;
