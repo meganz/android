@@ -70,12 +70,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				//MediaColumns.DATE_MODIFIED,
 				MediaColumns.DATE_MODIFIED};
 //		String selection = "(abs(" + MediaColumns.DATE_MODIFIED + "-" + n.getModificationTime() + ") < 3) OR ("+ MediaColumns.DATA + " LIKE '%" + n.getName() + "%')";
-		String selection = "";
-		log("SELECTION: " + selection);
 		ArrayList<Uri> uris = new ArrayList<Uri>();
 		uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 		uris.add(MediaStore.Images.Media.INTERNAL_CONTENT_URI);	
 		String order = MediaColumns.DATE_MODIFIED + " ASC";
+		String selection = null;
 		String[] selectionArgs = null;
 		
 		for(int i=0; i<uris.size(); i++){
