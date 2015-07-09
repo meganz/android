@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 
-public class SentRequestsFragment extends Fragment implements OnClickListener, OnItemClickListener, OnItemLongClickListener{
+public class SentRequestsFragment extends Fragment implements OnClickListener, OnItemLongClickListener{
 	
 	public static int GRID_WIDTH =400;
 	
@@ -44,10 +44,10 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
+//	LinearLayout outSpaceLayout=null;
+//	TextView outSpaceText;
+//	Button outSpaceButton;
+//	int usedSpacePerc;
 	
 	private Button addContactButton;
 	private ActionMode actionMode;
@@ -70,15 +70,6 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}	
-		
-//		contacts = megaApi.getOutgoingContactRequests();
-//    	if(contacts!=null)
-//    	{
-//    		log("Number of requests: "+contacts.size());
-//    	}
-//    	else{
-//    		log("Number of requests: NULL");
-//    	}
     }
 
     @Override
@@ -93,7 +84,7 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
     		{
     			log("-----------------REQUEST: "+i);
     			MegaContactRequest contactRequest = contacts.get(i);
-    			log("user sent: "+contactRequest.getTargetEmail());
+    			log("user sent: "+contactRequest.getSourceEmail());
     		}
     	}
     	else{
@@ -104,7 +95,7 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
 	        View v = inflater.inflate(R.layout.contacts_requests_tab, container, false);
 	        
 	        listView = (ListView) v.findViewById(R.id.incoming_contacts_list_view);
-			listView.setOnItemClickListener(this);
+//			listView.setOnItemClickListener(this);
 			listView.setOnItemLongClickListener(this);
 			listView.setItemsCanFocus(false);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);		        
@@ -114,7 +105,7 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
 			
 			listView.setItemsCanFocus(false);
 			if (adapterList == null){
-				adapterList = new MegaContactRequestListAdapter(context, contacts, emptyImageView, emptyTextView, listView);
+				adapterList = new MegaContactRequestListAdapter(context, contacts, emptyImageView, emptyTextView, listView, ManagerActivity.OUTGOING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -150,7 +141,6 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
     	    View v = inflater.inflate(R.layout.contacts_requests_tab, container, false);
     	    return v;
     	}
-
     }
 
     
@@ -166,12 +156,12 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
 		return false;
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void onItemClick(AdapterView<?> parent, View view, int position,
+//			long id) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 	
 //	public ListView getListView(){
 //		return listView;

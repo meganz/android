@@ -199,6 +199,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int OUTGOING_SHARES_ADAPTER = 2009;
 	final public static int INCOMING_SHARES_ADAPTER = 2010;
 	final public static int INBOX_ADAPTER = 2011;
+	final public static int INCOMING_REQUEST_ADAPTER = 2012;
+	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
