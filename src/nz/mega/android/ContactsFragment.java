@@ -707,4 +707,12 @@ public class ContactsFragment extends Fragment implements OnClickListener, OnIte
 	public void setOrder(int orderContacts){
 		this.orderContacts = orderContacts;
 	}
+
+	public ArrayList<MegaUser> getVisibleContacts() {
+		return visibleContacts;
+	}
+
+	public void setVisibleContacts(ArrayList<MegaUser> visibleContacts) {
+		this.visibleContacts = visibleContacts;
+	}
 }
