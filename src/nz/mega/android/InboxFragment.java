@@ -263,11 +263,12 @@ public class InboxFragment extends Fragment implements OnClickListener, OnItemCl
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
-
-		parentHandle = megaApi.getInboxNode().getHandle();
-		inboxNode = megaApi.getInboxNode();		
-//		((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-		nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+		if (megaApi.getInboxNode() != null){
+			parentHandle = megaApi.getInboxNode().getHandle();
+			inboxNode = megaApi.getInboxNode();		
+	//		((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+			nodes = megaApi.getChildren(inboxNode, orderGetChildren);
+		}
 		
 		if(((ManagerActivity)context).getmDrawerToggle() != null)
 		{
