@@ -637,6 +637,10 @@ public class MegaProxyServer
 			if(extensionIndex < 0)
 				return new Response( HTTP_NOTFOUND, "Error 404, file not found." );
 
+			if (fileName.length() <= extensionIndex){
+				return new Response( HTTP_NOTFOUND, "Error 404, file not found." );
+			}
+			
 			String baseName = fileName.substring(0, extensionIndex+1);
 			if (folderLink){
 				node = megaApiFolder.getChildNode(megaApiFolder.getParentNode(node), fileName);
