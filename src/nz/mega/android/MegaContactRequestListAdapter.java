@@ -54,12 +54,104 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 	ListView listFragment;
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
+	int type;
+	
+	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
-	public MegaContactRequestListAdapter(Context _context, ArrayList<MegaContactRequest> _contacts, ImageView _emptyImageView,TextView _emptyTextView, ListView _listView) {
+		Context context;
+		ViewHolderContactsRequestList holder;
+		MegaContactRequestListAdapter adapter;
+		
+		public UserAvatarListenerList(Context context, ViewHolderContactsRequestList holder, MegaContactRequestListAdapter megaContactRequestListAdapter) {
+			this.context = context;
+			this.holder = holder;
+			this.adapter = megaContactRequestListAdapter;
+		}
+		
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			log("onRequestStart()");
+		}
+
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+			log("onRequestFinish()");
+			if (e.getErrorCode() == MegaError.API_OK){
+				boolean avatarExists = false;
+				
+				if (holder.contactMail.compareTo(request.getEmail()) == 0){
+					File avatar = null;
+					if (context.getExternalCacheDir() != null){
+						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					}
+					else{
+						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+					}
+					Bitmap bitmap = null;
+					if (avatar.exists()){
+						if (avatar.length() > 0){
+							BitmapFactory.Options bOpts = new BitmapFactory.Options();
+							bOpts.inPurgeable = true;
+							bOpts.inInputShareable = true;
+							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+							if (bitmap == null) {
+								avatar.delete();
+							}
+							else{
+								avatarExists = true;
+								holder.imageView.setImageBitmap(bitmap);
+								holder.contactInitialLetter.setVisibility(View.GONE);
+							}
+						}
+					}
+					
+					if(request.getParamType()==1){
+						log("(1)request.getText(): "+request.getText());
+						holder.nameText=request.getText();
+						holder.name=true;
+					}
+					else if(request.getParamType()==2){
+						log("(2)request.getText(): "+request.getText());
+						holder.firstNameText = request.getText();
+						holder.firstName = true;
+					}
+					if(holder.name&&holder.firstName){
+						holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
+						holder.name= false;
+						holder.firstName = false;
+					}
+					
+//					if (!avatarExists){
+//						createDefaultAvatar();
+//					}
+				}
+			}
+//			else{
+//				if (holder.contactMail.compareTo(request.getEmail()) == 0){
+//					createDefaultAvatar();
+//				}
+//			}
+		}
+
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api,
+				MegaRequest request, MegaError e) {
+			log("onRequestTemporaryError");
+		}
+
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub			
+		}
+		
+	}
+
+	public MegaContactRequestListAdapter(Context _context, ArrayList<MegaContactRequest> _contacts, ImageView _emptyImageView,TextView _emptyTextView, ListView _listView, int type) {
 		log("new adapter");
 		this.context = _context;
 		this.contacts = _contacts;
 		this.positionClicked = -1;
+		this.type = type;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -95,10 +187,10 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
         RelativeLayout optionDelete;
         int currentPosition;
         String contactMail;
-//    	boolean name = false;
-//    	boolean firstName = false;
-//    	String nameText;
-//    	String firstNameText;
+    	boolean name = false;
+    	boolean firstName = false;
+    	String nameText;
+    	String firstNameText;
     }
 
 	@Override
@@ -146,7 +238,6 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 		
 		log("Get the MegaContactRequest");
 		MegaContactRequest contact = (MegaContactRequest) getItem(position);
-		holder.contactMail = contact.getTargetEmail();
 		
 		if (!multipleSelect) {
 			holder.checkbox.setVisibility(View.GONE);
@@ -163,11 +254,82 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 				holder.checkbox.setChecked(false);
 			}
 		}
-
-		createDefaultAvatar(holder);		
-	
-		holder.textViewContactName.setText(contact.getTargetEmail());
-		log("--------------El mail del user es: "+contact.getTargetEmail());
+		
+		createDefaultAvatar(holder);
+		
+		if(type==ManagerActivity.OUTGOING_REQUEST_ADAPTER)
+		{
+			holder.contactMail = contact.getTargetEmail();
+			holder.textViewContactName.setText(contact.getTargetEmail());
+			log("--------------user target: "+contact.getTargetEmail());
+		}
+		else{
+			//Incoming request
+						
+			holder.contactMail = contact.getSourceEmail();
+			log("--------------user source: "+contact.getSourceEmail());
+			
+			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
+			
+			holder.textViewContactName.setText(contact.getSourceEmail());
+			holder.name=false;
+			holder.firstName=false;
+			MegaUser user = megaApi.getContact(contact.getSourceEmail());
+			if(user!=null)
+			{
+				megaApi.getUserAttribute(user, 1, listener);
+				megaApi.getUserAttribute(user, 2, listener);
+			}			
+			
+			File avatar = null;
+			if (context.getExternalCacheDir() != null){
+				avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+			}
+			else{
+				avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+			}
+			Bitmap bitmap = null;
+			if (avatar.exists()){
+				if (avatar.length() > 0){
+					BitmapFactory.Options bOpts = new BitmapFactory.Options();
+					bOpts.inPurgeable = true;
+					bOpts.inInputShareable = true;
+					bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+					if (bitmap == null) {
+						avatar.delete();
+						if (context.getExternalCacheDir() != null){
+							megaApi.getUserAvatar(user, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);
+						}
+						else{
+							megaApi.getUserAvatar(user, context.getCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);
+						}
+					}
+					else{
+						holder.contactInitialLetter.setVisibility(View.GONE);
+						holder.imageView.setImageBitmap(bitmap);
+					}
+				}
+				else{
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(user, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);	
+					}
+					else{
+						megaApi.getUserAvatar(user, context.getCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);	
+					}			
+				}
+			}	
+			else{
+				if (context.getExternalCacheDir() != null){
+					megaApi.getUserAvatar(user, context.getExternalCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);
+				}
+				else{
+					megaApi.getUserAvatar(user, context.getCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);
+				}
+			}
+			
+			
+		}
+		
 
 //		holder.name=false;
 //		holder.firstName=false;
