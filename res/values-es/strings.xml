@@ -216,6 +216,9 @@
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Enviar a</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Propietario</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvitar</string>
+	<string name="contact_ignore" context="option to ignore a contact invitation">Ignorar</string>
+	<string name="contact_decline" context="option to decline a contact invitation">Declinar</string>
+	<string name="contact_accept" context="option to accept a contact invitation">Aceptar</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Info</string>	
 	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Contenido</string>	
 	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Compartir carpetas con:</string>	
@@ -277,12 +280,16 @@
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Contactos del teléfono</string>
     <string name="context_delete" context="menu item">Borrar</string>
     <string name="context_more" context="menu item">Más</string>
-    <string name="context_contact_added" context="success message when adding a contact">Contacto añadido</string>
+    <string name="context_contact_added" context="success message when adding a contact">Invitación enviada</string>
+    <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Invitación eliminada</string>
+    <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Invitación reenviada</string>
+     <string name="context_invitacion_reply" context="success message when adding a contact">Contestación a la invitación enviada</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contacto borrado</string>
     <string name="context_contact_not_removed" context="error message">Error. No se pudo borrar</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permisos modificados</string>
     <string name="context_permissions_not_changed" context="error message">Error. No se pudo cambiar</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">La carpeta ya existe</string>
+    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">ya es un contacto existente</string>
     <string name="context_folder_created" context="success message when creating a folder">Carpeta creada</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Renombrado correctamente</string>
     <string name="context_no_renamed" context="error message">Error. No se pudo renombrar</string>
@@ -334,7 +341,8 @@
 	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Descomprimiendo archivo</string>
 		
 	<string name="error_io_problem" context="error message while browsing the local filesystem">Error en el sistema de ficheros</string>
-
+	<string name="general_error" context="error message while browsing the local filesystem">Error al procesar la acción</string>
+	
 	<string name="full_screen_image_viewer_label" context="title of the image gallery">Visor de imágenes</string>	
 
 	<string name="manager_download_from_link_incorrect" context="Error message when the user entered an incorrect MEGA link format for importing">Formato de enlace incorrecto</string>

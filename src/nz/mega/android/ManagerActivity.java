@@ -5216,7 +5216,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){	
-			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getType());
+			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
 
 			try { 
 				statusDialog.dismiss();	
@@ -5225,12 +5225,41 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();
+				if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+				{
+					Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();					
+				}
+				else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
+				{
+					Toast.makeText(this, getString(R.string.context_contact_invitation_deleted), Toast.LENGTH_LONG).show();					
+				}
+				else
+				{
+					Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();					
+				}				
+			}
+			else{
+				if(e.getErrorCode()==MegaError.API_EEXIST)
+				{
+					Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+				}
+				else{
+					Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+				}				
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_REPLY_CONTACT_REQUEST){	
+			log("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: "+request.getType());
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				Toast.makeText(this, getString(R.string.context_invitacion_reply), Toast.LENGTH_LONG).show();
 	//			Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 
 			}
 			else{
-				Toast.makeText(this, getString(R.string.error_io_problem), Toast.LENGTH_LONG).show();
+				Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -6250,7 +6279,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		catch(Exception e){
 			return;
 		}
-		
+
 		megaApi.addContact(contactEmail, this);
 	}
 	
@@ -6274,8 +6303,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 		catch(Exception e){
 			return;
-		}
-		
+		}		
 
 		megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, this);
 	}	
@@ -8334,6 +8362,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, this);
 	}
 	
+	public void acceptInvitationContact(MegaContactRequest c)
+	{
+		log("acceptInvitationContact");
+		megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_ACCEPT, this);
+	}
+	
+	public void ignoreInvitationContact(MegaContactRequest c)
+	{
+		log("ignoreInvitationContact");
+		megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_IGNORE, this);
+	}
+	
+	public void declineInvitationContact(MegaContactRequest c)
+	{
+		log("declineInvitationContact");
+		megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_DENY, this);
+	}
+	
 	public int getAccountType(){
 		return accountType;
 	}
@@ -8353,31 +8399,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("onContactRequestsUpdate");
 		// TODO Auto-generated method stub
 		if (drawerItem == DrawerItem.CONTACTS){
-			int index = viewPagerContacts.getCurrentItem();
-			if(index==1||index==0){	
-				log("En SentRequestFragment TAB");
-				String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
-				log("Tag: "+ sRFTag1);
-				sRF = (SentRequestsFragment) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-				if (sRF != null){	
-					log("sRF != null");
+//			int index = viewPagerContacts.getCurrentItem();
+//			if(index==1||index==0){	
+//				log("En SentRequestFragment TAB");
+			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
+			log("Tag: "+ sRFTag1);
+			sRF = (SentRequestsFragment) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+			if (sRF != null){	
+				log("sRF != null");
 //					ArrayList<MegaContactRequest> contacts = megaApi.getOutgoingContactRequests();
 //			    	if(contacts!=null)
 //			    	{
 //			    		log("contacts SIZE: "+contacts.size());
 //			    	}
-					sRF.setContactRequests();
-				}	
-			}
-			else if(index==2){
-				log("En ReceiveRequestFragment TAB");
-				String rRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 2);	
-				log("Tag: "+ rRFTag1);
-				rRF = (ReceivedRequestsFragment) getSupportFragmentManager().findFragmentByTag(rRFTag1);
-				if (rRF != null){					
-//					rRF.getListView().invalidateViews();
-				}	
-			}						
+				sRF.setContactRequests();
+			}	
+//			}
+//			else if(index==2){
+//				log("En ReceiveRequestFragment TAB");
+			String rRFTag2 = getFragmentTag(R.id.contact_tabs_pager, 2);	
+			log("Tag: "+ rRFTag2);
+			rRF = (ReceivedRequestsFragment) getSupportFragmentManager().findFragmentByTag(rRFTag2);
+			if (rRF != null){					
+				rRF.setContactRequests();
+			}	
+//			}						
 		}
 		
 	}

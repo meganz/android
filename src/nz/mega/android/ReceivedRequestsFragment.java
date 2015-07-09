@@ -159,7 +159,8 @@ public class ReceivedRequestsFragment extends Fragment implements OnClickListene
 	
 	public void setContactRequests()
 	{
-		contacts = megaApi.getOutgoingContactRequests();
+		log("setContactRequests");
+		contacts = megaApi.getIncomingContactRequests();
     	if(contacts!=null)
     	{
     		adapterList.setContacts(contacts);

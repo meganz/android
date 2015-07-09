@@ -217,6 +217,9 @@
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
 	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>	
+	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
+	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>
+	<string name="contact_accept" context="option to accept a contact invitation">Accept</string>
 	<string name="contact_properties_activity" context="title of the contact properties screen">Contact Info</string>	
 	<string name="contact_file_list_activity" context="header of a status field for what content a user has shared to you">Content</string>	
 	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Shared Folders with:</string>	
@@ -279,12 +282,16 @@
     <string name="context_phone_contacts" context="when sharing a folder, the user chan choose a contact from the device">Phone Contacts</string>
     <string name="context_delete" context="menu item">Delete</string>
     <string name="context_more" context="menu item">More</string>
-    <string name="context_contact_added" context="success message when adding a contact">Contact added</string>
+    <string name="context_contact_added" context="success message when adding a contact">Request sent</string>
+    <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
+    <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
+    <string name="context_invitacion_reply" context="success message when adding a contact">Reply to the invitation sent</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
     <string name="context_permissions_not_changed" context="error message">Error. Permissions did not change</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
+    <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">is already a contact</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
     <string name="context_no_renamed" context="error message">Error. Not renamed</string>
@@ -336,6 +343,7 @@
 	<string name="unzipping_process" context="when a zip file is downloaded and clicked, the app unzips the file. This is the status text while unzipping the file">Unzipping file</string>
 		
 	<string name="error_io_problem" context="error message while browsing the local filesystem">Filesystem problem</string>
+	<string name="general_error" context="error message while browsing the local filesystem">Error when executing the action</string>
 	
 	<string name="full_screen_image_viewer_label" context="title of the image gallery">Image Viewer</string>
 	
