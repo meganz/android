@@ -185,6 +185,9 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
         RelativeLayout optionReinvite;
 //        ImageButton optionSend;
         RelativeLayout optionDelete;
+        RelativeLayout optionAccept;
+        RelativeLayout optionDecline;
+        RelativeLayout optionIgnore;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -210,26 +213,66 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 	    float scaleH = Util.getScaleH(outMetrics, density);    	   
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		if (convertView == null) {
-			convertView = inflater.inflate(R.layout.item_contact_request_list, parent, false);
-			holder = new ViewHolderContactsRequestList();
-			holder.checkbox = (CheckBox) convertView.findViewById(R.id.contact_request_list_checkbox);
-			holder.checkbox.setClickable(false);
-			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_request_list_item_layout);
-			holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_request_list_thumbnail);	
-			holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_request_list_initial_letter);
-			holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_request_list_name);
-			holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_request_list_content);
-			holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_request_list_three_dots);
-			holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.contact_request_list_options);
-			holder.optionReinvite = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_reinvite_layout);
-//			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-			holder.optionDelete = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_delete_layout);
-//			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-			convertView.setTag(holder);
+		if(type==ManagerActivity.OUTGOING_REQUEST_ADAPTER)
+		{
+			if (convertView == null) {
+				convertView = inflater.inflate(R.layout.item_contact_outg_request_list, parent, false);
+				holder = new ViewHolderContactsRequestList();
+				holder.checkbox = (CheckBox) convertView.findViewById(R.id.contact_request_list_checkbox);
+				holder.checkbox.setClickable(false);
+				holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_request_list_item_layout);
+				holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_request_list_thumbnail);	
+				holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_request_list_initial_letter);
+				holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_request_list_name);
+				holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_request_list_content);
+				holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_request_list_three_dots);
+				holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.contact_request_list_options);
+				holder.optionReinvite = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_reinvite_layout);
+	//			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+				holder.optionDelete = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_delete_layout);
+	//			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+				convertView.setTag(holder);
+			}
+			else{
+				holder = (ViewHolderContactsRequestList) convertView.getTag();
+			}
+			
+			holder.optionReinvite.setTag(holder);
+			holder.optionReinvite.setOnClickListener(this);
+			holder.optionDelete.setOnClickListener(this);
+			holder.optionDelete.setTag(holder);
 		}
 		else{
-			holder = (ViewHolderContactsRequestList) convertView.getTag();
+			//Incoming request
+			if (convertView == null) {
+				convertView = inflater.inflate(R.layout.item_contact_incom_request_list, parent, false);
+				holder = new ViewHolderContactsRequestList();
+				holder.checkbox = (CheckBox) convertView.findViewById(R.id.contact_request_list_checkbox);
+				holder.checkbox.setClickable(false);
+				holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.contact_request_list_item_layout);
+				holder.imageView = (RoundedImageView) convertView.findViewById(R.id.contact_request_list_thumbnail);	
+				holder.contactInitialLetter = (TextView) convertView.findViewById(R.id.contact_request_list_initial_letter);
+				holder.textViewContactName = (TextView) convertView.findViewById(R.id.contact_request_list_name);
+				holder.textViewContent = (TextView) convertView.findViewById(R.id.contact_request_list_content);
+				holder.imageButtonThreeDots = (ImageButton) convertView.findViewById(R.id.contact_request_list_three_dots);
+				holder.optionsLayout = (LinearLayout) convertView.findViewById(R.id.contact_request_list_options);
+				holder.optionAccept = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_accept_layout);
+	//			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+				holder.optionDecline = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_decline_layout);				
+	//			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
+				holder.optionIgnore = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_ignore_layout);
+				convertView.setTag(holder);
+			}
+			else{
+				holder = (ViewHolderContactsRequestList) convertView.getTag();
+			}
+			
+			holder.optionAccept.setTag(holder);
+			holder.optionAccept.setOnClickListener(this);
+			holder.optionDecline.setOnClickListener(this);
+			holder.optionDecline.setTag(holder);
+			holder.optionIgnore.setOnClickListener(this);
+			holder.optionIgnore.setTag(holder);
 		}
 
 		holder.currentPosition = position;
@@ -254,12 +297,11 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 				holder.checkbox.setChecked(false);
 			}
 		}
-		
-		createDefaultAvatar(holder);
-		
+						
 		if(type==ManagerActivity.OUTGOING_REQUEST_ADAPTER)
 		{
 			holder.contactMail = contact.getTargetEmail();
+			createDefaultAvatar(holder);
 			holder.textViewContactName.setText(contact.getTargetEmail());
 			log("--------------user target: "+contact.getTargetEmail());
 		}
@@ -267,6 +309,7 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 			//Incoming request
 						
 			holder.contactMail = contact.getSourceEmail();
+			createDefaultAvatar(holder);
 			log("--------------user source: "+contact.getSourceEmail());
 			
 			UserAvatarListenerList listener = new UserAvatarListenerList(context, holder, this);
@@ -325,11 +368,8 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 				else{
 					megaApi.getUserAvatar(user, context.getCacheDir().getAbsolutePath() + "/" + contact.getSourceEmail() + ".jpg", listener);
 				}
-			}
-			
-			
-		}
-		
+			}			
+		}		
 
 //		holder.name=false;
 //		holder.firstName=false;
@@ -399,11 +439,6 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 			holder.itemLayout.setBackgroundColor(Color.WHITE);
 			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 		}
-		
-		holder.optionReinvite.setTag(holder);
-		holder.optionReinvite.setOnClickListener(this);
-		holder.optionDelete.setOnClickListener(this);
-		holder.optionDelete.setTag(holder);
 		
 		return convertView;
 	}
@@ -537,7 +572,26 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 				((ManagerActivity) context).removeInvitationContact(c);
 				notifyDataSetChanged();	
 				break;
-			}			
+			}	
+			case R.id.contact_list_option_accept_layout:{
+				log("optionReinvite");
+				((ManagerActivity) context).acceptInvitationContact(c);			
+				positionClicked = -1;
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_list_option_decline_layout:{
+				log("Remove Invitation");
+				((ManagerActivity) context).declineInvitationContact(c);
+				notifyDataSetChanged();	
+				break;
+			}
+			case R.id.contact_list_option_ignore_layout:{
+				log("Remove Invitation");
+				((ManagerActivity) context).ignoreInvitationContact(c);
+				notifyDataSetChanged();	
+				break;
+			}
 			case R.id.contact_request_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;

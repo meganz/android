@@ -20,7 +20,7 @@
 		android:layout_height="54dp"
 		android:layout_marginLeft="5dp" 
 		android:paddingTop="3dp"
-		android:layout_toRightOf="@id/contact_list_checkbox" >
+		android:layout_toRightOf="@id/contact_request_list_checkbox" >
          
 	    <nz.mega.components.RoundedImageView 
 	         android:id="@+id/contact_request_list_thumbnail"
@@ -116,6 +116,7 @@
 					android:textSize="10sp"
 					android:textStyle="bold"/>
 	        </RelativeLayout>    
+       
 	         
          <RelativeLayout
                 android:id="@+id/contact_list_option_delete_layout"
