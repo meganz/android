@@ -28,6 +28,7 @@ import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
+import nz.mega.sdk.MegaContactRequest;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
@@ -198,6 +199,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	final public static int OUTGOING_SHARES_ADAPTER = 2009;
 	final public static int INCOMING_SHARES_ADAPTER = 2010;
 	final public static int INBOX_ADAPTER = 2011;
+	final public static int INCOMING_REQUEST_ADAPTER = 2012;
+	final public static int OUTGOING_REQUEST_ADAPTER = 2013;
 	
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
@@ -276,6 +279,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	private boolean isListInbox = true;
 	private FileBrowserFragment fbF;
 	private ContactsFragment cF;
+	private SentRequestsFragment sRF;
+	private ReceivedRequestsFragment rRF;
 	private RubbishBinFragment rbF;
 	private IncomingSharesFragment inSF;
 	private OutgoingSharesFragment outSF;
@@ -5210,6 +5215,53 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				log("Termino con error");
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){	
+			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+				{
+					Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();					
+				}
+				else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
+				{
+					Toast.makeText(this, getString(R.string.context_contact_invitation_deleted), Toast.LENGTH_LONG).show();					
+				}
+				else
+				{
+					Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();					
+				}				
+			}
+			else{
+				if(e.getErrorCode()==MegaError.API_EEXIST)
+				{
+					Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+				}
+				else{
+					Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+				}				
+				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_REPLY_CONTACT_REQUEST){	
+			log("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: "+request.getType());
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				Toast.makeText(this, getString(R.string.context_invitacion_reply), Toast.LENGTH_LONG).show();
+	//			Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+
+			}
+			else{
+				Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+			}
+		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
 			try { 
 				statusDialog.dismiss();	
@@ -5235,8 +5287,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			
 				log("move nodes request finished");
-			}
-			
+			}			
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -6117,7 +6168,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						if (value.length() == 0) {
 							return;
 						}
-						addContact(value);
+						inviteContact(value);
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
@@ -6228,9 +6279,34 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		catch(Exception e){
 			return;
 		}
-		
+
 		megaApi.addContact(contactEmail, this);
 	}
+	
+	public void inviteContact(String contactEmail){
+		log("inviteContact");
+		
+		if (!Util.isOnline(this)){
+			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			return;
+		}
+		
+		if(isFinishing()){
+			return;	
+		}
+		
+		statusDialog = null;
+		try {
+			statusDialog = new ProgressDialog(this);
+			statusDialog.setMessage(getString(R.string.context_adding_contact));
+			statusDialog.show();
+		}
+		catch(Exception e){
+			return;
+		}		
+
+		megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, this);
+	}	
 	
 	private void createFolder(String title) {
 		log("createFolder");
@@ -8274,6 +8350,36 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public void reinviteContact(MegaContactRequest c)
+	{
+		log("inviteContact");
+		megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_REMIND, this);
+	}
+	
+	public void removeInvitationContact(MegaContactRequest c)
+	{
+		log("removeInvitationContact");
+		megaApi.inviteContact(c.getTargetEmail(), null, MegaContactRequest.INVITE_ACTION_DELETE, this);
+	}
+	
+	public void acceptInvitationContact(MegaContactRequest c)
+	{
+		log("acceptInvitationContact");
+		megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_ACCEPT, this);
+	}
+	
+	public void ignoreInvitationContact(MegaContactRequest c)
+	{
+		log("ignoreInvitationContact");
+		megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_IGNORE, this);
+	}
+	
+	public void declineInvitationContact(MegaContactRequest c)
+	{
+		log("declineInvitationContact");
+		megaApi.replyContactRequest(c, MegaContactRequest.REPLY_ACTION_DENY, this);
+	}
+	
 	public int getAccountType(){
 		return accountType;
 	}
@@ -8285,6 +8391,40 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onAccountUpdate(MegaApiJava api) {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
+		log("onContactRequestsUpdate");
+		// TODO Auto-generated method stub
+		if (drawerItem == DrawerItem.CONTACTS){
+//			int index = viewPagerContacts.getCurrentItem();
+//			if(index==1||index==0){	
+//				log("En SentRequestFragment TAB");
+			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
+			log("Tag: "+ sRFTag1);
+			sRF = (SentRequestsFragment) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+			if (sRF != null){	
+				log("sRF != null");
+//					ArrayList<MegaContactRequest> contacts = megaApi.getOutgoingContactRequests();
+//			    	if(contacts!=null)
+//			    	{
+//			    		log("contacts SIZE: "+contacts.size());
+//			    	}
+				sRF.setContactRequests();
+			}	
+//			}
+//			else if(index==2){
+//				log("En ReceiveRequestFragment TAB");
+			String rRFTag2 = getFragmentTag(R.id.contact_tabs_pager, 2);	
+			log("Tag: "+ rRFTag2);
+			rRF = (ReceivedRequestsFragment) getSupportFragmentManager().findFragmentByTag(rRFTag2);
+			if (rRF != null){					
+				rRF.setContactRequests();
+			}	
+//			}						
+		}
 		
 	}
 }
