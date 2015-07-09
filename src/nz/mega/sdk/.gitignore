@@ -36,3 +36,5 @@
 /MegaAccountPurchase.java
 /MegaAccountSession.java
 /MegaAccountTransaction.java
+/MegaContactRequest.java
+/MegaContactRequestList.java
