@@ -404,6 +404,10 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 		this.parentHandle = _parentHandle;
 		this.type = type;
 		
+		if (this.nodes == null){
+			this.nodes = new ArrayList<MegaNode>();
+		}
+		
 		switch (type) {
 		case ManagerActivity.FILE_BROWSER_ADAPTER: {
 			((ManagerActivity) context).setParentHandleBrowser(parentHandle);

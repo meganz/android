@@ -264,15 +264,17 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 		}
 		
 		if (parentHandle == -1){
-			parentHandle = megaApi.getRubbishNode().getHandle();
-			((ManagerActivity)context).setParentHandleRubbish(parentHandle);
-			nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-			
-			if(((ManagerActivity)context).getmDrawerToggle() != null)
-			{
-				aB.setTitle(getString(R.string.section_rubbish_bin));	
-				((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
+			if (megaApi.getRubbishNode() != null){
+				parentHandle = megaApi.getRubbishNode().getHandle();
+				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+				
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
+				}
 			}
 		}
 		else{
@@ -280,23 +282,28 @@ public class RubbishBinFragment extends Fragment implements OnClickListener, OnI
 			
 			if (parentNode == null){
 				parentNode = megaApi.getRubbishNode();
-				parentHandle = parentNode.getHandle();
-				((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+				if (parentNode != null){
+					parentHandle = parentNode.getHandle();
+					((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+				}
 			}
-			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-			if(((ManagerActivity)context).getmDrawerToggle() != null)
-			{
-				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-					aB.setTitle(getString(R.string.section_rubbish_bin));	
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			if (parentNode != null){
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+			
+				if(((ManagerActivity)context).getmDrawerToggle() != null)
+				{
+					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
+						aB.setTitle(getString(R.string.section_rubbish_bin));	
+						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					}
+					else{
+						aB.setTitle(parentNode.getName());					
+						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					}
+					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
-				else{
-					aB.setTitle(parentNode.getName());					
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-				}
-				((ManagerActivity)context).supportInvalidateOptionsMenu();
-			}
+			}			
 		}
 
 		if (isList){
