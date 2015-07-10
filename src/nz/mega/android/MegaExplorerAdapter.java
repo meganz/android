@@ -23,7 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
+public class MegaExplorerAdapter extends BaseAdapter {
 	
 	final public static int CLOUD_EXPLORER = 0;
 	final public static int INCOMING_SHARES_EXPLORER = 1;
@@ -39,7 +39,7 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	private ArrayList<Long> disabledNodes;
 	
 	long parentHandle = -1;
-	
+	boolean selectFile = false;
 	int caller;
 	
 	ListView listFragment;
@@ -57,14 +57,14 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
     	public long document;
     }
 	
-	public MegaExplorerAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView){
+	public MegaExplorerAdapter(Context _context, ArrayList<MegaNode> _nodes, long _parentHandle, ListView listView, ImageView emptyImageView, TextView emptyTextView, boolean selectFile){
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
 		this.emptyTextViewFragment = emptyTextView;
-		
+		this.selectFile = selectFile;
 		this.positionClicked = -1;
 		this.imageIds = new ArrayList<Integer>();
 		this.names = new ArrayList<String>();
@@ -131,10 +131,12 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 		Bitmap thumb = null;
 		
 		holder.textViewFileName.setText(node.getName());
-		
-		Util.setViewAlpha(holder.imageView, 1);
-		holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));		
-		if (node.isFolder()){
+			
+		if (node.isFolder()){			
+
+			Util.setViewAlpha(holder.imageView, 1);
+			holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+			
 			if (disabledNodes != null){
 				if (disabledNodes.contains(node.getHandle())){
 					Util.setViewAlpha(holder.imageView,  .4f);
@@ -145,8 +147,16 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 			holder.imageView.setImageResource(R.drawable.ic_folder_list);
 		}
 		else{
-			Util.setViewAlpha(holder.imageView, .4f);
-			holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+			if(selectFile)
+			{
+				Util.setViewAlpha(holder.imageView, 1);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));	
+			}
+			else{
+				Util.setViewAlpha(holder.imageView, .4f);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+			}			
+			
 			long nodeSize = node.getSize();
 			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
 			holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -235,7 +245,12 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 		
 		MegaNode document = nodes.get(position);
 		if (document.isFile()){
-			return false;
+			if(selectFile){
+				return true;
+			}
+			else{
+				return false;
+			}
 		}
 		else{
 			if (disabledNodes != null) {
@@ -248,12 +263,6 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 		return true;
 	}
 
-	@Override
-	public void onClick(View arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public int getPositionClicked (){
     	return positionClicked;
     }
@@ -281,6 +290,14 @@ public class MegaExplorerAdapter extends BaseAdapter implements OnClickListener{
 	 */
 	public void setDisableNodes(ArrayList<Long> disabledNodes) {
 		this.disabledNodes = disabledNodes;
+	}
+
+	public boolean isSelectFile() {
+		return selectFile;
+	}
+
+	public void setSelectFile(boolean selectFile) {
+		this.selectFile = selectFile;
 	}
 
 }

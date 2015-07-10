@@ -89,7 +89,7 @@ public class FileExplorerFragment extends Fragment implements OnClickListener, O
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
 		if (adapter == null){
-			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
+			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, false);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);

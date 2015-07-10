@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class IncomingSharesExplorerFragment extends Fragment implements OnClickListener, OnItemClickListener{
@@ -37,7 +38,7 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 	MegaExplorerAdapter adapter;
 	
 	int modeCloud;
-	
+	boolean selectFile;
 	public String name;
 	
 //	boolean first = false;
@@ -71,7 +72,8 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		
 		Bundle bundle = this.getArguments();
 		if (bundle != null) {
-		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);		    
+		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);
+		    selectFile = bundle.getBoolean("SELECTFILE", false);
 		}
 	}
 
@@ -108,11 +110,17 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
 		
 		if (adapter == null){
-			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
+			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
 			adapter.setNodes(nodes);
+			adapter.setSelectFile(selectFile);
+		}
+		
+		if(selectFile)
+		{
+			uploadButton.setVisibility(View.GONE);
 		}
 		
 		String actionBarTitle = getString(R.string.title_incoming_shares_explorer);	
@@ -157,8 +165,15 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 			MegaNode folder = nodes.get(i);
 			int accessLevel = megaApi.getAccess(folder);
 			
-			if(accessLevel==MegaShare.ACCESS_READ) {
-				disabledNodes.add(folder.getHandle());
+			if(selectFile){
+				if(accessLevel!=MegaShare.ACCESS_FULL) {
+					disabledNodes.add(folder.getHandle());
+				}
+			}
+			else{
+				if(accessLevel==MegaShare.ACCESS_READ) {
+					disabledNodes.add(folder.getHandle());
+				}
 			}
 		}
 		
@@ -260,8 +275,29 @@ public class IncomingSharesExplorerFragment extends Fragment implements OnClickL
 				emptyTextView.setVisibility(View.GONE);
 			}
 		}
+		else
+		{
+			//Is file
+			if(selectFile)
+			{
+				//Seleccionar el fichero para enviar...
+				MegaNode n = nodes.get(position);
+				log("Selected node to send: "+n.getName());
+				if(nodes.get(position).isFile()){
+					MegaNode nFile = nodes.get(position);
+					
+					MegaNode parentFile = megaApi.getParentNode(nFile);
+					if(megaApi.getAccess(parentFile)==MegaShare.ACCESS_FULL)
+					{
+						((FileExplorerActivity) context).buttonClick(nFile.getHandle());
+					}
+					else{
+						Toast.makeText(context, getString(R.string.context_send_no_permission), Toast.LENGTH_LONG).show();
+					}					
+				}		
+			}
+		}
 	}	
-
 
 	public int onBackPressed(){
 		log("deepBrowserTree "+deepBrowserTree);

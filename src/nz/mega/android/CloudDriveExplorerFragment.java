@@ -36,6 +36,7 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 	MegaExplorerAdapter adapter;
 	
 	int modeCloud;
+	boolean selectFile=false;
 	MegaPreferences prefs;
 	DatabaseHandler dbH;
 	
@@ -69,7 +70,8 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 		
 		Bundle bundle = this.getArguments();
 		if (bundle != null) {
-		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);		    
+		    modeCloud = bundle.getInt("MODE", FileExplorerActivity.COPY);	
+		    selectFile = bundle.getBoolean("SELECTFILE", false);
 		}
 		log("onCreate mode: "+modeCloud);
 //		first=true;
@@ -182,11 +184,17 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 //		}	
 //				
 		if (adapter == null){
-			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView);
+			adapter = new MegaExplorerAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
 		}
 		else{
 			adapter.setParentHandle(parentHandle);
 			adapter.setNodes(nodes);
+			adapter.setSelectFile(selectFile);
+		}
+		
+		if(selectFile)
+		{
+			uploadButton.setVisibility(View.GONE);
 		}
 		
 		adapter.setPositionClicked(-1);		
@@ -307,6 +315,21 @@ public class CloudDriveExplorerFragment extends Fragment implements OnClickListe
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
+			}
+		}
+		else
+		{
+			//Is file
+			if(selectFile)
+			{
+				//Send file
+				MegaNode n = nodes.get(position);
+				log("Selected node to send: "+n.getName());
+				if(nodes.get(position).isFile()){
+					MegaNode nFile = nodes.get(position);
+					((FileExplorerActivity) context).buttonClick(nFile.getHandle());
+				}
+				
 			}
 		}
 	}	
