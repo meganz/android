@@ -273,6 +273,7 @@
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
     <string name="context_share_folder" context="menu item">Share folder</string>
+    <string name="context_send_file" context="menu item">Send file</string>
     <string name="context_view_shared_folders" context="open a shared folder">View shared folders</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Sharing</string>
     <string name="remove_all_sharing" context="status text">Removing all sharing contacts</string>
@@ -292,6 +293,7 @@
     <string name="context_permissions_not_changed" context="error message">Error. Permissions did not change</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">Folder already exists</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">is already a contact</string>
+    <string name="context_send_no_permission" context="message when trying to send a file without full access">No permissions to send this file</string>
     <string name="context_folder_created" context="success message when creating a folder">Folder created</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Correctly renamed</string>
     <string name="context_no_renamed" context="error message">Error. Not renamed</string>
