@@ -123,10 +123,10 @@
 		            android:layout_weight="1"/>
                 
                 <ImageView
-		            android:id="@+id/contact_grid_menu_layout_option_overflow"
+		            android:id="@+id/contact_grid_menu_layout_option_send_file"
 		            android:layout_width="match_parent"
 		            android:layout_height="match_parent"
-		            android:src="@drawable/ic_action_core_overflow"
+		            android:src="@drawable/send_file_ic"
 		            style="@style/dialogActionButton" 
 		            android:layout_weight="1"/>
             </LinearLayout>
