@@ -720,8 +720,10 @@ public class Util {
 		if (f != null){
 			log("deleteFolderAndSubfolders: "+ f.getAbsolutePath());
 			if (f.isDirectory()) {
-				for (File c : f.listFiles()){
-					deleteFolderAndSubfolders(context, c);
+				if (f.listFiles() != null){
+					for (File c : f.listFiles()){
+						deleteFolderAndSubfolders(context, c);
+					}
 				}
 			}
 			
