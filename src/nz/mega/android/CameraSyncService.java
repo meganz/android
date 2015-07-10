@@ -1648,7 +1648,11 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 				log("Fast login OK");
 				
 				dbH.clearCredentials();
+				String gSession = megaApi.dumpSession();
+				String lastEmail = credentials.getEmail();
+				credentials = new UserCredentials(lastEmail, gSession);
 				dbH.saveCredentials(credentials);
+				
 
 				log("Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes(this);

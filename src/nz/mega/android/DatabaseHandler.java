@@ -230,9 +230,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void saveCredentials(UserCredentials userCredentials) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
-        values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
+		ContentValues values = new ContentValues();
+        if (userCredentials.getEmail() != null){
+        	values.put(KEY_EMAIL, encrypt(userCredentials.getEmail()));
+        }
+        if (userCredentials.getSession() != null){
+           	values.put(KEY_SESSION, encrypt(userCredentials.getSession()));
+        }
         db.insert(TABLE_CREDENTIALS, null, values);
     }
 	
