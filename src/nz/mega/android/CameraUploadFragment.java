@@ -478,11 +478,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					if (megaApi.getNodeByHandle(photosyncHandle) == null){
 						photosyncHandle = -1;
 					}
-					else{
-						if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
-							photosyncHandle = -1;
-						}
-					}
 				}
 			}
 			
@@ -701,18 +696,7 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 					}
 					else{
 						MegaNode pshNode = megaApi.getNodeByHandle(photosyncHandle);
-						if (pshNode != null){
-							MegaNode pspNode = megaApi.getParentNode(pshNode);
-							if (pspNode != null){
-								if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
-									photosyncHandle = -1;
-								}
-							}
-							else{
-								photosyncHandle = -1;
-							}
-						}
-						else{
+						if (pshNode == null){
 							photosyncHandle = -1;
 						}
 					}
@@ -1387,11 +1371,6 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 				photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
 				if (megaApi.getNodeByHandle(photosyncHandle) == null){
 					photosyncHandle = -1;
-				}
-				else{
-					if (megaApi.getParentNode(megaApi.getNodeByHandle(photosyncHandle)).getHandle() != megaApi.getRootNode().getHandle()){
-						photosyncHandle = -1;
-					}
 				}
 			}
 		}
