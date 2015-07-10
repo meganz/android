@@ -963,26 +963,53 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
-			MegaNode n = megaApi.getNodeByHandle(request.getNodeHandle());
-			String currentNodeName = n.getName();
-			String megaFingerPrint = megaApi.getFingerprint(n);
-			log("copy node");
 			if (e.getErrorCode() == MegaError.API_OK){
-				String nameInMega = transfersCopy.get(megaFingerPrint);
-				if (nameInMega != null){
-					if (nameInMega.compareTo(currentNodeName) != 0){
-						megaApi.renameNode(n, nameInMega);
+				MegaNode n = megaApi.getNodeByHandle(request.getNodeHandle());
+				if (n != null){
+					String currentNodeName = n.getName();
+					String megaFingerPrint = megaApi.getFingerprint(n);
+					log("copy node");
+					String nameInMega = transfersCopy.get(megaFingerPrint);
+					if (nameInMega != null){
+						if (nameInMega.compareTo(currentNodeName) != 0){
+							megaApi.renameNode(n, nameInMega);
+						}
 					}
+					totalSizeUploaded += n.getSize();
+					totalUploaded++;
+					transfersCopy.remove(megaFingerPrint);
+					
+					if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
+						successCount = transfersOK.size();
+						errorCount = transfersError.size();
+						onQueueComplete();
+					}	
+				}
+				else{
+					Intent tempIntent = null;
+					tempIntent = new Intent(this, UploadService.class);
+					tempIntent.setAction(UploadService.ACTION_CANCEL);
+					startService(tempIntent);
 				}
 			}
-			totalSizeUploaded += n.getSize();
-			totalUploaded++;
-			transfersCopy.remove(megaFingerPrint);
-			
-			if ((currentTransfers.size() == 0) && (transfersCopy.size() == 0) && (foldersCreation.size() == 0)){
-				successCount = transfersOK.size();
-				errorCount = transfersError.size();
-				onQueueComplete();
+			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+				log("OVERQUOTA ERROR: "+e.getErrorCode());
+				
+				Intent intent = new Intent(this, ManagerActivity.class);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
+				startActivity(intent);
+				
+				Intent tempIntent = null;
+				tempIntent = new Intent(this, UploadService.class);
+				tempIntent.setAction(UploadService.ACTION_CANCEL);
+				startService(tempIntent);	
+			}
+			else{
+				Intent tempIntent = null;
+				tempIntent = new Intent(this, UploadService.class);
+				tempIntent.setAction(UploadService.ACTION_CANCEL);
+				startService(tempIntent);
 			}
 		}
 	}
