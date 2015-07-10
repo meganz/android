@@ -271,6 +271,7 @@
     <string name="context_copy_link" context="get the link and copy it">Copiar enlace</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Eliminar</string>
     <string name="context_share_folder" context="menu item">Compartir carpeta</string>
+    <string name="context_send_file" context="menu item">Enviar fichero</string>
     <string name="context_view_shared_folders" context="open a shared folder">Ver carpetas compartidas</string>
     <string name="context_sharing_folder" context="Item menu option upon clicking on one or multiple files.">Compartir</string>
     <string name="remove_all_sharing" context="status text">Eliminando todos los contactos compartidos</string>
@@ -290,6 +291,7 @@
     <string name="context_permissions_not_changed" context="error message">Error. No se pudo cambiar</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">La carpeta ya existe</string>
     <string name="context_contact_already_exists" context="message when trying to create a invite a contact already that is already added">ya es un contacto existente</string>
+    <string name="context_send_no_permission" context="message when trying to send a file without full access">No tiene permisos para enviar este fichero</string>
     <string name="context_folder_created" context="success message when creating a folder">Carpeta creada</string>
     <string name="context_correctly_renamed" context="success message when renaming a node">Renombrado correctamente</string>
     <string name="context_no_renamed" context="error message">Error. No se pudo renombrar</string>

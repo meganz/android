@@ -87,6 +87,35 @@
         android:orientation="horizontal"
         android:padding="0dp"
         android:background="@color/adapters_background">
+	    
+        <RelativeLayout
+                android:id="@+id/contact_list_option_remove_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+	        
+		        <ImageView
+		            android:id="@+id/contact_list_option_remove"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_delete"
+		            style="@style/dialogActionButton"
+		            android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+		        
+		      <TextView 
+                    android:id="@+id/contacts_list_option_remove_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_delete"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>
+		</RelativeLayout>
                
         <RelativeLayout
                 android:id="@+id/contact_list_option_properties_layout"
@@ -117,6 +146,35 @@
 					android:textStyle="bold"/>
 	        </RelativeLayout>    
 	         
+        <RelativeLayout
+                android:id="@+id/contact_list_option_send_file_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+	        
+		        <ImageView
+		            android:id="@+id/contact_list_option_send_file"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/send_file_ic"
+		            style="@style/dialogActionButton"
+		            android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+		        
+		      <TextView 
+                    android:id="@+id/contacts_list_option_send_file_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_send_file"
+                    android:layout_centerHorizontal="true"
+                     android:paddingBottom="10dp"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>
+		  </RelativeLayout>
+        
          <RelativeLayout
                 android:id="@+id/contact_list_option_share_layout"
                 android:layout_width="match_parent"
@@ -155,34 +213,7 @@
 		            android:paddingTop="10dp"
 		            android:background="@null"
 		            android:layout_gravity="center_vertical" /> -->   
-	        <RelativeLayout
-                android:id="@+id/contact_list_option_remove_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1" >
 	        
-		        <ImageView
-		            android:id="@+id/contact_list_option_remove"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
-		            style="@style/dialogActionButton"
-		            android:layout_centerHorizontal="true"
-		            android:layout_alignParentTop="true"
-		            android:paddingTop="2dp"/>
-		        
-		      <TextView 
-                    android:id="@+id/contacts_list_option_remove_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/context_delete"
-                    android:layout_centerHorizontal="true"
-                     android:paddingBottom="10dp"
-					android:layout_alignParentBottom="true"
-					android:textColor="#ffffff"
-					android:textSize="10sp"
-					android:textStyle="bold"/>
-		      </RelativeLayout>
 
     </LinearLayout>
     
