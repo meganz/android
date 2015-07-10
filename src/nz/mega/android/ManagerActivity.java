@@ -168,6 +168,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public static int REQUEST_CODE_SELECT_CONTACT = 1009;
 	public static int TAKE_PHOTO_CODE = 1010;
 	private static int WRITE_SD_CARD_REQUEST_CODE = 1011;
+	private static int REQUEST_CODE_SELECT_FILE = 1012;
 	
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
 	public static String ACTION_CANCEL_DOWNLOAD = "CANCEL_DOWNLOAD";
@@ -5517,20 +5518,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log("TYPE_COPY");
 			if(sendToInbox){
 				log("sendToInbox");
-				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE){
-					if(iF!=null){
-						sendToInbox=false;
-						if (e.getErrorCode() == MegaError.API_OK){
-							Toast.makeText(this, getString(R.string.context_correctly_sent), Toast.LENGTH_SHORT).show();
-						}
-						else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-							log("OVERQUOTA ERROR: "+e.getErrorCode());
-							showOverquotaAlert();
-						}
-						else
-						{
-							Toast.makeText(this, getString(R.string.context_no_sent), Toast.LENGTH_LONG).show();
-						}
+				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE||drawerItem == DrawerItem.CONTACTS){
+					sendToInbox=false;
+					if (e.getErrorCode() == MegaError.API_OK){
+						Toast.makeText(this, getString(R.string.context_correctly_sent), Toast.LENGTH_SHORT).show();
+					}
+					else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+						log("OVERQUOTA ERROR: "+e.getErrorCode());
+						showOverquotaAlert();
+					}
+					else
+					{
+						Toast.makeText(this, getString(R.string.context_no_sent), Toast.LENGTH_LONG).show();
 					}
 				}				
 			}
@@ -6677,6 +6676,32 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				startService(service);				
 			}			
 		}
+		else if (requestCode == REQUEST_CODE_SELECT_FILE && resultCode == RESULT_OK) {
+			log("requestCode == REQUEST_CODE_SELECT_FILE");
+			if (intent == null) {			
+				log("Return.....");
+				return;						
+			}
+			
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final String[] selectedContacts = intent.getStringArrayExtra("SELECTED_CONTACTS");
+			final long fileHandle = intent.getLongExtra("SELECT", 0);	
+			
+			MegaNode node = megaApi.getNodeByHandle(fileHandle);
+			if(node!=null)
+			{
+				sendToInbox=true;
+				log("File to send: "+node.getName());
+				for (int i=0;i<selectedContacts.length;i++){
+            		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+            		megaApi.sendFileToUser(node, user, this);
+            	}
+			}			
+		}	
 		else if (requestCode == REQUEST_CODE_SELECT_FOLDER && resultCode == RESULT_OK) {
 			
 			if (intent == null) {			
@@ -8035,6 +8060,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
+	}
+	
+	public void pickContacToSendFile(List<MegaUser> users){
+		
+		Intent intent = new Intent(this, FileExplorerActivity.class);
+		intent.setAction(FileExplorerActivity.ACTION_SELECT_FILE);
+		String[] longArray = new String[users.size()];
+		for (int i=0; i<users.size(); i++){
+			longArray[i] = users.get(i).getEmail();
+		}
+		intent.putExtra("SELECTED_CONTACTS", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);		
 	}
 	
 	public void leaveIncomingShare (MegaNode n){

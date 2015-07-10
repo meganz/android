@@ -53,6 +53,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	public static String ACTION_PICK_COPY_FOLDER = "ACTION_PICK_COPY_FOLDER";
 	public static String ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER";
 	public static String ACTION_SELECT_FOLDER = "ACTION_SELECT_FOLDER";
+	public static String ACTION_SELECT_FILE = "ACTION_SELECT_FILE";
 	public static String ACTION_UPLOAD_SELFIE = "ACTION_UPLOAD_SELFIE";	
 	public static String ACTION_CHOOSE_MEGA_FOLDER_SYNC = "ACTION_CHOOSE_MEGA_FOLDER_SYNC";
 	/*
@@ -112,6 +113,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	long gParentHandle;
 	String gcFTag = "";
+	boolean selectFile = false;
 	
 	/*
 	 * Background task to process files for uploading
@@ -236,6 +238,11 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
 				
 			}
+			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
+				mode = SELECT;
+				selectFile = true;
+				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");				
+			}
 			else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
 				mode = UPLOAD_SELFIE;
 				imagePath=intent.getStringExtra("IMAGE_PATH");
@@ -264,6 +271,13 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	                	          				
 	        Bundle b1 = new Bundle();
 	        b1.putInt("MODE", mode);
+	        if(selectFile){
+	        	b1.putBoolean("SELECTFILE", true);
+	        }
+	        else{
+	        	b1.putBoolean("SELECTFILE", false);
+	        }
+	        
 			mTabsAdapterExplorer.addTab(tabSpec3, CloudDriveExplorerFragment.class, b1);
 			mTabsAdapterExplorer.addTab(tabSpec4, IncomingSharesExplorerFragment.class, b1);
 			
@@ -575,17 +589,28 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		}
 		else if (mode == SELECT){
 
-			long parentHandle = handle;
-			MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-			if(parentNode == null){
-				parentNode = megaApi.getRootNode();
+			if(selectFile)
+			{
+				Intent intent = new Intent();
+				intent.putExtra("SELECT", handle);
+				intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+				setResult(RESULT_OK, intent);
+				finish();
 			}
+			else{
+				long parentHandle = handle;
+				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
+				if(parentNode == null){
+					parentNode = megaApi.getRootNode();
+				}
 
-			Intent intent = new Intent();
-			intent.putExtra("SELECT", parentNode.getHandle());
-			intent.putExtra("SELECTED_CONTACTS", selectedContacts);
-			setResult(RESULT_OK, intent);
-			finish();
+				Intent intent = new Intent();
+				intent.putExtra("SELECT", parentNode.getHandle());
+				intent.putExtra("SELECTED_CONTACTS", selectedContacts);
+				setResult(RESULT_OK, intent);
+				finish();
+			}
+			
 		}
 		else if (mode == SELECT_CAMERA_FOLDER){
 

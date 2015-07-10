@@ -174,6 +174,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 //        ImageButton optionSend;
         RelativeLayout optionShare;
         RelativeLayout optionRemove;
+        RelativeLayout optionSendFile;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -217,6 +218,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			holder.optionShare = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_share_layout);
 //			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			holder.optionRemove = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_remove_layout);
+			holder.optionSendFile = (RelativeLayout) convertView.findViewById(R.id.contact_list_option_send_file_layout);
 //			holder.optionRemove.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
 			convertView.setTag(holder);
 		}
@@ -344,6 +346,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		holder.optionShare.setTag(holder);
 		holder.optionRemove.setOnClickListener(this);
 		holder.optionRemove.setTag(holder);
+		holder.optionSendFile.setOnClickListener(this);
+		holder.optionSendFile.setTag(holder);
 		
 		return convertView;
 	}
@@ -476,6 +480,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			}
 			case R.id.contact_list_option_share_layout:{
 				log("optionShare");
+				positionClicked = -1;
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(c);
 				((ManagerActivity) context).pickFolderToShare(user);
@@ -485,6 +490,7 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 			//TODO remove contact
 			case R.id.contact_list_option_remove_layout:{
 				log("Remove contact");
+				positionClicked = -1;
 				((ManagerActivity) context).removeContact(c);
 				notifyDataSetChanged();	
 				break;
@@ -506,6 +512,15 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 				}
 				break;
 			}
+			case R.id.contact_list_option_send_file_layout:{
+				log("optionSendFile");
+				positionClicked = -1;
+				List<MegaUser> user = new ArrayList<MegaUser>();
+				user.add(c);
+				((ManagerActivity) context).pickContacToSendFile(user);
+				notifyDataSetChanged();
+				break;
+			}			
 		}
 	}
 	
