@@ -217,6 +217,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 				
 				ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
 				for (long n : copyFromHandles){
+//					log("Disabled nodes to copy: "+n);
 					list.add(n);
 				}
 				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);

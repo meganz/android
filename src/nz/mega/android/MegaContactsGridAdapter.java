@@ -274,6 +274,7 @@ public class MegaContactsGridAdapter extends BaseAdapter{
     	public ArrayList<ImageView> optionsProperties;
     	public ArrayList<ImageView> optionsShare;
     	public ArrayList<ImageView> optionsDelete;
+    	public ArrayList<ImageView> optionsSendFile;
     	public ArrayList<ImageView> optionsOverflow;
     	
     	public ArrayList<String> contactMails;
@@ -302,6 +303,7 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 			holder.optionsProperties = new ArrayList<ImageView>();
 			holder.optionsShare = new ArrayList<ImageView>();
 			holder.optionsDelete = new ArrayList<ImageView>();
+			holder.optionsSendFile = new ArrayList<ImageView>();
 			holder.optionsOverflow = new ArrayList<ImageView>();
 			
 			holder.contactMails = new ArrayList<String>();
@@ -340,9 +342,8 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 				ImageView oD = (ImageView) rLView.findViewById(R.id.contact_grid_menu_layout_option_delete);
 				holder.optionsDelete.add(oD);
 				
-				ImageView oO = (ImageView) rLView.findViewById(R.id.contact_grid_menu_layout_option_overflow);
-				oO.setVisibility(View.INVISIBLE);
-				holder.optionsOverflow.add(oO);
+				ImageView oSF = (ImageView) rLView.findViewById(R.id.contact_grid_menu_layout_option_send_file);
+				holder.optionsSendFile.add(oSF);
 				
 				ImageButton tD = (ImageButton) rLView.findViewById(R.id.contact_cell_three_dots);
 				holder.threeDots.add(tD);
@@ -544,6 +545,18 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 					onDeleteClick(holder, positionFinal, index, totalPosition);
 				}
 			});
+			
+			ImageView oSF = holder.optionsSendFile.get(i);
+			oSF.setTag(holder);
+			oSF.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					ViewHolderContactsGrid holder = (ViewHolderContactsGrid) v.getTag();
+					
+					onSendFileClick(holder, positionFinal, index, totalPosition);
+				}
+			});
 		}
 		
 		return convertView;
@@ -647,6 +660,22 @@ public class MegaContactsGridAdapter extends BaseAdapter{
 		}
 		
 		((ManagerActivity) context).removeContact(c);
+		positionClicked = -1;
+		notifyDataSetChanged();	
+	}
+	
+	public void onSendFileClick(ViewHolderContactsGrid holder, int positionFinal, int index, int totalPosition){
+		log("onSendFileClick");
+		MegaUser c = megaApi.getContact(holder.contactMails.get(index));
+		if(c == null)
+		{
+			return;
+		}		
+
+		List<MegaUser> user = new ArrayList<MegaUser>();
+		user.add(c);
+		((ManagerActivity) context).pickContacToSendFile(user);		
+		
 		positionClicked = -1;
 		notifyDataSetChanged();	
 	}
