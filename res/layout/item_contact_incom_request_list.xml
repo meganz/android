@@ -127,7 +127,7 @@
 		            android:id="@+id/contact_list_option_ignore"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
-		            android:src="@drawable/ic_delete"
+		            android:src="@drawable/ignore_ic"
 		           style="@style/dialogActionButton"
 		            android:layout_centerHorizontal="true"
 		            android:layout_alignParentTop="true"
