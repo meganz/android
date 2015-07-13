@@ -465,6 +465,10 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			emptyTextView.setVisibility(View.GONE);
 			listView.setVisibility(View.GONE);
 			
+			if (megaApi.getRootNode() == null){
+				return v;
+			}
+			
 			if (prefs == null){
 				photosyncHandle = -1;
 			}
@@ -680,6 +684,10 @@ public class CameraUploadFragment extends Fragment implements OnClickListener, O
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
+			
+			if (megaApi.getRootNode() == null){
+				return v;
+			}
 			
 			if (prefs == null){
 				photosyncHandle = -1;
