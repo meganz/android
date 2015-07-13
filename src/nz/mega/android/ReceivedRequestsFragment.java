@@ -163,8 +163,33 @@ public class ReceivedRequestsFragment extends Fragment implements OnClickListene
 		contacts = megaApi.getIncomingContactRequests();
     	if(contacts!=null)
     	{
-    		adapterList.setContacts(contacts);
-    		adapterList.notifyDataSetChanged();
+    		if(adapterList!=null)
+    		{
+    			adapterList.setContacts(contacts);
+        		adapterList.notifyDataSetChanged();
+    		}
+    		else
+    		{
+    			log("adapter==NULL");
+    			adapterList = new MegaContactRequestListAdapter(context, contacts, emptyImageView, emptyTextView, listView, ManagerActivity.INCOMING_REQUEST_ADAPTER);
+    		} 
+    		
+    		if (adapterList.getCount() == 0){				
+				log("adapterList.getCount() == 0");
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.sent_requests_empty);
+				listView.setVisibility(View.GONE);
+				addContactButton.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			}
+			else{
+				log("adapterList.getCount() NOT = 0");
+				listView.setVisibility(View.VISIBLE);
+				addContactButton.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}
 		}
 	}
 	

@@ -178,18 +178,48 @@ public class SentRequestsFragment extends Fragment implements OnClickListener, O
 	
 	public void setContactRequests()
 	{
+		log("setContactRequests");
 		contacts = megaApi.getOutgoingContactRequests();
     	if(contacts!=null)
     	{
-    		adapterList.setContacts(contacts);
-    		adapterList.notifyDataSetChanged();
+    		log("Sent requests: "+contacts.size());
+    		if(adapterList!=null){
+    			log("adapter!=NULL");
+    			adapterList.setContacts(contacts);
+        		adapterList.notifyDataSetChanged();
+    		}
+    		else{
+    			adapterList = new MegaContactRequestListAdapter(context, contacts, emptyImageView, emptyTextView, listView, ManagerActivity.OUTGOING_REQUEST_ADAPTER);
+    		}
+    		
+    		if (adapterList.getCount() == 0){				
+				log("adapterList.getCount() == 0");
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.sent_requests_empty);
+				listView.setVisibility(View.GONE);
+				addContactButton.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			}
+			else{
+				log("adapterList.getCount() NOT = 0");
+				listView.setVisibility(View.VISIBLE);
+				addContactButton.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}	
+    		
 		}
 	}
 
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		
+		switch(v.getId()){
+			case R.id.invite_contact_button:				
+				((ManagerActivity)context).showNewContactDialog(null);				
+				break;
+		}
 	}
 	
 	@Override

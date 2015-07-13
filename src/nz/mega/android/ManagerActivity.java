@@ -5224,30 +5224,35 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			} 
 			catch (Exception ex) {}
 			
-			if (e.getErrorCode() == MegaError.API_OK){
-				
-				if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
-				{
-					Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();					
-				}
-				else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
-				{
-					Toast.makeText(this, getString(R.string.context_contact_invitation_deleted), Toast.LENGTH_LONG).show();					
-				}
-				else
-				{
-					Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();					
-				}				
+			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
+				Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();
 			}
 			else{
-				if(e.getErrorCode()==MegaError.API_EEXIST)
-				{
-					Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+				if (e.getErrorCode() == MegaError.API_OK){
+					
+					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+					{
+						Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();					
+					}
+					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
+					{
+						Toast.makeText(this, getString(R.string.context_contact_invitation_deleted), Toast.LENGTH_LONG).show();					
+					}
+//					else
+//					{
+//						Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();					
+//					}				
 				}
 				else{
-					Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
-				}				
-				log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+					if(e.getErrorCode()==MegaError.API_EEXIST)
+					{
+						Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+					}
+					else{
+						Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+					}				
+					log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				}
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REPLY_CONTACT_REQUEST){	
@@ -8433,7 +8438,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	@Override
 	public void onContactRequestsUpdate(MegaApiJava api, ArrayList<MegaContactRequest> requests) {
-		log("onContactRequestsUpdate");
+		log("---------------------onContactRequestsUpdate");
 		// TODO Auto-generated method stub
 		if (drawerItem == DrawerItem.CONTACTS){
 //			int index = viewPagerContacts.getCurrentItem();
