@@ -1304,10 +1304,12 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
 	    	
 	    	if (n.isFolder()){
 	    		
-	    		if (context != null){
-	    			Intent intent = new Intent(context, CreateThumbPreviewService.class);
-	    			intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, n.getHandle());
-	    			context.startService(intent);
+	    		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
+		    		if (context != null){
+		    			Intent intent = new Intent(context, CreateThumbPreviewService.class);
+		    			intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, n.getHandle());
+		    			context.startService(intent);
+		    		}
 	    		}
 				
 				if ((n.getName().compareTo(CameraSyncService.CAMERA_UPLOADS) == 0) && (megaApi.getParentNode(n).getType() == MegaNode.TYPE_ROOT)){

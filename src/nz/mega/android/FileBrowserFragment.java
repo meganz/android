@@ -342,10 +342,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			}
 		}	
 		
-		if (context != null){
-			Intent intent = new Intent(context, CreateThumbPreviewService.class);
-			intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
-			context.startService(intent);
+		if (Util.CREATE_THUMB_PREVIEW_SERVICE){
+			if (context != null){
+				Intent intent = new Intent(context, CreateThumbPreviewService.class);
+				intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
+				context.startService(intent);
+			}
 		}
 		
 		megaApi.getAccountDetails(this);
@@ -741,10 +743,12 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 					adapterList.setNodes(nodes);
 					listView.setSelection(0);
 					
-					if (context != null){
-						Intent intent = new Intent(context, CreateThumbPreviewService.class);
-						intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
-						context.startService(intent);
+					if (Util.CREATE_THUMB_PREVIEW_SERVICE){
+						if (context != null){
+							Intent intent = new Intent(context, CreateThumbPreviewService.class);
+							intent.putExtra(CreateThumbPreviewService.EXTRA_PARENT_HASH, parentHandle);
+							context.startService(intent);
+						}
 					}
 					
 					//If folder has no files
