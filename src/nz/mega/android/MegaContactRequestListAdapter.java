@@ -215,6 +215,7 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		if(type==ManagerActivity.OUTGOING_REQUEST_ADAPTER)
 		{
+			log("ManagerActivity.OUTGOING_REQUEST_ADAPTER");
 			if (convertView == null) {
 				convertView = inflater.inflate(R.layout.item_contact_outg_request_list, parent, false);
 				holder = new ViewHolderContactsRequestList();
@@ -244,6 +245,7 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 		}
 		else{
 			//Incoming request
+			log("ManagerActivity.INCOMING_REQUEST_ADAPTER");
 			if (convertView == null) {
 				convertView = inflater.inflate(R.layout.item_contact_incom_request_list, parent, false);
 				holder = new ViewHolderContactsRequestList();
@@ -620,6 +622,7 @@ public class MegaContactRequestListAdapter extends BaseAdapter implements OnClic
 			log("num requests: "+contacts.size());
 		}
 		positionClicked = -1;
+//		listFragment.invalidate();
 		notifyDataSetChanged();
 	}
 	
