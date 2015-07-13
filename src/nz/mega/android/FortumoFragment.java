@@ -130,10 +130,18 @@ public class FortumoFragment extends Fragment implements MegaRequestListenerInte
 //			Toast.makeText(context, "PAYMENTID: " + request.getLink(), Toast.LENGTH_LONG).show();
 			
 			String urlFortumo = "http://fortumo.com/mobile_payments/f250460ec5d97fd27e361afaa366db0f?cuid=" + request.getLink();
-			myWebView.loadUrl(urlFortumo);
-//			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlFortumo));
+//			myWebView.loadUrl(urlFortumo);
+			
+			/*INICIO CENTILI*/
+//			String urlCentili = "https://www.centili.com/widget/WidgetModule?api=9e8eee856f4c048821954052a8d734ac&clientid=" + request.getLink();
+//			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlCentili));
 //			startActivity(browserIntent);
 //			((ManagerActivity)context).onBackPressed();
+			/*FIN CENTILI*/
+			
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlFortumo));
+			startActivity(browserIntent);
+			((ManagerActivity)context).onBackPressed();
 		}
 	}
 	
