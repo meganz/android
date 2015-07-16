@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
+import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
@@ -69,8 +70,6 @@ import android.os.StatFs;
 import android.provider.MediaStore;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
@@ -85,7 +84,6 @@ import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -102,24 +100,21 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
-import android.widget.TabHost.TabSpec;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-
+import android.widget.ImageButton;
 
 public class ManagerActivity extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 	
@@ -295,6 +290,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private InboxFragment iF;
     private CreditCardFragment ccF;
     private FortumoFragment fF;
+    
+    
+    /////LOLLIPOP FRAGMENTS
+    private FileBrowserFragmentLollipop fbFLol;  
+    
+    
+    //////
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -1282,7 +1284,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 	
 			//INITIAL FRAGMENT
-			selectDrawerItem(drawerItem);
+			selectDrawerItem(drawerItem);			
+			// Check if we're running on Android 5.0 or higher
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Call some material design APIs here
+				log("Material Design");
+				selectDrawerItemLollipop(drawerItem);
+			} else {
+				// Implement this feature without material design
+				selectDrawerItem(drawerItem);
+				log("Old designs");
+			}
 		}
 	}	
 	
@@ -1719,7 +1731,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void cameraUploadsClicked(){
 		log("cameraUplaodsClicked");
 		drawerItem = DrawerItem.CAMERA_UPLOADS;
-		selectDrawerItem(drawerItem);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+			selectDrawerItemLollipop(drawerItem);
+		} else {
+			// Implement this feature without material design
+			selectDrawerItem(drawerItem);
+		}
 	}
     
 	private View getTabIndicator(Context context, String title) {
@@ -1735,7 +1753,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		nDA.setPositionClicked(0);
 		mDrawerLayout.openDrawer(Gravity.LEFT);
 		firstTime = true;
-		selectDrawerItem(drawerItem);
+		
+		
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+			selectDrawerItemLollipop(drawerItem);
+		} else {
+			// Implement this feature without material design
+			selectDrawerItem(drawerItem);
+		}
 
 //		if (fbF == null){
 //			fbF = new FileBrowserFragment();
@@ -1830,6 +1857,745 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		fragTransaction.attach(currentFragment);
 		fragTransaction.commit();
 	}
+	
+    public void selectDrawerItemLollipop(DrawerItem item){
+    	log("selectDrawerItemLollipop");
+    	switch (item){
+    		case CLOUD_DRIVE:{
+//    			
+//    			megaApi.getPricing(this);
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			if (fbFLol == null){
+    				fbFLol = new FileBrowserFragmentLollipop();
+					if (parentHandleBrowser == -1){
+						fbFLol.setParentHandle(megaApi.getRootNode().getHandle());
+						parentHandleBrowser = megaApi.getRootNode().getHandle();
+					}
+					else{
+						fbFLol.setParentHandle(parentHandleBrowser);
+					}
+					fbFLol.setIsList(isListCloudDrive);
+					fbFLol.setOrder(orderGetChildren);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+					fbFLol.setNodes(nodes);
+				}
+				else{
+										
+					fbFLol.setIsList(isListCloudDrive);
+					fbFLol.setParentHandle(parentHandleBrowser);
+					fbFLol.setOrder(orderGetChildren);
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+					fbFLol.setNodes(nodes);
+				}
+								
+				mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, fbFLol, "fbFLol");
+    			ft.commit();
+    			
+    			if (!firstTime){
+    				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			}
+    			else{
+    				firstTime = false;
+    			}
+    			
+    			customSearch.setVisibility(View.VISIBLE);
+    			viewPagerContacts.setVisibility(View.GONE);
+    			
+    			if (createFolderMenuItem != null){
+    				changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+	    			createFolderMenuItem.setVisible(true);
+	    			addContactMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(true);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(false);
+	    			settingsMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(true);
+	    			addMenuItem.setEnabled(true);	  
+ 	    			
+	    			if (isListCloudDrive){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
+	    			rubbishBinMenuItem.setVisible(false);
+	    			rubbishBinMenuItem.setTitle(getString(R.string.section_rubbish_bin));
+	    			clearRubbishBinMenuitem.setVisible(false);
+    			}
+    			
+    			break;
+    		}
+    		case INBOX:{
+   			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (iF == null){
+    				iF = new InboxFragment();
+    				iF.setParentHandle(megaApi.getInboxNode().getHandle());
+    				parentHandleInbox = megaApi.getInboxNode().getHandle();
+    				iF.setIsList(isListInbox);
+    				iF.setOrder(orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
+    				iF.setNodes(nodes);
+    			}
+    			else{
+    				iF.setIsList(isListInbox);
+    				iF.setParentHandle(parentHandleInbox);
+    				iF.setOrder(orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
+    				iF.setNodes(nodes);
+    			}
+    			    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, iF, "iF");
+    			ft.commit();
+    			
+    			customSearch.setVisibility(View.VISIBLE);
+    			viewPagerContacts.setVisibility(View.GONE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				//Show				
+        			sortByMenuItem.setVisible(true);
+        			selectMenuItem.setVisible(true); 
+        			upgradeAccountMenuItem.setVisible(false);
+        			
+    				//Hide
+        			refreshMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+    				pauseRestartTransfersItem.setVisible(false);
+    				createFolderMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			addContactMenuItem.setVisible(false);        			
+        			unSelectMenuItem.setVisible(false);
+        			addMenuItem.setEnabled(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+        			importLinkMenuItem.setVisible(false);
+        			takePicture.setVisible(false);
+        			refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+    				settingsMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+        			clearRubbishBinMenuitem.setVisible(false);
+        			rubbishBinMenuItem.setVisible(false);
+	    		}
+
+    			break;
+    		}
+    		case CONTACTS:{
+  			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setTitle(getString(R.string.section_contacts));
+    			
+    			if (getmDrawerToggle() != null){
+    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
+    				supportInvalidateOptionsMenu();
+    			}
+    			
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+    			
+    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    			if (currentFragment != null){
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    			}
+    			mTabHostContacts.setVisibility(View.VISIBLE);    			
+    			viewPagerContacts.setVisibility(View.VISIBLE);
+    			
+    			mTabHostContacts.getTabWidget().setBackgroundColor(Color.BLACK);
+    			//mTabHostContacts.getTabWidget().setTextAlignment(textAlignment)
+    			
+//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);    		    
+//    		    title1.setText(R.string.tab_contacts); 			
+    			
+    			if (mTabsAdapterContacts == null){
+    				mTabsAdapterContacts = new TabsAdapter(this, mTabHostContacts, viewPagerContacts);   	
+    				
+        			TabHost.TabSpec tabSpec1 = mTabHostContacts.newTabSpec("contactsFragment");
+        	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
+        	        //tabSpec.setContent(contentID);
+        	        //mTabHostContacts.addTab(tabSpec);
+        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
+        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
+        	        
+        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
+        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
+   				
+    				
+    				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
+    			}		
+    			
+    			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
+                    @Override
+                    public void onTabChanged(String tabId) {
+                    	managerActivity.supportInvalidateOptionsMenu();
+                    }
+    			});
+    			
+    			for (int i=0;i<mTabsAdapterContacts.getCount();i++){
+    				final int index = i;
+    				mTabHostContacts.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							viewPagerContacts.setCurrentItem(index);
+						}
+					});
+    			}
+    			
+    			customSearch.setVisibility(View.VISIBLE);     			
+			    			
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+
+    			if (createFolderMenuItem != null){
+    				changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+    				createFolderMenuItem.setVisible(false);
+    				addContactMenuItem.setVisible(true);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(false);
+	    			settingsMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(true);
+	    			addMenuItem.setEnabled(false);	
+	    			rubbishBinMenuItem.setVisible(false);
+	    			clearRubbishBinMenuitem.setVisible(false);
+	    			
+	    			if (isListContacts){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}	    			
+    			}
+    			break;
+    		}
+    		case RUBBISH_BIN:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (rbF == null){
+    				rbF = new RubbishBinFragment();
+    				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+    				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+    				rbF.setIsList(isListRubbishBin);
+    				rbF.setOrder(orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+    				rbF.setNodes(nodes);
+    			}
+    			else{
+    				rbF.setIsList(isListRubbishBin);
+    				rbF.setParentHandle(parentHandleRubbish);
+    				rbF.setOrder(orderGetChildren);
+    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
+    				rbF.setNodes(nodes);
+    			}
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, rbF, "rbF");
+    			ft.commit();
+    			
+    			customSearch.setVisibility(View.VISIBLE);
+    			viewPagerContacts.setVisibility(View.GONE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(true);
+	    			helpMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(false);
+	    			settingsMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(true);
+	    			thumbViewMenuItem.setVisible(true);
+	    			addMenuItem.setEnabled(false);
+	    			changePass.setVisible(false);
+	    			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+    			
+        			if (isListRubbishBin){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
+        			rbF.setIsList(isListRubbishBin);	        			
+        			rbF.setParentHandle(parentHandleRubbish);
+        			rubbishBinMenuItem.setVisible(false);
+        			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
+	    			clearRubbishBinMenuitem.setVisible(true);
+	    		}
+
+    			break;
+    		}
+    		case SHARED_WITH_ME:{    			
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (aB == null){
+    				aB = getSupportActionBar();
+    			}
+    			aB.setTitle(getString(R.string.section_shared_items));
+    			
+    			if (getmDrawerToggle() != null){
+    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
+    				supportInvalidateOptionsMenu();
+    			}
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			
+    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    			if (currentFragment != null){
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    			}
+    			
+    			mTabHostShares.getTabWidget().setBackgroundColor(Color.BLACK);
+    			
+    			mTabHostShares.setVisibility(View.VISIBLE);    			
+    			mTabHostShares.setVisibility(View.VISIBLE);
+    			
+    			if (mTabsAdapterShares == null){
+    				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
+    				
+        			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
+        			tabSpec3.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_incoming_shares))); // new function to inject our own tab layout
+        	        //tabSpec.setContent(contentID);
+        	        //mTabHostContacts.addTab(tabSpec);
+        	        TabHost.TabSpec tabSpec4 = mTabHostShares.newTabSpec("outgoingSharesFragment");
+        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_outgoing_shares))); // new function to inject our own tab layout
+        	                	          				
+    				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragment.class, null);
+    				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragment.class, null);
+    				
+    			}
+    			
+    			mTabHostShares.setOnTabChangedListener(new OnTabChangeListener(){
+                    @Override
+                    public void onTabChanged(String tabId) {
+                    	log("TabId :"+ tabId);
+                    	supportInvalidateOptionsMenu();
+                        if(tabId.equals("outgoingSharesFragment")){                         	
+                			if (outSF != null){                 				
+                				if(parentHandleOutgoing!=-1){
+	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+	            					aB.setTitle(node.getName());
+            					}
+                				else{
+                					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					outSF.refresh(); 
+                				}            					   				
+                			}
+                        }
+                        else if(tabId.equals("incomingSharesFragment")){                        	
+                        	if (inSF != null){                        		
+                        		if(parentHandleIncoming!=-1){
+                        			
+                        			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+                					aB.setTitle(node.getName());	
+            					}
+                				else{
+                					
+                					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					inSF.refresh(); 
+                				}   				
+                			}                           	
+                        }
+                     }
+    			});
+    			
+				for (int i=0;i<mTabsAdapterShares.getCount();i++){
+					final int index = i;
+					mTabHostShares.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+						
+						@Override
+						public void onClick(View v) {
+							viewPagerShares.setCurrentItem(index);	
+						}
+					});
+				}
+   			
+    			customSearch.setVisibility(View.VISIBLE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				selectMenuItem.setVisible(true);
+    				sortByMenuItem.setVisible(true);
+    				thumbViewMenuItem.setVisible(true); 
+        			upgradeAccountMenuItem.setVisible(false);
+
+    				
+        			//Hide
+    				createFolderMenuItem.setVisible(false);
+    				addContactMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);   			
+        			selectMenuItem.setVisible(false);
+        			unSelectMenuItem.setVisible(false);  				
+        			rubbishBinMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			createFolderMenuItem.setVisible(false);
+        			rubbishBinMenuItem.setVisible(false);
+        			clearRubbishBinMenuitem.setVisible(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+        			settingsMenuItem.setVisible(false);
+    				refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+	    		}
+    			
+    			if (inSF != null){
+    				aB.setTitle(getString(R.string.section_shared_items));	
+    				inSF.refresh();			
+    				
+    			}    			
+    			if (outSF != null){    				
+					aB.setTitle(getString(R.string.section_shared_items));				
+					outSF.refresh();    				
+    			}
+    			
+    			break;
+    		}
+    		case SETTINGS:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			startActivity(new Intent(this, SettingsActivity.class));
+    			
+    			drawerItem = lastDrawerItem;
+    			selectDrawerItemLollipop(drawerItem);
+    			
+    			break;
+    		}
+    		case ACCOUNT:{
+    			
+    			if (nDA != null){
+					nDA.setPositionClicked(-1);
+				}
+    			
+    			accountFragment=MY_ACCOUNT_FRAGMENT;
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
+    			
+    			if (maF == null){
+    				maF = new MyAccountFragment();
+    			}
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, maF, "maF");
+    			ft.commit();
+    			
+    			customSearch.setVisibility(View.GONE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				createFolderMenuItem.setVisible(false);
+//        				rubbishBinMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			refreshMenuItem.setVisible(true);
+	    			sortByMenuItem.setVisible(false);
+	    			helpMenuItem.setVisible(true);
+	    			upgradeAccountMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(false);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(false);
+	    			changePass.setVisible(true); 
+	    			if (numberOfSubscriptions > 0){
+	    				cancelSubscription.setVisible(true);
+	    			}
+	    			killAllSessions.setVisible(true);
+	    			
+	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+	    			log("Export in: "+path);
+	    			File file= new File(path);
+	    			if(file.exists()){
+	    				exportMK.setVisible(false); 
+		    			removeMK.setVisible(true); 
+	    			}
+	    			else{
+	    				exportMK.setVisible(true); 
+		    			removeMK.setVisible(false); 		
+	    			}
+	    			
+//    	    			logoutMenuItem.setVisible(true);
+//    	    			rubbishBinMenuItem.setIcon(R.drawable.ic_action_bar_null);
+//    	    			rubbishBinMenuItem.setEnabled(false);
+//    	    			addMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			addMenuItem.setEnabled(false);
+//    	    			createFolderMenuItem.setIcon(R.drawable.ic_action_bar_null);
+	    			createFolderMenuItem.setEnabled(false);
+	    			rubbishBinMenuItem.setVisible(false);
+	    			clearRubbishBinMenuitem.setVisible(false);
+        			settingsMenuItem.setVisible(false);
+	    		}
+    			
+    			
+    			break;
+    		}
+    		case TRANSFERS:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (tF == null){
+    				tF = new TransfersFragment();
+    			}
+    			tF.setTransfers(megaApi.getTransfers());
+    			tF.setPause(!downloadPlay);
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, tF, "tF");
+    			ft.commit();
+    			
+    			customSearch.setVisibility(View.GONE);
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			if (createFolderMenuItem != null){
+    				//Show
+    				pauseRestartTransfersItem.setVisible(true);
+        			upgradeAccountMenuItem.setVisible(false);
+        			
+    				//Hide
+    				createFolderMenuItem.setVisible(false);
+    				addContactMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			sortByMenuItem.setVisible(false);
+        			selectMenuItem.setVisible(false);
+        			unSelectMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+        			rubbishBinMenuItem.setVisible(false);
+        			clearRubbishBinMenuitem.setVisible(false);
+        			settingsMenuItem.setVisible(false);
+    				refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+        			
+//        			if (downloadPlay){
+//        				addMenuItem.setIcon(R.drawable.ic_pause);
+//        			}
+//        			else{
+//        				addMenuItem.setIcon(R.drawable.ic_play);
+//        			}
+        			
+        			if (megaApi.getTransfers().size() == 0){
+        				downloadPlay = true;
+        			}
+    			}
+    			
+    			break;
+    		}
+    		case SAVED_FOR_OFFLINE:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (oF == null){
+    				oF = new OfflineFragment();
+    				oF.setIsList(isListOffline);
+    				oF.setPathNavigation("/");
+    			}
+    			else{
+    				oF.setPathNavigation("/");
+    				oF.setIsList(isListOffline);
+    			}
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, oF, "oF");
+    			ft.commit();
+    			
+    			mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			customSearch.setVisibility(View.VISIBLE);
+    			
+
+    			if (createFolderMenuItem != null){
+	    			createFolderMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(true);
+	    			addMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setEnabled(false);
+	    			changePass.setVisible(false); 
+	    			exportMK.setVisible(false); 
+	    			removeMK.setVisible(false); 
+	    			if (isListOffline){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
+	    			rubbishBinMenuItem.setVisible(false);
+	    			clearRubbishBinMenuitem.setVisible(false);
+        			settingsMenuItem.setVisible(false);
+    				refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+    			}
+    			
+    			break;
+    		}
+    		case SEARCH:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (sF == null){
+        			sF = new SearchFragment();
+        		}
+    			
+    			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
+    			
+    			drawerItem = DrawerItem.SEARCH;
+    			
+    			sF.setSearchNodes(searchNodes);
+    			sF.setNodes(searchNodes);
+    			sF.setSearchQuery(searchQuery);
+    			sF.setParentHandle(parentHandleSearch);
+    			sF.setLevels(levelsSearch);
+    			
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, sF, "sF");
+    			ft.commit();
+    			
+    			customSearch.setVisibility(View.VISIBLE);    			
+
+    			if (createFolderMenuItem != null){
+        			createFolderMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			sortByMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(true);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(true);
+        			addMenuItem.setEnabled(true);
+        			rubbishBinMenuItem.setVisible(false); 
+        			clearRubbishBinMenuitem.setVisible(false);
+        			changePass.setVisible(false); 
+        			exportMK.setVisible(false); 
+        			removeMK.setVisible(false); 
+        			settingsMenuItem.setVisible(false);
+    				refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+    			}
+    			break;
+    		}
+    		case CAMERA_UPLOADS:{
+    			
+    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+    			
+    			if (nDA != null){
+    				nDA.setPositionClicked(POS_CAMERA_UPLOADS);
+    			}
+    			
+    			if (psF == null){
+    				psF = new CameraUploadFragment();
+    				psF.setIsList(isListCameraUpload);
+   					psF.setFirstTimeCam(firstTimeCam);
+				}
+				else{
+					psF.setIsList(isListCameraUpload);
+					psF.setFirstTimeCam(firstTimeCam);
+				}
+				
+				
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, psF, "psF");
+    			ft.commit();
+    			
+    			
+    			firstTimeCam = false;
+    			
+    			
+				mDrawerLayout.closeDrawer(Gravity.LEFT);
+    			
+    			customSearch.setVisibility(View.VISIBLE);
+    			
+    			if (createFolderMenuItem != null){
+	    			createFolderMenuItem.setVisible(false);
+	    			addMenuItem.setVisible(false);
+	    			sortByMenuItem.setVisible(false);
+	    			upgradeAccountMenuItem.setVisible(false);
+	    			selectMenuItem.setVisible(false);
+	    			unSelectMenuItem.setVisible(false);
+	    			thumbViewMenuItem.setVisible(true);
+	    			addMenuItem.setEnabled(false);
+	    			createFolderMenuItem.setEnabled(false);
+	    			changePass.setVisible(false); 
+	    			exportMK.setVisible(false); 
+	    			removeMK.setVisible(false); 
+        			settingsMenuItem.setVisible(false);
+    				refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+	    			if (isListCameraUpload){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
+	    			rubbishBinMenuItem.setVisible(false);
+	    			clearRubbishBinMenuitem.setVisible(false);
+    			}
+      			break;
+    		}
+			default:{
+				break;
+			}
+    	}
+    }
 	
     public void selectDrawerItem(DrawerItem item){
     	log("selectDrawerItem");
@@ -2831,7 +3597,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	protected void onPostResume() {
 	    super.onPostResume();
 	    if (isSearching){
-    		selectDrawerItem(DrawerItem.SEARCH);    		
+	    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Call some material design APIs here
+				selectDrawerItemLollipop(DrawerItem.SEARCH);
+			} else {
+				// Implement this feature without material design
+				selectDrawerItem(DrawerItem.SEARCH);
+			}        		
     		isSearching = false;
 	    } 
 	}
@@ -4784,7 +5556,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			else{
 				getSupportActionBar().setTitle(titleAB);
 			}
-			selectDrawerItem(drawerItem);
+			
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Call some material design APIs here
+				selectDrawerItemLollipop(drawerItem);
+			} else {
+				// Implement this feature without material design
+				selectDrawerItem(drawerItem);
+			}
+			
 		}
 		else{
 			getSupportActionBar().setTitle(titleAB);
@@ -4817,7 +5597,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				drawerItem = DrawerItem.ACCOUNT;
 				titleAB = drawerItem.getTitle(this);
-				selectDrawerItem(drawerItem);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					// Call some material design APIs here
+					selectDrawerItemLollipop(drawerItem);
+				} else {
+					// Implement this feature without material design
+					selectDrawerItem(drawerItem);
+				}
 				break;
 			}
 			case R.id.bottom_control_bar:{
@@ -4826,7 +5612,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 				drawerItem = DrawerItem.ACCOUNT;
 				titleAB = drawerItem.getTitle(this);
-				selectDrawerItem(drawerItem);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					// Call some material design APIs here
+					selectDrawerItemLollipop(drawerItem);
+				} else {
+					// Implement this feature without material design
+					selectDrawerItem(drawerItem);
+				}
 				break;
 			}
 		}
