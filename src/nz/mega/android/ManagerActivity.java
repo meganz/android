@@ -75,6 +75,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.text.Spannable;
@@ -1284,7 +1285,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 	
 			//INITIAL FRAGMENT
-			selectDrawerItem(drawerItem);			
+
 			// Check if we're running on Android 5.0 or higher
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				// Call some material design APIs here
@@ -3608,6 +3609,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    } 
 	}
 
+	public void showOptionsPanel(MegaNode node){
+		log("showOptionsPanel");
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			if (fbFLol != null){
+				fbFLol.showOptionsPanel(node);
+			}
+			
+//			int index = viewPagerCloudDrive.getCurrentItem();
+//			if (index == 0){
+//				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+//				cDriveF = (CloudDriveLollipopFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+//				if (cDriveF != null){
+//					cDriveF.showOptionsPanel(node);
+//				}
+//			}
+//			else{
+//				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+//				rbFLol = (RubbishBinLollipopFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+//				if (rbFLol != null){
+//					rbFLol.showOptionsPanel(node);
+//				}				
+//			}
+		}		
+	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
