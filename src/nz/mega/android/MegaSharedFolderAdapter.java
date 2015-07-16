@@ -91,48 +91,51 @@ public class MegaSharedFolderAdapter extends BaseAdapter implements OnClickListe
 				MegaError e) {
 			log("onRequestFinish() avatar");
 			if (e.getErrorCode() == MegaError.API_OK){
-
-				pendingAvatars.remove(request.getEmail());
 				
-				if (holder.contactMail.compareTo(request.getEmail()) == 0){
-					File avatar = null;
-					if (context.getExternalCacheDir() != null){
-						avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					else{
-						avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
-					}
-					Bitmap bitmap = null;
-					if (avatar.exists()){
-						if (avatar.length() > 0){
-							BitmapFactory.Options bOpts = new BitmapFactory.Options();
-							bOpts.inPurgeable = true;
-							bOpts.inInputShareable = true;
-							bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
-							if (bitmap == null) {
-								avatar.delete();
-							}
-							else{
-								holder.imageView.setImageBitmap(bitmap);
-								holder.initialLetter.setVisibility(View.GONE);
+				if(request.getEmail()!=null)
+				{
+					pendingAvatars.remove(request.getEmail());
+					
+					if (holder.contactMail.compareTo(request.getEmail()) == 0){
+						File avatar = null;
+						if (context.getExternalCacheDir() != null){
+							avatar = new File(context.getExternalCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+						}
+						else{
+							avatar = new File(context.getCacheDir().getAbsolutePath(), holder.contactMail + ".jpg");
+						}
+						Bitmap bitmap = null;
+						if (avatar.exists()){
+							if (avatar.length() > 0){
+								BitmapFactory.Options bOpts = new BitmapFactory.Options();
+								bOpts.inPurgeable = true;
+								bOpts.inInputShareable = true;
+								bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+								if (bitmap == null) {
+									avatar.delete();
+								}
+								else{
+									holder.imageView.setImageBitmap(bitmap);
+									holder.initialLetter.setVisibility(View.GONE);
+								}
 							}
 						}
-					}
-					
-					if(request.getParamType()==1){
-						log("(1)request.getText(): "+request.getText());
-						holder.nameText=request.getText();
-						holder.name=true;
-					}
-					else if(request.getParamType()==2){
-						log("(2)request.getText(): "+request.getText());
-						holder.firstNameText = request.getText();
-						holder.firstName = true;
-					}
-					if(holder.name&&holder.firstName){
-						holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
-						holder.name= false;
-						holder.firstName = false;
+						
+						if(request.getParamType()==1){
+							log("(1)request.getText(): "+request.getText());
+							holder.nameText=request.getText();
+							holder.name=true;
+						}
+						else if(request.getParamType()==2){
+							log("(2)request.getText(): "+request.getText());
+							holder.firstNameText = request.getText();
+							holder.firstName = true;
+						}
+						if(holder.name&&holder.firstName){
+							holder.textViewContactName.setText(holder.nameText+" "+holder.firstNameText);
+							holder.name= false;
+							holder.firstName = false;
+						}
 					}
 				}
 			}

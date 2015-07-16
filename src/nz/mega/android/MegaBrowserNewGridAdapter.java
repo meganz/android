@@ -1189,7 +1189,7 @@ public class MegaBrowserNewGridAdapter extends BaseAdapter {
     /*
 	 * Disable selection
 	 */
-	void hideMultipleSelect() {
+	public void hideMultipleSelect() {
 		this.multipleSelect = false;
 		if (actionMode != null) {
 			actionMode.finish();

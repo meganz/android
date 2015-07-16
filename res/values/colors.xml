@@ -51,4 +51,6 @@
     
     <color name="transparent_black">#80000000</color>
     <color name="transparent_mega">#80db0605</color>
+    
+    <color name="accentColor">#00BFA5</color>
 </resources>
