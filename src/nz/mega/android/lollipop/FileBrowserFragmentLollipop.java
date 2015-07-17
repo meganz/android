@@ -9,6 +9,7 @@ import java.util.List;
 import nz.mega.android.ContactPropertiesMainActivity;
 import nz.mega.android.CreateThumbPreviewService;
 import nz.mega.android.DatabaseHandler;
+import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FolderLinkActivity;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.ManagerActivity;
@@ -17,6 +18,7 @@ import nz.mega.android.MegaBrowserNewGridAdapter;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.MegaStreamingService;
 import nz.mega.android.MimeTypeList;
+import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
@@ -849,7 +851,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Move option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
- 
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			handleList.add(selectedNode.getHandle());									
+			((ManagerActivity) context).showMove(handleList);
 
 			break;
 		}
@@ -858,6 +862,22 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
 
+			Intent i = new Intent(context, FilePropertiesActivity.class);
+			i.putExtra("handle", selectedNode.getHandle());
+			
+			if (selectedNode.isFolder()) {
+				if (megaApi.isShared(selectedNode)){
+					i.putExtra("imageId", R.drawable.folder_shared_mime);	
+				}
+				else{
+					i.putExtra("imageId", R.drawable.folder_mime);
+				}
+			} 
+			else {
+				i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+			}
+			i.putExtra("name", selectedNode.getName());
+			context.startActivity(i);
 
 			break;
 		}
@@ -865,6 +885,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Delete option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			handleList.add(selectedNode.getHandle());
+
+			((ManagerActivity) context).moveToTrash(handleList);
 
 			break;
 		}
@@ -873,13 +897,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
 
+			((ManagerActivity) context).getPublicLinkAndShareIt(selectedNode);
+
 			break;
 		}
 		case R.id.file_list_option_rename_layout: {
 			log("Rename option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-
+			((ManagerActivity) context).showRenameDialog(selectedNode, selectedNode.getName());
 			break;
 		}		
 		
@@ -887,14 +913,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Share option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-
+			((ManagerActivity) context).shareFolder(selectedNode);
 			break;
 		}			
 		case R.id.file_list_option_copy_layout: {
 			log("Copy option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			handleList.add(selectedNode.getHandle());									
+			((ManagerActivity) context).showCopy(handleList);
 			break;
 		}
 	}
@@ -1235,8 +1263,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				log("ps: "+pS);
 			}
-		}
-		
+		}		
 		
 		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
 			log("getPanelState()!=PanelState.HIDDEN");

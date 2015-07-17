@@ -5904,6 +5904,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("---------onRequestFinish: "  + request.getRequestString());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+			log("onRequestFinish Material");
+			onRequestFinishLollipop(api, request, e);
+		}
+		else {
+			onRequestFinishKitKat(api, request, e);
+		}
+	}
+	
+	@SuppressLint("NewApi")
+	public void onRequestFinishKitKat(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("---------onRequestFinishKitKat: "  + request.getRequestString());
 		
 		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
@@ -6603,7 +6616,711 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}
 	}
+
+	@SuppressLint("NewApi")
+	public void onRequestFinishLollipop(MegaApiJava api, MegaRequest request, MegaError e) {
+		log("---------onRequestFinishLollipop: "  + request.getRequestString());
+		
+		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+			log ("account_details request");
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+				
+				
+				accountType = accountInfo.getProLevel();
+				
+				switch (accountType){
+					case 0:{
+						levelAccountDetails = -1;
+						break;
+					}
+					case 1:{
+						levelAccountDetails = 1;
+						break;
+					}
+					case 2:{
+						levelAccountDetails = 2;
+						break;
+					}
+					case 3:{
+						levelAccountDetails = 3;
+						break;
+					}
+					case 4:{
+						levelAccountDetails = 0;
+						break;
+					}
+				}
+
+				accountDetailsFinished = true;
+				
+				if (inventoryFinished){
+					if (levelAccountDetails < levelInventory){
+						if (maxP != null){
+							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
+						}
+					}
+				}
+				
+				long totalStorage = accountInfo.getStorageMax();
+				long usedStorage = accountInfo.getStorageUsed();;
+				boolean totalGb = false;				
+		        
+		        bottomControlBar.setVisibility(View.VISIBLE);
+		        usedPerc = 0;
+		        if (totalStorage != 0){
+		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
+		        }
+		        usedSpaceBar.setProgress(usedPerc);
+				
+				totalStorage = ((totalStorage / 1024) / 1024) / 1024;
+				String total = "";
+				if (totalStorage >= 1024){
+					totalStorage = totalStorage / 1024;
+					total = total + totalStorage + " TB";
+				}
+				else{
+					 total = total + totalStorage + " GB";
+					 totalGb = true;
+				}
+
+				usedStorage = ((usedStorage / 1024) / 1024) / 1024;
+				String used = "";
+				if(totalGb){
+					usedGbStorage = usedStorage;
+					used = used + usedStorage + " GB";					
+				}
+				else{
+					if (usedStorage >= 1024){
+						usedGbStorage = usedStorage;
+						usedStorage = usedStorage / 1024;
+
+						used = used + usedStorage + " TB";
+					}
+					else{
+						usedGbStorage = usedStorage;
+						used = used + usedStorage + " GB";
+					}
+				}
+		      
+//				String usedSpaceString = getString(R.string.used_space, used, total);
+				String usedSpaceString = used + " / " + total;
+		        usedSpace.setText(usedSpaceString);
+		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
+
+		        if (usedPerc < 90){
+		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
+		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        	usedSpaceWarning.setVisibility(View.INVISIBLE);
+		        }
+		        else if ((usedPerc >= 90) && (usedPerc <= 95)){
+		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
+		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        	usedSpaceWarning.setVisibility(View.VISIBLE);
+		        }
+		        else{
+		        	if (usedPerc > 100){
+			        	usedPerc = 100;			        	
+			        }
+		        	usedSpaceWarning.setVisibility(View.VISIBLE);
+		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));    
+		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        }      
+		        
+		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 3, used.length() + 3 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		        usedSpace.setText(wordtoSpan);	
+		        
+		        log("onRequest TYPE_ACCOUNT_DETAILS: "+usedPerc);
+
+		        if(drawerItem==DrawerItem.CLOUD_DRIVE){
+		        	if (usedPerc > 95){
+		        		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+						ft.detach(fbFLol);
+						ft.attach(fbFLol);
+						ft.commitAllowingStateLoss();
+		        	}
+		        }
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				paymentBitSet = Util.convertToBitSet(request.getNumber());
+			}
+		}
+		else if(request.getType() == MegaRequest.TYPE_CREDIT_CARD_QUERY_SUBSCRIPTIONS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				numberOfSubscriptions = request.getNumber();
+				log("NUMBER OF SUBS: " + numberOfSubscriptions);
+				if (cancelSubscription != null){
+					cancelSubscription.setVisible(false);
+				}
+				if (numberOfSubscriptions > 0){
+					if (cancelSubscription != null){
+						if (drawerItem == DrawerItem.ACCOUNT){
+							if (maF != null){
+								cancelSubscription.setVisible(true);
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.cancel_subscription_ok), Toast.LENGTH_SHORT).show();
+			}
+			else{
+				Toast.makeText(this, getString(R.string.cancel_subscription_error), Toast.LENGTH_SHORT).show();
+			}
+			megaApi.creditCardQuerySubscriptions(this);
+		}
+		else if (request.getType() == MegaRequest.TYPE_LOGOUT){
+			log("logout finished");
+//			if (request.getType() == MegaRequest.TYPE_LOGOUT){
+//				log("type_logout");
+//				if (e.getErrorCode() == MegaError.API_ESID){
+//					log("calling ManagerActivity.logout");
+//					MegaApiAndroid megaApi = app.getMegaApi(); 
+//					ManagerActivity.logout(managerActivity, app, megaApi, false);
+//				}
+//			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
+			if (e.getErrorCode() == MegaError.API_OK){
+				userName.setText(request.getName());
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			log("fecthnodes request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE_CONTACT){
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+			
+				if(drawerItem==DrawerItem.CONTACTS){
+					cF.notifyDataSetChanged();
+				}	
+			}
+			else{
+				log("Termino con error");
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){	
+			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
+				Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();
+			}
+			else{
+				if (e.getErrorCode() == MegaError.API_OK){
+					
+					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+					{
+						Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();					
+					}
+					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
+					{
+						Toast.makeText(this, getString(R.string.context_contact_invitation_deleted), Toast.LENGTH_LONG).show();					
+					}
+//					else
+//					{
+//						Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();					
+//					}				
+				}
+				else{
+					if(e.getErrorCode()==MegaError.API_EEXIST)
+					{
+						Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+					}
+					else{
+						Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+					}				
+					log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_REPLY_CONTACT_REQUEST){	
+			log("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: "+request.getType());
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				Toast.makeText(this, getString(R.string.context_invitacion_reply), Toast.LENGTH_LONG).show();
+	//			Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+
+			}
+			else{
+				Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_MOVE){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (moveToRubbish){
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+				}
+				moveToRubbish = false;
+				log("move to rubbish request finished");
+			}
+			else{
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+				}
+			
+				log("move nodes request finished");
+			}			
+			if (e.getErrorCode() == MegaError.API_OK){
+//				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null){
+					
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+						fbFLol.setNodes(nodes);
+						fbFLol.getListView().invalidate();
+					}
+				}
+				if (drawerItem == DrawerItem.INBOX){
+					if (iF != null){
+//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iF.getParentHandle()), orderGetChildren);
+//							rbF.setNodes(nodes);
+						iF.refresh();
+					}
+				}	
+				if (drawerItem == DrawerItem.RUBBISH_BIN){
+					if (rbF != null){
+					
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
+				}
+				if (drawerItem == DrawerItem.SHARED_WITH_ME){
+					if (inSF != null){
+						//TODO: ojo con los hijos
+//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+//							inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();
+					}
+					if (outSF != null){
+						//TODO: ojo con los hijos
+//							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(outSF.getParentHandle()), orderGetChildren);
+//							inSF.setNodes(nodes);
+						outSF.getListView().invalidateViews();
+					}
+				}
+			}	
+		}
+		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.success_kill_all_sessions), Toast.LENGTH_SHORT).show();
+			}
+			else
+			{
+				log("error when killing sessions: "+e.getErrorString());
+				Toast.makeText(this, getString(R.string.error_kill_all_sessions), Toast.LENGTH_SHORT).show();
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_REMOVE){
+			
+			log("requestFinish "+MegaRequest.TYPE_REMOVE);
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (statusDialog != null){
+					if (statusDialog.isShowing()){
+						try { 
+							statusDialog.dismiss();	
+						} 
+						catch (Exception ex) {}
+						Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
+					}
+				}
+				
+				if (fbFLol != null){
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+						fbFLol.setNodes(nodes);
+						fbFLol.getListView().invalidate();
+					}
+				}
+				if (rbF != null){
+					if (drawerItem == DrawerItem.RUBBISH_BIN){
+						if (isClearRubbishBin){
+							isClearRubbishBin = false;
+							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+							rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+							aB.setTitle(getString(R.string.section_rubbish_bin));	
+							getmDrawerToggle().setDrawerIndicatorEnabled(true);
+						}
+						else{
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
+				}
 	
+			}
+			else{
+				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
+			}
+			log("remove request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			MegaNode node = megaApi.getNodeByHandle(request.getNodeHandle());
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				if (isGetLink){
+					final String link = request.getLink();
+					
+					AlertDialog getLinkDialog;
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					builder.setTitle(getString(R.string.context_get_link_menu));
+					
+					LayoutInflater inflater = getLayoutInflater();
+					View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+					ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+					TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+					TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+					
+					String urlString = "";
+					String keyString = "";
+					String [] s = link.split("!");
+					if (s.length == 3){
+						urlString = s[0] + "!" + s[1];
+						keyString = s[2];
+					}
+					if (node.isFolder()){
+						thumb.setImageResource(R.drawable.folder_thumbnail);
+					}
+					else{
+						thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
+					}
+					
+					Display display = getWindowManager().getDefaultDisplay();
+					DisplayMetrics outMetrics = new DisplayMetrics();
+					display.getMetrics(outMetrics);
+					float density = getResources().getDisplayMetrics().density;
+	
+					float scaleW = Util.getScaleW(outMetrics, density);
+					float scaleH = Util.getScaleH(outMetrics, density);
+					
+					url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+					key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+					
+					url.setText(urlString);
+					key.setText(keyString);
+					
+					
+					builder.setView(dialoglayout);
+					
+					builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Intent intent = new Intent(Intent.ACTION_SEND);
+							intent.setType("text/plain");
+							intent.putExtra(Intent.EXTRA_TEXT, link);
+							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
+						}
+					});
+					
+					builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+						
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+							    android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+							    clipboard.setText(link);
+							} else {
+							    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+					            clipboard.setPrimaryClip(clip);
+							}
+							
+							Toast.makeText(managerActivity, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+						}
+					});
+					
+					getLinkDialog = builder.create();
+					getLinkDialog.show();
+					Util.brandAlertDialog(getLinkDialog);
+				}
+			}
+			else{
+				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
+			}
+			log("export request finished");
+		}
+		else if (request.getType() == MegaRequest.TYPE_RENAME){
+			
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
+				if (fbFLol != null){
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+						fbFLol.setNodes(nodes);
+						fbFLol.getListView().invalidate();
+					}
+				}
+				if (rbF != null){
+					if (drawerItem == DrawerItem.RUBBISH_BIN){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
+				}
+				if (inSF != null){
+					if (drawerItem == DrawerItem.SHARED_WITH_ME){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+						//TODO: ojo con los hijos
+//						inSF.setNodes(nodes);
+						inSF.getListView().invalidateViews();
+					}
+				}
+			}
+			else{
+				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
+			}
+		} 
+		else if (request.getType() == MegaRequest.TYPE_COPY){
+			log("TYPE_COPY");
+			if(sendToInbox){
+				log("sendToInbox");
+				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE||drawerItem == DrawerItem.CONTACTS){
+					sendToInbox=false;
+					if (e.getErrorCode() == MegaError.API_OK){
+						Toast.makeText(this, getString(R.string.context_correctly_sent), Toast.LENGTH_SHORT).show();
+					}
+					else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+						log("OVERQUOTA ERROR: "+e.getErrorCode());
+						showOverquotaAlert();
+					}
+					else
+					{
+						Toast.makeText(this, getString(R.string.context_no_sent), Toast.LENGTH_LONG).show();
+					}
+				}				
+			}
+			else{
+				try { 
+					statusDialog.dismiss();	
+				} 
+				catch (Exception ex) {}
+				
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
+					if (fbFLol != null){
+						if (drawerItem == DrawerItem.CLOUD_DRIVE){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+							fbFLol.setNodes(nodes);
+							fbFLol.getListView().invalidate();
+						}
+					}
+					if (rbF != null){
+						if (drawerItem == DrawerItem.RUBBISH_BIN){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+							rbF.setNodes(nodes);
+							rbF.getListView().invalidateViews();
+						}
+					}
+					if (inSF != null){
+						if (drawerItem == DrawerItem.SHARED_WITH_ME){
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+							//TODO: ojo con los hijos
+//							inSF.setNodes(nodes);
+//							inSF.getListView().invalidateViews();
+						}
+					}
+				}
+				else{
+					if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+						log("OVERQUOTA ERROR: "+e.getErrorCode());
+						showOverquotaAlert();
+					}
+					else
+					{
+						Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+					}
+				}			
+			}			
+		}
+		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
+				if (fbFLol != null){
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+						fbFLol.setNodes(nodes);
+						fbF.getListView().invalidateViews();
+					}
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			boolean avatarExists = false;
+			if (e.getErrorCode() == MegaError.API_OK){
+				
+				File avatar = null;
+				if (getExternalCacheDir() != null){
+					avatar = new File(getExternalCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				}
+				else{
+					avatar = new File(getCacheDir().getAbsolutePath(), request.getEmail() + ".jpg");
+				}
+				Bitmap imBitmap = null;
+				if (avatar.exists()){
+					if (avatar.length() > 0){
+						BitmapFactory.Options options = new BitmapFactory.Options();
+						options.inJustDecodeBounds = true;
+						BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+						int imageHeight = options.outHeight;
+						int imageWidth = options.outWidth;
+						String imageType = options.outMimeType;
+						
+						// Calculate inSampleSize
+					    options.inSampleSize = calculateInSampleSize(options, 250, 250);
+					    
+					    // Decode bitmap with inSampleSize set
+					    options.inJustDecodeBounds = false;
+
+						imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), options);
+						if (imBitmap == null) {
+							avatar.delete();
+						}
+						else{
+							avatarExists = true;
+							Bitmap circleBitmap = Bitmap.createBitmap(imBitmap.getWidth(), imBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+							
+							BitmapShader shader = new BitmapShader (imBitmap,  TileMode.CLAMP, TileMode.CLAMP);
+					        Paint paint = new Paint();
+					        paint.setShader(shader);
+					
+					        Canvas c = new Canvas(circleBitmap);
+					        int radius; 
+					        if (imBitmap.getWidth() < imBitmap.getHeight())
+					        	radius = imBitmap.getWidth()/2;
+					        else
+					        	radius = imBitmap.getHeight()/2;
+					        
+						    c.drawCircle(imBitmap.getWidth()/2, imBitmap.getHeight()/2, radius, paint);
+					        imageProfile.setImageBitmap(circleBitmap);
+					        textViewProfile.setVisibility(View.GONE);
+						}
+					}
+				}
+			}
+			
+			log("avatar user downloaded");
+		}
+		else if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
+			
+			try { 
+				statusDialog.dismiss();	
+			} 
+			catch (Exception ex) {}
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();
+//				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+//				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+//				if (cF != null){
+//					if (drawerItem == DrawerItem.CONTACTS){	
+//						ArrayList<MegaUser> contacts = megaApi.getContacts();
+//						cF.setContacts(contacts);
+//						cF.getListView().invalidateViews();
+//					}
+//				}
+			}
+			log("add contact");
+		}
+		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
+			if (e.getErrorCode() == MegaError.API_OK) {
+				if (tF != null){
+					if (drawerItem == DrawerItem.TRANSFERS){
+						if (!downloadPlay){
+		    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_restart_transfers));
+							tF.setPause(true);
+						}
+						else{
+		    				pauseRestartTransfersItem.setTitle(getResources().getString(R.string.menu_pause_transfers));
+							tF.setPause(false);
+						}		
+					}
+				}				
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
+			if (e.getErrorCode() == MegaError.API_OK){
+				if (tF != null){
+					if (drawerItem == DrawerItem.TRANSFERS){
+						Intent cancelOneIntent = new Intent(this, DownloadService.class);
+						cancelOneIntent.setAction(DownloadService.ACTION_CANCEL_ONE_DOWNLOAD);				
+						startService(cancelOneIntent);
+						tF.setTransfers(megaApi.getTransfers());
+					}
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_SHARE){
+			try {				
+				statusDialog.dismiss();	
+				log("Dismiss");
+			} 
+			catch (Exception ex) {log("Exception");}
+			if (e.getErrorCode() == MegaError.API_OK){
+				log("OK MegaRequest.TYPE_SHARE");				
+			}
+			else{
+				log("ERROR MegaRequest.TYPE_SHARE");
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
+			if (e.getErrorCode() == MegaError.API_OK){
+//				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
+				drawerItem = DrawerItem.CLOUD_DRIVE;
+				selectDrawerItem(drawerItem);
+			}
+			else{
+				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+	
+
 	private void showOverquotaAlert(){
 		
 		dbH.setCamSyncEnabled(false);
@@ -8252,6 +8969,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+			log("onNodesUpdate Material");
+			onNodesUpdateLollipop(api, updatedNodes);
+		}
+		else {
+			onNodesUpdateKitkat(api, updatedNodes);
+		}
+	}	
+
+	public void onNodesUpdateKitkat(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
+		log("onNodesUpdateKitkat");
 		try { 
 			statusDialog.dismiss();	
 		} 
@@ -8265,6 +8994,104 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					fbF.setNodes(nodes);
 					fbF.setContentText();
 					fbF.getListView().invalidateViews();
+				}
+			}
+		}
+		if (drawerItem == DrawerItem.INBOX){
+			log("INBOX shown");
+			if (iF != null){
+				iF.refresh();
+//				iF.getListView().invalidateViews();
+			}
+		}
+		if (rbF != null){
+			if (drawerItem == DrawerItem.RUBBISH_BIN){
+				if (isClearRubbishBin){
+					isClearRubbishBin = false;
+					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					getmDrawerToggle().setDrawerIndicatorEnabled(true);
+
+					if(rbF.isVisible())
+					{
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+						rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+						rbF.setNodes(nodes);
+						rbF.getListView().invalidateViews();
+					}
+				}
+				else{
+					if(rbF.isVisible())
+					{
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						rbF.setNodes(nodes);
+						rbF.setContentText();
+						rbF.getListView().invalidateViews();
+					}
+				}				
+			}
+		}
+		
+		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==1){				
+				//OUTGOING				
+				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				log("Tag: "+ cFTag2);
+				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSF != null){					
+					aB.setTitle(getString(R.string.section_shared_items));				
+					outSF.refresh(this.parentHandleOutgoing);				
+				}
+			}
+			else{			
+				//InCOMING
+				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+				log("Tag: "+ cFTag1);
+				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSF != null){					
+					aB.setTitle(getString(R.string.section_shared_items));	
+					inSF.refresh(this.parentHandleIncoming);			
+				}				
+			}	
+		}
+		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+			if (psF != null){			
+				if(psF.isAdded()){
+					long cameraUploadHandle = psF.getPhotoSyncHandle();
+					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
+					log("cameraUploadHandle: " + cameraUploadHandle);
+					if (nps != null){
+						log("nps != null");
+						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
+						psF.setNodes(nodes);
+					}
+				}				
+			}
+		}
+		if (cF != null){
+			if (drawerItem == DrawerItem.CONTACTS){
+				log("Share finish");
+				cF.updateView();
+			}
+		}
+	}	
+
+	public void onNodesUpdateLollipop(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
+		log("onNodesUpdateLollipop");
+		try { 
+			statusDialog.dismiss();	
+		} 
+		catch (Exception ex) {}
+		
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			if (fbFLol != null){
+			
+				if (fbFLol.isVisible()){
+					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+					fbFLol.setNodes(nodes);
+					fbFLol.setContentText();
+					fbFLol.getListView().invalidate();
 				}
 			}
 		}

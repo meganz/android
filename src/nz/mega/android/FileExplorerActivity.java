@@ -150,6 +150,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
 		
@@ -163,9 +164,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 		}
-		
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+	
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
 		megaApi.addGlobalListener(this);
