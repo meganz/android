@@ -197,6 +197,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
 		if (megaApi == null){
@@ -204,9 +205,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 			megaApi = app.getMegaApi();
 		}			
 		
-		megaApi.addGlobalListener(this);
-		
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		megaApi.addGlobalListener(this);		
 		
 		setContentView(R.layout.activity_contactsexplorer);
 		
