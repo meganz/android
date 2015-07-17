@@ -3336,6 +3336,55 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
     	}
     }
+    
+    public void onBackPressedLollipop(){
+		if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
+		try { 
+			statusDialog.dismiss();	
+		} 
+		catch (Exception ex) {}
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			/*
+			int index = viewPagerCloudDrive.getCurrentItem();
+			if (index == 0){
+				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+				cDriveF = (CloudDriveLollipopFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (cDriveF != null){
+					if (cDriveF.onBackPressed() == 0){
+						super.onBackPressed();
+						return;
+					}
+				}
+			}
+			else{
+				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+				rbFLol = (RubbishBinLollipopFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (rbFLol != null){
+					if (rbFLol.onBackPressed() == 0){
+						super.onBackPressed();
+						return;
+					}
+				}				
+			}*/
+			
+			if (fbFLol != null){
+				if (fbFLol.onBackPressed() == 0){
+					super.onBackPressed();
+					return;
+				}
+			}
+			
+		}		
+	}
+    
 	
 	@Override
 	public void onBackPressed() {
@@ -3353,233 +3402,243 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		} 
 		catch (Exception ex) {}
 		
-		if (fbF != null){
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				if (fbF.onBackPressed() == 0){
-					super.onBackPressed();
-					return;
-				}
-			}
-		}	
 		
-		if (drawerItem == DrawerItem.SEARCH){
-			if (sF != null){
-    			if (sF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+			log("onBackPressed Material");
+			onBackPressedLollipop();
+		} 
+
+		else {
+			// Implement this feature without material design		
+			
+			if (fbF != null){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbF.onBackPressed() == 0){
+						super.onBackPressed();
+						return;
 					}
-					return;
 				}
-    		}
-    	}
-		
-		if (drawerItem == DrawerItem.INBOX){
-			if (iF != null){			
-				if (iF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
-				}
-			}
-		}
-		
-		if (drawerItem == DrawerItem.CONTACTS){
-			String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-			cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-			if (cF != null){			
-				if (cF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
-				}
-			}
-		}
-		
-		if (drawerItem == DrawerItem.SHARED_WITH_ME){
-			int index = viewPagerShares.getCurrentItem();
-			if(index==1){				
-				//OUTGOING				
-				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-				log("Tag: "+ cFTag2);
-				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSF != null){					
-					if (outSF.onBackPressed() == 0){
+			}				
+			if (drawerItem == DrawerItem.SEARCH){
+				if (sF != null){
+	    			if (sF.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						selectDrawerItem(drawerItem);
 						if(nDA!=null){
 							nDA.setPositionClicked(0);
 						}
 						return;
-					}					
-				}
-			}
-			else{			
-				//InCOMING
-				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-				log("Tag: "+ cFTag1);
-				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSF != null){					
-					if (inSF.onBackPressed() == 0){
+					}
+	    		}
+	    	}
+			
+			if (drawerItem == DrawerItem.INBOX){
+				if (iF != null){			
+					if (iF.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						selectDrawerItem(drawerItem);
 						if(nDA!=null){
 							nDA.setPositionClicked(0);
 						}
 						return;
-					}					
-				}				
-			}	
-		}
-		if (rbF != null){
-			if (drawerItem == DrawerItem.RUBBISH_BIN){
-				if (rbF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
 					}
-					return;
 				}
 			}
-		}
-		if (tF != null){
-			if (drawerItem == DrawerItem.TRANSFERS){
-				if (tF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
-				}
-			}
-		}		
-		if (drawerItem == DrawerItem.ACCOUNT){
 			
-			switch(accountFragment){
-			
-				case MY_ACCOUNT_FRAGMENT:{
-					if (maF != null){						
+			if (drawerItem == DrawerItem.CONTACTS){
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (cF != null){			
+					if (cF.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						selectDrawerItem(drawerItem);
 						if(nDA!=null){
 							nDA.setPositionClicked(0);
-							
-						}					
-					}
-					return;
-				}
-				case UPGRADE_ACCOUNT_FRAGMENT:{
-					if (upAF != null){						
-						drawerItem = DrawerItem.ACCOUNT;
-						selectDrawerItem(drawerItem);
-						if(nDA!=null){
-							nDA.setPositionClicked(-1);
-							
-						}					
-					}
-					return;
-				}
-				case PAYMENT_FRAGMENT:{
-					if (pF != null){
-						pF.onBackPressed();
-					}
-					return;					
-				}
-				case CC_FRAGMENT:{
-					if (ccF != null){
-						int parameterType = ccF.getParameterType();
-						ArrayList<Product> accounts = ccF.getAccounts();
-						BitSet paymentBitSet = ccF.getPaymentBitSet();
-						showpF(parameterType, accounts, paymentBitSet);
-					}
-					else{
-						showUpAF(null);
-					}
-					return;
-				}
-				case OVERQUOTA_ALERT:{
-					if (upAF != null){						
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						selectDrawerItem(drawerItem);
-						if(nDA!=null){
-							nDA.setPositionClicked(0);
-							
-						}					
-					}
-					return;
-				}
-				default:{
-					if (fbF != null){						
-						drawerItem = DrawerItem.CLOUD_DRIVE;
-						selectDrawerItem(drawerItem);
-						if(nDA!=null){
-							nDA.setPositionClicked(0);
-							
-						}					
+						}
+						return;
 					}
 				}
 			}
-		}
-		
-		if (oF != null){
-			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
-				if (oF.onBackPressed() == 0){
-					attr = dbH.getAttributes();
-					if (attr != null){
-						if (attr.getOnline() != null){
-							if (!Boolean.parseBoolean(attr.getOnline())){
-								super.onBackPressed();
-								return;
+			
+			if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				int index = viewPagerShares.getCurrentItem();
+				if(index==1){				
+					//OUTGOING				
+					String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+					log("Tag: "+ cFTag2);
+					outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+					if (outSF != null){					
+						if (outSF.onBackPressed() == 0){
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(0);
+							}
+							return;
+						}					
+					}
+				}
+				else{			
+					//InCOMING
+					String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+					log("Tag: "+ cFTag1);
+					inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+					if (inSF != null){					
+						if (inSF.onBackPressed() == 0){
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(0);
+							}
+							return;
+						}					
+					}				
+				}	
+			}
+			if (rbF != null){
+				if (drawerItem == DrawerItem.RUBBISH_BIN){
+					if (rbF.onBackPressed() == 0){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
+						return;
+					}
+				}
+			}
+			if (tF != null){
+				if (drawerItem == DrawerItem.TRANSFERS){
+					if (tF.onBackPressed() == 0){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
+						return;
+					}
+				}
+			}		
+			if (drawerItem == DrawerItem.ACCOUNT){
+				
+				switch(accountFragment){
+				
+					case MY_ACCOUNT_FRAGMENT:{
+						if (maF != null){						
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(0);
+								
+							}					
+						}
+						return;
+					}
+					case UPGRADE_ACCOUNT_FRAGMENT:{
+						if (upAF != null){						
+							drawerItem = DrawerItem.ACCOUNT;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(-1);
+								
+							}					
+						}
+						return;
+					}
+					case PAYMENT_FRAGMENT:{
+						if (pF != null){
+							pF.onBackPressed();
+						}
+						return;					
+					}
+					case CC_FRAGMENT:{
+						if (ccF != null){
+							int parameterType = ccF.getParameterType();
+							ArrayList<Product> accounts = ccF.getAccounts();
+							BitSet paymentBitSet = ccF.getPaymentBitSet();
+							showpF(parameterType, accounts, paymentBitSet);
+						}
+						else{
+							showUpAF(null);
+						}
+						return;
+					}
+					case OVERQUOTA_ALERT:{
+						if (upAF != null){						
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(0);
+								
+							}					
+						}
+						return;
+					}
+					default:{
+						if (fbF != null){						
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(0);
+								
+							}					
+						}
+					}
+				}
+			}
+			
+			if (oF != null){
+				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+					if (oF.onBackPressed() == 0){
+						attr = dbH.getAttributes();
+						if (attr != null){
+							if (attr.getOnline() != null){
+								if (!Boolean.parseBoolean(attr.getOnline())){
+									super.onBackPressed();
+									return;
+								}
 							}
 						}
+						
+						if (fbF != null){
+							drawerItem = DrawerItem.CLOUD_DRIVE;
+							selectDrawerItem(drawerItem);
+							if(nDA!=null){
+								nDA.setPositionClicked(0);
+							}
+						}
+						else{
+							super.onBackPressed();
+						}
+						return;
 					}
-					
-					if (fbF != null){
+				}
+			}
+			
+	//		if (sF != null){
+	//			if (drawerItem == DrawerItem.SEARCH){
+	//				if (sF.onBackPressed() == 0){
+	//					drawerItem = DrawerItem.CLOUD_DRIVE;
+	//					selectDrawerItem(drawerItem);
+	//					if(nDA!=null){
+	//						nDA.setPositionClicked(0);
+	//					}
+	//					return;
+	//				}
+	//			}
+	//		}
+			
+			if (psF != null){
+				if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+					if (psF.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						selectDrawerItem(drawerItem);
 						if(nDA!=null){
 							nDA.setPositionClicked(0);
 						}
+						return;
 					}
-					else{
-						super.onBackPressed();
-					}
-					return;
-				}
-			}
-		}
-		
-//		if (sF != null){
-//			if (drawerItem == DrawerItem.SEARCH){
-//				if (sF.onBackPressed() == 0){
-//					drawerItem = DrawerItem.CLOUD_DRIVE;
-//					selectDrawerItem(drawerItem);
-//					if(nDA!=null){
-//						nDA.setPositionClicked(0);
-//					}
-//					return;
-//				}
-//			}
-//		}
-		
-		if (psF != null){
-			if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-				if (psF.onBackPressed() == 0){
-					drawerItem = DrawerItem.CLOUD_DRIVE;
-					selectDrawerItem(drawerItem);
-					if(nDA!=null){
-						nDA.setPositionClicked(0);
-					}
-					return;
 				}
 			}
 		}
