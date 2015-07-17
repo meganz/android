@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import nz.mega.android.ContactPropertiesMainActivity;
 import nz.mega.android.CreateThumbPreviewService;
 import nz.mega.android.DatabaseHandler;
+import nz.mega.android.FolderLinkActivity;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
@@ -54,7 +56,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -826,8 +827,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Download option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 			slidingOptionsPanel.setVisibility(View.GONE);
-
-
+			ArrayList<Long> handleList = new ArrayList<Long>();
+			handleList.add(selectedNode.getHandle());
+			((ManagerActivity) context).onFileClick(handleList);
 			break;
 		}
 //		case R.id.file_list_option_leave_share_layout: {
@@ -1265,6 +1267,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				else{
 					MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 					if (parentNode != null){
+						log("ParentNode: "+parentNode.getName());
 						listView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);

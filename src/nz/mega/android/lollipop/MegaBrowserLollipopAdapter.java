@@ -130,6 +130,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
+		this.type = type;
 		
 		switch (type) {
 		case ManagerActivity.FILE_BROWSER_ADAPTER: {
