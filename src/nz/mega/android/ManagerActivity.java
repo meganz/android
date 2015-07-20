@@ -17,6 +17,7 @@ import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
+import nz.mega.android.lollipop.FileExplorerActivityLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
@@ -8135,6 +8136,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("showCopy");
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("COPY_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
+	}
+	
+	public void showCopyLollipop(ArrayList<Long> handleList){
+		log("showCopyLollipop");
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);

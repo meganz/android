@@ -922,7 +922,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingOptionsPanel.setVisibility(View.GONE);
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(selectedNode.getHandle());									
-			((ManagerActivity) context).showCopy(handleList);
+			((ManagerActivity) context).showCopyLollipop(handleList);
 			break;
 		}
 	}

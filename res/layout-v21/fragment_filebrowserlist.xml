@@ -235,7 +235,7 @@
             android:layout_width="match_parent"
         	android:layout_height="wrap_content"
         	android:padding="0dp"
-        	android:background="@color/adapters_background"
+        	android:background="@color/white"
         	android:orientation="vertical">
         	
             <LinearLayout
@@ -261,7 +261,7 @@
                     android:text="@string/general_download"                    
                     android:paddingTop="2dp"
                     android:paddingBottom="2dp"					
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
             </LinearLayout>
@@ -289,7 +289,7 @@
                     android:layout_height="wrap_content"
 		            android:paddingTop="2dp"
 		            android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 	        </LinearLayout>    
@@ -317,7 +317,7 @@
                     android:text="@string/context_get_link_menu"      
 		            android:paddingTop="2dp"
 		            android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		    </LinearLayout>
@@ -345,7 +345,7 @@
                     android:text="@string/context_leave_menu"
 		            android:paddingTop="2dp"
 		            android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>	               
 		      </LinearLayout>  
@@ -373,7 +373,7 @@
                     android:text="@string/context_share_folder"     
 		            android:paddingTop="2dp"
 		            android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>	               
 		      </LinearLayout>  
@@ -400,7 +400,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/file_properties_shared_folder_select_contact"
                      android:paddingBottom="10dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>	
 		           
@@ -427,7 +427,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/context_clean_shares_menu"
                     android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>	               
 		      </LinearLayout>  
@@ -454,7 +454,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/section_rubbish_bin"
                      android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		      </LinearLayout>
@@ -481,7 +481,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/context_rename"
                     android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>	    
 		           
@@ -509,7 +509,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/general_move_to"
                      android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		      </LinearLayout>
@@ -538,7 +538,7 @@
                     android:text="@string/context_copy"
                     android:gravity="center_vertical"
                      android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		      </LinearLayout>		    
@@ -565,7 +565,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/context_delete"
                      android:paddingBottom="2dp"
-					android:textColor="#ffffff"
+					android:textColor="@color/black"
 					android:textSize="14sp"
 					android:textStyle="bold"/>
 		      </LinearLayout>  
