@@ -72,13 +72,14 @@
 
 
 #ifdef SWIGJAVA
+#if SWIG_VERSION < 0x030000
 %typemap(directorargout) (const char *time, int loglevel, const char *source, const char *message)
 %{
 	jenv->DeleteLocalRef(jtime); 
 	jenv->DeleteLocalRef(jsource);
 	jenv->DeleteLocalRef(jmessage); 
 %}
-
+#endif
 
 %apply (char *STRING, size_t LENGTH) {(char *buffer, size_t size)};
 %typemap(directorargout) (char *buffer, size_t size)
@@ -93,10 +94,12 @@
 
 
 #ifdef SWIGJAVA
+#if SWIG_VERSION < 0x030000
 %typemap(directorargout) (const char* path)
 %{ 
 	jenv->DeleteLocalRef(jpath); 
 %}
+#endif
 
 %apply (char *STRING, size_t LENGTH) {(char *bitmapData, size_t size)};
 %typemap(directorin, descriptor="[B") (char *bitmapData, size_t size)
@@ -133,6 +136,7 @@
 %ignore mega::MegaApi::MEGA_DEBRIS_FOLDER;
 %ignore mega::MegaNode::getNodeKey;
 %ignore mega::MegaNode::getAttrString;
+%ignore mega::MegaNode::getAuth;
 %ignore mega::MegaListener::onSyncStateChanged;
 %ignore mega::MegaListener::onSyncFileStateChanged;
 %ignore mega::MegaTransfer::getListener;
@@ -188,6 +192,8 @@
 %newobject mega::MegaApi::getPendingOutShares;
 %newobject mega::MegaApi::getContactRequestByHandle;
 %newobject mega::MegaRequest::getMegaAccountDetails;
+%newobject mega::MegaApi::escapeFsIncompatible;
+%newobject mega::MegaApi::unescapeFsIncompatible;
 %newobject mega::MegaRequest::getPricing;
 %newobject mega::MegaAccountDetails::getSubscriptionMethod;
 %newobject mega::MegaAccountDetails::getSubscriptionCycle;

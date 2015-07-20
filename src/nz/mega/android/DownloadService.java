@@ -299,7 +299,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		currentDir = getDir(currentDocument, intent);
 		if (currentDir.isDirectory()){
 			log("currentDir is Directory");
-			currentFile = new File(currentDir, megaApi.nameToLocal(currentDocument.getName()));
+			currentFile = new File(currentDir, megaApi.escapeFsIncompatible(currentDocument.getName()));
 		}
 		else{
 			log("currentDir is File");
@@ -1333,7 +1333,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				MegaNode node = request.getPublicMegaNode();
 				
 				if (currentDir.isDirectory()){
-					currentFile = new File(currentDir, megaApi.nameToLocal(node.getName()));
+					currentFile = new File(currentDir, megaApi.escapeFsIncompatible(node.getName()));
 					log("node.getName(): " + node.getName());
 					
 				}

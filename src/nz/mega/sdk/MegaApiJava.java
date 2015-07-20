@@ -3570,8 +3570,8 @@ public class MegaApiJava
      * @param name Name to convert
      * @return Converted name
      */
-	public String nameToLocal(String name) {
-		return megaApi.nameToLocal(name);
+	public String escapeFsIncompatible(String name) {
+		return megaApi.escapeFsIncompatible(name);
 	}
 
 	/**
@@ -3580,8 +3580,8 @@ public class MegaApiJava
      * @param name Escaped name to convert
      * @return Converted name
      */
-	public String localToName(String localName) {
-		return megaApi.localToName(localName);
+	public String unescapeFsIncompatible(String localName) {
+		return megaApi.unescapeFsIncompatible(localName);
 	}
 	
 	/**
