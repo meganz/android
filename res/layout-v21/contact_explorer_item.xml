@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/contact_list_item_layout" >
+        
+
+    <RelativeLayout
+		android:id="@+id/contact_explorer_relative_layout_avatar"
+		android:layout_width="54dp"
+		android:layout_height="54dp"
+		android:layout_marginLeft="5dp" 
+		android:paddingTop="3dp">
+		
+	    <nz.mega.components.RoundedImageView 
+	         android:id="@+id/contact_explorer_thumbnail"
+	         android:layout_width="54dp"
+	         android:layout_height="54dp"
+	         android:scaleType="fitCenter"
+	         rounded:corner_radius="27dp" 
+	         rounded:border_width="0dp"
+	         rounded:border_color="@color/border_file_properties"/>
+    
+    	<TextView
+	        android:id="@+id/contact_explorer_initial_letter"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent" 
+	        android:layout_centerInParent="true"
+		    android:gravity="center_horizontal|center_vertical" />
+	    
+    </RelativeLayout>
+    
+    <TextView
+        android:id="@+id/contact_explorer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/contact_explorer_relative_layout_avatar"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp" />
+    
+    <TextView 
+        android:id="@+id/contact_explorer_phone_mail"
+        android:layout_width="fill_parent"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/contact_explorer_relative_layout_avatar"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp"
+        android:layout_below="@id/contact_explorer_name"/>
+    
+</RelativeLayout>
+

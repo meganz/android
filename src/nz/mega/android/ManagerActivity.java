@@ -16,6 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
+import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
 import nz.mega.android.lollipop.FileExplorerActivityLollipop;
 import nz.mega.android.utils.PreviewUtils;
@@ -202,6 +203,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	public static int MODE_IN = 0;
 	public static int MODE_OUT = 1;
+	
+	boolean megaContacts = true;
+	ArrayList<String> contactsData;
 	
 	String accessToken;
 	String feedback;
@@ -5907,7 +5911,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("---------onRequestFinish: "  + request.getRequestString());
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			// Call some material design APIs here
-			log("onRequestFinish Material");
 			onRequestFinishLollipop(api, request, e);
 		}
 		else {
@@ -8396,9 +8399,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
 				return;
 			}
+						
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Call some material design APIs here
+				contactsData = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);			
+				megaContacts = intent.getBooleanExtra(ContactsExplorerActivityLollipop.EXTRA_MEGA_CONTACTS, true);
+			}
+			else {
+				contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);			
+				megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
+			}
 			
-			final ArrayList<String> contactsData = intent.getStringArrayListExtra(ContactsExplorerActivity.EXTRA_CONTACTS);			
-			final boolean megaContacts = intent.getBooleanExtra(ContactsExplorerActivity.EXTRA_MEGA_CONTACTS, true);
 			final int multiselectIntent = intent.getIntExtra("MULTISELECT", -1);
 			final int sentToInbox = intent.getIntExtra("SEND_FILE", -1);
 			
@@ -8431,7 +8442,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 								switch(item) {
 				                    case 0:{
 				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));		
+				                    		log("Node: "+node.getName());
+				                    		log("User: "+u.getEmail());
 				                    		megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
 				                    	}
 				                    	break;
@@ -8461,7 +8474,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				        alertTitle.setTextColor(resources.getColor(R.color.mega));
 						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-						titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+						if(titleDivider!=null){
+							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+						}						
 					}
 					else if(multiselectIntent==1){
 						//Several folder to share
@@ -9764,6 +9779,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.putExtra("MULTISELECT", 0);
 	    	intent.putExtra("SEND_FILE",0);
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
+	}
+	
+	public void shareFolderLollipop(MegaNode node){
+		log("shareFolderLollipop");
+		
+		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+									
+			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
+	    	//Multiselect=0
+	    	intent.putExtra("MULTISELECT", 0);
+	    	intent.putExtra("SEND_FILE",0);
+	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
 	}

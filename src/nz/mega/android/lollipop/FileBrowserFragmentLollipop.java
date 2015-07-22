@@ -913,7 +913,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Share option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-			((ManagerActivity) context).shareFolder(selectedNode);
+			((ManagerActivity) context).shareFolderLollipop(selectedNode);
 			break;
 		}			
 		case R.id.file_list_option_copy_layout: {

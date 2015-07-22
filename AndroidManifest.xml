@@ -276,6 +276,13 @@
         </activity>
         
         <activity
+            android:name="nz.mega.android.lollipop.ContactsExplorerActivityLollipop"
+            android:label="@string/app_name"
+            android:theme="@style/login_activity" 
+            android:screenOrientation="portrait">
+        </activity>
+        
+        <activity
             android:name="FolderLinkActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
