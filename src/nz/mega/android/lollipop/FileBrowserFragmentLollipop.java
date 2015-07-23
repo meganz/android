@@ -789,6 +789,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public PanelState getPanelState ()
 	{
+		log("getPanelState: "+slidingOptionsPanel.getPanelState());
 		return slidingOptionsPanel.getPanelState();
 	}
 		
@@ -853,7 +854,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingOptionsPanel.setVisibility(View.GONE);
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(selectedNode.getHandle());									
-			((ManagerActivity) context).showMove(handleList);
+			((ManagerActivity) context).showMoveLollipop(handleList);
 
 			break;
 		}

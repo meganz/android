@@ -2,6 +2,7 @@ package nz.mega.android.lollipop;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.MegaApplication;
@@ -51,13 +52,16 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 //	boolean first = false;
 //	private boolean folderSelected = false;
-	private Button uploadButton;
+	RelativeLayout optionsBar;
 	RecyclerView listView;
 	RecyclerView.LayoutManager mLayoutManager;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+	TextView optionText;
+	TextView cancelText;
 	LinearLayout outSpaceLayout=null;
+	View separator;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -87,8 +91,17 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
 				
-		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);		
+		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);	
 		
+		separator = (View) v.findViewById(R.id.separator);
+		
+		optionsBar = (RelativeLayout) v.findViewById(R.id.options_layout);
+		optionText = (TextView) v.findViewById(R.id.action_text);
+		optionText.setOnClickListener(this);
+		cancelText = (TextView) v.findViewById(R.id.cancel_text);
+		cancelText.setOnClickListener(this);		
+		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+				
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
@@ -99,20 +112,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
-	
-		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
-		uploadButton.setOnClickListener(this);
-		uploadButton.setVisibility(View.VISIBLE);
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) listView.getLayoutParams();
-		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
-		
 		if(modeCloud==FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
 			parentHandle = -1;
-			changeButtonTitle(context.getString(R.string.section_cloud_drive));
 		}
 		else{
 			if (parentHandle == -1)
@@ -140,7 +145,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		{
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
-			changeButtonTitle(context.getString(R.string.section_cloud_drive));
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			changeBackVisibility(false);
 		}
@@ -149,13 +153,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			nodes = megaApi.getChildren(chosenNode);
 			if(chosenNode.getType() != MegaNode.TYPE_ROOT)
 			{
-				changeButtonTitle(chosenNode.getName());
 				changeActionBarTitle(chosenNode.getName());	
 				changeBackVisibility(true);
 			}
 			else
 			{
-				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 				changeBackVisibility(false);
 			}
@@ -163,27 +165,8 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		if (context instanceof FileExplorerActivityLollipop){
 			((FileExplorerActivityLollipop)context).setParentHandle(parentHandle);
-		}
+		}		
 		
-//		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-//			uploadButton.setText(getString(R.string.general_move_to) + " " + actionBarTitle );
-//		}
-//		else if (modeCloud == FileExplorerActivityLollipop.COPY){
-//			uploadButton.setText(getString(R.string.general_copy_to) + " " + actionBarTitle );
-//		}
-//		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
-//			uploadButton.setText(getString(R.string.action_upload));
-//		}
-//		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-//			uploadButton.setText(getString(R.string.general_import_to) + " " + actionBarTitle );
-//		}
-//		else if (modeCloud == FileExplorerActivityLollipop.SELECT){
-//			uploadButton.setText(getString(R.string.general_select) + " " + actionBarTitle );
-//		}
-//		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-//			uploadButton.setText(getString(R.string.action_upload) + " " + actionBarTitle );
-//		}	
-//				
 		if (adapter == null){
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);			
 			
@@ -201,9 +184,32 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			adapter.setSelectFile(selectFile);
 		}
 		
+		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
+			optionText.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));			
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.COPY){
+			optionText.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));	
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
+			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));	
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
+			optionText.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
+			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
+		}
+		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
+			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+		}	
+		else {
+			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
+		}	
+		
 		if(selectFile)
 		{
-			uploadButton.setVisibility(View.GONE);
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
 		}
 		
 		adapter.setPositionClicked(-1);		
@@ -219,34 +225,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 //		log("setMode: "+modeCloud);
 //	}	
 	
-	public void changeButtonTitle(String folder){
-		log("changeButtonTitle "+folder);
-//		windowTitle.setText(folder);
-		
-		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.COPY){
-			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
-			uploadButton.setText(getString(R.string.action_upload));
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
-			uploadButton.setText(getString(R.string.general_select) + " " + folder);
-		}
-		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
-		}	
-		else {
-			uploadButton.setText(getString(R.string.general_select) + " " + folder);
-		}
-		
-		
-	}
 	
 	public void changeActionBarTitle(String folder){
 		((FileExplorerActivityLollipop) context).changeTitle(folder);
@@ -265,9 +243,12 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.file_explorer_button:{				
+			case R.id.action_text:{				
 				dbH.setLastCloudFolder(Long.toString(parentHandle));
 				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
+			}
+			case R.id.cancel_text:{				
+				((FileExplorerActivityLollipop) context).finish();
 			}
 		}
 	}
@@ -286,13 +267,11 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 
 			if(n.getType() != MegaNode.TYPE_ROOT)
 			{
-				changeButtonTitle(name);
 				changeActionBarTitle(name);
 				changeBackVisibility(true);
 			}
 			else
 			{
-				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 				changeBackVisibility(false);
 			}
@@ -352,7 +331,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
-				changeButtonTitle(context.getString(R.string.section_cloud_drive));
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 				changeBackVisibility(false);
 			}
@@ -362,7 +340,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				temp = path.split("/");
 				name = temp[temp.length-1];
 
-				changeButtonTitle(name);
 				changeActionBarTitle(name);
 				changeBackVisibility(true);
 				
