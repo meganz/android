@@ -1,6 +1,7 @@
 package nz.mega.android.lollipop;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import nz.mega.android.MegaApplication;
 import nz.mega.android.R;
@@ -45,9 +46,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	boolean selectFile;
 	public String name;
 	
-//	boolean first = false;
-//	private boolean folderSelected = false;
-	private Button uploadButton;
 	RecyclerView listView;
 	RecyclerView.LayoutManager mLayoutManager;
 	ImageView emptyImageView;
@@ -55,6 +53,10 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	TextView contentText;
 	LinearLayout outSpaceLayout=null;
 	int deepBrowserTree = 0;
+	View separator;
+	TextView optionText;
+	TextView cancelText;
+	RelativeLayout optionsBar;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -84,14 +86,22 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
 				
-		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);		
+		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
+		
+		separator = (View) v.findViewById(R.id.separator);
+		
+		optionsBar = (RelativeLayout) v.findViewById(R.id.options_layout);
+		optionText = (TextView) v.findViewById(R.id.action_text);
+		optionText.setOnClickListener(this);
+		cancelText = (TextView) v.findViewById(R.id.cancel_text);
+		cancelText.setOnClickListener(this);		
+		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
 		
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
 		listView.setLayoutManager(mLayoutManager);
-
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
@@ -99,10 +109,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
 		
-		uploadButton = (Button) v.findViewById(R.id.file_explorer_button);
-		uploadButton.setOnClickListener(this);
-		uploadButton.setVisibility(View.VISIBLE);
-		
+
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
@@ -126,9 +133,32 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			adapter.setSelectFile(selectFile);
 		}
 		
+		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
+			optionText.setText(getString(R.string.context_move).toUpperCase(Locale.getDefault()));			
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.COPY){
+			optionText.setText(getString(R.string.context_copy).toUpperCase(Locale.getDefault()));	
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
+			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));	
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
+			optionText.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
+		}
+		else if (modeCloud == FileExplorerActivityLollipop.SELECT || modeCloud == FileExplorerActivityLollipop.SELECT_CAMERA_FOLDER){
+			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
+		}
+		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
+			optionText.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+		}	
+		else {
+			optionText.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));	
+		}
+		
 		if(selectFile)
 		{
-			uploadButton.setVisibility(View.GONE);
+			separator.setVisibility(View.GONE);
+			optionsBar.setVisibility(View.GONE);
 		}
 		
 		String actionBarTitle = getString(R.string.title_incoming_shares_explorer);	
@@ -136,7 +166,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if (parentHandle == -1){			
 			findNodes();	
 			adapter.parentHandle=-1;
-			uploadButton.setText(getString(R.string.choose_folder_explorer));
+//			uploadButton.setText(getString(R.string.choose_folder_explorer));
 		}
 		else{
 			adapter.parentHandle=parentHandle;
@@ -189,32 +219,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 	}
 	
-	public void changeButtonTitle(String folder){
-		log("changeButtonTitle "+folder);
-//		windowTitle.setText(folder);
-		
-		if (modeCloud == FileExplorerActivityLollipop.MOVE) {
-			uploadButton.setText(getString(R.string.general_move_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.COPY){
-			uploadButton.setText(getString(R.string.general_copy_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.UPLOAD){
-			uploadButton.setText(getString(R.string.action_upload));
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.IMPORT){
-			uploadButton.setText(getString(R.string.general_import_to) + " " + folder);
-		}
-		else if (modeCloud == FileExplorerActivityLollipop.SELECT){
-			uploadButton.setText(getString(R.string.general_select) + " " + folder);
-		}
-		else if(modeCloud == FileExplorerActivityLollipop.UPLOAD_SELFIE){
-			uploadButton.setText(getString(R.string.action_upload) + " " + folder );
-		}	
-		
-		
-	}
-	
 	public void changeActionBarTitle(String folder){
 		((FileExplorerActivityLollipop) context).changeTitle(folder);
 	}
@@ -253,7 +257,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			temp = path.split("/");
 			name = temp[temp.length-1];
 
-			changeButtonTitle(name);
 			changeActionBarTitle(name);
 			changeBackVisibility(true);
 			
@@ -314,7 +317,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			parentHandle=-1;
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
 			changeBackVisibility(false);
-			uploadButton.setText(getString(R.string.choose_folder_explorer));
+//			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
 			
 			adapter.setNodes(nodes);

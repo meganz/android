@@ -8135,6 +8135,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
 	
+	public void showMoveLollipop(ArrayList<Long> handleList){
+		log("showMoveLollipop");
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
+		long[] longArray = new long[handleList.size()];
+		for (int i=0; i<handleList.size(); i++){
+			longArray[i] = handleList.get(i);
+		}
+		intent.putExtra("MOVE_FROM", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+	}
+	
 	public void showCopy(ArrayList<Long> handleList){
 		log("showCopy");
 		Intent intent = new Intent(this, FileExplorerActivity.class);

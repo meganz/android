@@ -255,6 +255,7 @@
     <string name="context_moving" context="while moving a file or folder">Moviendo</string>
     <string name="context_sharing" context="while sharing a folder">Compartiendo carpeta</string>
     <string name="context_copy" context="Item menu option upon right click on one or multiple files.">Copiar</string>
+        <string name="context_upload" context="Item menu option upon right click on one or multiple files.">Subir</string>
     <string name="context_copying" context="while copying a file or folder">Copiando</string>
     <string name="context_creating_link" context="status text">Creando enlace</string>
     <string name="context_moving_to_trash" context="status text">Moviendo a la Papelera</string>
