@@ -8603,7 +8603,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			int i = 0;
 			long parentHandleUpload=-1;
 			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-				parentHandleUpload = fbF.getParentHandle();
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+					// Call some material design APIs here
+					if(fbFLol!=null)
+					{
+						parentHandleUpload = fbFLol.getParentHandle();
+					}					
+				}
+				else {
+					if(fbF!=null)
+					{
+						parentHandleUpload = fbF.getParentHandle();
+					}					
+				}
+				
 			}
 			else if(drawerItem == DrawerItem.SHARED_WITH_ME){
 				int index = viewPagerShares.getCurrentItem();
@@ -8928,11 +8941,86 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 	}
 	
+	public void onIntentProcessed() {
+		
+		log("onIntentProcessed");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+			onIntentProcessedLollipop();
+		}
+		else {
+			onIntentProcessedKitKat();
+		}
+	}	
+	
 	/*
 	 * Handle processed upload intent
 	 */
-	public void onIntentProcessed() {
-		log("onIntentProcessed");
+	public void onIntentProcessedLollipop() {
+		log("onIntentProcessedLollipop");
+		List<ShareInfo> infos = filePreparedInfos;
+		if (statusDialog != null) {
+			try { 
+				statusDialog.dismiss(); 
+			} 
+			catch(Exception ex){}
+		}
+		
+		long parentHandle = -1;
+		MegaNode parentNode = null;
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			parentHandle = fbFLol.getParentHandle();
+			parentNode = megaApi.getNodeByHandle(parentHandle);
+		}
+		else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==1){				
+				//OUTGOING				
+				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				log("Tag: "+ cFTag2);
+				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSF != null){					
+					parentHandleOutgoing = outSF.getParentHandle();
+					parentNode = megaApi.getNodeByHandle(parentHandleOutgoing);
+				}
+			}
+			else{			
+				//InCOMING
+				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+				log("Tag: "+ cFTag1);
+				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSF != null){					
+					parentHandleIncoming = inSF.getParentHandle();	
+					parentNode = megaApi.getNodeByHandle(parentHandleIncoming);
+				}				
+			}	
+		}
+		
+		if(parentNode == null){
+			Util.showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
+			return;
+		}
+			
+		if (infos == null) {
+			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
+					false, this);
+		} 
+		else {
+			Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
+					Toast.LENGTH_SHORT).show();
+			for (ShareInfo info : infos) {
+				Intent intent = new Intent(this, UploadService.class);
+				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
+				intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
+				intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
+				intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
+				startService(intent);
+			}
+		}
+	}	
+	
+	public void onIntentProcessedKitKat() {
+		log("onIntentProcessedKitKat");
 		List<ShareInfo> infos = filePreparedInfos;
 		if (statusDialog != null) {
 			try { 
