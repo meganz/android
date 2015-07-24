@@ -818,8 +818,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 		case R.id.btnRight_grid_upload:
 			((ManagerActivity)getActivity()).uploadFile();
-			break;
-			
+			break;			
+		case R.id.file_upload_button:
+			((ManagerActivity)getActivity()).uploadFile();
+			break;			
 		case R.id.out_space_btn:
 			((ManagerActivity)getActivity()).upgradeAccountButton();
 			break;
