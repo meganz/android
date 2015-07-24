@@ -3,6 +3,7 @@ package nz.mega.android.lollipop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import nz.mega.android.ContactPropertiesMainActivity;
 import nz.mega.android.DatabaseHandler;
@@ -26,6 +27,7 @@ import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +55,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	long parentHandle = -1;
 	OnItemClickListener mItemClickListener;
+	
+	private SparseBooleanArray selectedItems;
 
 	RecyclerView listFragment;
 //	ImageView emptyImageViewFragment;
@@ -122,7 +126,51 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
 		this.mItemClickListener = mItemClickListener;
 	}
+	
+	public void toggleSelection(int pos) {
+		log("toggleSelection");
+		if (selectedItems.get(pos, false)) {
+			selectedItems.delete(pos);
+		}
+		else {
+			selectedItems.put(pos, true);
+		}
+		notifyItemChanged(pos);
+	}
 
+	public void clearSelections() {
+		selectedItems.clear();
+		notifyDataSetChanged();
+	}
+
+	public int getSelectedItemCount() {
+		return selectedItems.size();
+	}
+
+	public List<Integer> getSelectedItems() {
+		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+		for (int i = 0; i < selectedItems.size(); i++) {
+			items.add(selectedItems.keyAt(i));
+		}
+		return items;
+	}	
+	
+	/*
+	 * Get list of all selected nodes
+	 */
+	public List<MegaNode> getSelectedNodes() {
+		ArrayList<MegaNode> nodes = new ArrayList<MegaNode>();
+		
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (selectedItems.valueAt(i) == true) {
+				MegaNode document = getNodeAt(selectedItems.keyAt(i));
+				if (document != null){
+					nodes.add(document);
+				}
+			}
+		}
+		return nodes;
+	}
 
 	ViewHolderBrowser holder = null;
 	
@@ -1263,7 +1311,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	/*
 	 * Get document at specified position
 	 */
-	public MegaNode getDocumentAt(int position) {
+	public MegaNode getNodeAt(int position) {
 		try {
 			if (nodes != null) {
 				return nodes.get(position);
@@ -1357,6 +1405,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	private static void log(String log) {
 		Util.log("MegaBrowserLollipopAdapter", log);
+	}
+
+	public void startMultiselection() {
+		selectedItems = new SparseBooleanArray();
+		
 	}
 
 }
