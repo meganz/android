@@ -41,6 +41,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -49,11 +50,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
@@ -68,13 +72,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, OnItemLongClickListener, MegaRequestListenerInterface{
+public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, OnItemLongClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
 
 	public static int GRID_WIDTH =400;
-	
+		
 	Context context;
 	ActionBar aB;
 	RecyclerView listView;
+	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapterList;
@@ -137,11 +142,41 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public TextView propertiesText;
 	////
 	
+	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
+
+		@Override
+	    public boolean onSingleTapConfirmed(MotionEvent e) {
+	        View view = listView.findChildViewUnder(e.getX(), e.getY());
+	        int position = listView.getChildPosition(view);
+
+	        // handle single tap
+	        itemClick(view, position);
+
+	        return super.onSingleTapConfirmed(e);
+	    }
+
+	    public void onLongPress(MotionEvent e) {
+	        View view = listView.findChildViewUnder(e.getX(), e.getY());
+	        int position = listView.getChildPosition(view);
+
+	        // handle long press
+			if (adapterList.getPositionClicked() == -1){
+				adapterList.startMultiselection();
+				adapterList.setMultipleSelect(true);
+			
+				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());			
+
+		        itemClick(view, position);
+			}  
+	        super.onLongPress(e);
+	    }
+	}
+	
 	private class ActionBarCallBack implements ActionMode.Callback {
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaNode> documents = getSelectedDocuments();
+			List<MegaNode> documents = adapterList.getSelectedNodes();
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
@@ -241,7 +276,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = getSelectedDocuments();
+			List<MegaNode> selected = adapterList.getSelectedNodes();
 			
 			boolean showDownload = false;
 			boolean showRename = false;
@@ -390,11 +425,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 			
+			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+			
 			listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
-	        
+			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
@@ -469,13 +506,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				if (mTHash != null){
 					adapterList.setTransfers(mTHash);
 				}
-				adapterList.SetOnItemClickListener(new MegaBrowserLollipopAdapter.OnItemClickListener() {
-					
-					@Override
-					public void onItemClick(View view, int position) {
-						itemClick(view, position);
-					}
-				});
+//				adapterList.SetOnItemClickListener(new MegaBrowserLollipopAdapter.OnItemClickListener() {
+//					
+//					@Override
+//					public void onItemClick(View view, int position) {
+//						itemClick(view, position);
+//					}
+//				});
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -964,14 +1001,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		
 		if (isList){
 			if (adapterList.isMultipleSelect()){
-//				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//				if (checkedItems.get(position, false) == true){
-//					listView.setItemChecked(position, true);
-//				}
-//				else{
-//					listView.setItemChecked(position, false);
-//				}				
-//				updateActionModeTitle();
+				adapterList.toggleSelection(position);
+				updateActionModeTitle();
 //				adapterList.notifyDataSetChanged();
 			}
 			else{
@@ -1169,6 +1200,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		adapterList.startMultiselection();
 //		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
 //		for (int i = 0; i < checkedItems.size(); i++) {
 //			if (checkedItems.valueAt(i) == true) {
@@ -1180,10 +1212,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	private void updateActionModeTitle() {
+		log("updateActionModeTitle");
 		if (actionMode == null || getActivity() == null) {
+			log("RETURN");
 			return;
 		}
-		List<MegaNode> documents = getSelectedDocuments();
+		
+		List<MegaNode> documents = adapterList.getSelectedNodes();
 		int files = 0;
 		int folders = 0;
 		for (MegaNode document : documents) {
@@ -1219,28 +1254,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		// actionMode.
 	}
 	
-	/*
-	 * Get list of all selected documents
-	 */
-	private List<MegaNode> getSelectedDocuments() {
-//		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
-//				if (document != null){
-//					documents.add(document);
-//				}
-//			}
-//		}
-//		return documents;
-		return null;
-	}
-	
+		
 	/*
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
+		log("hideMultipleSelect");
 		adapterList.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
@@ -1649,6 +1668,62 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	@Override
 	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
 			MegaError e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
+		detector.onTouchEvent(e);
+		return false;
+	}
+
+	@Override
+	public void onRequestDisallowInterceptTouchEvent(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
 	}
