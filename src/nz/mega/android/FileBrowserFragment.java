@@ -356,8 +356,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
 	        
 	        listView = (ListView) v.findViewById(R.id.file_list_view_browser);
-			listView.setOnItemClickListener(this);
-			listView.setOnItemLongClickListener(this);
+//			listView.setOnItemClickListener(this);
+//			listView.setOnItemLongClickListener(this);
 			listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 			listView.setItemsCanFocus(false);
 			
@@ -636,6 +636,8 @@ public class FileBrowserFragment extends Fragment implements OnClickListener, On
 		
 	@Override
 	public void onClick(View v) {
+		
+//		onClick = true;
 
 		switch(v.getId()){
 			case R.id.btnLeft_new:

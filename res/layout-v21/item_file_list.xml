@@ -2,6 +2,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:descendantFocusability="blocksDescendants"
+    android:background="@drawable/statelist_item_layout"
     android:id="@+id/file_list_item_layout" >
     
     <CheckBox

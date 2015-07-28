@@ -39,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowserLollipopAdapter.ViewHolderBrowser> implements OnClickListener {
@@ -53,8 +54,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	int positionClicked;
 	ArrayList<MegaNode> nodes;
 
+	Object fragment;
 	long parentHandle = -1;
-	OnItemClickListener mItemClickListener;
 	
 	private SparseBooleanArray selectedItems;
 
@@ -67,14 +68,17 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	boolean incoming = false;
 	DatabaseHandler dbH = null;
 	boolean multipleSelect;
-//	boolean overflowMenu = false;
 	int type = ManagerActivity.FILE_BROWSER_ADAPTER;
 
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	/* public static view holder class */
-	public class ViewHolderBrowser extends RecyclerView.ViewHolder implements View.OnClickListener{
+	public class ViewHolderBrowser extends RecyclerView.ViewHolder{
 
+		public ViewHolderBrowser(View arg0) {
+			super(arg0);
+			// TODO Auto-generated constructor stub
+		}
 		public CheckBox checkbox;
 		public ImageView imageView;
 		public TextView textViewFileName;
@@ -102,37 +106,17 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //		public RelativeLayout optionMoveTo;
 //		public TextView propertiesText;
 		public int currentPosition;
-		public long document;
-		
-		public ViewHolderBrowser(View itemView) {
-			super(itemView);
-            itemView.setOnClickListener(this);
-		}
-		
-		@Override
-		public void onClick(View v) {
-			// TODO Auto-generated method stub
-			if(mItemClickListener != null){
-				mItemClickListener.onItemClick(v, getPosition());
-			}
-			
-		}
-	}
-	
-	public interface OnItemClickListener {
-		   public void onItemClick(View view , int position);
-	}
-	
-	public void SetOnItemClickListener(final OnItemClickListener mItemClickListener){
-		this.mItemClickListener = mItemClickListener;
+		public long document;		
 	}
 	
 	public void toggleSelection(int pos) {
 		log("toggleSelection");
 		if (selectedItems.get(pos, false)) {
+			log("delete pos: "+pos);
 			selectedItems.delete(pos);
 		}
 		else {
+			log("PUT pos: "+pos);
 			selectedItems.put(pos, true);
 		}
 		notifyItemChanged(pos);
@@ -142,6 +126,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		selectedItems.clear();
 		notifyDataSetChanged();
 	}
+	
+	private boolean isItemChecked(int position) {
+        return selectedItems.get(position);
+    }
 
 	public int getSelectedItemCount() {
 		return selectedItems.size();
@@ -174,15 +162,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 	ViewHolderBrowser holder = null;
 	
-	public MegaBrowserLollipopAdapter(Context _context, ArrayList<MegaNode> _nodes,long _parentHandle, RecyclerView recyclerView, ActionBar aB, int type) {
+	public MegaBrowserLollipopAdapter(Context _context, Object fragment, ArrayList<MegaNode> _nodes, long _parentHandle, RecyclerView recyclerView, ActionBar aB, int type) {
 		this.context = _context;
 		this.nodes = _nodes;
 		this.parentHandle = _parentHandle;
 		this.type = type;
+		this.fragment = fragment;
 		
 		switch (type) {
 		case ManagerActivity.FILE_BROWSER_ADAPTER: {
-//			((ManagerActivity) context).setParentHandleCloud(parentHandle);
+			((ManagerActivity) context).setParentHandleBrowser(parentHandle);			
 			break;
 		}
 		case ManagerActivity.CONTACT_FILE_ADAPTER: {
@@ -258,6 +247,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		holder = new ViewHolderBrowser(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
+		holder.itemLayout.setOnClickListener(this);
 		holder.checkbox = (CheckBox) v.findViewById(R.id.file_list_checkbox);
 		holder.checkbox.setClickable(false);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
@@ -273,56 +263,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list__browser_bar);
 		
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_list_three_dots);
-//		holder.optionsLayout = (LinearLayout) v.findViewById(R.id.file_list_options);
-//		holder.optionRename = (RelativeLayout) v.findViewById(R.id.file_list_option_rename_layout);
-//		holder.optionRename.setVisibility(View.GONE);
-//		holder.optionLeaveShare = (RelativeLayout) v.findViewById(R.id.file_list_option_leave_share_layout);
-//		holder.optionLeaveShare.setVisibility(View.GONE);
-//		
-//		holder.optionDownload = (RelativeLayout) v.findViewById(R.id.file_list_option_download_layout);
-//		holder.optionProperties = (RelativeLayout) v.findViewById(R.id.file_list_option_properties_layout);
-//		holder.propertiesText = (TextView) v.findViewById(R.id.file_list_option_properties_text);			
-//
-//		holder.optionPublicLink = (RelativeLayout) v.findViewById(R.id.file_list_option_public_link_layout);
-//			holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
-//			((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
-//		holder.optionShare = (RelativeLayout) v.findViewById(R.id.file_list_option_share_layout);
-//		holder.optionPermissions = (RelativeLayout) v.findViewById(R.id.file_list_option_permissions_layout);
-//		
-//		holder.optionDelete = (RelativeLayout) v.findViewById(R.id.file_list_option_delete_layout);			
-//		holder.optionRemoveTotal = (RelativeLayout) v.findViewById(R.id.file_list_option_remove_layout);
-//
-////			holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-////			((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-//
-//		holder.optionClearShares = (RelativeLayout) v.findViewById(R.id.file_list_option_clear_share_layout);	
-//		holder.optionMoveTo = (RelativeLayout) v.findViewById(R.id.file_list_option_move_layout);		
-//		
-//		holder.optionMore = (RelativeLayout) v.findViewById(R.id.file_list_option_overflow_layout);
-//			holder.optionMore.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
-//			((LinearLayout.LayoutParams) holder.optionMore.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
-					
-		
 		v.setTag(holder);
-//	
-//		holder.optionShare.setVisibility(View.GONE);
-//		holder.optionPermissions.setVisibility(View.GONE);
+
 		holder.savedOffline.setVisibility(View.INVISIBLE);
-//		holder.savedOfflineMultiselect.setVisibility(View.GONE);
+
 		holder.publicLinkImage.setVisibility(View.GONE);
 		holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 		
 		holder.transferProgressBar.setVisibility(View.GONE);
 		holder.textViewFileSize.setVisibility(View.VISIBLE);
-
-//		holder.currentPosition = position;
-//
-//		MegaNode node = (MegaNode) getItem(position);
-//		holder.document = node.getHandle();
-//		Bitmap thumb = null;
-//
-//		holder.textViewFileName.setText(node.getName());
 		
 		return holder;
 
@@ -356,20 +306,37 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		if (!multipleSelect) {
 			holder.checkbox.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			
+			if (positionClicked != -1) {
+				if (positionClicked == position) {
+					//				holder.arrowSelection.setVisibility(View.VISIBLE);
+//					holder.optionsLayout.setVisibility(View.GONE);
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					listFragment.smoothScrollToPosition(positionClicked);
+				}
+				else {
+					//				holder.arrowSelection.setVisibility(View.GONE);
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				}
+			} 
+			else {
+				//			holder.arrowSelection.setVisibility(View.GONE);
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+			}
 	
 		} else {
 			holder.checkbox.setVisibility(View.VISIBLE);
-			holder.imageButtonThreeDots.setVisibility(View.GONE);
-			
-//			SparseBooleanArray checkedItems = listFragment.getCheckedItemPositions();
-//			if (checkedItems.get(position, false) == true) {
-//				holder.checkbox.setChecked(true);					
-//				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-//				
-//
-//			} else {
-//				holder.checkbox.setChecked(false);
-//			}
+			holder.imageButtonThreeDots.setVisibility(View.GONE);		
+
+			if(this.isItemChecked(position)){
+				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+			}
+			else{
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+			}
 		}
 	
 		holder.textViewFileSize.setText("");
@@ -576,26 +543,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //		holder.optionLeaveShare.setTag(holder);
 //		holder.optionLeaveShare.setOnClickListener(this);
 		
-		if (positionClicked != -1) {
-			if (positionClicked == position) {
-				//				holder.arrowSelection.setVisibility(View.VISIBLE);
-//				holder.optionsLayout.setVisibility(View.GONE);
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-				listFragment.smoothScrollToPosition(positionClicked);
-			}
-			else {
-				//				holder.arrowSelection.setVisibility(View.GONE);
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-			}
-		} 
-		else {
-			//			holder.arrowSelection.setVisibility(View.GONE);
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-		}
-		
+	
 		
 /*				
 		if (positionClicked != -1) {
@@ -938,373 +886,31 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		int currentPosition = holder.currentPosition;
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
-		switch (v.getId()) {
-		/*case R.id.file_list_option_download_layout: {
-			positionClicked = -1;
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(n.getHandle());
-			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactPropertiesMainActivity) context).onFileClick(handleList);
-			} else if (type == ManagerActivity.FOLDER_LINK_ADAPTER) {
-				((FolderLinkActivity) context).onFileClick(handleList);
-			} else {
-				((ManagerActivity) context).onFileClick(handleList);
-			}
-			break;
-		}
-		case R.id.file_list_option_leave_share_layout: {
-			positionClicked = -1;	
-			notifyDataSetChanged();
-			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ContactPropertiesMainActivity) context).leaveIncomingShare(n);
-			}
-			else
-			{
-				((ManagerActivity) context).leaveIncomingShare(n);
-			}			
-			//Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-			break;
-		}
-		case R.id.file_list_option_move_layout:{
-			if (type == ManagerActivity.RUBBISH_BIN_ADAPTER) {
-				positionClicked = -1;
-				notifyDataSetChanged();
-				ArrayList<Long> handleList = new ArrayList<Long>();
-				handleList.add(n.getHandle());
-				((ManagerActivity) context).showMove(handleList);
-			} 
-			break;
-		}
-		case R.id.file_list_option_properties_layout: {
-			Intent i = new Intent(context, FilePropertiesActivity.class);
-			i.putExtra("handle", n.getHandle());
-			
-			if (n.isFolder()) {
-				if (megaApi.isShared(n)){
-					i.putExtra("imageId", R.drawable.folder_shared_mime);	
-				}
-				else{
-					i.putExtra("imageId", R.drawable.folder_mime);
-				}
-			} 
-			else {
-				i.putExtra("imageId", MimeTypeMime.typeForName(n.getName()).getIconResourceId());
-			}
-			i.putExtra("name", n.getName());
-			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
-				i.putExtra("from", FROM_INCOMING_SHARES);
-			}
-			else{
-				i.putExtra("from", FROM_FILE_BROWSER);
-			}
-			context.startActivity(i);
-			positionClicked = -1;
-			notifyDataSetChanged();
-			break;
-		}
-		case R.id.file_list_option_clear_share_layout: {
-			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
-				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
-				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
-				//break;
-			}
-		}
-		case R.id.file_list_option_remove_layout: {
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(n.getHandle());
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
-				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
-				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
-				//break;
-			}
-			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
-				((ManagerActivity) context).moveToTrash(handleList);
-				//break;
-			} 
-			else {
-				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
-				//break;
-			}
-			break;
-		}
-		case R.id.file_list_option_delete_layout: {
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(n.getHandle());
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
-				ArrayList<MegaShare> shareList = megaApi.getOutShares(n);				
-				((ManagerActivity) context).removeAllSharingContacts(shareList, n);
-				//break;
-			}
-			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
-				((ManagerActivity) context).moveToTrash(handleList);
-				//break;
-			} 
-			else {
-				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
-				//break;
-			}
-			break;
-		}
-		case R.id.file_list_option_public_link_layout: {
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)
-					|| (type == ManagerActivity.SEARCH_ADAPTER)) {
-				((ManagerActivity) context).getPublicLinkAndShareIt(n);
-			}
-			break;
-		}
-		case R.id.file_list_option_rename_layout: {
-			if (type == ManagerActivity.CONTACT_FILE_ADAPTER){
-				((ContactPropertiesMainActivity) context).showRenameDialog(n, n.getName());
-			}
-			else if (type == ManagerActivity.INCOMING_SHARES_ADAPTER){
-				((ManagerActivity) context).showRenameDialog(n, n.getName());
-			}
-			break;
-		}		
-		case R.id.file_list_option_overflow_layout: {
-
-
-			if ((type == ManagerActivity.FILE_BROWSER_ADAPTER)	|| (type == ManagerActivity.SEARCH_ADAPTER) || (type == ManagerActivity.OUTGOING_SHARES_ADAPTER)) {
-//				((ManagerActivity) context).showOverflowMenu(n);
-				AlertDialog moreOptionsDialog;
+		switch (v.getId()) {		
+			case R.id.file_list_three_dots: {	
 				
-				String [] optionsString = null;
-				if (n.isFolder()){
-					optionsString = new String[] {context.getString(R.string.context_share_folder), context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy), context.getString(R.string.context_send_link)}; 
-				}
-				else{
-					optionsString = new String[] {context.getString(R.string.context_rename), context.getString(R.string.context_move), context.getString(R.string.context_copy)};
-				}
-				
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, optionsString);
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle(R.string.more_options_overflow);
-				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (n.isFile()){
-							which = which + 1;
-						}
-						switch (which){
-							case 0:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();									
-								((ManagerActivity) context).shareFolder(n);
-								break;
-							}
-							case 1:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								((ManagerActivity) context).showRenameDialog(n, n.getName());
-								break;
-							}
-							case 2:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ManagerActivity) context).showMove(handleList);
-								break;
-							}
-							case 3:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ManagerActivity) context).showCopy(handleList);
-								break;
-							}
-//							case 4:{
-//								setPositionClicked(-1);
-//								notifyDataSetChanged();
-//								((ManagerActivity) context).getPublicLinkAndShareIt(n);
-//								break;
-//							}
-						}
-
-						dialog.dismiss();
-					}
-				});
-				
-				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-
-				moreOptionsDialog = builder.create();
-				moreOptionsDialog.show();
-				Util.brandAlertDialog(moreOptionsDialog);
-			}
-			
-			if (type == ManagerActivity.INCOMING_SHARES_ADAPTER) {
-//				((ManagerActivity) context).showOverflowMenu(n);
-				AlertDialog moreOptionsDialog;
-				
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle(R.string.more_options_overflow);
-				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which){
-							case 0:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ManagerActivity) context).showMove(handleList);
-								break;
-							}
-							case 1:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ManagerActivity) context).showCopy(handleList);
-								break;
-							}
-						}
-
-						dialog.dismiss();
-					}
-				});
-				
-				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-
-				moreOptionsDialog = builder.create();
-				moreOptionsDialog.show();
-				Util.brandAlertDialog(moreOptionsDialog);
-			}
-			
-			if (type == ManagerActivity.CONTACT_FILE_ADAPTER) {
-//				((ManagerActivity) context).showOverflowMenu(n);
-				AlertDialog moreOptionsDialog;
-				
-				final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_text, android.R.id.text1, new String[] {context.getString(R.string.context_move), context.getString(R.string.context_copy)});
-				AlertDialog.Builder builder = new AlertDialog.Builder(context);
-				builder.setTitle(R.string.more_options_overflow);
-				builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which){
-							case 0:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ContactPropertiesMainActivity) context).showMove(handleList);
-								break;
-							}
-							case 1:{
-								setPositionClicked(-1);
-								notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());									
-								((ContactPropertiesMainActivity) context).showCopy(handleList);
-								break;
-							}
-						}
-
-						dialog.dismiss();
-					}
-				});
-				
-				builder.setPositiveButton(R.string.general_cancel, new DialogInterface.OnClickListener() {
-					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-					}
-				});
-
-				moreOptionsDialog = builder.create();
-				moreOptionsDialog.show();
-				Util.brandAlertDialog(moreOptionsDialog);
-			}
-			break;
-		}	
-				
-		case R.id.file_list_option_permissions_layout: {
-			Intent i = new Intent(context, FileContactListActivity.class);
-			i.putExtra("name", n.getHandle());
-			context.startActivity(i);			
-			break;
-		}	
-		
-		case R.id.file_list_option_share_layout: {			
-			
-			if (type == ManagerActivity.OUTGOING_SHARES_ADAPTER){
-				if(n.isFolder()){
-					((ManagerActivity) context).shareFolder(n);
-				}
-			}			
-			break;
-		}	
-		
-		/*
-		case R.id.file_list_option_move: {
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(n.getHandle());
-			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ManagerActivity) context).showMove(handleList);
-			} else {
-				((ContactPropertiesMainActivity) context).showMove(handleList);
-			}
-			break;
-		}
-		case R.id.file_list_option_copy: {
-			positionClicked = -1;
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(n.getHandle());
-			if (type != ManagerActivity.CONTACT_FILE_ADAPTER) {
-				((ManagerActivity) context).showCopy(handleList);
-			} else {
-				((ContactPropertiesMainActivity) context).showCopy(handleList);
-			}
-			break;
-		}*/
-		case R.id.file_list_three_dots: {	
-			
-			log("onClick: file_list_three_dots: "+currentPosition);			
-
-			if (positionClicked == -1) {
-				positionClicked = currentPosition;
-				notifyDataSetChanged();
-			} else {
-				if (positionClicked == currentPosition) {
-					positionClicked = -1;
-					notifyDataSetChanged();
-				} else {
+				log("onClick: file_list_three_dots: "+currentPosition);			
+	
+				if (positionClicked == -1) {
 					positionClicked = currentPosition;
 					notifyDataSetChanged();
+				} else {
+					if (positionClicked == currentPosition) {
+						positionClicked = -1;
+						notifyDataSetChanged();
+					} else {
+						positionClicked = currentPosition;
+						notifyDataSetChanged();
+					}
 				}
+				
+				((ManagerActivity) context).showOptionsPanel(n);
+				break;
 			}
-			
-			((ManagerActivity) context).showOptionsPanel(n);
-			break;
-		}
+			case R.id.file_list_item_layout:{
+				((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+				break;
+			}
 		}
 	}
 

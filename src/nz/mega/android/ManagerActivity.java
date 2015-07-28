@@ -358,6 +358,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	long lastTimeOnTransferUpdate = -1;	
 	boolean firstTimeCam = false;
 	int accountType = -1;
+	MegaAccountDetails accountInfo = null;
 	long usedGbStorage = -1;
 	AlertDialog overquotaDialog;
 	
@@ -5926,7 +5927,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+				accountInfo = request.getMegaAccountDetails();
 				
 				
 				accountType = accountInfo.getProLevel();
@@ -6629,7 +6630,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK){
 				
-				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
+				accountInfo = request.getMegaAccountDetails();
 				
 				
 				accountType = accountInfo.getProLevel();
@@ -10193,7 +10194,44 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	public void upgradeAccountButton(){
 		log("upgradeAccountButton");
 		drawerItem = DrawerItem.ACCOUNT;
-//    	showUpAF();
+		if (accountInfo != null){
+			if ((accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_NONE) || (accountInfo.getSubscriptionStatus() == MegaAccountDetails.SUBSCRIPTION_STATUS_INVALID)){
+				Time now = new Time();
+				now.setToNow();
+				if (accountType != 0){
+					log("accountType != 0");
+					if (now.toMillis(false) >= (accountInfo.getProExpiration()*1000)){
+						if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+							log("SUBSCRIPTION INACTIVE: CHECKBITSET --> CC || FORT || INFO");
+							showUpAF(null);
+						}
+						else{
+							Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+						}
+					}
+					else{
+						log("CURRENTLY ACTIVE SUBSCRIPTION");
+						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+					}
+				}
+				else{
+					log("accountType == 0");
+					if (Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO) || Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+						log("CHECKBITSET --> CC || FORT || INFO");
+						showUpAF(null);
+					}
+					else{
+						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+					}
+				}
+			}
+			else{
+				Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+			}
+		}
+		else{
+			Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+		}
 	}
 
 	public long getNumberOfSubscriptions(){
