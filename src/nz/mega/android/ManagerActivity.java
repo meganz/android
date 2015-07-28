@@ -3747,8 +3747,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		killAllSessions.setVisible(false);
 		
 //		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-		if (fbF != null){
-			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			if (fbF != null||fbFLol!=null){
 				//Show
 				addMenuItem.setEnabled(true);
 				addMenuItem.setVisible(true);
@@ -3889,8 +3890,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
     			clearRubbishBinMenuitem.setVisible(true);
 			}
-		}
-		
+		}	
 		
 		if (drawerItem == DrawerItem.INBOX){
 			if (iF != null){	
@@ -4415,19 +4415,36 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        }
 	        case R.id.action_select:{
 	        	//TODO: multiselect
-	        	if (fbF != null){
-	        		if (drawerItem == DrawerItem.CLOUD_DRIVE){	        			
-	        			fbF.selectAll();
-	        			if (fbF.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
-	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
-	        			}
-	        			return true;
-	        		}
+	        	
+        		if (drawerItem == DrawerItem.CLOUD_DRIVE){	
+        			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        				// Material Design
+        				if (fbFLol != null){
+        					fbFLol.selectAll();
+	            			if (fbFLol.showSelectMenuItem()){
+	            				selectMenuItem.setVisible(true);
+	            				unSelectMenuItem.setVisible(false);
+	            			}
+	            			else{
+	            				selectMenuItem.setVisible(false);
+	            				unSelectMenuItem.setVisible(true);
+	            			}
+        				}
+        			} else {
+        				// Implement this feature without material design
+        				if (fbF != null){
+	        				fbF.selectAll();
+	            			if (fbF.showSelectMenuItem()){
+	            				selectMenuItem.setVisible(true);
+	            				unSelectMenuItem.setVisible(false);
+	            			}
+	            			else{
+	            				selectMenuItem.setVisible(false);
+	            				unSelectMenuItem.setVisible(true);
+	            			}
+        				}
+        			}        			
+        			return true;        		
 	        	}
 
 	        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
@@ -7190,7 +7207,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 						fbFLol.setNodes(nodes);
-						fbF.getListView().invalidateViews();
+						fbFLol.getListView().invalidate();
 					}
 				}
 			}
@@ -7792,7 +7809,81 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	}
 	
 	public void showNewFolderDialog(String editText){
-		log("showNewFolderDialog");
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Material Design
+			showNewFolderDialogLollipop(editText);
+		}
+		else {
+			showNewFolderDialogKitkat(editText);
+		}
+	}
+	
+	public void showNewFolderDialogLollipop(String editText){
+		log("showNewFolderDialogKitLollipop");
+		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			fbFLol.setPositionClicked(-1);
+			fbFLol.notifyDataSetChanged();
+		}
+		
+		String text;
+		if (editText == null || editText.equals("")){
+			text = getString(R.string.context_new_folder_name);
+		}
+		else{
+			text = editText;
+		}
+		
+		final EditText input = new EditText(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					createFolder(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),
+				KeyEvent.KEYCODE_ENTER);
+		input.setText(text);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_new_folder),
+				null, input);
+		builder.setPositiveButton(getString(R.string.general_create),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						createFolder(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
+	}
+	
+	public void showNewFolderDialogKitkat(String editText){
+		log("showNewFolderDialogKitkat");
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			fbF.setPositionClicked(-1);
 			fbF.notifyDataSetChanged();
@@ -7923,7 +8014,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		
 		long parentHandle;
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
-			parentHandle = fbF.getParentHandle();
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Material Design
+				parentHandle = fbFLol.getParentHandle();
+			}
+			else {
+				parentHandle = fbF.getParentHandle();
+			}			
 		}
 		else{
 			return;
@@ -8398,7 +8495,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        alertTitle.setTextColor(resources.getColor(R.color.mega));
 				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+				if(titleDivider!=null){
+					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+				}
 			}
 		}	
 		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
@@ -8560,8 +8659,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				        alertTitle.setTextColor(resources.getColor(R.color.mega));
 						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-						titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-						
+						if(titleDivider!=null){
+							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+						}				
 					}
 				}
 				else if (sentToInbox==1){
@@ -9880,6 +9980,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.putExtra("MULTISELECT", 0);
 	    	intent.putExtra("SEND_FILE",0);
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
+	}
+	
+	public void shareFolderLollipop(ArrayList<Long> handleList){
+		log("shareFolder ArrayListLong");
+		//TODO shareMultipleFolders
+
+		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
+	    	
+	    	long[] handles=new long[handleList.size()];
+	    	int j=0;
+	    	for(int i=0; i<handleList.size();i++){
+	    		handles[j]=handleList.get(i);
+	    		j++;
+	    	}	    	
+	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
+	    	//Multiselect=1 (multiple folders)
+	    	intent.putExtra("MULTISELECT", 1);
+	    	intent.putExtra("SEND_FILE",0);
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
 	}
