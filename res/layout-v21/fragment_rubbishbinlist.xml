@@ -1,0 +1,200 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    tools:context=".RubbishBinListFragment" >
+   
+    <TextView
+	    android:id="@+id/rubbishbin_list_content_text"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:paddingLeft="8dp"
+	    android:paddingTop="3dp"
+	    android:paddingBottom="3dp"
+	    android:textColor="@color/white"
+	    android:background="@color/content_text_folder"
+	    android:textSize="14sp"/>
+    
+    <LinearLayout
+         android:id="@+id/out_space_rubbish"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:layout_centerHorizontal="true"
+    	 android:orientation="vertical">
+
+		<TextView
+		    android:id="@+id/out_space_text_rubbish"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/white"
+		    android:textStyle="bold"
+		    android:paddingTop="20dp"
+		    android:paddingBottom="20dp"
+		    android:paddingLeft="20dp"
+		    android:paddingRight="20dp"
+		    android:gravity="center"
+		    android:background="@color/navigation_drawer_background"
+		    android:textSize="16sp"
+		    android:text="@string/warning_out_space"/>  
+         
+         <Button
+            android:id="@+id/out_space_btn_rubbish"
+       		android:layout_height="48dp"       		
+       		android:layout_width="fill_parent"
+            android:background="@drawable/btn_default_holo_light_without_corners"
+            android:textColor="@color/button_text"
+            android:text="@string/my_account_upgrade_pro" />
+     </LinearLayout>          
+    
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rubbishbin_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="multipleChoice"
+        android:layout_below="@id/rubbishbin_list_content_text" />
+    
+    <ImageView
+	    android:id="@+id/rubbishbin_list_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true" />
+    
+    <TextView
+	    android:id="@+id/rubbishbin_list_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/rubbishbin_list_empty_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>
+    
+  <nz.mega.components.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoPanelHeight="100dp"
+        sothree:umanoShadowHeight="4dp"
+        sothree:umanoParalaxOffset="100dp"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoOverlay="true">
+
+   <!-- MAIN CONTENT -->
+        
+     <FrameLayout
+            android:id="@+id/rubbishbin_list_out_options"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:orientation="vertical">
+            
+            <TextView
+                android:id="@+id/main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:gravity="center"                
+                android:focusable="false"
+                android:focusableInTouchMode="true"/>
+        </FrameLayout>
+        
+       
+        <!-- SLIDING LAYOUT -->
+		 <LinearLayout 
+            android:id="@+id/rubbishbin_list_options"
+            android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:padding="0dp"
+        	android:background="@color/adapters_background"
+        	android:orientation="vertical">                  	
+           
+			<LinearLayout
+                android:id="@+id/rubbishbin_list_option_properties_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+               	android:orientation="horizontal"
+               	android:gravity="center_vertical">
+		        
+		        <ImageView
+		            android:id="@+id/rubbishbin_list_option_properties"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/info_ic"		            
+		            style="@style/dialogActionButton"           
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"/>
+		        
+		        <TextView 
+                    android:id="@+id/rubbishbin_list_option_properties_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"
+					android:textColor="#ffffff"
+					android:textSize="14sp"
+					android:textStyle="bold"/>
+	        </LinearLayout>    
+ 
+	    
+		    <LinearLayout
+                android:id="@+id/rubbishbin_list_option_move_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+		            
+		         <ImageView
+		            android:id="@+id/rubbishbin_list_option_move"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_move"
+		            style="@style/dialogActionButton"
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"/>
+		         
+		         <TextView 
+                    android:id="@+id/rubbishbin_list_option_move_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/general_move_to"
+                     android:paddingBottom="2dp"
+					android:textColor="#ffffff"
+					android:textSize="14sp"
+					android:textStyle="bold"/>
+		      </LinearLayout>
+		    
+		    <LinearLayout
+                android:id="@+id/rubbishbin_list_option_remove_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+		            
+		         <ImageView
+		            android:id="@+id/rubbishbin_list_option_remove"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_delete"
+		            style="@style/dialogActionButton"
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"/>
+		         
+		         <TextView 
+                    android:id="@+id/rubbishbin_list_option_remove_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/context_delete"
+                     android:paddingBottom="2dp"
+					android:textColor="#ffffff"
+					android:textSize="14sp"
+					android:textStyle="bold"/>
+		      </LinearLayout>
+        </LinearLayout>
+    </nz.mega.components.SlidingUpPanelLayout>
+
+</RelativeLayout>

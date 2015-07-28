@@ -73,7 +73,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
-public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, OnItemLongClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
+public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
 
 	public static int GRID_WIDTH =400;
 		
@@ -1141,20 +1141,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				rightUploadButton.setVisibility(View.GONE);
 			}			
 		}
-	}
-	
-	@Override
-	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		if (adapterList.getPositionClicked() == -1){
-//			clearSelections();
-//			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-//			listView.setItemChecked(position, true);
-//			adapterList.setMultipleSelect(true);
-//			updateActionModeTitle();
-//			listView.setOnItemLongClickListener(null);
-		}
-		return true;
-	}
+	}	
 	
 	public boolean showSelectMenuItem(){
 		if (isList){
@@ -1725,5 +1712,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public int getItemCount(){
+		return adapterList.getItemCount();
 	}
 }

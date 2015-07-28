@@ -19,6 +19,7 @@ import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
 import nz.mega.android.lollipop.FileExplorerActivityLollipop;
+import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
@@ -300,7 +301,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     
     /////LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;  
-    
+    private RubbishBinFragmentLollipop rbFLol;
     
     //////
     
@@ -415,25 +416,27 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		protected Void doInBackground(String... params) {
 			log("doInBackground-Async Task ClearRubbisBinTask");
 			
-			if (rbF != null){
-				ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-				
-//				ProgressDialog temp = null;
-//				try{
-//					temp = new ProgressDialog(this);
-//					temp.setMessage(getString(R.string.context_delete_from_mega));
-//					temp.show();
-//				}
-//				catch(Exception e){
-//					return;
-//				}
-//				statusDialog = temp;
-				
-				isClearRubbishBin = true;
-				for (int i=0; i<rubbishNodes.size(); i++){
-					megaApi.remove(rubbishNodes.get(i), managerActivity);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Call some material design APIs here
+				if (rbFLol != null){
+					ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+					
+					isClearRubbishBin = true;
+					for (int i=0; i<rubbishNodes.size(); i++){
+						megaApi.remove(rubbishNodes.get(i), managerActivity);
+					}
 				}
-			}
+			} else {
+				// Implement this feature without material design
+				if (rbF != null){
+					ArrayList<MegaNode> rubbishNodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
+					
+					isClearRubbishBin = true;
+					for (int i=0; i<rubbishNodes.size(); i++){
+						megaApi.remove(rubbishNodes.get(i), managerActivity);
+					}
+				}
+			}			
 			return null;
 		}		
 	}	
@@ -1329,7 +1332,144 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 }
     
     @Override
-	protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
+    	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Call some material design APIs here
+    		onSaveInstanceStateLollipop(outState);
+		} else {
+			// Implement this feature without material design
+			onSaveInstanceStateKitkat(outState);
+		}
+    }
+    
+	protected void onSaveInstanceStateLollipop(Bundle outState) {
+    	log("onSaveInstaceState");
+    	if (megaApi == null){
+			megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		}
+		
+		log("retryPendingConnections()");
+		if (megaApi != null){
+			megaApi.retryPendingConnections();
+		}
+    	super.onSaveInstanceState(outState);
+    	
+    	long pHBrowser = -1;
+    	long pHRubbish = -1;
+    	long pHSharedWithMe = -1;
+    	long pHSearch = -1;
+    	long pHInbox = -1;
+    	int visibleFragment = -1;
+    	String pathOffline = this.pathNavigation;
+    	
+    	int order = this.orderGetChildren;
+    	if (drawerItem == DrawerItem.CLOUD_DRIVE){
+    		if (fbFLol != null){
+    			pHBrowser = fbFLol.getParentHandle();    		
+    			if (isListCloudDrive){
+    				visibleFragment = 1;
+    			}
+    			else{
+    				visibleFragment = 2;
+    			}
+    		}
+    	}
+    	
+    	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+    	if (cF != null){
+    		if (drawerItem == DrawerItem.CONTACTS){
+    			if (isListContacts){
+    				visibleFragment = 3;
+    			}
+    			else{
+    				visibleFragment = 4;
+    			}
+    		}
+    	}
+    	if (drawerItem == DrawerItem.RUBBISH_BIN)
+    	{
+    		pHRubbish = rbFLol.getParentHandle();
+    		if (rbFLol != null){
+    			if (isListRubbishBin){
+    				visibleFragment = 5;
+    			}
+    			else{
+    				visibleFragment = 6;
+    			}
+    		}
+    	}    	
+    	
+    	if (inSF != null){
+    		pHSharedWithMe = inSF.getParentHandle();
+    		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+    			if (isListSharedWithMe){
+    				visibleFragment = 8;
+    			}
+    			else{
+    				visibleFragment = 9;
+    			}
+    		}
+    	}
+    	
+    	if (tF != null){
+	    	if (drawerItem == DrawerItem.TRANSFERS){
+	    		visibleFragment = 7;
+	    		outState.putBoolean("pauseIconVisible", pauseIconVisible);
+	    		outState.putBoolean("downloadPlay", downloadPlay);
+	    	}
+    	}
+    	
+    	if (maF != null){
+    		if (drawerItem == DrawerItem.ACCOUNT){
+    			visibleFragment = 10;
+    		}
+    	}
+    	
+    	if (sF != null){
+    		if (drawerItem == DrawerItem.SEARCH){
+    			pHSearch = sF.getParentHandle();
+    			visibleFragment = 11;
+    			outState.putString("searchQuery", searchQuery);
+    			outState.putInt("levels", sF.getLevels());
+    		}
+    	}
+    	
+    	if (psF != null){
+    		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+    			if (isListCameraUpload){
+    				visibleFragment = 12;
+    			}
+    			else{
+    				visibleFragment = 13;
+    			}
+    			
+    		}
+    	}
+    	
+    	if (drawerItem == DrawerItem.INBOX)
+    	{
+    		pHInbox = iF.getParentHandle();
+    		if (rbF != null){
+    			if (isListInbox){
+    				visibleFragment = 14;
+    			}
+    			else{
+    				visibleFragment = 15;
+    			}
+    		}
+    	}
+    	
+    	outState.putInt("orderGetChildren", order);
+    	outState.putInt("visibleFragment", visibleFragment);
+    	outState.putLong("parentHandleBrowser", pHBrowser);
+    	outState.putLong("parentHandleRubbish", pHRubbish);
+    	outState.putLong("parentHandleSharedWithMe", pHSharedWithMe);
+    	outState.putLong("parentHandleSearch", pHSearch);
+    	outState.putLong("parentHandleInbox", pHInbox);
+    }
+    
+	protected void onSaveInstanceStateKitkat(Bundle outState) {
     	log("onSaveInstaceState");
     	if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
@@ -2109,21 +2249,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (rbF == null){
-    				rbF = new RubbishBinFragment();
-    				rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+    			if (rbFLol == null){
+    				rbFLol = new RubbishBinFragmentLollipop();
+    				rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
     				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-    				rbF.setIsList(isListRubbishBin);
-    				rbF.setOrder(orderGetChildren);
+    				rbFLol.setIsList(isListRubbishBin);
+    				rbFLol.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-    				rbF.setNodes(nodes);
+    				rbFLol.setNodes(nodes);
     			}
     			else{
-    				rbF.setIsList(isListRubbishBin);
-    				rbF.setParentHandle(parentHandleRubbish);
-    				rbF.setOrder(orderGetChildren);
+    				rbFLol.setIsList(isListRubbishBin);
+    				rbFLol.setParentHandle(parentHandleRubbish);
+    				rbFLol.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
-    				rbF.setNodes(nodes);
+    				rbFLol.setNodes(nodes);
     			}
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -2131,7 +2271,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, rbF, "rbF");
+				ft.replace(R.id.fragment_container, rbFLol, "rbFLol");
     			ft.commit();
     			
     			customSearch.setVisibility(View.VISIBLE);
@@ -2160,8 +2300,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
-        			rbF.setIsList(isListRubbishBin);	        			
-        			rbF.setParentHandle(parentHandleRubbish);
+        			rbFLol.setIsList(isListRubbishBin);	        			
+        			rbFLol.setParentHandle(parentHandleRubbish);
         			rubbishBinMenuItem.setVisible(false);
         			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
 	    			clearRubbishBinMenuitem.setVisible(true);
@@ -3388,9 +3528,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 			
-		}		
-	}
-    
+		}	
+		else if (drawerItem == DrawerItem.RUBBISH_BIN){
+			if (rbFLol != null){
+				if (rbFLol.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItemLollipop(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
+					return;
+				}
+			}
+		}
+	}    
 	
 	@Override
 	public void onBackPressed() {
@@ -3501,9 +3652,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						}					
 					}				
 				}	
-			}
-			if (rbF != null){
-				if (drawerItem == DrawerItem.RUBBISH_BIN){
+			}			
+			if (drawerItem == DrawerItem.RUBBISH_BIN){
+				if (rbF != null){
 					if (rbF.onBackPressed() == 0){
 						drawerItem = DrawerItem.CLOUD_DRIVE;
 						selectDrawerItem(drawerItem);
@@ -3696,7 +3847,13 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 //					rbFLol.showOptionsPanel(node);
 //				}				
 //			}
-		}		
+		}	
+		else if (drawerItem == DrawerItem.RUBBISH_BIN){
+			if (rbFLol != null){
+				rbFLol.showOptionsPanel(node);
+			}
+		}
+		
 	}
 	
 	@Override
@@ -3753,14 +3910,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//Show
 				addMenuItem.setEnabled(true);
 				addMenuItem.setVisible(true);
-				createFolderMenuItem.setVisible(true);
-				selectMenuItem.setVisible(true);
+				createFolderMenuItem.setVisible(true);				
 				sortByMenuItem.setVisible(true);
 				thumbViewMenuItem.setVisible(true);
 				rubbishBinMenuItem.setVisible(false);				
     			upgradeAccountMenuItem.setVisible(false);    			
     			importLinkMenuItem.setVisible(true);
     			takePicture.setVisible(true);
+    			selectMenuItem.setVisible(true);
     			
 				//Hide
     			pauseRestartTransfersItem.setVisible(false);
@@ -3774,6 +3931,15 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
 				killAllSessions.setVisible(false);
+				
+				if(fbFLol!=null){
+    				if(fbFLol.getItemCount()>0){
+    					selectMenuItem.setVisible(true);
+    				}
+    				else{
+    					selectMenuItem.setVisible(true);
+    				}
+    			}
     			
     			if (isListCloudDrive){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -3850,18 +4016,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
 			}
-		}
-		
+		}		
 		
 		if (drawerItem == DrawerItem.RUBBISH_BIN){
-			if (rbF != null){	
-				//Show
-				refreshMenuItem.setVisible(true);
+			if (rbF != null || rbFLol != null){	
+				//Show				
     			sortByMenuItem.setVisible(true);
     			selectMenuItem.setVisible(true);
     			thumbViewMenuItem.setVisible(true);
+    			clearRubbishBinMenuitem.setVisible(true);
     			
 				//Hide
+    			refreshMenuItem.setVisible(false);
 				pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
     			addMenuItem.setVisible(false);
@@ -3884,11 +4050,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
     			}
-    			rbF.setIsList(isListRubbishBin);	        			
-    			rbF.setParentHandle(parentHandleRubbish);
+    			if(rbF!=null){
+    				rbF.setIsList(isListRubbishBin);	        			
+        			rbF.setParentHandle(parentHandleRubbish);
+    			}
+    			else if(rbFLol!=null){
+    				rbFLol.setIsList(isListRubbishBin);	        			
+    				rbFLol.setParentHandle(parentHandleRubbish);
+    				
+    				if(rbFLol.getItemCount()>0){
+    					selectMenuItem.setVisible(true);
+    					clearRubbishBinMenuitem.setVisible(true);
+    				}
+    				else{
+    					selectMenuItem.setVisible(false);
+    					clearRubbishBinMenuitem.setVisible(false);
+    				}
+        			
+    			}    			
     			rubbishBinMenuItem.setVisible(false);
-    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
-    			clearRubbishBinMenuitem.setVisible(true);
+    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));    			
 			}
 		}	
 		
@@ -4494,8 +4675,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        			}
 	        		}
 	        	}
-	        	if (oF != null){ 
-	        		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+	        		if (oF != null){ 	        		
 	    				oF.selectAll();
 	    				if (oF.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
@@ -4532,24 +4713,37 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        				unSelectMenuItem.setVisible(true);
 	        			}
 	        		}
-	        	}
-	        	
-	        	if (rbF != null){
-	        		if (drawerItem == DrawerItem.RUBBISH_BIN){	        			
-	        			rbF.selectAll();
-	        			if (rbF.showSelectMenuItem()){
-	        				selectMenuItem.setVisible(true);
-	        				unSelectMenuItem.setVisible(false);
+	        	} 	        	
+	        	if (drawerItem == DrawerItem.RUBBISH_BIN){
+	        		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+	        			// Material Design
+	        			if (rbFLol != null){
+	        				rbFLol.selectAll();
+	        				if (rbFLol.showSelectMenuItem()){
+	        					selectMenuItem.setVisible(true);
+	        					unSelectMenuItem.setVisible(false);
+	        				}
+	        				else{
+	        					selectMenuItem.setVisible(false);
+	        					unSelectMenuItem.setVisible(true);
+	        				}
 	        			}
-	        			else{
-	        				selectMenuItem.setVisible(false);
-	        				unSelectMenuItem.setVisible(true);
+	        		} else {
+	        			if (rbF != null){
+	        				rbF.selectAll();
+	        				if (rbF.showSelectMenuItem()){
+	        					selectMenuItem.setVisible(true);
+	        					unSelectMenuItem.setVisible(false);
+	        				}
+	        				else{
+	        					selectMenuItem.setVisible(false);
+	        					unSelectMenuItem.setVisible(true);
+	        				}
 	        			}
-	        			return true;
-	        		}
+	        		} 		
+	        		return true;
 	        	}
-	        	
-	        	return true;
+
 	        }
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
@@ -6918,22 +7112,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						fbFLol.getListView().invalidate();
 					}
 				}
-				if (drawerItem == DrawerItem.INBOX){
+				else if (drawerItem == DrawerItem.INBOX){
 					if (iF != null){
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iF.getParentHandle()), orderGetChildren);
-//							rbF.setNodes(nodes);
+//							rbFLol.setNodes(nodes);
 						iF.refresh();
 					}
 				}	
-				if (drawerItem == DrawerItem.RUBBISH_BIN){
-					if (rbF != null){
+				else if (drawerItem == DrawerItem.RUBBISH_BIN){
+					if (rbFLol != null){
 					
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+						rbFLol.setNodes(nodes);
+						rbFLol.getListView().invalidate();
 					}
 				}
-				if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 					if (inSF != null){
 						//TODO: ojo con los hijos
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
@@ -6972,30 +7166,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
 					}
 				}
-				
-				if (fbFLol != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null){					
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 						fbFLol.setNodes(nodes);
 						fbFLol.getListView().invalidate();
 					}
 				}
-				if (rbF != null){
-					if (drawerItem == DrawerItem.RUBBISH_BIN){
+				else if (drawerItem == DrawerItem.RUBBISH_BIN){
+					if (rbFLol != null){					
 						if (isClearRubbishBin){
 							isClearRubbishBin = false;
 							parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-							rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
+							rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
+							rbFLol.setNodes(nodes);
+							rbFLol.getListView().invalidate();
 							aB.setTitle(getString(R.string.section_rubbish_bin));	
 							getmDrawerToggle().setDrawerIndicatorEnabled(true);
 						}
 						else{
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+							rbFLol.setNodes(nodes);
+							rbFLol.getListView().invalidate();
 						}
 					}
 				}
@@ -7106,22 +7299,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
-				if (fbFLol != null){
-					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (fbFLol != null){					
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 						fbFLol.setNodes(nodes);
 						fbFLol.getListView().invalidate();
 					}
 				}
-				if (rbF != null){
-					if (drawerItem == DrawerItem.RUBBISH_BIN){
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
+				else if (drawerItem == DrawerItem.RUBBISH_BIN){
+					if (rbFLol != null){					
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+						rbFLol.setNodes(nodes);
+						rbFLol.getListView().invalidate();
 					}
 				}
-				if (inSF != null){
-					if (drawerItem == DrawerItem.SHARED_WITH_ME){
+				else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+					if (inSF != null){					
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						inSF.setNodes(nodes);
@@ -7160,22 +7353,22 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				
 				if (e.getErrorCode() == MegaError.API_OK){
 					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
-					if (fbFLol != null){
-						if (drawerItem == DrawerItem.CLOUD_DRIVE){
+					if (drawerItem == DrawerItem.CLOUD_DRIVE){
+						if (fbFLol != null){						
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 							fbFLol.setNodes(nodes);
 							fbFLol.getListView().invalidate();
 						}
 					}
-					if (rbF != null){
-						if (drawerItem == DrawerItem.RUBBISH_BIN){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-							rbF.setNodes(nodes);
-							rbF.getListView().invalidateViews();
+					else if (drawerItem == DrawerItem.RUBBISH_BIN){
+						if (rbFLol != null){						
+							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+							rbFLol.setNodes(nodes);
+							rbFLol.getListView().invalidate();
 						}
-					}
-					if (inSF != null){
-						if (drawerItem == DrawerItem.SHARED_WITH_ME){
+					}					
+					else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+							if (inSF != null){
 							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 							//TODO: ojo con los hijos
 //							inSF.setNodes(nodes);
@@ -7695,10 +7888,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 
 	public void showClearRubbishBinDialog(String editText){
 		log("showClearRubbishBinDialog");
-		if (rbF.isVisible()){
-			rbF.setPositionClicked(-1);
-			rbF.notifyDataSetChanged();
-		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			// Material Design
+			if (rbFLol.isVisible()){
+				rbFLol.setPositionClicked(-1);
+				rbFLol.notifyDataSetChanged();
+			}
+		} else {
+			if (rbF.isVisible()){
+				rbF.setPositionClicked(-1);
+				rbF.notifyDataSetChanged();
+			}
+		}		
 		
 		String text;
 		if ((editText == null) || editText.equals("")){

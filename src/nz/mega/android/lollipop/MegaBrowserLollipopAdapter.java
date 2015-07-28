@@ -918,7 +918,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				break;
 			}
 			case R.id.file_list_item_layout:{
-				((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+				if(type==ManagerActivity.RUBBISH_BIN_ADAPTER){
+					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
+				}else{
+					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
+				}				
 				break;
 			}
 		}
