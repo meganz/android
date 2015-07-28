@@ -540,4 +540,5 @@
     <string name="account_successfully_upgraded" context="Message shown when the payment of an upgrade has been correct">Account successfully upgraded!</string>
     <string name="account_error_upgraded" context="Message shown when the payment of an upgrade has not been correct">The operation has not finished correctly. The credit card will not be charged.</string>
     <string name="credit_card_information_error" context="Message shown when the credit card information is not correct">The credit card information is not correct. The credit card will not be charged.</string>
+    <string name="not_upgrade_is_possible" context="Message shown when the user wants to upgrade an account that cannot be upgraded">Your account cannot be upgraded from the app. Please contact support@mega.co.nz to upgrade your account</string>
 </resources>

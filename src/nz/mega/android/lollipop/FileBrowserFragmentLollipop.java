@@ -144,16 +144,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-		@Override
-	    public boolean onSingleTapConfirmed(MotionEvent e) {
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
-
-	        // handle single tap
-	        itemClick(view, position);
-
-	        return super.onSingleTapConfirmed(e);
-	    }
+//		@Override
+//	    public boolean onSingleTapConfirmed(MotionEvent e) {
+//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
+//	        int position = listView.getChildPosition(view);
+//
+//	        // handle single tap
+//	        itemClick(view, position);
+//
+//	        return super.onSingleTapConfirmed(e);
+//	    }
 
 	    public void onLongPress(MotionEvent e) {
 	        View view = listView.findChildViewUnder(e.getX(), e.getY());
@@ -166,7 +166,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(view, position);
+		        itemClick(position);
 			}  
 	        super.onLongPress(e);
 	    }
@@ -270,7 +270,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
 			adapterList.setMultipleSelect(false);
-//			listView.setOnItemLongClickListener(fileBrowserFragment);
 			clearSelections();
 		}
 
@@ -502,17 +501,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			}
 
 			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
+				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivity.FILE_BROWSER_ADAPTER);
 				if (mTHash != null){
 					adapterList.setTransfers(mTHash);
 				}
-//				adapterList.SetOnItemClickListener(new MegaBrowserLollipopAdapter.OnItemClickListener() {
-//					
-//					@Override
-//					public void onItemClick(View view, int position) {
-//						itemClick(view, position);
-//					}
-//				});
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -996,13 +988,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		return info;
 	}
 	
-    public void itemClick(View view, int position) {
+    public void itemClick(int position) {
 		log("item click position: " + position);
 		
 		if (isList){
 			if (adapterList.isMultipleSelect()){
 				adapterList.toggleSelection(position);
 				updateActionModeTitle();
+				adapterList.notifyDataSetChanged();
 //				adapterList.notifyDataSetChanged();
 			}
 			else{
