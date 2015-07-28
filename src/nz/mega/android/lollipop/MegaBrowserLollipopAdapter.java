@@ -121,9 +121,19 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		notifyItemChanged(pos);
 	}
+	
+	public void selectAll(){
+		for (int i= 0; i<this.getItemCount();i++){
+			if(!isItemChecked(i)){
+				toggleSelection(i);
+			}
+		}
+	}
 
 	public void clearSelections() {
-		selectedItems.clear();
+		if(selectedItems!=null){
+			selectedItems.clear();
+		}
 		notifyDataSetChanged();
 	}
 	
@@ -982,6 +992,10 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();
 		}
+		if(this.multipleSelect)
+		{
+			selectedItems = new SparseBooleanArray();
+		}
 	}
 
 	public void setOrder(int orderGetChildren) {
@@ -1012,10 +1026,4 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	private static void log(String log) {
 		Util.log("MegaBrowserLollipopAdapter", log);
 	}
-
-	public void startMultiselection() {
-		selectedItems = new SparseBooleanArray();
-		
-	}
-
 }

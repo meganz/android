@@ -70,6 +70,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 
 public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, OnItemLongClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
@@ -161,7 +162,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 	        // handle long press
 			if (adapterList.getPositionClicked() == -1){
-				adapterList.startMultiselection();
 				adapterList.setMultipleSelect(true);
 			
 				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());			
@@ -204,7 +204,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showCopy(handleList);
+					((ManagerActivity) context).showCopyLollipop(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -214,7 +214,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showMove(handleList);
+					((ManagerActivity) context).showMoveLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_share:{
@@ -227,7 +227,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).shareFolder(handleList);					
+					((ManagerActivity) context).shareFolderLollipop(handleList);					
 					break;
 				}
 				case R.id.cab_menu_share_link:{
@@ -1172,28 +1172,34 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public void selectAll(){
-//		if (isList){
-//			actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-//	
-//			adapterList.setMultipleSelect(true);
-//			for ( int i=0; i< adapterList.getItemCount(); i++ ) {
-//				listView.setItemChecked(i, true);
-//			}
-//			updateActionModeTitle();
-//			listView.setOnItemLongClickListener(null);
-//		}
-//		else{
-//			if (adapterGrid != null){
-//				adapterGrid.selectAll();
-//			}
-//		}
+		if (isList){
+			if(adapterList.isMultipleSelect()){
+				adapterList.selectAll();
+			}
+			else{
+				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+				
+				adapterList.setMultipleSelect(true);
+				adapterList.selectAll();
+			}
+			
+			updateActionModeTitle();
+		}
+		else{
+			if (adapterGrid != null){
+				adapterGrid.selectAll();
+			}
+		}
 	}
 	
 	/*
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		adapterList.startMultiselection();
+		if(adapterList.isMultipleSelect()){
+			adapterList.clearSelections();
+		}
+//		adapterList.startMultiselection();
 //		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
 //		for (int i = 0; i < checkedItems.size(); i++) {
 //			if (checkedItems.valueAt(i) == true) {
@@ -1201,7 +1207,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //				listView.setItemChecked(checkedPosition, false);
 //			}
 //		}
-//		updateActionModeTitle();
+		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
