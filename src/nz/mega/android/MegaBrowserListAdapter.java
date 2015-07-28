@@ -1224,11 +1224,11 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 				//break;
 			}
 			else if (type != ManagerActivity.CONTACT_FILE_ADAPTER ) {
-				((ManagerActivity) context).moveToTrash(handleList);
+				((ContactPropertiesMainActivity) context).moveToTrash(handleList);				
 				//break;
 			} 
 			else {
-				((ContactPropertiesMainActivity) context).moveToTrash(handleList);
+				((ManagerActivity) context).moveToTrash(handleList);
 				//break;
 			}
 			break;

@@ -312,7 +312,7 @@
     <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
-    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí...</string>
+    <string name="hint_cancel_subscriptions" context="hint cancel subscriptions dialog">Escribe aquí las posibles mejoras...</string>
     <string name="dismiss_cancel_subscriptions" context="dismiss cancel subscriptions dialog">Atrás</string>
     <string name="send_cancel_subscriptions" context="send cancel subscriptions dialog">Enviar</string>
     <string name="title_cancel_subscriptions" context="title cancel subscriptions dialog">Cancelar Subscripción</string>
