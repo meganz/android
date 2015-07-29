@@ -79,7 +79,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			super(arg0);
 			// TODO Auto-generated constructor stub
 		}
-		public CheckBox checkbox;
 		public ImageView imageView;
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
@@ -258,8 +257,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder = new ViewHolderBrowser(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
 		holder.itemLayout.setOnClickListener(this);
-		holder.checkbox = (CheckBox) v.findViewById(R.id.file_list_checkbox);
-		holder.checkbox.setClickable(false);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
 		holder.savedOffline = (ImageView) v.findViewById(R.id.file_list_saved_offline);
 		
@@ -314,7 +311,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.textViewFileName.setText(node.getName());
 		
 		if (!multipleSelect) {
-			holder.checkbox.setVisibility(View.GONE);
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
 			
 			if (positionClicked != -1) {
@@ -338,7 +334,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 	
 		} else {
-			holder.checkbox.setVisibility(View.VISIBLE);
 			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
