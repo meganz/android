@@ -282,7 +282,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
-					aB.setTitle(getString(R.string.section_rubbish_bin));	
+//					aB.setTitle(getString(R.string.section_rubbish_bin));	
 					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					((ManagerActivity)context).supportInvalidateOptionsMenu();
 				}
@@ -305,7 +305,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				if(((ManagerActivity)context).getmDrawerToggle() != null)
 				{
 					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-						aB.setTitle(getString(R.string.section_rubbish_bin));	
+//						aB.setTitle(getString(R.string.section_rubbish_bin));	
 						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					}
 					else{
@@ -385,7 +385,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			}	
 			
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-				aB.setTitle(getString(R.string.section_rubbish_bin));
+//				aB.setTitle(getString(R.string.section_rubbish_bin));
 				MegaNode infoNode = megaApi.getRubbishNode();
 				contentText.setText(getInfoFolder(infoNode));
 			}

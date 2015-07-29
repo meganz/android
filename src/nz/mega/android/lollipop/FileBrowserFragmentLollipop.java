@@ -1715,6 +1715,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public int getItemCount(){
-		return adapterList.getItemCount();
+		if(adapterList!=null){
+			return adapterList.getItemCount();
+		}
+		return 0;
 	}
 }

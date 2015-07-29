@@ -5,16 +5,7 @@
     android:background="@drawable/statelist_item_layout"
     android:id="@+id/file_list_item_layout" >
     
-    <CheckBox
-        android:id="@+id/file_list_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:checked="false"
-        android:focusable="false"
-        android:layout_centerVertical="true"
-        android:button="@drawable/btn_check_holo_light" />
-    
-      <ImageView
+    <ImageView
         android:id="@+id/file_list_saved_offline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

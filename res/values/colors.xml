@@ -53,4 +53,7 @@
     <color name="transparent_mega">#80db0605</color>
     
     <color name="accentColor">#00BFA5</color>
+    
+    <color name="text_tab_selected">#FFFFFF</color>    
+	<color name="text_tab_unselected">#B9B9B9</color> 
 </resources>
