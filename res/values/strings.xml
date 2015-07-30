@@ -303,6 +303,7 @@
     <string name="context_no_sent" context="error message when sending a file">Error. File not sent</string>
     <string name="context_no_copied" context="error message">Error. Not copied</string>
     <string name="context_correctly_moved" context="success message when moving a node">Correctly moved</string>
+    <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Correctly sent to Rubbish Bin</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Correctly shared</string>
     <string name="context_no_shared" context="error message">Error. Not shared</string>
