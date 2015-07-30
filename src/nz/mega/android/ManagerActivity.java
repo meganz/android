@@ -1082,16 +1082,28 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        megaApi.getAccountDetails(this);
 	        megaApi.creditCardQuerySubscriptions(this);
 	        
-	        List<String> items = new ArrayList<String>();
-			for (DrawerItem item : DrawerItem.values()) {
-				if (!(item.equals(DrawerItem.SEARCH)||(item.equals(DrawerItem.ACCOUNT)))){					
-					items.add(item.getTitle(this));
+	        List<String> items;
+	        
+	        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Material Design
+	        	items = new ArrayList<String>();
+				for (DrawerItem item : DrawerItem.values()) {
+					if (!(item.equals(DrawerItem.SEARCH)||(item.equals(DrawerItem.ACCOUNT))||(item.equals(DrawerItem.RUBBISH_BIN))||(item.equals(DrawerItem.TRANSFERS)))){					
+						items.add(item.getTitle(this));
+					}
 				}
-			}
+			} else {
+				// Implement this feature without material design
+				items = new ArrayList<String>();
+				for (DrawerItem item : DrawerItem.values()) {
+					if (!(item.equals(DrawerItem.SEARCH)||(item.equals(DrawerItem.ACCOUNT)))){					
+						items.add(item.getTitle(this));
+					}
+				}
+			}        
 	        
 			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
-			mDrawerList.setAdapter(nDA);
-	        
+			mDrawerList.setAdapter(nDA);       
 	        mDrawerList.setOnItemClickListener(this);
 	        
 	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
@@ -8994,51 +9006,54 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			} 
 			catch (Exception ex) {}
 			
-			if (moveToRubbish){
-				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
-				}
-				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
-				}
-				moveToRubbish = false;
-				log("move to rubbish request finished");
-			}
-			else{
-				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
-				}
-				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
-				}
 			
-				log("move nodes request finished");
-			}			
 			if (e.getErrorCode() == MegaError.API_OK){
 //				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
-					int index = viewPagerCDrive.getCurrentItem();
-        			log("----------------------------------------INDEX: "+index);
-        			if(index==1){
+					if (moveToRubbish){
+						//Update both tabs
         				//Rubbish bin
-        				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
-        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+						String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
         				if (rbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
     						rbFLol.setNodes(nodes);
     						rbFLol.getListView().invalidate();
-            			}		
-        			}
-        			else{
+            			}	
+
         				//Cloud Drive
-        				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
-        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+        				String cFTagCD = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagCD);
         				if (fbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
     						fbFLol.getListView().invalidate();
-        				}
-        			}
+        				}	        			
+					}
+					else{
+						int index = viewPagerCDrive.getCurrentItem();
+	        			log("----------------------------------------INDEX: "+index);
+	        			if(index==1){
+	        				//Rubbish bin
+	        				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+	        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	        				if (rbFLol != null){
+	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+	    						rbFLol.setNodes(nodes);
+	    						rbFLol.getListView().invalidate();
+	            			}		
+	        			}
+	        			else{
+	        				//Cloud Drive
+	        				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+	        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	        				if (fbFLol != null){
+	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+	    						fbFLol.setNodes(nodes);
+	    						fbFLol.getListView().invalidate();
+	        				}
+	        			}
+					}					
 				}
 				else if (drawerItem == DrawerItem.INBOX){
 					if (iF != null){
@@ -9062,6 +9077,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 			}	
+			
+			if (moveToRubbish){
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, getString(R.string.context_correctly_moved_to_rubbish), Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+				}
+				moveToRubbish = false;
+				log("move to rubbish request finished");
+			}
+			else{
+				if (e.getErrorCode() == MegaError.API_OK){
+					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+				}
+				else{
+					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+				}
+			
+				log("move nodes request finished");
+			}
+			
+			
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			if (e.getErrorCode() == MegaError.API_OK){
