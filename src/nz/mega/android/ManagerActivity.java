@@ -19,6 +19,7 @@ import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
 import nz.mega.android.lollipop.FileExplorerActivityLollipop;
+import nz.mega.android.lollipop.NavigationDrawerLollipopAdapter;
 import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -363,7 +364,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	int levelsSearch = -1;
 	private boolean openLink = false;	
 	MegaApplication app;	
-	NavigationDrawerAdapter nDA;	
+	NavigationDrawerAdapter nDA;
+	NavigationDrawerLollipopAdapter nDALol;
 	String pathNavigation = "/";	
 	long lastTimeOnTransferUpdate = -1;	
 	boolean firstTimeCam = false;
@@ -1100,10 +1102,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						items.add(item.getTitle(this));
 					}
 				}
-			}        
-	        
-			nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
-			mDrawerList.setAdapter(nDA);       
+			}      
+			
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				// Call some material design APIs here
+				nDALol = new NavigationDrawerLollipopAdapter(getApplicationContext(), items);
+				mDrawerList.setDividerHeight(0);
+				mDrawerList.setDivider(null);
+				mDrawerList.setAdapter(nDALol);
+			} else {
+				// Implement this feature without material design
+				nDA = new NavigationDrawerAdapter(getApplicationContext(), items);
+				mDrawerList.setAdapter(nDA);
+			}			
+       
 	        mDrawerList.setOnItemClickListener(this);
 	        
 	        getSupportActionBar().setIcon(R.drawable.ic_launcher);
@@ -1931,20 +1943,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     }
 	
 	public void setInitialCloudDrive (){
-		drawerItem = DrawerItem.CLOUD_DRIVE;
-		nDA.setPositionClicked(0);
-		mDrawerLayout.openDrawer(Gravity.LEFT);
-		firstTime = true;
-		
-		
+		drawerItem = DrawerItem.CLOUD_DRIVE;		
 		
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			// Call some material design APIs here
+			nDALol.setPositionClicked(0);
 			selectDrawerItemLollipop(drawerItem);
 		} else {
 			// Implement this feature without material design
+			nDA.setPositionClicked(0);
 			selectDrawerItem(drawerItem);
 		}
+
+		mDrawerLayout.openDrawer(Gravity.LEFT);
+		firstTime = true;
 
 //		if (fbF == null){
 //			fbF = new FileBrowserFragment();
