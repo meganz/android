@@ -19,6 +19,7 @@ import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
 import nz.mega.android.lollipop.FileExplorerActivityLollipop;
+import nz.mega.android.lollipop.InboxFragmentLollipop;
 import nz.mega.android.lollipop.NavigationDrawerLollipopAdapter;
 import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
@@ -304,6 +305,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     /////LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol;  
     private RubbishBinFragmentLollipop rbFLol;
+    private InboxFragmentLollipop iFLol;
     
     //////
     
@@ -2124,6 +2126,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			}
     			else{
     				log("mTabsAdapterCloudDrive NOT null");
+        			mTabHostCDrive.setVisibility(View.VISIBLE);    			
+        			viewPagerCDrive.setVisibility(View.VISIBLE);
     				
     				fbFLol.setIsList(isListCloudDrive);
     				fbFLol.setParentHandle(parentHandleBrowser);
@@ -2310,29 +2314,32 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
    			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (iF == null){
-    				iF = new InboxFragment();
-    				iF.setParentHandle(megaApi.getInboxNode().getHandle());
+    			if (iFLol == null){
+    				iFLol = new InboxFragmentLollipop();
+    				iFLol.setParentHandle(megaApi.getInboxNode().getHandle());
     				parentHandleInbox = megaApi.getInboxNode().getHandle();
-    				iF.setIsList(isListInbox);
-    				iF.setOrder(orderGetChildren);
+    				iFLol.setIsList(isListInbox);
+    				iFLol.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getInboxNode(), orderGetChildren);
-    				iF.setNodes(nodes);
+    				iFLol.setNodes(nodes);
     			}
     			else{
-    				iF.setIsList(isListInbox);
-    				iF.setParentHandle(parentHandleInbox);
-    				iF.setOrder(orderGetChildren);
+    				iFLol.setIsList(isListInbox);
+    				iFLol.setParentHandle(parentHandleInbox);
+    				iFLol.setOrder(orderGetChildren);
     				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleInbox), orderGetChildren);
-    				iF.setNodes(nodes);
+    				iFLol.setNodes(nodes);
     			}
-    			    			
+    			    
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
+    			viewPagerShares.setVisibility(View.GONE);
+    			
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, iF, "iF");
+				ft.replace(R.id.fragment_container, iFLol, "iFLol");
     			ft.commit();
     			
     			customSearch.setVisibility(View.VISIBLE);
@@ -3745,7 +3752,19 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 			}			
-		}	
+		}
+		else if (drawerItem == DrawerItem.INBOX){
+			if (iFLol != null){			
+				if (iFLol.onBackPressed() == 0){
+					drawerItem = DrawerItem.CLOUD_DRIVE;
+					selectDrawerItemLollipop(drawerItem);
+					if(nDA!=null){
+						nDA.setPositionClicked(0);
+					}
+					return;
+				}
+			}
+		}
 	}    
 	
 	@Override
@@ -4046,6 +4065,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				if (rbFLol != null){
 					rbFLol.showOptionsPanel(node);
 				}				
+			}
+		}
+		else if (drawerItem == DrawerItem.INBOX){
+			if (iFLol != null){				
+				iFLol.showOptionsPanel(node);				
 			}
 		}		
 	}
