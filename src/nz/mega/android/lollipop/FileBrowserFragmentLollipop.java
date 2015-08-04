@@ -861,6 +861,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Download option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 			slidingOptionsPanel.setVisibility(View.GONE);
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(selectedNode.getHandle());
 			((ManagerActivity) context).onFileClick(handleList);
@@ -883,6 +885,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Move option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(selectedNode.getHandle());									
 			((ManagerActivity) context).showMoveLollipop(handleList);
@@ -893,7 +897,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Properties option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			Intent i = new Intent(context, FilePropertiesActivity.class);
 			i.putExtra("handle", selectedNode.getHandle());
 			
@@ -917,6 +922,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Delete option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(selectedNode.getHandle());
 
@@ -928,7 +935,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Public link option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			((ManagerActivity) context).getPublicLinkAndShareIt(selectedNode);
 
 			break;
@@ -937,14 +945,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Rename option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			((ManagerActivity) context).showRenameDialog(selectedNode, selectedNode.getName());
 			break;
-		}		
+		}	
 		
 		case R.id.file_list_option_share_layout: {	
 			log("Share option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			((ManagerActivity) context).shareFolderLollipop(selectedNode);
 			break;
 		}			
@@ -952,6 +964,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("Copy option");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			setPositionClicked(-1);
+			notifyDataSetChanged();
 			ArrayList<Long> handleList = new ArrayList<Long>();
 			handleList.add(selectedNode.getHandle());									
 			((ManagerActivity) context).showCopyLollipop(handleList);
@@ -1222,7 +1236,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				res.getQuantityString(R.plurals.general_num_folders, folders));
 		String title;
 		if (files == 0 && folders == 0) {
-			title = "";
+			title = foldersStr + ", " + filesStr;
 		} else if (files == 0) {
 			title = foldersStr;
 		} else if (folders == 0) {

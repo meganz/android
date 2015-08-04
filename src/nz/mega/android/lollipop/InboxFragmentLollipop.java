@@ -3,11 +3,13 @@ package nz.mega.android.lollipop;
 import java.util.ArrayList;
 import java.util.List;
 
+import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaBrowserNewGridAdapter;
 import nz.mega.android.MimeTypeList;
+import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop.RecyclerViewOnGestureListener;
 import nz.mega.android.utils.Util;
@@ -255,8 +257,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			
 			return false;
-		}
-		
+		}		
 	}
 	
 	public boolean showSelectMenuItem(){
@@ -582,9 +583,91 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public void onClick(View v) {
 
 		switch(v.getId()){
-		case R.id.out_space_btn_inbox:
-			((ManagerActivity)getActivity()).upgradeAccountButton();
-			break;
+			case R.id.out_space_btn_inbox:{
+				((ManagerActivity)getActivity()).upgradeAccountButton();
+				break;
+			}
+			case R.id.file_list_option_download_layout: {
+				log("Download option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+				((ManagerActivity) context).onFileClick(handleList);
+				break;
+			}
+			case R.id.file_list_option_move_layout:{
+				log("Move option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());									
+				((ManagerActivity) context).showMoveLollipop(handleList);
+
+				break;
+			}
+			case R.id.file_list_option_properties_layout: {
+				log("Properties option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				Intent i = new Intent(context, FilePropertiesActivity.class);
+				i.putExtra("handle", selectedNode.getHandle());
+				
+				if (selectedNode.isFolder()) {
+					if (megaApi.isShared(selectedNode)){
+						i.putExtra("imageId", R.drawable.folder_shared_mime);	
+					}
+					else{
+						i.putExtra("imageId", R.drawable.folder_mime);
+					}
+				} 
+				else {
+					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+				}
+				i.putExtra("name", selectedNode.getName());
+				context.startActivity(i);
+
+				break;
+			}
+			case R.id.file_list_option_delete_layout: {
+				log("Delete option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+
+				((ManagerActivity) context).moveToTrash(handleList);
+
+				break;
+			}
+			case R.id.file_list_option_rename_layout: {
+				log("Rename option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivity) context).showRenameDialog(selectedNode, selectedNode.getName());
+				break;
+			}
+			case R.id.file_list_option_copy_layout: {
+				log("Copy option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());									
+				((ManagerActivity) context).showCopyLollipop(handleList);
+				break;
+			}
 		}
 	}	
 
@@ -628,31 +711,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			return;
 		}
 		List<MegaNode> documents = adapterList.getSelectedNodes();
-		int files = 0;
-		int folders = 0;
-		for (MegaNode document : documents) {
-			if (document.isFile()) {
-				files++;
-			} else if (document.isFolder()) {
-				folders++;
-			}
-		}
+		int files = documents.size();
+
 		Resources res = getActivity().getResources();
 		String format = "%d %s";
 		String filesStr = String.format(format, files,
-				res.getQuantityString(R.plurals.general_num_files, files));
-		String foldersStr = String.format(format, folders,
-				res.getQuantityString(R.plurals.general_num_folders, folders));
-		String title;
-		if (files == 0 && folders == 0) {
-			title = "";
-		} else if (files == 0) {
-			title = foldersStr;
-		} else if (folders == 0) {
-			title = filesStr;
-		} else {
-			title = foldersStr + ", " + filesStr;
-		}
+				res.getQuantityString(R.plurals.general_num_files, files));		
+		String title = filesStr;
+
 		actionMode.setTitle(title);
 		try {
 			actionMode.invalidate();
