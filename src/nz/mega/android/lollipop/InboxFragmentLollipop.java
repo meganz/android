@@ -166,7 +166,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showCopy(handleList);
+					((ManagerActivity) context).showCopyLollipop(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -176,15 +176,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showMove(handleList);
-					break;
-				}
-				case R.id.cab_menu_share_link:{
-					clearSelections();
-					hideMultipleSelect();
-					if (documents.size()==1){
-						((ManagerActivity) context).getPublicLinkAndShareIt(documents.get(0));
-					}
+					((ManagerActivity) context).showMoveLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -237,11 +229,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				showRename = true;
 			}
 			
-			// Link
-			if ((selected.size() == 1) && (megaApi.checkAccess(selected.get(0), MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK)) {
-				showLink = true;
-			}
-			
 			if (selected.size() > 0) {
 				showDownload = true;
 				showTrash = true;
@@ -262,7 +249,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			menu.findItem(R.id.cab_menu_move).setVisible(showMove);
 			menu.findItem(R.id.cab_menu_share_link).setVisible(showLink);
 			if (showTrash){
-				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_remove));
+				menu.findItem(R.id.cab_menu_trash).setTitle(context.getString(R.string.context_move_to_trash));
 			}
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
