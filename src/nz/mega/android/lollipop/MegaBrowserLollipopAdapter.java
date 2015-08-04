@@ -915,7 +915,11 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			case R.id.file_list_item_layout:{
 				if(type==ManagerActivity.RUBBISH_BIN_ADAPTER){
 					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
-				}else{
+				}
+				else if(type==ManagerActivity.INBOX_ADAPTER){
+					((InboxFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else{
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
 				}				
 				break;

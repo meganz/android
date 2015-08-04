@@ -1498,8 +1498,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     	
     	if (drawerItem == DrawerItem.INBOX)
     	{
-    		pHInbox = iF.getParentHandle();
-    		if (rbF != null){
+    		pHInbox = iFLol.getParentHandle();
+    		if (iFLol != null){
     			if (isListInbox){
     				visibleFragment = 14;
     			}
@@ -9092,10 +9092,30 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}					
 				}
 				else if (drawerItem == DrawerItem.INBOX){
-					if (iF != null){
+					if (iFLol != null){
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(iF.getParentHandle()), orderGetChildren);
 //							rbFLol.setNodes(nodes);
-						iF.refresh();
+						iFLol.refresh();
+						if (moveToRubbish){
+							//Refresh Rubbish Fragment
+							String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+	        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
+	        				if (rbFLol != null){
+	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+	    						rbFLol.setNodes(nodes);
+	    						rbFLol.getListView().invalidate();
+	            			}	
+						}
+						else{
+							//Refresh Cloud Drive
+							String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+	        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	        				if (fbFLol != null){
+	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+	    						fbFLol.setNodes(nodes);
+	    						fbFLol.getListView().invalidate();
+	        				}
+						}
 					}
 				}	
 				else if (drawerItem == DrawerItem.SHARED_WITH_ME){
@@ -9318,9 +9338,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     					}
         			}					
 				}
+				else if (drawerItem == DrawerItem.INBOX){
+					
+					if (iFLol != null){					
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+						//TODO: ojo con los hijos
+//						inSF.setNodes(nodes);
+						iFLol.getListView().invalidate();
+					}			
+				}
 				else if (drawerItem == DrawerItem.SHARED_WITH_ME){
 					if (inSF != null){					
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						inSF.setNodes(nodes);
 						inSF.getListView().invalidateViews();
@@ -9383,12 +9412,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 							}
 	        			}		
 					}										
-					else if (drawerItem == DrawerItem.SHARED_WITH_ME){
-							if (inSF != null){
-							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
-							//TODO: ojo con los hijos
-//							inSF.setNodes(nodes);
-//							inSF.getListView().invalidateViews();
+					else if (drawerItem == DrawerItem.INBOX){
+						if (iFLol != null){
+							iFLol.getListView().invalidate();
 						}
 					}
 				}
@@ -11540,16 +11566,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					fbFLol.getListView().invalidate();
 				}
 			}
-		}
-		if (drawerItem == DrawerItem.INBOX){
-			log("INBOX shown");
-			if (iF != null){
-				iF.refresh();
-//				iF.getListView().invalidateViews();
-			}
-		}
-		if (rbF != null){
-			if (drawerItem == DrawerItem.RUBBISH_BIN){
+			if (rbFLol != null){
+				
 				if (isClearRubbishBin){
 					isClearRubbishBin = false;
 					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
@@ -11559,22 +11577,29 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if(rbF.isVisible())
 					{
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-						rbF.setParentHandle(megaApi.getRubbishNode().getHandle());
-						rbF.setNodes(nodes);
-						rbF.getListView().invalidateViews();
+						rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
+						rbFLol.setNodes(nodes);
+						rbFLol.getListView().invalidate();
 					}
 				}
 				else{
-					if(rbF.isVisible())
+					if(rbFLol.isVisible())
 					{
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
-						rbF.setNodes(nodes);
-						rbF.setContentText();
-						rbF.getListView().invalidateViews();
+						rbFLol.setNodes(nodes);
+						rbFLol.setContentText();
+						rbFLol.getListView().invalidate();
 					}
 				}				
 			}
 		}
+		if (drawerItem == DrawerItem.INBOX){
+			log("INBOX shown");
+			if (iFLol != null){
+				iFLol.refresh();
+//				iF.getListView().invalidateViews();
+			}
+		}		
 		
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
 			int index = viewPagerShares.getCurrentItem();
