@@ -213,6 +213,7 @@
     <TableLayout android:id="@+id/bottom_control_bar"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"
+		android:background="@color/white"
 		android:layout_alignParentBottom="true"
 		android:stretchColumns="1">
         
@@ -274,9 +275,9 @@
         android:choiceMode="singleChoice"
         
         android:dividerHeight="1dp"
-        android:background="@color/navigation_drawer_background"
+        android:background="@color/white"
         android:layout_below="@id/top_control_bar" android:layout_above="@id/bottom_control_bar"/>
-</RelativeLayout>
+	</RelativeLayout>
     
 	
 </android.support.v4.widget.DrawerLayout>
