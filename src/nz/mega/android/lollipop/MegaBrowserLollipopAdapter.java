@@ -546,9 +546,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 //		holder.optionPermissions.setOnClickListener(this);
 //		
 //		holder.optionLeaveShare.setTag(holder);
-//		holder.optionLeaveShare.setOnClickListener(this);
-		
-	
+//		holder.optionLeaveShare.setOnClickListener(this);	
 		
 /*				
 		if (positionClicked != -1) {

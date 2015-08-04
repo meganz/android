@@ -772,7 +772,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				res.getQuantityString(R.plurals.general_num_folders, folders));
 		String title;
 		if (files == 0 && folders == 0) {
-			title = "";
+			title = foldersStr + ", " + filesStr;
 		} else if (files == 0) {
 			title = foldersStr;
 		} else if (folders == 0) {
@@ -787,9 +787,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			e.printStackTrace();
 			log("oninvalidate error");
 		}
-		// actionMode.
 	}
-	
 	
 	/*
 	 * Clear all selected items

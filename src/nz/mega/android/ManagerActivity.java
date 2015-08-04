@@ -4223,7 +4223,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 						selectMenuItem.setVisible(true);
 					}
 					else{
-						selectMenuItem.setVisible(true);
+						selectMenuItem.setVisible(false);
 					}
 	    			
 	    			if (isListCloudDrive){	
@@ -4303,61 +4303,17 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			}
 		}		
 		
-		if (drawerItem == DrawerItem.RUBBISH_BIN){
-			if (rbFLol != null){	
+		if (drawerItem == DrawerItem.INBOX){
+			if (iFLol != null){	
 				//Show				
     			sortByMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(true);
-    			clearRubbishBinMenuitem.setVisible(true);
-    			
-				//Hide
-    			refreshMenuItem.setVisible(false);
-				pauseRestartTransfersItem.setVisible(false);
-				createFolderMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			addContactMenuItem.setVisible(false);
-    			upgradeAccountMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-    			refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				settingsMenuItem.setVisible(false);
-    			
-    			if (isListRubbishBin){	
-    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-				}
-				else{
-					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}
-
-				rbFLol.setIsList(isListRubbishBin);	        			
-				rbFLol.setParentHandle(parentHandleRubbish);
-				
-				if(rbFLol.getItemCount()>0){
+ 
+    			if(iFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
-					clearRubbishBinMenuitem.setVisible(true);
 				}
 				else{
 					selectMenuItem.setVisible(false);
-					clearRubbishBinMenuitem.setVisible(false);
-				}        			
-   			
-    			rubbishBinMenuItem.setVisible(false);
-    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));    			
-			}
-		}	
-		
-		if (drawerItem == DrawerItem.INBOX){
-			if (iF != null){	
-				//Show				
-    			sortByMenuItem.setVisible(true);
-    			selectMenuItem.setVisible(true);    			
+				}
     			    			
 				//Hide
     			refreshMenuItem.setVisible(false);
@@ -5491,9 +5447,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        		}
     			}
 	        	if (drawerItem == DrawerItem.INBOX){
-	        		if (iF != null){	        		
-	    				iF.selectAll();
-	    				if (iF.showSelectMenuItem()){
+	        		if (iFLol != null){	        		
+	        			iFLol.selectAll();
+	    				if (iFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
 	        			}
