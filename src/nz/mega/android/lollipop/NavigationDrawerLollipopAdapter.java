@@ -96,7 +96,12 @@ public class NavigationDrawerLollipopAdapter extends BaseAdapter{
 				}
 				break;
 			case 3:
-				holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_inbox,0,0,0);
+				if (positionClicked == position){
+					holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.inbox_red,0,0,0);	
+				}
+				else{
+					holder.text.setCompoundDrawablesWithIntrinsicBounds(R.drawable.inbox_grey,0,0,0);	
+				}
 				break;
 			case 4:
 				if (positionClicked == position){

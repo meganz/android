@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import nz.mega.android.lollipop.ContactPropertiesActivityLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaApiAndroid;
@@ -471,7 +472,8 @@ public class MegaContactsListAdapter extends BaseAdapter implements OnClickListe
 		switch (v.getId()){
 			case R.id.contact_list_option_properties_layout:{
 				log("optionProperties");
-				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
+//				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
+				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
 				i.putExtra("name", c.getEmail());
 				context.startActivity(i);							
 				positionClicked = -1;
