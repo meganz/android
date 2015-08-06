@@ -2349,8 +2349,12 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			if (createFolderMenuItem != null){
     				//Show				
         			sortByMenuItem.setVisible(true);
-        			selectMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(false);
+        			if(iFLol.getItemCount()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(true);
+					}
         			
     				//Hide
         			refreshMenuItem.setVisible(false);
@@ -2372,13 +2376,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			thumbViewMenuItem.setVisible(false);
         			clearRubbishBinMenuitem.setVisible(false);
         			rubbishBinMenuItem.setVisible(false);
+        			upgradeAccountMenuItem.setVisible(false);
 	    		}
 
     			break;
     		}
     		case CONTACTS:{
   			
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+//    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
     			if (aB == null){
     				aB = getSupportActionBar();
@@ -2392,6 +2397,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
     			
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
@@ -2474,71 +2481,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			}	    			
     			}
     			break;
-    		}
-    		case RUBBISH_BIN:{
-    			
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			
-    			if (rbFLol == null){
-    				rbFLol = new RubbishBinFragmentLollipop();
-    				rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
-    				parentHandleRubbish = megaApi.getRubbishNode().getHandle();
-    				rbFLol.setIsList(isListRubbishBin);
-    				rbFLol.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
-    				rbFLol.setNodes(nodes);
-    			}
-    			else{
-    				rbFLol.setIsList(isListRubbishBin);
-    				rbFLol.setParentHandle(parentHandleRubbish);
-    				rbFLol.setOrder(orderGetChildren);
-    				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleRubbish), orderGetChildren);
-    				rbFLol.setNodes(nodes);
-    			}
-    			
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, rbFLol, "rbFLol");
-    			ft.commit();
-    			
-    			customSearch.setVisibility(View.VISIBLE);
-    			viewPagerContacts.setVisibility(View.GONE);
-    			mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			if (createFolderMenuItem != null){
-    				createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			refreshMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(true);
-	    			helpMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
-	    			settingsMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(true);
-	    			unSelectMenuItem.setVisible(true);
-	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);
-	    			changePass.setVisible(false);
-	    			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
-    			
-        			if (isListRubbishBin){	
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-        			rbFLol.setIsList(isListRubbishBin);	        			
-        			rbFLol.setParentHandle(parentHandleRubbish);
-        			rubbishBinMenuItem.setVisible(false);
-        			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
-	    			clearRubbishBinMenuitem.setVisible(true);
-	    		}
-
-    			break;
-    		}
+    		}    		
     		case SHARED_WITH_ME:{    			
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
@@ -2555,6 +2498,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
     			
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){

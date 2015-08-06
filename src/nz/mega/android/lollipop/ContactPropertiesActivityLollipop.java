@@ -1,4 +1,4 @@
-package nz.mega.android;
+package nz.mega.android.lollipop;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -6,10 +6,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nz.mega.android.ContactFileListFragment;
+import nz.mega.android.DatabaseHandler;
+import nz.mega.android.DownloadService;
+import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
+import nz.mega.android.ManagerActivity;
+import nz.mega.android.MegaApplication;
+import nz.mega.android.MegaPreferences;
+import nz.mega.android.MimeTypeList;
+import nz.mega.android.PinActivity;
+import nz.mega.android.R;
+import nz.mega.android.ShareInfo;
+import nz.mega.android.UploadService;
+import nz.mega.android.ZipBrowserActivity;
+import nz.mega.android.utils.FixedCenterCrop;
 import nz.mega.android.utils.Util;
 import nz.mega.components.EditTextCursorWatcher;
-import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -55,11 +68,11 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class ContactPropertiesMainActivity extends PinActivity implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
+public class ContactPropertiesActivityLollipop extends PinActivity implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	TextView nameView;
 	TextView contentTextView;
-	RoundedImageView imageView;
+	FixedCenterCrop imageView;
 	RelativeLayout contentLayout;
 	TextView contentDetailedTextView;
 	TextView infoEmail;
@@ -74,7 +87,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	MegaApiAndroid megaApi;
 	AlertDialog permissionsDialog;
 
-	ContactPropertiesFragment cpF;
+	ContactPropertiesFragmentLollipop cpF;
 	ContactFileListFragment cflF;
 
 	MenuItem shareMenuItem;
@@ -90,7 +103,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 	public static final int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	public static int REQUEST_CODE_SELECT_FOLDER = 1008;
 
-	static ContactPropertiesMainActivity contactPropertiesMainActivity;
+	static ContactPropertiesActivityLollipop contactPropertiesMainActivity;
 
 	private static int EDIT_TEXT_ID = 2;
 
@@ -197,7 +210,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		switch(currentFragment){
 			case CONTACT_PROPERTIES:{
 				if (cpF == null){
-					cpF = new ContactPropertiesFragment();
+					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
 	
@@ -248,7 +261,7 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 		}
 		case R.id.action_contact_file_list_share: {
 			
-    		cpF = (ContactPropertiesFragment) getSupportFragmentManager().findFragmentByTag("cpF");
+    		cpF = (ContactPropertiesFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cpF");
         	if (cpF != null){
         		MegaUser user = megaApi.getContact(cpF.getUserEmail());
     			if(user == null)
@@ -401,8 +414,8 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 	public void pickFolderToShare(MegaUser user){
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
 		String[] longArray = new String[1];		
 		longArray[0] = user.getEmail();		
 		intent.putExtra("SELECTED_CONTACTS", longArray);
@@ -749,8 +762,8 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 	public void showMove(ArrayList<Long> handleList){
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
@@ -761,8 +774,8 @@ public class ContactPropertiesMainActivity extends PinActivity implements MegaGl
 
 	public void showCopy(ArrayList<Long> handleList) {
 
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i = 0; i < handleList.size(); i++) {
 			longArray[i] = handleList.get(i);
