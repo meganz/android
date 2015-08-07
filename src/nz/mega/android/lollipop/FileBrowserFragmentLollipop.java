@@ -325,6 +325,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			else{
 				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
 				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+				showShare = false;
 			}
 			
 			menu.findItem(R.id.cab_menu_download).setVisible(showDownload);
@@ -621,9 +622,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });
-			
-			
+	        });			
 			
 			return v;
 		}

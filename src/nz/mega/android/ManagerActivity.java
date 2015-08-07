@@ -20,7 +20,9 @@ import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
 import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
 import nz.mega.android.lollipop.FileExplorerActivityLollipop;
 import nz.mega.android.lollipop.InboxFragmentLollipop;
+import nz.mega.android.lollipop.IncomingSharesFragmentLollipop;
 import nz.mega.android.lollipop.NavigationDrawerLollipopAdapter;
+import nz.mega.android.lollipop.OutgoingSharesFragmentLollipop;
 import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -306,11 +308,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private FileBrowserFragmentLollipop fbFLol;  
     private RubbishBinFragmentLollipop rbFLol;
     private InboxFragmentLollipop iFLol;
-    
+	private IncomingSharesFragmentLollipop inSFLol;
+	private OutgoingSharesFragmentLollipop outSFLol;
     //////
     
     TextView textViewBrowser; 
 	TextView textViewRubbish;
+    TextView textViewIncoming; 
+	TextView textViewOutgoing;
     
     //Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -2109,19 +2114,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				
         			TabHost.TabSpec tabSpec5 = mTabHostCDrive.newTabSpec("fbFLol");
         			String titleTab5 = getString(R.string.section_cloud_drive);
-        			tabSpec5.setIndicator(getTabIndicator(mTabHostCDrive.getContext(), titleTab5.toUpperCase())); // new function to inject our own tab layout
-         	        //tabSpec.setContent(contentID);
-        	        //tabSpec.setContent(contentID);
-        	        //mTabHostContacts.addTab(tabSpec);
+        			tabSpec5.setIndicator(getTabIndicator(mTabHostCDrive.getContext(), titleTab5.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
         	        TabHost.TabSpec tabSpec6 = mTabHostCDrive.newTabSpec("rBFLol");
         	        String titleTab6 = getString(R.string.section_rubbish_bin);
-        	        tabSpec6.setIndicator(getTabIndicator(mTabHostCDrive.getContext(), titleTab6.toUpperCase())); // new function to inject our own tab layout   	                      	   
+        	        tabSpec6.setIndicator(getTabIndicator(mTabHostCDrive.getContext(), titleTab6.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout   	                      	   
         	        
         	        mTabsAdapterCDrive.addTab(tabSpec5, FileBrowserFragmentLollipop.class, null);
         	        mTabsAdapterCDrive.addTab(tabSpec6, RubbishBinFragmentLollipop.class, null);
         	        
         	        viewPagerCDrive.setCurrentItem(0);
-        	        aB.setTitle(getResources().getString(R.string.section_cloud_drive));	        
+        	        aB.setTitle(getResources().getString(R.string.section_cloud_drive));
+        	        
+        			textViewBrowser = (TextView) mTabHostCDrive.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
+        			textViewRubbish = (TextView) mTabHostCDrive.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
+        			textViewBrowser.setTypeface(null, Typeface.BOLD);
+    				textViewRubbish.setTypeface(null, Typeface.NORMAL); 
     				
     			}
     			else{
@@ -2134,12 +2141,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				fbFLol.setOrder(orderGetChildren);
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
 					fbFLol.setNodes(nodes);
-    			}
-    			
-    			textViewBrowser = (TextView) mTabHostCDrive.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
-    			textViewRubbish = (TextView) mTabHostCDrive.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
-    			textViewBrowser.setTypeface(null, Typeface.BOLD);
-				textViewRubbish.setTypeface(null, Typeface.NORMAL);    			
+    			}   			
     			
     			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){
                     @Override
@@ -2506,7 +2508,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
     			}
     			
-    			mTabHostShares.getTabWidget().setBackgroundColor(Color.BLACK);
+//    			mTabHostShares.getTabWidget().setBackgroundColor(Color.BLACK);
     			
     			mTabHostShares.setVisibility(View.VISIBLE);    			
     			mTabHostShares.setVisibility(View.VISIBLE);
@@ -2515,15 +2517,31 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
     				
         			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
-        			tabSpec3.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_incoming_shares))); // new function to inject our own tab layout
-        	        //tabSpec.setContent(contentID);
-        	        //mTabHostContacts.addTab(tabSpec);
+        			String titleTab3 = getString(R.string.tab_incoming_shares);
+        			tabSpec3.setIndicator(getTabIndicator(mTabHostShares.getContext(), titleTab3.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout  			
+         			
         	        TabHost.TabSpec tabSpec4 = mTabHostShares.newTabSpec("outgoingSharesFragment");
-        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), getString(R.string.tab_outgoing_shares))); // new function to inject our own tab layout
+        	        String titleTab4 = getString(R.string.tab_outgoing_shares);
+        	        tabSpec4.setIndicator(getTabIndicator(mTabHostShares.getContext(), titleTab4.toUpperCase(Locale.getDefault()))); // new function to inject our own tab layout
         	                	          				
-    				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragment.class, null);
-    				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragment.class, null);
+    				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragmentLollipop.class, null);
+    				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragmentLollipop.class, null); 
     				
+        	        viewPagerCDrive.setCurrentItem(0);
+        			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
+        			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
+        			textViewIncoming.setTypeface(null, Typeface.BOLD);
+        			textViewOutgoing.setTypeface(null, Typeface.NORMAL);
+    			}
+    			else{
+    				log("mTabsAdapterShares NOT null");
+        			mTabHostCDrive.setVisibility(View.VISIBLE);    			
+        			viewPagerCDrive.setVisibility(View.VISIBLE);
+    				
+        			inSFLol.setIsList(isListSharedWithMe);
+        			inSFLol.setParentHandle(parentHandleIncoming);
+        			inSFLol.setOrder(orderGetChildren);
+        			inSFLol.refresh(parentHandleIncoming);
     			}
     			
     			mTabHostShares.setOnTabChangedListener(new OnTabChangeListener(){
@@ -2532,19 +2550,23 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                     	log("TabId :"+ tabId);
                     	supportInvalidateOptionsMenu();
                         if(tabId.equals("outgoingSharesFragment")){                         	
-                			if (outSF != null){                 				
+                			if (outSFLol != null){    
+                				textViewOutgoing.setTypeface(null, Typeface.BOLD);
+                				textViewIncoming.setTypeface(null, Typeface.NORMAL);
                 				if(parentHandleOutgoing!=-1){
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
 	            					aB.setTitle(node.getName());
             					}
                 				else{
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
-                					outSF.refresh(); 
+                					outSFLol.refresh(); 
                 				}            					   				
                 			}
                         }
                         else if(tabId.equals("incomingSharesFragment")){                        	
-                        	if (inSF != null){                        		
+                        	if (inSFLol != null){    
+                        		textViewOutgoing.setTypeface(null, Typeface.NORMAL);
+                				textViewIncoming.setTypeface(null, Typeface.BOLD);
                         		if(parentHandleIncoming!=-1){
                         			
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
@@ -2553,7 +2575,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
                 				else{
                 					
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
-                					inSF.refresh(); 
+                					inSFLol.refresh(); 
                 				}   				
                 			}                           	
                         }
@@ -2574,40 +2596,108 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			customSearch.setVisibility(View.VISIBLE);
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
     			
-    			if (createFolderMenuItem != null){
-    				selectMenuItem.setVisible(true);
-    				sortByMenuItem.setVisible(true);
-    				thumbViewMenuItem.setVisible(true); 
-        			upgradeAccountMenuItem.setVisible(false);
+    			//onCreateOptionsMenu
+    			int index = viewPagerShares.getCurrentItem();
+    			if(index==0){	
+    				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				if (inSFLol != null){
+    					sortByMenuItem.setVisible(true);
+    					thumbViewMenuItem.setVisible(true); 
 
-    				
-        			//Hide
-    				createFolderMenuItem.setVisible(false);
-    				addContactMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);   			
-        			selectMenuItem.setVisible(false);
-        			unSelectMenuItem.setVisible(false);  				
-        			rubbishBinMenuItem.setVisible(false);
-        			addMenuItem.setVisible(false);
-        			createFolderMenuItem.setVisible(false);
-        			rubbishBinMenuItem.setVisible(false);
-        			clearRubbishBinMenuitem.setVisible(false);
-        			changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-	    		}
-    			
-    			if (inSF != null){
+    					addMenuItem.setEnabled(true);
+    					addMenuItem.setVisible(true);
+
+    					log("parentHandleIncoming: "+parentHandleIncoming);
+    					if(parentHandleIncoming==-1){
+    						addMenuItem.setVisible(false);
+    					}
+    					else{
+    						addMenuItem.setVisible(true);
+    					}
+    					
+    					if(inSFLol.getItemCount()>0){
+    						selectMenuItem.setVisible(true);
+    					}
+    					else{
+    						selectMenuItem.setVisible(false);
+    					}
+
+    					//Hide
+    					pauseRestartTransfersItem.setVisible(false);
+    					createFolderMenuItem.setVisible(false);
+    					addContactMenuItem.setVisible(false);
+    					unSelectMenuItem.setVisible(false);  				
+    					rubbishBinMenuItem.setVisible(false);
+    					createFolderMenuItem.setVisible(false);
+    					rubbishBinMenuItem.setVisible(false);
+    					clearRubbishBinMenuitem.setVisible(false);
+    					changePass.setVisible(false); 
+    					exportMK.setVisible(false); 
+    					removeMK.setVisible(false); 
+    					importLinkMenuItem.setVisible(false);
+    					takePicture.setVisible(false);					
+    	    			refreshMenuItem.setVisible(false);
+    					helpMenuItem.setVisible(false);
+    					settingsMenuItem.setVisible(false);
+    					upgradeAccountMenuItem.setVisible(false);
+    				}
+    			}
+    			else if(index==1){
+    				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				if (outSFLol != null){
+
+    					sortByMenuItem.setVisible(true);
+    					thumbViewMenuItem.setVisible(true); 
+
+    					log("parentHandleOutgoing: "+parentHandleOutgoing);
+    					if(parentHandleOutgoing==-1){
+    						addMenuItem.setVisible(false);
+    					}
+    					else{
+    						addMenuItem.setVisible(true);
+    					}
+    					
+    					if(outSFLol.getItemCount()>0){
+    						selectMenuItem.setVisible(true);
+    					}
+    					else{
+    						selectMenuItem.setVisible(false);
+    					}
+
+    					//Hide
+    					upgradeAccountMenuItem.setVisible(false);
+    					pauseRestartTransfersItem.setVisible(false);
+    					createFolderMenuItem.setVisible(false);
+    					addContactMenuItem.setVisible(false);
+    					unSelectMenuItem.setVisible(false);  				
+    					rubbishBinMenuItem.setVisible(false);
+    					createFolderMenuItem.setVisible(false);
+    					rubbishBinMenuItem.setVisible(false);
+    					clearRubbishBinMenuitem.setVisible(false);
+    					changePass.setVisible(false); 
+    					exportMK.setVisible(false); 
+    					removeMK.setVisible(false); 
+    					importLinkMenuItem.setVisible(false);
+    					takePicture.setVisible(false);					
+    	    			refreshMenuItem.setVisible(false);
+    					helpMenuItem.setVisible(false);
+    					settingsMenuItem.setVisible(false);
+    				}
+    			}   			
+    			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);    			
+    			if (inSFLol != null){
     				aB.setTitle(getString(R.string.section_shared_items));	
-    				inSF.refresh();			
+    				inSFLol.refresh();			
     				
-    			}    			
-    			if (outSF != null){    				
+    			} 
+    			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);	
+    			if (outSFLol != null){    				
 					aB.setTitle(getString(R.string.section_shared_items));				
-					outSF.refresh();    				
+					outSFLol.refresh();    				
     			}
     			
     			break;
@@ -3659,6 +3749,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     }
     
     public void onBackPressedLollipop(){
+    	log("onBackPressedLollipop");
 		if (megaApi == null){
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
@@ -3710,6 +3801,41 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}
 			}
 		}
+		else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if(index==1){				
+				//OUTGOING				
+				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				log("Tag: "+ cFTag2);
+				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSFLol != null){					
+					if (outSFLol.onBackPressed() == 0){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItemLollipop(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
+						return;
+					}					
+				}
+			}
+			else{			
+				//InCOMING
+				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
+				log("Tag: "+ cFTag1);
+				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSFLol != null){					
+					if (inSFLol.onBackPressed() == 0){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItemLollipop(drawerItem);
+						if(nDA!=null){
+							nDA.setPositionClicked(0);
+						}
+						return;
+					}					
+				}				
+			}	
+		}			
 	}    
 	
 	@Override
@@ -4286,14 +4412,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		}
 
 		if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			//Lollipop
 			int index = viewPagerShares.getCurrentItem();
 			if(index==0){	
 				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
-				if (inSF != null){
+				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+				if (inSFLol != null){
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(false);
 
 					addMenuItem.setEnabled(true);
 					addMenuItem.setVisible(true);
@@ -4305,12 +4431,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					else{
 						addMenuItem.setVisible(true);
 					}
+					
+					if(inSFLol.getItemCount()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(false);
+					}
 
 					//Hide
 					pauseRestartTransfersItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
-					selectMenuItem.setVisible(false);
 					unSelectMenuItem.setVisible(false);  				
 					rubbishBinMenuItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -4324,18 +4456,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
+					upgradeAccountMenuItem.setVisible(false);
 				}
 			}
 			else if(index==1){
 				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(sharesTag);
-				if (outSF != null){
+				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+				if (outSFLol != null){
 
-					selectMenuItem.setVisible(true);
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true); 
-					upgradeAccountMenuItem.setVisible(false);
-
 
 					log("parentHandleOutgoing: "+parentHandleOutgoing);
 					if(parentHandleOutgoing==-1){
@@ -4344,8 +4474,16 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					else{
 						addMenuItem.setVisible(true);
 					}
+					
+					if(outSFLol.getItemCount()>0){
+						selectMenuItem.setVisible(true);
+					}
+					else{
+						selectMenuItem.setVisible(false);
+					}
 
 					//Hide
+					upgradeAccountMenuItem.setVisible(false);
 					pauseRestartTransfersItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
 					addContactMenuItem.setVisible(false);
@@ -5143,16 +5281,26 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					mDrawerToggle.onOptionsItemSelected(item);
 				}
 		    	else {
-		    		if (fbF != null){
-		    			if (drawerItem == DrawerItem.CLOUD_DRIVE){
-		    				fbF.onBackPressed();
-		    				return true;
+		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+		    			int index = viewPagerCDrive.getCurrentItem();
+		    			if(index==1){				
+		    				//Rubbish Bin		
+		    				String cFTag2 = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+		    				log("Tag: "+ cFTag2);
+		    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		    				if (rbFLol != null){					
+		    					rbFLol.onBackPressed();	
+		    					return true;
+		    				}
 		    			}
-		    		}
-		    		if (rbF != null){
-		    			if (drawerItem == DrawerItem.RUBBISH_BIN){
-		    				rbF.onBackPressed();
-		    				return true;
+		    			else{			
+		    				//Cloud Drive
+		    				String cFTag1 = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);	
+		    				log("Tag: "+ cFTag1);
+		    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+		    				if (fbFLol != null){					
+		    					fbFLol.onBackPressed();					
+		    				}				
 		    			}
 		    		}
 		    		if (drawerItem == DrawerItem.SHARED_WITH_ME){
@@ -5161,18 +5309,18 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		    				//OUTGOING				
 		    				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
 		    				log("Tag: "+ cFTag2);
-		    				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-		    				if (outSF != null){					
-		    					outSF.onBackPressed();				
+		    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+		    				if (outSFLol != null){					
+		    					outSFLol.onBackPressed();				
 		    				}
 		    			}
 		    			else{			
 		    				//InCOMING
 		    				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
 		    				log("Tag: "+ cFTag1);
-		    				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-		    				if (inSF != null){					
-		    					inSF.onBackPressed();					
+		    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+		    				if (inSFLol != null){					
+		    					inSFLol.onBackPressed();					
 		    				}				
 		    			}	
 		    		}
@@ -5348,11 +5496,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_WITH_ME){
 	        		String swmTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-	        		inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);
+	        		inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);
 	        		if (viewPagerShares.getCurrentItem()==0){		
-		        		if (inSF != null){	        		
-		        			inSF.selectAll();
-		        			if (inSF.showSelectMenuItem()){
+		        		if (inSFLol != null){	        		
+		        			inSFLol.selectAll();
+		        			if (inSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
 		        			}
@@ -5363,11 +5511,11 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        		}
 	        		}
 	        		swmTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-	        		outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(swmTag);	
+	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);	
 	        		if (viewPagerShares.getCurrentItem()==1){	
-		        		if (outSF != null){        			
-		        			outSF.selectAll();
-		        			if (outSF.showSelectMenuItem()){
+		        		if (outSFLol != null){        			
+		        			outSFLol.selectAll();
+		        			if (outSFLol.showSelectMenuItem()){
 		        				selectMenuItem.setVisible(true);
 		        				unSelectMenuItem.setVisible(false);
 		        			}
@@ -5377,6 +5525,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		        			}
 	        			}
 	        		}
+        			return true;
 	        	}
 	        	if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 	        		if (oF != null){ 	        		
@@ -8950,8 +9099,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (moveToRubbish){
 						//Update both tabs
         				//Rubbish bin
-						String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
-        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
         				if (rbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
     						rbFLol.setNodes(nodes);
@@ -8959,8 +9106,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
             			}	
 
         				//Cloud Drive
-        				String cFTagCD = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
-        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagCD);
         				if (fbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
@@ -9020,17 +9165,42 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}	
 				else if (drawerItem == DrawerItem.SHARED_WITH_ME){
-					if (inSF != null){
+					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+					if (inSFLol != null){
 						//TODO: ojo con los hijos
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 //							inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();
+						inSFLol.getListView().invalidate();
 					}
-					if (outSF != null){
+	    			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+					if (outSFLol != null){
 						//TODO: ojo con los hijos
 //							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(outSF.getParentHandle()), orderGetChildren);
 //							inSF.setNodes(nodes);
-						outSF.getListView().invalidateViews();
+						outSFLol.getListView().invalidate();
+					}
+					
+					if (moveToRubbish){
+						//Refresh Rubbish Fragment
+						String cFTagRb = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+        				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRb);
+        				if (rbFLol != null){
+        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
+    						rbFLol.setNodes(nodes);
+    						rbFLol.getListView().invalidate();
+            			}	
+					}
+					else{
+						//Refresh Cloud Drive
+						String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+        				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+        				if (fbFLol != null){
+        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
+    						fbFLol.setNodes(nodes);
+    						fbFLol.getListView().invalidate();
+        				}
 					}
 				}
 			}	
@@ -9249,11 +9419,21 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}			
 				}
 				else if (drawerItem == DrawerItem.SHARED_WITH_ME){
-					if (inSF != null){					
+					String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+					if (inSFLol != null){					
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						inSF.setNodes(nodes);
-						inSF.getListView().invalidateViews();
+						inSFLol.getListView().invalidate();
+					}
+	    			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+					if (outSFLol != null){					
+//						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSF.getParentHandle()), orderGetChildren);
+						//TODO: ojo con los hijos
+//						inSF.setNodes(nodes);
+						outSFLol.getListView().invalidate();
 					}
 				}
 			}
@@ -11475,7 +11655,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					aB.setTitle(getString(R.string.section_rubbish_bin));	
 					getmDrawerToggle().setDrawerIndicatorEnabled(true);
 
-					if(rbF.isVisible())
+					if(rbFLol.isVisible())
 					{
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 						rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
@@ -11486,7 +11666,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				else{
 					if(rbFLol.isVisible())
 					{
-						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbF.getParentHandle()), orderGetChildren);
+						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
 						rbFLol.setNodes(nodes);
 						rbFLol.setContentText();
 						rbFLol.getListView().invalidate();
@@ -11508,20 +11688,20 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				//OUTGOING				
 				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
 				log("Tag: "+ cFTag2);
-				outSF = (OutgoingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag2);
-				if (outSF != null){					
+				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (outSFLol != null){					
 					aB.setTitle(getString(R.string.section_shared_items));				
-					outSF.refresh(this.parentHandleOutgoing);				
+					outSFLol.refresh(this.parentHandleOutgoing);				
 				}
 			}
 			else{			
 				//InCOMING
 				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
 				log("Tag: "+ cFTag1);
-				inSF = (IncomingSharesFragment) getSupportFragmentManager().findFragmentByTag(cFTag1);
-				if (inSF != null){					
+				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if (inSFLol != null){					
 					aB.setTitle(getString(R.string.section_shared_items));	
-					inSF.refresh(this.parentHandleIncoming);			
+					inSFLol.refresh(this.parentHandleIncoming);			
 				}				
 			}	
 		}
