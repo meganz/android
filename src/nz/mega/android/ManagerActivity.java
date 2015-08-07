@@ -2510,9 +2510,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
 //    			mTabHostShares.getTabWidget().setBackgroundColor(Color.BLACK);
     			
-    			mTabHostShares.setVisibility(View.VISIBLE);    			
-    			mTabHostShares.setVisibility(View.VISIBLE);
-    			
     			if (mTabsAdapterShares == null){
     				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
     				
@@ -2543,6 +2540,9 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
         			inSFLol.setOrder(orderGetChildren);
         			inSFLol.refresh(parentHandleIncoming);
     			}
+    			
+    			mTabHostShares.setVisibility(View.VISIBLE);    			
+    			mTabHostShares.setVisibility(View.VISIBLE);
     			
     			mTabHostShares.setOnTabChangedListener(new OnTabChangeListener(){
                     @Override
@@ -4142,7 +4142,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (iFLol != null){				
 				iFLol.showOptionsPanel(node);				
 			}
-		}		
+		}	
+		else if (drawerItem == DrawerItem.SHARED_WITH_ME){
+			int index = viewPagerShares.getCurrentItem();
+			if (index == 0){
+				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (inSFLol != null){
+					inSFLol.showOptionsPanel(node);
+				}
+			}
+			else{
+				String cFTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (outSFLol != null){
+					outSFLol.showOptionsPanel(node);
+				}				
+			}
+		}	
 	}
 	
 	@Override
