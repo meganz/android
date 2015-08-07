@@ -917,6 +917,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else if(type==ManagerActivity.INBOX_ADAPTER){
 					((InboxFragmentLollipop) fragment).itemClick(currentPosition);
 				}
+				else if(type==ManagerActivity.INCOMING_SHARES_ADAPTER){
+					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else if(type==ManagerActivity.OUTGOING_SHARES_ADAPTER){
+					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+				}
 				else{
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
 				}				
