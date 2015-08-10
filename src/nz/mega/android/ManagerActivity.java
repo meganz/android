@@ -6551,34 +6551,10 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
 	
-	public void showMoveLollipop(ArrayList<Long> handleList){
-		log("showMoveLollipop");
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("MOVE_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
-	}
-	
 	public void showCopy(ArrayList<Long> handleList){
 		log("showCopy");
 		Intent intent = new Intent(this, FileExplorerActivity.class);
 		intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
-		long[] longArray = new long[handleList.size()];
-		for (int i=0; i<handleList.size(); i++){
-			longArray[i] = handleList.get(i);
-		}
-		intent.putExtra("COPY_FROM", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
-	}
-	
-	public void showCopyLollipop(ArrayList<Long> handleList){
-		log("showCopyLollipop");
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
 		long[] longArray = new long[handleList.size()];
 		for (int i=0; i<handleList.size(); i++){
 			longArray[i] = handleList.get(i);
@@ -8098,41 +8074,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	    	intent.putExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, node.getHandle());
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
-	}
-	
-	public void shareFolderLollipop(ArrayList<Long> handleList){
-		log("shareFolder ArrayListLong");
-		//TODO shareMultipleFolders
-
-		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
-			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
-	    	
-	    	long[] handles=new long[handleList.size()];
-	    	int j=0;
-	    	for(int i=0; i<handleList.size();i++){
-	    		handles[j]=handleList.get(i);
-	    		j++;
-	    	}	    	
-	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
-	    	//Multiselect=1 (multiple folders)
-	    	intent.putExtra("MULTISELECT", 1);
-	    	intent.putExtra("SEND_FILE",0);
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-		}			
-	}
-	
-	public void shareFolderLollipop(MegaNode node){
-		log("shareFolderLollipop");		
-											
-		Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
-    	//Multiselect=0
-    	intent.putExtra("MULTISELECT", 0);
-    	intent.putExtra("SEND_FILE",0);
-    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
-    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-				
 	}
 	
 	public void sentToInbox(MegaNode node){

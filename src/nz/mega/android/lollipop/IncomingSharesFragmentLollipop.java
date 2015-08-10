@@ -196,7 +196,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopy(handleList);
+					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -206,7 +206,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMove(handleList);
+					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_share_link:{

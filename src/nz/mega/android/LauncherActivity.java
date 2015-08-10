@@ -12,7 +12,6 @@ public class LauncherActivity extends PinActivity{
 	ManagerActivity mActivity;
 	ManagerActivityLollipop mActivityLol;	
 	
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate");
