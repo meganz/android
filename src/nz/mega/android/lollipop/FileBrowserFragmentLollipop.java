@@ -1591,9 +1591,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (adapterGrid != null){
 				adapterGrid.setCurrentTransfer(mT);
 			}
-		}	
-		
-		
+		}		
 	}
 	
 	private static void log(String log) {

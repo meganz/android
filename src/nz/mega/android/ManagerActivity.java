@@ -22,6 +22,7 @@ import nz.mega.android.lollipop.FileExplorerActivityLollipop;
 import nz.mega.android.lollipop.InboxFragmentLollipop;
 import nz.mega.android.lollipop.IncomingSharesFragmentLollipop;
 import nz.mega.android.lollipop.NavigationDrawerLollipopAdapter;
+import nz.mega.android.lollipop.OfflineFragmentLollipop;
 import nz.mega.android.lollipop.OutgoingSharesFragmentLollipop;
 import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
@@ -310,6 +311,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     private InboxFragmentLollipop iFLol;
 	private IncomingSharesFragmentLollipop inSFLol;
 	private OutgoingSharesFragmentLollipop outSFLol;
+    private OfflineFragmentLollipop oFLol;
     //////
     
     TextView textViewBrowser; 
@@ -2843,22 +2845,24 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
     			
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
     			
-    			if (oF == null){
-    				oF = new OfflineFragment();
-    				oF.setIsList(isListOffline);
-    				oF.setPathNavigation("/");
+    			if (oFLol == null){
+    				oFLol = new OfflineFragmentLollipop();
+    				oFLol.setIsList(isListOffline);
+    				oFLol.setPathNavigation("/");
     			}
     			else{
-    				oF.setPathNavigation("/");
-    				oF.setIsList(isListOffline);
+    				oFLol.setPathNavigation("/");
+    				oFLol.setIsList(isListOffline);
     			}
     			
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, oF, "oF");
+				ft.replace(R.id.fragment_container, oFLol, "oFLol");
     			ft.commit();
     			
     			mDrawerLayout.closeDrawer(Gravity.LEFT);
@@ -3835,7 +3839,34 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}					
 				}				
 			}	
-		}			
+		}	
+		else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+			if (oFLol != null){				
+				if (oFLol.onBackPressed() == 0){
+					attr = dbH.getAttributes();
+					if (attr != null){
+						if (attr.getOnline() != null){
+							if (!Boolean.parseBoolean(attr.getOnline())){
+								super.onBackPressed();
+								return;
+							}
+						}
+					}
+					
+					if (fbF != null){
+						drawerItem = DrawerItem.CLOUD_DRIVE;
+						selectDrawerItem(drawerItem);
+						if(nDALol!=null){
+							nDALol.setPositionClicked(0);
+						}
+					}
+					else{
+						super.onBackPressed();
+					}
+					return;
+				}
+			}
+		}
 	}    
 	
 	@Override
@@ -3862,9 +3893,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		} 
 		else {
 			// Implement this feature without material design		
-			
-			if (fbF != null){
-				if (drawerItem == DrawerItem.CLOUD_DRIVE){
+			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+				if (fbF != null){				
 					if (fbF.onBackPressed() == 0){
 						super.onBackPressed();
 						return;
@@ -4038,9 +4068,8 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					}
 				}
 			}
-			
-			if (oF != null){
-				if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+			if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+				if (oF != null){				
 					if (oF.onBackPressed() == 0){
 						attr = dbH.getAttributes();
 						if (attr != null){
@@ -4160,6 +4189,14 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 				}				
 			}
 		}	
+	}
+	
+	public void showOptionsPanel(MegaOffline node){
+		log("showOptionsPanel-Offline");
+		
+		if (oFLol != null){				
+			oFLol.showOptionsPanel(node);				
+		}			
 	}
 	
 	@Override
