@@ -11,7 +11,6 @@ import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
-import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.MimeTypeList;
@@ -168,9 +167,9 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 
 		if (intent != null) { 
 			if (intent.getAction() != null){ 
-				if(getIntent().getAction().equals(ManagerActivity.ACTION_EXPLORE_ZIP)){  
+				if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_EXPLORE_ZIP)){  
 
-					String pathZip=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_ZIP);    				
+					String pathZip=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_ZIP);    				
 
 					log("Path: "+pathZip);
 
@@ -182,8 +181,8 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 
 
 				}
-//				else if(getIntent().getAction().equals(ManagerActivity.ACTION_OPEN_PDF)){ 
-//					String pathPdf=intent.getExtras().getString(ManagerActivity.EXTRA_PATH_PDF);
+//				else if(getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_PDF)){ 
+//					String pathPdf=intent.getExtras().getString(ManagerActivityLollipop.EXTRA_PATH_PDF);
 //
 //					File pdfFile = new File(pathPdf);
 //
@@ -535,13 +534,13 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(new File(localPath)),
 									MimeTypeList.typeForName(tempNode.getName()).getType());
-							if (ManagerActivity.isIntentAvailable(this, viewIntent))
+							if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
 								startActivity(viewIntent);
 							else {
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								intentShare.setDataAndType(Uri.fromFile(new File(localPath)),
 										MimeTypeList.typeForName(tempNode.getName()).getType());
-								if (ManagerActivity.isIntentAvailable(this, intentShare))
+								if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
 									startActivity(intentShare);
 								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
 								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();

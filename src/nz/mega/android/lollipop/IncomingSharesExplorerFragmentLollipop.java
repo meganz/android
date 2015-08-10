@@ -333,7 +333,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		}
 		else if (deepBrowserTree>0){
 			parentHandle = adapter.getParentHandle();
-			//((ManagerActivity)context).setParentHandleSharedWithMe(parentHandle);			
 			
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 

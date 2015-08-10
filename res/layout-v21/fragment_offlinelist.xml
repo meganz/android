@@ -87,7 +87,7 @@
         <!-- MAIN CONTENT -->
 
         <FrameLayout
-            android:id="@+id/file_list_out_options"
+            android:id="@+id/offline_list_out_options"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -106,7 +106,7 @@
         <!-- SLIDING LAYOUT -->
 
         <LinearLayout
-            android:id="@+id/file_list_options"
+            android:id="@+id/offline_list_options"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
@@ -114,14 +114,14 @@
             android:padding="0dp" >
 
             <LinearLayout
-                android:id="@+id/file_list_option_download_layout"
+                android:id="@+id/offline_list_option_download_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_download"
+                    android:id="@+id/offline_list_option_download"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
                     android:src="@drawable/ic_download" />
 
                 <TextView
-                    android:id="@+id/file_list_option_download_text"
+                    android:id="@+id/offline_list_option_download_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
@@ -142,14 +142,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/file_list_option_properties_layout"
+                android:id="@+id/offline_list_option_properties_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_properties"
+                    android:id="@+id/offline_list_option_properties"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -158,7 +158,7 @@
                     android:src="@drawable/info_ic" />
 
                 <TextView
-                    android:id="@+id/file_list_option_properties_text"
+                    android:id="@+id/offline_list_option_properties_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
@@ -169,14 +169,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/file_list_option_public_link_layout"
+                android:id="@+id/offline_list_option_public_link_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_public_link"
+                    android:id="@+id/offline_list_option_public_link"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -185,7 +185,7 @@
                     android:src="@drawable/link_ic" />
 
                 <TextView
-                    android:id="@+id/file_list_option_public_link_text"
+                    android:id="@+id/offline_list_option_public_link_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
@@ -197,14 +197,41 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/file_list_option_share_layout"
+                android:id="@+id/offline_list_option_delete_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_share"
+                    android:id="@+id/offline_list_option_delete"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_delete" />
+
+                <TextView
+                    android:id="@+id/offline_list_option_delete_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:text="@string/context_delete_offline"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/offline_list_option_share_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/offline_list_option_share"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -213,7 +240,7 @@
                     android:src="@drawable/ic_share" />
 
                 <TextView
-                    android:id="@+id/file_list_option_share_text"
+                    android:id="@+id/offline_list_option_share_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
@@ -225,41 +252,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/file_list_option_delete_layout"
+                android:id="@+id/offline_list_option_rename_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_delete"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_rubbish_bin" />
-
-                <TextView
-                    android:id="@+id/file_list_option_delete_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:text="@string/section_rubbish_bin"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-           
-            <LinearLayout
-                android:id="@+id/file_list_option_rename_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/file_list_option_rename"
+                    android:id="@+id/offline_list_option_rename"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -268,7 +268,7 @@
                     android:src="@drawable/ic_rename" />
 
                 <TextView
-                    android:id="@+id/file_list_option_rename_text"
+                    android:id="@+id/offline_list_option_rename_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
@@ -279,14 +279,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/file_list_option_move_layout"
+                android:id="@+id/offline_list_option_move_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_move"
+                    android:id="@+id/offline_list_option_move"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -295,7 +295,7 @@
                     android:src="@drawable/ic_move" />
 
                 <TextView
-                    android:id="@+id/file_list_option_move_text"
+                    android:id="@+id/offline_list_option_move_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingBottom="2dp"
@@ -306,14 +306,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/file_list_option_copy_layout"
+                android:id="@+id/offline_list_option_copy_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/file_list_option_copy"
+                    android:id="@+id/offline_list_option_copy"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -322,39 +322,12 @@
                     android:src="@drawable/ic_menu_copy" />
 
                 <TextView
-                    android:id="@+id/file_list_option_copy_text"
+                    android:id="@+id/offline_list_option_copy_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:paddingBottom="2dp"
                     android:text="@string/context_copy"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/file_list_option_remove_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/file_list_option_remove"
-                    style="@style/dialogActionButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:paddingTop="2dp"
-                    android:src="@drawable/ic_delete" />
-
-                <TextView
-                    android:id="@+id/file_list_option_remove_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="2dp"
-                    android:text="@string/context_delete"
                     android:textColor="@color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />

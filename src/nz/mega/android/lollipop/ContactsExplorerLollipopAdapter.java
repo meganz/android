@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.R;
 import nz.mega.android.lollipop.ContactsExplorerActivityLollipop.PhoneContacts;
@@ -443,7 +441,7 @@ public class ContactsExplorerLollipopAdapter extends RecyclerView.Adapter<Contac
 	public void createDefaultAvatar(ViewHolderContactsExplorerLollipop holder, boolean isMegaContact){
 		log("createDefaultAvatar()");
 		
-		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivity.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(defaultAvatar);
 		Paint p = new Paint();
 		p.setAntiAlias(true);
