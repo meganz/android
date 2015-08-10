@@ -204,7 +204,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showMove(handleList);
+					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -220,7 +220,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivityLollipop) context).showCopy(handleList);
+					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
