@@ -8,7 +8,6 @@ import java.util.List;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FullScreenImageViewer;
-import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaOffline;
 import nz.mega.android.MegaOfflineGridAdapter;
@@ -100,7 +99,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public LinearLayout optionPublicLink;
 	public LinearLayout optionShare;
 	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;	
 	public TextView propertiesText;
@@ -159,7 +157,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).onFileClick(handleList);
+					((ManagerActivityLollipop) context).onFileClick(handleList);
 					
 					break;
 				}
@@ -173,7 +171,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						{
 							break;
 						}
-						((ManagerActivity) context).showRenameDialog(n, n.getName());
+						((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 					}
 					break;
 				}
@@ -188,7 +186,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						{
 							break;
 						}
-						((ManagerActivity) context).getPublicLinkAndShareIt(n);
+						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
 					}
 					
 					break;
@@ -206,7 +204,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showMove(handleList);
+					((ManagerActivityLollipop) context).showMove(handleList);
 					break;
 				}
 				case R.id.cab_menu_copy:{
@@ -222,7 +220,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showCopy(handleList);
+					((ManagerActivityLollipop) context).showCopy(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -245,90 +243,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				}				
 			}
 			return false;
-		}
-		
-		private int deleteOffline(Context context,MegaOffline node){
-			
-			log("deleteOffline");
-
-//			dbH = new DatabaseHandler(context);
-			dbH = DatabaseHandler.getDbHandler(context);
-
-			ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
-			ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
-			MegaOffline parentNode = null;	
-			
-			//Delete children
-			mOffListChildren=dbH.findByParentId(node.getId());
-			if(mOffListChildren.size()>0){
-				//The node have childrens, delete
-				deleteChildrenDB(mOffListChildren);			
-			}
-			
-			int parentId = node.getParentId();
-			log("Finding parents...");
-			//Delete parents
-			if(parentId!=-1){
-				mOffListParent=dbH.findByParentId(parentId);
-				
-				log("Same Parent?:" +mOffListParent.size());
-				
-				if(mOffListParent.size()<1){
-					//No more node with the same parent, keep deleting				
-
-					parentNode = dbH.findById(parentId);
-					log("Recursive parent: "+parentNode.getName());
-					if(parentNode != null){
-						deleteOffline(context, parentNode);	
-							
-					}	
-				}			
-			}	
-			
-			log("Remove the node physically");
-			//Remove the node physically
-			File destination = null;								
-
-			if (Environment.getExternalStorageDirectory() != null){
-				destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
-			}
-			else{
-				destination = context.getFilesDir();
-			}	
-
-			try{
-				File offlineFile = new File(destination, node.getName());	
-				log("Delete in phone: "+node.getName());
-				Util.deleteFolderAndSubfolders(context, offlineFile);
-			}
-			catch(Exception e){
-				log("EXCEPTION: deleteOffline - adapter");
-			};		
-			
-			dbH.removeById(node.getId());		
-			
-			return 1;		
-		}
-		
-		private void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
-
-			log("deleteChildenDB: "+mOffListChildren.size());
-			MegaOffline mOffDelete=null;
-
-			for(int i=0; i<mOffListChildren.size(); i++){	
-
-				mOffDelete=mOffListChildren.get(i);
-
-				log("Children "+i+ ": "+ mOffDelete.getName());
-				ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
-				if(mOffListChildren2.size()>0){
-					//The node have children, delete				
-					deleteChildrenDB(mOffListChildren2);				
-				}	
-
-				int lines = dbH.removeById(mOffDelete.getId());		
-				log("Borradas; "+lines);
-			}		
 		}
 		
 		@Override
@@ -417,6 +331,90 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 	}
 	
+	public int deleteOffline(Context context,MegaOffline node){
+		
+		log("deleteOffline");
+
+//		dbH = new DatabaseHandler(context);
+		dbH = DatabaseHandler.getDbHandler(context);
+
+		ArrayList<MegaOffline> mOffListParent=new ArrayList<MegaOffline>();
+		ArrayList<MegaOffline> mOffListChildren=new ArrayList<MegaOffline>();			
+		MegaOffline parentNode = null;	
+		
+		//Delete children
+		mOffListChildren=dbH.findByParentId(node.getId());
+		if(mOffListChildren.size()>0){
+			//The node have childrens, delete
+			deleteChildrenDB(mOffListChildren);			
+		}
+		
+		int parentId = node.getParentId();
+		log("Finding parents...");
+		//Delete parents
+		if(parentId!=-1){
+			mOffListParent=dbH.findByParentId(parentId);
+			
+			log("Same Parent?:" +mOffListParent.size());
+			
+			if(mOffListParent.size()<1){
+				//No more node with the same parent, keep deleting				
+
+				parentNode = dbH.findById(parentId);
+				log("Recursive parent: "+parentNode.getName());
+				if(parentNode != null){
+					deleteOffline(context, parentNode);	
+						
+				}	
+			}			
+		}	
+		
+		log("Remove the node physically");
+		//Remove the node physically
+		File destination = null;								
+
+		if (Environment.getExternalStorageDirectory() != null){
+			destination = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + node.getPath());
+		}
+		else{
+			destination = context.getFilesDir();
+		}	
+
+		try{
+			File offlineFile = new File(destination, node.getName());	
+			log("Delete in phone: "+node.getName());
+			Util.deleteFolderAndSubfolders(context, offlineFile);
+		}
+		catch(Exception e){
+			log("EXCEPTION: deleteOffline - adapter");
+		};		
+		
+		dbH.removeById(node.getId());		
+		
+		return 1;		
+	}
+	
+	public void deleteChildrenDB(ArrayList<MegaOffline> mOffListChildren){
+
+		log("deleteChildenDB: "+mOffListChildren.size());
+		MegaOffline mOffDelete=null;
+
+		for(int i=0; i<mOffListChildren.size(); i++){	
+
+			mOffDelete=mOffListChildren.get(i);
+
+			log("Children "+i+ ": "+ mOffDelete.getName());
+			ArrayList<MegaOffline> mOffListChildren2=dbH.findByParentId(mOffDelete.getId());
+			if(mOffListChildren2.size()>0){
+				//The node have children, delete				
+				deleteChildrenDB(mOffListChildren2);				
+			}	
+
+			int lines = dbH.removeById(mOffDelete.getId());		
+			log("Borradas; "+lines);
+		}		
+	}
+	
 	public void selectAll(){
 		if (isList){
 			if(adapterList.isMultipleSelect()){
@@ -481,9 +479,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
-		if (context instanceof ManagerActivity && ((ManagerActivity)context).getmDrawerToggle() != null){
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
+		if (context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop)context).getmDrawerToggle() != null){
+			((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		
 		//Check pathNAvigation
@@ -508,10 +506,10 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text);
 			outSpaceButton = (Button) v.findViewById(R.id.offline_out_space_btn);
 			
-			if (context instanceof ManagerActivity){
+			if (context instanceof ManagerActivityLollipop){
 				
 				outSpaceButton.setOnClickListener(this);
-				usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+				usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 				
 				if(usedSpacePerc>95){
 					//Change below of ListView
@@ -636,36 +634,35 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			contentText.setText(getInfoFolder(mOffList));
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
-			optionsLayout = (LinearLayout) v.findViewById(R.id.file_list_options);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_options);
-			optionRename = (LinearLayout) v.findViewById(R.id.file_list_option_rename_layout);
+			optionsLayout = (LinearLayout) v.findViewById(R.id.offline_list_options);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.offline_list_out_options);
+			optionRename = (LinearLayout) v.findViewById(R.id.offline_list_option_rename_layout);
 			optionRename.setVisibility(View.GONE);
 			
-			optionDownload = (LinearLayout) v.findViewById(R.id.file_list_option_download_layout);
-			optionProperties = (LinearLayout) v.findViewById(R.id.file_list_option_properties_layout);
-			propertiesText = (TextView) v.findViewById(R.id.file_list_option_properties_text);			
+			optionDownload = (LinearLayout) v.findViewById(R.id.offline_list_option_download_layout);
+			optionProperties = (LinearLayout) v.findViewById(R.id.offline_list_option_properties_layout);
+			propertiesText = (TextView) v.findViewById(R.id.offline_list_option_properties_text);			
 
-			optionPublicLink = (LinearLayout) v.findViewById(R.id.file_list_option_public_link_layout);
+			optionPublicLink = (LinearLayout) v.findViewById(R.id.offline_list_option_public_link_layout);
 //				holder.optionPublicLink.getLayoutParams().width = Util.px2dp((60), outMetrics);
 //				((LinearLayout.LayoutParams) holder.optionPublicLink.getLayoutParams()).setMargins(Util.px2dp((17 * scaleW), outMetrics),Util.px2dp((4 * scaleH), outMetrics), 0, 0);
 
-			optionShare = (LinearLayout) v.findViewById(R.id.file_list_option_share_layout);
-			
-			optionDelete = (LinearLayout) v.findViewById(R.id.file_list_option_delete_layout);			
-			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.file_list_option_remove_layout);
+			optionShare = (LinearLayout) v.findViewById(R.id.offline_list_option_share_layout);			
+			optionDelete = (LinearLayout) v.findViewById(R.id.offline_list_option_delete_layout);			
 
 //				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
 //				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
 
-			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_list_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_list_option_copy_layout);			
+			optionMoveTo = (LinearLayout) v.findViewById(R.id.offline_list_option_move_layout);	
+			optionMoveTo.setVisibility(View.GONE);
+			optionCopyTo = (LinearLayout) v.findViewById(R.id.offline_list_option_copy_layout);			
+			optionCopyTo.setVisibility(View.GONE);
 			
 			optionDownload.setOnClickListener(this);
 			optionShare.setOnClickListener(this);
 			optionProperties.setOnClickListener(this);
 			optionRename.setOnClickListener(this);
 			optionDelete.setOnClickListener(this);
-			optionRemoveTotal.setOnClickListener(this);
 			optionPublicLink.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);
@@ -788,7 +785,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			handleList.add(node.getHandle());
 			log("download "+node.getName());
-			((ManagerActivity) context).onFileClick(handleList);
+			((ManagerActivityLollipop) context).onFileClick(handleList);
 		}
 		else{
 			//TODO toast no connection
@@ -963,7 +960,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			return;
 		}
 		
-		((ManagerActivity) context).getPublicLinkAndShareIt(n);
+		((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
 
 	}
 	
@@ -974,7 +971,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			return;
 		}
 		
-		((ManagerActivity) context).shareFolder(n);
+		((ManagerActivityLollipop) context).shareFolderLollipop(n);
 	}
 	
 	public void rename (String path){
@@ -984,7 +981,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			return;
 		}
 		
-		((ManagerActivity) context).showRenameDialog(n, n.getName());
+		((ManagerActivityLollipop) context).showRenameDialog(n, n.getName());
 	}
 	
 	public void move (String path){
@@ -996,7 +993,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());									
-		((ManagerActivity) context).showMove(handleList);
+		((ManagerActivityLollipop) context).showMoveLollipop(handleList);
 	}
 	
 	public void copy (String path){
@@ -1008,7 +1005,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 		ArrayList<Long> handleList = new ArrayList<Long>();
 		handleList.add(n.getHandle());									
-		((ManagerActivity) context).showCopy(handleList);
+		((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 	}
 	
 	public boolean isFolder(String path){
@@ -1093,45 +1090,38 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		this.selectedNode = sNode;
 		
 		//Check connection or not connection
-		/*
-		 * if (Util.isOnline(context)){
-					//With connection
-					LayoutParams params = holder.optionsLayout.getLayoutParams();
-					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-					listFragment.smoothScrollToPosition(position);
-					
-				}
-				else{
-					//No connection
-					LayoutParams params = holder.optionsLayoutOffline.getLayoutParams();
-					params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
-					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-					listFragment.smoothScrollToPosition(position);
-				}
-		 */
 		
-		if (selectedNode.getType().equals(DB_FOLDER)) {
-			propertiesText.setText(R.string.general_folder_info);
-			optionShare.setVisibility(View.VISIBLE);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-			optionShare.setVisibility(View.GONE);
+		if (Util.isOnline(context)){
+			//With connection
+			
+			if (selectedNode.getType().equals(DB_FOLDER)) {
+				propertiesText.setText(R.string.general_folder_info);
+				optionShare.setVisibility(View.VISIBLE);
+			}else{
+				propertiesText.setText(R.string.general_file_info);
+				optionShare.setVisibility(View.GONE);
+			}
+			
+			optionDownload.setVisibility(View.VISIBLE);
+			optionProperties.setVisibility(View.VISIBLE);				
+			optionDelete.setVisibility(View.VISIBLE);
+			optionPublicLink.setVisibility(View.VISIBLE);
+			optionRename.setVisibility(View.GONE);
+			optionMoveTo.setVisibility(View.GONE);
+			optionCopyTo.setVisibility(View.GONE);				
+				
 		}
-		
-		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);				
-		optionDelete.setVisibility(View.VISIBLE);
-		optionPublicLink.setVisibility(View.VISIBLE);
-		optionDelete.setVisibility(View.VISIBLE);
-		optionRename.setVisibility(View.VISIBLE);
-		optionMoveTo.setVisibility(View.VISIBLE);
-		optionCopyTo.setVisibility(View.VISIBLE);
-		
-		//Hide
-		optionRemoveTotal.setVisibility(View.GONE);
+		else{
+			//No connection
+			optionShare.setVisibility(View.GONE);			
+			optionDownload.setVisibility(View.GONE);
+			optionProperties.setVisibility(View.GONE);				
+			optionDelete.setVisibility(View.VISIBLE);
+			optionPublicLink.setVisibility(View.GONE);
+			optionRename.setVisibility(View.GONE);
+			optionMoveTo.setVisibility(View.GONE);
+			optionCopyTo.setVisibility(View.GONE);
+		}
 					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
@@ -1164,10 +1154,107 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
-		case R.id.offline_out_space_btn:
-			log("Click Account Button");
-			((ManagerActivity)getActivity()).upgradeAccountButton();
-			break;
+			case R.id.offline_out_space_btn:{				
+			
+				log("Click Account Button");
+				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
+				break;
+			}
+			case R.id.offline_list_option_download_layout: {
+				log("Download option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(Long.parseLong(selectedNode.getHandle()));
+				((ManagerActivityLollipop) context).onFileClick(handleList);
+				break;
+			}
+			case R.id.offline_list_option_move_layout:{
+				log("Move option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();			
+				if (Util.isOnline(context)){
+					String path = selectedNode.getPath() + selectedNode.getName();
+					move(path);
+				}
+				break;
+			}
+			case R.id.offline_list_option_copy_layout: {
+				log("Copy option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				if (Util.isOnline(context)){
+					String path = selectedNode.getPath() + selectedNode.getName();
+					copy(path);
+				}
+				break;
+			}
+			case R.id.offline_list_option_properties_layout:{				
+				log("Properties option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				if (Util.isOnline(context)){
+					String path = selectedNode.getPath() + selectedNode.getName();
+					String handle = selectedNode.getHandle();
+					showProperties(path, handle);
+				}
+				break;
+			}
+			case R.id.offline_list_option_public_link_layout:{
+				log("Get link");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				if (Util.isOnline(context)){
+					String path = selectedNode.getPath() + selectedNode.getName();
+					getLink(path);
+				}					
+				break;
+			}
+			case R.id.offline_list_option_delete_layout:{
+				log("Delete Offline");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();		
+									
+				deleteOffline(context, selectedNode);								
+				refreshPaths(selectedNode);				
+				break;
+			}
+			case R.id.offline_list_option_share_layout: {	
+				log("Share option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				if (Util.isOnline(context)){
+					String path = selectedNode.getPath() + selectedNode.getName();
+					shareFolder(path);
+				}
+				break;
+			}	
+			case R.id.offline_list_option_rename_layout: {
+				log("Rename option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				if (Util.isOnline(context)){
+					String path = selectedNode.getPath() + selectedNode.getName();
+					rename(path);
+				}
+				break;
+			}	
 		}
 	}
 	
@@ -1186,10 +1273,10 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				
 				aB.setTitle(currentNode.getName());
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
-				if (context instanceof ManagerActivity){
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					((ManagerActivity)context).supportInvalidateOptionsMenu();
-					((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+				if (context instanceof ManagerActivityLollipop){
+					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				}
 				else if (context instanceof OfflineActivity){
 					((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
@@ -1270,7 +1357,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 							Intent intent = new Intent(context, FullScreenImageViewer.class);
 							intent.putExtra("position", position);
-							intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+							intent.putExtra("adapterType", ManagerActivityLollipop.OFFLINE_ADAPTER);
 							intent.putExtra("parentNodeHandle", -1L);
 							intent.putExtra("offlinePathDirectory", currentFile.getParent());
 							startActivity(intent);
@@ -1287,13 +1374,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						else{
 							Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 							viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-							if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+							if (ManagerActivityLollipop.isIntentAvailable(context, viewIntent)){
 								context.startActivity(viewIntent);
 							}
 							else{
 								Intent intentShare = new Intent(Intent.ACTION_SEND);
 								intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-								if (ManagerActivity.isIntentAvailable(context, intentShare)){
+								if (ManagerActivityLollipop.isIntentAvailable(context, intentShare)){
 									context.startActivity(intentShare);
 								}
 							}
@@ -1309,20 +1396,20 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 //				if (MimeType.typeForName(currentFile.getName()).isImage()){
 //					Intent intent = new Intent(context, FullScreenImageViewer.class);
 //					intent.putExtra("position", position);
-//					intent.putExtra("adapterType", ManagerActivity.OFFLINE_ADAPTER);
+//					intent.putExtra("adapterType", ManagerActivityLollipop.OFFLINE_ADAPTER);
 //					intent.putExtra("parentNodeHandle", -1L);
 //					startActivity(intent);
 //				}
 //				else{
 //					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 //					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-//					if (ManagerActivity.isIntentAvailable(context, viewIntent)){
+//					if (ManagerActivityLollipop.isIntentAvailable(context, viewIntent)){
 //						context.startActivity(viewIntent);
 //					}
 //					else{
 //						Intent intentShare = new Intent(Intent.ACTION_SEND);
 //						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeType.typeForName(currentFile.getName()).getType());
-//						if (ManagerActivity.isIntentAvailable(context, intentShare)){
+//						if (ManagerActivityLollipop.isIntentAvailable(context, intentShare)){
 //							context.startActivity(intentShare);
 //						}
 //					}
@@ -1452,13 +1539,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					int index=pathNavigation.lastIndexOf("/");				
 					pathNavigation=pathNavigation.substring(0,index+1);
 					
-					if (context instanceof ManagerActivity){
-						((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+					if (context instanceof ManagerActivityLollipop){
+						((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 						
 						if (pathNavigation.equals("/")){
 							aB.setTitle(getString(R.string.section_saved_for_offline));
-							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-							((ManagerActivity)context).supportInvalidateOptionsMenu();
+							((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+							((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 						}
 						else{
 							String title = pathNavigation;
@@ -1467,8 +1554,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 							index=title.lastIndexOf("/");				
 							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);
-							((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-							((ManagerActivity)context).supportInvalidateOptionsMenu();
+							((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+							((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 						}
 					}
 					else if (context instanceof OfflineActivity){
@@ -1526,13 +1613,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
 		
 					// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
-					((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 					
 					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
 					int index=pathNavigation.lastIndexOf("/");				
 					pathNavigation=pathNavigation.substring(0,index+1);
-					if (context instanceof ManagerActivity){
-						((ManagerActivity)context).setPathNavigationOffline(pathNavigation);
+					if (context instanceof ManagerActivityLollipop){
+						((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 					}
 					else if (context instanceof OfflineActivity){
 						((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
@@ -1562,7 +1649,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			}
 					
 //			parentHandle = adapterGrid.getParentHandle();
-//			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+//			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 //			
 //			if (adapterGrid.getPositionClicked() != -1){
 //				adapterGrid.setPositionClicked(-1);
@@ -1577,17 +1664,17 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 //					emptyTextView.setVisibility(View.GONE);
 //					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 //						aB.setTitle(getString(R.string.section_cloud_drive));	
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+//						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
 //					}
 //					else{
 //						aB.setTitle(parentNode.getName());					
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+//						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
 //					}
 //					
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
+//					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 //					
 //					parentHandle = parentNode.getHandle();
-//					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
+//					((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 //					nodes = megaApi.getChildren(parentNode, orderGetChildren);
 //					adapterGrid.setNodes(nodes);
 //					listView.setSelection(0);
@@ -1782,7 +1869,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}
 	
 	private static void log(String log) {
-		Util.log("OfflineFragment", log);
+		Util.log("OfflineFragmentLollipop", log);
 	}
 
 	@Override

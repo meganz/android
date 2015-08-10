@@ -5,7 +5,6 @@ import java.util.List;
 
 import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FullScreenImageViewer;
-import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaBrowserNewGridAdapter;
 import nz.mega.android.MimeTypeList;
@@ -150,14 +149,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).onFileClick(handleList);
+					((ManagerActivityLollipop) context).onFileClick(handleList);
 					break;
 				}
 				case R.id.cab_menu_rename:{
 					clearSelections();
 					hideMultipleSelect();
 					if (documents.size()==1){
-						((ManagerActivity) context).showRenameDialog(documents.get(0), documents.get(0).getName());
+						((ManagerActivityLollipop) context).showRenameDialog(documents.get(0), documents.get(0).getName());
 					}
 					break;
 				}
@@ -168,7 +167,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showCopyLollipop(handleList);
+					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 					break;
 				}	
 				case R.id.cab_menu_move:{
@@ -178,7 +177,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).showMoveLollipop(handleList);
+					((ManagerActivityLollipop) context).showMoveLollipop(handleList);
 					break;
 				}
 				case R.id.cab_menu_trash:{
@@ -188,7 +187,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					}
 					clearSelections();
 					hideMultipleSelect();
-					((ManagerActivity) context).moveToTrash(handleList);
+					((ManagerActivityLollipop) context).moveToTrash(handleList);
 					break;
 				}
 				case R.id.cab_menu_select_all:{
@@ -318,15 +317,15 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		if (megaApi.getInboxNode() != null){
 			parentHandle = megaApi.getInboxNode().getHandle();
 			inboxNode = megaApi.getInboxNode();		
-	//		((ManagerActivity)context).setParentHandleRubbish(parentHandle);
+	//		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 			nodes = megaApi.getChildren(inboxNode, orderGetChildren);
 		}
 		
-		if(((ManagerActivity)context).getmDrawerToggle() != null)
+		if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
 		{
 			aB.setTitle(getString(R.string.section_inbox));	
-			((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivity)context).supportInvalidateOptionsMenu();
+			((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 
 		if (isList){
@@ -347,7 +346,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivity.INBOX_ADAPTER);
+				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.INBOX_ADAPTER);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);
@@ -360,7 +359,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			outSpaceButton.setOnClickListener(this);
 			
-			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 			
 			if(usedSpacePerc>95){
 				//Change below of ListView
@@ -506,7 +505,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);
 			
 			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivity.INBOX_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
+				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivityLollipop.INBOX_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
@@ -584,7 +583,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 		switch(v.getId()){
 			case R.id.out_space_btn_inbox:{
-				((ManagerActivity)getActivity()).upgradeAccountButton();
+				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
 			case R.id.file_list_option_download_layout: {
@@ -595,7 +594,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
-				((ManagerActivity) context).onFileClick(handleList);
+				((ManagerActivityLollipop) context).onFileClick(handleList);
 				break;
 			}
 			case R.id.file_list_option_move_layout:{
@@ -606,7 +605,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
-				((ManagerActivity) context).showMoveLollipop(handleList);
+				((ManagerActivityLollipop) context).showMoveLollipop(handleList);
 
 				break;
 			}
@@ -644,7 +643,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
 
-				((ManagerActivity) context).moveToTrash(handleList);
+				((ManagerActivityLollipop) context).moveToTrash(handleList);
 
 				break;
 			}
@@ -654,7 +653,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				((ManagerActivity) context).showRenameDialog(selectedNode, selectedNode.getName());
+				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
 				break;
 			}
 			case R.id.file_list_option_copy_layout: {
@@ -665,7 +664,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				notifyDataSetChanged();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
-				((ManagerActivity) context).showCopyLollipop(handleList);
+				((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 				break;
 			}
 		}
@@ -684,7 +683,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
 					Intent intent = new Intent(context, FullScreenImageViewer.class);
 					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivity.RUBBISH_BIN_ADAPTER);
+					intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
 					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
 						intent.putExtra("parentNodeHandle", -1L);
 					}
@@ -699,7 +698,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					adapterList.notifyDataSetChanged();
 					ArrayList<Long> handleList = new ArrayList<Long>();
 					handleList.add(nodes.get(position).getHandle());
-					((ManagerActivity) context).onFileClick(handleList);
+					((ManagerActivityLollipop) context).onFileClick(handleList);
 				}
 				
 			}

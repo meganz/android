@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.LoginActivity;
-import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.PinActivity;
 import nz.mega.android.R;
@@ -165,7 +164,7 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (dbH.getCredentials() == null){
-			ManagerActivity.logout(this, megaApi, false);
+			ManagerActivityLollipop.logout(this, megaApi, false);
 			return;
 		}
 		
@@ -183,7 +182,7 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 		if (megaApi.getRootNode() == null){
 			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
 			Intent loginIntent = new Intent(this, LoginActivity.class);
-			loginIntent.setAction(ManagerActivity.ACTION_FILE_EXPLORER_UPLOAD);
+			loginIntent.setAction(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD);
 			if (intent != null){
 				if(intent.getExtras() != null)
 				{

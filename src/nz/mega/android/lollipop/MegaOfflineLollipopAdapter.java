@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaOffline;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
@@ -438,19 +437,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
 		
 		switch (v.getId()){
-//			case R.id.offline_list_option_download_layout:{
-//				positionClicked = -1;
-//				notifyDataSetChanged();				
-//				if (Util.isOnline(context)){
-//					String path = mOff.getPath() + mOff.getName();
-//					fragment.download(path);	
-//				}
-//				break;
-//			}
-			case R.id.offline_list_item_layout:{
-				
-				fragment.itemClick(currentPosition);
-								
+			case R.id.offline_list_item_layout:{				
+				fragment.itemClick(currentPosition);								
 				break;
 			}			
 			case R.id.offline_list_three_dots:{
@@ -468,7 +456,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 						notifyDataSetChanged();
 					}
 				}				
-				((ManagerActivity) context).showOptionsPanel(mOff);
+				((ManagerActivityLollipop) context).showOptionsPanel(mOff);
 				break;
 			}
 		}		

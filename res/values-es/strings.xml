@@ -271,6 +271,7 @@
     <string name="context_send_file_inbox" context="send the file to inbox">Enviar al buzón</string>
     <string name="context_copy_link" context="get the link and copy it">Copiar enlace</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Eliminar</string>
+    <string name="context_delete_offline" context="Menu option to delete selected items of the offline state">Eliminar sin conexión</string>
     <string name="context_share_folder" context="menu item">Compartir carpeta</string>
     <string name="context_send_file" context="menu item">Enviar fichero</string>
     <string name="context_view_shared_folders" context="open a shared folder">Ver carpetas compartidas</string>
