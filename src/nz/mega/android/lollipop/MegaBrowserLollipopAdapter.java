@@ -239,8 +239,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 	public ViewHolderBrowser onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
 		// set the view's size, margins, paddings and layout parameters
-		
-		listFragment = (RecyclerView) parent;
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();

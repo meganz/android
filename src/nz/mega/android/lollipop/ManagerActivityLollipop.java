@@ -18,7 +18,6 @@ import java.util.Map;
 import nz.mega.android.CameraUploadFragment;
 import nz.mega.android.ChangePasswordActivity;
 import nz.mega.android.ContactsExplorerActivity;
-import nz.mega.android.ContactsFragment;
 import nz.mega.android.CreditCardFragment;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
@@ -331,7 +330,6 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private boolean isListOffline = true;
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
-	private ContactsFragment cF;
 	private SentRequestsFragment sRF;
 	private ReceivedRequestsFragment rRF;
     private TransfersFragment tF; 
@@ -350,6 +348,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private IncomingSharesFragmentLollipop inSFLol;
 	private OutgoingSharesFragmentLollipop outSFLol;
     private OfflineFragmentLollipop oFLol;
+	private ContactsFragmentLollipop cFLol;
     //////
     
     TextView textViewBrowser; 
@@ -1412,8 +1411,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     	}
     	
     	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-    	if (cF != null){
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+    	if (cFLol != null){
     		if (drawerItem == DrawerItem.CONTACTS){
     			if (isListContacts){
     				visibleFragment = 3;
@@ -2242,16 +2241,16 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
         	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
         	        //tabSpec.setContent(contentID);
         	        //mTabHostContacts.addTab(tabSpec);
-        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
-        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
-        	        
-        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
-        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
-   				
+//        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
+//        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
+//        	        
+//        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
+//        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
+//   				
     				
-    				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragment.class, null);
-    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
-    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragmentLollipop.class, null);
+//    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
+//    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
     			}		
     			
     			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
@@ -3174,8 +3173,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 			int index = viewPagerContacts.getCurrentItem();
 			if (index == 0){
 				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cF != null){
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (cFLol != null){
 					//Show
 					addContactMenuItem.setVisible(true);
 					selectMenuItem.setVisible(true);
@@ -3775,10 +3774,10 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	        	}
 	        	if (drawerItem == DrawerItem.CONTACTS){
 		        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		        	cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		        	if (cF != null){	        		
-	        			cF.selectAll();
-	        			if (cF.showSelectMenuItem()){
+		        	cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		        	if (cFLol != null){	        		
+	        			cFLol.selectAll();
+	        			if (cFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
 	        			}
@@ -3889,8 +3888,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	        	}
 	        	if (drawerItem == DrawerItem.CONTACTS){
 		        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		    		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		        	if (cF != null){
+		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		        	if (cFLol != null){
 	        		
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag(cFTag);
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -3904,7 +3903,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 						else{
 							thumbViewMenuItem.setTitle(getString(R.string.action_list));
 		    			}
-	        			cF.setIsList(isListContacts);
+	        			cFLol.setIsList(isListContacts);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -4808,14 +4807,14 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	public void selectSortByContacts(int _orderContacts){
 		this.orderContacts = _orderContacts;
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){	
-			cF.setOrder(orderContacts);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cFLol != null){	
+			cFLol.setOrder(orderContacts);
 			if (orderContacts == MegaApiJava.ORDER_DEFAULT_ASC){
-				cF.sortByNameAscending();
+				cFLol.sortByNameAscending();
 			}
 			else{
-				cF.sortByNameDescending();
+				cFLol.sortByNameDescending();
 			}
 		}
 	}
@@ -5368,7 +5367,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 			if (e.getErrorCode() == MegaError.API_OK){
 			
 				if(drawerItem==DrawerItem.CONTACTS){
-					cF.notifyDataSetChanged();
+					cFLol.notifyDataSetChanged();
 				}	
 			}
 			else{
@@ -5959,12 +5958,12 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 			if (e.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();
 //				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-//				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-//				if (cF != null){
+//				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+//				if (cFLol != null){
 //					if (drawerItem == DrawerItem.CONTACTS){	
 //						ArrayList<MegaUser> contacts = megaApi.getContacts();
-//						cF.setContacts(contacts);
-//						cF.getListView().invalidateViews();
+//						cFLol.setContacts(contacts);
+//						cFLol.getListView().invalidateViews();
 //					}
 //				}
 			}
@@ -6352,8 +6351,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 					}
 				}
 				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-				cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-				if (cF != null){
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (cFLol != null){
 					if (drawerItem == DrawerItem.CONTACTS){
 						return;
 					}
@@ -6407,11 +6406,11 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		log("showNewContactDialog");
 		
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cFLol != null){
 			if (drawerItem == DrawerItem.CONTACTS){
-				cF.setPositionClicked(-1);
-				cF.notifyDataSetChanged();
+				cFLol.setPositionClicked(-1);
+				cFLol.notifyDataSetChanged();
 			}
 		}
 		
@@ -7668,10 +7667,10 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	public void onUsersUpdate(MegaApiJava api, ArrayList<MegaUser> users) {
 		log("onUsersUpdate");
 		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		cF = (ContactsFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-		if (cF != null){
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		if (cFLol != null){
 			if (drawerItem == DrawerItem.CONTACTS){					
-				cF.updateView();
+				cFLol.updateView();
 			}
 		}
 	}
@@ -7766,10 +7765,10 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 				}				
 			}
 		}
-		if (cF != null){
+		if (cFLol != null){
 			if (drawerItem == DrawerItem.CONTACTS){
 				log("Share finish");
-				cF.updateView();
+				cFLol.updateView();
 			}
 		}
 	}
