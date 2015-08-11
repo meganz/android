@@ -32,7 +32,6 @@ import nz.mega.android.FolderLinkActivity;
 import nz.mega.android.FortumoFragment;
 import nz.mega.android.InboxFragment;
 import nz.mega.android.IncomingSharesFragment;
-import nz.mega.android.LoginActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaAttributes;
 import nz.mega.android.MegaOffline;
@@ -840,7 +839,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	    if (dbH.getCredentials() == null){
 			
 			if (OldPreferences.getOldCredentials(this) != null){
-	    		Intent loginWithOldCredentials = new Intent(this, LoginActivity.class);
+	    		Intent loginWithOldCredentials = new Intent(this, LoginActivityLollipop.class);
 	    		startActivity(loginWithOldCredentials);
 	    		finish();
 	    		return;
@@ -944,7 +943,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 			 if (getIntent() != null){
 				if (getIntent().getAction() != null){
 					if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
-						Intent intent = new Intent(managerActivity, LoginActivity.class);
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -962,7 +961,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 						return;
 					}
 					else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
-						Intent intent = new Intent(managerActivity, LoginActivity.class);
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -971,7 +970,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 						return;
 					}
 					else if (getIntent().getAction().equals(ACTION_CANCEL_UPLOAD) || getIntent().getAction().equals(ACTION_CANCEL_DOWNLOAD) || getIntent().getAction().equals(ACTION_CANCEL_CAM_SYNC)){
-						Intent intent = new Intent(managerActivity, LoginActivity.class);
+						Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(getIntent().getAction());
 						startActivity(intent);
@@ -980,7 +979,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 					}
 				}
 			}
-			Intent intent = new Intent(managerActivity, LoginActivity.class);
+			Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -1582,7 +1581,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 //    				
 //    			}    			
     			else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES)){
-					Intent loginIntent = new Intent(managerActivity, LoginActivity.class);
+					Intent loginIntent = new Intent(managerActivity, LoginActivityLollipop.class);
 					loginIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					loginIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
 					loginIntent.setData(Uri.parse(getIntent().getDataString()));
@@ -3417,13 +3416,19 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
 			if (oFLol != null){	
 				//Show
-				refreshMenuItem.setVisible(true);
     			sortByMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(false); //TODO
-    			selectMenuItem.setVisible(true);
-    			upgradeAccountMenuItem.setVisible(false);
+    			thumbViewMenuItem.setVisible(true); //TODO
+    			
+    			if(oFLol.getItemCount()>0){
+					selectMenuItem.setVisible(true);
+				}
+				else{
+					selectMenuItem.setVisible(false);
+				}
     			
 				//Hide
+    			upgradeAccountMenuItem.setVisible(false);
+				refreshMenuItem.setVisible(false);
     			pauseRestartTransfersItem.setVisible(false);
 				createFolderMenuItem.setVisible(false);
 				addContactMenuItem.setVisible(false);
@@ -3576,7 +3581,6 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 		
-		log("retryPendingConnections()");
 		if (megaApi != null){
 			megaApi.retryPendingConnections();
 		}
@@ -3856,6 +3860,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	        			}
 	        		}
 	        	}  
+	        	return true;
 	        }
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
@@ -3996,15 +4001,15 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	        case R.id.action_menu_refresh:{
 	        	switch(drawerItem){
 		        	case CLOUD_DRIVE:{
-		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
-			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 		        		break;
 		        	}
 		        	case CONTACTS:{
-		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
-			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 			    		break;
@@ -4018,8 +4023,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		    				log("Tag: "+ cFTag2);
 		    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
 		    				if (outSFLol != null){					
-		    					Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+					    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 					    		intent.putExtra("PARENT_HANDLE", parentHandleOutgoing);
 					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 					    		break;
@@ -4031,8 +4036,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		    				log("Tag: "+ cFTag1);
 		    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 		    				if (inSFLol != null){					
-		    					Intent intent = new Intent(managerActivity, LoginActivity.class);
-					    		intent.setAction(LoginActivity.ACTION_REFRESH);
+		    					Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+					    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 					    		intent.putExtra("PARENT_HANDLE", parentHandleIncoming);
 					    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 					    		break;
@@ -4040,8 +4045,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		    			}	
 		        	}
 		        	case ACCOUNT:{
-		        		Intent intent = new Intent(managerActivity, LoginActivity.class);
-			    		intent.setAction(LoginActivity.ACTION_REFRESH);
+		        		Intent intent = new Intent(managerActivity, LoginActivityLollipop.class);
+			    		intent.setAction(LoginActivityLollipop.ACTION_REFRESH);
 			    		intent.putExtra("PARENT_HANDLE", parentHandleBrowser);
 			    		startActivityForResult(intent, REQUEST_CODE_REFRESH);
 			    		break;
@@ -8338,22 +8343,21 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		log("shareFolder ArrayListLong");
 		//TODO shareMultipleFolders
 
-		if((drawerItem == DrawerItem.SHARED_WITH_ME) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
-			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
-	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
-	    	
-	    	long[] handles=new long[handleList.size()];
-	    	int j=0;
-	    	for(int i=0; i<handleList.size();i++){
-	    		handles[j]=handleList.get(i);
-	    		j++;
-	    	}	    	
-	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
-	    	//Multiselect=1 (multiple folders)
-	    	intent.putExtra("MULTISELECT", 1);
-	    	intent.putExtra("SEND_FILE",0);
-	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
-		}			
+		Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
+    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
+    	
+    	long[] handles=new long[handleList.size()];
+    	int j=0;
+    	for(int i=0; i<handleList.size();i++){
+    		handles[j]=handleList.get(i);
+    		j++;
+    	}	    	
+    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
+    	//Multiselect=1 (multiple folders)
+    	intent.putExtra("MULTISELECT", 1);
+    	intent.putExtra("SEND_FILE",0);
+    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+			
 	}
 	
 	public void shareFolderLollipop(MegaNode node){

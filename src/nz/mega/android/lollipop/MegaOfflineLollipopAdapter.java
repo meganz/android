@@ -198,6 +198,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	 * Get list of all selected nodes
 	 */
 	public List<MegaOffline> getSelectedOfflineNodes() {
+		log("getSelectedOfflineNodes");
 		ArrayList<MegaOffline> nodes = new ArrayList<MegaOffline>();
 		
 		for (int i = 0; i < selectedItems.size(); i++) {
@@ -283,15 +284,35 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		if (!multipleSelect){
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			
+			if (positionClicked != -1){
+				if (positionClicked == position){
+					
+					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					listFragment.smoothScrollToPosition(positionClicked);				
+				}
+				else{
+					//				
+					holder.itemLayout.setBackgroundColor(Color.WHITE);
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				}
+			}
+			else{
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+			}			
 		}
 		else{
-
+			log("multiselect enabled");
 			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
+				log("checked");
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
 			}
 			else{
+				log("NO checked");
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
 		}
@@ -382,24 +403,6 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		
 		holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
-		
-		if (positionClicked != -1){
-			if (positionClicked == position){
-				
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-				listFragment.smoothScrollToPosition(positionClicked);				
-			}
-			else{
-				//				
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-			}
-		}
-		else{
-			holder.itemLayout.setBackgroundColor(Color.WHITE);
-			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-		}
 	}
 	
 	@Override
@@ -426,6 +429,7 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     public void setPositionClicked(int p){
     	log("setPositionClicked");
     	positionClicked = p;
+		notifyDataSetChanged();
     }
 
 	@Override
@@ -618,12 +622,16 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		log("isMultipleSelect");
 		return multipleSelect;
 	}
-
+	
 	public void setMultipleSelect(boolean multipleSelect) {
-		log("setMultipleSelect");
-		if(this.multipleSelect != multipleSelect){
+		log("setMultipleSelect: "+multipleSelect);
+		if (this.multipleSelect != multipleSelect) {
 			this.multipleSelect = multipleSelect;
 			notifyDataSetChanged();
+		}
+		if(this.multipleSelect)
+		{
+			selectedItems = new SparseBooleanArray();
 		}
 	}
 	
