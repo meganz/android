@@ -6,7 +6,7 @@
     android:background="@color/background_secondary"
     android:stackFromBottom="true"
     android:id="@+id/scroll_view_login"
-    tools:context=".LoginActivity" >
+    tools:context=".LoginActivityLollipop" >
 
 	<LinearLayout 
 	    android:layout_width="match_parent"

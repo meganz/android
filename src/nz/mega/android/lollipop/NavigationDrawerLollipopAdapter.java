@@ -134,9 +134,9 @@ public class NavigationDrawerLollipopAdapter extends BaseAdapter{
 		if (positionClicked == position){
 			holder.text.setTextColor(context.getResources().getColor(R.color.pressed_mega));
 		}
-//		else{
-//			holder.layout.setBackgroundColor(context.getResources().getColor(R.color.navigation_drawer_background));
-//		}
+		else{
+			holder.text.setTextColor(context.getResources().getColor(R.color.navigation_drawer_background));
+		}
 		
 		return convertView;
 	}

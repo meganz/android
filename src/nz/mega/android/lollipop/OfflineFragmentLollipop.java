@@ -175,7 +175,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					}
 					break;
 				}
-				case R.id.cab_menu_share_folder:{
+				case R.id.cab_menu_share_link:{
 				
 					clearSelections();
 					hideMultipleSelect();
@@ -189,6 +189,23 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						((ManagerActivityLollipop) context).getPublicLinkAndShareIt(n);
 					}
 					
+					break;
+				}
+				case R.id.cab_menu_share:{
+					//Check that all the selected options are folders
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						String path = documents.get(i).getPath() + documents.get(i).getName();
+						MegaNode n = megaApi.getNodeByPath(path);			
+						if(n == null)
+						{
+							continue;
+						}
+						handleList.add(n.getHandle());
+					}
+					clearSelections();
+					hideMultipleSelect();
+					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);					
 					break;
 				}
 				case R.id.cab_menu_move:{					
@@ -223,7 +240,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 					break;
 				}
-				case R.id.cab_menu_trash:{
+				case R.id.cab_menu_delete:{
 					
 					for (int i=0;i<documents.size();i++){						
 						deleteOffline(context, documents.get(i));
@@ -249,7 +266,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			log("ActionBarCallBack::onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.file_browser_action, menu);
+			inflater.inflate(R.menu.offline_browser_action, menu);
 			return true;
 		}
 		
@@ -267,6 +284,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			if (Util.isOnline(context)){
 				if (selected.size() != 0) {
 					
+					menu.findItem(R.id.cab_menu_download).setVisible(true);
+					menu.findItem(R.id.cab_menu_share).setVisible(true);
+					
 					if(selected.size()==adapterList.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 						menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
@@ -283,20 +303,20 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				
 				if (selected.size() == 1) {
 					menu.findItem(R.id.cab_menu_share_link).setVisible(true);
-					menu.findItem(R.id.cab_menu_rename).setVisible(true);
 				}
 				else{
 					menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-					menu.findItem(R.id.cab_menu_rename).setVisible(false);
 				}
-
-				menu.findItem(R.id.cab_menu_download).setVisible(true);				
-				menu.findItem(R.id.cab_menu_copy).setVisible(true);
-				menu.findItem(R.id.cab_menu_move).setVisible(true);				
-				menu.findItem(R.id.cab_menu_trash).setVisible(true);
+				
+				menu.findItem(R.id.cab_menu_copy).setVisible(false);
+				menu.findItem(R.id.cab_menu_move).setVisible(false);				
+				menu.findItem(R.id.cab_menu_delete).setVisible(true);
+				menu.findItem(R.id.cab_menu_rename).setVisible(false);
 			}
 			else{
 				if (selected.size() != 0) {
+					
+					menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				
 					if(selected.size()==adapterList.getItemCount()){
 						menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -312,20 +332,19 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
 				}
 				
-				if (selected.size() == 1) {
-					menu.findItem(R.id.cab_menu_rename).setVisible(true);
-				}
-				else{
-					menu.findItem(R.id.cab_menu_rename).setVisible(false);
-				}
+//				if (selected.size() == 1) {
+//					menu.findItem(R.id.cab_menu_rename).setVisible(true);
+//				}
+//				else{
+//					menu.findItem(R.id.cab_menu_rename).setVisible(false);
+//				}
 
 				menu.findItem(R.id.cab_menu_download).setVisible(false);			
 				menu.findItem(R.id.cab_menu_copy).setVisible(false);
 				menu.findItem(R.id.cab_menu_move).setVisible(false);
 				menu.findItem(R.id.cab_menu_share_link).setVisible(false);
-				menu.findItem(R.id.cab_menu_trash).setVisible(true);
+				menu.findItem(R.id.cab_menu_rename).setVisible(false);
 			}			
-			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			return false;
 		}
 		
@@ -416,6 +435,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	}
 	
 	public void selectAll(){
+		log("selectAll");
 		if (isList){
 			if(adapterList.isMultipleSelect()){
 				adapterList.selectAll();
@@ -596,7 +616,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					
 				}
 			}
-
 			
 			if (adapterList == null){
 				adapterList = new MegaOfflineLollipopAdapter(this, context, mOffList, listView, emptyImageView, emptyTextView, aB);
@@ -1811,6 +1830,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 //		setNodes(mOffList);
 		pathNavigation=pNav;
 		listView.invalidate();
+	}
+	
+	public int getItemCount(){
+		if(adapterList!=null){
+			return adapterList.getItemCount();
+		}
+		return 0;
 	}
 	
 	private MegaOffline findPath (String pNav){
