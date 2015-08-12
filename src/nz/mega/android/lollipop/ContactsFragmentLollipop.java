@@ -204,9 +204,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
-				menu.findItem(R.id.cab_menu_help).setVisible(true);
-				menu.findItem(R.id.cab_menu_upgrade_account).setVisible(true);
-				menu.findItem(R.id.cab_menu_settings).setVisible(true);
 				
 				if(selected.size()==adapterList.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
@@ -447,8 +444,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });			
-			
+	        });					
 			
 			return v;
 		}
@@ -677,7 +673,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 			else{
 		
-				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
+				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
 				i.putExtra("name", visibleContacts.get(position).getEmail());
 				startActivity(i);
 			}
@@ -895,8 +891,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
+	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
+		detector.onTouchEvent(e);
 		return false;
 	}
 
