@@ -82,26 +82,16 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
 
 	LayoutManager mLayoutManager;
-	MegaNode selectedNode = null;
+	MegaUser selectedUser = null;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
 	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
 	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;
+	public LinearLayout optionSendFile;
 	public LinearLayout optionShare;
-	public LinearLayout optionPermissions;
-	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
-	public LinearLayout optionClearShares;
-	public LinearLayout optionLeaveShare;
-	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
-	public TextView propertiesText;
-	////
+	public LinearLayout optionRemove;
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -333,13 +323,9 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			
 			listView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-
-//			listView.setHasFixedSize(true);
+			listView.setHasFixedSize(true);
 		    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-		    listView.setLayoutManager(linearLayoutManager);
-			
-			
-			
+		    listView.setLayoutManager(linearLayoutManager);			
 			listView.addOnItemTouchListener(this);
 			listView.setItemAnimator(new DefaultItemAnimator()); 
 			
@@ -388,9 +374,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
 			
-			log("Justo antes de crear el adapter");
 			if (adapterList == null){
-				adapterList = new MegaContactsLollipopAdapter(context, visibleContacts, emptyImageView, emptyTextView, listView);
+				adapterList = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, listView);
 			}
 			else{
 				adapterList.setContacts(visibleContacts);
@@ -411,7 +396,59 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}	
+			}
+			
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
+			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_list_options);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_list_out_options);
+			optionProperties = (LinearLayout) v.findViewById(R.id.contact_list_option_properties_layout);
+			optionShare = (LinearLayout) v.findViewById(R.id.contact_list_option_share_layout);
+			optionSendFile = (LinearLayout) v.findViewById(R.id.contact_list_option_send_file_layout);
+			optionRemove = (LinearLayout) v.findViewById(R.id.contact_list_option_remove_layout);		
+			
+			optionRemove.setOnClickListener(this);
+			optionShare.setOnClickListener(this);
+			optionProperties.setOnClickListener(this);
+			optionSendFile.setOnClickListener(this);
+			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingOptionsPanel.setVisibility(View.INVISIBLE);
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+	            @Override
+	            public void onPanelSlide(View panel, float slideOffset) {
+	            	log("onPanelSlide, offset " + slideOffset);
+	            	if(slideOffset==0){
+	            		hideOptionsPanel();
+	            	}
+	            }
+
+	            @Override
+	            public void onPanelExpanded(View panel) {
+	            	log("onPanelExpanded");
+
+	            }
+
+	            @Override
+	            public void onPanelCollapsed(View panel) {
+	            	log("onPanelCollapsed");
+	            	
+
+	            }
+
+	            @Override
+	            public void onPanelAnchored(View panel) {
+	            	log("onPanelAnchored");
+	            }
+
+	            @Override
+	            public void onPanelHidden(View panel) {
+	                log("onPanelHidden");                
+	            }
+	        });			
+			
 			
 			return v;
 		}
@@ -521,6 +558,24 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		}			
 	}
 	
+	public void showOptionsPanel(MegaUser user){		
+		log("showOptionsPanel");	
+		
+		this.selectedUser = user;
+//		fabButton.setVisibility(View.GONE);					
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
+	}
+	
+	public void hideOptionsPanel(){
+		log("hideOptionsPanel");
+				
+		adapterList.setPositionClicked(-1);
+//		fabButton.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+		slidingOptionsPanel.setVisibility(View.GONE);
+	}
+	
 	public void setContacts(ArrayList<MegaUser> contacts){
 		this.contacts = contacts;
 		
@@ -552,14 +607,62 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	public void onClick(View v) {
 
 		switch(v.getId()){
-			case R.id.add_contact_button:				
+			case R.id.add_contact_button:	{			
 				((ManagerActivityLollipop)context).showNewContactDialog(null);				
 				break;
-				
+			}
 			case R.id.out_space_btn_contacts:
-			case R.id.out_space_btn_grid_contacts:
+			case R.id.out_space_btn_grid_contacts:{
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
+			}
+			case R.id.contact_list_option_send_file_layout:{
+				log("optionSendFile");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				List<MegaUser> user = new ArrayList<MegaUser>();
+				user.add(selectedUser);
+				((ManagerActivityLollipop) context).pickContacToSendFile(user);
+				notifyDataSetChanged();
+				break;
+			}
+			case R.id.contact_list_option_properties_layout:{
+				log("optionProperties");
+//				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
+				log("optionSendFile");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
+				i.putExtra("name", selectedUser.getEmail());
+				context.startActivity(i);			
+				break;
+			}
+			case R.id.contact_list_option_share_layout:{
+				log("optionShare");
+				log("optionSendFile");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				List<MegaUser> user = new ArrayList<MegaUser>();
+				user.add(selectedUser);
+				((ManagerActivityLollipop) context).pickFolderToShare(user);
+				break;
+			}
+			case R.id.contact_list_option_remove_layout:{
+				log("Remove contact");
+				log("optionSendFile");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).removeContact(selectedUser);
+				break;
+			}
 		}
 	}
 			

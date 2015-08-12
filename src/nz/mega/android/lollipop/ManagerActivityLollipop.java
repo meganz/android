@@ -22,11 +22,12 @@ import nz.mega.android.CreditCardFragment;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
 import nz.mega.android.FileBrowserFragment;
-import nz.mega.android.FileExplorerActivity;
 import nz.mega.android.FileLinkActivity;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
+import nz.mega.android.ManagerActivity.DrawerItem;
 import nz.mega.android.CameraSyncService;
+import nz.mega.android.ContactsFragment;
 import nz.mega.android.FolderLinkActivity;
 import nz.mega.android.FortumoFragment;
 import nz.mega.android.InboxFragment;
@@ -2946,6 +2947,87 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 				}
 			}
 		}
+    	if (drawerItem == DrawerItem.CONTACTS){
+    		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+    		if (cFLol != null){			
+    			if (cFLol.onBackPressed() == 0){
+    				drawerItem = DrawerItem.CLOUD_DRIVE;
+    				selectDrawerItemLollipop(drawerItem);
+    				if(nDALol!=null){
+    					nDALol.setPositionClicked(0);
+    				}
+    				return;
+    			}
+    		}
+    	}
+    	if (drawerItem == DrawerItem.ACCOUNT){
+
+    		switch(accountFragment){
+
+    		case MY_ACCOUNT_FRAGMENT:{
+    			if (maF != null){						
+    				drawerItem = DrawerItem.CLOUD_DRIVE;
+    				selectDrawerItemLollipop(drawerItem);
+    				if(nDALol!=null){
+    					nDALol.setPositionClicked(0);
+
+    				}					
+    			}
+    			return;
+    		}
+    		case UPGRADE_ACCOUNT_FRAGMENT:{
+    			if (upAF != null){						
+    				drawerItem = DrawerItem.ACCOUNT;
+    				selectDrawerItemLollipop(drawerItem);
+    				if(nDALol!=null){
+    					nDALol.setPositionClicked(-1);
+
+    				}					
+    			}
+    			return;
+    		}
+    		case PAYMENT_FRAGMENT:{
+    			if (pF != null){
+    				pF.onBackPressed();
+    			}
+    			return;					
+    		}
+    		case CC_FRAGMENT:{
+    			if (ccF != null){
+    				int parameterType = ccF.getParameterType();
+    				ArrayList<Product> accounts = ccF.getAccounts();
+    				BitSet paymentBitSet = ccF.getPaymentBitSet();
+    				showpF(parameterType, accounts, paymentBitSet);
+    			}
+    			else{
+    				showUpAF(null);
+    			}
+    			return;
+    		}
+    		case OVERQUOTA_ALERT:{
+    			if (upAF != null){						
+    				drawerItem = DrawerItem.CLOUD_DRIVE;
+    				selectDrawerItemLollipop(drawerItem);
+    				if(nDALol!=null){
+    					nDALol.setPositionClicked(0);
+
+    				}					
+    			}
+    			return;
+    		}
+    		default:{
+    			if (fbFLol != null){						
+    				drawerItem = DrawerItem.CLOUD_DRIVE;
+    				selectDrawerItemLollipop(drawerItem);
+    				if(nDALol!=null){
+    					nDALol.setPositionClicked(0);
+
+    				}					
+    			}
+    		}
+    		}
+    	}
 	}    
 	
 	@Override
@@ -3014,6 +3096,14 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		
 		if (oFLol != null){				
 			oFLol.showOptionsPanel(node);				
+		}			
+	}
+	
+	public void showOptionsPanel(MegaUser user){
+		log("showOptionsPanel-Offline");
+		
+		if (cFLol != null){				
+			cFLol.showOptionsPanel(user);				
 		}			
 	}
 	
@@ -6473,8 +6563,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	
 	public void pickFolderToShare(List<MegaUser> users){
 		
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_SELECT_FOLDER);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
 		String[] longArray = new String[users.size()];
 		for (int i=0; i<users.size(); i++){
 			longArray[i] = users.get(i).getEmail();
@@ -8389,8 +8479,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	
 	public void pickContacToSendFile(List<MegaUser> users){
 		
-		Intent intent = new Intent(this, FileExplorerActivity.class);
-		intent.setAction(FileExplorerActivity.ACTION_SELECT_FILE);
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
 		String[] longArray = new String[users.size()];
 		for (int i=0; i<users.size(); i++){
 			longArray[i] = users.get(i).getEmail();
