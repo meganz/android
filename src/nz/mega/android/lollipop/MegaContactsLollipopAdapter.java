@@ -57,6 +57,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	MegaApiAndroid megaApi;
 	boolean multipleSelect;
 	private SparseBooleanArray selectedItems;
+	ContactsFragmentLollipop fragment;
 	
 	private class UserAvatarListenerList implements MegaRequestListenerInterface{
 
@@ -148,9 +149,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		
 	}
 	
-	public MegaContactsLollipopAdapter(Context _context, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView, RecyclerView _listView) {
+	public MegaContactsLollipopAdapter(Context _context, ContactsFragmentLollipop _fragment, ArrayList<MegaUser> _contacts, ImageView _emptyImageView,TextView _emptyTextView, RecyclerView _listView) {
 		this.context = _context;
 		this.contacts = _contacts;
+		this.fragment = _fragment;
 		this.positionClicked = -1;
 		
 		if (megaApi == null){
@@ -160,8 +162,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		emptyImageViewFragment = _emptyImageView;
 		emptyTextViewFragment = _emptyTextView;
 		listFragment = _listView;
-		
-		log("creado el adapter");
 	}
 	
 	/*private view holder class*/
@@ -177,13 +177,6 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
         TextView textViewContent;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-//        ImageView arrowSelection;
-//        LinearLayout optionsLayout;
-//        RelativeLayout optionProperties;
-////        ImageButton optionSend;
-//        RelativeLayout optionShare;
-//        RelativeLayout optionRemove;
-//        RelativeLayout optionSendFile;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -209,6 +202,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 
 		holder = new ViewHolderContactsList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_list_item_layout);
+		holder.itemLayout.setOnClickListener(this);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.contact_list_thumbnail);	
 		holder.contactInitialLetter = (TextView) v.findViewById(R.id.contact_list_initial_letter);
 		holder.textViewContactName = (TextView) v.findViewById(R.id.contact_list_name);
@@ -531,34 +525,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		int currentPosition = holder.currentPosition;
 		MegaUser c = (MegaUser) getItem(currentPosition);
 		
-		switch (v.getId()){
-			case R.id.contact_list_option_properties_layout:{
-				log("optionProperties");
-//				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
-				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
-				i.putExtra("name", c.getEmail());
-				context.startActivity(i);							
-				positionClicked = -1;
-				notifyDataSetChanged();
-				break;
-			}
-			case R.id.contact_list_option_share_layout:{
-				log("optionShare");
-				positionClicked = -1;
-				List<MegaUser> user = new ArrayList<MegaUser>();
-				user.add(c);
-				((ManagerActivityLollipop) context).pickFolderToShare(user);
-				notifyDataSetChanged();
-				break;
-			}
-			//TODO remove contact
-			case R.id.contact_list_option_remove_layout:{
-				log("Remove contact");
-				positionClicked = -1;
-				((ManagerActivityLollipop) context).removeContact(c);
-				notifyDataSetChanged();	
-				break;
-			}			
+		switch (v.getId()){			
 			case R.id.contact_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
@@ -574,17 +541,13 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 						notifyDataSetChanged();
 					}
 				}
-				break;
-			}
-			case R.id.contact_list_option_send_file_layout:{
-				log("optionSendFile");
-				positionClicked = -1;
-				List<MegaUser> user = new ArrayList<MegaUser>();
-				user.add(c);
-				((ManagerActivityLollipop) context).pickContacToSendFile(user);
-				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).showOptionsPanel(c);
 				break;
 			}			
+			case R.id.contact_list_item_layout:{
+				((ContactsFragmentLollipop) fragment).itemClick(currentPosition);	
+				break;
+			}
 		}
 	}
 	
