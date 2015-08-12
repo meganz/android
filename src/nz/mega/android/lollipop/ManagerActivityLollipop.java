@@ -15,43 +15,33 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import nz.mega.android.CameraSyncService;
 import nz.mega.android.CameraUploadFragment;
 import nz.mega.android.ChangePasswordActivity;
 import nz.mega.android.ContactsExplorerActivity;
 import nz.mega.android.CreditCardFragment;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
-import nz.mega.android.FileBrowserFragment;
 import nz.mega.android.FileLinkActivity;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
-import nz.mega.android.ManagerActivity.DrawerItem;
-import nz.mega.android.CameraSyncService;
-import nz.mega.android.ContactsFragment;
 import nz.mega.android.FolderLinkActivity;
 import nz.mega.android.FortumoFragment;
-import nz.mega.android.InboxFragment;
-import nz.mega.android.IncomingSharesFragment;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaAttributes;
 import nz.mega.android.MegaOffline;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.MyAccountFragment;
-import nz.mega.android.NavigationDrawerAdapter;
 import nz.mega.android.OfflineActivity;
-import nz.mega.android.OfflineFragment;
 import nz.mega.android.OldPreferences;
-import nz.mega.android.OutgoingSharesFragment;
 import nz.mega.android.PaymentFragment;
 import nz.mega.android.PinActivity;
 import nz.mega.android.Product;
 import nz.mega.android.R;
 import nz.mega.android.ReceivedRequestsFragment;
-import nz.mega.android.RubbishBinFragment;
 import nz.mega.android.SearchFragment;
 import nz.mega.android.SecureSelfiePreviewActivity;
-import nz.mega.android.SentRequestsFragment;
 import nz.mega.android.SettingsActivity;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.SortByDialogActivity;
@@ -63,15 +53,6 @@ import nz.mega.android.UpgradeAccountFragment;
 import nz.mega.android.UploadHereDialog;
 import nz.mega.android.UploadService;
 import nz.mega.android.ZipBrowserActivity;
-import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
-import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
-import nz.mega.android.lollipop.FileExplorerActivityLollipop;
-import nz.mega.android.lollipop.InboxFragmentLollipop;
-import nz.mega.android.lollipop.IncomingSharesFragmentLollipop;
-import nz.mega.android.lollipop.NavigationDrawerLollipopAdapter;
-import nz.mega.android.lollipop.OfflineFragmentLollipop;
-import nz.mega.android.lollipop.OutgoingSharesFragmentLollipop;
-import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
@@ -131,7 +112,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.text.Spannable;
@@ -159,7 +139,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -171,7 +150,6 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import android.widget.ImageButton;
 
 public class ManagerActivityLollipop extends PinActivity implements OnItemClickListener, OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface {
 	
@@ -331,7 +309,6 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private boolean isListOffline = true;
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
-	private SentRequestsFragment sRF;
 	private ReceivedRequestsFragment rRF;
     private TransfersFragment tF; 
     private MyAccountFragment maF;
@@ -350,6 +327,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private OutgoingSharesFragmentLollipop outSFLol;
     private OfflineFragmentLollipop oFLol;
 	private ContactsFragmentLollipop cFLol;
+	private SentRequestsFragmentLollipop sRFLol;
     //////
     
     TextView textViewBrowser; 
@@ -2242,15 +2220,14 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
         	        tabSpec1.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_contacts))); // new function to inject our own tab layout
         	        //tabSpec.setContent(contentID);
         	        //mTabHostContacts.addTab(tabSpec);
-//        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
-//        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
+        	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
+        	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
 //        	        
 //        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
 //        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
-//   				
     				
     				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragmentLollipop.class, null);
-//    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragmentLollipop.class, null);
 //    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
     			}		
     			
@@ -3104,6 +3081,16 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		
 		if (cFLol != null){				
 			cFLol.showOptionsPanel(user);				
+		}			
+	}
+	
+	public void showOptionsPanel(MegaContactRequest request){
+		log("showOptionsPanel-MegaContactRequest");
+		String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
+		log("Tag: "+ sRFTag1);
+		sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+		if (sRFLol != null){				
+			sRFLol.showOptionsPanel(request);				
 		}			
 	}
 	
@@ -8893,15 +8880,15 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 //				log("En SentRequestFragment TAB");
 			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
 			log("Tag: "+ sRFTag1);
-			sRF = (SentRequestsFragment) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-			if (sRF != null){	
-				log("sRF != null");
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+			if (sRFLol != null){	
+				log("sRFLol != null");
 //					ArrayList<MegaContactRequest> contacts = megaApi.getOutgoingContactRequests();
 //			    	if(contacts!=null)
 //			    	{
 //			    		log("contacts SIZE: "+contacts.size());
 //			    	}
-				sRF.setContactRequests();
+				sRFLol.setContactRequests();
 			}	
 //			}
 //			else if(index==2){

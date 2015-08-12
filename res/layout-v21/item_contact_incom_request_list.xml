@@ -1,0 +1,172 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/contact_request_list_item_layout" >
+
+    <RelativeLayout
+		android:id="@+id/contact_request_list_relative_layout_avatar"
+		android:layout_width="54dp"
+		android:layout_height="54dp"
+		android:layout_marginLeft="5dp" 
+		android:paddingTop="3dp"
+		android:layout_toRightOf="@id/contact_request_list_checkbox" >
+         
+	    <nz.mega.components.RoundedImageView 
+	         android:id="@+id/contact_request_list_thumbnail"
+	         android:layout_width="54dp"
+	         android:layout_height="54dp" 
+	         android:scaleType="fitCenter"         
+	         rounded:corner_radius="27dp" 
+	         rounded:border_width="0dp"
+	         rounded:border_color="@color/border_file_properties"/>
+	    
+	    <TextView
+	        android:id="@+id/contact_request_list_initial_letter"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent" 
+	        android:layout_centerInParent="true"
+		    android:gravity="center_horizontal|center_vertical" />
+	    
+    </RelativeLayout>
+        
+    <TextView
+        android:id="@+id/contact_request_list_name"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp" />  
+    
+    <TextView
+        android:id="@+id/contact_request_list_content"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/contact_request_list_relative_layout_avatar"
+        android:layout_below="@id/contact_request_list_name"
+        android:paddingLeft="5dp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/file_list_second_row" />
+    
+    <ImageButton 
+        android:id="@+id/contact_request_list_three_dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/action_selector_ic"
+		android:background="@null" 
+        android:layout_alignTop="@id/contact_request_list_name"
+        android:layout_alignParentRight="true"
+		android:paddingTop="12dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="15dp" />
+     <!--
+    <ImageView
+        android:id="@+id/contact_list_arrow_selection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arrow_selection"
+		android:layout_alignBottom="@id/contact_list_thumbnail"
+        android:layout_alignParentRight="true"
+        android:paddingRight="15dp" />-->
+    
+    <LinearLayout
+        android:id="@+id/contact_request_list_options"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_request_list_content"
+        android:orientation="horizontal"
+        android:padding="0dp"
+        android:background="@color/adapters_background">               
+        	        
+        <RelativeLayout
+                android:id="@+id/contact_list_option_accept_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+                
+	            <ImageView
+		            android:id="@+id/contact_list_option_accept"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/accept_ic"
+		           style="@style/dialogActionButton"
+		            android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+	            
+	            <TextView 
+                    android:id="@+id/contact_list_option_accept_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:paddingBottom="10dp"
+                    android:text="@string/contact_accept"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>
+	        </RelativeLayout>    
+	        
+        <RelativeLayout
+                android:id="@+id/contact_list_option_ignore_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+                
+	            <ImageView
+		            android:id="@+id/contact_list_option_ignore"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ignore_ic"
+		           style="@style/dialogActionButton"
+		            android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+	            
+	            <TextView 
+                    android:id="@+id/contact_list_option_ignore_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:paddingBottom="10dp"
+                    android:text="@string/contact_ignore"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>
+	        </RelativeLayout>    
+	        
+        <RelativeLayout
+                android:id="@+id/contact_list_option_decline_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" >
+                
+	            <ImageView
+		            android:id="@+id/contact_list_option_decline"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_delete"
+		           style="@style/dialogActionButton"
+		            android:layout_centerHorizontal="true"
+		            android:layout_alignParentTop="true"
+		            android:paddingTop="2dp"/>
+	            
+	            <TextView 
+                    android:id="@+id/contact_list_option_decline_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:paddingBottom="10dp"
+                    android:text="@string/contact_decline"
+					android:layout_alignParentBottom="true"
+					android:textColor="#ffffff"
+					android:textSize="10sp"
+					android:textStyle="bold"/>
+	        </RelativeLayout>  
+     
+    </LinearLayout>
+    
+</RelativeLayout>
+
