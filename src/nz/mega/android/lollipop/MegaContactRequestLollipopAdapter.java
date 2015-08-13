@@ -89,9 +89,6 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
         RelativeLayout itemLayout;
 //        ImageView arrowSelection;
         LinearLayout optionsLayout;
-        RelativeLayout optionAccept;
-        RelativeLayout optionDecline;
-        RelativeLayout optionIgnore;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -222,6 +219,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
 			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
+			v.setTag(holder);	
 		}
 		else{
 			//Incoming request
@@ -235,19 +233,8 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
 			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
-			holder.optionAccept = (RelativeLayout) v.findViewById(R.id.contact_list_option_accept_layout);
-//			holder.optionProperties.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-			holder.optionDecline = (RelativeLayout) v.findViewById(R.id.contact_list_option_decline_layout);				
-//			holder.optionShare.setPadding(Util.px2dp((70*scaleW), outMetrics), Util.px2dp((20*scaleH), outMetrics), 0, 0);
-			holder.optionIgnore = (RelativeLayout) v.findViewById(R.id.contact_list_option_ignore_layout);
-			v.setTag(holder);
 			
-			holder.optionAccept.setTag(holder);
-			holder.optionAccept.setOnClickListener(this);
-			holder.optionDecline.setOnClickListener(this);
-			holder.optionDecline.setTag(holder);
-			holder.optionIgnore.setOnClickListener(this);
-			holder.optionIgnore.setTag(holder);
+			v.setTag(holder);		
 		}
 		return holder;
 	}
@@ -432,39 +419,7 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 		int currentPosition = holder.currentPosition;
 		MegaContactRequest c = (MegaContactRequest) getItem(currentPosition);
 		
-		switch (v.getId()){
-			case R.id.contact_list_option_reinvite_layout:{
-				log("optionReinvite");
-				((ManagerActivityLollipop) context).reinviteContact(c);				
-				positionClicked = -1;
-				notifyDataSetChanged();
-				break;
-			}
-			case R.id.contact_list_option_delete_layout:{
-				log("Remove Invitation");
-				((ManagerActivityLollipop) context).removeInvitationContact(c);
-				notifyDataSetChanged();	
-				break;
-			}	
-			case R.id.contact_list_option_accept_layout:{
-				log("optionReinvite");
-				((ManagerActivityLollipop) context).acceptInvitationContact(c);			
-				positionClicked = -1;
-				notifyDataSetChanged();
-				break;
-			}
-			case R.id.contact_list_option_decline_layout:{
-				log("Remove Invitation");
-				((ManagerActivityLollipop) context).declineInvitationContact(c);
-				notifyDataSetChanged();	
-				break;
-			}
-			case R.id.contact_list_option_ignore_layout:{
-				log("Remove Invitation");
-				((ManagerActivityLollipop) context).ignoreInvitationContact(c);
-				notifyDataSetChanged();	
-				break;
-			}
+		switch (v.getId()){	
 			case R.id.contact_request_list_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;

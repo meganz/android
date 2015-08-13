@@ -45,6 +45,7 @@ import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -65,7 +66,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	MegaContactsGridAdapter adapterGrid;
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	
+    ImageButton fabButton;
 	LinearLayout outSpaceLayout=null;
 	TextView outSpaceText;
 	Button outSpaceButton;
@@ -371,6 +372,9 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
 			
+			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
+			fabButton.setOnClickListener(this);
+			
 			if (adapterList == null){
 				adapterList = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, listView);
 			}
@@ -558,7 +562,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		log("showOptionsPanel");	
 		
 		this.selectedUser = user;
-//		fabButton.setVisibility(View.GONE);					
+		fabButton.setVisibility(View.GONE);					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
 	}
@@ -567,7 +571,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		log("hideOptionsPanel");
 				
 		adapterList.setPositionClicked(-1);
-//		fabButton.setVisibility(View.VISIBLE);
+		fabButton.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
@@ -603,7 +607,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	public void onClick(View v) {
 
 		switch(v.getId()){
-			case R.id.add_contact_button:	{			
+			case R.id.invite_contact_button:{				
 				((ManagerActivityLollipop)context).showNewContactDialog(null);				
 				break;
 			}
@@ -621,7 +625,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(selectedUser);
 				((ManagerActivityLollipop) context).pickContacToSendFile(user);
-				notifyDataSetChanged();
 				break;
 			}
 			case R.id.contact_list_option_properties_layout:{
@@ -639,7 +642,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 			case R.id.contact_list_option_share_layout:{
 				log("optionShare");
-				log("optionSendFile");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
@@ -651,7 +653,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 			case R.id.contact_list_option_remove_layout:{
 				log("Remove contact");
-				log("optionSendFile");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
