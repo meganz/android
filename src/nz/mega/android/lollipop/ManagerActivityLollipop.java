@@ -309,7 +309,6 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private boolean isListOffline = true;
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
-	private ReceivedRequestsFragment rRF;
     private TransfersFragment tF; 
     private MyAccountFragment maF;
     private SearchFragment sF;
@@ -328,6 +327,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     private OfflineFragmentLollipop oFLol;
 	private ContactsFragmentLollipop cFLol;
 	private SentRequestsFragmentLollipop sRFLol;
+	private ReceivedRequestsFragmentLollipop rRFLol;
     //////
     
     TextView textViewBrowser; 
@@ -2206,13 +2206,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     			}
     			mTabHostContacts.setVisibility(View.VISIBLE);    			
     			viewPagerContacts.setVisibility(View.VISIBLE);
-    			
-    			mTabHostContacts.getTabWidget().setBackgroundColor(Color.BLACK);
-    			//mTabHostContacts.getTabWidget().setTextAlignment(textAlignment)
-    			
-//    		    TextView title1 = (TextView) mIndicator.findViewById(android.R.id.title);    		    
-//    		    title1.setText(R.string.tab_contacts); 			
-    			
+    			    			    			
     			if (mTabsAdapterContacts == null){
     				mTabsAdapterContacts = new TabsAdapter(this, mTabHostContacts, viewPagerContacts);   	
     				
@@ -2222,13 +2216,13 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
         	        //mTabHostContacts.addTab(tabSpec);
         	        TabHost.TabSpec tabSpec2 = mTabHostContacts.newTabSpec("sentRequests");
         	        tabSpec2.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_sent_requests))); // new function to inject our own tab layout
-//        	        
-//        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
-//        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
+       	        
+        	        TabHost.TabSpec tabSpec3 = mTabHostContacts.newTabSpec("receivedRequests");
+        	        tabSpec3.setIndicator(getTabIndicator(mTabHostContacts.getContext(), getString(R.string.tab_received_requests))); // new function to inject our own tab layout
     				
     				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragmentLollipop.class, null);
     				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragmentLollipop.class, null);
-//    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragment.class, null);
+    				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragmentLollipop.class, null);
     			}		
     			
     			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
@@ -2331,11 +2325,35 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     				log("mTabsAdapterShares NOT null");
         			mTabHostCDrive.setVisibility(View.VISIBLE);    			
         			viewPagerCDrive.setVisibility(View.VISIBLE);
-    				
-        			inSFLol.setIsList(isListSharedWithMe);
-        			inSFLol.setParentHandle(parentHandleIncoming);
-        			inSFLol.setOrder(orderGetChildren);
-        			inSFLol.refresh(parentHandleIncoming);
+        			
+        			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
+        			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView);        			
+        			
+        			int index = viewPagerShares.getCurrentItem();
+        			if(index==0){	
+        				textViewOutgoing.setTypeface(null, Typeface.NORMAL);
+        				textViewIncoming.setTypeface(null, Typeface.BOLD);
+        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+        				if (inSFLol != null){
+                			inSFLol.setIsList(isListSharedWithMe);
+                			inSFLol.setParentHandle(parentHandleIncoming);
+                			inSFLol.setOrder(orderGetChildren);
+                			inSFLol.refresh(parentHandleIncoming);
+        				}
+        			}
+        			else{
+        				textViewOutgoing.setTypeface(null, Typeface.BOLD);
+        				textViewIncoming.setTypeface(null, Typeface.NORMAL);
+        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+        				if (outSFLol != null){
+        					outSFLol.setIsList(isListSharedWithMe);
+        					outSFLol.setParentHandle(parentHandleIncoming);
+        					outSFLol.setOrder(orderGetChildren);
+        					outSFLol.refresh(parentHandleIncoming);
+        				}
+        			}  		
     			}
     			
     			mTabHostShares.setVisibility(View.VISIBLE);    			
@@ -3086,12 +3104,24 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	
 	public void showOptionsPanel(MegaContactRequest request){
 		log("showOptionsPanel-MegaContactRequest");
-		String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
-		log("Tag: "+ sRFTag1);
-		sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
-		if (sRFLol != null){				
-			sRFLol.showOptionsPanel(request);				
-		}			
+		
+		int index = viewPagerContacts.getCurrentItem();
+		if (index == 2){
+			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 2);	
+			log("Tag: "+ sRFTag1);
+			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+			if (rRFLol != null){				
+				rRFLol.showOptionsPanel(request);				
+			}
+		}
+		else if (index == 1){
+			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
+			log("Tag: "+ sRFTag1);
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+			if (sRFLol != null){				
+				sRFLol.showOptionsPanel(request);				
+			}				
+		}		
 	}
 	
 	@Override
@@ -5458,6 +5488,15 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 				statusDialog.dismiss();	
 			} 
 			catch (Exception ex) {}
+			
+			//Update the fragments
+			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
+			log("Tag: "+ sRFTag1);
+			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
+			if (sRFLol != null){	
+				log("sRFLol != null");
+				sRFLol.setContactRequests();
+			}
 			
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
 				Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();
@@ -8875,31 +8914,19 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		log("---------------------onContactRequestsUpdate");
 		// TODO Auto-generated method stub
 		if (drawerItem == DrawerItem.CONTACTS){
-//			int index = viewPagerContacts.getCurrentItem();
-//			if(index==1||index==0){	
-//				log("En SentRequestFragment TAB");
 			String sRFTag1 = getFragmentTag(R.id.contact_tabs_pager, 1);	
 			log("Tag: "+ sRFTag1);
 			sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sRFTag1);
 			if (sRFLol != null){	
 				log("sRFLol != null");
-//					ArrayList<MegaContactRequest> contacts = megaApi.getOutgoingContactRequests();
-//			    	if(contacts!=null)
-//			    	{
-//			    		log("contacts SIZE: "+contacts.size());
-//			    	}
 				sRFLol.setContactRequests();
 			}	
-//			}
-//			else if(index==2){
-//				log("En ReceiveRequestFragment TAB");
 			String rRFTag2 = getFragmentTag(R.id.contact_tabs_pager, 2);	
 			log("Tag: "+ rRFTag2);
-			rRF = (ReceivedRequestsFragment) getSupportFragmentManager().findFragmentByTag(rRFTag2);
-			if (rRF != null){					
-				rRF.setContactRequests();
-			}	
-//			}						
+			rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(rRFTag2);
+			if (rRFLol != null){					
+				rRFLol.setContactRequests();
+			}		
 		}
 		
 	}

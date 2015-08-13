@@ -3,6 +3,7 @@ package nz.mega.android.lollipop;
 import java.util.ArrayList;
 
 import nz.mega.android.MegaApplication;
+import nz.mega.android.MegaContactsGridAdapter;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
@@ -11,14 +12,10 @@ import nz.mega.components.SlidingUpPanelLayout.PanelState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -27,16 +24,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemLongClickListener;
 
-public class SentRequestsFragmentLollipop extends Fragment implements OnClickListener{
+
+public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClickListener{
 	
 	public static int GRID_WIDTH =400;
 	
@@ -48,17 +48,17 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	ActionBar aB;
 	RecyclerView listView;
 	MegaContactRequestLollipopAdapter adapterList;
+	MegaContactsGridAdapter adapterGrid;
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	RecyclerView.LayoutManager mLayoutManager;
-	MegaContactRequest selectedRequest = null;
-	
-    ImageButton fabButton;
+	MegaContactRequest selectedRequest;
+
 	private ActionMode actionMode;
 	
 	boolean isList = true;
 	
-	SentRequestsFragmentLollipop sentRequestsFragment = this;
+	ReceivedRequestsFragmentLollipop receivedRequestsFragment = this;
 	
 	ArrayList<MegaContactRequest> contacts;
 //	ArrayList<MegaUser> visibleContacts = new ArrayList<MegaUser>();
@@ -69,8 +69,9 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
 	public LinearLayout optionsLayout;
-	public LinearLayout optionReinvite;
-	public LinearLayout optionDelete;
+	public LinearLayout optionAccept;
+	public LinearLayout optionDecline;
+	public LinearLayout optionIgnore;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,13 +81,14 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}	
+		
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-    	log("onCreateView");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {                
+        log("onCreateView");
     	
-    	contacts = megaApi.getOutgoingContactRequests();
+    	contacts = megaApi.getIncomingContactRequests();
     	if(contacts!=null)
     	{
     		log("Number of requests: "+contacts.size());
@@ -102,7 +104,8 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
     	}
     	
     	if (isList){
-	        View v = inflater.inflate(R.layout.contacts_sent_requests_tab, container, false);			
+     
+	        View v = inflater.inflate(R.layout.contacts_received_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
 
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
@@ -113,13 +116,10 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 			listView.setItemAnimator(new DefaultItemAnimator());		        
 	        
 	        emptyImageView = (ImageView) v.findViewById(R.id.empty_image_contacts_requests);
-			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);	
+			emptyTextView = (TextView) v.findViewById(R.id.empty_text_contacts_requests);			
 			
-			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
-			fabButton.setOnClickListener(this);
-
 			if (adapterList == null){
-				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER);
+				adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
 			}
 			else{
 				adapterList.setContacts(contacts);
@@ -129,29 +129,30 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 			listView.setAdapter(adapterList);
 						
 			if (adapterList.getItemCount() == 0){				
-				log("adapterList.getItemCount() == 0");
+				log("adapterList.getCount() == 0");
 				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.sent_requests_empty);
+				emptyTextView.setText(R.string.received_requests_empty);
 				listView.setVisibility(View.GONE);
-
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
-				log("adapterList.getItemCount() NOT = 0");
+				log("adapterList.getCount() NOT = 0");
 				listView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}	
+			}
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_request_list_out_options);
-			optionReinvite = (LinearLayout) v.findViewById(R.id.contact_list_option_reinvite_layout);
-			optionDelete = (LinearLayout) v.findViewById(R.id.contact_list_option_delete_layout);
+			optionAccept = (LinearLayout) v.findViewById(R.id.contact_list_option_accept_layout);
+			optionDecline = (LinearLayout) v.findViewById(R.id.contact_list_option_decline_layout);
+			optionIgnore = (LinearLayout) v.findViewById(R.id.contact_list_option_ignore_layout);
 			
-			optionReinvite.setOnClickListener(this);
-			optionDelete.setOnClickListener(this);
+			optionAccept.setOnClickListener(this);
+			optionDecline.setOnClickListener(this);
+			optionIgnore.setOnClickListener(this);
 			
 			optionsOutLayout.setOnClickListener(this);
 			
@@ -192,20 +193,19 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	        });			
 						
 			return v;
-
     	}
     	else{
 
-    	    View v = inflater.inflate(R.layout.contacts_sent_requests_tab, container, false);
+    	    View v = inflater.inflate(R.layout.contacts_requests_tab, container, false);
     	    return v;
-    	}
-    }
+    	}		
 
+    }
+    
 	public void showOptionsPanel(MegaContactRequest request){		
 		log("showOptionsPanel");	
 		
-		this.selectedRequest = request;
-		fabButton.setVisibility(View.GONE);					
+		this.selectedRequest = request;		
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
 	}
@@ -214,67 +214,46 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 		log("hideOptionsPanel");
 				
 		adapterList.setPositionClicked(-1);
-		fabButton.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
     
-	private static void log(String log) {		
-		Util.log("SentRequestsFragmentLollipop", log);
+	private static void log(String log) {
+		Util.log("ReceivedRequestsFragmentLollipop", log);
 	}
 
-
-//	@Override
-//	public void onItemClick(AdapterView<?> parent, View view, int position,
-//			long id) {
-//		// TODO Auto-generated method stub
-//		
-//	}
-	
-//	public RecyclerView getListView(){
-//		return listView;
-//	}
-//	
-//	public void updateListView(){
-//		log("updateListView");
-//		if(adapterList!=null)
-//		{
-////			adapterList.notifyDataSetInvalidated();
-//			adapterList.notifyDataSetChanged();
-//		}
-//	}
-	
-	public void setContactRequests()
-	{
-		log("setContactRequests");
-		contacts = megaApi.getOutgoingContactRequests();
-    	if(contacts!=null)
-    	{
-    		log("Sent requests: "+contacts.size());
-    		if(adapterList!=null){
-    			log("adapter!=NULL");
-    			adapterList.setContacts(contacts);
-        		adapterList.notifyDataSetChanged();
-    		}
-    		else{
-    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.OUTGOING_REQUEST_ADAPTER);
-    		}
-    		
-    		if (adapterList.getItemCount() == 0){				
-				log("adapterList.getItemCount() == 0");
-				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-				emptyTextView.setText(R.string.sent_requests_empty);
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
+	@Override
+	public void onClick(View v) {
+		log("onClick");
+		switch(v.getId()){
+			case R.id.contact_list_option_accept_layout:{
+				log("option Accept");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).acceptInvitationContact(selectedRequest);			
+				break;
 			}
-			else{
-				log("adapterList.getItemCount() NOT = 0");
-				listView.setVisibility(View.VISIBLE);
-				emptyImageView.setVisibility(View.GONE);
-				emptyTextView.setVisibility(View.GONE);
-			}    		
-		}
+			case R.id.contact_list_option_decline_layout:{
+				log("Remove Invitation");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).declineInvitationContact(selectedRequest);
+				break;
+			}
+			case R.id.contact_list_option_ignore_layout:{
+				log("Ignore Invitation");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).ignoreInvitationContact(selectedRequest);
+				break;
+			}			
+		}			
 	}
 	
 	public void setPositionClicked(int positionClicked){
@@ -302,34 +281,39 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 //			}
 		}
 	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		switch(v.getId()){
-			case R.id.invite_contact_button:{				
-				((ManagerActivityLollipop)context).showNewContactDialog(null);				
-				break;
+	
+	public void setContactRequests()
+	{
+		log("setContactRequests");
+		contacts = megaApi.getIncomingContactRequests();
+    	if(contacts!=null)
+    	{
+    		if(adapterList!=null)
+    		{
+    			adapterList.setContacts(contacts);
+        		adapterList.notifyDataSetChanged();
+    		}
+    		else
+    		{
+    			log("adapter==NULL");
+    			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
+    		} 
+    		
+    		if (adapterList.getItemCount() == 0){				
+				log("adapterList.getCount() == 0");
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.sent_requests_empty);
+				listView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
 			}
-			case R.id.contact_list_option_reinvite_layout:{
-				log("optionReinvite");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).reinviteContact(selectedRequest);				
-				break;
+			else{
+				log("adapterList.getCount() NOT = 0");
+				listView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
 			}
-			case R.id.contact_list_option_delete_layout:{
-				log("Remove Invitation");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
-				((ManagerActivityLollipop) context).removeInvitationContact(selectedRequest);
-				break;
-			}
-		}		
+		}
 	}
 	
 	@Override
