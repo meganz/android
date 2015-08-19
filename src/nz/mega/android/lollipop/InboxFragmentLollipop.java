@@ -3,7 +3,6 @@ package nz.mega.android.lollipop;
 import java.util.ArrayList;
 import java.util.List;
 
-import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaBrowserNewGridAdapter;
@@ -615,7 +614,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				Intent i = new Intent(context, FilePropertiesActivity.class);
+				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 				i.putExtra("handle", selectedNode.getHandle());
 				
 				if (selectedNode.isFolder()) {

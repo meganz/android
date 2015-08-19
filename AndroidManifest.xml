@@ -181,6 +181,14 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar">            
         </activity>
         
+       <activity
+            android:name="nz.mega.android.lollipop.FilePropertiesActivityLollipop"
+            android:label="@string/file_properties_activity"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">            
+        </activity>
+        
         <activity
             android:name="ContactPropertiesMainActivity"
             android:label="@string/contact_properties_activity"

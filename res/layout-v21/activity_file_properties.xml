@@ -1,0 +1,413 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rounded="http://schemas.android.com/apk/res-auto"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".FilePropertiesActivityLollipop" >
+
+    <LinearLayout
+        android:id="@+id/file_properties_icon_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" >
+
+            <ImageView
+                android:id="@+id/file_properties_image"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp" />
+
+            <ImageView
+                android:id="@+id/file_properties_image_link"
+                android:layout_width="wrap_content"
+                android:layout_height="70dp"
+                android:layout_alignBottom="@id/file_properties_image"
+                android:layout_alignLeft="@id/file_properties_image"
+                android:src="@drawable/get_link_circle_white_ic" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Content of the Sliding Panel -->
+
+    <nz.mega.components.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/file_properties_sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoOverlay="true"
+        sothree:umanoPanelHeight="400dp"
+        sothree:umanoParalaxOffset="100dp"
+        sothree:umanoShadowHeight="0dp" >
+
+        <!-- MAIN CONTENT -->
+
+        <FrameLayout
+            android:id="@+id/file_properties_out_options"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:focusable="false"
+                android:focusableInTouchMode="true"
+                android:gravity="center" />
+        </FrameLayout>
+
+        <!-- SLIDING LAYOUT -->
+
+        <LinearLayout
+            android:id="@+id/file_properties_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"
+            android:padding="0dp" >
+
+            <TextView
+                android:id="@+id/file_properties_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:textColor="@color/file_properties_info_menu" />
+
+            <TextView
+                android:id="@+id/file_properties_owner_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="-10dp"
+                android:layout_weight="1"
+                android:textColor="@color/file_properties_info_menu" />
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="#c0c0c0" />
+
+            <LinearLayout
+                android:id="@+id/available_offline_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/file_properties_available_offline_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:layout_weight="5"
+                    android:text="@string/file_properties_available_offline"
+                    android:textColor="@color/file_properties_info_menu"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/file_properties_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:gravity="right"/>
+            </LinearLayout>
+
+            <View
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="#c0c0c0" />
+            
+           	<!-- SHARED LAYOUT -->
+           	
+           	<LinearLayout
+                android:id="@+id/file_properties_shared_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_properties_shared_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/ic_share" />
+
+
+                  <TextView
+                      android:id="@+id/file_properties_shared_label"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:paddingLeft="18dp"
+                      android:paddingTop="7dp"
+                      android:text="@string/file_properties_shared_folder_list_shares"
+                      android:textColor="@color/file_properties_info_menu"
+                      android:textStyle="bold" />
+
+                  <TextView
+                      android:id="@+id/file_properties_shared_info"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"                        
+                      android:paddingLeft="18dp"
+                      android:paddingTop="7dp"
+                      android:textColor="@color/accentColor"
+                      android:gravity="right" />
+                
+
+            </LinearLayout>
+            
+           	 <View
+           	    android:id="@+id/divider_shared_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="2dp"
+                android:background="#c0c0c0" />
+           	
+           	
+           	
+
+            <!-- PERMISSIONS LAYOUT -->
+
+            <LinearLayout
+                android:id="@+id/file_properties_permissions_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_properties_permissions_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left" >
+
+                    <TextView
+                        android:id="@+id/file_properties_permission_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="30dp"
+                        android:paddingTop="7dp"
+                        android:text="@string/file_properties_shared_folder_permissions"
+                        android:textColor="@color/file_properties_info_menu"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/file_properties_permission_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_permission_label"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:textColor="@color/file_properties_info_menu" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- SIZE LAYOUT -->
+
+            <LinearLayout
+                android:id="@+id/file_properties_size_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_properties_size_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left">
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:text="@string/file_properties_info_size_file"
+                        android:textColor="@color/file_properties_info_menu"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_size"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:textColor="@color/file_properties_info_menu" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- CONTENT LAYOUT -->
+
+            <LinearLayout
+                android:id="@+id/file_properties_content_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_properties_content_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left" >
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:text="@string/file_properties_info_content"
+                        android:textColor="@color/file_properties_info_menu"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_content"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:textColor="@color/file_properties_info_menu" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- ADDED LAYOUT -->
+
+            <LinearLayout
+                android:id="@+id/file_properties_added_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_properties_added_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left" >
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_added"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:text="@string/file_properties_info_added"
+                        android:textColor="@color/file_properties_info_menu"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_added"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_added"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:textColor="@color/file_properties_info_menu" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <!-- MODIFIED LAYOUT -->
+
+            <LinearLayout
+                android:id="@+id/file_properties_modified_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/file_properties_modified_image"
+                    style="@style/dialogActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="2dp"
+                    android:paddingTop="2dp"
+                    android:src="@drawable/info_ic" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left" >
+
+                    <TextView
+                        android:id="@+id/file_properties_info_menu_modified"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:text="@string/file_properties_info_modified"
+                        android:textColor="@color/file_properties_info_menu"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/file_properties_info_data_modified"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/file_properties_info_menu_modified"
+                        android:paddingBottom="15dp"
+                        android:paddingLeft="18dp"
+                        android:paddingTop="7dp"
+                        android:textColor="@color/file_properties_info_menu" />
+
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </nz.mega.components.SlidingUpPanelLayout>
+
+</RelativeLayout>
