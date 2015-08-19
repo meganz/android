@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaOffline;
@@ -952,7 +951,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			return;
 		}
 		
-		Intent i = new Intent(context, FilePropertiesActivity.class);
+		Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 		i.putExtra("handle", Long.valueOf(handle));
 		i.putExtra("from", FROM_OFFLINE);
 

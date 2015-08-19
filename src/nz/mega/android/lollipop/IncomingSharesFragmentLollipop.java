@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import nz.mega.android.ContactPropertiesMainActivity;
-import nz.mega.android.FilePropertiesActivity;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaBrowserGridAdapter;
@@ -874,7 +873,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
 				notifyDataSetChanged();
-				Intent i = new Intent(context, FilePropertiesActivity.class);
+				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 				i.putExtra("handle", selectedNode.getHandle());
 				
 				if (selectedNode.isFolder()) {

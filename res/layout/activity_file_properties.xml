@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/file_properties_bottom"
-    tools:context=".FilePropertiesActivity" >
+    tools:context=".FilePropertiesActivityLollipop" >
     
     <LinearLayout 
 	    android:layout_width="match_parent"
