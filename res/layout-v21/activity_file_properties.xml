@@ -7,33 +7,6 @@
     android:background="@color/white"
     tools:context=".FilePropertiesActivityLollipop" >
 
-    <LinearLayout
-        android:id="@+id/file_properties_icon_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal" >
-
-            <ImageView
-                android:id="@+id/file_properties_image"
-                android:layout_width="wrap_content"
-                android:layout_height="200dp" />
-
-            <ImageView
-                android:id="@+id/file_properties_image_link"
-                android:layout_width="wrap_content"
-                android:layout_height="70dp"
-                android:layout_alignBottom="@id/file_properties_image"
-                android:layout_alignLeft="@id/file_properties_image"
-                android:src="@drawable/get_link_circle_white_ic" />
-        </RelativeLayout>
-    </LinearLayout>
-
     <!-- Content of the Sliding Panel -->
 
     <nz.mega.components.SlidingUpPanelLayout
@@ -42,9 +15,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
+        sothree:umanoFadeColor="@android:color/transparent"
         sothree:umanoDragView="@+id/dragView"
-        sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="400dp"
+        sothree:umanoOverlay="false"
+        sothree:umanoPanelHeight="200dp"
         sothree:umanoParalaxOffset="100dp"
         sothree:umanoShadowHeight="0dp" >
 
@@ -57,14 +31,32 @@
             android:clickable="true"
             android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/main"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="?attr/actionBarSize"
-                android:focusable="false"
-                android:focusableInTouchMode="true"
-                android:gravity="center" />
+	    <LinearLayout
+	        android:id="@+id/file_properties_icon_layout"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@color/white"
+	        android:orientation="vertical">
+	
+	        <RelativeLayout
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center_horizontal" >
+	
+	            <ImageView
+	                android:id="@+id/file_properties_image"
+	                android:layout_width="wrap_content"
+	                android:layout_height="200dp" />
+	
+	            <ImageView
+	                android:id="@+id/file_properties_image_link"
+	                android:layout_width="wrap_content"
+	                android:layout_height="70dp"
+	                android:layout_alignBottom="@id/file_properties_image"
+	                android:layout_alignLeft="@id/file_properties_image"
+	                android:src="@drawable/get_link_circle_white_ic" />
+	        </RelativeLayout>
+	    </LinearLayout>
         </FrameLayout>
 
         <!-- SLIDING LAYOUT -->
