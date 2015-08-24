@@ -1,24 +1,36 @@
 <resources>
  
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="AppTheme.Base"/>
- 
-    <style name="AppTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
  
         <!-- colorPrimary is used for the default action bar background -->
-        <item name="colorPrimary">@color/mega</item>
+        <item name="colorPrimary">@color/lollipop_primary_color</item>
  
         <!-- colorPrimaryDark is used for the status bar -->
-        <item name="colorPrimaryDark">@color/pressed_mega</item>
+        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
  
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
-        <item name="colorAccent">@color/accentColor</item>
+        <item name="colorAccent">@color/lollipop_accent_color</item>
  
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
         
+    </style>
+    
+    <style name="login_activity" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:windowNoTitle">true</item>
+        
+        <!-- colorPrimary is used for the default action bar background -->
+        <item name="colorPrimary">@color/lollipop_primary_color</item>
+ 
+        <!-- colorPrimaryDark is used for the status bar -->
+        <item name="colorPrimaryDark">@color/lollipop_dark_primary_color</item>
+ 
+        <!-- colorAccent is used as the default value for colorControlActivated
+             which is used to tint widgets -->
+        <item name="colorAccent">@color/lollipop_accent_color</item>
     </style>
  
 </resources>

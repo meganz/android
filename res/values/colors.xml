@@ -41,6 +41,10 @@
  	<color name="adapters_background">#333333</color>
  	<color name="file_properties_bottom">#292929</color>
  	<color name="file_properties_top">#222222</color>
+ 	
+ 	<color name="lollipop_primary_color">#d90007</color>
+ 	<color name="lollipop_dark_primary_color">#b4070c</color>
+ 	<color name="lollipop_accent_color">#2aa5dd</color>
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
     
