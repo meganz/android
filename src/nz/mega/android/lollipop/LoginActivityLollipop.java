@@ -15,13 +15,13 @@ import nz.mega.android.TourActivity;
 import nz.mega.android.UserCredentials;
 import nz.mega.android.providers.FileProviderActivity;
 import nz.mega.android.utils.Util;
-import nz.mega.components.MySwitch;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -46,6 +46,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -61,11 +62,11 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView loginTitle;
 	EditText et_user;
 	EditText et_password;
-	Button bRegister;
+	TextView bRegister;
 	TextView registerText;
-	Button bLogin;
+	TextView bLogin;
 	ImageView loginThreeDots;
-	MySwitch loginSwitch;
+	Switch loginSwitch;
 	TextView loginABC;
 	LinearLayout loginLogin;
 	LinearLayout loginLoggingIn;
@@ -135,6 +136,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 
 	}
 	
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -161,7 +163,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	    MegaPreferences prefs = dbH.getPreferences();
 		if (prefs == null){
 		    setContentView(R.layout.activity_login);
-		    bRegister = (Button) findViewById(R.id.button_create_account_login);
+		    bRegister = (TextView) findViewById(R.id.button_create_account_login);
 		    bRegister.setOnClickListener(this);
 		    ((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
 		    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
@@ -226,7 +228,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 		});		
 		
-		bLogin = (Button) findViewById(R.id.button_login_login);
+		bLogin = (TextView) findViewById(R.id.button_login_login);
 		
 		bLogin.setOnClickListener(this);
 		
@@ -242,14 +244,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		
 		((TableRow.LayoutParams)loginABC.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((5*scaleH), outMetrics));
 		
-		loginSwitch = (MySwitch) findViewById(R.id.switch_login);
-		loginSwitch.setChecked(true);
+		loginSwitch = (Switch) findViewById(R.id.switch_login);
+		loginSwitch.setChecked(false);
 		
 		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if(isChecked){
+				if(!isChecked){
 						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 						et_password.setSelection(et_password.getText().length());
 				}else{
