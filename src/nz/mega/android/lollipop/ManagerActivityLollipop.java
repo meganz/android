@@ -46,7 +46,6 @@ import nz.mega.android.SettingsActivity;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.SortByDialogActivity;
 import nz.mega.android.TabsAdapter;
-import nz.mega.android.TourActivity;
 import nz.mega.android.TransfersFragment;
 import nz.mega.android.TransfersHolder;
 import nz.mega.android.UpgradeAccountFragment;
@@ -831,7 +830,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		    			openLink = true;
 		    		}
 		    		else if (newIntent.getAction().equals(ACTION_CANCEL_UPLOAD) || newIntent.getAction().equals(ACTION_CANCEL_DOWNLOAD) || newIntent.getAction().equals(ACTION_CANCEL_CAM_SYNC)){
-		    			Intent cancelTourIntent = new Intent(this, TourActivity.class);
+		    			Intent cancelTourIntent = new Intent(this, TourActivityLollipop.class);
 		    			cancelTourIntent.setAction(newIntent.getAction());
 		    			startActivity(cancelTourIntent);
 		    			finish();
@@ -5226,7 +5225,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		
 		if (!confirmAccount){		
 			if(managerActivity != null)	{
-				Intent intent = new Intent(managerActivity, TourActivity.class);
+				Intent intent = new Intent(managerActivity, TourActivityLollipop.class);
 		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				managerActivity.startActivity(intent);
@@ -5234,7 +5233,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 				managerActivity = null;
 			}
 			else{
-//				Intent intent = new Intent (context, TourActivity.class);
+//				Intent intent = new Intent (context, TourActivityLollipop.class);
 //				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 //		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //				context.startActivity(intent);
