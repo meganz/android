@@ -45,7 +45,6 @@
  	
  	<color name="lollipop_primary_color">#d90007</color>
  	<color name="lollipop_dark_primary_color">#b4070c</color>
- 	<color name="lollipop_accent_color">#2aa5dd</color>
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
     
@@ -60,6 +59,7 @@
     <color name="transparent_mega">#80db0605</color>
     
     <color name="accentColor">#00BFA5</color>
+    <color name="textGrey">#6d6f70</color> 
     
     <color name="text_tab_selected">#FFFFFF</color>    
 	<color name="text_tab_unselected">#B9B9B9</color> 

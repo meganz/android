@@ -12,7 +12,7 @@
  
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
-        <item name="colorAccent">@color/lollipop_accent_color</item>
+        <item name="colorAccent">@color/accentColor</item>
         
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     	<item name="android:statusBarColor">@android:color/transparent</item>
@@ -34,11 +34,12 @@
  
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
-        <item name="colorAccent">@color/lollipop_accent_color</item>
+
+        <item name="colorAccent">@color/accentColor</item>
         
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-    	<item name="android:statusBarColor">@android:color/transparent</item>
-    	<item name="android:windowTranslucentStatus">true</item>
+    	<item name="android:statusBarColor">@color/lollipop_dark_primary_color</item>
+    	<item name="android:windowTranslucentStatus">false</item>
     </style>
     
     <style name="NavDrawerAccountInfoText">
