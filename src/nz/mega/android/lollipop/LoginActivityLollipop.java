@@ -29,15 +29,17 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
@@ -46,7 +48,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Switch;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -59,6 +60,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	public static String EXTRA_CONFIRMATION = "MEGA_EXTRA_CONFIRMATION";
 	
 	TextView loginTitle;
+	TextView newToMega;
 	EditText et_user;
 	EditText et_password;
 	TextView bRegister;
@@ -80,8 +82,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
 	ScrollView scrollView;
-	
-	int heightGrey = 0;
+
 	float scaleH, scaleW;
 	float density;
 	DisplayMetrics outMetrics;
@@ -155,6 +156,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
+	    float scaleText;
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
 	    
 //	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 	    DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
@@ -163,20 +171,29 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		if (prefs == null){
 		    setContentView(R.layout.activity_login);
 		    bRegister = (TextView) findViewById(R.id.button_create_account_login);
+		    
+		    bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
+			android.view.ViewGroup.LayoutParams paramsb2 = bRegister.getLayoutParams();		
+			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+			paramsb2.width = Util.scaleWidthPx(144, outMetrics);
+			bRegister.setLayoutParams(paramsb2);
+			//Margin
+			LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
+			textParamsLogin.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, 0); 
+			bRegister.setLayoutParams(textParamsLogin);
+		    
 		    bRegister.setOnClickListener(this);
-		    ((LinearLayout.LayoutParams)bRegister.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-		    heightGrey = (int) (Util.percScreenLogin * outMetrics.heightPixels);
+		    
 		    firstTime = true;
 		}
 		else{
 			setContentView(R.layout.activity_login_returning);
 			registerText = (TextView) findViewById(R.id.login_text_create_account);
 			registerText.setOnClickListener(this);
-			heightGrey = (int) (Util.percScreenLoginReturning * outMetrics.heightPixels);
 			firstTime = false;
 		}	
 
-//		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
+		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
 //		
 //		scrollView.post(new Runnable() { 
 //	        public void run() { 
@@ -185,10 +202,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 //		});		
 				
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
+		//Left margin
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
+		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		loginTitle.setLayoutParams(textParams);
+		
 		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
-		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
-		loginDelimiter = (View) findViewById(R.id.login_delimiter);
 		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
 		loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
 		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
@@ -199,22 +219,21 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		
 		loginTitle.setText(R.string.login_text);
-		loginTitle.setTextSize(28*scaleH);
-		
-		loginLogin.setVisibility(View.VISIBLE);
-		loginCreateAccount.setVisibility(View.VISIBLE);
-		loginDelimiter.setVisibility(View.VISIBLE);
-		loginLoggingIn.setVisibility(View.GONE);
-		generatingKeysText.setVisibility(View.GONE);
-		loggingInText.setVisibility(View.GONE);
-		fetchingNodesText.setVisibility(View.GONE);
-		prepareNodesText.setVisibility(View.GONE);
-		loginProgressBar.setVisibility(View.GONE);
-		queryingSignupLinkText.setVisibility(View.GONE);
-		confirmingAccountText.setVisibility(View.GONE);
+		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
 		et_user = (EditText) findViewById(R.id.login_email_text);
-		et_password = (EditText) findViewById(R.id.login_password_text);
+		android.view.ViewGroup.LayoutParams paramsb1 = et_user.getLayoutParams();		
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);		
+		et_user.setLayoutParams(paramsb1);
+		//Left margin
+		textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
+		et_user.setLayoutParams(textParams);		
+		
+		et_password = (EditText) findViewById(R.id.login_password_text);	
+		et_password.setLayoutParams(paramsb1);
+		et_password.setLayoutParams(textParams);	
+		
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
 			
 			@Override
@@ -225,25 +244,18 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				}
 				return false;
 			}
-		});		
-		
-		bLogin = (TextView) findViewById(R.id.button_login_login);
-		
-		bLogin.setOnClickListener(this);
-		
-		loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, Util.px2dp((40*scaleH), outMetrics));
-		
-		((LinearLayout.LayoutParams)bLogin.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), Util.px2dp((5*scaleH), outMetrics));
-		
+		});			
 		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
-		
-		loginThreeDots.setPadding(0, Util.px2dp((20*scaleH), outMetrics), Util.px2dp((4*scaleW), outMetrics), Util.px2dp((3*scaleH), outMetrics));
+		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
+		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		loginThreeDots.setLayoutParams(textThreeDots);
 		
 		loginABC = (TextView) findViewById(R.id.ABC);
 		
-		((TableRow.LayoutParams)loginABC.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((5*scaleH), outMetrics));
-		
 		loginSwitch = (Switch) findViewById(R.id.switch_login);
+		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitch.getLayoutParams();
+		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		loginSwitch.setLayoutParams(switchParams);
 		loginSwitch.setChecked(false);
 		
 		loginSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -260,8 +272,42 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 		});
 		
-		((TableRow.LayoutParams)loginSwitch.getLayoutParams()).setMargins(Util.px2dp((1*scaleH), outMetrics), Util.px2dp((8*scaleW), outMetrics), Util.px2dp((4*scaleH), outMetrics), 0);
+		bLogin = (TextView) findViewById(R.id.button_login_login);
+		bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb2 = bLogin.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		paramsb2.width = Util.scaleWidthPx(63, outMetrics);
+		bLogin.setLayoutParams(paramsb2);
+		//Margin
+		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
+		textParamsLogin.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
+		bLogin.setLayoutParams(textParamsLogin);
 		
+		bLogin.setOnClickListener(this);
+		
+		loginDelimiter = (View) findViewById(R.id.login_delimiter);
+		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
+		
+	    newToMega = (TextView) findViewById(R.id.text_newToMega);
+		//Margins (left, top, right, bottom)
+		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
+		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics)); 
+		newToMega.setLayoutParams(textnewToMega);	
+		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+		
+		loginLogin.setVisibility(View.VISIBLE);
+		loginCreateAccount.setVisibility(View.VISIBLE);
+		loginDelimiter.setVisibility(View.VISIBLE);
+		loginLoggingIn.setVisibility(View.GONE);
+		generatingKeysText.setVisibility(View.GONE);
+		loggingInText.setVisibility(View.GONE);
+		fetchingNodesText.setVisibility(View.GONE);
+		prepareNodesText.setVisibility(View.GONE);
+		loginProgressBar.setVisibility(View.GONE);
+		queryingSignupLinkText.setVisibility(View.GONE);
+		confirmingAccountText.setVisibility(View.GONE);
+		
+			
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
 			if (ACTION_CONFIRM.equals(intentReceived.getAction())) {
@@ -507,17 +553,17 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-		if (firstTime){
-			int diffHeight = heightGrey - loginCreateAccount.getTop();
-		
-			int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
-			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
-		}
-		else{
-			int diffHeight = heightGrey - loginCreateAccount.getTop();
-			int paddingBottom = Util.px2dp((10*scaleH), outMetrics) + diffHeight;
-			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
-		}
+//		if (firstTime){
+//			int diffHeight = heightGrey - loginCreateAccount.getTop();
+//		
+//			int paddingBottom = Util.px2dp((40*scaleH), outMetrics) + diffHeight;
+//			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
+//		}
+//		else{
+//			int diffHeight = heightGrey - loginCreateAccount.getTop();
+//			int paddingBottom = Util.px2dp((10*scaleH), outMetrics) + diffHeight;
+//			loginLogin.setPadding(0, Util.px2dp((40*scaleH), outMetrics), 0, paddingBottom);
+//		}
 //		Toast.makeText(this, "onWindow: HEIGHT: " + loginCreateAccount.getTop() +"____" + heightGrey, Toast.LENGTH_LONG).show();
 //		int marginBottom = 37; //related to a 533dp height
 //		float dpHeight = outMetrics.heightPixels / density;
@@ -773,7 +819,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
 				
-				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+//				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
 				
 //				DatabaseHandler dbH = new DatabaseHandler(this);
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());

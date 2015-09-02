@@ -1341,8 +1341,6 @@ public class Util {
 	public static int scaleHeightPx(int px, DisplayMetrics metrics){
 		log("scaleHeightPx");
 		int myHeightPx = metrics.heightPixels;
-		log("My screen px, myHeightPx="+myHeightPx);
-		log("RESULT scale px: "+px*myHeightPx/548);
 		
 		return px*myHeightPx/548; //Based on Eduardo's measurements				
 	}

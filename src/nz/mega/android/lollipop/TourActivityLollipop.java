@@ -102,11 +102,10 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 		android.view.ViewGroup.LayoutParams paramsb2 = bLogin.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, metrics);
 		paramsb2.width = Util.scaleWidthPx(63, metrics);
-//		bLogin.setGravity(Gravity.CENTER);
 		bLogin.setLayoutParams(paramsb2);
-		//Right margin
+		//Left and Right margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleHeightPx(6, metrics), 0, Util.scaleHeightPx(8, metrics), 0); 
+		textParamsLogin.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
 		bLogin.setLayoutParams(textParamsLogin);
 		
 		bRegister = (TextView) findViewById(R.id.button_register_tour);
