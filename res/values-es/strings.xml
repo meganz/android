@@ -138,10 +138,10 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activando cuenta</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparando lista de archivos</string>
     
-    <string name="tour_space_title">ESPACIO EN MEGA</string>
-    <string name="tour_speed_title">VELOCIDAD DE MEGA</string>
-    <string name="tour_privacy_title">PRIVACIDAD EN MEGA</string>
-    <string name="tour_access_title">ACCESO A MEGA</string>
+    <string name="tour_space_title">Espacio en Mega</string>
+    <string name="tour_speed_title">Velocidad de Mega</string>
+    <string name="tour_privacy_title">Privacidad en Mega</string>
+    <string name="tour_access_title">Acceso a Mega</string>
     <string name="tour_space_text">Regístrate ahora y consigue 50 GB de espacio gratis</string>
     <string name="tour_speed_text">Subidas rápidas. Compartir ficheros rápidamente con todo el mundo</string>
     <string name="tour_privacy_text">Mantén todos tus ficheros a salvo con el cifrado punto a punto de MEGA</string>

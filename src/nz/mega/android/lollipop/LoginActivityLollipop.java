@@ -11,7 +11,6 @@ import nz.mega.android.MegaPreferences;
 import nz.mega.android.OldPreferences;
 import nz.mega.android.OldUserCredentials;
 import nz.mega.android.R;
-import nz.mega.android.TourActivity;
 import nz.mega.android.UserCredentials;
 import nz.mega.android.providers.FileProviderActivity;
 import nz.mega.android.utils.Util;
@@ -993,7 +992,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			super.onBackPressed();
 		}
 		else{
-			Intent intent = new Intent(this, TourActivity.class);
+			Intent intent = new Intent(this, TourActivityLollipop.class);
 			startActivity(intent);
 			finish();
 		}

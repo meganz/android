@@ -1337,6 +1337,23 @@ public class Util {
 			return false;
 		}
 	}
+	
+	public static int scaleHeightPx(int px, DisplayMetrics metrics){
+		log("scaleHeightPx");
+		int myHeightPx = metrics.heightPixels;
+		log("My screen px, myHeightPx="+myHeightPx);
+		log("RESULT scale px: "+px*myHeightPx/548);
+		
+		return px*myHeightPx/548; //Based on Eduardo's measurements				
+	}
+	
+	public static int scaleWidthPx(int px, DisplayMetrics metrics){
+
+		int myWidthPx = metrics.widthPixels;
+		
+		return px*myWidthPx/360; //Based on Eduardo's measurements		
+		
+	}
 
 	private static void log(String message) {
 		log("Util", message);
