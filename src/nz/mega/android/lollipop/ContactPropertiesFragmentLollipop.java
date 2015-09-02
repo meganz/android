@@ -27,7 +27,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -89,7 +89,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		}
 
 		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
 		aB.setTitle(R.string.contact_properties_activity);
@@ -264,7 +264,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((ActionBarActivity)activity).getSupportActionBar();
+		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}	
 
 	@Override

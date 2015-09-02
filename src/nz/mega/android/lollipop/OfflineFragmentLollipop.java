@@ -32,7 +32,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -126,7 +126,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			if (adapterList.getPositionClicked() == -1){
 				adapterList.setMultipleSelect(true);
 			
-				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());			
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
 		        itemClick(position);
 			}  
@@ -440,7 +440,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				adapterList.selectAll();
 			}
 			else{
-				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 				
 				adapterList.setMultipleSelect(true);
 				adapterList.selectAll();
@@ -494,7 +494,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
@@ -1165,7 +1165,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		log("onAttach");
         super.onAttach(activity);
         context = activity;
-        aB = ((ActionBarActivity)activity).getSupportActionBar();
+        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 	
 	@Override
