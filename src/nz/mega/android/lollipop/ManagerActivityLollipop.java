@@ -309,7 +309,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private boolean isListCameraUpload = false;
 	private boolean isListInbox = true;
     private TransfersFragment tF; 
-    private MyAccountFragment maF;
+
     private SearchFragment sF;
     private CameraUploadFragment psF;
     private UpgradeAccountFragment upAF;
@@ -327,6 +327,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 	private ContactsFragmentLollipop cFLol;
 	private SentRequestsFragmentLollipop sRFLol;
 	private ReceivedRequestsFragmentLollipop rRFLol;
+    private MyAccountFragmentLollipop maFLol;
     //////
     
     TextView textViewBrowser; 
@@ -1413,7 +1414,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     		}
     	}
     	
-    	if (maF != null){
+    	if (maFLol != null){
     		if (drawerItem == DrawerItem.ACCOUNT){
     			visibleFragment = 10;
     		}
@@ -2537,8 +2538,8 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			topControlBar.setBackgroundColor(getResources().getColor(R.color.color_navigation_drawer_selected));
     			
-    			if (maF == null){
-    				maF = new MyAccountFragment();
+    			if (maFLol == null){
+    				maFLol = new MyAccountFragmentLollipop();
     			}
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -2546,7 +2547,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, maF, "maF");
+				ft.replace(R.id.fragment_container, maFLol, "maF");
     			ft.commit();
     			
     			customSearch.setVisibility(View.GONE);
@@ -2759,64 +2760,64 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     		}
     		case CAMERA_UPLOADS:{
     			
-    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
-    			
-    			if (nDALol != null){
-    				nDALol.setPositionClicked(POS_CAMERA_UPLOADS);
-    			}
-    			
-    			if (psF == null){
-    				psF = new CameraUploadFragment();
-    				psF.setIsList(isListCameraUpload);
-   					psF.setFirstTimeCam(firstTimeCam);
-				}
-				else{
-					psF.setIsList(isListCameraUpload);
-					psF.setFirstTimeCam(firstTimeCam);
-				}
-				
-				
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, psF, "psF");
-    			ft.commit();
-    			
-    			
-    			firstTimeCam = false;
-    			
-    			
-				mDrawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			customSearch.setVisibility(View.VISIBLE);
-    			
-    			if (createFolderMenuItem != null){
-	    			createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
-	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-	    			if (isListCameraUpload){	
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-    			}
+//    			topControlBar.setBackgroundColor(getResources().getColor(R.color.navigation_drawer_background));
+//    			
+//    			if (nDALol != null){
+//    				nDALol.setPositionClicked(POS_CAMERA_UPLOADS);
+//    			}
+//    			
+//    			if (psF == null){
+//    				psF = new CameraUploadFragment();
+//    				psF.setIsList(isListCameraUpload);
+//   					psF.setFirstTimeCam(firstTimeCam);
+//				}
+//				else{
+//					psF.setIsList(isListCameraUpload);
+//					psF.setFirstTimeCam(firstTimeCam);
+//				}
+//				
+//				
+//    			mTabHostContacts.setVisibility(View.GONE);    			
+//    			viewPagerContacts.setVisibility(View.GONE); 
+//    			mTabHostShares.setVisibility(View.GONE);    			
+//    			mTabHostShares.setVisibility(View.GONE);
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, psF, "psF");
+//    			ft.commit();
+//    			
+//    			
+//    			firstTimeCam = false;
+//    			
+//    			
+//				mDrawerLayout.closeDrawer(Gravity.LEFT);
+//    			
+//    			customSearch.setVisibility(View.VISIBLE);
+//    			
+//    			if (createFolderMenuItem != null){
+//	    			createFolderMenuItem.setVisible(false);
+//	    			addMenuItem.setVisible(false);
+//	    			sortByMenuItem.setVisible(false);
+//	    			upgradeAccountMenuItem.setVisible(false);
+//	    			selectMenuItem.setVisible(false);
+//	    			unSelectMenuItem.setVisible(false);
+//	    			thumbViewMenuItem.setVisible(true);
+//	    			addMenuItem.setEnabled(false);
+//	    			createFolderMenuItem.setEnabled(false);
+//	    			changePass.setVisible(false); 
+//	    			exportMK.setVisible(false); 
+//	    			removeMK.setVisible(false); 
+//        			settingsMenuItem.setVisible(false);
+//    				refreshMenuItem.setVisible(false);
+//    				helpMenuItem.setVisible(false);
+//	    			if (isListCameraUpload){	
+//	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//					}
+//					else{
+//						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//	    			}
+//	    			rubbishBinMenuItem.setVisible(false);
+//	    			clearRubbishBinMenuitem.setVisible(false);
+//    			}
       			break;
     		}
 			default:{
@@ -2960,7 +2961,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
     		switch(accountFragment){
 
     		case MY_ACCOUNT_FRAGMENT:{
-    			if (maF != null){						
+    			if (maFLol != null){						
     				drawerItem = DrawerItem.CLOUD_DRIVE;
     				selectDrawerItemLollipop(drawerItem);
     				if(nDALol!=null){
@@ -3472,7 +3473,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		}
 		
 		if (drawerItem == DrawerItem.ACCOUNT){
-			if (maF != null){
+			if (maFLol != null){
 					
 				//Show
 				refreshMenuItem.setVisible(true);
@@ -5432,7 +5433,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 				if (numberOfSubscriptions > 0){
 					if (cancelSubscription != null){
 						if (drawerItem == DrawerItem.ACCOUNT){
-							if (maF != null){
+							if (maFLol != null){
 								cancelSubscription.setVisible(true);
 							}
 						}
@@ -8829,7 +8830,7 @@ public class ManagerActivityLollipop extends PinActivity implements OnItemClickL
 		if (numberOfSubscriptions > 0){
 			if (cancelSubscription != null){
 				if (drawerItem == DrawerItem.ACCOUNT){
-					if (maF != null){
+					if (maFLol != null){
 						cancelSubscription.setVisible(true);
 					}
 				}

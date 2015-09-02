@@ -139,10 +139,10 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     
-    <string name="tour_space_title">MEGA SPACE</string>
-    <string name="tour_speed_title">MEGA SPEED</string>
-    <string name="tour_privacy_title">MEGA PRIVACY</string>
-    <string name="tour_access_title">MEGA ACCESS</string>
+    <string name="tour_space_title">Mega Space</string>
+    <string name="tour_speed_title">Mega Speed</string>
+    <string name="tour_privacy_title">Mega Privacy</string>
+    <string name="tour_access_title">Mega Access</string>
     <string name="tour_space_text">Register now and get 50 GB of free space</string>
     <string name="tour_speed_text">Uploads are fast. Quickly share files with everyone</string>
     <string name="tour_privacy_text">Keep all your files safe with MEGA\'s end-to-end encryption</string>

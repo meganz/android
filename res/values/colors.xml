@@ -6,6 +6,7 @@
     <color name="background">#ffffff</color>
     <color name="background_secondary">#eeeeee</color>
     <color name="mega">#db0605</color>
+    <color name="mega_text">#d90007</color>
     <color name="text_login">#333333</color>
     <color name="used_space_ok">#1fa4e7</color>
     <color name="used_space_warning">#ffb800</color>
@@ -52,6 +53,8 @@
      
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="orange">#FFFFBB33</color>
+    <color name="blue">#FF33B5E5</color>
     
     <color name="transparent_black">#80000000</color>
     <color name="transparent_mega">#80db0605</color>
