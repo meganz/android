@@ -1542,56 +1542,56 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
     			break;
     		}
     		case CAMERA_UPLOADS:{
-    			
-    			if (cuF == null){
-    				cuF = new CameraUploadFragment();
-    				cuF.setIsList(isListCameraUploads);
-    				cuF.setFirstTimeCam(firstTimeCam);
-				}
-				else{
-					cuF.setIsList(isListCameraUploads);
-					cuF.setFirstTimeCam(firstTimeCam);
-				}
-				
-				
-    			mTabHostContacts.setVisibility(View.GONE);    			
-    			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
-    			mTabHostShares.setVisibility(View.GONE);
-				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, cuF, "cuF");
-    			ft.commit();
-    			
-    			
-    			firstTimeCam = false;
-    			
-				drawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			if (createFolderMenuItem != null){
-	    			createFolderMenuItem.setVisible(false);
-	    			addMenuItem.setVisible(false);
-	    			sortByMenuItem.setVisible(false);
-	    			upgradeAccountMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(false);
-	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-	    			addMenuItem.setEnabled(false);
-	    			createFolderMenuItem.setEnabled(false);
-	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
-        			settingsMenuItem.setVisible(false);
-    				refreshMenuItem.setVisible(false);
-    				helpMenuItem.setVisible(false);
-	    			if (isListCameraUploads){	
-	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-					}
-					else{
-						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}
-	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
-    			}
+    			//TODO: UNCOMMENT THIS WHEN CAMERA UPLOADS FRAGMENT LOLLIPOP IS READY
+//    			if (cuF == null){
+//    				cuF = new CameraUploadFragment();
+//    				cuF.setIsList(isListCameraUploads);
+//    				cuF.setFirstTimeCam(firstTimeCam);
+//				}
+//				else{
+//					cuF.setIsList(isListCameraUploads);
+//					cuF.setFirstTimeCam(firstTimeCam);
+//				}
+//				
+//				
+//    			mTabHostContacts.setVisibility(View.GONE);    			
+//    			viewPagerContacts.setVisibility(View.GONE); 
+//    			mTabHostShares.setVisibility(View.GONE);    			
+//    			mTabHostShares.setVisibility(View.GONE);
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, cuF, "cuF");
+//    			ft.commit();
+//    			
+//    			
+//    			firstTimeCam = false;
+//    			
+//				drawerLayout.closeDrawer(Gravity.LEFT);
+//    			
+//    			if (createFolderMenuItem != null){
+//	    			createFolderMenuItem.setVisible(false);
+//	    			addMenuItem.setVisible(false);
+//	    			sortByMenuItem.setVisible(false);
+//	    			upgradeAccountMenuItem.setVisible(false);
+//	    			selectMenuItem.setVisible(false);
+//	    			unSelectMenuItem.setVisible(false);
+//	    			thumbViewMenuItem.setVisible(true);
+//	    			addMenuItem.setEnabled(false);
+//	    			createFolderMenuItem.setEnabled(false);
+//	    			changePass.setVisible(false); 
+//	    			exportMK.setVisible(false); 
+//	    			removeMK.setVisible(false); 
+//        			settingsMenuItem.setVisible(false);
+//    				refreshMenuItem.setVisible(false);
+//    				helpMenuItem.setVisible(false);
+//	    			if (isListCameraUploads){	
+//	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+//					}
+//					else{
+//						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+//	    			}
+//	    			rubbishBinMenuItem.setVisible(false);
+//	    			clearRubbishBinMenuitem.setVisible(false);
+//    			}
       			break;
     		}
     		case INBOX:{
