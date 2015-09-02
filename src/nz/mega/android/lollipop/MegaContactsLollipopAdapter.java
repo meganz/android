@@ -7,7 +7,6 @@ import java.util.Locale;
 
 import nz.mega.android.MegaApplication;
 import nz.mega.android.R;
-import nz.mega.android.lollipop.ContactPropertiesActivityLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.components.RoundedImageView;
 import nz.mega.sdk.MegaApiAndroid;

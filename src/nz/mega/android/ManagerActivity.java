@@ -16,15 +16,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import nz.mega.android.FileStorageActivity.Mode;
-import nz.mega.android.lollipop.ContactsExplorerActivityLollipop;
-import nz.mega.android.lollipop.FileBrowserFragmentLollipop;
-import nz.mega.android.lollipop.FileExplorerActivityLollipop;
-import nz.mega.android.lollipop.InboxFragmentLollipop;
-import nz.mega.android.lollipop.IncomingSharesFragmentLollipop;
-import nz.mega.android.lollipop.NavigationDrawerLollipopAdapter;
-import nz.mega.android.lollipop.OfflineFragmentLollipop;
-import nz.mega.android.lollipop.OutgoingSharesFragmentLollipop;
-import nz.mega.android.lollipop.RubbishBinFragmentLollipop;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;

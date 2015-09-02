@@ -1,7 +1,7 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
  
     <!-- Base application theme. -->
-    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.NoActionBar">
         <!-- Customize your theme here. -->
  
         <!-- colorPrimary is used for the default action bar background -->
@@ -13,6 +13,10 @@
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
         <item name="colorAccent">@color/lollipop_accent_color</item>
+        
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    	<item name="android:statusBarColor">@android:color/transparent</item>
+    	<item name="android:windowTranslucentStatus">true</item>
  
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
@@ -31,6 +35,31 @@
         <!-- colorAccent is used as the default value for colorControlActivated
              which is used to tint widgets -->
         <item name="colorAccent">@color/lollipop_accent_color</item>
+        
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    	<item name="android:statusBarColor">@android:color/transparent</item>
+    	<item name="android:windowTranslucentStatus">true</item>
+    </style>
+    
+    <style name="NavDrawerAccountInfoText">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#b9b9b9</item>
+    </style>
+    
+    <style name="NavDrawerAccountUsedSpaceText">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#9e9e9e</item>
+        <item name="android:padding">10dp</item>
     </style>
  
+    <style name="UsedSpaceProgressBar" parent="android:Widget.Material.Light.ProgressBar.Horizontal">
+		 <item name="android:indeterminateOnly">false</item>
+         <item name="android:minHeight">8dp</item>
+         <item name="android:maxHeight">8dp</item>
+	</style>
+    
 </resources>
