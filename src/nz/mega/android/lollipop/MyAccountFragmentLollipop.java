@@ -27,7 +27,7 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.format.Time;
@@ -123,7 +123,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 
 		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
 		aB.setTitle(R.string.section_account);
@@ -311,7 +311,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((ActionBarActivity)activity).getSupportActionBar();
+		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}	
 
 	@Override
