@@ -101,7 +101,16 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="stateHidden"
             android:screenOrientation="portrait" >
-        </activity>             
+        </activity>  
+        
+        <activity
+            android:name="nz.mega.android.lollipop.CreateAccountActivityLollipop"
+            android:label="@string/create_account_text"
+            android:theme="@style/login_activity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" >
+        </activity> 
         
         <activity
             android:name="LauncherActivity"

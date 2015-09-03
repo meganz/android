@@ -4,7 +4,6 @@ import java.util.Locale;
 
 import nz.mega.android.CameraSyncService;
 import nz.mega.android.ChooseAccountActivity;
-import nz.mega.android.CreateAccountActivity;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaPreferences;
@@ -163,60 +162,21 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	    else{
 	    	scaleText = scaleW;
 	    }
-	    
-//	    DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
+
 	    DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 	    
 	    MegaPreferences prefs = dbH.getPreferences();
-		if (prefs == null){
-		    setContentView(R.layout.activity_login);
-		    bRegister = (TextView) findViewById(R.id.button_create_account_login);
-		    
-		    bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
-			android.view.ViewGroup.LayoutParams paramsb2 = bRegister.getLayoutParams();		
-			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-			paramsb2.width = Util.scaleWidthPx(144, outMetrics);
-			bRegister.setLayoutParams(paramsb2);
-			//Margin
-			LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
-			textParamsLogin.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, 0); 
-			bRegister.setLayoutParams(textParamsLogin);
-		    
-		    bRegister.setOnClickListener(this);
-		    
-		    firstTime = true;
-		}
-		else{
-			setContentView(R.layout.activity_login_returning);
-			registerText = (TextView) findViewById(R.id.login_text_create_account);
-			registerText.setOnClickListener(this);
-			firstTime = false;
-		}	
+
+	    setContentView(R.layout.activity_login);	    
+	    firstTime = true;
 
 		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
-//		
-//		scrollView.post(new Runnable() { 
-//	        public void run() { 
-//	        	scrollView.fullScroll(scrollView.FOCUS_DOWN);
-//	        } 
-//		});		
 				
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
 		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		loginTitle.setLayoutParams(textParams);
-		
-		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
-		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
-		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
-		loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
-		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
-		queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
-		confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
-		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
-		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
-		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
 		
 		loginTitle.setText(R.string.login_text);
 		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
@@ -274,13 +234,13 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		
 		bLogin = (TextView) findViewById(R.id.button_login_login);
 		bLogin.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb2 = bLogin.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		paramsb2.width = Util.scaleWidthPx(63, outMetrics);
-		bLogin.setLayoutParams(paramsb2);
+		android.view.ViewGroup.LayoutParams paramsbLogin = bLogin.getLayoutParams();		
+		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
+		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
+		bLogin.setLayoutParams(paramsbLogin);
 		//Margin
 		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLogin.getLayoutParams();
-		textParamsLogin.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
+		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
 		bLogin.setLayoutParams(textParamsLogin);
 		
 		bLogin.setOnClickListener(this);
@@ -295,6 +255,31 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		newToMega.setLayoutParams(textnewToMega);	
 		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
 		
+	    bRegister = (TextView) findViewById(R.id.button_create_account_login);
+	    
+	    bRegister.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb2 = bRegister.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
+		bRegister.setLayoutParams(paramsb2);
+		//Margin
+		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegister.getLayoutParams();
+		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
+		bRegister.setLayoutParams(textParamsRegister);
+	    
+	    bRegister.setOnClickListener(this);
+		
+		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
+		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
+		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
+		loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
+		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
+		queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
+		confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
+		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
+		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
+		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
+		
 		loginLogin.setVisibility(View.VISIBLE);
 		loginCreateAccount.setVisibility(View.VISIBLE);
 		loginDelimiter.setVisibility(View.VISIBLE);
@@ -305,8 +290,19 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		prepareNodesText.setVisibility(View.GONE);
 		loginProgressBar.setVisibility(View.GONE);
 		queryingSignupLinkText.setVisibility(View.GONE);
-		confirmingAccountText.setVisibility(View.GONE);
+		confirmingAccountText.setVisibility(View.GONE);		
 		
+//		loginLogin.setVisibility(View.GONE);
+//		loginCreateAccount.setVisibility(View.GONE);
+//		loginDelimiter.setVisibility(View.GONE);
+//		loginLoggingIn.setVisibility(View.VISIBLE);
+//		generatingKeysText.setVisibility(View.VISIBLE);
+//		loggingInText.setVisibility(View.VISIBLE);
+//		fetchingNodesText.setVisibility(View.VISIBLE);
+//		prepareNodesText.setVisibility(View.VISIBLE);
+//		loginProgressBar.setVisibility(View.VISIBLE);
+//		queryingSignupLinkText.setVisibility(View.VISIBLE);
+//		confirmingAccountText.setVisibility(View.VISIBLE);
 			
 		Intent intentReceived = getIntent();
 		if (intentReceived != null){
@@ -316,7 +312,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 			else if (ACTION_CREATE_ACCOUNT_EXISTS.equals(intentReceived.getAction())){
 				String message = getString(R.string.error_email_registered);
-				Util.showErrorAlertDialog(message, false, LoginActivityLollipop.this);
+				Snackbar.make(scrollView,message,Snackbar.LENGTH_LONG).show();
 				return;
 			}
 		}
@@ -591,7 +587,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	}
 	
 	public void onRegisterClick(View v){
-		Intent intent = new Intent(this, CreateAccountActivity.class);
+		Intent intent = new Intent(this, CreateAccountActivityLollipop.class);
 		startActivity(intent);
 		finish();
 	}
@@ -628,8 +624,8 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			loggingInText.setVisibility(View.GONE);
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
-			
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),false, this);
+
+			Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -662,7 +658,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		} 
 		else{
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), true, this);
+				Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();				
 				return;
 			}
 			
@@ -697,7 +693,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
 			
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -818,8 +814,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				loggingInText.setVisibility(View.GONE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
-				
-//				Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+
 				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
 				
 //				DatabaseHandler dbH = new DatabaseHandler(this);
@@ -891,7 +886,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					queryingSignupLinkText.setVisibility(View.GONE);
 					confirmingAccountText.setVisibility(View.GONE);
 					
-					Util.showErrorAlertDialog(errorMessage, false, loginActivity);
+					Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();
 				}
 				else{
 					if (!backWhileLogin){
@@ -995,7 +990,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				et_password.requestFocus();
 			}
 			else{
-				Util.showErrorAlertDialog(error.getErrorString(), true, LoginActivityLollipop.this);
+				Snackbar.make(scrollView,error.getErrorString(),Snackbar.LENGTH_LONG).show();
 				confirmLink = null;
 			}
 		}
@@ -1016,10 +1011,10 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				prepareNodesText.setVisibility(View.GONE);
 				
 				if (error.getErrorCode() == MegaError.API_ENOENT){
-					Util.showErrorAlertDialog(getString(R.string.error_incorrect_email_or_password), false, LoginActivityLollipop.this);
+					Snackbar.make(scrollView,getString(R.string.error_incorrect_email_or_password),Snackbar.LENGTH_LONG).show();
 				}
 				else{
-					Util.showErrorAlertDialog(error.getErrorString(), false, LoginActivityLollipop.this);
+					Snackbar.make(scrollView,error.getErrorString(),Snackbar.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -1071,7 +1066,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	 */
 	private void updateConfirmEmail(String link) {
 		if(!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), true, this);
+			Snackbar.make(scrollView,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
