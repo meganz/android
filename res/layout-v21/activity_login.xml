@@ -67,27 +67,26 @@
                     android:id="@+id/switch_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"/>
+                    android:layout_gravity="center_vertical" />
 
                 <TextView
                     android:id="@+id/ABC"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:textColor="@color/textGrey"
                     android:text="@string/abc"
+                    android:textColor="@color/textGrey"
                     android:textSize="16sp" />
-
             </LinearLayout>
-            
+
             <TextView
-                    android:id="@+id/button_login_login"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="left"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/accentColor"
-                    android:textSize="14sp"/>
+                android:id="@+id/button_login_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/accentColor"
+                android:textSize="14sp" />
 
             <include
                 android:id="@+id/login_delimiter"
@@ -109,89 +108,88 @@
                     android:text="@string/new_to_mega"
                     android:textColor="@color/text_login"
                     android:textSize="14sp" />
-               
+
                 <TextView
                     android:id="@+id/button_create_account_login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/accentColor"
-                    android:textSize="14sp"/>
-                
+                    android:textSize="14sp" />
             </LinearLayout>
+        </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/login_logging_in_layout"
+        <LinearLayout
+            android:id="@+id/login_logging_in_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/login_mega_logo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/logo_loading_ic" />
+
+            <TextView
+                android:id="@+id/login_query_signup_link_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/login_querying_signup_link" />
+
+            <TextView
+                android:id="@+id/login_generating_keys_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="@string/login_generating_key" />
+
+            <TextView
+                android:id="@+id/login_confirm_account_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/login_confirming_account" />
+
+            <TextView
+                android:id="@+id/login_logging_in_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/login_connecting_to_server" />
+
+            <TextView
+                android:id="@+id/login_fetch_nodes_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/download_updating_filelist" />
+
+            <TextView
+                android:id="@+id/login_prepare_nodes_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/login_preparing_filelist" />
+
+            <ProgressBar
+                android:id="@+id/login_fetching_nodes_bar"
+                style="@style/MEGAProgressBarLogin"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical" >
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp" />
 
-                <ImageView
-                    android:id="@+id/login_mega_logo"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:layout_marginTop="20dp"
-                    android:src="@drawable/logo_loading_ic" />
-
-                <TextView
-                    android:id="@+id/login_query_signup_link_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:text="@string/login_querying_signup_link" />
-
-                <TextView
-                    android:id="@+id/login_generating_keys_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:text="@string/login_generating_key" />
-
-                <TextView
-                    android:id="@+id/login_confirm_account_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/login_confirming_account" />
-
-                <TextView
-                    android:id="@+id/login_logging_in_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/login_connecting_to_server" />
-
-                <TextView
-                    android:id="@+id/login_fetch_nodes_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/download_updating_filelist" />
-
-                <TextView
-                    android:id="@+id/login_prepare_nodes_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/login_preparing_filelist" />
-
-                <ProgressBar
-                    android:id="@+id/login_fetching_nodes_bar"
-                    style="@style/MEGAProgressBarLogin"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="10dp" />
-
-                <ProgressBar
-                    android:id="@+id/login_progress_bar"
-                    style="?android:attr/progressBarStyleLargeInverse"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="10dp" />
-            </LinearLayout>
+            <ProgressBar
+                android:id="@+id/login_progress_bar"
+                style="?android:attr/progressBarStyleLargeInverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp" />
         </LinearLayout>
     </LinearLayout>
 

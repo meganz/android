@@ -3,7 +3,6 @@ package nz.mega.android.lollipop;
 import java.util.Locale;
 
 import nz.mega.android.CameraSyncService;
-import nz.mega.android.CreateAccountActivity;
 import nz.mega.android.DownloadService;
 import nz.mega.android.R;
 import nz.mega.android.TourImageAdapter;
@@ -294,7 +293,7 @@ public class TourActivityLollipop extends Activity implements OnClickListener {
 	}
 
 	public void onRegisterClick(View v){
-		Intent intent = new Intent(this, CreateAccountActivity.class);
+		Intent intent = new Intent(this, CreateAccountActivityLollipop.class);
 		startActivity(intent);
 		finish();
 	}
