@@ -96,32 +96,32 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	private ActionMode actionMode;
 	
 	//OPTIONS PANEL
-		private SlidingUpPanelLayout slidingOptionsPanel;
-		public FrameLayout optionsOutLayout;
-		public LinearLayout optionsLayout;
-		public LinearLayout optionProperties;
-		public LinearLayout optionRemoveTotal;
-		public LinearLayout optionMoveTo;
-		public TextView propertiesText;
+	private SlidingUpPanelLayout slidingOptionsPanel;
+	public FrameLayout optionsOutLayout;
+	public LinearLayout optionsLayout;
+	public LinearLayout optionProperties;
+	public LinearLayout optionRemoveTotal;
+	public LinearLayout optionMoveTo;
+	public TextView propertiesText;
 	////
 		
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-		    public void onLongPress(MotionEvent e) {
-		        View view = listView.findChildViewUnder(e.getX(), e.getY());
-		        int position = listView.getChildPosition(view);
+		public void onLongPress(MotionEvent e) {
+			View view = listView.findChildViewUnder(e.getX(), e.getY());
+			int position = listView.getChildPosition(view);
 
-		        // handle long press
-				if (adapterList.getPositionClicked() == -1){
-					adapterList.setMultipleSelect(true);
-				
-					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
+			// handle long press
+			if (adapterList.getPositionClicked() == -1){
+				adapterList.setMultipleSelect(true);
 
-			        itemClick(position);
-				}  
-		        super.onLongPress(e);
-		    }
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
+
+				itemClick(position);
+			}  
+			super.onLongPress(e);
 		}
+	}
 	
 	private class ActionBarCallBack implements ActionMode.Callback {
 

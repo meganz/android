@@ -26,8 +26,8 @@ import nz.mega.android.MegaTransfersAdapter.ViewHolderTransfer;
 import nz.mega.android.NavigationDrawerAdapter.ViewHolderNavigationDrawer;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
-import nz.mega.android.providers.MegaProviderAdapter;
-import nz.mega.android.providers.MegaProviderAdapter.ViewHolderProvider;
+import nz.mega.android.lollipop.providers.MegaProviderLollipopAdapter;
+import nz.mega.android.lollipop.providers.MegaProviderLollipopAdapter.ViewHolderLollipopProvider;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -494,10 +494,10 @@ public class ThumbnailUtilsLollipop {
 	
 	static class ThumbnailDownloadListenerProvider implements MegaRequestListenerInterface{
 		Context context;
-		ViewHolderProvider holder;
-		MegaProviderAdapter adapter;
+		ViewHolderLollipopProvider holder;
+		MegaProviderLollipopAdapter adapter;
 		
-		ThumbnailDownloadListenerProvider(Context context, ViewHolderProvider holder, MegaProviderAdapter adapter){
+		ThumbnailDownloadListenerProvider(Context context, ViewHolderLollipopProvider holder, MegaProviderLollipopAdapter adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -839,7 +839,7 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 	
-	public static Bitmap getThumbnailFromMegaProvider(MegaNode document, Context context, ViewHolderProvider viewHolder, MegaApiAndroid megaApi, MegaProviderAdapter adapter){
+	public static Bitmap getThumbnailFromMegaProvider(MegaNode document, Context context, ViewHolderLollipopProvider viewHolder, MegaApiAndroid megaApi, MegaProviderLollipopAdapter adapter){
 		
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");
@@ -999,10 +999,10 @@ public class ThumbnailUtilsLollipop {
 		MegaApiAndroid megaApi;
 		File thumbFile;
 		ResizerParams param;
-		ViewHolderProvider holder;
-		MegaProviderAdapter adapter;
+		ViewHolderLollipopProvider holder;
+		MegaProviderLollipopAdapter adapter;
 		
-		AttachThumbnailTaskProviderLollipop(Context context, MegaApiAndroid megaApi, ViewHolderProvider holder, MegaProviderAdapter adapter)
+		AttachThumbnailTaskProviderLollipop(Context context, MegaApiAndroid megaApi, ViewHolderLollipopProvider holder, MegaProviderLollipopAdapter adapter)
 		{
 			this.context = context;
 			this.megaApi = megaApi;
@@ -1356,7 +1356,7 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 	
-	public static void createThumbnailProviderLollipop(Context context, MegaNode document, ViewHolderProvider holder, MegaApiAndroid megaApi, MegaProviderAdapter adapter){
+	public static void createThumbnailProviderLollipop(Context context, MegaNode document, ViewHolderLollipopProvider holder, MegaApiAndroid megaApi, MegaProviderLollipopAdapter adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");

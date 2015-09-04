@@ -14,6 +14,8 @@ import nz.mega.android.PinActivity;
 import nz.mega.android.R;
 import nz.mega.android.TabsAdapter;
 import nz.mega.android.UserCredentials;
+import nz.mega.android.lollipop.providers.CloudDriveProviderFragmentLollipop;
+import nz.mega.android.lollipop.providers.IncomingSharesProviderFragmentLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.components.MySwitch;
 import nz.mega.sdk.MegaApiAndroid;
@@ -30,21 +32,31 @@ import nz.mega.sdk.MegaUser;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.v4.content.FileProvider;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -67,7 +79,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class FileProviderActivity extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
+public class FileProviderActivity extends AppCompatActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface, MegaTransferListenerInterface{
 	
 //	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 //	
@@ -99,6 +111,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	private String gPublicKey;
 	private String gPrivateKey;
 	UserCredentials credentials;
+	
+	private MenuItem searchMenuItem;
+	
+    Toolbar tB;
+    ActionBar aB;
 	
 	LinearLayout loginLogin;
 	View loginDelimiter;
@@ -146,8 +163,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	
 	private int tabShown = CLOUD_TAB;
 	
-	private CloudDriveProviderFragment cDriveExplorer;
+	private CloudDriveProviderFragment cDriveProvider;
 	private IncomingSharesProviderFragment iSharesProvider;
+	
+	private CloudDriveProviderFragmentLollipop cDriveProviderLol;
+	private IncomingSharesProviderFragmentLollipop iSharesProviderLol;
 
 	ProgressDialog statusDialog;
 	
@@ -173,8 +193,11 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		log("onCreate first");
+	
+		requestWindowFeature(Window.FEATURE_NO_TITLE);	
+
 		super.onCreate(savedInstanceState);
-		
+			
 		display = getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -187,9 +210,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
-		}
-		
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		}		
 		
 		try{
 			app = (MegaApplication) getApplication();
@@ -299,7 +320,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 				log("megaApi.getRootNode() == null");
 				lastEmail = credentials.getEmail();
 				gSession = credentials.getSession();
-				
+
 				loginTitle = (TextView) findViewById(R.id.login_text_view);
 				loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 				loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
@@ -313,10 +334,10 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 				loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 				fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 				prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
-				
+
 				loginTitle.setText(R.string.login_text);
 				loginTitle.setTextSize(28*scaleH);
-				
+
 				loginLogin.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.VISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
@@ -328,7 +349,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 				loginProgressBar.setVisibility(View.GONE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
-				
+
 				log("session: " + gSession);
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
@@ -336,184 +357,196 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
-//				generatingKeysText.setVisibility(View.VISIBLE);
+				//				generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
 				megaApi.fastLogin(gSession, this);
-				
-				
-//				Intent loginIntent = new Intent(this, LoginActivity.class);
-//				loginIntent.setAction(ManagerActivity.ACTION_FILE_PROVIDER);
-//				if (intent != null){
-//					if(intent.getExtras() != null)
-//					{
-//						loginIntent.putExtras(intent.getExtras());
-//					}
-//					
-//					if(intent.getData() != null)
-//					{
-//						loginIntent.setData(intent.getData());
-//					}
-//				}
-//				startActivity(loginIntent);
-//				finish();
-//				return;
+
 			}
 			else{
 				setContentView(R.layout.activity_file_explorer);
 				log("megaApi.getRootNode() NOT null");
-			
-		
-			handler = new Handler();		
-			/*	
-			if ((intent != null) && (intent.getAction() != null)){
-				if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
-					mode = MOVE;
-					moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
-					
-					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
-					for (long n : moveFromHandles){
-						list.add(n);
+
+				handler = new Handler();		
+
+				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+				mTabHostProvider.setup();
+				viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+
+				//Create tabs
+				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
+
+				mTabHostProvider.setVisibility(View.VISIBLE);    			
+
+				if (mTabsAdapterProvider == null){
+					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+
+					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
+					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+					//tabSpec.setContent(contentID);
+					//mTabHostContacts.addTab(tabSpec);
+					TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
+					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+
+					if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {						
+
+						//Set toolbar
+						tB = (Toolbar) findViewById(R.id.toolbar_provider);
+						setSupportActionBar(tB);
+						aB = getSupportActionBar();
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						aB.setDisplayHomeAsUpEnabled(true);
+						aB.setDisplayShowHomeEnabled(true);
+
+						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
+						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
+
+						mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+							@Override
+							public void onTabChanged(String tabId) {
+								log("TabId :"+ tabId);
+								if(tabId.equals("cloudProviderFragment")){                     	
+
+									tabShown=CLOUD_TAB;
+									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+									cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+									if(cDriveProviderLol!=null){
+										if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
+											aB.setTitle(getString(R.string.section_cloud_drive));											
+											changeBackVisibility(false);
+										}
+										else{
+											aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());											
+											changeBackVisibility(true);
+										}    					
+									}	
+								}
+								else if(tabId.equals("incomingProviderFragment")){                     	
+
+									tabShown=INCOMING_TAB;
+
+									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+									iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+									if(iSharesProviderLol!=null){
+										if(iSharesProviderLol.getDeepBrowserTree()==0){
+											aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+											changeBackVisibility(false);
+										}
+										else{
+											aB.setTitle(iSharesProvider.name);
+//											changeTitle(iSharesProvider.name);
+											changeBackVisibility(true);
+										}    					
+									}        			                      	
+								}
+							}
+						});
 					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if(cDriveExplorer!=null){
-						cDriveExplorer.setDisableNodes(list);
-					}				
-				}					
-				else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
-					mode = COPY;
-					copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
-					
-					ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
-					for (long n : copyFromHandles){
-						list.add(n);
-					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if(cDriveExplorer!=null){
-						cDriveExplorer.setDisableNodes(list);
-					}
+					else{
+						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
+						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
+
+						mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+							@Override
+							public void onTabChanged(String tabId) {
+								log("TabId :"+ tabId);
+								if(tabId.equals("cloudProviderFragment")){                     	
+
+									tabShown=CLOUD_TAB;
+									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+									cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+									if(cDriveProvider!=null){
+										if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
+											aB.setTitle(getString(R.string.section_cloud_drive));
+											changeBackVisibility(false);
+										}
+										else{
+											aB.setTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
+											changeBackVisibility(true);
+										}    					
+									}	
+								}
+								else if(tabId.equals("incomingProviderFragment")){                     	
+
+									tabShown=INCOMING_TAB;
+
+									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+									iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+									if(iSharesProvider!=null){
+										if(iSharesProvider.getDeepBrowserTree()==0){
+											aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+											changeBackVisibility(false);
+										}
+										else{
+											aB.setTitle(iSharesProvider.name);
+											changeBackVisibility(true);
+										}    					
+									}        			                      	
+								}
+							}
+						});
+					}	
 				}
-				else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
-					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
-					mode = SELECT_CAMERA_FOLDER;
-				}	
-				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
-					mode = IMPORT;
+
+				for (int i=0;i<mTabsAdapterProvider.getCount();i++){
+					final int index = i;
+					mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							viewPagerProvider.setCurrentItem(index);							
+						}
+					});
 				}
-				else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
-					mode = SELECT;
-					selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
-					
-				}
-				else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
-					mode = UPLOAD_SELFIE;
-					imagePath=intent.getStringExtra("IMAGE_PATH");
-				}
-			}*/
 			
-			mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
-			mTabHostProvider.setup();
-	        viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
-	        
-	        //Create tabs
-	        mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
-			
-	        mTabHostProvider.setVisibility(View.VISIBLE);    			
-			
-			
-			if (mTabsAdapterProvider == null){
-				mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
-				
-				TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-				tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
-		        //tabSpec.setContent(contentID);
-		        //mTabHostContacts.addTab(tabSpec);
-		        TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-		        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
-		                	          				
-				mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-				mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
-				
-			}
-			
-			mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
-	            @Override
-	            public void onTabChanged(String tabId) {
-	            	log("TabId :"+ tabId);
-	                if(tabId.equals("cloudProviderFragment")){                     	
-	
-	     				tabShown=CLOUD_TAB;
-	    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-	    				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-	    				cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	
-	    				if(cDriveExplorer!=null){
-	    					if(cDriveExplorer.getParentHandle()==-1|| cDriveExplorer.getParentHandle()==megaApi.getRootNode().getHandle()){
-	    						changeTitle(getString(R.string.section_cloud_drive));
-	    						changeBackVisibility(false);
-	    					}
-	    					else{
-	    						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
-	    						changeBackVisibility(true);
-	    					}    					
-	    				}	
-	                }
-	                else if(tabId.equals("incomingProviderFragment")){                     	
-	
-	            		tabShown=INCOMING_TAB;
-	            		
-	            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-	            		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-	    				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	    		
-	    				if(iSharesProvider!=null){
-	    					if(iSharesProvider.getDeepBrowserTree()==0){
-	    						changeTitle(getString(R.string.title_incoming_shares_explorer));
-	    						changeBackVisibility(false);
-	    					}
-	    					else{
-	    						changeTitle(iSharesProvider.name);
-	    						changeBackVisibility(true);
-	    					}    					
-	    				}        			                      	
-	                }
-	             }
-			});
-			
-			for (int i=0;i<mTabsAdapterProvider.getCount();i++){
-				final int index = i;
-				mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						viewPagerProvider.setCurrentItem(index);							
-					}
-				});
-			}
-			
-			newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
-			newFolderButton.setVisibility(View.GONE);
-	//		newFolderButton.setOnClickListener(this);
-			
-			windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-			actionBarTitle = getString(R.string.section_cloud_drive);
-			windowTitle.setText(actionBarTitle);
-			
-			windowBack = (ImageView) findViewById(R.id.file_explorer_back);
-			windowBack.setOnClickListener(this);
-			windowTitle.setOnClickListener(this);	
-			
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+				newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
+				newFolderButton.setVisibility(View.GONE);
+				//		newFolderButton.setOnClickListener(this);
+
+				windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
+				actionBarTitle = getString(R.string.section_cloud_drive);
+				windowTitle.setText(actionBarTitle);
+
+				windowBack = (ImageView) findViewById(R.id.file_explorer_back);
+				windowBack.setOnClickListener(this);
+				windowTitle.setOnClickListener(this);	
+
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}			
 		}	
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+		
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.activity_fileprovider, menu);
+	    getSupportActionBar().setDisplayShowCustomEnabled(true);
+	    
+	    final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		searchMenuItem = menu.findItem(R.id.action_search);
+		final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+		
+		if (searchView != null){
+			searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+			searchView.setIconifiedByDefault(true);
+		}
+		
+		return super.onCreateOptionsMenu(menu);
 	}
 	
 	private View getTabIndicator(Context context, String title) {
@@ -525,9 +558,7 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
     }
 	
 	public void changeTitle (String title){
-		if (windowTitle != null){
-			windowTitle.setText(title);
-		}
+		aB.setTitle(title);
 	}
 	
 	public void changeBackVisibility(boolean backVisible){
@@ -657,15 +688,53 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	
 	@Override
 	public void onBackPressed() {
-		log("onBackPressed: "+tabShown);		
+		log("onBackPressed: "+tabShown);
 		
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
+			onBackPressedLollipop();
+		}
+		else{
+		
+			if(tabShown==CLOUD_TAB){
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+		
+				if(cDriveProvider!=null){
+					if (cDriveProvider.onBackPressed() == 0){
+						super.onBackPressed();
+						return;
+					}
+				}
+			}
+			else if(tabShown==INCOMING_TAB){
+				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+			
+				if(iSharesProvider!=null){
+					if (iSharesProvider.onBackPressed() == 0){
+						super.onBackPressed();
+						return;
+					}
+				}
+			}
+			else{
+				super.onBackPressed();
+			}
+		}
+	}
+	
+	public void onBackPressedLollipop() {
+		log("onBackPressedLollipop: "+tabShown);
+
 		if(tabShown==CLOUD_TAB){
 			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
 			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-			cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+			cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 	
-			if(cDriveExplorer!=null){
-				if (cDriveExplorer.onBackPressed() == 0){
+			if(cDriveProviderLol!=null){
+				if (cDriveProviderLol.onBackPressed() == 0){
 					super.onBackPressed();
 					return;
 				}
@@ -674,10 +743,10 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 		else if(tabShown==INCOMING_TAB){
 			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
 			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-			iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+			iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		
-			if(iSharesProvider!=null){
-				if (iSharesProvider.onBackPressed() == 0){
+			if(iSharesProviderLol!=null){
+				if (iSharesProviderLol.onBackPressed() == 0){
 					super.onBackPressed();
 					return;
 				}
@@ -687,51 +756,6 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 			super.onBackPressed();
 		}
 	}
-	
-	public void onIntentProcessed() {
-//		List<ShareInfo> infos = filePreparedInfos;
-//		
-//		if (statusDialog != null) {
-//			try { 
-//				statusDialog.dismiss(); 
-//			} 
-//			catch(Exception ex){}
-//		}
-//		
-//		log("intent processed!");
-//		if (folderSelected) {
-//			if (infos == null) {
-//				Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
-//						true, this);
-//				return;
-//			}
-//			else {
-//				long parentHandle;
-//				if (cDriveExplorer != null){
-//					parentHandle = cDriveExplorer.getParentHandle();
-//				}
-//				else{
-//					parentHandle = gParentHandle;
-//				}
-//				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-//				if(parentNode == null){
-//					parentNode = megaApi.getRootNode();
-//				}
-//				Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
-//						Toast.LENGTH_SHORT).show();
-//				for (ShareInfo info : infos) {
-//					Intent intent = new Intent(this, UploadService.class);
-//					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
-//					intent.putExtra(UploadService.EXTRA_NAME, info.getTitle());
-//					intent.putExtra(UploadService.EXTRA_PARENT_HASH, parentNode.getHandle());
-//					intent.putExtra(UploadService.EXTRA_SIZE, info.getSize());
-//					startService(intent);
-//				}
-//				filePreparedInfos = null;
-//				finish();
-//			}	
-//		}
-	}	
 
 	@Override
 	public void onClick(View v) {
@@ -1006,156 +1030,169 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 				prepareNodesText.setVisibility(View.GONE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
-				
+
 				Util.showErrorAlertDialog(errorMessage, false, this);
 			}
 			else{
 				setContentView(R.layout.activity_file_explorer);
 				log("megaApi.getRootNode() NOT null");
-			
-		
-			handler = new Handler();		
-			/*	
-			if ((intent != null) && (intent.getAction() != null)){
-				if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
-					mode = MOVE;
-					moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
-					
-					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
-					for (long n : moveFromHandles){
-						list.add(n);
+
+				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+				mTabHostProvider.setup();
+				viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+
+				//Create tabs
+				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
+
+				mTabHostProvider.setVisibility(View.VISIBLE);    			
+
+				if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
+					//Lollipop Version
+					if (mTabsAdapterProvider == null){
+						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+
+						TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
+						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+						//tabSpec.setContent(contentID);
+						//mTabHostContacts.addTab(tabSpec);
+						TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
+						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+
+						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
+						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
+
 					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if(cDriveExplorer!=null){
-						cDriveExplorer.setDisableNodes(list);
-					}				
-				}					
-				else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
-					mode = COPY;
-					copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
-					
-					ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
-					for (long n : copyFromHandles){
-						list.add(n);
+
+					mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+						@Override
+						public void onTabChanged(String tabId) {
+							log("TabId :"+ tabId);
+							if(tabId.equals("cloudProviderFragment")){                     	
+
+								tabShown=CLOUD_TAB;
+								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+								if(cDriveProviderLol!=null){
+									if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
+										aB.setTitle(getString(R.string.section_cloud_drive));
+										changeBackVisibility(false);
+									}
+									else{
+										aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
+										changeBackVisibility(true);
+									}    					
+								}	
+							}
+							else if(tabId.equals("incomingProviderFragment")){                     	
+
+								tabShown=INCOMING_TAB;
+
+								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+								if(iSharesProviderLol!=null){
+									if(iSharesProviderLol.getDeepBrowserTree()==0){
+										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+										changeBackVisibility(false);
+									}
+									else{
+										aB.setTitle(iSharesProviderLol.name);
+										changeBackVisibility(true);
+									}    					
+								}        			                      	
+							}
+						}
+					});
+				}
+				else{
+					if (mTabsAdapterProvider == null){
+						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+
+						TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
+						tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+						//tabSpec.setContent(contentID);
+						//mTabHostContacts.addTab(tabSpec);
+						TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
+						tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+
+						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
+						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
+
 					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-					if(cDriveExplorer!=null){
-						cDriveExplorer.setDisableNodes(list);
-					}
+
+					mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+						@Override
+						public void onTabChanged(String tabId) {
+							log("TabId :"+ tabId);
+							if(tabId.equals("cloudProviderFragment")){                     	
+
+								tabShown=CLOUD_TAB;
+								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+								if(cDriveProvider!=null){
+									if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
+										aB.setTitle(getString(R.string.section_cloud_drive));
+										changeBackVisibility(false);
+									}
+									else{
+										aB.setTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
+										changeBackVisibility(true);
+									}    					
+								}	
+							}
+							else if(tabId.equals("incomingProviderFragment")){                     	
+
+								tabShown=INCOMING_TAB;
+
+								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+								if(iSharesProvider!=null){
+									if(iSharesProvider.getDeepBrowserTree()==0){
+										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+//										changeTitle(getString(R.string.title_incoming_shares_explorer));
+										changeBackVisibility(false);
+									}
+									else{
+										aB.setTitle(iSharesProvider.name);
+//										changeTitle(iSharesProvider.name);
+										changeBackVisibility(true);
+									}    					
+								}        			                      	
+							}
+						}
+					});
 				}
-				else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
-					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
-					mode = SELECT_CAMERA_FOLDER;
-				}	
-				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
-					mode = IMPORT;
+
+
+				for (int i=0;i<mTabsAdapterProvider.getCount();i++){
+					final int index = i;
+					mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							viewPagerProvider.setCurrentItem(index);							
+						}
+					});
 				}
-				else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
-					mode = SELECT;
-					selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
-					
-				}
-				else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
-					mode = UPLOAD_SELFIE;
-					imagePath=intent.getStringExtra("IMAGE_PATH");
-				}
-			}*/
-			
-			mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
-			mTabHostProvider.setup();
-	        viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
-	        
-	        //Create tabs
-	        mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
-			
-	        mTabHostProvider.setVisibility(View.VISIBLE);    			
-			
-			
-			if (mTabsAdapterProvider == null){
-				mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
-				
-				TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-				tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
-		        //tabSpec.setContent(contentID);
-		        //mTabHostContacts.addTab(tabSpec);
-		        TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-		        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
-		                	          				
-				mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
-				mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
-				
-			}
-			
-			mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
-	            @Override
-	            public void onTabChanged(String tabId) {
-	            	log("TabId :"+ tabId);
-	                if(tabId.equals("cloudProviderFragment")){                     	
-	
-	     				tabShown=CLOUD_TAB;
-	    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-	    				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-	    				cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	
-	    				if(cDriveExplorer!=null){
-	    					if(cDriveExplorer.getParentHandle()==-1|| cDriveExplorer.getParentHandle()==megaApi.getRootNode().getHandle()){
-	    						changeTitle(getString(R.string.section_cloud_drive));
-	    						changeBackVisibility(false);
-	    					}
-	    					else{
-	    						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()).getName());
-	    						changeBackVisibility(true);
-	    					}    					
-	    				}	
-	                }
-	                else if(tabId.equals("incomingProviderFragment")){                     	
-	
-	            		tabShown=INCOMING_TAB;
-	            		
-	            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-	            		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-	    				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-	    		
-	    				if(iSharesProvider!=null){
-	    					if(iSharesProvider.getDeepBrowserTree()==0){
-	    						changeTitle(getString(R.string.title_incoming_shares_explorer));
-	    						changeBackVisibility(false);
-	    					}
-	    					else{
-	    						changeTitle(iSharesProvider.name);
-	    						changeBackVisibility(true);
-	    					}    					
-	    				}        			                      	
-	                }
-	             }
-			});
-			
-			for (int i=0;i<mTabsAdapterProvider.getCount();i++){
-				final int index = i;
-				mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-					
-					@Override
-					public void onClick(View v) {
-						viewPagerProvider.setCurrentItem(index);							
-					}
-				});
-			}
-			
-			newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
-			newFolderButton.setVisibility(View.GONE);
-	//		newFolderButton.setOnClickListener(this);
-			
-			windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-			actionBarTitle = getString(R.string.section_cloud_drive);
-			windowTitle.setText(actionBarTitle);
-	
-			
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-			getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+
+				newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
+				newFolderButton.setVisibility(View.GONE);
+				//		newFolderButton.setOnClickListener(this);
+
+				windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
+				actionBarTitle = getString(R.string.section_cloud_drive);
+				windowTitle.setText(actionBarTitle);
+
+
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}
 		}
 	}
@@ -1182,13 +1219,24 @@ public class FileProviderActivity extends PinActivity implements OnClickListener
 	@Override
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> updatedNodes) {
 		log("onNodesUpdate");
-		if (cDriveExplorer != null){
-			if (megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()) != null){
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-				cDriveExplorer.setNodes(nodes);
-				cDriveExplorer.getListView().invalidateViews();
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
+			if (cDriveProviderLol != null){
+				if (megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()) != null){
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()));
+					cDriveProviderLol.setNodes(nodes);
+					cDriveProviderLol.getListView().invalidate();
+				}
 			}
 		}
+		else{
+			if (cDriveProvider != null){
+				if (megaApi.getNodeByHandle(cDriveProvider.getParentHandle()) != null){
+					nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()));
+					cDriveProvider.setNodes(nodes);
+					cDriveProvider.getListView().invalidateViews();
+				}
+			}
+		}		
 	}
 
 	@Override
