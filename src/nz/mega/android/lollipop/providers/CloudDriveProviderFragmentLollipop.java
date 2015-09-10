@@ -118,15 +118,14 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 					}
 				}
 			}
-		}
-			
+		}			
 		
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		if(chosenNode == null)
 		{
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
-			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+//			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
 			changeBackVisibility(false);
 		}
 		else
@@ -194,7 +193,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 	}
 	
 	public void changeBackVisibility(boolean backVisibility){
-		((FileProviderActivity) context).changeBackVisibility(backVisibility);
+//		((FileProviderActivity) context).changeBackVisibility(backVisibility);
 	}
 	
 	@Override
@@ -224,6 +223,9 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 			String[] temp;
 			temp = path.split("/");
 			name = temp[temp.length-1];
+
+			changeActionBarTitle(name);
+			changeBackVisibility(true);
 		
 			parentHandle = nodes.get(position).getHandle();
 			if (context instanceof FileProviderActivity){
