@@ -29,6 +29,7 @@ import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -51,6 +52,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -71,6 +73,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TableRow;
@@ -114,9 +118,11 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	
 	private MenuItem searchMenuItem;
 	
-    Toolbar tB;
+	Toolbar tB;
     ActionBar aB;
 	
+	ScrollView scrollView;
+	TextView newToMega;
 	LinearLayout loginLogin;
 	View loginDelimiter;
 	LinearLayout loginCreateAccount;
@@ -133,14 +139,18 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	float scaleH, scaleW;
 	float density;
 	DisplayMetrics outMetrics;
+    float scaleText;
 	Display display;
 	EditText et_user;
 	EditText et_password;
-	Button bRegister;
-	Button bLogin;
+	TextView bRegisterLol;
+	TextView bLoginLol;
 	ImageView loginThreeDots;
 	TextView loginABC;
-	MySwitch loginSwitch;	
+	Switch loginSwitchLol;	
+	MySwitch loginSwitch;
+	Button bRegister;
+	Button bLogin;
 	
 	public static int CLOUD_TAB = 0;
 	public static int INCOMING_TAB = 1;
@@ -191,8 +201,22 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	}  
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		log("onCreate first");
+	protected void onCreate(Bundle savedInstanceState) {	
+		
+		log("onCreate first");	
+		
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {		
+			onCreateLollipop(savedInstanceState);
+		}
+		else
+		{
+//			onCreateOlder(savedInstanceState);
+		}
+	}
+	
+	protected void onCreateLollipop(Bundle savedInstanceState) {		
+		
+		log("onCreateLollipop");
 	
 		requestWindowFeature(Window.FEATURE_NO_TITLE);	
 
@@ -205,12 +229,202 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 		
 	    scaleW = Util.getScaleW(outMetrics, density);
 	    scaleH = Util.getScaleH(outMetrics, density);
+
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
 		
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
 		if (savedInstanceState != null){
 			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
 		}		
+		
+		try{
+			app = (MegaApplication) getApplication();
+		}
+		catch(Exception ex){
+			finish();
+		}
+		
+		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		
+		megaApi.addGlobalListener(this);
+		megaApi.addTransferListener(this);
+		
+//		Intent intent = getIntent();
+		checkLogin();
+		credentials = dbH.getCredentials();
+		if (credentials == null){
+			
+//			loginLogin.setVisibility(View.VISIBLE);
+//			loginCreateAccount.setVisibility(View.VISIBLE);
+//			loginDelimiter.setVisibility(View.VISIBLE);
+//			loginLoggingIn.setVisibility(View.GONE);
+//			generatingKeysText.setVisibility(View.GONE);
+//			loggingInText.setVisibility(View.GONE);
+//			fetchingNodesText.setVisibility(View.GONE);
+//			prepareNodesText.setVisibility(View.GONE);
+//			loginProgressBar.setVisibility(View.GONE);
+//			queryingSignupLinkText.setVisibility(View.GONE);
+//			confirmingAccountText.setVisibility(View.GONE);
+			
+			
+			loginLogin.setVisibility(View.VISIBLE);
+			loginCreateAccount.setVisibility(View.VISIBLE);
+			loginDelimiter.setVisibility(View.VISIBLE);
+			loginLoggingIn.setVisibility(View.GONE);
+			generatingKeysText.setVisibility(View.GONE);
+			loggingInText.setVisibility(View.GONE);
+			fetchingNodesText.setVisibility(View.GONE);
+			prepareNodesText.setVisibility(View.GONE);
+			loginProgressBar.setVisibility(View.GONE);
+			queryingSignupLinkText.setVisibility(View.GONE);
+			confirmingAccountText.setVisibility(View.GONE);				
+		
+		}
+		else{
+			log("dbH.getCredentials() NOT null");
+			if (megaApi.getRootNode() == null){
+				setContentView(R.layout.activity_login);
+				log("megaApi.getRootNode() == null");
+				
+				lastEmail = credentials.getEmail();
+				gSession = credentials.getSession();
+				
+				loginLogin.setVisibility(View.GONE);
+				loginDelimiter.setVisibility(View.GONE);
+				loginCreateAccount.setVisibility(View.GONE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
+				loginLoggingIn.setVisibility(View.VISIBLE);
+//				generatingKeysText.setVisibility(View.VISIBLE);
+				loginProgressBar.setVisibility(View.VISIBLE);
+				loginFetchNodesProgressBar.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.VISIBLE);
+				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
+				megaApi.fastLogin(gSession, this);
+
+			}
+			else{
+				setContentView(R.layout.activity_file_explorer);
+				log("megaApi.getRootNode() NOT null");
+
+				handler = new Handler();		
+
+				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+				mTabHostProvider.setup();
+				viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+
+				//Create tabs
+				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
+
+				mTabHostProvider.setVisibility(View.VISIBLE);    			
+
+				if (mTabsAdapterProvider == null){
+					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+
+					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
+					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+					//tabSpec.setContent(contentID);
+					//mTabHostContacts.addTab(tabSpec);
+					TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
+					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+
+										
+
+					//Set toolbar
+					tB = (Toolbar) findViewById(R.id.toolbar_provider);
+					setSupportActionBar(tB);
+					aB = getSupportActionBar();
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					aB.setDisplayHomeAsUpEnabled(true);
+					aB.setDisplayShowHomeEnabled(true);
+
+					mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
+					mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
+
+					mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+						@Override
+						public void onTabChanged(String tabId) {
+							log("TabId :"+ tabId);
+							if(tabId.equals("cloudProviderFragment")){                     	
+
+								tabShown=CLOUD_TAB;
+								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+								if(cDriveProviderLol!=null){
+									if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
+										aB.setTitle(getString(R.string.section_cloud_drive));											
+									}
+									else{
+										aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());											
+									}    					
+								}	
+							}
+							else if(tabId.equals("incomingProviderFragment")){                     	
+
+								tabShown=INCOMING_TAB;
+
+								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+
+								if(iSharesProviderLol!=null){
+									if(iSharesProviderLol.getDeepBrowserTree()==0){
+										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+									}
+									else{
+										aB.setTitle(iSharesProvider.name);
+									}    					
+								}        			                      	
+							}
+						}
+					});
+				}					
+			}
+
+			for (int i=0;i<mTabsAdapterProvider.getCount();i++){
+				final int index = i;
+				mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						viewPagerProvider.setCurrentItem(index);							
+					}
+				});
+			}			
+
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+		}			
+	}
+
+	protected void onCreateOlder(Bundle savedInstanceState) {
+		log("onCreate first");
+		super.onCreate(savedInstanceState);
+		
+		display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
+		
+		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+		
+		if (savedInstanceState != null){
+			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
+		}
+		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		try{
 			app = (MegaApplication) getApplication();
@@ -320,7 +534,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				log("megaApi.getRootNode() == null");
 				lastEmail = credentials.getEmail();
 				gSession = credentials.getSession();
-
+				
 				loginTitle = (TextView) findViewById(R.id.login_text_view);
 				loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
 				loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
@@ -334,10 +548,10 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
 				fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
 				prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);
-
+				
 				loginTitle.setText(R.string.login_text);
 				loginTitle.setTextSize(28*scaleH);
-
+				
 				loginLogin.setVisibility(View.VISIBLE);
 				loginCreateAccount.setVisibility(View.VISIBLE);
 				loginDelimiter.setVisibility(View.VISIBLE);
@@ -349,7 +563,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				loginProgressBar.setVisibility(View.GONE);
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
-
+				
 				log("session: " + gSession);
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
@@ -357,177 +571,301 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				queryingSignupLinkText.setVisibility(View.GONE);
 				confirmingAccountText.setVisibility(View.GONE);
 				loginLoggingIn.setVisibility(View.VISIBLE);
-				//				generatingKeysText.setVisibility(View.VISIBLE);
+//				generatingKeysText.setVisibility(View.VISIBLE);
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.GONE);
 				prepareNodesText.setVisibility(View.GONE);
 				megaApi.fastLogin(gSession, this);
-
+				
+				
+//				Intent loginIntent = new Intent(this, LoginActivity.class);
+//				loginIntent.setAction(ManagerActivity.ACTION_FILE_PROVIDER);
+//				if (intent != null){
+//					if(intent.getExtras() != null)
+//					{
+//						loginIntent.putExtras(intent.getExtras());
+//					}
+//					
+//					if(intent.getData() != null)
+//					{
+//						loginIntent.setData(intent.getData());
+//					}
+//				}
+//				startActivity(loginIntent);
+//				finish();
+//				return;
 			}
 			else{
 				setContentView(R.layout.activity_file_explorer);
 				log("megaApi.getRootNode() NOT null");
-
-				handler = new Handler();		
-
-				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
-				mTabHostProvider.setup();
-				viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
-
-				//Create tabs
-				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
-
-				mTabHostProvider.setVisibility(View.VISIBLE);    			
-
-				if (mTabsAdapterProvider == null){
-					mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
-
-					TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
-					tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
-					//tabSpec.setContent(contentID);
-					//mTabHostContacts.addTab(tabSpec);
-					TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
-					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
-
-					if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {						
-
-						//Set toolbar
-						tB = (Toolbar) findViewById(R.id.toolbar_provider);
-						setSupportActionBar(tB);
-						aB = getSupportActionBar();
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						aB.setDisplayHomeAsUpEnabled(true);
-						aB.setDisplayShowHomeEnabled(true);
-
-						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
-						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
-
-						mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
-							@Override
-							public void onTabChanged(String tabId) {
-								log("TabId :"+ tabId);
-								if(tabId.equals("cloudProviderFragment")){                     	
-
-									tabShown=CLOUD_TAB;
-									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-									cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-									if(cDriveProviderLol!=null){
-										if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
-											aB.setTitle(getString(R.string.section_cloud_drive));											
-											changeBackVisibility(false);
-										}
-										else{
-											aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());											
-											changeBackVisibility(true);
-										}    					
-									}	
-								}
-								else if(tabId.equals("incomingProviderFragment")){                     	
-
-									tabShown=INCOMING_TAB;
-
-									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-									iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-									if(iSharesProviderLol!=null){
-										if(iSharesProviderLol.getDeepBrowserTree()==0){
-											aB.setTitle(getString(R.string.title_incoming_shares_explorer));
-											changeBackVisibility(false);
-										}
-										else{
-											aB.setTitle(iSharesProvider.name);
-//											changeTitle(iSharesProvider.name);
-											changeBackVisibility(true);
-										}    					
-									}        			                      	
-								}
-							}
-						});
-					}
-					else{
-						mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragmentLollipop.class, null);
-						mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragmentLollipop.class, null);
-
-						mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
-							@Override
-							public void onTabChanged(String tabId) {
-								log("TabId :"+ tabId);
-								if(tabId.equals("cloudProviderFragment")){                     	
-
-									tabShown=CLOUD_TAB;
-									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-									cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-									if(cDriveProvider!=null){
-										if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
-											aB.setTitle(getString(R.string.section_cloud_drive));
-											changeBackVisibility(false);
-										}
-										else{
-											aB.setTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
-											changeBackVisibility(true);
-										}    					
-									}	
-								}
-								else if(tabId.equals("incomingProviderFragment")){                     	
-
-									tabShown=INCOMING_TAB;
-
-									String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-									gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-									iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
-
-									if(iSharesProvider!=null){
-										if(iSharesProvider.getDeepBrowserTree()==0){
-											aB.setTitle(getString(R.string.title_incoming_shares_explorer));
-											changeBackVisibility(false);
-										}
-										else{
-											aB.setTitle(iSharesProvider.name);
-											changeBackVisibility(true);
-										}    					
-									}        			                      	
-								}
-							}
-						});
-					}	
-				}
-
-				for (int i=0;i<mTabsAdapterProvider.getCount();i++){
-					final int index = i;
-					mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							viewPagerProvider.setCurrentItem(index);							
-						}
-					});
-				}
 			
-				newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
-				newFolderButton.setVisibility(View.GONE);
-				//		newFolderButton.setOnClickListener(this);
-
-				windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-				actionBarTitle = getString(R.string.section_cloud_drive);
-				windowTitle.setText(actionBarTitle);
-
-				windowBack = (ImageView) findViewById(R.id.file_explorer_back);
-				windowBack.setOnClickListener(this);
-				windowTitle.setOnClickListener(this);	
-
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-				getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+		
+			handler = new Handler();		
+			/*	
+			if ((intent != null) && (intent.getAction() != null)){
+				if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
+					mode = MOVE;
+					moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
+					
+					ArrayList<Long> list = new ArrayList<Long>(moveFromHandles.length);
+					for (long n : moveFromHandles){
+						list.add(n);
+					}
+					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if(cDriveExplorer!=null){
+						cDriveExplorer.setDisableNodes(list);
+					}				
+				}					
+				else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
+					mode = COPY;
+					copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
+					
+					ArrayList<Long> list = new ArrayList<Long>(copyFromHandles.length);
+					for (long n : copyFromHandles){
+						list.add(n);
+					}
+					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+					if(cDriveExplorer!=null){
+						cDriveExplorer.setDisableNodes(list);
+					}
+				}
+				else if (intent.getAction().equals(ACTION_CHOOSE_MEGA_FOLDER_SYNC)){
+					log("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC");
+					mode = SELECT_CAMERA_FOLDER;
+				}	
+				else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
+					mode = IMPORT;
+				}
+				else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
+					mode = SELECT;
+					selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
+					
+				}
+				else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
+					mode = UPLOAD_SELFIE;
+					imagePath=intent.getStringExtra("IMAGE_PATH");
+				}
+			}*/
+			
+			mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+			mTabHostProvider.setup();
+	        viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+	        
+	        //Create tabs
+	        mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
+			
+	        mTabHostProvider.setVisibility(View.VISIBLE);    			
+			
+			
+			if (mTabsAdapterProvider == null){
+				mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
+				
+				TabHost.TabSpec tabSpec3 = mTabHostProvider.newTabSpec("cloudProviderFragment");
+				tabSpec3.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_cloud_drive_explorer))); // new function to inject our own tab layout
+		        //tabSpec.setContent(contentID);
+		        //mTabHostContacts.addTab(tabSpec);
+		        TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
+		        tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
+		                	          				
+				mTabsAdapterProvider.addTab(tabSpec3, CloudDriveProviderFragment.class, null);
+				mTabsAdapterProvider.addTab(tabSpec4, IncomingSharesProviderFragment.class, null);
+				
+			}
+			
+			mTabHostProvider.setOnTabChangedListener(new OnTabChangeListener(){
+	            @Override
+	            public void onTabChanged(String tabId) {
+	            	log("TabId :"+ tabId);
+	                if(tabId.equals("cloudProviderFragment")){                     	
+	
+	     				tabShown=CLOUD_TAB;
+	    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+	    				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+	    				cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+	
+	    				if(cDriveProvider!=null){
+	    					if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
+	    						changeTitle(getString(R.string.section_cloud_drive));
+	    						changeBackVisibility(false);
+	    					}
+	    					else{
+	    						changeTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
+	    						changeBackVisibility(true);
+	    					}    					
+	    				}	
+	                }
+	                else if(tabId.equals("incomingProviderFragment")){                     	
+	
+	            		tabShown=INCOMING_TAB;
+	            		
+	            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+	            		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+	    				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
+	    		
+	    				if(iSharesProvider!=null){
+	    					if(iSharesProvider.getDeepBrowserTree()==0){
+	    						changeTitle(getString(R.string.title_incoming_shares_explorer));
+	    						changeBackVisibility(false);
+	    					}
+	    					else{
+	    						changeTitle(iSharesProvider.name);
+	    						changeBackVisibility(true);
+	    					}    					
+	    				}        			                      	
+	                }
+	             }
+			});
+			
+			for (int i=0;i<mTabsAdapterProvider.getCount();i++){
+				final int index = i;
+				mTabHostProvider.getTabWidget().getChildAt(i).setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						viewPagerProvider.setCurrentItem(index);							
+					}
+				});
+			}
+			
+			newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
+			newFolderButton.setVisibility(View.GONE);
+	//		newFolderButton.setOnClickListener(this);
+			
+			windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
+			actionBarTitle = getString(R.string.section_cloud_drive);
+			windowTitle.setText(actionBarTitle);
+			
+			windowBack = (ImageView) findViewById(R.id.file_explorer_back);
+			windowBack.setOnClickListener(this);
+			windowTitle.setOnClickListener(this);	
+			
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+			getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 			}			
 		}	
 	}
 	
+	@SuppressLint("NewApi")
+	public void checkLogin(){
+		setContentView(R.layout.activity_login);
+		
+		scrollView = (ScrollView) findViewById(R.id.scroll_view_login);		
+		
+	    loginTitle = (TextView) findViewById(R.id.login_text_view);
+		//Left margin
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
+		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		loginTitle.setLayoutParams(textParams);
+		
+		loginTitle.setText(R.string.login_text);
+		loginTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+		
+		et_user = (EditText) findViewById(R.id.login_email_text);
+		android.view.ViewGroup.LayoutParams paramsb1 = et_user.getLayoutParams();		
+		paramsb1.width = Util.scaleWidthPx(280, outMetrics);		
+		et_user.setLayoutParams(paramsb1);
+		//Left margin
+		textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
+		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
+		et_user.setLayoutParams(textParams);		
+		
+		et_password = (EditText) findViewById(R.id.login_password_text);	
+		et_password.setLayoutParams(paramsb1);
+		et_password.setLayoutParams(textParams);	
+		
+		et_password.setOnEditorActionListener(new OnEditorActionListener() {
+			
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					submitForm();
+					return true;
+				}
+				return false;
+			}
+		});			
+		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
+		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
+		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		loginThreeDots.setLayoutParams(textThreeDots);
+		
+		loginABC = (TextView) findViewById(R.id.ABC);
+		
+		loginSwitchLol = (Switch) findViewById(R.id.switch_login);
+		LinearLayout.LayoutParams switchParams = (LinearLayout.LayoutParams)loginSwitchLol.getLayoutParams();
+		switchParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		loginSwitchLol.setLayoutParams(switchParams);
+		loginSwitchLol.setChecked(false);
+		
+		loginSwitchLol.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if(!isChecked){
+						et_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+						et_password.setSelection(et_password.getText().length());
+				}else{
+						et_password.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+						et_password.setSelection(et_password.getText().length());
+			    }				
+			}
+		});
+		
+		bLoginLol = (TextView) findViewById(R.id.button_login_login);
+		bLoginLol.setText(getString(R.string.login_text).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsbLogin = bLoginLol.getLayoutParams();		
+		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
+		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
+		bLoginLol.setLayoutParams(paramsbLogin);
+		//Margin
+		LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bLoginLol.getLayoutParams();
+		textParamsLogin.setMargins(Util.scaleWidthPx(35, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(80, outMetrics)); 
+		bLoginLol.setLayoutParams(textParamsLogin);
+		
+		bLoginLol.setOnClickListener(this);
+		
+		loginDelimiter = (View) findViewById(R.id.login_delimiter);
+		loginCreateAccount = (LinearLayout) findViewById(R.id.login_create_account_layout);
+		
+	    newToMega = (TextView) findViewById(R.id.text_newToMega);
+		//Margins (left, top, right, bottom)
+		LinearLayout.LayoutParams textnewToMega = (LinearLayout.LayoutParams)newToMega.getLayoutParams();
+		textnewToMega.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(20, outMetrics), 0, Util.scaleHeightPx(30, outMetrics)); 
+		newToMega.setLayoutParams(textnewToMega);	
+		newToMega.setTextSize(TypedValue.COMPLEX_UNIT_SP, (22*scaleText));
+		
+	    bRegisterLol = (TextView) findViewById(R.id.button_create_account_login);
+	    
+	    bRegisterLol.setText(getString(R.string.create_account).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb2 = bRegisterLol.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		paramsb2.width = Util.scaleWidthPx(144, outMetrics);
+		bRegisterLol.setLayoutParams(paramsb2);
+		//Margin
+		LinearLayout.LayoutParams textParamsRegister = (LinearLayout.LayoutParams)bRegisterLol.getLayoutParams();
+		textParamsRegister.setMargins(Util.scaleWidthPx(35, outMetrics), 0, 0, 0); 
+		bRegisterLol.setLayoutParams(textParamsRegister);
+	    
+	    bRegisterLol.setOnClickListener(this);
+		
+		loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
+		loginLoggingIn = (LinearLayout) findViewById(R.id.login_logging_in_layout);
+		loginProgressBar = (ProgressBar) findViewById(R.id.login_progress_bar);
+		loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.login_fetching_nodes_bar);
+		generatingKeysText = (TextView) findViewById(R.id.login_generating_keys_text);
+		queryingSignupLinkText = (TextView) findViewById(R.id.login_query_signup_link_text);
+		confirmingAccountText = (TextView) findViewById(R.id.login_confirm_account_text);
+		loggingInText = (TextView) findViewById(R.id.login_logging_in_text);
+		fetchingNodesText = (TextView) findViewById(R.id.login_fetch_nodes_text);
+		prepareNodesText = (TextView) findViewById(R.id.login_prepare_nodes_text);	
+		
+	}
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
 		log("onCreateOptionsMenuLollipop");
@@ -558,7 +896,9 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
     }
 	
 	public void changeTitle (String title){
-		aB.setTitle(title);
+		if (windowTitle != null){
+			windowTitle.setText(title);
+		}
 	}
 	
 	public void changeBackVisibility(boolean backVisible){
@@ -1077,11 +1417,9 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 								if(cDriveProviderLol!=null){
 									if(cDriveProviderLol.getParentHandle()==-1|| cDriveProviderLol.getParentHandle()==megaApi.getRootNode().getHandle()){
 										aB.setTitle(getString(R.string.section_cloud_drive));
-										changeBackVisibility(false);
 									}
 									else{
 										aB.setTitle(megaApi.getNodeByHandle(cDriveProviderLol.getParentHandle()).getName());
-										changeBackVisibility(true);
 									}    					
 								}	
 							}
@@ -1096,11 +1434,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 								if(iSharesProviderLol!=null){
 									if(iSharesProviderLol.getDeepBrowserTree()==0){
 										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
-										changeBackVisibility(false);
 									}
 									else{
-										aB.setTitle(iSharesProviderLol.name);
-										changeBackVisibility(true);
 									}    					
 								}        			                      	
 							}
@@ -1108,6 +1443,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 					});
 				}
 				else{
+					//NOT Lollipop
 					if (mTabsAdapterProvider == null){
 						mTabsAdapterProvider= new TabsAdapter(this, mTabHostProvider, viewPagerProvider);   	
 
@@ -1136,11 +1472,11 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 
 								if(cDriveProvider!=null){
 									if(cDriveProvider.getParentHandle()==-1|| cDriveProvider.getParentHandle()==megaApi.getRootNode().getHandle()){
-										aB.setTitle(getString(R.string.section_cloud_drive));
+										changeTitle(getString(R.string.section_cloud_drive));
 										changeBackVisibility(false);
 									}
 									else{
-										aB.setTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
+										changeTitle(megaApi.getNodeByHandle(cDriveProvider.getParentHandle()).getName());
 										changeBackVisibility(true);
 									}    					
 								}	
@@ -1155,12 +1491,12 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 
 								if(iSharesProvider!=null){
 									if(iSharesProvider.getDeepBrowserTree()==0){
-										aB.setTitle(getString(R.string.title_incoming_shares_explorer));
+										changeTitle(getString(R.string.title_incoming_shares_explorer));
 //										changeTitle(getString(R.string.title_incoming_shares_explorer));
 										changeBackVisibility(false);
 									}
 									else{
-										aB.setTitle(iSharesProvider.name);
+										changeTitle(iSharesProvider.name);
 //										changeTitle(iSharesProvider.name);
 										changeBackVisibility(true);
 									}    					

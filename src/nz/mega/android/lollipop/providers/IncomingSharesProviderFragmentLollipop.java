@@ -156,7 +156,7 @@ public class IncomingSharesProviderFragmentLollipop extends Fragment implements 
 	}
 	
 	public void changeBackVisibility(boolean backVisibility){
-		((FileProviderActivity) context).changeBackVisibility(backVisibility);
+//		((FileProviderActivity) context).changeBackVisibility(backVisibility);
 	}
 	
 	@Override
