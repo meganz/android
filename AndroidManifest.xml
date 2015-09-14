@@ -228,7 +228,7 @@
             android:label="@string/contact_properties_activity"
             android:launchMode="singleTop" 
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">            
+            android:theme="@style/provider_activity">            
         </activity>
         
         <activity
