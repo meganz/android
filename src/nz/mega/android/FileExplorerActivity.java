@@ -169,7 +169,7 @@ public class FileExplorerActivity extends PinActivity implements OnClickListener
 		
 		megaApi.addGlobalListener(this);
 		
-		setContentView(R.layout.activity_file_explorer);
+		setContentView(R.layout.activity_file_provider);
         		
 		Intent intent = getIntent();
 		if (megaApi.getRootNode() == null){

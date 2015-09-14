@@ -21,6 +21,8 @@ import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -52,7 +54,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	
 //	boolean first = false;
 //	private boolean folderSelected = false;
-	RelativeLayout optionsBar;
+	LinearLayout optionsBar;
 	RecyclerView listView;
 	RecyclerView.LayoutManager mLayoutManager;
 	ImageView emptyImageView;
@@ -91,16 +93,49 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
 				
-		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);	
+		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics(metrics);
+		
+		float density  = getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(metrics, density);
+	    float scaleH = Util.getScaleH(metrics, density);
+	    float scaleText;
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
 		
 		separator = (View) v.findViewById(R.id.separator);
 		
-		optionsBar = (RelativeLayout) v.findViewById(R.id.options_layout);
+		optionsBar = (LinearLayout) v.findViewById(R.id.options_layout);
 		optionText = (TextView) v.findViewById(R.id.action_text);
 		optionText.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = optionText.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, metrics);
+		paramsb2.width = Util.scaleWidthPx(73, metrics);
+		optionText.setLayoutParams(paramsb2);
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		optionText.setLayoutParams(optionTextParams);
+		
 		cancelText = (TextView) v.findViewById(R.id.cancel_text);
 		cancelText.setOnClickListener(this);		
 		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = cancelText.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, metrics);
+		paramsb1.width = Util.scaleWidthPx(73, metrics);
+		cancelText.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		cancelText.setLayoutParams(cancelTextParams);		
 				
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));

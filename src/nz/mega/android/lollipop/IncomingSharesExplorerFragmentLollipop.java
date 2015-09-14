@@ -17,8 +17,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -56,7 +60,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	View separator;
 	TextView optionText;
 	TextView cancelText;
-	RelativeLayout optionsBar;
+	LinearLayout optionsBar;
 
 	@Override
 	public void onCreate (Bundle savedInstanceState){
@@ -85,19 +89,55 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		log("onCreateView");
+		
+		Display display = getActivity().getWindowManager().getDefaultDisplay();
+		
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics(metrics);
+		
+		float density  = getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(metrics, density);
+	    float scaleH = Util.getScaleH(metrics, density);
+	    float scaleText;
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
 				
 		View v = inflater.inflate(R.layout.fragment_fileexplorerlist, container, false);
 		
 		separator = (View) v.findViewById(R.id.separator);
 		
-		optionsBar = (RelativeLayout) v.findViewById(R.id.options_layout);
+		optionsBar = (LinearLayout) v.findViewById(R.id.options_explorer_layout);
+		
 		optionText = (TextView) v.findViewById(R.id.action_text);
+		optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 		optionText.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = optionText.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, metrics);
+		paramsb2.width = Util.scaleWidthPx(73, metrics);
+		optionText.setLayoutParams(paramsb2);
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)optionText.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		optionText.setLayoutParams(optionTextParams);		
+		
 		cancelText = (TextView) v.findViewById(R.id.cancel_text);
+		cancelText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
 		cancelText.setOnClickListener(this);		
 		cancelText.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = cancelText.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, metrics);
+		paramsb1.width = Util.scaleWidthPx(73, metrics);
+		cancelText.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelText.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		cancelText.setLayoutParams(cancelTextParams);		
 		
-		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 		mLayoutManager = new LinearLayoutManager(context);
@@ -112,9 +152,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-		
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) listView.getLayoutParams();
-		params.addRule(RelativeLayout.ABOVE, R.id.file_explorer_button);
 		
 		if (adapter == null){
 			adapter = new MegaExplorerLollipopAdapter(context, nodes, parentHandle, listView, emptyImageView, emptyTextView, selectFile);
@@ -236,15 +273,17 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	@Override
 	public void onClick(View v) {
 		switch(v.getId()){
-			case R.id.file_explorer_button:{
+			case R.id.action_text:{				
 				((FileExplorerActivityLollipop) context).buttonClick(parentHandle);
+			}
+			case R.id.cancel_text:{				
+				((FileExplorerActivityLollipop) context).finish();
 			}
 		}
 	}
 
     public void itemClick(View view, int position) {
-		log("------------------itemClick: "+deepBrowserTree);
-		
+		log("------------------itemClick: "+deepBrowserTree);		
 		
 		if (nodes.get(position).isFolder()){
 					
@@ -371,7 +410,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	}
 	
 	private static void log(String log) {
-		Util.log("IncomingSharesExplorerFragment", log);
+		Util.log("IncomingSharesExplorerFragmentLollipop", log);
 	}
 	
 	public long getParentHandle(){

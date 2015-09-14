@@ -93,10 +93,7 @@
        	android:textColor="@color/button_text"
        	android:visibility="gone"
        	android:layout_below="@id/buttons_layout">
-    </Button>   
-    
-     
- 
+    </Button>    
     
       <Button
          android:id="@+id/file_explorer_button"
@@ -111,51 +108,49 @@
         android:tint="@android:color/white"
         android:elevation="@dimen/elevation_low"
         android:stateListAnimator="@anim/button_elevation"/>--> 
-       
-    <RelativeLayout
-         android:id="@+id/options_layout"
-    	 android:layout_width="fill_parent"
-    	 android:layout_height="48dp"
-    	 android:layout_alignParentBottom="true"
-    	 android:background="@color/background"
-    	 android:orientation="horizontal">
+      
+    <LinearLayout
+         android:id="@+id/options_explorer_layout"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:gravity="right"
+         android:layout_alignParentBottom="true"
+         android:orientation="horizontal" >
 
-        <TextView
-	    android:id="@+id/cancel_text"
-	    android:layout_width="wrap_content"
-	    android:layout_height="36dp"
-	    android:layout_centerVertical="true"
-	    android:layout_marginLeft="200dp"
-	    android:textColor="@color/accentColor"
-	    android:textStyle="bold"
-	    android:textSize="14sp"/>
-        
-        <TextView
-	    android:id="@+id/action_text"
-	    android:layout_width="wrap_content"
-	    android:layout_height="36dp"
-	    android:layout_centerVertical="true"
-	    android:paddingLeft="20dp"
-	    android:layout_toRightOf="@id/cancel_text"
-	    android:textColor="@color/accentColor"
-	    android:textStyle="bold"
-	    android:textSize="14sp"/> 
-         
-    </RelativeLayout>
-    
+         <TextView
+             android:id="@+id/cancel_text"
+             android:fontFamily="sans-serif-medium"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="@color/accentColor"
+             android:gravity="center_vertical|center_horizontal"
+             android:textSize="14sp"/>
+
+         <TextView
+             android:id="@+id/action_text"
+             android:fontFamily="sans-serif-medium"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:textColor="@color/accentColor"
+             android:gravity="center_vertical|center_horizontal"
+             android:textSize="14sp"/>
+     </LinearLayout>
+     
     <View 
      android:id="@+id/separator" 
 	 android:background="@color/text_secondary"
 	 android:layout_width = "fill_parent"
 	 android:layout_height="1dip"
-	 android:layout_above="@id/options_layout"/>
+	 android:layout_above="@id/options_explorer_layout"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
+        android:layout_height="match_parent" 
+        android:clipToPadding="false"
         android:choiceMode="multipleChoice"
         android:layout_below="@id/content_text"
-        android:layout_above="@id/separator"/>
+        android:layout_above="@id/separator"/>    
+    
     
 </RelativeLayout>

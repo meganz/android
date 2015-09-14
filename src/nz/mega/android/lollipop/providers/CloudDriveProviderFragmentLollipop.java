@@ -189,6 +189,7 @@ public class CloudDriveProviderFragmentLollipop extends Fragment implements OnCl
 	
 	
 	public void changeActionBarTitle(String folder){
+		log("changeActionBarTitle");
 		((FileProviderActivity) context).changeTitle(folder);
 	}
 	
