@@ -49,6 +49,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -79,7 +80,8 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 	ImageView statusImageView;
 	ImageButton eyeButton;
 	TableLayout contentTable;
-	ActionBar aB;
+	Toolbar tB;
+    ActionBar aB;
 
 	String userEmail;
 
@@ -132,11 +134,6 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 		megaApi.addGlobalListener(this);
 		megaApi.addTransferListener(this);
 
-		aB = getSupportActionBar();
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayShowTitleEnabled(true);
-		aB.setLogo(R.drawable.ic_action_navigation_accept_white);
-
 		contactPropertiesMainActivity=this;
 
 		Display display = getWindowManager().getDefaultDisplay();
@@ -150,12 +147,21 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
 			userEmail = extras.getString("name");
-			aB.setTitle(userEmail);
+
 			setContentView(R.layout.activity_main_contact_properties);
+			
+			//Set toolbar
+			tB = (Toolbar) findViewById(R.id.toolbar_explorer);
+			setSupportActionBar(tB);
+			aB = getSupportActionBar();
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setDisplayShowHomeEnabled(true);
 
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
 		}
+		
 	}
 
 	@Override
@@ -212,10 +218,6 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
-	
-				if (aB != null){
-					aB.setTitle(userEmail);
-				}
 	
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
 	

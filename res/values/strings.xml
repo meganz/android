@@ -167,7 +167,7 @@
 	<string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Saved for Offline</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Shared with me</string>
-	<string name="section_shared_items" context="title of the screen that shows all the shared items">Shared items</string>
+	<string name="section_shared_items" context="title of the screen that shows all the shared items">Shared folders</string>
 	<string name="section_rubbish_bin" context="The title of the trash bin in the tree of the file manager.">Rubbish Bin</string>
 	<string name="section_contacts" context="Title of the contact list">Contacts</string>
 	<string name="tab_contacts" context="Title of the contact tab. Capital letters">CONTACTS</string>

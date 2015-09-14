@@ -51,12 +51,12 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
 	FixedCenterCrop imageView;
-	TextView initialLetter;
+//	TextView initialLetter;
 	RelativeLayout contentLayout;
 	TextView userNameTextView;
 	TextView infoEmail;
-	TableLayout contentTable;
-	Button sharedFoldersButton;	
+	TextView sharedFoldersButton;	
+	TextView sharedFoldersLabel;
 	String userEmail;	
 	Context context;
 	ActionBar aB;
@@ -92,7 +92,6 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
-		aB.setTitle(R.string.contact_properties_activity);
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
@@ -116,8 +115,9 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			imageView = (FixedCenterCrop) v.findViewById(R.id.contact_properties_image);
 //			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
 //			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
-			initialLetter = (TextView) v.findViewById(R.id.contact_properties_initial_letter);
-			contentTable = (TableLayout) v.findViewById(R.id.contact_properties_content_table);
+			
+//			initialLetter = (TextView) v.findViewById(R.id.contact_properties_initial_letter);
+			
 			userNameTextView = (TextView) v.findViewById(R.id.contact_properties_name);
 			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
 			//			contentLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_content);
@@ -126,9 +126,9 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			//			eyeButton = (ImageButton) v.findViewById(R.id.contact_properties_content_eye);
 
 			//			eyeButton.setOnClickListener(this);
-			sharedFoldersButton = (Button) v.findViewById(R.id.shared_folders_button);
+			sharedFoldersLabel = (TextView) v.findViewById(R.id.shared_folders_label);
+			sharedFoldersButton = (TextView) v.findViewById(R.id.shared_folders_button);
 			sharedFoldersButton.setOnClickListener(this);
-
 
 			contact = megaApi.getContact(userEmail);
 			if(contact == null)
@@ -184,10 +184,10 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			    	log("TEXT AT 0: " + userEmail.charAt(0));
 			    	String firstLetter = userEmail.charAt(0) + "";
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-			    	initialLetter.setText(firstLetter);
-			    	initialLetter.setTextSize(100);
-			    	initialLetter.setTextColor(Color.WHITE);
-			    	initialLetter.setVisibility(View.VISIBLE);
+//			    	initialLetter.setText(firstLetter);
+//			    	initialLetter.setTextSize(100);
+//			    	initialLetter.setTextColor(Color.WHITE);
+//			    	initialLetter.setVisibility(View.VISIBLE);
 			    }
 		    }
 		    
@@ -217,7 +217,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 					}
 					else{
 						imageView.setImageBitmap(imBitmap);
-						initialLetter.setVisibility(View.GONE);
+//						initialLetter.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -343,7 +343,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 						}
 						else{
 							imageView.setImageBitmap(imBitmap);
-							initialLetter.setVisibility(View.GONE);
+//							initialLetter.setVisibility(View.GONE);
 						}
 					}
 				}

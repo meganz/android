@@ -2055,6 +2055,9 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
+    			
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 				ft.replace(R.id.fragment_container, maFLol, "maF");
     			ft.commit();
@@ -6080,7 +6083,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_drawer_account_view:{
-				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_SHORT).show();
 				drawerItem = DrawerItem.ACCOUNT;
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
