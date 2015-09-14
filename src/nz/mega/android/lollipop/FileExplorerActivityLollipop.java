@@ -32,6 +32,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,11 +83,13 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 	
 	public static int CLOUD_TAB = 0;
 	public static int INCOMING_TAB = 1;
+	
+	Toolbar tB;
+    ActionBar aB;
 
-	private ImageView windowBack;
-	private boolean backVisible = false;
-	private TextView windowTitle;
-	private ImageButton newFolderButton;
+//	private ImageView windowBack;
+//	private boolean backVisible = false;
+//	private TextView windowTitle;
 	
 	private MegaApiAndroid megaApi;
 	private int mode;
@@ -160,7 +164,7 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		log("onCreate first");
 		super.onCreate(savedInstanceState);
-		
+				
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		if (dbH.getCredentials() == null){
@@ -177,6 +181,14 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 		megaApi.addGlobalListener(this);
 		
 		setContentView(R.layout.activity_file_explorer);
+		
+		//Set toolbar
+		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
+		setSupportActionBar(tB);
+		aB = getSupportActionBar();
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setDisplayShowHomeEnabled(true);
         		
 		Intent intent = getIntent();
 		if (megaApi.getRootNode() == null){
@@ -344,17 +356,8 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 				}
 			});
 		}
-		
-		newFolderButton = (ImageButton) findViewById(R.id.file_explorer_new_folder);
-		newFolderButton.setOnClickListener(this);
-		
-		windowTitle = (TextView) findViewById(R.id.file_explorer_window_title);
-		actionBarTitle = getString(R.string.section_cloud_drive);
-		windowTitle.setText(actionBarTitle);
-		
-		windowBack = (ImageView) findViewById(R.id.file_explorer_back);
-		windowBack.setOnClickListener(this);
-		windowTitle.setOnClickListener(this);
+	
+		aB.setTitle(getString(R.string.section_cloud_drive));	
 
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
@@ -369,21 +372,19 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
     }
 	
 	public void changeBackVisibility(boolean backVisible){
-		this.backVisible = backVisible;
-		if (windowBack != null){
-			if (!backVisible){
-				windowBack.setVisibility(View.INVISIBLE);
-			}
-			else{
-				windowBack.setVisibility(View.VISIBLE);
-			}
-		}
+//		this.backVisible = backVisible;
+//		if (windowBack != null){
+//			if (!backVisible){
+//				windowBack.setVisibility(View.INVISIBLE);
+//			}
+//			else{
+//				windowBack.setVisibility(View.VISIBLE);
+//			}
+//		}
 	}
 	
 	public void changeTitle (String title){
-		if (windowTitle != null){
-			windowTitle.setText(title);
-		}
+		aB.setTitle(title);	
 	}
 	
 	private String getFragmentTag(int viewPagerId, int fragmentPosition)
@@ -749,10 +750,10 @@ public class FileExplorerActivityLollipop extends PinActivity implements OnClick
 				break;
 			}
 			case R.id.file_explorer_window_title:{
-				if (backVisible){
-					onBackPressed();
-					break;
-				}
+//				if (backVisible){
+//					onBackPressed();
+//					break;
+//				}
 			}
 		}
 	}

@@ -210,7 +210,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 		}
 		else
 		{
-//			onCreateOlder(savedInstanceState);
+			onCreateOlder(savedInstanceState);
 		}
 	}
 	
@@ -270,8 +270,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 //			prepareNodesText.setVisibility(View.GONE);
 //			loginProgressBar.setVisibility(View.GONE);
 //			queryingSignupLinkText.setVisibility(View.GONE);
-//			confirmingAccountText.setVisibility(View.GONE);
-			
+//			confirmingAccountText.setVisibility(View.GONE);			
 			
 			loginLogin.setVisibility(View.VISIBLE);
 			loginCreateAccount.setVisibility(View.VISIBLE);
@@ -311,14 +310,14 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 
 			}
 			else{
-				setContentView(R.layout.activity_file_explorer);
+				setContentView(R.layout.activity_file_provider);
 				log("megaApi.getRootNode() NOT null");
 
 				handler = new Handler();		
 
-				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
 				mTabHostProvider.setup();
-				viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
 
 				//Create tabs
 				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
@@ -334,8 +333,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 					//mTabHostContacts.addTab(tabSpec);
 					TabHost.TabSpec tabSpec4 = mTabHostProvider.newTabSpec("incomingProviderFragment");
 					tabSpec4.setIndicator(getTabIndicator(mTabHostProvider.getContext(), getString(R.string.tab_incoming_shares_explorer))); // new function to inject our own tab layout
-
-										
+									
 
 					//Set toolbar
 					tB = (Toolbar) findViewById(R.id.toolbar_provider);
@@ -355,8 +353,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 							if(tabId.equals("cloudProviderFragment")){                     	
 
 								tabShown=CLOUD_TAB;
-								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 								cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 								if(cDriveProviderLol!=null){
@@ -372,8 +370,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 
 								tabShown=INCOMING_TAB;
 
-								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 								iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 								if(iSharesProviderLol!=null){
@@ -598,7 +596,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 //				return;
 			}
 			else{
-				setContentView(R.layout.activity_file_explorer);
+				setContentView(R.layout.activity_file_provider);
 				log("megaApi.getRootNode() NOT null");
 			
 		
@@ -613,8 +611,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 					for (long n : moveFromHandles){
 						list.add(n);
 					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+					gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cDriveExplorer!=null){
 						cDriveExplorer.setDisableNodes(list);
@@ -628,8 +626,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 					for (long n : copyFromHandles){
 						list.add(n);
 					}
-					String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+					gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 					cDriveExplorer = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 					if(cDriveExplorer!=null){
 						cDriveExplorer.setDisableNodes(list);
@@ -653,9 +651,9 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				}
 			}*/
 			
-			mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+			mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
 			mTabHostProvider.setup();
-	        viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+	        viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
 	        
 	        //Create tabs
 	        mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
@@ -685,8 +683,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	                if(tabId.equals("cloudProviderFragment")){                     	
 	
 	     				tabShown=CLOUD_TAB;
-	    				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-	    				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+	    				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+	    				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 	    				cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 	
 	    				if(cDriveProvider!=null){
@@ -704,8 +702,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	
 	            		tabShown=INCOMING_TAB;
 	            		
-	            		String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-	            		gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+	            		String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+	            		gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 	    				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 	    		
 	    				if(iSharesProvider!=null){
@@ -896,8 +894,14 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
     }
 	
 	public void changeTitle (String title){
-		if (windowTitle != null){
-			windowTitle.setText(title);
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {	
+			aB.setTitle(title);
+		}
+		else
+		{
+			if (windowTitle != null){
+				windowTitle.setText(title);
+			}
 		}
 	}
 	
@@ -1036,8 +1040,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 		else{
 		
 			if(tabShown==CLOUD_TAB){
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 				cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 		
 				if(cDriveProvider!=null){
@@ -1048,8 +1052,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				}
 			}
 			else if(tabShown==INCOMING_TAB){
-				String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-				gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+				String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+				gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 				iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 			
 				if(iSharesProvider!=null){
@@ -1069,8 +1073,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 		log("onBackPressedLollipop: "+tabShown);
 
 		if(tabShown==CLOUD_TAB){
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+			gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 			cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 	
 			if(cDriveProviderLol!=null){
@@ -1081,8 +1085,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 			}
 		}
 		else if(tabShown==INCOMING_TAB){
-			String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-			gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+			String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+			gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 			iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 		
 			if(iSharesProviderLol!=null){
@@ -1374,12 +1378,12 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				Util.showErrorAlertDialog(errorMessage, false, this);
 			}
 			else{
-				setContentView(R.layout.activity_file_explorer);
+				setContentView(R.layout.activity_file_provider);
 				log("megaApi.getRootNode() NOT null");
 
-				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_explorer);
+				mTabHostProvider = (TabHost)findViewById(R.id.tabhost_provider);
 				mTabHostProvider.setup();
-				viewPagerProvider = (ViewPager) findViewById(R.id.explorer_tabs_pager);  
+				viewPagerProvider = (ViewPager) findViewById(R.id.provider_tabs_pager);  
 
 				//Create tabs
 				mTabHostProvider.getTabWidget().setBackgroundColor(Color.BLACK);
@@ -1410,8 +1414,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 							if(tabId.equals("cloudProviderFragment")){                     	
 
 								tabShown=CLOUD_TAB;
-								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 								cDriveProviderLol = (CloudDriveProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 								if(cDriveProviderLol!=null){
@@ -1427,8 +1431,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 
 								tabShown=INCOMING_TAB;
 
-								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 								iSharesProviderLol = (IncomingSharesProviderFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 								if(iSharesProviderLol!=null){
@@ -1466,8 +1470,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 							if(tabId.equals("cloudProviderFragment")){                     	
 
 								tabShown=CLOUD_TAB;
-								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
+								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 0);
 								cDriveProvider = (CloudDriveProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 								if(cDriveProvider!=null){
@@ -1485,8 +1489,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 
 								tabShown=INCOMING_TAB;
 
-								String cFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
-								gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+								String cFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
+								gcFTag = getFragmentTag(R.id.provider_tabs_pager, 1);
 								iSharesProvider = (IncomingSharesProviderFragment) getSupportFragmentManager().findFragmentByTag(cFTag);
 
 								if(iSharesProvider!=null){
