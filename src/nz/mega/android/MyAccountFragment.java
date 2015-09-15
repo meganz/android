@@ -610,7 +610,7 @@ public class MyAccountFragment extends Fragment implements OnClickListener, Mega
 	}
 
 	public static void log(String log) {
-		Util.log("ContactPropertiesFragment", log);
+		Util.log("MyAccountFragment", log);
 	}
 
 	@Override

@@ -32,9 +32,6 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 	private Button changePasswordButton;
 	
 	private ActionBar aB;
-	
-	private UserCredentials newCredentials = null;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -211,8 +208,6 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 	}
 	
 	private void changePassword (String email, String newPassword, String oldPassword){
-		newCredentials = new UserCredentials(email);
-		
 		megaApi.changePassword(oldPassword, newPassword, this);
 	}
 	
@@ -238,13 +233,6 @@ public class ChangePasswordActivity extends PinActivity implements OnClickListen
 				
 			}
 			else{
-				//Now update the credentials
-				newCredentials.setSession(megaApi.dumpSession());
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-//				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext()); 
-				dbH.clearCredentials();
-				dbH.saveCredentials(newCredentials);
-				
 				try{ 
 					progress.dismiss();
 				} catch(Exception ex) {};

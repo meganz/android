@@ -600,7 +600,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	public static void log(String log) {
-		Util.log("ContactPropertiesFragment", log);
+		Util.log("MyAccountFragmentLollipop", log);
 	}
 
 	@Override

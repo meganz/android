@@ -797,7 +797,6 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 //				DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 				dbH.clearCredentials();
-				dbH.saveCredentials(credentials);
 				
 				log("Logged in: " + gSession);
 				
@@ -822,6 +821,16 @@ public class LoginActivity extends Activity implements OnClickListener, MegaRequ
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			if (error.getErrorCode() == MegaError.API_OK){
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				
+				gSession = megaApi.dumpSession();
+				lastEmail = megaApi.getMyEmail();
+				credentials = new UserCredentials(lastEmail, gSession);
+				
+				dbH.saveCredentials(credentials);
+			}
+			
 			if(confirmLink==null){
 				if (error.getErrorCode() != MegaError.API_OK) {
 					String errorMessage;
