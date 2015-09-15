@@ -181,7 +181,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			break;
 		}
 		case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
-			((ContactPropertiesMainActivity) context).setParentHandle(parentHandle);
+			((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
 			break;
 		}
 		case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER: {

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nz.mega.android.ContactFileListFragment;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
 import nz.mega.android.FileStorageActivity;
@@ -89,7 +88,7 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 	AlertDialog permissionsDialog;
 
 	ContactPropertiesFragmentLollipop cpF;
-	ContactFileListFragment cflF;
+	ContactFileListFragmentLollipop cflF;
 
 	MenuItem shareMenuItem;
 	MenuItem viewSharedItem;
@@ -225,7 +224,7 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 			}
 			case CONTACT_FILE_LIST:{
 				if (cflF == null){
-					cflF = new ContactFileListFragment();
+					cflF = new ContactFileListFragmentLollipop();
 				}
 				cflF.setUserEmail(userEmail);
 	
