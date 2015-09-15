@@ -5747,7 +5747,8 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					outSFLol.showOptionsPanel(node);
 				}				
 			}
-		}	
+		}
+		//PONER el contacts
 	}
 	
 	public void showOptionsPanel(MegaOffline node){

@@ -38,30 +38,29 @@
      
     </RelativeLayout>
     -->
-    
-    <RelativeLayout 
+
+    <RelativeLayout
         android:id="@+id/contact_image_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" >
 
-    <nz.mega.android.utils.FixedCenterCrop
-        android:id="@+id/contact_properties_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop" />
-    
-         <TextView
-         android:id="@+id/contact_properties_name"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:gravity="center"
-         android:textColor="@color/white"
-         android:layout_alignBottom="@+id/contact_properties_image"
-         android:textSize="20sp"
-         android:textStyle="bold" />    
-    
+        <nz.mega.android.utils.FixedCenterCrop
+            android:id="@+id/contact_properties_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/contact_properties_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/contact_properties_image"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
     </RelativeLayout>
-    
+
     <!--
     	<TextView
             android:id="@+id/contact_properties_initial_letter"
@@ -89,20 +88,35 @@
         android:gravity="left"
         android:orientation="horizontal" >
 
-     <ImageView
+        <ImageView
             android:id="@+id/contact_email_icon"
             style="@style/dialogActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_share" />               
+            android:src="@drawable/ic_share" />
 
-
-        <TextView
-            android:id="@+id/contact_properties_email"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/email_text_layout"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-           	android:layout_gravity="center_horizontal"
-            android:textColor="@color/file_properties_info_menu" />
+            android:background="@color/orange"
+            android:gravity="left"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/email_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email_text"
+                android:textColor="@color/file_properties_info_menu"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/contact_properties_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/file_properties_info_menu" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

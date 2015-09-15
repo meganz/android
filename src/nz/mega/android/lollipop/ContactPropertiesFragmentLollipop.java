@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import nz.mega.android.ContactPropertiesMainActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.R;
 import nz.mega.android.utils.FixedCenterCrop;
@@ -272,7 +271,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 		switch (v.getId()) {
 		case R.id.shared_folders_button:{
-			((ContactPropertiesMainActivity)context).onContentClick(userEmail);
+			((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
 			break;
 		}
 		}
@@ -294,17 +293,17 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 		String info = "";
 		if (numFolders > 0){
-			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
+			info = numFolders +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders).toUpperCase(Locale.getDefault());
 			if (numFiles > 0){
-				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
+				info = info + ", " + numFiles + " " + getResources().getQuantityString(R.plurals.general_num_folders, numFiles).toUpperCase(Locale.getDefault());
 			}
 		}
 		else {
 			if (numFiles == 0){
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFolders);
+				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFolders).toUpperCase(Locale.getDefault());
 			}
 			else{
-				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_shared_folders, numFiles);
+				info = numFiles +  " " + getResources().getQuantityString(R.plurals.general_num_folders, numFiles).toUpperCase(Locale.getDefault());
 			}
 		}
 

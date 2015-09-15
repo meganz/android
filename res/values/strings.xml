@@ -117,7 +117,7 @@
     
     
     <string name="login_text" context="Login button">Login</string>
-    <string name="email_text" context="email label">e-mail</string>
+    <string name="email_text" context="email label">Email</string>
     <string name="password_text" context="password label">password</string>
     <string name="confirm_password_text" context="label shown in the confirmation of the password when creating an account">Confirm password</string>
     <string name="abc" context="in the password edittext the user can see the password or asterisks. ABC shows the letters of the password">ABC</string>

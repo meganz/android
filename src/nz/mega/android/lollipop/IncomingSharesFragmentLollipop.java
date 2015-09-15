@@ -714,18 +714,15 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		log("showOptionsPanel");		
 	
 		this.selectedNode = sNode;
-		MegaNode folder = null;
 		
 		if (selectedNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
-			folder = selectedNode;
 		}else{
 			propertiesText.setText(R.string.general_file_info);
-			folder = megaApi.getParentNode(selectedNode);
 		}			
 
-		int accessLevel = megaApi.getAccess(folder);
-		log("Node: "+folder.getName()+" "+accessLevel);
+		int accessLevel = megaApi.getAccess(selectedNode);
+		log("Node: "+selectedNode.getName()+" "+accessLevel);
 		
 		switch (accessLevel) {			
 			case MegaShare.ACCESS_FULL: {
