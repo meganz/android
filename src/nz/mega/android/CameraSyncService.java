@@ -75,8 +75,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	MegaApplication app;
 	DatabaseHandler dbH;
 	
-	UserCredentials credentials;	
-	
 	static public boolean running = false;
 	private boolean canceled;
 	
@@ -133,6 +131,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 	
 	static CameraSyncService cameraSyncService;
 	
+	boolean isLogging = false;
+	
 	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(){
@@ -183,23 +183,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if (!Util.isOnline(this)){
 			log("Not online");
 			finish();
-			return START_NOT_STICKY;
-		}
-		
-		credentials = dbH.getCredentials();
-		
-		if (credentials == null){
-			log("There are not user credentials");
-			finish();
-			return START_NOT_STICKY;
-		}
-		
-		String gSession = credentials.getSession();
-		
-		if (megaApi.getRootNode() == null){
-			log("RootNode = null");
-			running = true;
-			megaApi.fastLogin(gSession, this);
 			return START_NOT_STICKY;
 		}
 		
@@ -273,6 +256,27 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 							}
 						}
 					}
+					
+					UserCredentials credentials = dbH.getCredentials();
+					
+					if (credentials == null){
+						log("There are not user credentials");
+						finish();
+						return START_NOT_STICKY;
+					}
+					
+					String gSession = credentials.getSession();
+					
+					if (megaApi.getRootNode() == null){
+						log("RootNode = null");
+						running = true;
+						if (!isLogging){
+							isLogging = true;
+							megaApi.fastLogin(gSession, this);
+						}						
+						return START_NOT_STICKY;
+					}
+					
 //					//TODO: now assuming that ischarging is needed
 //					if (!isCharging){
 //						log("no charging...");
@@ -1646,24 +1650,24 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		if (request.getType() == MegaRequest.TYPE_LOGIN){
 			if (e.getErrorCode() == MegaError.API_OK){
 				log("Fast login OK");
-				
-				dbH.clearCredentials();
-				String gSession = megaApi.dumpSession();
-				String lastEmail = credentials.getEmail();
-				credentials = new UserCredentials(lastEmail, gSession);
-				dbH.saveCredentials(credentials);
-				
-
 				log("Calling fetchNodes from CameraSyncService");
 				megaApi.fetchNodes(this);
 			}
 			else{
-				retryLaterShortTime();
+				log("ERROR: " + e.getErrorString());
+				isLogging = false;
+				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
 			if (e.getErrorCode() == MegaError.API_OK){
+				isLogging = false;
 				retryLaterShortTime();
+			}
+			else{
+				log("ERROR: " + e.getErrorString());
+				isLogging = false;
+				finish();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){		

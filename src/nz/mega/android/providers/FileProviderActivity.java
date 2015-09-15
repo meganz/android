@@ -111,10 +111,8 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 	
 	private String lastEmail;
 	private String lastPassword;
-	private String gSession;
 	private String gPublicKey;
 	private String gPrivateKey;
-	UserCredentials credentials;
 	
 	private MenuItem searchMenuItem;
 	
@@ -257,7 +255,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 		
 //		Intent intent = getIntent();
 		checkLogin();
-		credentials = dbH.getCredentials();
+		UserCredentials credentials = dbH.getCredentials();
 		if (credentials == null){
 			
 //			loginLogin.setVisibility(View.VISIBLE);
@@ -292,7 +290,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				log("megaApi.getRootNode() == null");
 				
 				lastEmail = credentials.getEmail();
-				gSession = credentials.getSession();
+				String gSession = credentials.getSession();
 				
 				loginLogin.setVisibility(View.GONE);
 				loginDelimiter.setVisibility(View.GONE);
@@ -437,7 +435,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 		megaApi.addTransferListener(this);
 		
 		Intent intent = getIntent();		
-		credentials = dbH.getCredentials();
+		UserCredentials credentials = dbH.getCredentials();
 		if (credentials == null){
 			setContentView(R.layout.activity_login_returning);
 			log("dbH.getCredentials() == null");
@@ -531,7 +529,7 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				setContentView(R.layout.activity_login_returning);
 				log("megaApi.getRootNode() == null");
 				lastEmail = credentials.getEmail();
-				gSession = credentials.getSession();
+				String gSession = credentials.getSession();
 				
 				loginTitle = (TextView) findViewById(R.id.login_text_view);
 				loginLogin = (LinearLayout) findViewById(R.id.login_login_layout);
@@ -1330,7 +1328,6 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				Util.showErrorAlertDialog(errorMessage, false, this);
 				
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
 				if (dbH.getPreferences() != null){
 					dbH.clearPreferences();
 					dbH.setFirstTime(false);
@@ -1348,14 +1345,14 @@ public class FileProviderActivity extends AppCompatActivity implements OnClickLi
 				fetchingNodesText.setVisibility(View.VISIBLE);
 				prepareNodesText.setVisibility(View.GONE);
 				
-				gSession = megaApi.dumpSession();
-				credentials = new UserCredentials(lastEmail, gSession);
+//				gSession = megaApi.dumpSession();
+//				credentials = new UserCredentials(lastEmail, gSession);
 				
-				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-				dbH.clearCredentials();
-				dbH.saveCredentials(credentials);
+//				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+//				dbH.clearCredentials();
+//				dbH.saveCredentials(credentials);
 				
-				log("Logged in: " + gSession);
+				log("Logged in");
 				
 				megaApi.fetchNodes(this);
 			}
