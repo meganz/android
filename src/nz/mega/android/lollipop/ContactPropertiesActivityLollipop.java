@@ -250,6 +250,14 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 //		statusDialog = temp;
 		megaApi.remove(n);
 	}
+	
+	public void leaveMultipleShares (ArrayList<Long> handleList){
+		
+		for (int i=0; i<handleList.size(); i++){
+			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+			this.leaveIncomingShare(node);
+		}
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -760,7 +768,7 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 		megaApi.renameNode(document, newName, this);
 	}
 
-	public void showMove(ArrayList<Long> handleList){
+	public void showMoveLollipop(ArrayList<Long> handleList){
 
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_MOVE_FOLDER);
@@ -772,7 +780,7 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
 
-	public void showCopy(ArrayList<Long> handleList) {
+	public void showCopyLollipop(ArrayList<Long> handleList) {
 
 		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
 		intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_COPY_FOLDER);
@@ -833,6 +841,34 @@ public class ContactPropertiesActivityLollipop extends PinActivity implements Me
 				megaApi.copyNode(megaApi.getNodeByHandle(copyHandles[i]), parent, this);
 			}
 		}
+		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
+	
+			if(!Util.isOnline(this)){
+				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				return;
+			}
+			
+			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
+			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
+//			final int totalMoves = moveHandles.length;
+			
+			MegaNode parent = megaApi.getNodeByHandle(toHandle);
+			
+			ProgressDialog temp = null;
+			try{
+				temp = new ProgressDialog(this);
+				temp.setMessage(getString(R.string.context_moving));
+				temp.show();
+			}
+			catch(Exception e){
+				return;
+			}
+			statusDialog = temp;
+			
+			for(int i=0; i<moveHandles.length;i++){
+				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+			}
+		}		
 		else if (requestCode == REQUEST_CODE_GET && resultCode == RESULT_OK) {
 			Uri uri = intent.getData();
 			intent.setAction(Intent.ACTION_GET_CONTENT);

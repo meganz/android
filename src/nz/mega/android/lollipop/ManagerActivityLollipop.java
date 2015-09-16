@@ -5748,7 +5748,6 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}				
 			}
 		}
-		//PONER el contacts
 	}
 	
 	public void showOptionsPanel(MegaOffline node){
@@ -5762,6 +5761,9 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	public void showOptionsPanel(MegaUser user){
 		log("showOptionsPanel-Offline");
 		
+		String cFTag1 = getFragmentTag(R.id.contact_tabs_pager, 0);	
+		log("Tag: "+ cFTag1);
+		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 		if (cFLol != null){				
 			cFLol.showOptionsPanel(user);				
 		}			
@@ -5786,7 +5788,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			if (sRFLol != null){				
 				sRFLol.showOptionsPanel(request);				
 			}				
-		}		
+		}	
 	}
 	
 	private int getAvatarTextSize (float density){

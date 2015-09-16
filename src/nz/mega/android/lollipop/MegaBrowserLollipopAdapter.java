@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import nz.mega.android.ContactPropertiesMainActivity;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaOffline;
@@ -624,8 +623,13 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						notifyDataSetChanged();
 					}
 				}
+				if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
+					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
+				}
+				else{
+					((ManagerActivityLollipop) context).showOptionsPanel(n);
+				}				
 				
-				((ManagerActivityLollipop) context).showOptionsPanel(n);
 				break;
 			}
 			case R.id.file_list_item_layout:{
@@ -640,6 +644,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER){
 					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
+					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
 				}
 				else{
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
@@ -675,7 +682,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			break;
 		}
 		case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
-			((ContactPropertiesMainActivity) context).setParentHandle(parentHandle);
+			((ContactPropertiesActivityLollipop) context).setParentHandle(parentHandle);
 			break;
 		}
 		case ManagerActivityLollipop.RUBBISH_BIN_ADAPTER: {
