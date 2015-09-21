@@ -72,7 +72,7 @@ import nz.mega.sdk.MegaUser;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -132,10 +132,10 @@ import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -203,7 +203,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	MegaApiAndroid megaApi;
 	Handler handler;
     ArrayList<MegaTransfer> tL;	
-    
+	DisplayMetrics outMetrics;
     FrameLayout fragmentContainer;
     
     Toolbar tB;
@@ -711,7 +711,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 		
@@ -1213,8 +1213,9 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 					
 					final Intent cancelIntent = tempIntent;
-					AlertDialog.Builder builder = Util.getCustomAlertBuilder(this,
-							title, text, null);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					builder.setTitle(title);
+		            builder.setMessage(text);
 					builder.setPositiveButton(getString(R.string.general_yes),
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int whichButton) {
@@ -3010,7 +3011,8 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							}	
 							else if(megaApi.checkAccess(checkNode, MegaShare.ACCESS_READ).getErrorCode() == MegaError.API_OK){
 								log("Not permissions to upload");
-								AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.no_permissions_upload), null, null);
+								AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+					            builder.setMessage(getString(R.string.no_permissions_upload));
 								builder.setTitle(R.string.op_not_allowed);
 								builder.setCancelable(false).setPositiveButton(R.string.cam_sync_ok, new DialogInterface.OnClickListener() {
 							           public void onClick(DialogInterface dialog, int id) {
@@ -3021,7 +3023,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 								
 								alertNotPermissionsUpload = builder.create();
 								alertNotPermissionsUpload.show();
-								Util.brandAlertDialog(alertNotPermissionsUpload);
+//								Util.brandAlertDialog(alertNotPermissionsUpload);
 							}
 		        		}
 	        		}
@@ -3220,9 +3222,9 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	        		}
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
-	        		
-	    			Toast toast = Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG);
-	    			toast.show();
+
+	    			Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_SHORT).show();
+
 //	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSFLol");
 //	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 //	        			fragTransaction.detach(currentFragment);
@@ -3380,7 +3382,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		        		
 		        		sortByDialog = builder.create();
 		        		sortByDialog.show();
-		        		Util.brandAlertDialog(sortByDialog);
+//		        		Util.brandAlertDialog(sortByDialog);
 		        		
 		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
 		        		byNameTextView.setText(getString(R.string.sortby_name));
@@ -3483,7 +3485,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		        		
 		        		sortByDialog = builder.create();
 		        		sortByDialog.show();
-		        		Util.brandAlertDialog(sortByDialog);
+//		        		Util.brandAlertDialog(sortByDialog);
 		        		
 		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
 		        		byNameTextView.setText(getString(R.string.sortby_name));
@@ -3588,7 +3590,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		        		
 		        		sortByDialog = builder.create();
 		        		sortByDialog.show();
-		        		Util.brandAlertDialog(sortByDialog);
+//		        		Util.brandAlertDialog(sortByDialog);
 		        		
 		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
 		        		byNameTextView.setText(getString(R.string.sortby_name));
@@ -3724,7 +3726,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		        		
 		        		sortByDialog = builder.create();
 		        		sortByDialog.show();
-		        		Util.brandAlertDialog(sortByDialog);
+//		        		Util.brandAlertDialog(sortByDialog);
 		        		
 		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
 		        		byNameTextView.setText(getString(R.string.sortby_name));
@@ -3993,7 +3995,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 								out.write(key);	
 								out.close(); 								
 								String toastMessage = getString(R.string.toast_master_key) + " " + path;
-								Toast.makeText(getBaseContext(), toastMessage, Toast.LENGTH_LONG).show();	
+				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_SHORT).show();
 								removeMK.setVisible(true);
 					        	exportMK.setVisible(false);
 
@@ -4373,7 +4375,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				else
 				{
 					//Show error message, just one file
-					Toast.makeText(this, getString(R.string.context_select_one_file), Toast.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_select_one_file), Snackbar.LENGTH_SHORT).show();
 				}		    	
 			}
 			else{
@@ -4416,7 +4418,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			if(url != null) {
 				log("url NOT null");
 				if(availableFreeSpace < size) {
-					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_SHORT).show();
 					log("Not enough space");
 					return;
 				}
@@ -4488,8 +4490,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 									log("call to startActivity(intentShare)");
 									startActivity(intentShare);
 								}									
-								String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-								Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+								Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_SHORT).show();
 							}								
 						}
 						return;
@@ -4518,7 +4519,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 						
 						if(availableFreeSpace < document.getSize()){
 							log("Not enough space");
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space)+ " (" + new String(document.getName()) + ")", Snackbar.LENGTH_SHORT).show();							
 							continue;
 						}
 						
@@ -4535,7 +4536,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					log("URL NOT null");
 					if(availableFreeSpace < size) {
 						log("Not enough space");
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_SHORT).show();
 						continue;
 					}
 					log("start service");
@@ -4616,16 +4617,14 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			    catch(Exception e){
 			    	log("Exception in External SDCARD");
 			    	Environment.getExternalStorageDirectory();
-					Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
-					toast.show();
+			    	Snackbar.make(fragmentContainer, getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_SHORT).show();
 			    }
 			}
 		}
 		else{
 			log("No external SD card");
 			Environment.getExternalStorageDirectory();
-			Toast toast = Toast.makeText(this, getString(R.string.no_external_SD_card_detected), Toast.LENGTH_LONG);
-			toast.show();
+			Snackbar.make(fragmentContainer, getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_SHORT).show();
 		}		
 	}
 	
@@ -4669,20 +4668,20 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 		});
 
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(document.getName()), null, input);
-		builder.setPositiveButton(getString(R.string.context_rename),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						rename(document, value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		renameDialog = builder.create();
-		renameDialog.show();
+//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(document.getName()), null, input);
+//		builder.setPositiveButton(getString(R.string.context_rename),
+//				new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int whichButton) {
+//						String value = input.getText().toString().trim();
+//						if (value.length() == 0) {
+//							return;
+//						}
+//						rename(document, value);
+//					}
+//				});
+//		builder.setNegativeButton(getString(android.R.string.cancel), null);
+//		renameDialog = builder.create();
+//		renameDialog.show();
 
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -4709,7 +4708,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		
 		if(!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 			return;
 		}
 		
@@ -4809,7 +4808,8 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	}
 	
 	public void shareFolderLollipop(MegaNode node){
-		log("shareFolderLollipop");		
+		log("shareFolderLollipop");	
+		log("Sale el AlertDialog");
 											
 		Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SHARE_FOLDER);
     	intent.setClass(this, ContactsExplorerActivityLollipop.class);
@@ -4824,7 +4824,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	public void getPublicLinkAndShareIt(MegaNode document){
 		log("getPublicLinkAndShareIt");
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 			return;
 		}
 		
@@ -4852,7 +4852,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		isClearRubbishBin = false;
 		
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 			return;
 		}		
 		
@@ -4924,17 +4924,23 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			while (megaApi.getParentNode(p) != null){
 				p = megaApi.getParentNode(p);
 			}
-			if (p.getHandle() != megaApi.getRubbishNode().getHandle()){
-				AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-				String message= getResources().getString(R.string.confirmation_move_to_rubbish);
-				builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-			    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+			if (p.getHandle() != megaApi.getRubbishNode().getHandle()){				
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
+	            builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+	            builder.setPositiveButton(R.string.general_yes, dialogClickListener);
+	            builder.setNegativeButton(R.string.general_no, dialogClickListener);
+	            builder.show();
 			}
 			else{
-				AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
-				String message= getResources().getString(R.string.confirmation_delete_from_mega);
-				builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
-			    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
+				builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+				builder.setPositiveButton(R.string.general_yes, dialogClickListener);
+				builder.setNegativeButton(R.string.general_no, dialogClickListener);
+				builder.show();
 			}
 		}
 	}
@@ -4946,27 +4952,27 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_open_link_title),KeyEvent.KEYCODE_ENTER);
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_open_link_title), null, input);
-		builder.setPositiveButton(getString(R.string.context_open_link),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						
-						try{
-							openLinkDialog.dismiss();
-						}
-						catch(Exception e){}
-						importLink(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		openLinkDialog = builder.create();
-		openLinkDialog.show();
-		Util.brandAlertDialog(openLinkDialog);
+//		input.setImeActionLabel(getString(R.string.context_open_link_title),KeyEvent.KEYCODE_ENTER);
+//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_open_link_title), null, input);
+//		builder.setPositiveButton(getString(R.string.context_open_link),
+//				new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int whichButton) {
+//						String value = input.getText().toString().trim();
+//						if (value.length() == 0) {
+//							return;
+//						}
+//						
+//						try{
+//							openLinkDialog.dismiss();
+//						}
+//						catch(Exception e){}
+//						importLink(value);
+//					}
+//				});
+//		builder.setNegativeButton(getString(android.R.string.cancel), null);
+//		openLinkDialog = builder.create();
+//		openLinkDialog.show();
+//		Util.brandAlertDialog(openLinkDialog);
 		
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -5084,7 +5090,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			public void onClick(DialogInterface dialog, int which) {
 				feedback = text.getText().toString();
 				if(feedback.matches("")||feedback.isEmpty()){
-					Toast.makeText(managerActivity, getString(R.string.reason_cancel_subscriptions), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.reason_cancel_subscriptions), Snackbar.LENGTH_SHORT).show();
 				}
 				else{
 					showCancelConfirmation(feedback);			
@@ -5102,7 +5108,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		
 		cancelDialog = builder.create();
 		cancelDialog.show();
-		Util.brandAlertDialog(cancelDialog);
+//		Util.brandAlertDialog(cancelDialog);
 	}
 	
 	public void showCancelConfirmation(final String feedback){
@@ -5139,23 +5145,24 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			fbFLol.notifyDataSetChanged();
 		}
 		
-		String text;
-		if (editText == null || editText.equals("")){
-			text = getString(R.string.context_new_folder_name);
-		}
-		else{
-			text = editText;
-		}
+//		String text;
+//		if (editText == null || editText.equals("")){
+//			text = getString(R.string.context_new_folder_name);
+//		}
+//		else{
+//			text = editText;
+//		}
 		
 		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setSelectAllOnFocus(true);
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.context_new_folder_name));
+//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
@@ -5170,7 +5177,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		});
 		input.setImeActionLabel(getString(R.string.general_create),
 				KeyEvent.KEYCODE_ENTER);
-		input.setText(text);
+//		input.setText(text);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -5179,8 +5186,11 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 		});
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_new_folder),
-				null, input);
+		
+		input.setWidth(Util.scaleWidthPx(40, outMetrics));
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.menu_new_folder));
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -5192,6 +5202,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(input);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 	}
@@ -5199,7 +5210,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	private void createFolder(String title) {
 		log("createFolder");
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 			return;
 		}
 		
@@ -5243,7 +5254,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			megaApi.createFolder(title, parentNode, this);
 		}
 		else{
-			Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
+			Snackbar.make(fragmentContainer, getString(R.string.context_folder_already_exists), Snackbar.LENGTH_SHORT).show();
 		}		
 	}
 	
@@ -5263,7 +5274,9 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			text = editText;
 		}
 		
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_clear_rubbish), null, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle("Clear Rubbbish Bin?");
+		builder.setMessage(getString(R.string.context_clear_rubbish));
 		builder.setPositiveButton(getString(R.string.general_empty),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -5273,7 +5286,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		clearRubbishBinDialog = builder.create();
 		clearRubbishBinDialog.show();
-		Util.brandAlertDialog(clearRubbishBinDialog);
+//		Util.brandAlertDialog(clearRubbishBinDialog);
 	}
 	
 	private void clearRubbishBin(){
@@ -5328,12 +5341,13 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							showUpAF(null);
 						}
 						else{
-							Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+							Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
+							
 						}
 					}
 					else{
 						log("CURRENTLY ACTIVE SUBSCRIPTION");
-						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
 					}
 				}
 				else{
@@ -5343,16 +5357,16 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 						showUpAF(null);
 					}
 					else{
-						Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
 					}
 				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
 			}
 		}
 		else{
-			Toast.makeText(this, getString(R.string.not_upgrade_is_possible), Toast.LENGTH_LONG).show();
+			Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
 		}
 	}
 	
@@ -5447,27 +5461,27 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 		});
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_add_contact),
-				null, input);
-		builder.setPositiveButton(getString(R.string.general_add),
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						inviteContact(value);
-					}
-				});
-		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		addContactDialog = builder.create();
-		addContactDialog.show();
+//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_add_contact),
+//				null, input);
+//		builder.setPositiveButton(getString(R.string.general_add),
+//				new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog, int whichButton) {
+//						String value = input.getText().toString().trim();
+//						if (value.length() == 0) {
+//							return;
+//						}
+//						inviteContact(value);
+//					}
+//				});
+//		builder.setNegativeButton(getString(android.R.string.cancel), null);
+//		addContactDialog = builder.create();
+//		addContactDialog.show();
 	}
 	
 	public void addContact(String contactEmail){
 		log("addContact");
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 			return;
 		}
 		
@@ -5492,7 +5506,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		log("inviteContact");
 		
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 			return;
 		}
 		
@@ -5882,7 +5896,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			
 			overquotaDialog = builder.create();
 			overquotaDialog.show();
-			Util.brandAlertDialog(overquotaDialog);
+//			Util.brandAlertDialog(overquotaDialog);
 		}	
 	}
 	
@@ -6184,7 +6198,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 				return;
 			}
 			
@@ -6210,7 +6224,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 				return;
 			}
 			
@@ -6284,7 +6298,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 				return;
 			}
 
@@ -6448,12 +6462,12 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					String type = contactsData.get(i);
 					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
 						i++;
-						Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_SHORT).show();
 //						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 					}
 					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
 						i++;
-						Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_SHORT).show();
 //						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
 					}
 				}
@@ -6514,7 +6528,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 				return;
 			}
 			
@@ -6548,7 +6562,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
 				return;
 			}
 			
@@ -6889,17 +6903,15 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		
 		if(parentNode == null){
-			Util.showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_temporary_unavaible), Snackbar.LENGTH_SHORT).show();
 			return;
 		}
 			
 		if (infos == null) {
-			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
-					false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_SHORT).show();
 		} 
 		else {
-			Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
-					Toast.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_SHORT).show();
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -7136,10 +7148,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.cancel_subscription_ok), Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_SHORT).show();
 			}
 			else{
-				Toast.makeText(this, getString(R.string.cancel_subscription_error), Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_SHORT).show();
 			}
 			megaApi.creditCardQuerySubscriptions(this);
 		}
@@ -7186,18 +7198,18 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
-				Toast.makeText(this, getString(R.string.context_contact_invitation_resent), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_resent), Snackbar.LENGTH_SHORT).show();
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
-						Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();					
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_added), Snackbar.LENGTH_SHORT).show();			
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
 					{
-						Toast.makeText(this, getString(R.string.context_contact_invitation_deleted), Toast.LENGTH_LONG).show();					
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_deleted), Snackbar.LENGTH_SHORT).show();	
 					}
 //					else
 //					{
@@ -7207,10 +7219,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				else{
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
-						Toast.makeText(this, request.getEmail()+" "+getString(R.string.context_contact_already_exists), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists), Snackbar.LENGTH_SHORT).show();	
 					}
 					else{
-						Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_SHORT).show();	
 					}				
 					log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 				}
@@ -7220,13 +7232,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			log("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: "+request.getType());
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				
-				Toast.makeText(this, getString(R.string.context_invitacion_reply), Toast.LENGTH_LONG).show();
-	//			Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
-
+				Snackbar.make(fragmentContainer, getString(R.string.context_invitacion_reply), Snackbar.LENGTH_SHORT).show();	
 			}
 			else{
-				Toast.makeText(this, getString(R.string.general_error), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_SHORT).show();	
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -7365,20 +7374,20 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved_to_rubbish), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved_to_rubbish), Snackbar.LENGTH_SHORT).show();	
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_SHORT).show();	
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_SHORT).show();	
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_SHORT).show();	
 				}
 			
 				log("move nodes request finished");
@@ -7386,12 +7395,12 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.success_kill_all_sessions), Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_SHORT).show();
 			}
 			else
 			{
 				log("error when killing sessions: "+e.getErrorString());
-				Toast.makeText(this, getString(R.string.error_kill_all_sessions), Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_SHORT).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
@@ -7404,7 +7413,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							statusDialog.dismiss();	
 						} 
 						catch (Exception ex) {}
-						Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_SHORT).show();
 					}
 				}
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -7446,7 +7455,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}	
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_SHORT).show();
 			}
 			log("remove request finished");
 		}
@@ -7527,18 +7536,17 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
 					            clipboard.setPrimaryClip(clip);
 							}
-							
-							Toast.makeText(managerActivity, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+							Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_SHORT).show();
 						}
 					});
 					
 					getLinkDialog = builder.create();
 					getLinkDialog.show();
-					Util.brandAlertDialog(getLinkDialog);
+//					Util.brandAlertDialog(getLinkDialog);
 				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_link), Snackbar.LENGTH_SHORT).show();
 			}
 			log("export request finished");
 		}
@@ -7550,7 +7558,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_SHORT).show();
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					
 					int index = viewPagerCDrive.getCurrentItem();
@@ -7604,7 +7612,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_SHORT).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
@@ -7614,7 +7622,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE||drawerItem == DrawerItem.CONTACTS){
 					sendToInbox=false;
 					if (e.getErrorCode() == MegaError.API_OK){
-						Toast.makeText(this, getString(R.string.context_correctly_sent), Toast.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_SHORT).show();
 					}
 					else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 						log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -7622,7 +7630,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 					else
 					{
-						Toast.makeText(this, getString(R.string.context_no_sent), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_SHORT).show();
 					}
 				}				
 			}
@@ -7633,7 +7641,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				catch (Exception ex) {}
 				
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_SHORT).show();
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						
 						int index = viewPagerCDrive.getCurrentItem();
@@ -7672,7 +7680,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 					else
 					{
-						Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_SHORT).show();
 					}
 				}			
 			}			
@@ -7684,7 +7692,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_folder_created), Snackbar.LENGTH_SHORT).show();
 				if (fbFLol != null){
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
@@ -7714,7 +7722,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				selectDrawerItemLollipop(drawerItem);
 			}
 			else{
-				Toast.makeText(this, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_SHORT).show();
 			}
 		}
 	}
