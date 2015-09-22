@@ -486,7 +486,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
     }
     
     void alert(String message) {
-        AlertDialog.Builder bld = new AlertDialog.Builder(this);
+        AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
         bld.setMessage(message);
         bld.setNeutralButton("OK", null);
         log("Showing alert dialog: " + message);
@@ -4630,13 +4630,20 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	
 	public void showRenameDialog(final MegaNode document, String text){
 		log("showRenameDialog");
+		
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+	
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+//		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_rename),
-				KeyEvent.KEYCODE_ENTER);
+		input.setImeActionLabel(getString(R.string.context_rename),KeyEvent.KEYCODE_ENTER);
 		input.setText(text);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -4666,22 +4673,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 				}
 			}
-		});
-
-//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_rename) + " "	+ new String(document.getName()), null, input);
-//		builder.setPositiveButton(getString(R.string.context_rename),
-//				new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int whichButton) {
-//						String value = input.getText().toString().trim();
-//						if (value.length() == 0) {
-//							return;
-//						}
-//						rename(document, value);
-//					}
-//				});
-//		builder.setNegativeButton(getString(android.R.string.cancel), null);
-//		renameDialog = builder.create();
-//		renameDialog.show();
+		});		
 
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -4699,6 +4691,26 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				return false;
 			}
 		});
+		
+	    layout.addView(input, params);	    
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.context_rename) + " "	+ new String(document.getName()));
+		builder.setPositiveButton(getString(R.string.context_rename),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						rename(document, value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		renameDialog = builder.create();
+		renameDialog.show();
+
 	}
 	
 	private void rename(MegaNode document, String newName){
@@ -4947,32 +4959,41 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	
 	public void showImportLinkDialog(){
 		log("showRenameDialog");
-		final EditText input = new EditText(this);
-		input.setId(EDIT_TEXT_ID);
-		input.setSingleLine();
-		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
-//		input.setImeActionLabel(getString(R.string.context_open_link_title),KeyEvent.KEYCODE_ENTER);
-//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.context_open_link_title), null, input);
-//		builder.setPositiveButton(getString(R.string.context_open_link),
-//				new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int whichButton) {
-//						String value = input.getText().toString().trim();
-//						if (value.length() == 0) {
-//							return;
-//						}
-//						
-//						try{
-//							openLinkDialog.dismiss();
-//						}
-//						catch(Exception e){}
-//						importLink(value);
-//					}
-//				});
-//		builder.setNegativeButton(getString(android.R.string.cancel), null);
-//		openLinkDialog = builder.create();
-//		openLinkDialog.show();
-//		Util.brandAlertDialog(openLinkDialog);
+	    final EditText input = new EditText(this);
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine(false);
+		
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+	    layout.addView(input, params);
+		input.setImeActionLabel(getString(R.string.context_open_link_title),KeyEvent.KEYCODE_ENTER);
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.context_open_link_title));
+		builder.setPositiveButton(getString(R.string.context_open_link),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						
+						try{
+							openLinkDialog.dismiss();
+						}
+						catch(Exception e){}
+						importLink(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		openLinkDialog = builder.create();
+		openLinkDialog.show();
 		
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -5063,7 +5084,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	
 	public void showCancelMessage(){
 		AlertDialog cancelDialog;
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.title_cancel_subscriptions));
 		
 		LayoutInflater inflater = getLayoutInflater();
@@ -5132,7 +5153,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		    }
 		};
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setMessage(R.string.confirmation_cancel_subscriptions).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    .setNegativeButton(R.string.general_no, dialogClickListener).show();		
 		
@@ -5145,15 +5166,14 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			fbFLol.notifyDataSetChanged();
 		}
 		
-//		String text;
-//		if (editText == null || editText.equals("")){
-//			text = getString(R.string.context_new_folder_name);
-//		}
-//		else{
-//			text = editText;
-//		}
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+	    final EditText input = new EditText(this);
+	    layout.addView(input, params);		
 		
-		final EditText input = new EditText(this);
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
@@ -5175,9 +5195,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.general_create),
-				KeyEvent.KEYCODE_ENTER);
-//		input.setText(text);
+		input.setImeActionLabel(getString(R.string.general_create),KeyEvent.KEYCODE_ENTER);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -5186,8 +5204,6 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 		});
-		
-		input.setWidth(Util.scaleWidthPx(40, outMetrics));
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.menu_new_folder));
@@ -5202,7 +5218,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		builder.setView(input);
+		builder.setView(layout);
 		newFolderDialog = builder.create();
 		newFolderDialog.show();
 	}
@@ -5429,10 +5445,18 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			text = editText;
 		}
 		
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+		
 		final EditText input = new EditText(this);
+	    layout.addView(input, params);
+	    
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
-		input.setSelectAllOnFocus(true);
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
@@ -5461,21 +5485,23 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 		});
-//		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_add_contact),
-//				null, input);
-//		builder.setPositiveButton(getString(R.string.general_add),
-//				new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int whichButton) {
-//						String value = input.getText().toString().trim();
-//						if (value.length() == 0) {
-//							return;
-//						}
-//						inviteContact(value);
-//					}
-//				});
-//		builder.setNegativeButton(getString(android.R.string.cancel), null);
-//		addContactDialog = builder.create();
-//		addContactDialog.show();
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.menu_add_contact));
+		builder.setPositiveButton(getString(R.string.general_add),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						inviteContact(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		addContactDialog = builder.create();
+		addContactDialog.show();
 	}
 	
 	public void addContact(String contactEmail){
@@ -5567,7 +5593,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			    }
 			};
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
+			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
 			builder.setMessage(getResources().getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?").setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
@@ -5591,7 +5617,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			    }
 			};
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity);
+			AlertDialog.Builder builder = new AlertDialog.Builder(managerActivity, R.style.AppCompatAlertDialogStyle);
 			String message= getResources().getString(R.string.confirmation_remove_contact)+" "+c.getEmail()+"?";
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();			
@@ -5857,7 +5883,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		dbH.setCamSyncEnabled(false);
 		
 		if(overquotaDialog==null){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			builder.setTitle(getString(R.string.overquota_alert_title));
 			LayoutInflater inflater = getLayoutInflater();
 			View dialoglayout = inflater.inflate(R.layout.dialog_overquota_error, null);
@@ -6234,7 +6260,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
 			
 			if (parent.isFolder()){
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -6277,17 +6303,18 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		                }
 					}
 				});
+				dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 				permissionsDialog = dialogBuilder.create();
 				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				if(titleDivider!=null){
-					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-				}
+//				Resources resources = permissionsDialog.getContext().getResources();
+//				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+//				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+//		        alertTitle.setTextColor(resources.getColor(R.color.mega));
+//				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+//				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+//				if(titleDivider!=null){
+//					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+//				}
 			}
 		}	
 		else if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
@@ -6317,7 +6344,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
 						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
 						
-						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -6361,17 +6388,18 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				                }
 							}
 						});
+						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 						permissionsDialog = dialogBuilder.create();
 						permissionsDialog.show();
-						Resources resources = permissionsDialog.getContext().getResources();
-						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				        alertTitle.setTextColor(resources.getColor(R.color.mega));
-						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-						if(titleDivider!=null){
-							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-						}						
+//						Resources resources = permissionsDialog.getContext().getResources();
+//						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+//						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+//				        alertTitle.setTextColor(resources.getColor(R.color.mega));
+//						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+//						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+//						if(titleDivider!=null){
+//							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+//						}						
 					}
 					else if(multiselectIntent==1){
 						//Several folder to share
@@ -6434,17 +6462,18 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				                }
 							}
 						});
+						dialogBuilder.setTitle(getString(R.string.dialog_select_permissions));
 						permissionsDialog = dialogBuilder.create();
 						permissionsDialog.show();
-						Resources resources = permissionsDialog.getContext().getResources();
-						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-				        alertTitle.setTextColor(resources.getColor(R.color.mega));
-						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-						if(titleDivider!=null){
-							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-						}				
+//						Resources resources = permissionsDialog.getContext().getResources();
+//						int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+//						TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+//				        alertTitle.setTextColor(resources.getColor(R.color.mega));
+//						int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+//						View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+//						if(titleDivider!=null){
+//							titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+//						}				
 					}
 				}
 				else if (sentToInbox==1){
