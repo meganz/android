@@ -212,6 +212,7 @@
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Read-only</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Shared with: </string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permissions:</string>
+	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Sharing Permissions</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Change permissions</string>
 	<string name="file_properties_shared_folder_select_contact" context="button name">Shared with</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>

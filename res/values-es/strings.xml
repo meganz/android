@@ -211,6 +211,7 @@
 	<string name="file_properties_shared_folder_read_only" context="Refers to access rights for a file folder.">Solo Lectura</string>
 	<string name="file_properties_shared_folder_shared_with" context="title of the screen that shows the users with whom the user has shared a folder">Compartido con:</string>
 	<string name="file_properties_shared_folder_permissions" context="Item menu option upon clicking on a file folder. Refers to the permissions of a file folder in the file manager.">Permisos:</string>
+	<string name="dialog_select_permissions" context="Title of the dialog to choose permissions when sharing.">Permisos</string>
 	<string name="file_properties_shared_folder_change_permissions" context="menu item">Cambiar permisos</string>
 	<string name="file_properties_shared_folder_select_contact" context="menu item">Compartida</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Compartido con</string>
