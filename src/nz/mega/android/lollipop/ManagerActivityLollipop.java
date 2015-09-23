@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.google.android.gms.internal.bl;
+
 import nz.mega.android.CameraSyncService;
 import nz.mega.android.CameraUploadFragment;
 import nz.mega.android.ChangePasswordActivity;
@@ -24,7 +26,6 @@ import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
 import nz.mega.android.FileLinkActivity;
 import nz.mega.android.FileStorageActivity;
-import nz.mega.android.FolderLinkActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaAttributes;
 import nz.mega.android.MegaOffline;
@@ -423,27 +424,27 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
             log("ORDERID WHEN FINISHED: ***____" + purchase.getOrderId() + "___***");
             if (purchase.getSku().equals(SKU_PRO_I_MONTH)) {
                 log("PRO I Monthly subscription purchased.");
-                alert("Thank you for subscribing to PRO I Monthly!");
+                showAlert("Thank you for subscribing to PRO I Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_I_YEAR)) {
                 log("PRO I Yearly subscription purchased.");
-                alert("Thank you for subscribing to PRO I Yearly!");
+                showAlert("Thank you for subscribing to PRO I Yearly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_II_MONTH)) {
                 log("PRO II Monthly subscription purchased.");
-                alert("Thank you for subscribing to PRO II Monthly!");
+                showAlert("Thank you for subscribing to PRO II Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_III_MONTH)) {
                 log("PRO III Monthly subscription purchased.");
-                alert("Thank you for subscribing to PRO III Monthly!");
+                showAlert("Thank you for subscribing to PRO III Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_MONTH)) {
                 log("PRO LITE Monthly subscription purchased.");
-                alert("Thank you for subscribing to PRO LITE Monthly!");
+                showAlert("Thank you for subscribing to PRO LITE Monthly!");
             }
             else if (purchase.getSku().equals(SKU_PRO_LITE_YEAR)) {
                 log("PRO LITE Yearly subscription purchased.");
-                alert("Thank you for subscribing to PRO LITE Yearly!");
+                showAlert("Thank you for subscribing to PRO LITE Yearly!");
             }
             
             if (managerActivity != null){
@@ -483,16 +484,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
          */
 
         return true;
-    }
-    
-    void alert(String message) {
-        AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-        bld.setMessage(message);
-        bld.setNeutralButton("OK", null);
-        log("Showing alert dialog: " + message);
-        bld.create().show();
-    }
-    
+    }    
     // Listener that's called when we finish querying the items and subscriptions we own
     IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
         public void onQueryInventoryFinished(IabResult result, Inventory inventory) {
@@ -1150,7 +1142,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					return;
 				}
     			else if (intent.getAction().equals(ACTION_OPEN_MEGA_FOLDER_LINK)){
-    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivity.class);
+    				Intent intentFolderLink = new Intent(managerActivity, FolderLinkActivityLollipop.class);
     				intentFolderLink.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     				intentFolderLink.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
     				intentFolderLink.setData(Uri.parse(getIntent().getDataString()));
@@ -3971,7 +3963,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				    }
 				};
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
 				    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 				return true;
@@ -3994,8 +3986,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 								out = new BufferedWriter(fileWriter);	
 								out.write(key);	
 								out.close(); 								
-								String toastMessage = getString(R.string.toast_master_key) + " " + path;
-				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_SHORT).show();
+								String message = getString(R.string.toast_master_key) + " " + path;
+//				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_SHORT).show();
+
+				    			showAlert(message, "MasterKey exported!");
 								removeMK.setVisible(true);
 					        	exportMK.setVisible(false);
 
@@ -4014,7 +4008,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				    }
 				};
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
 				    .setNegativeButton(R.string.general_no, dialogClickListener).show();		
 	        	
@@ -4036,6 +4030,25 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
             }
 		}
 	}
+	
+    
+    void showAlert(String message) {
+        AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        bld.setMessage(message);
+        bld.setNeutralButton("OK", null);
+        log("Showing alert dialog: " + message);
+        bld.create().show();
+    }
+    
+    void showAlert(String message, String title) {
+        AlertDialog.Builder bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        bld.setMessage(message);
+        bld.setTitle(title);
+//        bld.setNeutralButton("OK", null);
+        bld.setPositiveButton("OK",null);
+        log("Showing alert dialog: " + message);
+        bld.create().show();
+    }
 	
 	@Override
 	public void onBackPressed() {
@@ -5047,7 +5060,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		// Folder Download link
 		else if (url != null && (url.matches("^https://mega.co.nz/#F!.+$") || url.matches("^https://mega.nz/#F!.+$"))) {
 			log("folder link url");
-			Intent openFolderIntent = new Intent(this, FolderLinkActivity.class);
+			Intent openFolderIntent = new Intent(this, FolderLinkActivityLollipop.class);
 			openFolderIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFolderIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK);
 			openFolderIntent.setData(Uri.parse(url));
@@ -7501,46 +7514,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					final String link = request.getLink();
 					
 					AlertDialog getLinkDialog;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
+		            builder.setMessage(link);
 					builder.setTitle(getString(R.string.context_get_link_menu));
-					
-					LayoutInflater inflater = getLayoutInflater();
-					View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-					ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
-					TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-					TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-					
-					String urlString = "";
-					String keyString = "";
-					String [] s = link.split("!");
-					if (s.length == 3){
-						urlString = s[0] + "!" + s[1];
-						keyString = s[2];
-					}
-					if (node.isFolder()){
-						thumb.setImageResource(R.drawable.folder_thumbnail);
-					}
-					else{
-						thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-					}
-					
-					Display display = getWindowManager().getDefaultDisplay();
-					DisplayMetrics outMetrics = new DisplayMetrics();
-					display.getMetrics(outMetrics);
-					float density = getResources().getDisplayMetrics().density;
-	
-					float scaleW = Util.getScaleW(outMetrics, density);
-					float scaleH = Util.getScaleH(outMetrics, density);
-					
-					url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-					key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-					
-					url.setText(urlString);
-					key.setText(keyString);
-					
-					
-					builder.setView(dialoglayout);
-					
+//					
 					builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
 						
 						@Override
