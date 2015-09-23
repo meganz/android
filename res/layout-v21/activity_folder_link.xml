@@ -1,0 +1,272 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/fragment_background"
+    tools:context=".FolderLinkActivityLollipop" >
+    
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_folder_link"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        tools:context=".FolderLinkActivityLollipop" />
+
+     <TextView
+	    android:id="@+id/content_text"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/toolbar_folder_link"
+	    android:paddingLeft="8dp"
+	    android:paddingTop="3dp"
+	    android:paddingBottom="3dp"
+	    android:textColor="@color/white"
+	    android:background="@color/content_text_folder"
+	    android:textSize="14sp"/>
+    
+   <ImageView
+	    android:id="@+id/folder_link_list_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="100dp"
+	    android:layout_centerHorizontal="true" 
+	    android:gravity="center_horizontal"/>
+    
+    <TextView
+	    android:id="@+id/folder_link_list_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/folder_link_list_empty_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>  
+    
+    
+     <LinearLayout
+         android:id="@+id/buttons_layout"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:orientation="horizontal">
+
+         <Button
+             android:id="@+id/btnLeft_new"
+             android:layout_width="fill_parent"
+       		android:layout_height="48dp"
+       		android:layout_weight="1"
+             android:background="@drawable/grey_btn_default_holo_light"
+             android:textColor="@color/button_text"
+             android:text="@string/menu_new_folder" />
+         
+         <Button
+             android:id="@+id/btnRight_upload"
+             android:layout_width="fill_parent"
+       		android:layout_height="48dp"
+       		android:layout_weight="1"
+             android:background="@drawable/btn_default_holo_light_without_corners"
+             android:textColor="@color/button_text"
+             android:text="@string/general_upload" />
+      </LinearLayout>    
+      
+      <LinearLayout
+         android:id="@+id/out_space"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:layout_centerHorizontal="true"
+    	 android:orientation="vertical">
+
+		<TextView
+		    android:id="@+id/out_space_text"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/white"
+		    android:textStyle="bold"
+		    android:paddingTop="20dp"
+		    android:paddingBottom="20dp"
+		    android:paddingLeft="20dp"
+		    android:paddingRight="20dp"
+		    android:gravity="center"
+		    android:background="@color/navigation_drawer_background"
+		    android:textSize="16sp"
+		    android:text="@string/warning_out_space"/>  
+         
+         <Button
+            android:id="@+id/out_space_btn"
+       		android:layout_height="48dp"       		
+       		android:layout_width="fill_parent"
+            android:background="@drawable/btn_default_holo_light_without_corners"
+            android:textColor="@color/button_text"
+            android:text="@string/my_account_upgrade_pro" />
+     </LinearLayout>
+     
+      
+      <LinearLayout
+         android:id="@+id/get_pro_account"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:layout_centerHorizontal="true"
+    	 android:orientation="vertical">
+
+		<TextView
+		    android:id="@+id/get_pro_account_text"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/white"
+		    android:textStyle="bold"
+		    android:paddingTop="20dp"
+		    android:paddingBottom="20dp"
+		    android:paddingLeft="20dp"
+		    android:paddingRight="20dp"
+		    android:gravity="center"
+		    android:background="@color/navigation_drawer_background"
+		    android:textSize="16sp"
+		    android:text="@string/get_pro_account"/>  
+         
+	      <LinearLayout
+	         android:id="@+id/get_pro_account_buttons_layout"
+	    	 android:layout_width="fill_parent"
+	    	 android:layout_height="wrap_content"
+	    	 android:layout_alignParentBottom="true"
+	    	 android:layout_gravity="center|fill_horizontal"
+	    	 android:orientation="horizontal">
+	
+	         <Button
+	             android:id="@+id/btnLeft_cancel"
+	             android:layout_width="fill_parent"
+	       		android:layout_height="48dp"
+	       		android:layout_weight="1"
+	             android:background="@drawable/grey_btn_default_holo_light"
+	             android:textColor="@color/button_text"
+	             android:text="@string/general_cancel" />
+	         
+	         <Button
+	             android:id="@+id/btnRight_upgrade"
+	             android:layout_width="fill_parent"
+	       		android:layout_height="48dp"
+	       		android:layout_weight="1"
+	             android:background="@drawable/btn_default_holo_light_without_corners"
+	             android:textColor="@color/button_text"
+	             android:text="@string/my_account_upgrade_pro" />
+	      	</LinearLayout> 
+     </LinearLayout>        
+      
+		 
+	<android.support.v7.widget.RecyclerView
+        android:id="@+id/folder_link_list_view_browser"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:choiceMode="multipleChoice"
+        android:layout_below="@id/content_text"
+        android:layout_above="@id/buttons_layout"/>
+   
+ 
+     <nz.mega.components.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoPanelHeight="100dp"
+        sothree:umanoShadowHeight="4dp"
+        sothree:umanoParalaxOffset="100dp"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoOverlay="true">
+
+        <!-- MAIN CONTENT -->
+        
+        <FrameLayout
+            android:id="@+id/folder_link_list_out_options"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:orientation="vertical">
+            
+            <TextView
+                android:id="@+id/main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:gravity="center"                
+                android:focusable="false"
+                android:focusableInTouchMode="true"/>
+        </FrameLayout>
+        
+       
+        <!-- SLIDING LAYOUT -->
+		 <LinearLayout 
+            android:id="@+id/folder_link_list_options"
+            android:layout_width="match_parent"
+        	android:layout_height="wrap_content"
+        	android:padding="0dp"
+        	android:background="@color/white"
+        	android:orientation="vertical">
+        	
+            <LinearLayout
+                android:id="@+id/folder_link_list_option_download_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                
+                <ImageView
+		            android:id="@+id/folder_link_list_option_download"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/ic_download"
+		            style="@style/dialogActionButton"	           
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"/>
+                
+                <TextView 
+                    android:id="@+id/folder_link_list_option_download_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/general_download"                    
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"					
+					android:textColor="@color/black"
+					android:textSize="14sp"
+					android:textStyle="bold"/>
+            </LinearLayout>
+        	
+           
+			<LinearLayout
+                android:id="@+id/folder_link_list_option_properties_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+               	android:orientation="horizontal"
+               	android:gravity="center_vertical">
+		        
+		        <ImageView
+		            android:id="@+id/folder_link_list_option_properties"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:src="@drawable/info_ic"		            
+		            style="@style/dialogActionButton"           
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"/>
+		        
+		        <TextView 
+                    android:id="@+id/folder_link_list_option_properties_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+		            android:paddingTop="2dp"
+		            android:paddingBottom="2dp"
+					android:textColor="@color/black"
+					android:textSize="14sp"
+					android:textStyle="bold"/>
+	        </LinearLayout>   
+        </LinearLayout>
+    </nz.mega.components.SlidingUpPanelLayout>
+
+</RelativeLayout>

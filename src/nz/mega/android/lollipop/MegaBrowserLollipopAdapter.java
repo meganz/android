@@ -188,8 +188,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			break;
 		}		
 		case ManagerActivityLollipop.FOLDER_LINK_ADAPTER: {
-			megaApi = ((MegaApplication) ((Activity) context).getApplication())
-					.getMegaApiFolder();
+			megaApi = ((MegaApplication) ((Activity) context).getApplication()).getMegaApiFolder();
 			break;
 		}
 		case ManagerActivityLollipop.SEARCH_ADAPTER: {
@@ -626,6 +625,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).showOptionsPanel(n);
 				}
+				else if(type==ManagerActivityLollipop.FOLDER_LINK_ADAPTER){
+					((FolderLinkActivityLollipop) context).showOptionsPanel(n);
+				}
 				else{
 					((ManagerActivityLollipop) context).showOptionsPanel(n);
 				}				
@@ -647,6 +649,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 				else if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
 					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
+				}
+				else if(type==ManagerActivityLollipop.FOLDER_LINK_ADAPTER){
+					((FolderLinkActivityLollipop) context).itemClick(currentPosition);
 				}
 				else{
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
