@@ -67,7 +67,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class ContactPropertiesActivityLollipop extends PinActivity implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
+public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
 	TextView nameView;
 	TextView contentTextView;

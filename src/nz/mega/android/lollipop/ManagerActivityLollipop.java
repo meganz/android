@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.google.android.gms.internal.bl;
-
 import nz.mega.android.CameraSyncService;
 import nz.mega.android.CameraUploadFragment;
 import nz.mega.android.ChangePasswordActivity;
@@ -26,6 +24,7 @@ import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
 import nz.mega.android.FileLinkActivity;
 import nz.mega.android.FileStorageActivity;
+import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaAttributes;
 import nz.mega.android.MegaOffline;
@@ -46,7 +45,6 @@ import nz.mega.android.UpgradeAccountFragment;
 import nz.mega.android.UploadHereDialog;
 import nz.mega.android.UploadService;
 import nz.mega.android.ZipBrowserActivity;
-import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
@@ -69,11 +67,9 @@ import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
 import nz.mega.sdk.MegaUser;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -81,17 +77,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.graphics.Shader.TileMode;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -110,7 +105,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -125,22 +120,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.View.OnClickListener;
+import android.view.ViewConfiguration;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-public class ManagerActivityLollipop extends AppCompatActivity implements MegaRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener{
+public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener{
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
@@ -3215,7 +3209,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	        	}
 	        	if (drawerItem == DrawerItem.SHARED_ITEMS){
 
-	    			Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_SHORT).show();
+	    			Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 
 //	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("inSFLol");
 //	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -3987,7 +3981,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 								out.write(key);	
 								out.close(); 								
 								String message = getString(R.string.toast_master_key) + " " + path;
-//				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_SHORT).show();
+//				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
 
 				    			showAlert(message, "MasterKey exported!");
 								removeMK.setVisible(true);
@@ -4274,7 +4268,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		
 		switch (menuItem.getItemId()){
 			case R.id.navigation_item_cloud_drive:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				menuItem.setChecked(true);
@@ -4282,7 +4276,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_item_saved_for_offline:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
 				menuItem.setChecked(true);
@@ -4290,7 +4284,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_item_camera_uploads:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CAMERA_UPLOADS;
 				menuItem.setChecked(true);
@@ -4298,7 +4292,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_item_inbox:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.INBOX;
 				menuItem.setChecked(true);
@@ -4306,7 +4300,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_item_shared_items:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SHARED_ITEMS;
 				menuItem.setChecked(true);
@@ -4314,7 +4308,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_item_contacts:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CONTACTS;
 				menuItem.setChecked(true);
@@ -4322,7 +4316,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_item_settings:{
-//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				lastDrawerItem = drawerItem;
 				drawerItem = DrawerItem.SETTINGS;
 				selectDrawerItemLollipop(drawerItem);
@@ -4388,7 +4382,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				else
 				{
 					//Show error message, just one file
-					Snackbar.make(fragmentContainer, getString(R.string.context_select_one_file), Snackbar.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_select_one_file), Snackbar.LENGTH_LONG).show();
 				}		    	
 			}
 			else{
@@ -4431,7 +4425,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			if(url != null) {
 				log("url NOT null");
 				if(availableFreeSpace < size) {
-					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 					log("Not enough space");
 					return;
 				}
@@ -4503,7 +4497,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 									log("call to startActivity(intentShare)");
 									startActivity(intentShare);
 								}									
-								Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_SHORT).show();
+								Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
 							}								
 						}
 						return;
@@ -4532,7 +4526,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 						
 						if(availableFreeSpace < document.getSize()){
 							log("Not enough space");
-							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space)+ " (" + new String(document.getName()) + ")", Snackbar.LENGTH_SHORT).show();							
+							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space)+ " (" + new String(document.getName()) + ")", Snackbar.LENGTH_LONG).show();							
 							continue;
 						}
 						
@@ -4549,7 +4543,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					log("URL NOT null");
 					if(availableFreeSpace < size) {
 						log("Not enough space");
-						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 						continue;
 					}
 					log("start service");
@@ -4630,14 +4624,14 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			    catch(Exception e){
 			    	log("Exception in External SDCARD");
 			    	Environment.getExternalStorageDirectory();
-			    	Snackbar.make(fragmentContainer, getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_SHORT).show();
+			    	Snackbar.make(fragmentContainer, getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_LONG).show();
 			    }
 			}
 		}
 		else{
 			log("No external SD card");
 			Environment.getExternalStorageDirectory();
-			Snackbar.make(fragmentContainer, getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.no_external_SD_card_detected), Snackbar.LENGTH_LONG).show();
 		}		
 	}
 	
@@ -4733,7 +4727,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		
 		if(!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -4849,7 +4843,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	public void getPublicLinkAndShareIt(MegaNode document){
 		log("getPublicLinkAndShareIt");
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -4877,7 +4871,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		isClearRubbishBin = false;
 		
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}		
 		
@@ -5124,7 +5118,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			public void onClick(DialogInterface dialog, int which) {
 				feedback = text.getText().toString();
 				if(feedback.matches("")||feedback.isEmpty()){
-					Snackbar.make(fragmentContainer, getString(R.string.reason_cancel_subscriptions), Snackbar.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.reason_cancel_subscriptions), Snackbar.LENGTH_LONG).show();
 				}
 				else{
 					showCancelConfirmation(feedback);			
@@ -5239,7 +5233,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	private void createFolder(String title) {
 		log("createFolder");
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -5283,7 +5277,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			megaApi.createFolder(title, parentNode, this);
 		}
 		else{
-			Snackbar.make(fragmentContainer, getString(R.string.context_folder_already_exists), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.context_folder_already_exists), Snackbar.LENGTH_LONG).show();
 		}		
 	}
 	
@@ -5370,13 +5364,13 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							showUpAF(null);
 						}
 						else{
-							Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
+							Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
 							
 						}
 					}
 					else{
 						log("CURRENTLY ACTIVE SUBSCRIPTION");
-						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
 					}
 				}
 				else{
@@ -5386,16 +5380,16 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 						showUpAF(null);
 					}
 					else{
-						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
 					}
 				}
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else{
-			Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.not_upgrade_is_possible), Snackbar.LENGTH_LONG).show();
 		}
 	}
 	
@@ -5520,7 +5514,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 	public void addContact(String contactEmail){
 		log("addContact");
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -5545,7 +5539,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		log("inviteContact");
 		
 		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -6139,7 +6133,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				break;
 			}
 			case R.id.navigation_drawer_account_view:{
-//				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_SHORT).show();
+//				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
 				drawerItem = DrawerItem.ACCOUNT;
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
@@ -6237,7 +6231,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -6263,7 +6257,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -6338,7 +6332,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 
@@ -6504,12 +6498,12 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					String type = contactsData.get(i);
 					if (type.compareTo(ContactsExplorerActivity.EXTRA_EMAIL) == 0){
 						i++;
-						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 //						Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
 					}
 					else if (type.compareTo(ContactsExplorerActivity.EXTRA_PHONE) == 0){
 						i++;
-						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 //						Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
 					}
 				}
@@ -6570,7 +6564,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -6604,7 +6598,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(!Util.isOnline(this)){
-				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -6945,15 +6939,15 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		
 		if(parentNode == null){
-			Snackbar.make(fragmentContainer, getString(R.string.error_temporary_unavaible), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.error_temporary_unavaible), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 			
 		if (infos == null) {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
 		} 
 		else {
-			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_SHORT).show();
+			Snackbar.make(fragmentContainer, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -7190,10 +7184,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		else if (request.getType() == MegaRequest.TYPE_CREDIT_CARD_CANCEL_SUBSCRIPTIONS){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_ok), Snackbar.LENGTH_LONG).show();
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.cancel_subscription_error), Snackbar.LENGTH_LONG).show();
 			}
 			megaApi.creditCardQuerySubscriptions(this);
 		}
@@ -7240,18 +7234,18 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			}
 			
 			if(request.getNumber()==MegaContactRequest.INVITE_ACTION_REMIND){
-				Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_resent), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_resent), Snackbar.LENGTH_LONG).show();
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
 					
 					if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_added), Snackbar.LENGTH_SHORT).show();			
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_added), Snackbar.LENGTH_LONG).show();			
 					}
 					else if(request.getNumber()==MegaContactRequest.INVITE_ACTION_DELETE)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_deleted), Snackbar.LENGTH_SHORT).show();	
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_invitation_deleted), Snackbar.LENGTH_LONG).show();	
 					}
 //					else
 //					{
@@ -7261,10 +7255,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				else{
 					if(e.getErrorCode()==MegaError.API_EEXIST)
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists), Snackbar.LENGTH_SHORT).show();	
+						Snackbar.make(fragmentContainer, getString(R.string.context_contact_already_exists), Snackbar.LENGTH_LONG).show();	
 					}
 					else{
-						Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_SHORT).show();	
+						Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_LONG).show();	
 					}				
 					log("ERROR: " + e.getErrorCode() + "___" + e.getErrorString());
 				}
@@ -7274,10 +7268,10 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			log("MegaRequest.TYPE_REPLY_CONTACT_REQUEST finished: "+request.getType());
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_invitacion_reply), Snackbar.LENGTH_SHORT).show();	
+				Snackbar.make(fragmentContainer, getString(R.string.context_invitacion_reply), Snackbar.LENGTH_LONG).show();	
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_SHORT).show();	
+				Snackbar.make(fragmentContainer, getString(R.string.general_error), Snackbar.LENGTH_LONG).show();	
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -7288,7 +7282,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-//				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+//				Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_LONG).show();
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					if (moveToRubbish){
 						//Update both tabs
@@ -7416,20 +7410,20 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved_to_rubbish), Snackbar.LENGTH_SHORT).show();	
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved_to_rubbish), Snackbar.LENGTH_LONG).show();	
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_SHORT).show();	
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();	
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_SHORT).show();	
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();	
 				}
 				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_SHORT).show();	
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();	
 				}
 			
 				log("move nodes request finished");
@@ -7437,12 +7431,12 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_LONG).show();
 			}
 			else
 			{
 				log("error when killing sessions: "+e.getErrorString());
-				Snackbar.make(fragmentContainer, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_REMOVE){
@@ -7455,7 +7449,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							statusDialog.dismiss();	
 						} 
 						catch (Exception ex) {}
-						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
 					}
 				}
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -7497,7 +7491,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}	
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
 			}
 			log("remove request finished");
 		}
@@ -7542,7 +7536,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
 					            clipboard.setPrimaryClip(clip);
 							}
-							Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_SHORT).show();
+							Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
 						}
 					});
 					
@@ -7552,7 +7546,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_link), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_link), Snackbar.LENGTH_LONG).show();
 			}
 			log("export request finished");
 		}
@@ -7564,7 +7558,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
 				if (drawerItem == DrawerItem.CLOUD_DRIVE){
 					
 					int index = viewPagerCDrive.getCurrentItem();
@@ -7618,7 +7612,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				}
 			}
 			else{
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_COPY){
@@ -7628,7 +7622,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE||drawerItem == DrawerItem.CONTACTS){
 					sendToInbox=false;
 					if (e.getErrorCode() == MegaError.API_OK){
-						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_LONG).show();
 					}
 					else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 						log("OVERQUOTA ERROR: "+e.getErrorCode());
@@ -7636,7 +7630,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 					else
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_LONG).show();
 					}
 				}				
 			}
@@ -7647,7 +7641,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				catch (Exception ex) {}
 				
 				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						
 						int index = viewPagerCDrive.getCurrentItem();
@@ -7686,7 +7680,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 					}
 					else
 					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_SHORT).show();
+						Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 					}
 				}			
 			}			
@@ -7698,7 +7692,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Snackbar.make(fragmentContainer, getString(R.string.context_folder_created), Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_folder_created), Snackbar.LENGTH_LONG).show();
 				if (fbFLol != null){
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
@@ -7728,7 +7722,7 @@ public class ManagerActivityLollipop extends AppCompatActivity implements MegaRe
 				selectDrawerItemLollipop(drawerItem);
 			}
 			else{
-				Snackbar.make(fragmentContainer, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, "PURCHASE WRONG: " + e.getErrorString() + " (" + e.getErrorCode() + ")", Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}

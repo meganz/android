@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 
-public class OfflineActivityLollipop extends PinActivity{
+public class OfflineActivityLollipop extends PinActivityLollipop{
 	
 	OfflineFragmentLollipop oFLol;
 	
