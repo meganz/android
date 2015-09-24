@@ -86,7 +86,7 @@ import android.widget.Toast;
 
 
 @SuppressLint("NewApi")
-public class FilePropertiesActivityLollipop extends PinActivity implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
+public class FilePropertiesActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, OnCheckedChangeListener, MegaGlobalListenerInterface{
 	
 	static int TYPE_EXPORT_GET = 0;
 	static int TYPE_EXPORT_REMOVE = 1;

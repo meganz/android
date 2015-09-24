@@ -9,17 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 import nz.mega.android.DatabaseHandler;
+import nz.mega.android.DownloadService;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
-import nz.mega.android.DownloadService;
 import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.MegaStreamingService;
 import nz.mega.android.MimeTypeList;
-import nz.mega.android.PinActivity;
+import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
-import nz.mega.android.lollipop.FileBrowserFragmentLollipop.RecyclerViewOnGestureListener;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
 import nz.mega.components.SlidingUpPanelLayout;
@@ -30,48 +29,39 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StatFs;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-
-public class FolderLinkActivityLollipop extends PinActivity implements MegaRequestListenerInterface, OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 	
 	FolderLinkActivityLollipop folderLinkActivity = this;
 	MegaApiAndroid megaApi;
@@ -88,6 +78,7 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+    RelativeLayout fragmentContainer;
 	
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
@@ -316,6 +307,8 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 //		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
+		
+        fragmentContainer = (RelativeLayout) findViewById(R.id.folder_link_fragment_container);
 
 		emptyImageView = (ImageView) findViewById(R.id.folder_link_list_empty_image);
 		emptyTextView = (TextView) findViewById(R.id.folder_link_list_empty_text);
@@ -361,6 +354,8 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 		optionProperties = (LinearLayout) findViewById(R.id.folder_link_list_option_properties_layout);
 		propertiesText = (TextView) findViewById(R.id.folder_link_list_option_properties_text);	
 		
+		optionDownload.setOnClickListener(this);
+		optionProperties.setOnClickListener(this);
 		optionsOutLayout.setOnClickListener(this);
 		
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
@@ -640,7 +635,7 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 			log("URL: " + url + "___SIZE: " + size);
 	
 			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
+			Snackbar.make(fragmentContainer, getResources().getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 	}
 
@@ -688,7 +683,7 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
-					Util.showToast(this, getString(R.string.general_error_folder_not_found)); 
+					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
 	    			finish();
 				}
 			}
@@ -735,7 +730,7 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
-					Util.showToast(this, getString(R.string.general_error_folder_not_found));
+					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
 	    			finish();
 				}
 			}
@@ -812,23 +807,6 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 		}
 		// actionMode.
 	}
-	
-	/*
-	 * Get list of all selected documents
-	 */
-//	private List<MegaNode> getSelectedDocuments() {
-//		ArrayList<MegaNode> documents = new ArrayList<MegaNode>();
-//		SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-//		for (int i = 0; i < checkedItems.size(); i++) {
-//			if (checkedItems.valueAt(i) == true) {
-//				MegaNode document = adapterList.getDocumentAt(checkedItems.keyAt(i));
-//				if (document != null){
-//					documents.add(document);
-//				}
-//			}
-//		}
-//		return documents;
-//	}
 
 	public void itemClick(int position) {
 		if (adapterList.isMultipleSelect()){
@@ -907,7 +885,7 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 			  			startActivity(mediaIntent);
 			  		}
 			  		else{
-			  			Toast.makeText(this, getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+			  			Snackbar.make(fragmentContainer, getResources().getString(R.string.intent_not_available), Snackbar.LENGTH_SHORT).show();
 			  			adapterList.setPositionClicked(-1);
 						adapterList.notifyDataSetChanged();
 						ArrayList<Long> handleList = new ArrayList<Long>();
@@ -1058,12 +1036,49 @@ public class FolderLinkActivityLollipop extends PinActivity implements MegaReque
 
 	@Override
 	public void onClick(View v) {
-		// TODO Auto-generated method stub
+		log("onClick");
+		
 		switch(v.getId()){
 			case R.id.folder_link_list_out_options:{
+				log("Out Panel");
 				hideOptionsPanel();
+				break;				
+			}
+			case R.id.folder_link_list_option_download_layout: {
+				log("Download option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				adapterList.setPositionClicked(-1);
+				adapterList.notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+				onFileClick(handleList);
 				break;
+			}
+			case R.id.folder_link_list_option_properties_layout: {
+				log("Properties option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				adapterList.setPositionClicked(-1);
+				adapterList.notifyDataSetChanged();
+				Intent i = new Intent(this, FilePropertiesActivityLollipop.class);
+				i.putExtra("handle", selectedNode.getHandle());
 				
+				if (selectedNode.isFolder()) {
+					if (megaApi.isShared(selectedNode)){
+						i.putExtra("imageId", R.drawable.folder_shared_mime);	
+					}
+					else{
+						i.putExtra("imageId", R.drawable.folder_mime);
+					}
+				} 
+				else {
+					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+				}
+				i.putExtra("name", selectedNode.getName());
+				this.startActivity(i);
+
+				break;
 			}
 		}			
 	}

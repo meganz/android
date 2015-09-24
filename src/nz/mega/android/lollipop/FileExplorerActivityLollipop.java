@@ -54,7 +54,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class FileExplorerActivityLollipop extends PinActivity implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
+public class FileExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
 	public static String ACTION_PROCESSED = "CreateLink.ACTION_PROCESSED";
 	

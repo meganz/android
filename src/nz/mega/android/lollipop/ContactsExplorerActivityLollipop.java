@@ -53,7 +53,7 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
-public class ContactsExplorerActivityLollipop extends PinActivity implements OnClickListener, OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
+public class ContactsExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemCheckClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface {
 	
 	public static String ACTION_PICK_CONTACT_SHARE_FOLDER = "ACTION_PICK_CONTACT_SHARE_FOLDER";
 	public static String ACTION_PICK_CONTACT_SEND_FILE = "ACTION_PICK_CONTACT_SEND_FILE";
