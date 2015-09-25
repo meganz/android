@@ -13,7 +13,6 @@ import nz.mega.sdk.MegaNode;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v7.internal.widget.AdapterViewCompat.OnItemClickListener;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.Display;

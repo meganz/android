@@ -61,6 +61,8 @@
     <color name="accentColor">#00BFA5</color>
     <color name="textGrey">#6d6f70</color> 
     
+    <color name="filePropertiesToolBar">#2284b1</color>
+    
     <color name="text_tab_selected">#FFFFFF</color>    
 	<color name="text_tab_unselected">#B9B9B9</color> 
 </resources>
