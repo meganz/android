@@ -18,12 +18,10 @@ import nz.mega.android.MegaPreferences;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.PinActivity;
 import nz.mega.android.R;
+import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.components.EditTextCursorWatcher;
-import nz.mega.components.MySwitch;
-import nz.mega.components.RoundedImageView;
-import nz.mega.components.SlidingUpPanelLayout;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -47,6 +45,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.ExifInterface;
 import android.net.Uri;
@@ -54,7 +53,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -95,10 +96,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	static int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
 
-	//Sliding Panel
+	ImageView imageView;
 	
-	SlidingUpPanelLayout slidingOptionsPanel;
-	FrameLayout optionsOutLayout;
 	LinearLayout optionsLayout;
 	TextView nameView;
 	LinearLayout availableOfflineLayout;
@@ -112,13 +111,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	View dividerSharedLayout;
 	
 	TextView availableOfflineView;
-	ImageView imageView;	
+	
 	ImageView publicLinkImage;
-//	MySwitch availableSwitchOnline;
-//	MySwitch availableSwitchOffline;
 	Switch offlineSwitch;
-	ActionBar aB;
-	int typeExport = -1;
 	
 	TextView sizeTextView;
 	TextView sizeTitleTextView;
@@ -129,9 +124,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	TextView addedTextView;
 	TextView modifiedTextView;
 	
-	LinearLayout iconLayout;	
+	TextView permissionLabel;
+	TextView permissionInfo;
 	
 	boolean owner= true;
+	Toolbar tB;
+	ActionBar aB;
+	int typeExport = -1;
 	
 //	RelativeLayout sharedWith;
 //	TableLayout contactTable;	
@@ -139,8 +138,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //	TextView contentDetailedTextView;
 //	TextView sharedWithTextView;
 //	TextView publicLinkTextView;
-	TextView permissionLabel;
-	TextView permissionInfo;
+	
 	ArrayList<MegaShare> sl;
 	MegaOffline mOffDelete;
 	
@@ -218,12 +216,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //		dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
-		aB = getSupportActionBar();
-		aB.setHomeButtonEnabled(true);
-		aB.setDisplayShowTitleEnabled(true);
-		aB.setLogo(R.drawable.ic_action_navigation_accept_white);
-		aB.setTitle(getString(R.string.file_properties_activity));		
-		
 		Display display = getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -247,14 +239,30 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			name = node.getName();
 					
 			setContentView(R.layout.activity_file_properties);
-//			iconView = (ImageView) findViewById(R.id.file_properties_icon);
+			tB = (Toolbar) findViewById(R.id.file_properties_toolbar);
+			setSupportActionBar(tB);
+			aB = getSupportActionBar();
+			aB.setHomeButtonEnabled(true);
+			aB.setDisplayShowTitleEnabled(true);
+			aB.setLogo(R.drawable.ic_arrow_back_black);
+			aB.setElevation(0);
 			
-			iconLayout = (LinearLayout) findViewById(R.id.file_properties_icon_layout);
-			iconLayout.setVisibility(View.VISIBLE);
+			CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.file_properties_collapsing_toolbar);
+//			collapsingToolbarLayout.setTitle(getString(R.string.file_properties_activity));
+			collapsingToolbarLayout.setTitle(name);
+//			collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+//			collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.filePropertiesToolBar));
+//			collapsingToolbarLayout.setStatusBarScrimColor(getResources().getColor(R.color.filePropertiesToolBar));
+			collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
+			collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
+			collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
+			collapsingToolbarLayout.setStatusBarScrimColor(Color.WHITE);
+			collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
+			
+			
+			imageView = (ImageView) findViewById(R.id.file_properties_toolbar_image);
+			imageView.setImageResource(imageId);
 			nameView = (TextView) findViewById(R.id.file_properties_name);
-			imageView = (ImageView) findViewById(R.id.file_properties_image);
-			imageView.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
-			imageView.getLayoutParams().height = Util.px2dp((250*scaleH), outMetrics);
 //			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
 //			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((-30*scaleH), outMetrics));
 			publicLinkImage = (ImageView) findViewById(R.id.file_properties_image_link);
@@ -262,9 +270,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			((RelativeLayout.LayoutParams) publicLinkImage.getLayoutParams()).setMargins(Util.px2dp((-10*scaleH), outMetrics), Util.px2dp((-20*scaleH), outMetrics), 0, 0);
 			publicLinkImage.setVisibility(View.GONE);			
 			
-			slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.file_properties_sliding_layout);
 			optionsLayout = (LinearLayout) findViewById(R.id.file_properties_options);
-			optionsOutLayout = (FrameLayout) findViewById(R.id.file_properties_out_options);
 			
 			permissionsLayout = (LinearLayout) findViewById(R.id.file_properties_permissions_layout);
 			permissionsLayout.setVisibility(View.GONE);
@@ -423,6 +429,37 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				else{
 					addedTextView.setText("");
 					modifiedTextView.setText("");
+				}
+				
+				Bitmap thumb = null;
+				Bitmap preview = null;
+				thumb = ThumbnailUtils.getThumbnailFromCache(node);
+				if (thumb != null){
+					imageView.setImageBitmap(thumb);
+				}
+				else{
+					thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
+					if (thumb != null){
+						imageView.setImageBitmap(thumb);
+					}
+				}
+				preview = PreviewUtils.getPreviewFromCache(node);
+				if (preview != null){
+					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					imageView.setImageBitmap(preview);
+				}
+				else{
+					preview = PreviewUtils.getPreviewFromFolder(node, this);
+					if (preview != null){
+						PreviewUtils.previewCache.put(node.getHandle(), preview);
+						imageView.setImageBitmap(preview);	
+					}
+					else{
+						if (node.hasPreview()){	
+							File previewFile = new File(PreviewUtils.getPreviewFolder(this), node.getBase64Handle()+".jpg");
+							megaApi.getPreview(node, previewFile.getAbsolutePath(), this);
+						}
+					}
 				}
 			}
 			else{ //Folder
@@ -600,56 +637,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					sharedLayout.setVisibility(View.GONE);
 					dividerSharedLayout.setVisibility(View.GONE);	
 				}
-				
-				Bitmap thumb = null;
-				Bitmap preview = null;
-				//If image
-				if (node.isFile()){
-					if (node.hasThumbnail()){
-						if (availableOfflineBoolean){
-							if (offlineFile != null){
-
-								BitmapFactory.Options options = new BitmapFactory.Options();
-								options.inJustDecodeBounds = true;
-								thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-
-								ExifInterface exif;
-								int orientation = ExifInterface.ORIENTATION_NORMAL;
-								try {
-									exif = new ExifInterface(offlineFile.getAbsolutePath());
-									orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-								} catch (IOException e) {}  
-
-								// Calculate inSampleSize
-								options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
-
-								// Decode bitmap with inSampleSize set
-								options.inJustDecodeBounds = false;
-
-								thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-								if (thumb != null){
-									thumb = Util.rotateBitmap(thumb, orientation);
-
-									imageView.setImageBitmap(thumb);
-								}
-							}
-						}
-						else{
-							thumb = ThumbnailUtils.getThumbnailFromCache(node);
-							if (thumb != null){
-								imageView.setImageBitmap(thumb);
-							}
-							else{
-								thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
-								if (thumb != null){
-									imageView.setImageBitmap(thumb);
-								}
-							}
-						}
-					}
-				}
 			}
-
 		}
 	}
 	
@@ -1749,9 +1737,24 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		
 		node = megaApi.getNodeByHandle(request.getNodeHandle());
 		
-		log("onRequestFinish: "+request.getType());
+		log("onRequestFinish: "+request.getType() + "__" + request.getRequestString());
 		
-		if (request.getType() == MegaRequest.TYPE_EXPORT){
+		if (request.getType() == MegaRequest.TYPE_GET_ATTR_FILE){
+			if (e.getErrorCode() == MegaError.API_OK){
+				File previewDir = PreviewUtils.getPreviewFolder(this);
+				File preview = new File(previewDir, node.getBase64Handle()+".jpg");
+				if (preview.exists()) {
+					if (preview.length() > 0) {
+						Bitmap bitmap = PreviewUtils.getBitmapForCache(preview, this);
+						PreviewUtils.previewCache.put(handle, bitmap);	
+						if (imageView != null){
+							imageView.setImageBitmap(bitmap);
+						}
+					}
+				}
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_EXPORT){
 			try { 
 				statusDialog.dismiss();	
 			} 

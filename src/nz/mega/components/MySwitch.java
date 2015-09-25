@@ -455,7 +455,7 @@ public class MySwitch extends CompoundButton {
 
     private Layout makeLayout(CharSequence text) {
         return new StaticLayout(text, mTextPaint,
-                (int) android.util.FloatMath.ceil(Layout.getDesiredWidth(text, mTextPaint)),
+                (int) Math.ceil(Layout.getDesiredWidth(text, mTextPaint)),
                 Layout.Alignment.ALIGN_NORMAL, 1.f, 0, true);
     }
 
