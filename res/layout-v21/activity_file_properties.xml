@@ -41,8 +41,8 @@
 	                android:id="@+id/file_properties_image_link"
 	                android:layout_width="wrap_content"
 	                android:layout_height="70dp"
-	                android:layout_alignBottom="@id/file_properties_image"
-	                android:layout_alignLeft="@id/file_properties_image"
+	                android:layout_alignBottom="@id/file_properties_toolbar_image"
+	                android:layout_alignLeft="@id/file_properties_toolbar_image"
 	                android:src="@drawable/get_link_circle_white_ic" />
 	        </RelativeLayout>
  

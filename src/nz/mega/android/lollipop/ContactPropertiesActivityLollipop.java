@@ -47,6 +47,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StatFs;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Time;
@@ -81,6 +82,10 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 	TableLayout contentTable;
 	Toolbar tB;
     ActionBar aB;
+    
+    ImageView contactPropertiesImage;
+    CollapsingToolbarLayout collapsingToolbarLayout;
+    TextView initialLetter;
 
 	String userEmail;
 
@@ -150,12 +155,16 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			setContentView(R.layout.activity_main_contact_properties);
 			
 			//Set toolbar
-			tB = (Toolbar) findViewById(R.id.toolbar_explorer);
+			tB = (Toolbar) findViewById(R.id.contact_properties_toolbar);
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
-			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//			aB.setLogo(R.drawable.ic_arrow_back_black);
 			aB.setDisplayHomeAsUpEnabled(true);
 			aB.setDisplayShowHomeEnabled(true);
+			
+			contactPropertiesImage = (ImageView) findViewById(R.id.contact_properties_toolbar_image);
+			collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.contact_properties_collapsing_toolbar);
+			initialLetter = (TextView) findViewById(R.id.contact_properties_toolbar_initial_letter);
 
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
@@ -217,7 +226,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
-	
+				cpF.setToolbar(contactPropertiesImage, initialLetter, collapsingToolbarLayout);
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
 	
 				break;

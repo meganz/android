@@ -17,6 +17,7 @@
     <color name="navigation_drawer_background_odd">#292929</color>
     <color name="navigation_drawer_background">#222222</color>
     <color name="color_navigation_drawer_selected">#1AFFFFFF</color> 
+    <color name="file_list_first_row">#000000</color>
     <color name="file_list_second_row">#848484</color>
     <color name="file_list_selected_row">#1A000000</color>
     <color name="border_file_properties">#cccccc</color>
@@ -45,6 +46,7 @@
  	
  	<color name="lollipop_primary_color">#d90007</color>
  	<color name="lollipop_dark_primary_color">#b4070c</color>
+ 	<color name="lollipop_dark_primary_color_file_properties">#2284b1</color>
     
  <!--    <color name="dark_grey_cloud_drive">#6d6f70</color>--> 
     

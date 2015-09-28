@@ -242,9 +242,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			tB = (Toolbar) findViewById(R.id.file_properties_toolbar);
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
-			aB.setHomeButtonEnabled(true);
-			aB.setDisplayShowTitleEnabled(true);
-			aB.setLogo(R.drawable.ic_arrow_back_black);
+//			aB.setHomeButtonEnabled(true);
+//			aB.setDisplayShowTitleEnabled(true);
+			aB.setDisplayHomeAsUpEnabled(true);
+			aB.setDisplayShowHomeEnabled(true);
+//			aB.setLogo(R.drawable.ic_arrow_back_black);
 			aB.setElevation(0);
 			
 			CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.file_properties_collapsing_toolbar);
@@ -256,7 +258,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
 			collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
 			collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
-			collapsingToolbarLayout.setStatusBarScrimColor(Color.WHITE);
+//			collapsingToolbarLayout.setStatusBarScrimColor(getResources().getColor(R.color.accentColor));
 			collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
 			
 			

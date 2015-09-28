@@ -24,6 +24,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -49,10 +50,10 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
-	FixedCenterCrop imageView;
-//	TextView initialLetter;
+	ImageView contactPropertiesImage;
+	CollapsingToolbarLayout collapsingToolbarLayout;
+	TextView initialLetter;
 	RelativeLayout contentLayout;
-	TextView userNameTextView;
 	TextView infoEmail;
 	TextView sharedFoldersButton;	
 	TextView sharedFoldersLabel;
@@ -110,14 +111,10 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			//			
 			//			overflowImage.setOnClickListener(this);
 			//			closeImage.setOnClickListener(this);
-			//			
-			imageView = (FixedCenterCrop) v.findViewById(R.id.contact_properties_image);
+			//	
 //			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
 //			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
 			
-//			initialLetter = (TextView) v.findViewById(R.id.contact_properties_initial_letter);
-			
-			userNameTextView = (TextView) v.findViewById(R.id.contact_properties_name);
 			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
 			//			contentLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_content);
 			//			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_text);
@@ -136,7 +133,13 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			}
 			
 			infoEmail.setText(userEmail);
-			userNameTextView.setText(userEmail);
+			if (collapsingToolbarLayout != null){
+				collapsingToolbarLayout.setTitle(userEmail);
+				collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
+				collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
+				collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
+				collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
+			}			
 			name=false;
 			firstName=false;
 			megaApi.getUserAttribute(contact, 1, this);
@@ -160,12 +163,12 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			//			}			
 
 			
-//			Bitmap defaultAvatar = Bitmap.createBitmap(imageView.getLayoutParams().width,imageView.getLayoutParams().height, Bitmap.Config.ARGB_8888);
-//			Canvas c = new Canvas(defaultAvatar);
-//			Paint p = new Paint();
-//			p.setAntiAlias(true);
-//			p.setColor(getResources().getColor(R.color.color_default_avatar_mega));
-//			
+			Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(Color.TRANSPARENT);
+			c.drawPaint(p);
 //			int radius; 
 //	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
 //	        	radius = defaultAvatar.getWidth()/2;
@@ -173,7 +176,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 //	        	radius = defaultAvatar.getHeight()/2;
 //	        
 //			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-//			imageView.setImageBitmap(defaultAvatar);
+			contactPropertiesImage.setImageBitmap(defaultAvatar);
 			
 		    int avatarTextSize = getAvatarTextSize(density);
 		    log("DENSITY: " + density + ":::: " + avatarTextSize);
@@ -183,10 +186,10 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			    	log("TEXT AT 0: " + userEmail.charAt(0));
 			    	String firstLetter = userEmail.charAt(0) + "";
 			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-//			    	initialLetter.setText(firstLetter);
-//			    	initialLetter.setTextSize(100);
-//			    	initialLetter.setTextColor(Color.WHITE);
-//			    	initialLetter.setVisibility(View.VISIBLE);
+			    	initialLetter.setText(firstLetter);
+			    	initialLetter.setTextSize(100);
+			    	initialLetter.setTextColor(Color.WHITE);
+			    	initialLetter.setVisibility(View.VISIBLE);
 			    }
 		    }
 		    
@@ -215,8 +218,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 						}
 					}
 					else{
-						imageView.setImageBitmap(imBitmap);
-//						initialLetter.setVisibility(View.GONE);
+						contactPropertiesImage.setImageBitmap(imBitmap);
+						initialLetter.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -253,6 +256,12 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 	public void setUserEmail(String userEmail){
 		this.userEmail = userEmail;
+	}
+	
+	public void setToolbar(ImageView contactPropertiesImage, TextView initialLetter, CollapsingToolbarLayout collapsingToolbarLayout){
+		this.contactPropertiesImage = contactPropertiesImage;
+		this.initialLetter = initialLetter;
+		this.collapsingToolbarLayout = collapsingToolbarLayout;
 	}
 
 	public String getUserEmail(){
@@ -341,8 +350,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 							avatar.delete();
 						}
 						else{
-							imageView.setImageBitmap(imBitmap);
-//							initialLetter.setVisibility(View.GONE);
+							contactPropertiesImage.setImageBitmap(imBitmap);
+							initialLetter.setVisibility(View.GONE);
 						}
 					}
 				}
@@ -357,7 +366,9 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 					firstName = true;
 				}
 				if(name&&firstName){
-					userNameTextView.setText(nameText+" "+firstNameText);
+					if (collapsingToolbarLayout != null){
+						collapsingToolbarLayout.setTitle(nameText+" "+firstNameText);
+					}
 					name= false;
 					firstName = false;
 				}
@@ -368,7 +379,10 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			if (e.getErrorCode() == MegaError.API_OK) {
 				log("MegaRequest.TYPE_GET_USER_DATA: "+request.getName());
 				log("ParamType: "+request.getParamType());
-				userNameTextView.setText(request.getName());
+//				if (aB != null){
+//					aB.setTitle(request.getName());
+//				}
+//				userNameTextView.setText(request.getName());
 			}
 		}
 		else{
