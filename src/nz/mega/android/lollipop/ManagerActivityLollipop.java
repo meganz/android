@@ -1257,6 +1257,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	super.onDestroy();
 	}
 	
+	@SuppressLint("NewApi")
 	public void selectDrawerItemLollipop(DrawerItem item){
     	log("selectDrawerItemLollipop");
     	
@@ -1977,11 +1978,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		case SETTINGS:{
     			
     			drawerLayout.closeDrawer(Gravity.LEFT);
+    			aB.setTitle(getString(R.string.action_settings));
+//    			startActivity(new Intent(this, SettingsActivity.class));
+    			mTabHostContacts.setVisibility(View.GONE);    			
+    			viewPagerContacts.setVisibility(View.GONE); 
+    			mTabHostShares.setVisibility(View.GONE);    			
+    			mTabHostShares.setVisibility(View.GONE);
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
     			
-    			startActivity(new Intent(this, SettingsActivity.class));
+    			getFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragmentLollipop()).commit();
+//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//				ft.replace(R.id.fragment_container, sF, "sF");
+//    			ft.commit();
     			
-    			drawerItem = lastDrawerItem;
-    			selectDrawerItemLollipop(drawerItem);
+//    			drawerItem = lastDrawerItem;
+//    			selectDrawerItemLollipop(drawerItem);
     			
     			break;
     		}
