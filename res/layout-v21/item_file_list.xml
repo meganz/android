@@ -38,6 +38,7 @@
         android:layout_toRightOf="@id/file_list_thumbnail"
         android:paddingLeft="3dp"
         android:paddingTop="7dp"
+        android:textColor="@color/file_list_first_row"
         android:ellipsize="end"
         android:maxLines="2"/>
     
