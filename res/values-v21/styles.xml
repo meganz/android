@@ -1,7 +1,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
  
     <!-- Base application theme. -->
-    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.Megaactionbar" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
  
         <!-- colorPrimary is used for the default action bar background -->
@@ -18,6 +18,10 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     	<item name="android:statusBarColor">@android:color/transparent</item>
     	<item name="android:windowTranslucentStatus">true</item>
+    	
+    	<item name="windowActionModeOverlay">true</item>
+    	<item name="actionModeBackground">@color/lollipop_primary_color</item>
+		<item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
  
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
