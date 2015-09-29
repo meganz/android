@@ -25,6 +25,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -54,33 +57,36 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int UPGRADE_ACCOUNT_FRAGMENT = 5001;
 	public static int PAYMENT_FRAGMENT = 5002;
 
-	RelativeLayout avatarLayout;
-	RoundedImageView imageView;
-	TextView initialLetter;
-	RelativeLayout contentLayout;
-	TextView userNameTextView;
-	TextView infoEmail;
-	Button logoutButton;	
-	Button upgradeButton;
-
-//	String userEmail;	
 	Context context;
 	ActionBar aB;
-	TableLayout bottomControlBar;
-	TextView usedSpace;
-	TextView usedSpaceText;
-	ProgressBar usedSpaceBar;  
-	TextView titleTypeAccount;
-	TextView typeAccount;
-	TextView expiresOn;
-	TextView expirationAccount;
-	TextView titleLastSession;
-	TextView lastSession;
-	TextView titleConnections;
-	TextView connections;
-	MegaApiAndroid megaApi;
+	
+	TextView initialLetter;
+	ImageView myAccountImage;
+	CollapsingToolbarLayout collapsingToolbarLayout;
+	
 	String myEmail;
 	MegaUser myUser;
+	
+	TextView typeAccount;
+	TextView infoEmail;
+	TextView expirationAccount;
+	TextView usedSpace;
+	TextView lastSession;
+	TextView connections;
+	
+	Button upgradeButton;
+	
+	RelativeLayout typeLayout;
+	LinearLayout expirationLayout;
+	LinearLayout usedSpaceLayout;
+	LinearLayout lastSessionLayout;
+	LinearLayout connectionsLayout;
+	
+
+//	String userEmail;	
+	
+	MegaApiAndroid megaApi;
+	
 	long numberOfSubscriptions = -1;
 	
 	private boolean name = false;
@@ -137,6 +143,115 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
+		
+		myUser = megaApi.getContact(myEmail);
+		if(myUser == null){
+			return null;
+		}
+		
+		infoEmail = (TextView) v.findViewById(R.id.myaccount_email);
+		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
+		expirationAccount = (TextView) v.findViewById(R.id.myaccount_expiration);
+		usedSpace = (TextView) v.findViewById(R.id.myaccount_used_space);
+		lastSession = (TextView) v.findViewById(R.id.myaccount_last_session);
+		connections = (TextView) v.findViewById(R.id.myaccount_connections);
+		
+		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
+		expirationLayout = (LinearLayout) v.findViewById(R.id.myaccount_expiration_layout);
+		usedSpaceLayout = (LinearLayout) v.findViewById(R.id.myaccount_used_space_layout);
+		lastSessionLayout = (LinearLayout) v.findViewById(R.id.myaccount_last_session_layout);
+		connectionsLayout = (LinearLayout) v.findViewById(R.id.myaccount_connections_layout);
+		
+		typeLayout.setVisibility(View.GONE);
+		expirationLayout.setVisibility(View.GONE);
+		usedSpaceLayout.setVisibility(View.GONE);
+		lastSessionLayout.setVisibility(View.GONE);
+		
+		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
+		
+		infoEmail.setText(myEmail);
+		if (collapsingToolbarLayout != null){
+			collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
+			collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
+			collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
+			collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
+		}
+		
+		name=false;
+		firstName=false;
+		megaApi.getUserAttribute(myUser, 1, this);
+		megaApi.getUserAttribute(myUser, 2, this);
+		
+		
+		Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
+		Canvas c = new Canvas(defaultAvatar);
+		Paint p = new Paint();
+		p.setAntiAlias(true);
+		p.setColor(Color.TRANSPARENT);
+		c.drawPaint(p);
+		myAccountImage.setImageBitmap(defaultAvatar);
+		
+	    int avatarTextSize = getAvatarTextSize(density);
+	    log("DENSITY: " + density + ":::: " + avatarTextSize);
+	    if (myEmail != null){
+		    if (myEmail.length() > 0){
+		    	log("TEXT: " + myEmail);
+		    	log("TEXT AT 0: " + myEmail.charAt(0));
+		    	String firstLetter = myEmail.charAt(0) + "";
+		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+		    	initialLetter.setText(firstLetter);
+		    	initialLetter.setTextSize(100);
+		    	initialLetter.setTextColor(Color.WHITE);
+		    	initialLetter.setVisibility(View.VISIBLE);
+		    }
+	    }
+		
+	    File avatar = null;
+		if (context.getExternalCacheDir() != null){
+			avatar = new File(context.getExternalCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		}
+		else{
+			avatar = new File(context.getCacheDir().getAbsolutePath(), myEmail + ".jpg");
+		}
+
+		Bitmap imBitmap = null;
+		if (avatar.exists()){
+			if (avatar.length() > 0){
+				BitmapFactory.Options bOpts = new BitmapFactory.Options();
+				bOpts.inPurgeable = true;
+				bOpts.inInputShareable = true;
+				imBitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
+				if (imBitmap == null) {
+					avatar.delete();
+					if (context.getExternalCacheDir() != null){
+						megaApi.getUserAvatar(myUser, context.getExternalCacheDir().getAbsolutePath() + "/" + myEmail, this);
+					}
+					else{
+						megaApi.getUserAvatar(myUser, context.getCacheDir().getAbsolutePath() + "/" + myEmail, this);
+					}
+				}
+				else{
+					myAccountImage.setImageBitmap(imBitmap);
+					initialLetter.setVisibility(View.GONE);
+				}
+			}
+		}
+		
+		ArrayList<MegaUser> contacts = megaApi.getContacts();
+		ArrayList<MegaUser> visibleContacts=new ArrayList<MegaUser>();
+
+		for (int i=0;i<contacts.size();i++){
+			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
+				visibleContacts.add(contacts.get(i));
+			}
+		}		
+		connections.setText(visibleContacts.size()+" " + context.getResources().getQuantityString(R.plurals.general_num_contacts, visibleContacts.size()));
+		
+		megaApi.getAccountDetails(this);
+		megaApi.getPaymentMethods(this);
+		
+		/*
 		
 		avatarLayout = (RelativeLayout) v.findViewById(R.id.my_account_avatar_layout);
 		avatarLayout.getLayoutParams().width = Util.px2dp((200*scaleW), outMetrics);
@@ -278,7 +393,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		//infoAdded.setText(contact.getTimestamp()+"");
 		
-		
+		*/
 		return v;
 	}
 	
@@ -305,6 +420,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		}
 		
 		return (int)textSize;
+	}
+	
+	public void setToolbar(ImageView myAccountImage, TextView initialLetter, CollapsingToolbarLayout collapsingToolbarLayout){
+		this.myAccountImage = myAccountImage;
+		this.initialLetter = initialLetter;
+		this.collapsingToolbarLayout = collapsingToolbarLayout;
+	}
+	
+	public void setMyEmail(String myEmail){
+		this.myEmail = myEmail;
 	}
 
 	@Override
@@ -377,6 +502,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			MegaError e) {
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_GET_ATTR_USER){
+			log("MegaRequest.TYPE_GET_ATTR_USER");
 			if (e.getErrorCode() == MegaError.API_OK){
 				File avatar = null;
 				if (context.getExternalCacheDir() != null){
@@ -396,7 +522,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 							avatar.delete();
 						}
 						else{
-							imageView.setImageBitmap(imBitmap);
+							myAccountImage.setImageBitmap(imBitmap);
 							initialLetter.setVisibility(View.GONE);
 						}
 					}
@@ -412,15 +538,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					firstName = true;
 				}
 				if(name&&firstName){
-					userNameTextView.setText(nameText+" "+firstNameText);
+					if (collapsingToolbarLayout != null){
+						collapsingToolbarLayout.setTitle(nameText+" "+firstNameText);
+					}
 					name= false;
 					firstName = false;
-				}				
-			}
-		}
-		if (request.getType() == MegaRequest.TYPE_GET_USER_DATA){
-			if (e.getErrorCode() == MegaError.API_OK){
-				userNameTextView.setText(request.getName());
+				}
+				
 			}
 		}
 		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
@@ -460,42 +584,40 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				
 				accountType = accountInfo.getProLevel();
 				accountDetailsBoolean = true;
+				typeLayout.setVisibility(View.VISIBLE);
 				switch(accountType){				
 				
 					case 0:{	  
 						typeAccount.setTextColor(getActivity().getResources().getColor(R.color.green_free_account));
 						typeAccount.setText(R.string.free_account);
+						expirationLayout.setVisibility(View.GONE);
 						break;
 					}
 						
 					case 1:{
 						typeAccount.setText(getString(R.string.pro1_account));
-						expirationAccount.setVisibility(View.VISIBLE);
-						expiresOn.setVisibility(View.VISIBLE);
+						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 2:{
 						typeAccount.setText(getString(R.string.pro2_account));
-						expirationAccount.setVisibility(View.VISIBLE);
-						expiresOn.setVisibility(View.VISIBLE);
+						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 3:{
 						typeAccount.setText(getString(R.string.pro3_account));
-						expirationAccount.setVisibility(View.VISIBLE);
-						expiresOn.setVisibility(View.VISIBLE);
+						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
 					
 					case 4:{
 						typeAccount.setText(getString(R.string.prolite_account));
-						expirationAccount.setVisibility(View.VISIBLE);
-						expiresOn.setVisibility(View.VISIBLE);
+						expirationLayout.setVisibility(View.VISIBLE);
 						expirationAccount.setText(Util.getDateString(accountInfo.getProExpiration()));
 						break;
 					}
@@ -526,12 +648,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				long totalStorage = accountInfo.getStorageMax();
 				long usedStorage = accountInfo.getStorageUsed();	
 				
-				bottomControlBar.setVisibility(View.VISIBLE);
 		        int usedPerc = 0;
 		        if (totalStorage != 0){
 		        	usedPerc = (int)((100 * usedStorage) / totalStorage);
 		        }
-		        usedSpaceBar.setProgress(usedPerc); 
 			        
 				boolean totalGb = false;
 				
@@ -563,32 +683,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					}
 				}
 				
-//		        String usedSpaceString = getString(R.string.used_space, used, total);
 				String usedSpaceString = used + " / " + total;
-		        usedSpace.setText(usedSpaceString);
-		        Spannable wordtoSpan = new SpannableString(usedSpaceString);
-		       		       
-		        if (usedPerc < 90){
-		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
-		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_ok)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        }
-		        else if ((usedPerc >= 90) && (usedPerc <= 95)){
-		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_warning));
-		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_warning)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        }
-		        else{
-		        	if (usedPerc > 100){
-			        	usedPerc = 100;
-			        }
-		        	usedSpaceBar.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_exceed));    
-		        	wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.used_space_exceed)), 0, used.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        }	             
-		        
-		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), 0, used.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        wordtoSpan.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.navigation_drawer_mail)), used.length() + 1, used.length() + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        wordtoSpan.setSpan(new RelativeSizeSpan(1.5f), used.length() + 3, used.length() + 3 + total.length() - 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-		        usedSpace.setText(wordtoSpan);        
-			        
+		        usedSpace.setText(usedSpaceString);    
+			    
+		        usedSpaceLayout.setVisibility(View.VISIBLE);
 			}
 		}
 	}

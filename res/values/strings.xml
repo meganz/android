@@ -75,9 +75,10 @@
     <string name="action_remove_master_key" context="Menu item to let the user remove the MasterKey (previously downloaded)">Remove MasterKey</string>
     <string name="action_cancel_subscriptions" context="Menu item to let the user cancel subscriptions">Cancel subscription</string>
     <string name="toast_master_key" context="success message when the MasterKey file has been downloaded">The MasterKey has been exported into: </string>
+    <string name="toast_master_key_removed" context="success message when the MasterKey file has been removed">The MasterKey has been removed</string>
     <string name="cancel_subscription_ok" context="success message when the subscription has been canceled correctly">The subscription has been canceled correctly</string>
     <string name="cancel_subscription_error" context="error message when the subscription has not been canceled correctly">The subscription has not been canceled correctly. Please contact support\@mega.co.nz to cancel your subscription</string>
-    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Close all sessions</string>
+    <string name="action_kill_all_sessions" context="Menu item to kill all opened sessions">Logout from all devices</string>
     <string name="success_kill_all_sessions" context="Message after kill all opened sessions">The remaining sessions have been successfully closed</string>
     <string name="error_kill_all_sessions" context="Message after kill all opened sessions">Error when closing the opened sessions</string>    
     
@@ -492,7 +493,7 @@
     
     <string name="new_account" context="in login screen to create a new account">Create one account now!</string>
     
-    <string name="my_account_title" context="title of the My Account screen">Account Type:</string>
+    <string name="my_account_title" context="title of the My Account screen">Account Type</string>
     <string name="expires_on" context="title of the Expiration Date">Expires on </string>
     <string name="free_account">Free</string>
     <string name="prolite_account" context="Not translate">Lite</string>

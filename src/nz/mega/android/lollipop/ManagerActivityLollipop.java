@@ -2043,6 +2043,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case ACCOUNT:{
     			
+    			Intent myAccountIntent = new Intent(this, MyAccountMainActivityLollipop.class);
+    			startActivity(myAccountIntent);
+    			
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			
     			if (maFLol == null){
@@ -6145,13 +6148,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			case R.id.navigation_drawer_account_view:{
 //				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
-				drawerItem = DrawerItem.ACCOUNT;
+				/*drawerItem = DrawerItem.ACCOUNT;
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
 					hidden.setChecked(true);
 				}
-				selectDrawerItemLollipop(drawerItem);
+				selectDrawerItemLollipop(drawerItem);*/
+				Intent myAccountIntent = new Intent(this, MyAccountMainActivityLollipop.class);
+    			startActivity(myAccountIntent);
+    			drawerLayout.closeDrawer(Gravity.LEFT);
 				break;
 			}
 //			case R.id.top_control_bar:{
