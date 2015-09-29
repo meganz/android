@@ -902,7 +902,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 	
 	public static void log(String log) {
-		Util.log("FileExplorerActivity", log);
+		Util.log("FileExplorerActivityLollipop", log);
 	}
 
 	@Override
