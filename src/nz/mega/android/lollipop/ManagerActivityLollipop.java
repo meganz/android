@@ -36,7 +36,6 @@ import nz.mega.android.PaymentFragment;
 import nz.mega.android.Product;
 import nz.mega.android.R;
 import nz.mega.android.SearchFragment;
-import nz.mega.android.SecureSelfiePreviewActivity;
 import nz.mega.android.SettingsActivity;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.SortByDialogActivity;
@@ -6722,7 +6721,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(resultCode == Activity.RESULT_OK){
 				
 				log("REcibo el intent OOOOKK");
-				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivity.class);			
+				Intent intentPicture = new Intent(this, SecureSelfiePreviewActivityLollipop.class);			
 				startActivity(intentPicture);
 			}
 			else{
