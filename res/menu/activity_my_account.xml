@@ -1,0 +1,59 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+
+	<item
+	    android:id="@+id/action_my_account_logout_from_all_devices"
+	    android:orderInCategory="110"
+	    android:showAsAction="never"
+	    android:title="@string/action_kill_all_sessions"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_my_account_change_password"
+	    android:orderInCategory="115"
+	    android:showAsAction="never"
+	    android:title="@string/my_account_change_password"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_my_account_export_master_key"
+	    android:orderInCategory="120"
+	    android:showAsAction="never"
+	    android:title="@string/action_export_master_key"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_my_account_remove_master_key"
+	    android:orderInCategory="120"
+	    android:showAsAction="never"
+	    android:title="@string/action_remove_master_key"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_my_account_help"
+	    android:orderInCategory="125"
+	    android:showAsAction="never"
+	    android:title="@string/action_help"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_my_account_upgrade_account"
+	    android:orderInCategory="130"
+	    android:showAsAction="never"
+	    android:title="@string/action_upgrade_account"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+	
+	<item
+	    android:id="@+id/action_my_account_logout"
+	    android:orderInCategory="135"
+	    android:showAsAction="never"
+	    android:title="@string/action_logout"	    
+	    android:icon="@drawable/ic_menu_upload_here_dark"
+	    MEGA:showAsAction="never" />
+</menu>
