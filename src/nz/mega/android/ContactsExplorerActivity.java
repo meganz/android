@@ -532,7 +532,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 					if (value.length() == 0) {
 						return true;
 					}
-					addContact(value);
+					inviteContact(value);
 					addContactDialog.dismiss();
 					return true;
 				}
@@ -562,7 +562,7 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 						if (value.length() == 0) {
 							return;
 						}
-						addContact(value);
+						inviteContact(value);
 					}
 				});
 		
@@ -587,9 +587,9 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 	/*
 	 * Add contact
 	 */
-	private void addContact(String emailContact) {
+	private void inviteContact(String emailContact) {
 		log(emailContact + " of Contact");
-		megaApi.addContact(emailContact, this); 
+		megaApi.inviteContact(emailContact, null, MegaContactRequest.INVITE_ACTION_ADD, this);
 	}
 	
 	public static void log(String message) {
@@ -611,11 +611,16 @@ public class ContactsExplorerActivity extends PinActivity implements OnClickList
 			MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
-		if (request.getType() == MegaRequest.TYPE_ADD_CONTACT){
+		if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){	
+			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
+			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, "Contact added", Toast.LENGTH_LONG).show();
-				log("add contact");
-			}
+				
+				if(request.getNumber()==MegaContactRequest.INVITE_ACTION_ADD)
+				{
+					Toast.makeText(this, getString(R.string.context_contact_added), Toast.LENGTH_LONG).show();	
+				}
+			}			
 		}
 	}
 
