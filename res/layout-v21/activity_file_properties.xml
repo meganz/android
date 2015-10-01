@@ -101,7 +101,7 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
-                android:background="#c0c0c0" />
+               	android:background="@color/separator_grey"/>
 
             <LinearLayout
                 android:id="@+id/available_offline_layout"
@@ -133,7 +133,7 @@
             <View
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
-                android:background="#c0c0c0" />
+                android:background="@color/separator_grey"/>
             
            	<!-- SHARED LAYOUT -->
             	
@@ -180,7 +180,7 @@
            	    android:id="@+id/divider_shared_layout"
                 android:layout_width="fill_parent"
                 android:layout_height="2dp"
-                android:background="#c0c0c0" />
+                android:background="@color/separator_grey" />
            	
            	
            	
