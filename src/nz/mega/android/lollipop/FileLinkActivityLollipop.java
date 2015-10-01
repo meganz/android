@@ -2,6 +2,7 @@ package nz.mega.android.lollipop;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import nz.mega.android.DatabaseHandler;
@@ -38,6 +39,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -67,11 +69,12 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	TextView nameView;
 	RelativeLayout nameLayout;
 	TextView sizeTextView;
+	TextView sizeTitleView;
 	TextView importButton;
 	TextView downloadButton;
-	
+	LinearLayout optionsBar;
 	MegaNode document = null;
-	
+	RelativeLayout infoLayout;
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
 	
@@ -115,12 +118,17 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+		aB.setDisplayShowTitleEnabled(false);
 		
-		iconView = (ImageView) findViewById(R.id.file_link_icon);
+		infoLayout = (RelativeLayout) findViewById(R.id.file_link_layout);
 		
-		iconView.getLayoutParams().width = Util.scaleWidthPx(300, outMetrics);
-		iconView.getLayoutParams().height = Util.scaleHeightPx(300, outMetrics);
+		RelativeLayout.LayoutParams infoLayoutParams = (RelativeLayout.LayoutParams)infoLayout.getLayoutParams();
+		infoLayoutParams.setMargins(0, 0, 0, Util.scaleHeightPx(80, outMetrics)); 		
+		infoLayout.setLayoutParams(infoLayoutParams);
 		
+		iconView = (ImageView) findViewById(R.id.file_link_icon);		
+		iconView.getLayoutParams().width = Util.scaleWidthPx(200, outMetrics);
+		iconView.getLayoutParams().height = Util.scaleHeightPx(200, outMetrics);		
 		
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) iconView.getLayoutParams();
 		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
@@ -131,22 +139,66 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 //		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 //		lp.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics));
 //		iconView.setLayoutParams(lp);
-//		
+		
+		float scaleText;
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
+			
 		nameView = (TextView) findViewById(R.id.file_link_name);
+		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
+		nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+		nameView.setSingleLine();
+		nameView.setTypeface(null, Typeface.BOLD);
+		//Left margin
+		RelativeLayout.LayoutParams nameViewParams = (RelativeLayout.LayoutParams)nameView.getLayoutParams();
+		nameViewParams.setMargins(Util.scaleWidthPx(60, outMetrics), 0, 0, Util.scaleHeightPx(20, outMetrics)); 		
+		nameView.setLayoutParams(nameViewParams);
+		
 //		lp.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics));
 //		nameView.setLayoutParams(lp);
 		
 		nameLayout = (RelativeLayout) findViewById(R.id.file_link_name_layout);
+		sizeTitleView = (TextView) findViewById(R.id.file_link_info_menu_size);
+		//Left margin, Top margin
+		RelativeLayout.LayoutParams sizeTitleParams = (RelativeLayout.LayoutParams)sizeTitleView.getLayoutParams();
+		sizeTitleParams.setMargins(Util.scaleWidthPx(10, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, 0); 		
+		sizeTitleView.setLayoutParams(sizeTitleParams);
+				
 		sizeTextView = (TextView) findViewById(R.id.file_link_size);
-		importButton = (TextView) findViewById(R.id.file_link_button_import);
-		importButton.setOnClickListener(this);
+		//Bottom margin
+		RelativeLayout.LayoutParams sizeTextParams = (RelativeLayout.LayoutParams)sizeTextView.getLayoutParams();
+		sizeTextParams.setMargins(Util.scaleWidthPx(10, outMetrics), 0, 0, Util.scaleHeightPx(15, outMetrics)); 		
+		sizeTextView.setLayoutParams(sizeTextParams);		
+		
+		optionsBar = (LinearLayout) findViewById(R.id.options_file_link_layout);
 		downloadButton = (TextView) findViewById(R.id.file_link_button_download);
 		downloadButton.setOnClickListener(this);
+		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
+		downloadButton.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		downloadButton.setLayoutParams(cancelTextParams);
 		
-		nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-		nameView.setSingleLine();
-		nameView.setTypeface(null, Typeface.BOLD);
-		
+		importButton = (TextView) findViewById(R.id.file_link_button_import);
+		importButton.setText(getString(R.string.general_import).toUpperCase(Locale.getDefault()));	
+		importButton.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = importButton.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		paramsb2.width = Util.scaleWidthPx(73, outMetrics);
+		importButton.setLayoutParams(paramsb2);
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)importButton.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		importButton.setLayoutParams(optionTextParams);
+				
 //		iconView.getLayoutParams().height = Util.px2dp((20*scaleH), outMetrics);
 //		((LayoutParams)iconView.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, 0);
 //		
