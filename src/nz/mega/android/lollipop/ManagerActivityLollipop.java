@@ -22,7 +22,6 @@ import nz.mega.android.ContactsExplorerActivity;
 import nz.mega.android.CreditCardFragment;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
-import nz.mega.android.FileLinkActivity;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.MegaApplication;
@@ -829,7 +828,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 					else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK)){
-						Intent intent = new Intent(managerActivity, FileLinkActivity.class);
+						Intent intent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 						intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 						intent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
 						intent.setData(Uri.parse(getIntent().getDataString()));
@@ -1126,7 +1125,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 				else if (getIntent().getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK)){
-					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivity.class);
+					Intent fileLinkIntent = new Intent(managerActivity, FileLinkActivityLollipop.class);
 					fileLinkIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 					fileLinkIntent.setAction(ManagerActivityLollipop.ACTION_IMPORT_LINK_FETCH_NODES);
 					fileLinkIntent.setData(Uri.parse(getIntent().getDataString()));
@@ -5056,7 +5055,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("open link url");
 			
 //			Intent openIntent = new Intent(this, ManagerActivityLollipop.class);
-			Intent openFileIntent = new Intent(this, FileLinkActivity.class);
+			Intent openFileIntent = new Intent(this, FileLinkActivityLollipop.class);
 			openFileIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			openFileIntent.setAction(ManagerActivityLollipop.ACTION_OPEN_MEGA_LINK);
 			openFileIntent.setData(Uri.parse(url));
@@ -5488,7 +5487,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (value.length() == 0) {
 						return true;
 					}
-					addContact(value);
+					inviteContact(value);
 					addContactDialog.dismiss();
 					return true;
 				}
@@ -5523,30 +5522,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setView(layout);
 		addContactDialog = builder.create();
 		addContactDialog.show();
-	}
-	
-	public void addContact(String contactEmail){
-		log("addContact");
-		if (!Util.isOnline(this)){
-			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
-			return;
-		}
-		
-		if(isFinishing()){
-			return;	
-		}
-		
-		statusDialog = null;
-		try {
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.context_adding_contact));
-			statusDialog.show();
-		}
-		catch(Exception e){
-			return;
-		}
-
-		megaApi.addContact(contactEmail, this);
 	}
 	
 	public void inviteContact(String contactEmail){

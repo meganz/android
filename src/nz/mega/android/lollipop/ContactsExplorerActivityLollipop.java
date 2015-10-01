@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import nz.mega.android.ContactsExplorerAdapter.OnItemCheckClickListener;
 import nz.mega.android.MegaApplication;
-import nz.mega.android.PinActivity;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
@@ -17,18 +16,14 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.MultiSelectListPreference;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
@@ -37,22 +32,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 
@@ -71,8 +55,6 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	
 	ActionBar aB;
 	Toolbar tB;
-	
-	boolean megaContacts = true;
 	
 	int multipleSelectIntent;
 	int sendToInbox;
@@ -130,37 +112,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	        return true;
 	    }
 	    return super.onKeyDown(keyCode, event);
-	} 
-	
-	private class RefreshContactsTask extends AsyncTask<String, Void, Boolean> {
-
-		ArrayList<PhoneContacts> contactList;
-		
-		@Override
-		protected Boolean doInBackground(String... args) {
-			// Fetch emails from contact list
-	        contactList = refreshPhoneContacts();
-	        
-	        if (contactList != null){
-	        	return true;
-	        }
-	        else{
-	        	return false;
-	        }
-		}
-		
-		@Override
-		protected void onPostExecute(Boolean res) {
-			// Show emails on screen
-
-			if (!megaContacts){
-				if (adapter != null){
-					adapter.setContacts(null, contactList);
-				}
-			}
-		}
-		
-	}
+	} 	
 	
 	@SuppressLint("InlinedApi")
 	private ArrayList<PhoneContacts> refreshPhoneContacts() {
@@ -257,7 +209,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		}
 		
 		if (adapter == null){
-			adapter = new ContactsExplorerLollipopAdapter(this, visibleContacts, null, megaContacts);
+			adapter = new ContactsExplorerLollipopAdapter(this, visibleContacts);
 			
 			listView.setAdapter(adapter);
 			
@@ -270,7 +222,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			});
 		}
 		else{
-			adapter.setContacts(visibleContacts, null);
+			adapter.setContacts(visibleContacts);
 		}			
 		
 		
@@ -381,38 +333,16 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	}
 
 	public void itemClick(View view, int position) {
-		log("on item click");
-		
-		if (megaContacts){
-			MegaUser contact = (MegaUser) adapter.getDocumentAt(position);
-			if(contact == null)
-			{
-				return;
-			}
-			ArrayList<String> emails = new ArrayList<String>();
-			emails.add(contact.getEmail());
-			setResultContacts(emails, megaContacts);
-//			listView.setItemChecked(position, false);
+		log("on item click");		
+
+		MegaUser contact = (MegaUser) adapter.getDocumentAt(position);
+		if(contact == null)
+		{
+			return;
 		}
-		else{
-			PhoneContacts contact = (PhoneContacts) adapter.getDocumentAt(position);
-			if(contact == null)
-			{
-				return;
-			}
-			
-			ArrayList<String> contacts = new ArrayList<String>();
-			if (contact.getEmail() != null){
-				contacts.add(ContactsExplorerActivityLollipop.EXTRA_EMAIL);
-				contacts.add(contact.getEmail());
-			}
-			else if (contact.getPhoneNumber() != null){
-				contacts.add(ContactsExplorerActivityLollipop.EXTRA_PHONE);
-				contacts.add(contact.getPhoneNumber());
-			}
-			setResultContacts(contacts, megaContacts);
-//			listView.setItemChecked(position, false);
-		}
+		ArrayList<String> emails = new ArrayList<String>();
+		emails.add(contact.getEmail());
+		setResultContacts(emails, true);		
 	}
 	
 	/*
@@ -462,7 +392,7 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 	 */
 //	private void addContact(String emailContact) {
 //		log(emailContact + " of Contact");
-//		megaApi.addContact(emailContact, this); 
+//		megaApi.inviteContact(emailContact, this); 
 //	}
 //	
 //	public void onAddContactClick(){
@@ -518,19 +448,19 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 //		addContactDialog = builder.create();
 //		addContactDialog.show();
 //	}
-	
-	/*
-	 * Display keyboard
-	 */
-	private void showKeyboardDelayed(final View view) {
-		view.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				InputMethodManager imm = (InputMethodManager) ContactsExplorerActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
-			}
-		}, 50);
-	}	
+//	
+//	/*
+//	 * Display keyboard
+//	 */
+//	private void showKeyboardDelayed(final View view) {
+//		view.postDelayed(new Runnable() {
+//			@Override
+//			public void run() {
+//				InputMethodManager imm = (InputMethodManager) ContactsExplorerActivityLollipop.this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+//			}
+//		}, 50);
+//	}	
 	
 	public static void log(String message) {
 		Util.log("ContactsExplorerActivityLollipop", message);
@@ -576,16 +506,14 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
 				visibleContacts.add(contacts.get(i));
 			}
+		}		
+
+		if (adapter == null){
+			adapter = new ContactsExplorerLollipopAdapter(this, visibleContacts);
+			listView.setAdapter(adapter);
 		}
-		
-		if (megaContacts){
-			if (adapter == null){
-				adapter = new ContactsExplorerLollipopAdapter(this, visibleContacts, null, megaContacts);
-				listView.setAdapter(adapter);
-			}
-			else{
-				adapter.setContacts(visibleContacts, null);
-			}
+		else{
+			adapter.setContacts(visibleContacts);
 		}
 		
 	}

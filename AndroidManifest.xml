@@ -379,6 +379,13 @@
             android:screenOrientation="portrait">            
         </activity>
         
+       <activity
+            android:name="nz.mega.android.lollipop.FileLinkActivityLollipop"
+            android:label="@string/app_name"
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">            
+        </activity>
+        
         <activity
             android:name="SortByDialogActivity"
             android:label="@string/action_sort_by"

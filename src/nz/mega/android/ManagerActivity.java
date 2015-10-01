@@ -6149,7 +6149,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 					if (value.length() == 0) {
 						return true;
 					}
-					addContact(value);
+					inviteContact(value);
 					addContactDialog.dismiss();
 					return true;
 				}
@@ -6265,30 +6265,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		log("clearRubbishBin");
 		ClearRubbisBinTask clearRubbishBinTask = new ClearRubbisBinTask(this);
 		clearRubbishBinTask.execute();
-	}
-	
-	public void addContact(String contactEmail){
-		log("addContact");
-		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
-			return;
-		}
-		
-		if(isFinishing()){
-			return;	
-		}
-		
-		statusDialog = null;
-		try {
-			statusDialog = new ProgressDialog(this);
-			statusDialog.setMessage(getString(R.string.context_adding_contact));
-			statusDialog.show();
-		}
-		catch(Exception e){
-			return;
-		}
-
-		megaApi.addContact(contactEmail, this);
 	}
 	
 	public void inviteContact(String contactEmail){
