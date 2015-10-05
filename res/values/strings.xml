@@ -38,7 +38,7 @@
     <string name="general_folder_info" context="Label of the option menu. When clicking this button, the app shows the info of the folder">Folder info</string>
     <string name="general_menu" context="Title when the left menu is opened">Menu</string>
  
-    <string name="secondary_media_service_error_local_folder" context="Local folder Error in Sync Service">The secondary media folder does not exist, please choose a new folder.</string>   
+    <string name="secondary_media_service_error_local_folder" context="Local folder error in Sync Service. There are two syncs for images and videos. This error appears when the secondary media local folder doesn't exist">The secondary media folder does not exist, please choose a new folder.</string>   
     <string name="no_external_SD_card_detected" context="when no external card exists">No external SD card detected</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload.</string>
     
@@ -430,8 +430,8 @@
     <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
     
-    <string name="settings_secondary_upload_on" context="settings option">Enable Secondary Media Uploads</string>
-    <string name="settings_secondary_upload_off" context="settings option">Disable Secondary Media Uploads</string>
+    <string name="settings_secondary_upload_on" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization.">Enable Secondary Media Uploads</string>
+    <string name="settings_secondary_upload_off" context="The Secondary Media Uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won't be running anymore. This is the text that appears in the settings option to disable the second synchronization.">Disable Secondary Media Uploads</string>
     
     <string name="settings_empty_folder" context="settings option">Choose folder</string>
     
@@ -451,11 +451,11 @@
     <string name="settings_camera_upload_charging" context="Option to choose that the camera sync will only be enable when the device is charging">Only when charging</string>
     <string name="settings_keep_file_names" context="Option to choose that the camera sync will maintain the local file names when uploading">Keep file names as in the device</string>
     
-    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored.">Local Camera folder</string>
-    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored.">Mega Camera Uploads Folder</string>
+    <string name="settings_local_camera_upload_folder" context="The location of where the user photos or videos are stored in the device.">Local Camera folder</string>
+    <string name="settings_mega_camera_upload_folder" context="The location of where the user photos or videos are stored in MEGA.">Mega Camera Uploads Folder</string>
     
-    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos are stored.">Local Secondary folder</string>
-    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos are stored.">Mega Secondary Folder</string>
+    <string name="settings_local_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in the device.">Local Secondary folder</string>
+    <string name="settings_mega_secondary_folder" context="The location of where the user photos or videos of the secondary sync are stored in MEGA.">Mega Secondary Folder</string>
     
     <string name="settings_camera_upload_only_photos" context="what kind of file are going to be uploaded. Needed for the settings summary">Photos only</string>
     <string name="settings_camera_upload_only_videos" context="what kind of file are going to be uploaded. Needed for the settings summary">Videos only</string>
