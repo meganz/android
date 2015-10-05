@@ -9,7 +9,6 @@ import java.util.Map;
 
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
-import nz.mega.android.FileContactListActivity;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.MegaApplication;
@@ -841,13 +840,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		
 		switch (v.getId()) {
 			case R.id.file_properties_shared_info:{
-				Intent i = new Intent(this, FileContactListActivity.class);
+				Intent i = new Intent(this, FileContactListActivityLollipop.class);
 				i.putExtra("name", node.getHandle());
 				startActivity(i);				
 				break;
 			}
 //			case R.id.file_properties_content_table:{			
-//				Intent i = new Intent(this, FileContactListActivity.class);
+//				Intent i = new Intent(this, FileContactListActivityLollipop.class);
 //				i.putExtra("name", node.getHandle());
 //				startActivity(i);
 //				finish();
