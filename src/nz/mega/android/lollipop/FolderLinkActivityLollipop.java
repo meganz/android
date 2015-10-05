@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import nz.mega.android.DatabaseHandler;
@@ -79,6 +80,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	TextView emptyTextView;
 	TextView contentText;
     RelativeLayout fragmentContainer;
+	TextView downloadButton;
+	LinearLayout optionsBar;
 	
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
@@ -199,84 +202,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			return false;
 		}
 		
-	}
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		log("onCreateOptionsMenu");
-		menu.clear();
-		
-		// Inflate the menu items for use in the action bar
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.folder_link_action, menu);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		
-		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
-		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
-		importFolderMenuItem.setVisible(false);
-		if(megaApiFolder.getRootNode() == null)
-		{
-			downloadFolderMenuItem.setVisible(false);
-		}
-		
-		return super.onCreateOptionsMenu(menu);
-	}
-	
-	public boolean onPrepareOptionsMenu(Menu menu) 
-	{
-		log("onPrepareOptionsMenu");
-		menu.clear();
-
-		// Inflate the menu items for use in the action bar
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.folder_link_action, menu);
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		
-		downloadFolderMenuItem =menu.findItem(R.id.action_download_folder);
-		importFolderMenuItem = menu.findItem(R.id.action_import_folder);
-		
-		importFolderMenuItem.setVisible(false);
-		if(megaApiFolder.getRootNode() == null)
-		{
-			downloadFolderMenuItem.setVisible(false);
-		}
-		
-		return super.onPrepareOptionsMenu(menu);
-	}
+	}	
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		log("onOptionsItemSelected");
-		if (megaApi == null){
-			megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		}
-		
-		log("retryPendingConnections()");
-		if (megaApi != null){
-			megaApi.retryPendingConnections();
-		}
-		// Handle presses on the action bar items
-	    switch (item.getItemId()) {
+		switch (item.getItemId()) {
+	    	// Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
-				finish();
-			}
-		    case R.id.action_import_folder:{
-		    	//TODO
+		    	finish();
 		    	return true;
 		    }
-	        case R.id.action_download_folder:{
-	        	//TODO        	
-	        	
-	        	MegaNode rootNode = megaApiFolder.getRootNode();	        	
-	        	onFolderClick(rootNode.getHandle(),rootNode.getSize());	        	
-	        	return true;
-	        
-	        }
-	        default:{
-	            return super.onOptionsItemSelected(item);
-            }
-	    }
-//		return false;
+		}
+	
+		return super.onOptionsItemSelected(item);
     }
 
 	@Override
@@ -321,6 +260,19 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
+		
+		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
+		downloadButton = (TextView) findViewById(R.id.folder_link_button_download);
+		downloadButton.setOnClickListener(this);
+		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = downloadButton.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
+		downloadButton.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		downloadButton.setLayoutParams(cancelTextParams);
 
 		outSpaceLayout = (LinearLayout) findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
@@ -1039,6 +991,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		log("onClick");
 		
 		switch(v.getId()){
+			case R.id.folder_link_button_download:{
+	        	MegaNode rootNode = megaApiFolder.getRootNode();	        	
+	        	onFolderClick(rootNode.getHandle(),rootNode.getSize());	
+				break;		
+			}
 			case R.id.folder_link_list_out_options:{
 				log("Out Panel");
 				hideOptionsPanel();
