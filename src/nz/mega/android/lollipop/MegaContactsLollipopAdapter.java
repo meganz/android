@@ -592,4 +592,12 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	private static void log(String log) {
 		Util.log("MegaContactsLollipopAdapter", log);
 	}
+
+	public RecyclerView getListFragment() {
+		return listFragment;
+	}
+
+	public void setListFragment(RecyclerView listFragment) {
+		this.listFragment = listFragment;
+	}
 }
