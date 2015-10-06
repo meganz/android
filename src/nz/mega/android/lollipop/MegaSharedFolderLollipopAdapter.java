@@ -47,17 +47,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSharedFolderLollipopAdapter.ViewHolderShareList> implements OnClickListener, MegaRequestListenerInterface {
+public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSharedFolderLollipopAdapter.ViewHolderShareList> implements OnClickListener {
 	
 	Context context;
 	int positionClicked;
 	ArrayList<MegaShare> shareList;
 	MegaNode node;
-	RecyclerView listViewActivity;
+//	RecyclerView listViewActivity;
 	
 	MegaApiAndroid megaApi;
 	
-	boolean removeShare = false;
+//	boolean removeShare = false;
 	boolean multipleSelect = false;
 	
 	OnItemClickListener mItemClickListener;
@@ -168,7 +168,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		this.shareList = _shareList;
 		this.positionClicked = -1;
 		this.megaSharedFolderAdapter = this;
-		this.listViewActivity = _lv;
+		this.listFragment = _lv;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -183,10 +183,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		this.node = node;
 	}
 	
-	public void setListViewActivity(RecyclerView lv){
-		this.listViewActivity = lv;
-	}
-		
 	/*private view holder class*/
     class ViewHolderShareList extends RecyclerView.ViewHolder implements View.OnClickListener{
     	RoundedImageView imageView;
@@ -196,9 +192,9 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
         TextView textViewPermissions;
         ImageButton imageButtonThreeDots;
         RelativeLayout itemLayout;
-        LinearLayout optionsLayout;
-        RelativeLayout optionPermissions;
-        RelativeLayout optionRemoveShare;
+//        LinearLayout optionsLayout;
+//        RelativeLayout optionPermissions;
+//        RelativeLayout optionRemoveShare;
         int currentPosition;
         String contactMail;
     	boolean name = false;
@@ -231,9 +227,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	@Override
 	public ViewHolderShareList onCreateViewHolder(ViewGroup parent, int viewType) {
 		
-		listViewActivity = (RecyclerView) parent;
-		
-
+		listFragment = (RecyclerView) parent;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -256,9 +250,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		holder.textViewContactName.setSingleLine();
 		holder.textViewPermissions = (TextView) v.findViewById(R.id.shared_folder_contact_permissions);
 		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.shared_folder_contact_three_dots);
-		holder.optionsLayout = (LinearLayout) v.findViewById(R.id.shared_folder_options);
-		holder.optionPermissions = (RelativeLayout) v.findViewById(R.id.shared_folder_permissions_option_layout);			
-		holder.optionRemoveShare = (RelativeLayout) v.findViewById(R.id.shared_folder_remove_share_option_layout);			
 		v.setTag(holder); 
 		
 		return holder;
@@ -396,40 +387,21 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
 		if (positionClicked != -1){
 			if (positionClicked == position){
-//				holder.arrowSelection.setVisibility(View.VISIBLE);
-				LayoutParams params = holder.optionsLayout.getLayoutParams();
-				params.height = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, context.getResources().getDisplayMetrics());
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));				
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				listFragment.smoothScrollToPosition(position);
 			}
 			else{
 //				holder.arrowSelection.setVisibility(View.GONE);
-				LayoutParams params = holder.optionsLayout.getLayoutParams();
-				params.height = 0;
+				holder.itemLayout.setBackgroundColor(Color.WHITE);
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		}
 		else{
-//			holder.arrowSelection.setVisibility(View.GONE);
-			LayoutParams params = holder.optionsLayout.getLayoutParams();
-			params.height = 0;
 			holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
 			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 		}
-		
-		if (share.getUser() != null){
-			holder.optionPermissions.setVisibility(View.VISIBLE);
-			holder.optionPermissions.setTag(holder);
-			holder.optionPermissions.setOnClickListener(this);
-		}
-		else{
-			holder.optionPermissions.setVisibility(View.GONE);			
-		}
-		
-		holder.optionRemoveShare.setTag(holder);
-		holder.optionRemoveShare.setOnClickListener(this);
 
 	}
 	
@@ -527,69 +499,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		int currentPosition = holder.currentPosition;
 		final MegaShare s = (MegaShare) getItem(currentPosition);
 				
-		switch (v.getId()){
-			case R.id.shared_folder_permissions_option_layout:{
-				log("En el adapter - change");
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
-				dialogBuilder.setTitle(context.getString(R.string.file_properties_shared_folder_permissions));
-				final CharSequence[] items = {context.getString(R.string.file_properties_shared_folder_read_only), context.getString(R.string.file_properties_shared_folder_read_write), context.getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, s.getAccess(), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						removeShare = false;
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(context);
-							temp.setMessage(((Activity)context).getString(R.string.context_sharing_folder));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-						switch(item) {
-	                        case 0:{
-	                        	MegaUser u = megaApi.getContact(s.getUser());
-	                        	megaApi.share(node, u, MegaShare.ACCESS_READ, megaSharedFolderAdapter);
-	                        	break;
-	                        }
-	                        case 1:{
-	                        	MegaUser u = megaApi.getContact(s.getUser());
-	                        	megaApi.share(node, u, MegaShare.ACCESS_READWRITE, megaSharedFolderAdapter);
-                                break;
-	                        }
-	                        case 2:{
-	                        	MegaUser u = megaApi.getContact(s.getUser());
-	                        	megaApi.share(node, u, MegaShare.ACCESS_FULL, megaSharedFolderAdapter);
-                                break;
-	                        }
-	                    }
-					}
-				});
-				permissionsDialog = dialogBuilder.create();
-				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));				
-				
-				positionClicked = -1;
-//				((FileContactListActivityLollipop)context).refreshView();
-				break;
-			}
-			case R.id.shared_folder_remove_share_option_layout:{
-				log("En el adapter - remove");
-				MegaUser c = null;
-				if (s.getUser() != null){
-					c = megaApi.getContact(s.getUser());
-				}
-				((FileContactListActivityLollipop)context).removeShare(c);
-				positionClicked = -1;
-//				((FileContactListActivityLollipop)context).refreshView();
-				break;
-			}
+		switch (v.getId()){			
 			case R.id.shared_folder_contact_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
@@ -605,6 +515,11 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 						notifyDataSetChanged();
 					}
 				}
+				((FileContactListActivityLollipop) context).showOptionsPanel(s);
+				break;
+			}			
+			case R.id.contact_list_item_layout:{
+				((FileContactListActivityLollipop) context).itemClick(currentPosition);	
 				break;
 			}
 		}
@@ -619,62 +534,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	
 	private static void log(String log) {
 		Util.log("MegaSharedFolderAdapter", log);
-	}
-
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getRequestString());
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestFinish: " + request.getRequestString());
-		
-		try { 
-			statusDialog.dismiss();
-		} 
-		catch (Exception ex) {}
-		
-		if (request.getType() == MegaRequest.TYPE_EXPORT){
-			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(context, context.getString(R.string.context_node_private), Toast.LENGTH_LONG).show();
-			}
-			else{
-				Util.showErrorAlertDialog(e, (Activity)context);
-			}
-		}
-		else if (request.getType() == MegaRequest.TYPE_SHARE){
-			if (removeShare){
-				if (e.getErrorCode() == MegaError.API_OK){
-					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-					Toast.makeText(context, context.getString(R.string.context_share_correctly_removed), Toast.LENGTH_LONG).show();
-					for(int i=0;i<sl.size();i++){
-						MegaShare sh = sl.get(i);
-						if (sh.getAccess() == MegaShare.ACCESS_UNKNOWN){
-							sl.remove(i);
-						}
-					}
-					setShareList(sl);
-				}
-				else{
-					Util.showErrorAlertDialog(e, (Activity)context);
-				}
-				removeShare = false;
-			}
-			else{
-				permissionsDialog.dismiss();
-				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(context, context.getString(R.string.context_correctly_shared), Toast.LENGTH_LONG).show();
-					ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-					setShareList(sl);
-				}
-				else{
-					Util.showErrorAlertDialog(e, (Activity)context);
-				}
-			}
-		}
-		
 	}
 	
 	public boolean isMultipleSelect() {
@@ -771,17 +630,12 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		this.shareList = _shareList;
 		notifyDataSetChanged();
 	}
-	
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestTemporaryError: " + request.getRequestString());
+
+	public RecyclerView getListFragment() {
+		return listFragment;
 	}
 
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
+	public void setListFragment(RecyclerView listFragment) {
+		this.listFragment = listFragment;
 	}
-
 }

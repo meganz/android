@@ -10,10 +10,10 @@ import nz.mega.android.R;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.UploadHereDialog;
 import nz.mega.android.UploadService;
-import nz.mega.android.lollipop.ContactFileListFragmentLollipop.RecyclerViewOnGestureListener;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
 import nz.mega.components.SlidingUpPanelLayout;
+import nz.mega.components.SlidingUpPanelLayout.PanelState;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaContactRequest;
@@ -24,7 +24,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -33,7 +33,6 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,19 +40,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -61,14 +56,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
 
 	MegaApiAndroid megaApi;
 	ActionBar aB;
 	Toolbar tB;
-	FileContactListActivityLollipop fileContactListActivity = this;
-		
+	FileContactListActivityLollipop fileContactListActivityLollipop = this;
+	MegaShare selectedNode;
+	
 	TextView nameView;
 	ImageView imageView;
 	ImageView statusDot;
@@ -125,19 +120,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
 	public LinearLayout optionsLayout;
-	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public LinearLayout optionRename;
-//	public LinearLayout optionPublicLink;
-//	public LinearLayout optionShare;
-//	public LinearLayout optionPermissions;
-	public LinearLayout optionDelete;
-	public LinearLayout optionRemoveTotal;
-//	public LinearLayout optionClearShares;
-	public LinearLayout optionLeaveShare;
-//	public LinearLayout optionMoveTo;
-	public LinearLayout optionCopyTo;	
-	public TextView propertiesText;
+	public LinearLayout optionPermissions;
+	public LinearLayout optionRemove;
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -180,7 +164,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					
 					//Change permissions
 	
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileContactListActivity);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(fileContactListActivityLollipop);
 	
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					
@@ -192,7 +176,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 							changeShare = true;
 							ProgressDialog temp = null;
 							try{
-								temp = new ProgressDialog(fileContactListActivity);
+								temp = new ProgressDialog(fileContactListActivityLollipop);
 								temp.setMessage(getString(R.string.context_sharing_folder));
 								temp.show();
 							}
@@ -210,7 +194,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 												log("Numero: "+j);	
 												if(contacts.get(j).getUser()!=null){
 													MegaUser u = megaApi.getContact(contacts.get(j).getUser());													
-													megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);	
+													megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);	
 												}
 											}
 										}
@@ -225,7 +209,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 												log("Numero: "+j);
 												if(contacts.get(j).getUser()!=null){
 													MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-													megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);		
+													megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);		
 												}
 											}
 										}
@@ -242,7 +226,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 												log("Numero: "+j);	
 												if(contacts.get(j).getUser()!=null){
 													MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-													megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);								
+													megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);								
 												}
 											}
 										}
@@ -255,13 +239,6 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					
 					permissionsDialog = dialogBuilder.create();
 					permissionsDialog.show();
-					Resources resources = permissionsDialog.getContext().getResources();
-					int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-					TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-					alertTitle.setTextColor(resources.getColor(R.color.mega));
-					int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-					View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-					titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
 					
 					adapter.setMultipleSelect(false);
 	
@@ -280,7 +257,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 					ProgressDialog temp = null;
 	
 					try{
-						temp = new ProgressDialog(fileContactListActivity);					
+						temp = new ProgressDialog(fileContactListActivityLollipop);					
 	
 						temp.setMessage((getString(R.string.context_sharing_folder))); 
 						temp.show();
@@ -298,10 +275,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 							for(int j=0;j<contacts.size();j++){	
 								if(contacts.get(j).getUser()!=null){
 									MegaUser u = megaApi.getContact(contacts.get(j).getUser());
-									megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivity);	
+									megaApi.share(node, u, MegaShare.ACCESS_UNKNOWN, fileContactListActivityLollipop);	
 								}
 								else{
-									megaApi.disableExport(node, fileContactListActivity);
+									megaApi.disableExport(node, fileContactListActivityLollipop);
 								}
 							}
 
@@ -482,7 +459,89 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			adapter.setMultipleSelect(false);
 			
 			listView.setAdapter(adapter);
+			
+			slidingOptionsPanel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout_file_contact_list);
+			optionsLayout = (LinearLayout) findViewById(R.id.file_contact_list_options);
+			optionsOutLayout = (FrameLayout) findViewById(R.id.file_contact_list_out_options);
+			optionPermissions = (LinearLayout) findViewById(R.id.file_contact_list_option_share_layout);					
+			optionRemove = (LinearLayout) findViewById(R.id.file_contact_list_option_remove_layout);
+			
+			optionRemove.setOnClickListener(this);			
+			optionPermissions.setOnClickListener(this);
+			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingOptionsPanel.setVisibility(View.INVISIBLE);
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+	            @Override
+	            public void onPanelSlide(View panel, float slideOffset) {
+	            	log("onPanelSlide, offset " + slideOffset);
+	            	if(slideOffset==0){
+	            		hideOptionsPanel();
+	            	}
+	            }
+
+	            @Override
+	            public void onPanelExpanded(View panel) {
+	            	log("onPanelExpanded");
+
+	            }
+
+	            @Override
+	            public void onPanelCollapsed(View panel) {
+	            	log("onPanelCollapsed");
+	            	
+
+	            }
+
+	            @Override
+	            public void onPanelAnchored(View panel) {
+	            	log("onPanelAnchored");
+	            }
+
+	            @Override
+	            public void onPanelHidden(View panel) {
+	                log("onPanelHidden");                
+	            }
+	        });			
 		}
+	}
+	
+	
+	public void showOptionsPanel(MegaShare sShare){
+		log("showOptionsPanel");
+		
+//		fabButton.setVisibility(View.GONE);
+		
+		this.selectedNode = sShare;	
+		
+		if (selectedNode.getUser() != null){
+			optionPermissions.setVisibility(View.VISIBLE);
+			optionPermissions.setOnClickListener(this);
+		}
+		else{
+			optionPermissions.setVisibility(View.GONE);			
+		}		
+					
+		slidingOptionsPanel.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
+	}
+	
+	public void hideOptionsPanel(){
+		log("hideOptionsPanel");
+				
+		adapter.setPositionClicked(-1);
+//		fabButton.setVisibility(View.VISIBLE);
+		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+		slidingOptionsPanel.setVisibility(View.GONE);
+	}
+	
+	public PanelState getPanelState ()
+	{
+		log("getPanelState: "+slidingOptionsPanel.getPanelState());
+		return slidingOptionsPanel.getPanelState();
 	}
 	
 	@Override
@@ -574,9 +633,11 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,MegaError e) {
-		log("onRequestFinish Activity" + request.getType());
+		log("onRequestFinish: " + request.getType());
+		log("onRequestFinish: " + request.getRequestString());
 		if (request.getType() == MegaRequest.TYPE_SHARE){		
-
+			log(" MegaRequest.TYPE_SHARE");
+			
 			try { 
 				statusDialog.dismiss();	
 			} 
@@ -586,7 +647,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 			if (e.getErrorCode() == MegaError.API_OK){
 				if(removeShare){
-					log("onRequestFinish remove");
+					log("OK onRequestFinish remove");
 					Toast.makeText(this, getString(R.string.context_contact_removed), Toast.LENGTH_SHORT).show();
 					removeShare=false;
 					adapter.setShareList(listContacts);
@@ -594,7 +655,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 
 				}
 				if(changeShare){
-					log("onRequestFinish change");
+					log("OK onRequestFinish change");
 					permissionsDialog.dismiss();
 					Toast.makeText(this, getString(R.string.context_permissions_changed), Toast.LENGTH_SHORT).show();
 					changeShare=false;
@@ -605,22 +666,32 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			}
 			else{
 				if(removeShare){
+					log("ERROR onRequestFinish remove");
 					Toast.makeText(this, getString(R.string.context_contact_not_removed), Toast.LENGTH_SHORT).show();
 					removeShare=false;	
 				}
-				if(changeShare)
+				if(changeShare){
+					log("ERROR onRequestFinish change");
 					Toast.makeText(this, getString(R.string.context_permissions_not_changed), Toast.LENGTH_SHORT).show();
+				}
 			}
 			log("Finish onRequestFinish");
 		}
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
-			try { 
-				statusDialog.dismiss();	
-				adapter.setShareList(listContacts);
-				listView.invalidate();
-			} 
-			catch (Exception ex) {
-				log("Error dismiss status dialog");
+			
+			if (e.getErrorCode() == MegaError.API_OK){
+				try { 
+					statusDialog.dismiss();	
+					adapter.setShareList(listContacts);
+					listView.invalidate();
+				} 
+				catch (Exception ex) {
+					log("Error dismiss status dialog");
+				}
+				Toast.makeText(this, getString(R.string.context_node_private), Toast.LENGTH_LONG).show();
+			}
+			else{
+				Util.showErrorAlertDialog(e, this);
 			}
 		}
 	}
@@ -633,7 +704,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	}
 	
 	public static void log(String log) {
-		Util.log("FileContactListActivity", log);
+		Util.log("FileContactListActivityLollipop", log);
 	}
 
 	public void itemClick(int position) {
@@ -713,8 +784,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	@Override
 	public void onClick(View v) {
 		
-		switch (v.getId()){
-		
+		switch (v.getId()){		
 			case R.id.file_contact_list_layout:{
 				Intent i = new Intent(this, ManagerActivityLollipop.class);
 				i.setAction(ManagerActivityLollipop.ACTION_REFRESH_PARENTHANDLE_BROWSER);
@@ -723,7 +793,90 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				finish();
 				break;
 			}
+			case R.id.file_contact_list_option_share_layout:{
+				log("En el adapter - change");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+				dialogBuilder.setSingleChoiceItems(items, selectedNode.getAccess(), new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						removeShare = false;
+						ProgressDialog temp = null;
+						try{
+							temp = new ProgressDialog(fileContactListActivityLollipop);
+							temp.setMessage(getString(R.string.context_sharing_folder));
+							temp.show();
+						}
+						catch(Exception e){
+							return;
+						}
+						statusDialog = temp;
+						permissionsDialog.dismiss();
+						
+						switch(item) {
+	                        case 0:{
+	                        	MegaUser u = megaApi.getContact(selectedNode.getUser());
+	                        	megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
+	                        	break;
+	                        }
+	                        case 1:{
+	                        	MegaUser u = megaApi.getContact(selectedNode.getUser());
+	                        	megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+                                break;
+	                        }
+	                        case 2:{
+	                        	MegaUser u = megaApi.getContact(selectedNode.getUser());
+	                        	megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
+                                break;
+	                        }
+	                    }
+					}
+				});
+				permissionsDialog = dialogBuilder.create();
+				permissionsDialog.show();
+//				Resources resources = permissionsDialog.getContext().getResources();
+//				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
+//				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
+//		        alertTitle.setTextColor(resources.getColor(R.color.mega));
+//				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+//				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
+//				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));				
+				setPositionClicked(-1);
+//				((FileContactListActivityLollipop)context).refreshView();
+				break;
+			}
+			case R.id.file_contact_list_option_remove_layout:{
+				log("En el adapter - remove");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				MegaUser c = null;
+				if (selectedNode.getUser() != null){
+					c = megaApi.getContact(selectedNode.getUser());
+				}
+				removeShare(c);
+				setPositionClicked(-1);
+//				((FileContactListActivityLollipop)context).refreshView();
+				break;
+			}
 		}
+	}
+	
+	public void setPositionClicked(int positionClicked){
+		if (adapter != null){
+			adapter.setPositionClicked(positionClicked);
+		}	
+	}
+	
+	public void notifyDataSetChanged(){		
+		if (adapter != null){
+			adapter.notifyDataSetChanged();
+		}		
 	}
 
 	/*
@@ -778,68 +931,65 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			final ArrayList<String> emails = intent.getStringArrayListExtra(ContactsExplorerActivityLollipop.EXTRA_CONTACTS);
 			final long nodeHandle = intent.getLongExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, -1);
 			
-			if (node.isFolder()){
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
-				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(fileContactListActivity);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
+			if(nodeHandle!=-1){
+				node=megaApi.getNodeByHandle(nodeHandle);
+			}			
+			if(node!=null)
+			{
+				if (node.isFolder()){
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							ProgressDialog temp = null;
+							try{
+								temp = new ProgressDialog(fileContactListActivityLollipop);
+								temp.setMessage(getString(R.string.context_sharing_folder));
+								temp.show();
+							}
+							catch(Exception e){
+								return;
+							}
+							statusDialog = temp;
+							permissionsDialog.dismiss();
+							
+							switch(item) {
+			                    case 0:{
+			                    	for (int i=0;i<emails.size();i++){
+			                    		MegaUser u = megaApi.getContact(emails.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivityLollipop);
+			                    	}
+			                    	break;
+			                    }
+			                    case 1:{
+			                    	for (int i=0;i<emails.size();i++){
+			                    		MegaUser u = megaApi.getContact(emails.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivityLollipop);
+			                    	}
+			                        break;
+			                    }
+			                    case 2:{
+			                    	for (int i=0;i<emails.size();i++){
+			                    		MegaUser u = megaApi.getContact(emails.get(i));
+			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivityLollipop);
+			                    	}		                    	
+			                        break;
+			                    }
+			                }
 						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-						permissionsDialog.dismiss();
-						
-						switch(item) {
-		                    case 0:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		MegaUser u = megaApi.getContact(emails.get(i));
-		                    		megaApi.share(node, u, MegaShare.ACCESS_READ, fileContactListActivity);
-		                    	}
-		                    	break;
-		                    }
-		                    case 1:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		MegaUser u = megaApi.getContact(emails.get(i));
-		                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, fileContactListActivity);
-		                    	}
-		                        break;
-		                    }
-		                    case 2:{
-		                    	for (int i=0;i<emails.size();i++){
-		                    		MegaUser u = megaApi.getContact(emails.get(i));
-		                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, fileContactListActivity);
-		                    	}		                    	
-		                        break;
-		                    }
-		                }
+					});
+					permissionsDialog = dialogBuilder.create();
+					permissionsDialog.show();
+				}
+				else{ 
+					for (int i=0;i<emails.size();i++){
+						MegaUser u = megaApi.getContact(emails.get(i));
+						megaApi.sendFileToUser(node, u, fileContactListActivityLollipop);
 					}
-				});
-				permissionsDialog = dialogBuilder.create();
-				permissionsDialog.show();
-				Resources resources = permissionsDialog.getContext().getResources();
-				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
-				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
-		        alertTitle.setTextColor(resources.getColor(R.color.mega));
-				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
-				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
-			}
-			else{ 
-				for (int i=0;i<emails.size();i++){
-					MegaUser u = megaApi.getContact(emails.get(i));
-					megaApi.sendFileToUser(node, u, fileContactListActivity);
 				}
 			}
-			
-		}
-			
+		}			
 	}
 	
 	@Override
@@ -872,7 +1022,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 						adapter.setNode(node);
 						adapter.setContext(this);
 						adapter.setShareList(listContacts);
-						adapter.setListViewActivity(listView);
+						adapter.setListFragment(listView);
 					}
 					else{
 						adapter = new MegaSharedFolderLollipopAdapter(this, node, listContacts, listView);
