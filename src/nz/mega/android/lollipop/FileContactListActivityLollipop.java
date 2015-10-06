@@ -33,6 +33,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -307,7 +308,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			log("onCreateActionMode");
 			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.shared_contact_browser_action, menu);
+			inflater.inflate(R.menu.file_contact_shared_browser_action, menu);
 			return true;
 		}
 		
@@ -599,21 +600,27 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	        	return true;
 	        }
 		    case R.id.action_select:{
-		    	adapter.selectAll();
-		    	if (showSelectMenuItem()){
-    				selectMenuItem.setVisible(true);
-    				unSelectMenuItem.setVisible(false);
-    			}
-    			else{
-    				selectMenuItem.setVisible(false);
-    				unSelectMenuItem.setVisible(true);
-    			}
+		    	
+		    	selectAll();
 		    	return true;
 		    }
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
 	    }
+	}
+	
+	public void selectAll(){
+
+		if(adapter.isMultipleSelect()){
+			adapter.selectAll();
+		}
+		else{						
+			adapter.setMultipleSelect(true);
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+			adapter.selectAll();
+		}		
+		updateActionModeTitle();		
 	}
 	
 	public boolean showSelectMenuItem(){
