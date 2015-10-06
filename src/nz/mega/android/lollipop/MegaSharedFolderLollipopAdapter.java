@@ -240,6 +240,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_shared_folder, parent, false);
 		ViewHolderShareList holder = new ViewHolderShareList(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.shared_folder_item_layout);
+		holder.itemLayout.setOnClickListener(this);
 		holder.imageView = (RoundedImageView) v.findViewById(R.id.shared_folder_contact_thumbnail);
 		holder.imageView.getLayoutParams().width = Util.px2dp((54*scaleW), outMetrics);
 		holder.imageView.getLayoutParams().height = Util.px2dp((54*scaleH), outMetrics);
@@ -262,7 +263,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
 		if (!multipleSelect) {
 			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
-			
+			log("positionClicked: "+positionClicked+" position: "+position);
 			if (positionClicked != -1) {
 				if (positionClicked == position) {
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
@@ -291,7 +292,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
 			}
-		}		
+		}	
 
 		holder.currentPosition = position;
 		
@@ -384,24 +385,6 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		
         holder.imageButtonThreeDots.setTag(holder);
 		holder.imageButtonThreeDots.setOnClickListener(this);
-		
-		if (positionClicked != -1){
-			if (positionClicked == position){
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));				
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-				listFragment.smoothScrollToPosition(position);
-			}
-			else{
-//				holder.arrowSelection.setVisibility(View.GONE);
-				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-			}
-		}
-		else{
-			holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_properties_available_layout));
-			holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-		}
 
 	}
 	
@@ -518,8 +501,8 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 				((FileContactListActivityLollipop) context).showOptionsPanel(s);
 				break;
 			}			
-			case R.id.contact_list_item_layout:{
-				((FileContactListActivityLollipop) context).itemClick(currentPosition);	
+			case R.id.shared_folder_item_layout:{
+				((FileContactListActivityLollipop) context).itemClick(currentPosition);
 				break;
 			}
 		}
@@ -533,7 +516,7 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaSharedFolderAdapter", log);
+		Util.log("MegaSharedFolderLollipopAdapter", log);
 	}
 	
 	public boolean isMultipleSelect() {
@@ -564,12 +547,25 @@ public class MegaSharedFolderLollipopAdapter extends RecyclerView.Adapter<MegaSh
 		notifyItemChanged(pos);
 	}
 	
+
 	public void selectAll(){
 		for (int i= 0; i<this.getItemCount();i++){
 			if(!isItemChecked(i)){
 				toggleSelection(i);
 			}
 		}
+	}
+
+	public int getSelectedItemCount() {
+		return selectedItems.size();
+	}
+
+	public List<Integer> getSelectedItems() {
+		List<Integer> items = new ArrayList<Integer>(selectedItems.size());
+		for (int i = 0; i < selectedItems.size(); i++) {
+			items.add(selectedItems.keyAt(i));
+		}
+		return items;
 	}
 
 	public MegaShare getContactAt(int position) {
