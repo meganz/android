@@ -26,7 +26,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -134,7 +134,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		}
 
 		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
 		aB.setTitle(R.string.action_upgrade_account);
@@ -283,9 +283,9 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 //			megaApi.getAccountDetails(this);
 //		}
 		
-		accountType = ((ManagerActivity)context).getAccountType();
+		/*accountType = ((ManagerActivity)context).getAccountType();
 		usedStorage = ((ManagerActivity)context).getUsedGbStorage();
-		
+		*/
 		checkAvailableAccount();
 
 		megaApi.getPricing(this);
@@ -570,7 +570,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((ActionBarActivity)activity).getSupportActionBar();
+		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}
 	
 	public static void log(String log) {
