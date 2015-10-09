@@ -498,8 +498,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		}
 		
 		aB.setTitle(getString(R.string.section_saved_for_offline));	
-		if (context instanceof ManagerActivityLollipop && ((ManagerActivityLollipop)context).getmDrawerToggle() != null){
-			((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+		if (context instanceof ManagerActivityLollipop){
+			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		
@@ -1292,7 +1293,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 				aB.setTitle(currentNode.getName());
 				pathNavigation= currentNode.getPath()+ currentNode.getName()+"/";	
 				if (context instanceof ManagerActivityLollipop){
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				}
@@ -1562,7 +1564,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						
 						if (pathNavigation.equals("/")){
 							aB.setTitle(getString(R.string.section_saved_for_offline));
-							((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 							((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 						}
 						else{
@@ -1572,7 +1575,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 							index=title.lastIndexOf("/");				
 							title=title.substring(index+1,title.length());			
 							aB.setTitle(title);
-							((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 							((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 						}
 					}
@@ -1631,7 +1635,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					//TODO En caso de que no esté en el raíz del offline, pues navegar para atrás.
 		
 					// Esto es, poner el nuevo path y adapterList.setNodes() y adapterList.notifyDataSetChanged();
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					/*((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);*/
 					
 					pathNavigation=pathNavigation.substring(0,pathNavigation.length()-1);
 					int index=pathNavigation.lastIndexOf("/");				

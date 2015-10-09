@@ -128,6 +128,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
+import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -201,9 +202,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     
     Toolbar tB;
     ActionBar aB;
+    boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
-    ActionBarDrawerToggle drawerToggle;
-    boolean drawerOpen = false;    
     public enum DrawerItem {
 		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH;
 
@@ -758,22 +758,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
         aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
-        aB.setDisplayShowHomeEnabled(true);
+//        aB.setDisplayShowHomeEnabled(true);
 //        getSupportActionBar().setCustomView(R.layout.custom_action_bar_top);
         
         //Set navigation view
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, tB, R.string.app_name, R.string.app_name){
-        	public void onDrawerClosed(View view) {
-            	drawerOpen = false;
-            }
-
-            public void onDrawerOpened(View drawerView) {
-            	drawerOpen = true;
-            }
-        };
-        drawerLayout.setDrawerListener(drawerToggle);
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
         
@@ -1058,9 +1049,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onPostCreate(Bundle savedInstanceState){
 		log("onPostCreate");
 		super.onPostCreate(savedInstanceState);
-		if (!openLink){
-			drawerToggle.syncState();
-		}
 	}
 	
 	@Override
@@ -1263,17 +1251,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		case CLOUD_DRIVE:{
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
-    			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
+    			viewPagerShares.setVisibility(View.GONE);
     			
     			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     			if (currentFragment != null){
     				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
     			}
     			
-    			mTabHostCDrive.setVisibility(View.VISIBLE);
     			if (mTabsAdapterCDrive == null){
     				log("mTabsAdapterCloudDrive == null");
+    				mTabHostCDrive.setVisibility(View.VISIBLE);    			
+        			viewPagerCDrive.setVisibility(View.VISIBLE);
     				
     				mTabsAdapterCDrive= new TabsAdapter(this, mTabHostCDrive, viewPagerCDrive);   	
     				
@@ -1289,6 +1278,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	        
         	        viewPagerCDrive.setCurrentItem(0);
         	        aB.setTitle(getResources().getString(R.string.section_cloud_drive));
+        	        firstNavigationLevel = true;
         	        
         			textViewBrowser = (TextView) mTabHostCDrive.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
         			textViewRubbish = (TextView) mTabHostCDrive.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
@@ -1304,7 +1294,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				fbFLol.setIsList(isListCloudDrive);
     				fbFLol.setParentHandle(parentHandleBrowser);
     				fbFLol.setOrder(orderGetChildren);
-					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(parentHandleBrowser), orderGetChildren);
+    				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+					if (parentNode != null){
+						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+							aB.setTitle(getString(R.string.section_cloud_drive));
+							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+							firstNavigationLevel = true;
+						}
+						else{
+							aB.setTitle(parentNode.getName());
+							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+							firstNavigationLevel = false;
+						}
+					}
+					else{
+						parentHandleBrowser = megaApi.getRootNode().getHandle();
+						parentNode = megaApi.getRootNode();
+						aB.setTitle(getString(R.string.section_cloud_drive));
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						firstNavigationLevel = true;
+					}
+					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 					fbFLol.setNodes(nodes);
     			} 
     			
@@ -1322,10 +1332,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 				log("parentHandleCloud: "+ parentHandleBrowser);
                 				if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
                 					aB.setTitle(getResources().getString(R.string.section_cloud_drive));
+                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+                					firstNavigationLevel = true;
                 				}
                 				else {
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleBrowser);
 	            					aB.setTitle(node.getName());
+	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+	            					firstNavigationLevel = false;
             					}          					   				
                 			}
                         }
@@ -1338,10 +1352,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         		log("parentHandleRubbish: "+ parentHandleRubbish);
                         		if(parentHandleRubbish==megaApi.getRubbishNode().getHandle()||parentHandleRubbish==-1){
                         			aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
+                        			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+                    				firstNavigationLevel = true;
                         		}
                         		else{                        			
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
-                					aB.setTitle(node.getName());	
+                					aB.setTitle(node.getName());
+                					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                					firstNavigationLevel = false;
             					}		
                 			}                           	
                                           	
@@ -1506,7 +1524,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
+	    			thumbViewMenuItem.setVisible(false);
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
@@ -1654,11 +1672,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			aB.setTitle(getString(R.string.section_shared_items));
     			
-    			if (getmDrawerToggle() != null){
-    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
-    				supportInvalidateOptionsMenu();
-    			}
-    			
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostCDrive.setVisibility(View.GONE);    			
@@ -1683,7 +1696,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				mTabsAdapterShares.addTab(tabSpec3, IncomingSharesFragmentLollipop.class, null);
     				mTabsAdapterShares.addTab(tabSpec4, OutgoingSharesFragmentLollipop.class, null); 
     				
-        	        viewPagerCDrive.setCurrentItem(0);
+    				viewPagerShares.setCurrentItem(0);
         			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
         			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
         			textViewIncoming.setTypeface(null, Typeface.BOLD);
@@ -1691,8 +1704,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			else{
     				log("mTabsAdapterShares NOT null");
-        			mTabHostCDrive.setVisibility(View.VISIBLE);    			
-        			viewPagerCDrive.setVisibility(View.VISIBLE);
+        			mTabHostShares.setVisibility(View.VISIBLE);    			
+        			viewPagerShares.setVisibility(View.VISIBLE);
         			
         			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
         			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView);        			
@@ -1889,11 +1902,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				aB = getSupportActionBar();
     			}
     			aB.setTitle(getString(R.string.section_contacts));
-    			
-    			if (getmDrawerToggle() != null){
-    				getmDrawerToggle().setDrawerIndicatorEnabled(true);
-    				supportInvalidateOptionsMenu();
-    			}
     			
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
@@ -2528,7 +2536,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (oFLol != null){	
 				//Show
     			sortByMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(true); //TODO
+    			thumbViewMenuItem.setVisible(false); //TODO
     			
     			if(oFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
@@ -2897,14 +2905,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 		int id = item.getItemId();
 		switch(id){
-		case android.R.id.home:{
-//		    case R.id.home:
-//		    case R.id.homeAsUp:
-	    	//case 16908332: //Algo pasa con la CyanogenMod
-		    	if (drawerToggle.isDrawerIndicatorEnabled()) {
-					drawerToggle.onOptionsItemSelected(item);
+			case android.R.id.home:{
+				if (firstNavigationLevel){
+					drawerLayout.openDrawer(nV);
 				}
-		    	else {
+				else{
 		    		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 		    			int index = viewPagerCDrive.getCurrentItem();
 		    			if(index==1){				
@@ -4061,7 +4066,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void onBackPressed() {
 		log("onBackPressedLollipop");
 		
-		if (drawerOpen){
+		if (drawerLayout.isDrawerOpen(nV)){
     		drawerLayout.closeDrawer(Gravity.LEFT);
     		return;
     	}
@@ -6022,13 +6027,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return numberOfSubscriptions;
 	}
 	
-	public int getUsedPerc(){
-		return usedPerc;
+	public boolean IsFirstNavigationLevel(){
+		return firstNavigationLevel;
 	}
 	
-	ActionBarDrawerToggle getmDrawerToggle(){
-		log("getmDrawerToggle");
-		return drawerToggle;
+	public void setFirstNavigationLevel(boolean firstNavigationLevel){
+		this.firstNavigationLevel = firstNavigationLevel;
+	}
+	
+	public int getUsedPerc(){
+		return usedPerc;
 	}
 	
 	public void setPathNavigationOffline(String pathNavigation){
@@ -7461,7 +7469,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     							rbFLol.setNodes(nodes);
     							rbFLol.getListView().invalidate();
     							aB.setTitle(getString(R.string.section_rubbish_bin));	
-    							getmDrawerToggle().setDrawerIndicatorEnabled(true);
+    							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    							this.firstNavigationLevel = true;
     						}
     						else{
     							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
@@ -7761,7 +7770,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					isClearRubbishBin = false;
 					parentHandleRubbish = megaApi.getRubbishNode().getHandle();
 					aB.setTitle(getString(R.string.section_rubbish_bin));	
-					getmDrawerToggle().setDrawerIndicatorEnabled(true);
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					this.firstNavigationLevel = true;
 
 					if(rbFLol.isVisible())
 					{

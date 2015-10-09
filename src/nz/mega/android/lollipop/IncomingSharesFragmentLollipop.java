@@ -435,12 +435,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					sortByNameAscending();
 				}
 				
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-					aB.setTitle(getString(R.string.section_shared_items));	
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				}
+				aB.setTitle(getString(R.string.section_shared_items));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+
 				adapterList.parentHandle=-1;
 			}
 			else{
@@ -456,21 +455,17 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 //					sortByNameAscending();
 //				}
 				
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-					aB.setTitle(parentNode.getName());
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				}
+				aB.setTitle(parentNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}	
 
 			if (deepBrowserTree == 0){
 				contentText.setText(getInfoNode());
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-					aB.setTitle(getString(R.string.section_shared_items));
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-				}
+				aB.setTitle(getString(R.string.section_shared_items));
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
@@ -668,7 +663,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 		aB.setTitle(n.getName());
-		((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		
 		parentHandle = n.getHandle();												
@@ -971,7 +967,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					MegaNode n = nodes.get(position);
 					
 					aB.setTitle(n.getName());
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = nodes.get(position).getHandle();
@@ -1250,7 +1247,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).setParentHandleIncoming(-1);
 				parentHandle=-1;
 				aB.setTitle(getString(R.string.section_shared_items));	
-				((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				findNodes();
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1280,9 +1278,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-
+					aB.setTitle(parentNode.getName());	
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
@@ -1327,9 +1325,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					leftNewFolder.setVisibility(View.GONE);
 					rightUploadButton.setVisibility(View.GONE);
 					
-					aB.setTitle(parentNode.getName());					
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);					
-					
+					aB.setTitle(parentNode.getName());	
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
