@@ -278,12 +278,9 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
 				nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 				
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-//					aB.setTitle(getString(R.string.section_rubbish_bin));	
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				}
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}
 		}
 		else{
@@ -300,18 +297,16 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (parentNode != null){
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-//						aB.setTitle(getString(R.string.section_rubbish_bin));	
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-					}
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				}
+				else{
+					aB.setTitle(parentNode.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				}
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}			
 		}
 
@@ -689,7 +684,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					MegaNode n = nodes.get(position);
 					
 					aB.setTitle(n.getName());
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = nodes.get(position).getHandle();
@@ -863,11 +859,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					emptyTextView.setVisibility(View.GONE);
 					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 						aB.setTitle(getString(R.string.section_rubbish_bin));	
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 					}
 					else{
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+						aB.setTitle(parentNode.getName());
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					}
 					
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
@@ -924,11 +922,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					emptyTextView.setVisibility(View.GONE);
 					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
 						aB.setTitle(getString(R.string.section_rubbish_bin));	
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 					}
 					else{
-						aB.setTitle(parentNode.getName());					
-						((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+						aB.setTitle(parentNode.getName());
+						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					}
 					
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();

@@ -428,24 +428,20 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					sortByNameAscending();
 				}
 				
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-					aB.setTitle(getString(R.string.section_shared_items));	
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				}
+				aB.setTitle(getString(R.string.section_shared_items));	
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}
 			else{
 				MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
 				((ManagerActivityLollipop)context).setParentHandleOutgoing(parentHandle);
 				nodes = megaApi.getChildren(parentNode, orderGetChildren);			
 				
-				if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-				{
-					aB.setTitle(parentNode.getName());
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-				}
+				aB.setTitle(parentNode.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}	
 			
 			adapterList.setPositionClicked(-1);
@@ -643,7 +639,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 		aB.setTitle(n.getName());
-		((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		contentText.setText(getInfoFolder(n));
@@ -944,7 +941,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					MegaNode n = nodes.get(position);
 										
 					aB.setTitle(n.getName());
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = nodes.get(position).getHandle();
@@ -1282,7 +1280,8 @@ public void sortByNameDescending(){
 				parentHandle=-1;
 				log("Shared With Me");
 				aB.setTitle(getString(R.string.section_shared_items));
-				((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
+				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				findNodes();
 				if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
 					sortByNameDescending();
@@ -1310,9 +1309,9 @@ public void sortByNameDescending(){
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 					
-					aB.setTitle(parentNode.getName());					
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);				
-					
+					aB.setTitle(parentNode.getName());		
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();
@@ -1358,7 +1357,8 @@ public void sortByNameDescending(){
 					emptyTextView.setVisibility(View.GONE);
 					
 					aB.setTitle(parentNode.getName());					
-					((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);					
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					
 					parentHandle = parentNode.getHandle();

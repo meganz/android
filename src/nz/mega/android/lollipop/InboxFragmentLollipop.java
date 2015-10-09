@@ -320,12 +320,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			nodes = megaApi.getChildren(inboxNode, orderGetChildren);
 		}
 		
-		if(((ManagerActivityLollipop)context).getmDrawerToggle() != null)
-		{
-			aB.setTitle(getString(R.string.section_inbox));	
-			((ManagerActivityLollipop)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-		}
+		aB.setTitle(getString(R.string.section_inbox));	
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
