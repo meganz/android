@@ -136,6 +136,7 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 	long parentHandle = -1;
 	BitSet paymentBitSet = null;
 	int currentFragment;
+	int accountType = -1;
 
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -246,6 +247,22 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 				maF.setMyEmail(megaApi.getMyEmail());
 				
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_myaccount, maF, "maF").commit();
+				
+				break;
+			}
+			case UPGRADE_ACCOUNT_FRAGMENT:{
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				if(upAF == null){
+					upAF = new UpgradeAccountFragmentLollipop();
+					upAF.setInfo(paymentBitSet);
+					ft.replace(R.id.fragment_container_myaccount, upAF, "upAF");
+					ft.commit();
+				}
+				else{
+					upAF.setInfo(paymentBitSet);
+					ft.replace(R.id.fragment_container_myaccount, upAF, "upAF");
+					ft.commit();
+				}
 				
 				break;
 			}
@@ -431,19 +448,7 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 		}
 		
 		currentFragment = UPGRADE_ACCOUNT_FRAGMENT;
-		
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if(upAF == null){
-			upAF = new UpgradeAccountFragmentLollipop();
-			upAF.setInfo(paymentBitSet);
-			ft.replace(R.id.fragment_container, upAF, "upAF");
-			ft.commit();
-		}
-		else{
-			upAF.setInfo(paymentBitSet);
-			ft.replace(R.id.fragment_container, upAF, "upAF");
-			ft.commit();
-		}
+		selectMyAccountFragment(currentFragment);
 	}
 	
 	@SuppressLint("NewApi") 
