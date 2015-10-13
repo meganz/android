@@ -194,7 +194,6 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		}
 		else{
 			if (prefs.getCamSyncEnabled() == null){
-				dbH.setCamSyncEnabled(false);
 				log("Not defined, so not enabled");
 				finish();
 				return START_NOT_STICKY;
