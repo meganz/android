@@ -8,17 +8,11 @@ import java.util.List;
 import java.util.Locale;
 
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.FileStorageAdapter;
-import nz.mega.android.FileStorageAdapter.OnItemCheckClickListener;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
-import nz.mega.sdk.MegaError;
-import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,40 +21,39 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.SparseBooleanArray;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 
-public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, OnItemClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
+public class FileStorageActivityLollipop extends PinActivityLollipop implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 	
 	public static String EXTRA_URL = "fileurl";
 	public static String EXTRA_SIZE = "filesize";
@@ -102,7 +95,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private File root;
 	
 	private String buttonPrefix;
-	
+	private RelativeLayout viewContainer;
 //	private TextView windowTitle;
 	private TextView button;
 	private TextView contentText;
@@ -137,17 +130,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 //	    }
 
 	    public void onLongPress(MotionEvent e) {
+	    	log("onLongPress");
 	        View view = listView.findChildViewUnder(e.getX(), e.getY());
 	        int position = listView.getChildPosition(view);
 
-	        // handle long press
-			if (adapter.getPositionClicked() == -1){
-				adapter.setMultipleSelect(true);
-			
-				actionMode = startSupportActionMode(new ActionBarCallBack());			
+			adapter.setMultipleSelect(true);
+		
+			actionMode = startSupportActionMode(new ActionBarCallBack());			
 
-		        itemClick(position);
-			}  
+	        itemClick(position);
+ 
 	        super.onLongPress(e);
 	    }
 	}
@@ -171,9 +163,16 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<FileDocument> documents = adapter.getSelectedDocuments();
 			
 			switch(item.getItemId()){
+			case R.id.cab_menu_select_all:{
+				selectAll();
+				break;
+			}
+			case R.id.cab_menu_unselect_all:{
+				clearSelections();
+				break;
+			}
 			}
 			return false;
 		}
@@ -181,7 +180,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 			MenuInflater inflater = mode.getMenuInflater();
-//			inflater.inflate(R.menu.file_browser_action, menu);
+			inflater.inflate(R.menu.file_storage_action, menu);
 			return true;
 		}
 
@@ -195,10 +194,39 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			List<FileDocument> selected = adapter.getSelectedDocuments();
 			
+			if (selected.size() != 0) {				
+				
+				if(selected.size()==adapter.getItemCount()){
+					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
+				}
+				else{
+					menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);	
+				}	
+			}
+			else{
+				menu.findItem(R.id.cab_menu_select_all).setVisible(true);
+				menu.findItem(R.id.cab_menu_unselect_all).setVisible(false);
+			}
 			
 			return false;
 		}
 		
+	}
+	
+	public void selectAll(){
+		if(adapter.isMultipleSelect()){
+			adapter.selectAll();
+		}
+		else{
+			actionMode = startSupportActionMode(new ActionBarCallBack());
+			
+			adapter.setMultipleSelect(true);
+			adapter.selectAll();
+		}
+		
+		updateActionModeTitle();
 	}
 	
 	@Override
@@ -225,6 +253,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    
 		setContentView(R.layout.activity_filestorage);
 		
+		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
+		
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar_filestorage);
 		setSupportActionBar(tB);
@@ -240,6 +270,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		}
 		
+        viewContainer = (RelativeLayout) findViewById(R.id.file_storage_container);
 		contentText = (TextView) findViewById(R.id.file_storage_content_text);
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		
@@ -277,7 +308,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if (mode == Mode.PICK_FOLDER) {
 			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
 			url = intent.getExtras().getString(EXTRA_URL);
-			size = intent.getExtras().getLong(EXTRA_SIZE);
+			size = intent.getExtras().getLong(EXTRA_SIZE);			
+		}
+		else{
+			createFolderButton.setVisibility(View.GONE);
 		}
 		
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
@@ -387,45 +421,47 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	private void updateActionModeTitle() {
 		log("updateActionModeTitle");
-//		if (actionMode == null || getActivity() == null) {
-//			log("RETURN");
-//			return;
-//		}
-//		
-//		List<MegaNode> documents = adapterList.getSelectedNodes();
-//		int files = 0;
-//		int folders = 0;
-//		for (MegaNode document : documents) {
-//			if (document.isFile()) {
-//				files++;
-//			} else if (document.isFolder()) {
-//				folders++;
-//			}
-//		}
-//		Resources res = getActivity().getResources();
-//		String format = "%d %s";
-//		String filesStr = String.format(format, files,
-//				res.getQuantityString(R.plurals.general_num_files, files));
-//		String foldersStr = String.format(format, folders,
-//				res.getQuantityString(R.plurals.general_num_folders, folders));
-//		String title;
-//		if (files == 0 && folders == 0) {
-//			title = foldersStr + ", " + filesStr;
-//		} else if (files == 0) {
-//			title = foldersStr;
-//		} else if (folders == 0) {
-//			title = filesStr;
-//		} else {
-//			title = foldersStr + ", " + filesStr;
-//		}
-//		actionMode.setTitle(title);
-//		try {
-//			actionMode.invalidate();
-//		} catch (NullPointerException e) {
-//			e.printStackTrace();
-//			log("oninvalidate error");
-//		}
-		// actionMode.
+		if (actionMode == null) {
+			log("RETURN");
+			return;
+		}
+		
+		List<FileDocument> documents = adapter.getSelectedDocuments();
+		int files = 0;
+		int folders = 0;
+		for (FileDocument document : documents) {
+			if (document.isFolder()) {
+				folders++;
+			}
+			else{
+				files++;
+			}
+		}
+		
+		Resources res = this.getResources();
+		String format = "%d %s";
+		String filesStr = String.format(format, files,
+				res.getQuantityString(R.plurals.general_num_files, files));
+		String foldersStr = String.format(format, folders,
+				res.getQuantityString(R.plurals.general_num_folders, folders));
+		String title;
+		if (files == 0 && folders == 0) {
+			title = foldersStr + ", " + filesStr;
+		} else if (files == 0) {
+			title = foldersStr;
+		} else if (folders == 0) {
+			title = filesStr;
+		} else {
+			title = foldersStr + ", " + filesStr;
+		}
+		actionMode.setTitle(title);
+		try {
+			actionMode.invalidate();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			log("oninvalidate error");
+		}
+
 	}
 
 	/*
@@ -533,6 +569,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 					finish();
 				}
 				else {
+					if(adapter.getSelectedCount()<=0){
+						Snackbar.make(viewContainer, getString(R.string.error_no_selection), Snackbar.LENGTH_LONG).show();
+						break;
+					}
 					new AsyncTask<Void, Void, Void>()
 					{
 						ArrayList<String> files = new ArrayList<String>();
@@ -545,11 +585,32 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 								if(document != null)
 								{
 									File file = document.getFile();
-									files.add(file.getAbsolutePath());
+									if(file.isFile()){
+										files.add(file.getAbsolutePath());
+									}
+									else{
+										files.addAll(getFiles(file));
+									}
+									
 								}
 								
 							}
 							return null;	
+						}
+						
+						public ArrayList<String> getFiles(File folder)
+						{
+							ArrayList<String> selectedFiles = new ArrayList<String>();
+							File[] files= folder.listFiles();
+							for (int i = 0; i < files.length; i++) {
+							      if (files[i].isFile()) {
+							    	  selectedFiles.add(files[i].getAbsolutePath());
+							      } else if (files[i].isDirectory()) {
+							    	  selectedFiles.addAll(getFiles(folder));
+							      }
+							
+							}
+							return selectedFiles;
 						}
 						
 						@Override
@@ -626,25 +687,42 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	public void itemClick(int position) {
-		log("on item click");		
+		log("itemClick: position: "+position);		
 		FileDocument document = adapter.getDocumentAt(position);
 		if(document == null)
 		{
 			return;
 		}
+		else{
+			log("El documento es: "+document.getName());
+		}
 		
-		if (document.isFolder()) {
-			changeFolder(document.getFile());
+		if (adapter.isMultipleSelect()){
+			log("MULTISELECT ON");
+			adapter.toggleSelection(position);
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
+//			adapterList.notifyDataSetChanged();
 		}
-		else if (mode == Mode.PICK_FILE) {
-			// Select file if mode is PICK_FILE
-			ArrayList<String> files = new ArrayList<String>();
-			files.add(document.getFile().getAbsolutePath());
-			dbH.setLastUploadFolder(path.getAbsolutePath());
-			setResultFiles(files);
-//			listView.setP
-//			listView.setItemChecked(position, false);
-		}
+		else{
+			if (document.isFolder()) {
+				changeFolder(document.getFile());
+			}
+			else if (mode == Mode.PICK_FILE) {
+				//Multiselect on to select several files if desired
+				adapter.setMultipleSelect(true);				
+				actionMode = startSupportActionMode(new ActionBarCallBack());
+				adapter.toggleSelection(position);
+				updateActionModeTitle();
+				adapter.notifyDataSetChanged();
+				
+				// Select file if mode is PICK_FILE
+//				ArrayList<String> files = new ArrayList<String>();
+//				files.add(document.getFile().getAbsolutePath());
+//				dbH.setLastUploadFolder(path.getAbsolutePath());
+//				setResultFiles(files);
+			}
+		}		
 	}
 	
 	/*
@@ -669,15 +747,28 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		return 0;
 	}
 	
+	/*
+	 * Disable selection
+	 */
+	void hideMultipleSelect() {
+		log("hideMultipleSelect");
+		adapter.clearSelections();
+		adapter.setMultipleSelect(false);
+		if (actionMode != null) {
+			actionMode.finish();
+		}
+	}
+	
 	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
 		// If some items are selected, clear selection
 		if (mode == Mode.PICK_FILE && adapter.isMultipleSelect()) {
 			log("mode == Mode.PICK_FILE && getItemCount() > 0");
-			clearSelections();
+			hideMultipleSelect();
 			return;
 		}
+
 		// Finish activity if at the root
 		if (path.equals(root)) {
 			log("Root: "+root);
@@ -810,8 +901,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 
 	@Override
-	public boolean onInterceptTouchEvent(RecyclerView arg0, MotionEvent arg1) {
-		// TODO Auto-generated method stub
+	public boolean onInterceptTouchEvent(RecyclerView rV, MotionEvent e) {
+		detector.onTouchEvent(e);
 		return false;
 	}
 
@@ -826,12 +917,4 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
