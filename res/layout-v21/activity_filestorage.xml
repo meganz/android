@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@color/white"
     android:orientation="vertical"
+    android:id="@+id/file_storage_container"
     tools:context=".FileStorageActivityLollipop" >
 
     <android.support.v7.widget.Toolbar
@@ -27,14 +29,6 @@
 	    android:textColor="@color/white"
 	    android:background="@color/content_text_folder"
 	    android:textSize="14sp"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/file_storage_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/file_storage_content_text"
-        android:choiceMode="multipleChoice" />
-
     <LinearLayout
         android:id="@+id/options_file_storage_layout"
         android:layout_width="fill_parent"
@@ -62,6 +56,14 @@
             android:textColor="@color/accentColor"
             android:textSize="14sp" />
     </LinearLayout>
+    
+   <android.support.v7.widget.RecyclerView
+        android:id="@+id/file_storage_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/file_storage_content_text"
+        android:layout_above="@id/options_file_storage_layout"
+        android:choiceMode="multipleChoice" />
 
     <View
         android:id="@+id/separator_3"
