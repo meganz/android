@@ -17,6 +17,7 @@
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copy to</string>
     <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Import to</string>
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Select</string>
+    <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">Select files</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Create</string>
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Upload File</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Download</string>

@@ -22,8 +22,6 @@ import nz.mega.android.ContactsExplorerActivity;
 import nz.mega.android.CreditCardFragment;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
-import nz.mega.android.FileStorageActivity;
-import nz.mega.android.FileStorageActivity.Mode;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaAttributes;
 import nz.mega.android.MegaOffline;
@@ -43,6 +41,7 @@ import nz.mega.android.UpgradeAccountFragment;
 import nz.mega.android.UploadHereDialog;
 import nz.mega.android.UploadService;
 import nz.mega.android.ZipBrowserActivity;
+import nz.mega.android.lollipop.FileStorageActivityLollipop.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
@@ -4406,10 +4405,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("NOT advancedDevices");
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
-				intent.putExtra(FileStorageActivity.EXTRA_SIZE, size);
-				intent.setClass(this, FileStorageActivity.class);
-				intent.putExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES, hashes);
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
+				intent.setClass(this, FileStorageActivityLollipop.class);
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
 				startActivityForResult(intent, REQUEST_CODE_SELECT_LOCAL_FOLDER);
 			}				
 		}
@@ -6517,8 +6516,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;						
 			}
 			
-			String folderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
-			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivity.EXTRA_FILES);
+			String folderPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			ArrayList<String> paths = intent.getStringArrayListExtra(FileStorageActivityLollipop.EXTRA_FILES);
 			
 			int i = 0;
 			long parentHandleUpload=-1;
@@ -6629,13 +6628,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;						
 			}
 			
-			String parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH);
+			String parentPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
 			log("parentPath: "+parentPath);
-			String url = intent.getStringExtra(FileStorageActivity.EXTRA_URL);
+			String url = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_URL);
 			log("url: "+url);
-			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
+			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			log("size: "+size);
-			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
+			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("hashes size: "+hashes.length);
 			
 			downloadTo (parentPath, url, size, hashes);
