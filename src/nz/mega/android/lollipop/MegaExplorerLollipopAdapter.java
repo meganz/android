@@ -146,8 +146,6 @@ public class MegaExplorerLollipopAdapter extends RecyclerView.Adapter<MegaExplor
 	@Override
 	public void onBindViewHolder(ViewHolderExplorerLollipop holder, int position){
 		
-		final int _position = position;		
-
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);

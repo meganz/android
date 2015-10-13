@@ -15,6 +15,7 @@
     <string name="general_copy_to" context="When copying a file to a location in MEGA. This is the text of the button after selection the destination">Copiar a</string>
     <string name="general_import_to" context="When importing a file to a location in MEGA. This is the text of the button after selection the destination">Importar a</string>
     <string name="general_select" context="Selecting a specific location in MEGA. This is the text of the button">Seleccionar</string>
+    <string name="general_select_to_upload" context="Selecting a specific location in MEGA. This is the text of the button">Seleccionar ficheros</string>
     <string name="general_create" context="This is the final button when creating a folder in the dialog where the user inserts the folder name">Crear</string>
     <string name="general_upload" context="Button text when uploading a file to a previously selected location in MEGA">Subir Archivo</string>
     <string name="general_download" context="Item menu option upon right click on one or multiple files.">Descargar</string>

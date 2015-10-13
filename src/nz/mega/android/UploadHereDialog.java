@@ -3,11 +3,14 @@ package nz.mega.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import nz.mega.android.lollipop.FileStorageActivityLollipop;
+import nz.mega.android.lollipop.ManagerActivityLollipop;
 import nz.mega.android.utils.Util;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -87,9 +90,16 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 		
 		// Pick from File System
 		if (item.type == null) {
-			intent.setAction(FileStorageActivity.Mode.PICK_FILE.getAction());
-			intent.setClass(getActivity(), FileStorageActivity.class);
-			getActivity().startActivityForResult(intent, ManagerActivity.REQUEST_CODE_GET_LOCAL);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
+				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
+				getActivity().startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
+			}
+			else{
+				intent.setAction(FileStorageActivity.Mode.PICK_FILE.getAction());
+				intent.setClass(getActivity(), FileStorageActivity.class);
+				getActivity().startActivityForResult(intent, ManagerActivity.REQUEST_CODE_GET_LOCAL);
+			}
 		}
 		else{
 			intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -98,7 +108,12 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 				intent.putExtra("android.intent.extra.ALLOW_MULTIPLE", true);
 			}
 			intent.setType(item.type);
-			getActivity().startActivityForResult(Intent.createChooser(intent, null), ManagerActivity.REQUEST_CODE_GET);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+				getActivity().startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+			}
+			else{
+				getActivity().startActivityForResult(Intent.createChooser(intent, null), ManagerActivity.REQUEST_CODE_GET);
+			}
 		}
 		dismiss();
 	}

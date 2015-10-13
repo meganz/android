@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".FileStorageActivity" >
+    tools:context=".FileStorageActivityLollipop" >
     
     <RelativeLayout
         android:id="@+id/contacts_explorer_toolbar"
