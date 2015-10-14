@@ -13,6 +13,7 @@ import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -93,7 +94,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private File path;
 	private File root;
-	
+	DisplayMetrics metrics;
 	private String buttonPrefix;
 	private RelativeLayout viewContainer;
 //	private TextView windowTitle;
@@ -114,7 +115,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private ActionMode actionMode;
 	
-	private AlertDialog createFolderDialog;
+	private AlertDialog newFolderDialog;
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
@@ -131,16 +132,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 	    public void onLongPress(MotionEvent e) {
 	    	log("onLongPress");
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
+	    	
+			if (mode == Mode.PICK_FILE) {
+		        View view = listView.findChildViewUnder(e.getX(), e.getY());
+		        int position = listView.getChildPosition(view);
 
-			adapter.setMultipleSelect(true);
-		
-			actionMode = startSupportActionMode(new ActionBarCallBack());			
+				adapter.setMultipleSelect(true);
+			
+				actionMode = startSupportActionMode(new ActionBarCallBack());			
 
-	        itemClick(position);
- 
-	        super.onLongPress(e);
+		        itemClick(position);
+	 
+		        super.onLongPress(e);
+			}
 	    }
 	}
 	
@@ -236,7 +240,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		
 		Display display = getWindowManager().getDefaultDisplay();
 		
-		DisplayMetrics metrics = new DisplayMetrics();
+		metrics = new DisplayMetrics();
 		display.getMetrics(metrics);
 		
 		float density  = getResources().getDisplayMetrics().density;
@@ -262,7 +266,22 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 //		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
-		aB.setTitle(getString(R.string.general_select_to_upload));
+		
+		Intent intent = getIntent();
+		buttonPrefix = intent.getStringExtra(EXTRA_BUTTON_PREFIX);
+		if (buttonPrefix == null) {
+			buttonPrefix = "";
+		}
+		mode = Mode.getFromIntent(intent);
+		if (mode == Mode.PICK_FOLDER) {
+			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
+			url = intent.getExtras().getString(EXTRA_URL);
+			size = intent.getExtras().getLong(EXTRA_SIZE);
+			aB.setTitle(getString(R.string.general_select_to_download));
+		}
+		else{
+			aB.setTitle(getString(R.string.general_select_to_upload));
+		}
 		
 		if (savedInstanceState != null) {
 			if (savedInstanceState.containsKey("path")) {
@@ -275,19 +294,29 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		
 //		optionsBar = (LinearLayout) v.findViewById(R.id.options_file_storage_layout);
+		createFolderButton = (TextView) findViewById(R.id.file_storage_create_folder);
 		button = (TextView) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, metrics);
-		paramsb2.width = Util.scaleWidthPx(73, metrics);
-		button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+		
+		if (mode == Mode.PICK_FOLDER) {
+			button.setText(getString(R.string.general_download_here).toUpperCase(Locale.getDefault()));
+			paramsb2.width = Util.scaleWidthPx(140, metrics);
+			
+		}
+		else{
+			createFolderButton.setVisibility(View.GONE);
+			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+			paramsb2.width = Util.scaleWidthPx(73, metrics);
+		}
+		
 		button.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)button.getLayoutParams();
 		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
-		button.setLayoutParams(optionTextParams);
+		button.setLayoutParams(optionTextParams);		
 		
-		createFolderButton = (TextView) findViewById(R.id.file_storage_create_folder);
 		createFolderButton.setOnClickListener(this);		
 		createFolderButton.setText(getString(R.string.action_create_folder).toUpperCase(Locale.getDefault()));
 		android.view.ViewGroup.LayoutParams paramsb1 = createFolderButton.getLayoutParams();		
@@ -297,22 +326,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)createFolderButton.getLayoutParams();
 		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
-		createFolderButton.setLayoutParams(cancelTextParams);	
-		
-		Intent intent = getIntent();
-		buttonPrefix = intent.getStringExtra(EXTRA_BUTTON_PREFIX);
-		if (buttonPrefix == null) {
-			buttonPrefix = "";
-		}
-		mode = Mode.getFromIntent(intent);
-		if (mode == Mode.PICK_FOLDER) {
-			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
-			url = intent.getExtras().getString(EXTRA_URL);
-			size = intent.getExtras().getLong(EXTRA_SIZE);			
-		}
-		else{
-			createFolderButton.setVisibility(View.GONE);
-		}
+		createFolderButton.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -404,6 +418,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			return;
 		}
 		File[] files = path.listFiles();
+		log("Number of files: "+files.length);
 		if(files != null)
 		{
 			for (File file : files) {
@@ -779,12 +794,23 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 	
+	@SuppressLint("NewApi")
 	public void onNewFolderClick(){
 		log("file storage activity ne FOLDER!!");
-		String text = getString(R.string.context_new_folder_name);
-		final EditText input = new EditText(this);
+		
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, metrics), Util.scaleWidthPx(20, metrics), Util.scaleWidthPx(17, metrics), 0);
+
+	    final EditText input = new EditText(this);
+	    layout.addView(input, params);		
+		
+		input.setId(1);
 		input.setSingleLine();
-		input.setSelectAllOnFocus(true);
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.context_new_folder_name));
+//		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
@@ -795,16 +821,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						return true;
 					}
 					createFolder(value);
-					createFolderDialog.dismiss();
+					newFolderDialog.dismiss();
 					return true;
 				}
 				return false;
 			}
 		});
-		
-		input.setImeActionLabel(getString(R.string.general_create),
-				KeyEvent.KEYCODE_ENTER);
-		input.setText(text);
+		input.setImeActionLabel(getString(R.string.general_create),KeyEvent.KEYCODE_ENTER);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -814,9 +837,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		});
 		
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(
-				this, getString(R.string.menu_new_folder),
-				null, input);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getString(R.string.menu_new_folder));
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -827,10 +849,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 						createFolder(value);
 					}
 				});
-		
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
-		createFolderDialog = builder.create();
-		createFolderDialog.show();
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
 	}
 	
 	/*

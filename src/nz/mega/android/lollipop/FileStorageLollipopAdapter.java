@@ -7,10 +7,8 @@ import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.lollipop.FileStorageActivityLollipop.FileDocument;
 import nz.mega.android.lollipop.FileStorageActivityLollipop.Mode;
-import nz.mega.android.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
 import nz.mega.android.lollipop.MegaSharedFolderLollipopAdapter.OnItemClickListener;
 import nz.mega.android.utils.Util;
-import nz.mega.sdk.MegaNode;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -135,24 +133,36 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
 				}
 			}
+			if (document.isFolder()){	
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+			}
+			else{
+				//Document is FILE
+				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());			
+			}
 		}
 		else 
 		{
-//			if(isEnabled(position)){
-//				holder.itemLayout.setEnabled(false)
-//			}				
-				
-			Util.setViewAlpha(holder.imageView, .4f);
-			holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
-		}	
+			if(!isEnabled(position)){
+				holder.itemLayout.setEnabled(false);
+			}
+			else{
+				log("position: "+position+" is ENABLED");
+				holder.itemLayout.setEnabled(true);
+			}
+			if (document.isFolder()){	
+				holder.imageView.setImageResource(R.drawable.ic_folder_list);
+				Util.setViewAlpha(holder.imageView, 1);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(android.R.color.black));
+			}
+			else{
+				//Document is FILE
+				holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());	
+				Util.setViewAlpha(holder.imageView, .4f);
+				holder.textViewFileName.setTextColor(context.getResources().getColor(R.color.text_secondary));
+			}			
 			
-		if (document.isFolder()){	
-			holder.imageView.setImageResource(R.drawable.ic_folder_list);
-		}
-		else{
-			//Document is FILE
-			holder.imageView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());			
-		}
+		}		
 		
 		try {
 			holder.textViewUpdated.setText(DateUtils.getRelativeTimeSpanString(document.getTimestampInMillis()));
@@ -160,13 +170,24 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 		catch(Exception ex)	{
 			holder.textViewUpdated.setText("");
 		}
-	}
-	
+	}	
 	
 	// Set new files on folder change
 	public void setFiles(List<FileDocument> newFiles) {
-		currentFiles = newFiles;
-		notifyDataSetChanged();
+		log("setFiles");
+		if(newFiles!=null){
+			if(newFiles.size()>0){
+				listFragment.setVisibility(View.VISIBLE);
+				currentFiles = newFiles;
+				notifyDataSetChanged();
+			}
+			else{
+				listFragment.setVisibility(View.GONE);
+			}
+		}
+		else{
+			listFragment.setVisibility(View.GONE);
+		}
 	}
 	
 	public FileDocument getDocumentAt(int position) {
@@ -197,14 +218,18 @@ public class FileStorageLollipopAdapter extends RecyclerView.Adapter<FileStorage
 	}
 
 	public boolean isEnabled(int position) {
+		log("isEnabled: position: "+position);
 		if (currentFiles.size() == 0) {
+			log("1-return");
 			return false;
 		}
 		FileDocument document = currentFiles.get(position);
 		if (mode == Mode.PICK_FOLDER && !document.isFolder()) {
+			log("2-return");
 			return false;
 		}
 		if (document.getFile().canRead() == false) {
+			log("3-return");
 			return false;
 		}
 
