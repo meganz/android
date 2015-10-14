@@ -22,6 +22,7 @@
 	    android:id="@+id/file_storage_content_text"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
+	    android:ellipsize="start"
 	    android:paddingLeft="8dp"
 	    android:paddingTop="3dp"
 	    android:paddingBottom="3dp"
