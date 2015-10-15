@@ -15,7 +15,7 @@
         android:layout_width="fill_parent"
         android:layout_height="48dp"
         android:id="@+id/image_viewer_layout_bottom"
-        android:background="#44000000"
+        android:background="#66000000"
         android:layout_alignParentBottom="true">
         
         <TextView 
