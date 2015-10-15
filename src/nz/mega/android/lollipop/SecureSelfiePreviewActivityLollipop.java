@@ -11,6 +11,7 @@ import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.UploadHereDialog;
 import nz.mega.android.utils.Util;
+import nz.mega.components.TouchImageView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -40,8 +41,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,15 +63,12 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 	ProgressDialog statusDialog;
 	
 	private TextView fileNameTextView;
-	private ImageView actionBarIcon;
 	private ImageView discardIcon;
-	private ImageView repeatIcon;
 	private ImageView uploadIcon;
 	
-	private RelativeLayout bottomLayout;
     private RelativeLayout topLayout;
     
-    private ImageView secureSelfieImage;
+    private TouchImageView secureSelfieImage;
 	public UploadHereDialog uploadDialog;
     
     String filePath;
@@ -103,11 +103,9 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 		
 		setContentView(R.layout.activity_secure_selfie_preview);
 		
-		secureSelfieImage = (ImageView) findViewById(R.id.secure_selfie_viewer_image);
+		secureSelfieImage = (TouchImageView) findViewById(R.id.secure_selfie_viewer_image);
+		secureSelfieImage.setOnClickListener(this);
 		secureSelfieImage.setVisibility(View.VISIBLE);
-		
-		actionBarIcon = (ImageView) findViewById(R.id.secure_selfie_viewer_icon);
-		actionBarIcon.setOnClickListener(this);
 		
 		discardIcon = (ImageView) findViewById(R.id.secure_selfie_viewer_discard);
 		discardIcon.setVisibility(View.VISIBLE);
@@ -117,11 +115,6 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 		uploadIcon.setVisibility(View.VISIBLE);
 		uploadIcon.setOnClickListener(this);		
 		
-		repeatIcon = (ImageView) findViewById(R.id.secure_selfie_viewer_repeat);
-		repeatIcon.setOnClickListener(this);
-		repeatIcon.setVisibility(View.VISIBLE);
-		
-		bottomLayout = (RelativeLayout) findViewById(R.id.secure_selfie_viewer_layout_bottom);
 	    topLayout = (RelativeLayout) findViewById(R.id.secure_selfie_viewer_layout_top);
 		
 //		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH){
@@ -177,29 +170,34 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 
 	@Override
 	public void onClick(View v) {		
+		log("onClick");
 		
 		switch (v.getId()){
-			case R.id.secure_selfie_viewer_icon:{
-				//Delete image
-				if(imgFile.exists()){
-					imgFile.delete();
-				}				
-				finish();
-				break;
-			}
-			case R.id.secure_selfie_viewer_discard:{				
-				log("Option discard");
-				if(imgFile.exists()){
-					imgFile.delete();
-				}	
-				finish();
-				break;
-			}
-			case R.id.secure_selfie_viewer_repeat:{
+//			case R.id.secure_selfie_viewer_icon:{
+//				//Delete image
+//				if(imgFile.exists()){
+//					imgFile.delete();
+//				}				
+//				finish();
+//				break;
+//			}
+//			case R.id.secure_selfie_viewer_discard:{				
+//				log("Option discard");
+//				if(imgFile.exists()){
+//					imgFile.delete();
+//				}	
+//				finish();
+//				break;
+//			}
+			case R.id.secure_selfie_viewer_discard:{
 				//Delete image
 				Intent intent = new Intent(this, ManagerActivityLollipop.class);
 				intent.setAction(ManagerActivityLollipop.ACTION_TAKE_SELFIE);
 				//intent.putExtra("IMAGE_PATH", imagePath);
+				//Delete image
+				if(imgFile.exists()){
+					imgFile.delete();
+				}
 				startActivity(intent);
 				finish();
 				break;
@@ -214,6 +212,43 @@ public class SecureSelfiePreviewActivityLollipop extends PinActivityLollipop imp
 				imgFile.renameTo(newFile);
 				
 				showFileChooser(newPath);		
+				
+				break;
+			}
+			case R.id.secure_selfie_viewer_image:{
+				log("click on secure_selfie_viewer_image");
+				
+				Display display = getWindowManager().getDefaultDisplay();
+				DisplayMetrics outMetrics = new DisplayMetrics ();
+			    display.getMetrics(outMetrics);
+			    float density  = getResources().getDisplayMetrics().density;
+				
+			    float scaleW = Util.getScaleW(outMetrics, density);
+			    float scaleH = Util.getScaleH(outMetrics, density);
+
+				if (aBshown){
+					log("Hide topLayout");
+					TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(-48, outMetrics));
+					animTop.setDuration(1000);
+					animTop.setFillAfter( true );
+//					topLayout.setAnimation(animTop);
+					topLayout.startAnimation(animTop);					
+					aBshown = false;
+				}
+				else{					
+					log("Shooow topLayout");
+					TranslateAnimation animTop = new TranslateAnimation(0, 0, Util.px2dp(-48, outMetrics), 0);
+					animTop.setDuration(1000);
+					animTop.setFillAfter( true );
+//					topLayout.setAnimation(animTop);
+					topLayout.startAnimation(animTop);
+					aBshown = true;
+				}
+
+				
+//				RelativeLayout activityLayout = (RelativeLayout) activity.findViewById(R.id.full_image_viewer_parent_layout);
+//				activityLayout.invalidate();
+
 				
 				break;
 			}

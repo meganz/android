@@ -154,7 +154,6 @@ public class FullScreenImageViewer extends PinActivity implements OnPageChangeLi
 		    if (actionBar != null){
 		    	actionBar.hide();
 		    }
-
 		}
 		
 		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD){
