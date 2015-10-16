@@ -15,7 +15,6 @@ import nz.mega.android.DatabaseHandler;
 import nz.mega.android.DownloadService;
 import nz.mega.android.FileStorageActivity;
 import nz.mega.android.FileStorageActivity.Mode;
-import nz.mega.android.ChangePasswordActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.MimeTypeList;
@@ -331,7 +330,7 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 				return true;
 			}
 			case R.id.action_my_account_change_password:{
-	        	Intent intent = new Intent(this, ChangePasswordActivity.class);
+	        	Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
 				startActivity(intent);
 				return true;
 			}

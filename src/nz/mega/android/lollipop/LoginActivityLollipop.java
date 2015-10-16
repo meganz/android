@@ -207,7 +207,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		});			
 		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
 		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
-		textThreeDots.setMargins(Util.scaleWidthPx(30, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
 		loginThreeDots.setLayoutParams(textThreeDots);
 		
 		loginABC = (TextView) findViewById(R.id.ABC);

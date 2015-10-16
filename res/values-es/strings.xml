@@ -363,7 +363,7 @@
     <string name="my_account_free_space" context="Headline for the amount of storage space is remaining">Espacio Libre</string>
     <string name="my_account_used_space" context="Headline for the amount of storage space is used">Espacio utilizado</string>
     <string name="my_account_upgrade_pro" context="Button to upgrade the account to PRO account">¡Hazte PRO!</string>
-    <string name="my_account_change_password" context="menu item">Modificar contraseña</string>
+    <string name="my_account_change_password" context="menu item">Modificar</string>
     <string name="warning_out_space" context="Warning in Cloud Drive when the user is runningut of space">Te estás quedando sin espacio libre.\n ¿Quieres mejorar tu cuenta?</string>
     <string name="get_pro_account" context="Message to promote PRO accounts">Podrías ser un usuario PRO.\n ¿Quieres mejorar tu cuenta?</string>
     <string name="overquota_alert_title" context="Title dialog overquota error">Alerta!Superada la cuota de almacenamiento!</string>
@@ -373,12 +373,15 @@
     <string name="my_account_last_session" context="when did the last session happen">Última sesión:</string>
     <string name="my_account_connections" context="header for the social connections, showing the number of contacts the user has">Conexiones:</string>
     
+    <string name="my_account_change_password_title" context="title of the screen to change the password">Cambiar contraseña</string>   
     <string name="my_account_changing_password" context="message displayed while the app is changing the password">Cambiando contraseña</string>
     <string name="my_account_change_password_oldPassword" context="when changing the password, the first edittext is to enter the current password">Contraseña actual</string>
     <string name="my_account_change_password_newPassword1" context="when changing the password">Nueva contraseña</string>
     <string name="my_account_change_password_newPassword2" context="when changing the password">Confirma tu nueva contraseña</string>
-    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">La contraseña actual es incorrecta o la nueva contraseña no coincide las dos veces. Por favor, intenta de nuevo.</string>
+    <string name="my_account_change_password_error" context="Error message when the user attempts to change his password (two potential reasons in one error message).">La contraseña actual es incorrecta o la nueva contraseña no coincide las dos veces. Por favor, inténtalo de nuevo.</string>
+    <string name="my_account_change_password_error_2" context="Error message when the user attempts to change his password (two potential reasons in one error message).">La contraseña actual es incorrecta. Por favor, inténtalo de nuevo.</string>
     <string name="my_account_change_password_OK" context="Success text">Contraseña modificada con éxito</string>
+    <string name="my_account_change_password_dont_match" context="title of the screen to change the password">Las nuevas contraseñas no coinciden</string> 
     
     <string name="upgrade_activity" context="title of the Upgrade screen">Cuenta Pro</string>
     <string name="upgrade_select_pricing" context="title of the selection of the pro account wanted">Seleccione plan</string>

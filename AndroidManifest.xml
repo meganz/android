@@ -414,6 +414,12 @@
         </activity>
         
         <activity
+            android:name="nz.mega.android.lollipop.ChangePasswordActivityLollipop"
+            android:label="@string/my_account_change_password" 
+            android:screenOrientation="portrait">
+        </activity>
+        
+        <activity
             android:name="UpgradeActivity"
             android:label="@string/upgrade_activity" 
             android:screenOrientation="portrait">
