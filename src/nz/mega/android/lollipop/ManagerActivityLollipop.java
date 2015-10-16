@@ -17,7 +17,6 @@ import java.util.Map;
 
 import nz.mega.android.CameraSyncService;
 import nz.mega.android.CameraUploadFragment;
-import nz.mega.android.ChangePasswordActivity;
 import nz.mega.android.ContactsExplorerActivity;
 import nz.mega.android.CreditCardFragment;
 import nz.mega.android.DatabaseHandler;
@@ -3949,7 +3948,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        
 	        case R.id.action_menu_change_pass:{
-	        	Intent intent = new Intent(this, ChangePasswordActivity.class);
+	        	Intent intent = new Intent(this, ChangePasswordActivityLollipop.class);
 				startActivity(intent);
 				return true;
 	        }
