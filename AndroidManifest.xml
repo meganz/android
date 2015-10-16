@@ -59,16 +59,6 @@
         </activity>
         
         <activity
-            android:name="InitialCamSyncActivity"
-            android:label="@string/section_photo_sync"
-            android:launchMode="singleTop" 
-            android:theme="@style/login_activity"
-            android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait" >
-        </activity>
-        
-        <activity
             android:name="LoginActivity"
             android:theme="@style/login_activity"
             android:label="@string/login_text" 

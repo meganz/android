@@ -249,7 +249,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 
 		holder = new ViewHolderBrowser(v);
 		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.file_list_item_layout);
-		holder.itemLayout.setOnClickListener(this);
 		holder.imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
 		holder.savedOffline = (ImageView) v.findViewById(R.id.file_list_saved_offline);
 		
@@ -273,6 +272,12 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		holder.transferProgressBar.setVisibility(View.GONE);
 		holder.textViewFileSize.setVisibility(View.VISIBLE);
+		
+		holder.itemLayout.setTag(holder);
+		holder.itemLayout.setOnClickListener(this);
+		
+		holder.imageButtonThreeDots.setTag(holder);
+		holder.imageButtonThreeDots.setOnClickListener(this);
 		
 		return holder;
 
@@ -528,9 +533,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				}
 			}
 		}
-
-		holder.imageButtonThreeDots.setTag(holder);
-		holder.imageButtonThreeDots.setOnClickListener(this);
 	}
 	
 	private String getInfoFolder(MegaNode n) {

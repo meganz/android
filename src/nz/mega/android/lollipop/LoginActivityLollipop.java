@@ -204,7 +204,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 				}
 				return false;
 			}
-		});			
+		});		
 		loginThreeDots = (ImageView) findViewById(R.id.login_three_dots);
 		LinearLayout.LayoutParams textThreeDots = (LinearLayout.LayoutParams)loginThreeDots.getLayoutParams();
 		textThreeDots.setMargins(Util.scaleWidthPx(0, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
@@ -319,6 +319,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		
 		credentials = dbH.getCredentials();
 		if (credentials != null){
+			firstTime = false;
 			if ((intentReceived != null) && (intentReceived.getAction() != null)){
 				if (intentReceived.getAction().equals(ACTION_REFRESH)){
 					parentHandle = intentReceived.getLongExtra("PARENT_HANDLE", -1);
@@ -489,7 +490,6 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					
 					lastEmail = credentials.getEmail();
 					gSession = credentials.getSession();
-					
 					log("session: " + gSession);
 					loginLogin.setVisibility(View.GONE);
 					loginDelimiter.setVisibility(View.GONE);
@@ -908,7 +908,6 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 						else{
 							Intent intent = null;
 							if (firstTime){
-//							intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 								intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 								intent.putExtra("firstTimeCam", true);
 							}
@@ -918,21 +917,27 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 								DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 								MegaPreferences prefs = dbH.getPreferences();
 								prefs = dbH.getPreferences();
-								if (prefs.getCamSyncEnabled() != null){
-									if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
-										log("Enciendo el servicio de la camara");
-										handler.postDelayed(new Runnable() {
-											
-											@Override
-											public void run() {
-												log("Now I start the service");
-												startService(new Intent(getApplicationContext(), CameraSyncService.class));		
-											}
-										}, 30 * 1000);
+								if (prefs != null){
+									if (prefs.getCamSyncEnabled() != null){
+										if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+											log("Enciendo el servicio de la camara");
+											handler.postDelayed(new Runnable() {
+												
+												@Override
+												public void run() {
+													log("Now I start the service");
+													startService(new Intent(getApplicationContext(), CameraSyncService.class));		
+												}
+											}, 30 * 1000);
+										}
+									}
+									else{
+										intent = new Intent(loginActivity,ManagerActivityLollipop.class);
+										intent.putExtra("firstTimeCam", true);
+										initialCam = true;								
 									}
 								}
 								else{
-//									intent = new Intent(loginActivity, InitialCamSyncActivity.class);
 									intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 									intent.putExtra("firstTimeCam", true);
 									initialCam = true;								
