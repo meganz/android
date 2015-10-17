@@ -3175,8 +3175,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
-	        	if (fbFLol != null){
-	        		if (drawerItem == DrawerItem.CLOUD_DRIVE){
+	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
+	        		if (fbFLol != null){	        		
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fbFLol");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);

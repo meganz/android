@@ -105,7 +105,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	MegaPreferences prefs;
 	
 	MegaPhotoSyncListAdapterLollipop adapterList;
-	/*MegaPhotoSyncGridAdapterLollipop adapterGrid;*/
+	MegaPhotoSyncGridAdapterLollipop adapterGrid;
 	LinearLayout outSpaceLayout=null;
 	LinearLayout getProLayout=null;
 	TextView outSpaceText;
@@ -122,7 +122,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	ArrayList<MegaNode> nodes;
 	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
 	ArrayList<PhotoSyncGridHolder> nodesArrayGrid = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncGridHolder>();
-	/*ArrayList<MegaMonthPic> monthPics = new ArrayList<MegaMonthPic>();*/
+	ArrayList<MegaMonthPicLollipop> monthPics = new ArrayList<MegaMonthPicLollipop>();
 	
 	private ActionMode actionMode;
 	
@@ -162,18 +162,20 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 		public void onLongPress(MotionEvent e) {
 			log("onLongPress");
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
-
-	        // handle long press
-	        if (!adapterList.isMultipleSelect()){
-				adapterList.setMultipleSelect(true);
-			
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
-
-		        itemClick(position);
-		        super.onLongPress(e);
-	        }
+			if (isList){
+		        View view = listView.findChildViewUnder(e.getX(), e.getY());
+		        int position = listView.getChildPosition(view);
+	
+		        // handle long press
+		        if (!adapterList.isMultipleSelect()){
+					adapterList.setMultipleSelect(true);
+				
+					actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
+	
+			        itemClick(position);
+			        super.onLongPress(e);
+		        }
+			}
 	    }
 	}
 	
@@ -634,20 +636,23 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			return v;
 		}
-		
-		return null;
-		/*else{
+		else{
 			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
-
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
 			
-			contentText.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
-			outSpaceLayout.setVisibility(View.GONE);
-			getProLayout.setVisibility(View.GONE);
+			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+			
+			listView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+//			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			mLayoutManager = new LinearLayoutManager(context);
+			listView.setLayoutManager(mLayoutManager);
+			listView.addOnItemTouchListener(this);
+			listView.setItemAnimator(new DefaultItemAnimator()); 
+			
+			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
+			fabButton.setVisibility(View.GONE);
+			
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
+			slidingOptionsPanel.setVisibility(View.GONE);
 			
 			final Button turnOnOff = (Button) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
@@ -657,7 +662,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
 						turnOnOff.setVisibility(View.GONE);
-						turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_off));
 						camEnabled = true;
 					}
 					else{
@@ -666,6 +670,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 			}
 			turnOnOff.setOnClickListener(this);
+	
+			contentText = (TextView) v.findViewById(R.id.content_grid_text);
+			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
+			
+			contentText.setVisibility(View.GONE);
+			buttonsLayout.setVisibility(View.GONE);
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
+			getProLayout.setVisibility(View.GONE);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
@@ -673,7 +685,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			outSpaceButton.setVisibility(View.VISIBLE);
 			outSpaceButton.setOnClickListener(this);
 			
-			usedSpacePerc=((ManagerActivity)context).getUsedPerc();
+			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 			
 			if(usedSpacePerc>95){
 				//Change below of ListView
@@ -729,8 +741,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				
 			}
 			
-			listView = (ListView) v.findViewById(R.id.file_grid_view_browser);
-			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
 			listView.setLayoutParams(p);
@@ -742,7 +752,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			emptyImageView.setVisibility(View.VISIBLE);
-			emptyTextView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.GONE);
 			listView.setVisibility(View.GONE);
 			
 			if (megaApi.getRootNode() == null){
@@ -762,12 +772,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					if (megaApi.getNodeByHandle(photosyncHandle) == null){
 						photosyncHandle = -1;
 					}
-					else{
-						MegaNode pshNode = megaApi.getNodeByHandle(photosyncHandle);
-						if (pshNode == null){
-							photosyncHandle = -1;
-						}
-					}
 				}
 			}
 			
@@ -784,7 +788,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					}
 				}
 			}
-
+			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
@@ -831,7 +835,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
 				int month = 0;
 				int year = 0;
-				MegaMonthPic monthPic = new MegaMonthPic();
+				MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
 				boolean thereAreImages = false;
 				for (int i=0;i<nodes.size();i++){
 					if (nodes.get(i).isFolder()){
@@ -848,14 +852,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						year = d.getYear();
 						monthPic.monthYearString = getImageDateString(month, year);
 						monthPics.add(monthPic);
-						monthPic = new MegaMonthPic();
+						monthPic = new MegaMonthPicLollipop();
 						i--;
 					}
 					else if ((month == d.getMonth()) && (year == d.getYear())){
 						thereAreImages = true;
 						if (monthPic.nodeHandles.size() == numberOfCells){
 							monthPics.add(monthPic);
-							monthPic = new MegaMonthPic();
+							monthPic = new MegaMonthPicLollipop();
 							monthPic.nodeHandles.add(nodes.get(i).getHandle());
 						}
 						else{
@@ -866,10 +870,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 						month = d.getMonth();
 						year = d.getYear();
 						monthPics.add(monthPic);
-						monthPic = new MegaMonthPic();
+						monthPic = new MegaMonthPicLollipop();
 						monthPic.monthYearString = getImageDateString(month, year);
 						monthPics.add(monthPic);
-						monthPic = new MegaMonthPic();
+						monthPic = new MegaMonthPicLollipop();
 						i--;						
 					}
 				}
@@ -894,18 +898,17 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-				adapterGrid = new MegaPhotoSyncGridAdapter(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells);
+				adapterGrid = new MegaPhotoSyncGridAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, this, ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
 				adapterGrid.setNodes(monthPics, nodes);
 			}
 			
-			adapterGrid.setPositionClicked(-1);	
 			listView.setAdapter(adapterGrid);
 			
 			return v;
-		}*/
+		}
 	}
 	
 	public void selectAll(){

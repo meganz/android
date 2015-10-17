@@ -533,7 +533,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaBrowserListAdapter", log);
+		Util.log("MegaPhotoSyncListAdapter", log);
 	}
 
 	@Override
