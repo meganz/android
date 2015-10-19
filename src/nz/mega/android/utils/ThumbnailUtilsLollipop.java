@@ -11,7 +11,6 @@ import nz.mega.android.MegaExplorerAdapter;
 import nz.mega.android.MegaFullScreenImageAdapter;
 import nz.mega.android.MegaPhotoSyncGridAdapter;
 import nz.mega.android.MegaPhotoSyncListAdapter;
-import nz.mega.android.MegaTransfersAdapter;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.ThumbnailCache;
@@ -22,10 +21,11 @@ import nz.mega.android.MegaExplorerAdapter.ViewHolderExplorer;
 import nz.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
 import nz.mega.android.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import nz.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
-import nz.mega.android.MegaTransfersAdapter.ViewHolderTransfer;
 import nz.mega.android.NavigationDrawerAdapter.ViewHolderNavigationDrawer;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
+import nz.mega.android.lollipop.MegaTransfersLollipopAdapter;
+import nz.mega.android.lollipop.MegaTransfersLollipopAdapter.ViewHolderTransfer;
 import nz.mega.android.lollipop.providers.MegaProviderLollipopAdapter;
 import nz.mega.android.lollipop.providers.MegaProviderLollipopAdapter.ViewHolderLollipopProvider;
 import nz.mega.sdk.MegaApiAndroid;
@@ -631,9 +631,9 @@ public class ThumbnailUtilsLollipop {
 	static class ThumbnailDownloadListenerTransfer implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderTransfer holder;
-		MegaTransfersAdapter adapter;
+		MegaTransfersLollipopAdapter adapter;
 		
-		ThumbnailDownloadListenerTransfer(Context context, ViewHolderTransfer holder, MegaTransfersAdapter adapter){
+		ThumbnailDownloadListenerTransfer(Context context, ViewHolderTransfer holder, MegaTransfersLollipopAdapter adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -796,7 +796,7 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 	
-	public static Bitmap getThumbnailFromMegaTransfer(MegaNode document, Context context, ViewHolderTransfer viewHolder, MegaApiAndroid megaApi, MegaTransfersAdapter adapter){
+	public static Bitmap getThumbnailFromMegaTransfer(MegaNode document, Context context, ViewHolderTransfer viewHolder, MegaApiAndroid megaApi, MegaTransfersLollipopAdapter adapter){
 		
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");

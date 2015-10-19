@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nz.mega.android.lollipop.ManagerActivityLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -418,9 +419,14 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		String title = getString(R.string.download_failed);
 		String message = getString(R.string.error_server_connection_problem);
 //		if(lastError != 0) message = MegaError.getErrorString(lastError);
-
-		Intent intent = new Intent(DownloadService.this, ManagerActivity.class);
+		Intent intent;
 		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+		}
+		else{
+			intent = new Intent(DownloadService.this, ManagerActivity.class);
+		}		
 		
 		mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -449,8 +455,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		Intent intent = null;
 		if(successCount != 1)
-		{		
-			intent = new Intent(getApplicationContext(), ManagerActivity.class);
+		{				
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+				intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+			}
+			else{
+				intent = new Intent(getApplicationContext(), ManagerActivity.class);
+			}
 			log("Show notification");
 			mBuilderCompat
 			.setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -497,10 +508,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 						
 					}
 					else{
-						Intent intentZip = new Intent(this, ManagerActivity.class);
-						intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
-						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						Intent intentZip = null;
+						
+						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+							intentZip = new Intent(this, ManagerActivityLollipop.class);
+							intentZip.setAction(ManagerActivityLollipop.ACTION_EXPLORE_ZIP);
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentZip.putExtra(ManagerActivityLollipop.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						}
+						else{
+							intentZip = new Intent(this, ManagerActivity.class);
+							intentZip.setAction(ManagerActivity.ACTION_EXPLORE_ZIP);
+							intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							intentZip.putExtra(ManagerActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+						}
+
 						startActivity(intentZip);
 					}
 					
@@ -514,14 +536,28 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					if (ManagerActivity.isIntentAvailable(this, viewIntent))
-						startActivity(viewIntent);
-					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						startActivity(intentShare);
+					
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else{
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intentShare);
+						}
 					}
+					else{
+						if (ManagerActivity.isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else{
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intentShare);
+						}
+					}
+
 				}
 				else if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 					log("Download is IMAGE");
@@ -529,14 +565,27 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					Intent viewIntent = new Intent(Intent.ACTION_VIEW);
 					viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
 					viewIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					if (ManagerActivity.isIntentAvailable(this, viewIntent))
-						startActivity(viewIntent);
-					else{
-						Intent intentShare = new Intent(Intent.ACTION_SEND);
-						intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						startActivity(intentShare);
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+						if (ManagerActivityLollipop.isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else{
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intentShare);
+						}
 					}
+					else{
+						if (ManagerActivity.isIntentAvailable(this, viewIntent))
+							startActivity(viewIntent);
+						else{
+							Intent intentShare = new Intent(Intent.ACTION_SEND);
+							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+							intentShare.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+							startActivity(intentShare);
+						}
+					}
+
 				}
 				else{
 					
@@ -545,10 +594,19 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
 							.getType());
 					
-					if (!ManagerActivity.isIntentAvailable(DownloadService.this, intent)){
-						intent.setAction(Intent.ACTION_SEND);
-						intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
-								.getType());
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+						if (!ManagerActivityLollipop.isIntentAvailable(DownloadService.this, intent)){
+							intent.setAction(Intent.ACTION_SEND);
+							intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
+									.getType());
+						}
+					}
+					else{
+						if (!ManagerActivity.isIntentAvailable(DownloadService.this, intent)){
+							intent.setAction(Intent.ACTION_SEND);
+							intent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName())
+									.getType());
+						}
 					}
 					
 					log("Show notification");
@@ -564,7 +622,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 			else{
 				openFile=true; //Set the openFile to the default
-				intent = new Intent(getApplicationContext(), ManagerActivity.class);
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+					intent = new Intent(getApplicationContext(), ManagerActivityLollipop.class);
+				}
+				else{
+					intent = new Intent(getApplicationContext(), ManagerActivity.class);
+				}
+
 				log("Show notification");
 				mBuilderCompat
 				.setSmallIcon(R.drawable.ic_stat_notify_download)
@@ -616,8 +680,17 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 			}
 		}
 
-		Intent intent = new Intent(DownloadService.this, ManagerActivity.class);
-		intent.setAction(ManagerActivity.ACTION_CANCEL_DOWNLOAD);	
+		Intent intent;
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
+			intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
+		}
+		else{
+			intent = new Intent(DownloadService.this, ManagerActivity.class);
+			intent.setAction(ManagerActivity.ACTION_CANCEL_DOWNLOAD);
+		}
+	
 		String info = Util.getProgressSize(DownloadService.this, progress, totalSizeToDownload);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(DownloadService.this, 0, intent, 0);
