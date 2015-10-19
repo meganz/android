@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    tools:context=".TransfersFragmentLollipop" >
+
+    <LinearLayout
+         android:id="@+id/out_space_tranfers"
+    	 android:layout_width="fill_parent"
+    	 android:layout_height="wrap_content"
+    	 android:layout_alignParentBottom="true"
+    	 android:layout_gravity="center|fill_horizontal"
+    	 android:layout_centerHorizontal="true"
+    	 android:orientation="vertical">
+
+		<TextView
+		    android:id="@+id/out_space_text_tranfers"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:textColor="@color/white"
+		    android:textStyle="bold"
+		    android:paddingTop="20dp"
+		    android:paddingBottom="20dp"
+		    android:paddingLeft="20dp"
+		    android:paddingRight="20dp"
+		    android:gravity="center"
+		    android:background="@color/navigation_drawer_background"
+		    android:textSize="16sp"
+		    android:text="@string/warning_out_space"/>  
+         
+         <Button
+            android:id="@+id/out_space_btn_tranfers"
+       		android:layout_height="48dp"       		
+       		android:layout_width="fill_parent"
+            android:background="@drawable/btn_default_holo_light_without_corners"
+            android:textColor="@color/button_text"
+            android:text="@string/my_account_upgrade_pro" />
+     </LinearLayout>          
+    
+    <ListView
+        android:id="@+id/transfers_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </ListView>
+    
+    <ImageView
+	    android:id="@+id/transfers_empty_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true" />
+    
+    <TextView
+	    android:id="@+id/transfers_empty_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/transfers_empty_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>
+    
+    <ImageView
+	    android:id="@+id/transfers_pause_image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerInParent="true" />
+    
+    <TextView
+	    android:id="@+id/transfers_pause_text"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textColor="@color/text_secondary"
+	    android:textSize="16sp"
+	    android:layout_below="@id/transfers_pause_image"
+	    android:layout_marginTop="@dimen/standard_margin"
+	    android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

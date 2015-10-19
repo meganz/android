@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
+    android:id="@+id/transfers_list_item_layout" >
+    
+    
+    <ImageView
+        android:id="@+id/transfers_list_thumbnail"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" 
+        android:scaleType="fitCenter"
+        android:layout_toRightOf="@id/transfers_list_checkbox"  />
+    
+    <ImageView
+        android:id="@+id/transfers_list_small_icon"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:src="@drawable/ic_download_transfers"
+        android:layout_alignRight="@id/transfers_list_thumbnail"
+        android:layout_alignTop="@id/transfers_list_thumbnail" />
+    
+    <TextView
+        android:id="@+id/transfers_list_filename"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_toRightOf="@id/transfers_list_thumbnail"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp" />
+    
+    <ImageView 
+        android:id="@+id/transfers_list_one_dot"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:src="@drawable/dot"
+        android:layout_toRightOf="@id/transfers_list_filename"
+        android:paddingTop="7dp"
+        android:paddingLeft="5dp" />
+    
+    <TextView
+        android:id="@+id/transfers_list_transfer_rate"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignTop="@id/transfers_list_one_dot"
+        android:layout_toRightOf="@id/transfers_list_one_dot"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp"
+        android:textColor="@color/file_list_second_row" />
+    
+    <ImageView
+        android:id="@+id/transfers_list_completed_image"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/transfers_list_thumbnail"
+        android:layout_below="@id/transfers_list_filename"
+        android:paddingBottom="7dp"
+        android:paddingLeft="5dp" />
+    
+    <TextView
+        android:id="@+id/transfers_list_completed_text"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_toRightOf="@id/transfers_list_completed_image"
+        android:layout_below="@+id/transfers_list_filename"
+        android:paddingLeft="5dp"
+        android:paddingBottom="7dp"
+        android:textColor="@color/file_list_second_row" />
+    
+
+     
+    <ProgressBar
+	    android:id="@+id/transfers_list_bar"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" 
+		style="@style/MEGAProgressBarTransfers"  
+		android:layout_margin="5dip" 
+		android:layout_below="@id/transfers_list_filename"
+		android:paddingRight="5dp"
+        android:layout_toRightOf="@id/transfers_list_thumbnail" />
+    
+    <ImageButton 
+        android:id="@+id/transfers_list_option_remove"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete"
+		android:background="@null" 
+        android:layout_alignTop="@id/transfers_list_filename"
+        android:layout_alignParentRight="true"
+		android:paddingTop="12dp"
+        android:paddingRight="15dp" />
+            
+</RelativeLayout>
+

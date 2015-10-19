@@ -333,7 +333,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 	
 	ActionBar aB;	
 	String urlLink = "";		
-	SparseArray<TransfersHolder> transfersListArray = null;	
+//	SparseArray<TransfersHolder> transfersListArray = null;	
 	boolean downloadPlay = true;	
 	boolean pauseIconVisible = false;	
 	DatabaseHandler dbH = null;

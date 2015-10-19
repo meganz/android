@@ -124,7 +124,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
-import android.widget.Toast;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -149,6 +148,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public static String ACTION_REFRESH_PARENTHANDLE_BROWSER = "REFRESH_PARENTHANDLE_BROWSER";
 	public static String ACTION_OVERQUOTA_ALERT = "OVERQUOTA_ALERT";
 	public static String ACTION_TAKE_SELFIE = "TAKE_SELFIE";
+	public static String ACTION_SHOW_TRANSFERS = "SHOW_TRANSFERS";
 	
 	final public static int FILE_BROWSER_ADAPTER = 2000;
 	final public static int CONTACT_FILE_ADAPTER = 2001;
@@ -196,13 +196,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     ArrayList<MegaTransfer> tL;	
 	DisplayMetrics outMetrics;
     FrameLayout fragmentContainer;
-    
+	boolean pauseIconVisible = true;
     Toolbar tB;
     ActionBar aB;
     boolean firstNavigationLevel = true;
     DrawerLayout drawerLayout;
     public enum DrawerItem {
-		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH;
+		CLOUD_DRIVE, SAVED_FOR_OFFLINE, CAMERA_UPLOADS, INBOX, SHARED_ITEMS, CONTACTS, SETTINGS, ACCOUNT, SEARCH, TRANSFERS;
 
 		public String getTitle(Context context) {
 			switch(this)
@@ -216,6 +216,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				case SETTINGS: return context.getString(R.string.action_settings);
 				case ACCOUNT: return context.getString(R.string.section_account);				
 				case SEARCH: return context.getString(R.string.action_search);
+				case TRANSFERS: return context.getString(R.string.section_transfers);
 			}
 			return null;			
 		}
@@ -318,6 +319,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private ReceivedRequestsFragmentLollipop rRFLol;
 	private SentRequestsFragmentLollipop sRFLol;
 	private MyAccountFragmentLollipop maFLol;
+	private TransfersFragmentLollipop tFLol;
 	
 	ProgressDialog statusDialog;
 	
@@ -2104,6 +2106,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			clearRubbishBinMenuitem.setVisible(false);
         			settingsMenuItem.setVisible(false);
 	    		}
+    			break;
+    		}
+    		case TRANSFERS:{
+						
+				drawerItem = DrawerItem.TRANSFERS;
+				selectDrawerItemLollipop(drawerItem);
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					hidden.setChecked(true);
+				}		
+				
+    			if (tFLol == null){
+    				tFLol = new TransfersFragmentLollipop();
+    			}
+				
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.fragment_container, tFLol, "tFLol");
+    			ft.commit();
+    			
+    			drawerLayout.closeDrawer(Gravity.LEFT);
+
     			break;
     		}
     	}
@@ -7887,6 +7911,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (rRFLol != null){					
 				rRFLol.setContactRequests();
 			}		
+		}
+	}	
+	
+	public void setPauseIconVisible(boolean visible){
+		log("setPauseIconVisible");
+		pauseIconVisible = visible;
+		if (pauseRestartTransfersItem != null){
+			pauseRestartTransfersItem.setVisible(visible);
+		}
+	}
+	
+	public void setTransfers(ArrayList<MegaTransfer> transfersList){
+		log("setTransfers");
+		if (tFLol != null){
+			tFLol.setTransfers(transfersList);
 		}
 	}
 	
