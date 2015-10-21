@@ -1302,7 +1302,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 		return inSampleSize;
 	} 
   
-     @Override
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
     	log("onSaveInstaceState");
     	if (megaApi == null){

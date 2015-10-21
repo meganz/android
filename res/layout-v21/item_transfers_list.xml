@@ -85,7 +85,7 @@
         android:id="@+id/transfers_list_option_remove"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_delete"
+        android:src="@drawable/ic_clear_black"
 		android:background="@null" 
         android:layout_alignTop="@id/transfers_list_filename"
         android:layout_alignParentRight="true"

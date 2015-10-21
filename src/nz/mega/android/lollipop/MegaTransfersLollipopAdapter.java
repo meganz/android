@@ -179,6 +179,7 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
     
     public void setCurrentTransfer(MegaTransfer mT)
     {
+    	log("setCurrentTransfer");
     	this.currentTransfer = mT;
     	notifyDataSetChanged();    		
    }   
@@ -334,6 +335,7 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 			holder.textViewRate.setText(Formatter.formatFileSize(context, transfer.getSpeed()) + "/s");
 			holder.transferProgressBar.getLayoutParams().width = Util.px2dp((250*scaleW), outMetrics);
 			double progressValue = 100.0 * transfer.getTransferredBytes() / transfer.getTotalBytes();
+			log("Progress Value: "+ progressValue);
 			holder.transferProgressBar.setProgress((int)progressValue);
 		}
 		
@@ -480,7 +482,7 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaTransfersAdapter", log);
+		Util.log("MegaTransfersLollipopAdapter", log);
 	}
 
 	@Override
