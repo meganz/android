@@ -498,13 +498,13 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 					log("Download success of zip file!");				
 					
 					if(pathFileToOpen!=null){
-						Intent intentZip = new Intent(this, ZipBrowserActivity.class);
-						intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
-						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
-						intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
-						intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
-						startActivity(intentZip);
+//						Intent intentZip = new Intent(this, ZipBrowserActivity.class);
+//						intentZip.setAction(ZipBrowserActivity.ACTION_OPEN_ZIP_FILE);
+//						intentZip.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//						intentZip.putExtra(ZipBrowserActivity.EXTRA_ZIP_FILE_TO_OPEN, pathFileToOpen);
+//						intentZip.putExtra(ZipBrowserActivity.EXTRA_PATH_ZIP, currentFile.getAbsolutePath());
+//						intentZip.putExtra(ZipBrowserActivity.EXTRA_HANDLE_ZIP, currentDocument.getHandle());
+//						startActivity(intentZip);
 						
 					}
 					else{
@@ -682,11 +682,21 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 
 		Intent intent;
 		
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			log("intent from Lollipop");
 			intent = new Intent(DownloadService.this, ManagerActivityLollipop.class);
-			intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
+			if (dbH == null){
+				dbH = DatabaseHandler.getDbHandler(getApplicationContext());	
+			}
+			if (dbH.getCredentials() == null){
+				intent.setAction(ManagerActivity.ACTION_CANCEL_DOWNLOAD);
+			}
+			else{
+				intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
+			}
 		}
 		else{
+			log("intent NOOT Lollipop");
 			intent = new Intent(DownloadService.this, ManagerActivity.class);
 			intent.setAction(ManagerActivity.ACTION_CANCEL_DOWNLOAD);
 		}

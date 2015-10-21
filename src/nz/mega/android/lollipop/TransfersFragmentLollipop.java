@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -160,6 +161,9 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 			aB = ((ActionBarActivity)context).getSupportActionBar();
 		}
 		
+		aB.setTitle(getResources().getString(R.string.section_transfers));					
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+		
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 		
 		
@@ -295,7 +299,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         context = activity;
-        aB = ((ActionBarActivity)activity).getSupportActionBar();
+        aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 	
 	@Override
@@ -497,6 +501,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 	}
 	
 	public void setCurrentTransfer(MegaTransfer mT){
+		log("setCurrentTransfer");
 		if (adapter != null){
 			adapter.setCurrentTransfer(mT);
 		}
@@ -553,6 +558,6 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 	}
 
 	private static void log(String log) {
-		Util.log("TransfersFragment", log);
+		Util.log("TransfersFragmentLollipop", log);
 	}
 }
