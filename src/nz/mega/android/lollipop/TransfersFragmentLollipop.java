@@ -107,7 +107,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		}
 		
 		aB.setTitle(getResources().getString(R.string.section_transfers));					
-		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+//		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 		
@@ -212,11 +212,13 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
 				listView.setVisibility(View.GONE);
+				((ManagerActivityLollipop)context).hideTransfersIcons();
 			}
 			else{
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
+				((ManagerActivityLollipop)context).setPauseIconVisible(true);
 			}
 			
 			pauseImage.setVisibility(View.GONE);
@@ -226,20 +228,6 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 //		refreshTransfers();
 		
 		return v;
-	}
-	
-	private void refreshTransfers(){
-		log("refreshTransfers()");
-		handler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				tL = megaApi.getTransfers();
-				setTransfers(tL);
-				if (tL.size() > 0){
-					refreshTransfers();
-				}
-			}
-		}, 1 * 1000);
 	}
 	
 	@Override
@@ -300,6 +288,10 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 			else{
 				if (tL.size() == 0){
 					adapter.setPositionClicked(-1);
+					((ManagerActivityLollipop)context).hideTransfersIcons();
+				}
+				else{
+					((ManagerActivityLollipop)context).setPauseIconVisible(true);
 				}
 			}
 			adapter.setTransfers(tL);
@@ -319,7 +311,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 					emptyImage.setVisibility(View.VISIBLE);
 					emptyText.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
-					((ManagerActivityLollipop)context).setPauseIconVisible(false);
+					((ManagerActivityLollipop)context).hideTransfersIcons();
 				}
 				else{
 					emptyImage.setVisibility(View.GONE);
@@ -363,7 +355,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 					emptyImage.setVisibility(View.VISIBLE);
 					emptyText.setVisibility(View.VISIBLE);
 					listView.setVisibility(View.GONE);
-					((ManagerActivityLollipop)context).setPauseIconVisible(false);
+					((ManagerActivityLollipop)context).hideTransfersIcons();
 				}
 				else{
 					emptyImage.setVisibility(View.GONE);
