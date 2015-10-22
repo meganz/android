@@ -84,22 +84,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		public ImageView publicLinkImageMultiselect;
 		public ImageView publicLinkImage;
 		public RelativeLayout itemLayout;
-		//public ImageView arrowSelection;
-//		public LinearLayout optionsLayout;
-//		public RelativeLayout optionDownload;
-//		public RelativeLayout optionProperties;
-//		public RelativeLayout optionMore;		
 		public ProgressBar transferProgressBar;
-//		public RelativeLayout optionRename;
-//		public RelativeLayout optionPublicLink;
-//		public RelativeLayout optionShare;
-//		public RelativeLayout optionPermissions;
-//		public RelativeLayout optionDelete;
-//		public RelativeLayout optionRemoveTotal;
-//		public RelativeLayout optionClearShares;
-//		public RelativeLayout optionLeaveShare;
-//		public RelativeLayout optionMoveTo;
-//		public TextView propertiesText;
 		public int currentPosition;
 		public long document;		
 	}

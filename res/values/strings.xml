@@ -168,6 +168,9 @@
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Confirmation required</string>
     <string name="create_account_confirm" context="">Please check your e-mail and click the link to login and confirm your account</string>
     <string name="create_account_creating_account">Connecting to the server: creating account</string>
+    
+    <string name="cancel_transfer_title">Cancel Transfer</string>
+    <string name="cancel_transfer_confirmation">The transfer will be canceled, are you sure?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA. The term \'cloud\' is a new computer term and can probably not be translated. Do not translate &quot;cloud&quot; literal unless your language allows this. Please see http://en.wikipedia.org/wiki/Cloud_computing for your reference.">Cloud Drive</string>
 	<string name="section_inbox" context="title of the screen that show the inbox">Inbox</string>
