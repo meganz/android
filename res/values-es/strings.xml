@@ -166,6 +166,9 @@
     <string name="create_account_confirm_title" context="Title that is shown when e-mail confirmation is still required for the account">Se requiere confirmación</string>
     <string name="create_account_confirm" context="">Por favor, comprueba tu correo electrónico y haz clic en el enlace para iniciar sesión y confirmar tu cuenta</string>
     <string name="create_account_creating_account">Conectando con el servidor: creando cuenta.</string>
+    
+    <string name="cancel_transfer_title">Cancelar Transferencia</string>
+    <string name="cancel_transfer_confirmation">La transferencia será cancelada, ¿está seguro?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>

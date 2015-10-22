@@ -4979,6 +4979,35 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		megaApi.exportNode(document, this);
 	}
 	
+	public void cancelTransfer (MegaTransfer t){
+		log("cancelTransfer");
+		final MegaTransfer mT = t;
+		
+		//Show confirmation message
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	log("Pressed button positive to cancel transfer");
+		    		megaApi.cancelTransfer(mT, managerActivity);		        	
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            break;
+		        }
+		    }
+		};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		builder.setTitle(getResources().getString(R.string.cancel_transfer_title));
+        builder.setMessage(getResources().getString(R.string.cancel_transfer_confirmation));
+        builder.setPositiveButton(R.string.general_yes, dialogClickListener);
+        builder.setNegativeButton(R.string.general_no, dialogClickListener);
+        builder.show();	
+		
+	}
+	
 	public void moveToTrash(final ArrayList<Long> handleList){
 		log("moveToTrash");
 		isClearRubbishBin = false;
@@ -7542,13 +7571,33 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
 			if (e.getErrorCode() == MegaError.API_OK){
+				tL = megaApi.getTransfers();
 				if (tFLol != null){
 					if (drawerItem == DrawerItem.TRANSFERS){
-						Intent cancelOneIntent = new Intent(this, DownloadService.class);
-						cancelOneIntent.setAction(DownloadService.ACTION_CANCEL_ONE_DOWNLOAD);				
-						startService(cancelOneIntent);
-						tFLol.setTransfers(megaApi.getTransfers());
+						tFLol.setTransfers(tL);
 					}
+				}
+				//Update File Browser Fragment
+				if (fbFLol != null){
+					
+					HashMap<Long, MegaTransfer> mTHash = new HashMap<Long, MegaTransfer>();
+					for(int i=0; i<tL.size(); i++){
+						
+						MegaTransfer tempT = tL.get(i);
+						if (tempT.getType() == MegaTransfer.TYPE_DOWNLOAD){
+							long handleT = tempT.getNodeHandle();
+							MegaNode nodeT = megaApi.getNodeByHandle(handleT);
+							MegaNode parentT = megaApi.getParentNode(nodeT);
+							
+							if (parentT != null){
+								if(parentT.getHandle() == this.parentHandleBrowser){	
+									mTHash.put(handleT,tempT);						
+								}
+							}
+						}
+					}
+					
+					fbFLol.setTransfers(mTHash);
 				}
 			}
 		}

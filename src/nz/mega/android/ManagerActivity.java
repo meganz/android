@@ -5698,9 +5698,6 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (tF != null){
 					if (drawerItem == DrawerItem.TRANSFERS){
-						Intent cancelOneIntent = new Intent(this, DownloadService.class);
-						cancelOneIntent.setAction(DownloadService.ACTION_CANCEL_ONE_DOWNLOAD);				
-						startService(cancelOneIntent);
 						tF.setTransfers(megaApi.getTransfers());
 					}
 				}

@@ -59,7 +59,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	
 	// Action to stop download
 	public static String ACTION_CANCEL = "CANCEL_DOWNLOAD";
-	public static String ACTION_CANCEL_ONE_DOWNLOAD = "CANCEL_ONE_DOWNLOAD";
 	public static String EXTRA_SIZE = "DOCUMENT_SIZE";
 	public static String EXTRA_HASH = "DOCUMENT_HASH";
 	public static String EXTRA_URL = "DOCUMENT_URL";
@@ -204,11 +203,6 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				log("Cancel intent");
 				canceled = true;
 				megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this);
-				return START_NOT_STICKY;
-			}
-			else if (intent.getAction().equals(ACTION_CANCEL_ONE_DOWNLOAD)){
-				log("Cancel one download intent");
-								
 				return START_NOT_STICKY;
 			}
 		}

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fragment_background"
+    android:background="@color/white"
     tools:context=".TransfersFragmentLollipop" >
 
     <LinearLayout
@@ -38,11 +38,12 @@
             android:text="@string/my_account_upgrade_pro" />
      </LinearLayout>          
     
-    <ListView
+    		 
+	<android.support.v7.widget.RecyclerView
         android:id="@+id/transfers_list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-    </ListView>
+        android:layout_height="match_parent" 
+        android:choiceMode="multipleChoice"/>
     
     <ImageView
 	    android:id="@+id/transfers_empty_image"

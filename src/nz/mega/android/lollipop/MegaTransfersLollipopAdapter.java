@@ -8,6 +8,7 @@ import nz.mega.android.MegaApplication;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.UploadService;
+import nz.mega.android.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.ThumbnailUtilsLollipop;
 import nz.mega.android.utils.Util;
@@ -28,6 +29,7 @@ import android.graphics.Color;
 import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils.TruncateAt;
 import android.text.format.Formatter;
 import android.util.DisplayMetrics;
@@ -52,7 +54,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 
-public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClickListener, MegaRequestListenerInterface {
+public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTransfersLollipopAdapter.ViewHolderTransfer> implements OnClickListener {
 	
 	Context context;
 //	SparseArray<TransfersHolder> transfersListArray;
@@ -60,7 +62,7 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 	MegaTransfer currentTransfer = null;
 	int positionClicked;
 	ActionBar aB;
-
+	TransfersFragmentLollipop fragment;
 	MegaApiAndroid megaApi;
 	
 	boolean multipleSelect;
@@ -131,28 +133,25 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 	}
 	
 	
-	public MegaTransfersLollipopAdapter(Context _context, ArrayList<MegaTransfer> _transfers, ActionBar aB) {
+	public MegaTransfersLollipopAdapter(Context _context, TransfersFragmentLollipop _fragment, ArrayList<MegaTransfer> _transfers, ActionBar aB) {
 		this.context = _context;
 		this.tL = _transfers;
 		this.positionClicked = -1;
 		this.aB = aB;
+		this.fragment = _fragment;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 	}
-	
-	public void destroyAdapter()
-	{
-		if (megaApi != null)
-		{
-			megaApi.removeRequestListener(this);
-		}
-	}
+
 		
 	/*private view holder class*/
-    public class ViewHolderTransfer {
-    	public ImageView imageView;
+    public class ViewHolderTransfer extends RecyclerView.ViewHolder{
+    	public ViewHolderTransfer(View v) {
+			super(v);
+		}
+		public ImageView imageView;
     	public ImageView iconDownloadUploadView;
     	public TextView textViewFileName;
     	public ImageView imageViewCompleted;
@@ -183,16 +182,13 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
     	this.currentTransfer = mT;
     	notifyDataSetChanged();    		
    }   
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-	
-		listFragment = (ListView) parent;
-		
-		final int _position = position;
-		
-		ViewHolderTransfer holder = null;
-		
+    
+    @Override
+	public ViewHolderTransfer onCreateViewHolder(ViewGroup parent, int viewType) {
+    	log("onCreateViewHolder");
+    	
+    	ViewHolderTransfer holder;
+    	
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -202,36 +198,44 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 	    float scaleH = Util.getScaleH(outMetrics, density);
 		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		if (convertView == null) {
-			convertView = inflater.inflate(R.layout.item_transfers_list, parent, false);
-			holder = new ViewHolderTransfer();
-			holder.itemLayout = (RelativeLayout) convertView.findViewById(R.id.transfers_list_item_layout);
-			holder.imageView = (ImageView) convertView.findViewById(R.id.transfers_list_thumbnail);
-			holder.iconDownloadUploadView = (ImageView) convertView.findViewById(R.id.transfers_list_small_icon);
-			holder.textViewFileName = (TextView) convertView.findViewById(R.id.transfers_list_filename);
-			holder.textViewFileName.setSingleLine(true);
-			holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
-			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-			holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
-			holder.imageViewCompleted = (ImageView) convertView.findViewById(R.id.transfers_list_completed_image);
-			holder.textViewCompleted = (TextView) convertView.findViewById(R.id.transfers_list_completed_text);
-			holder.imageViewOneDot = (ImageView) convertView.findViewById(R.id.transfers_list_one_dot);
-			holder.textViewRate = (TextView) convertView.findViewById(R.id.transfers_list_transfer_rate);
-			holder.transferProgressBar = (ProgressBar) convertView.findViewById(R.id.transfers_list_bar); 
-			holder.optionRemove = (ImageButton) convertView.findViewById(R.id.transfers_list_option_remove);
-//			holder.optionRemove.setPadding(Util.px2dp((75*scaleW), outMetrics), Util.px2dp((10*scaleH), outMetrics), Util.px2dp((30*scaleW), outMetrics), 0);
-//			holder.arrowSelection = (ImageView) convertView.findViewById(R.id.transfers_list_arrow_selection);
-//			holder.arrowSelection.setVisibility(View.GONE);
 
-			convertView.setTag(holder);
-		}
-		else{
-			holder = (ViewHolderTransfer) convertView.getTag();
-		}
+		View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_transfers_list, parent, false);
+
+		holder = new ViewHolderTransfer(v);
+		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.transfers_list_item_layout);
+		holder.imageView = (ImageView) v.findViewById(R.id.transfers_list_thumbnail);
+		holder.iconDownloadUploadView = (ImageView) v.findViewById(R.id.transfers_list_small_icon);
+		holder.textViewFileName = (TextView) v.findViewById(R.id.transfers_list_filename);
+		holder.textViewFileName.setSingleLine(true);
+		holder.textViewFileName.setEllipsize(TruncateAt.MIDDLE);
+		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+		holder.textViewFileName.getLayoutParams().width = Util.px2dp((150*scaleW), outMetrics);
+		holder.imageViewCompleted = (ImageView) v.findViewById(R.id.transfers_list_completed_image);
+		holder.textViewCompleted = (TextView) v.findViewById(R.id.transfers_list_completed_text);
+		holder.imageViewOneDot = (ImageView) v.findViewById(R.id.transfers_list_one_dot);
+		holder.textViewRate = (TextView) v.findViewById(R.id.transfers_list_transfer_rate);
+		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar); 
+		holder.optionRemove = (ImageButton) v.findViewById(R.id.transfers_list_option_remove);		
+		holder.optionRemove.setOnClickListener(this);
+		v.setTag(holder);
+    	
+    	return holder;
+    }
+
+	@Override
+	public void onBindViewHolder(ViewHolderTransfer holder, int position) {
+		log("onBindViewHolder");
+		
+		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics();
+		display.getMetrics(outMetrics);
+		float density = ((Activity) context).getResources().getDisplayMetrics().density;
+
+		float scaleW = Util.getScaleW(outMetrics, density);
+		float scaleH = Util.getScaleH(outMetrics, density);
 		
 		holder.currentPosition = position;
-		
-		holder.optionRemove.setOnClickListener(this);
+
 		MegaTransfer transfer = null;
 		MegaTransfer transferFromList = (MegaTransfer) getItem(position);
 		if (currentTransfer == null){
@@ -342,7 +346,7 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 		if (positionClicked != -1){
 			if (positionClicked == position){
 				holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-				listFragment.smoothScrollToPosition(_position);
+				listFragment.smoothScrollToPosition(position);
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
@@ -353,17 +357,13 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 		}
 		
 		holder.optionRemove.setTag(holder);
-		holder.optionRemove.setOnClickListener(this);
-		
-		return convertView;
 	}
  
 	@Override
-	public int getCount() {
+	public int getItemCount() {
 		return tL.size();
 	}
 	
-	@Override
 	public Object getItem(int position) {
 		return tL.get(position);
 	}
@@ -400,36 +400,16 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 
 	@Override
 	public void onClick(View v) {
-
+		log("onClick");
+		
 		ViewHolderTransfer holder = (ViewHolderTransfer) v.getTag();
 		int currentPosition = holder.currentPosition;
 		
 		switch(v.getId()){
-			case R.id.transfers_list_three_dots:{
-				if (positionClicked == -1){
-					positionClicked = currentPosition;
-					notifyDataSetChanged();
-				}
-				else{
-					if (positionClicked == currentPosition){
-						positionClicked = -1;
-						notifyDataSetChanged();
-					}
-					else{
-						positionClicked = currentPosition;
-						notifyDataSetChanged();
-					}
-				}
-				break;
-			}
 			case R.id.transfers_list_option_remove:{
+				log("click to cancel transfer");
 				MegaTransfer t = (MegaTransfer) getItem(currentPosition);
-				if (t.getType() == MegaTransfer.TYPE_DOWNLOAD){
-					megaApi.cancelTransfer(t, (ManagerActivityLollipop)context);
-				}
-				else if (t.getType() == MegaTransfer.TYPE_UPLOAD){
-					megaApi.cancelTransfer(t, this);
-				}
+				fragment.cancelTransferConfirmation(t);
 				positionClicked = -1;
 				notifyDataSetChanged();
 				break;
@@ -459,35 +439,9 @@ public class MegaTransfersLollipopAdapter extends BaseAdapter implements OnClick
 			notifyDataSetChanged();
 		}
 	}
-
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		log("onRequestStart: " + request.getType());
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestFinish: " + request.getType());
-		Intent cancelOneIntent = new Intent(context, UploadService.class);
-		cancelOneIntent.setAction(UploadService.ACTION_CANCEL_ONE_UPLOAD);				
-		context.startService(cancelOneIntent);
-		((ManagerActivityLollipop)context).setTransfers(megaApi.getTransfers());
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		log("onRequestTemporaryError: " + request.getType());		
-	}
 	
 	private static void log(String log) {
 		Util.log("MegaTransfersLollipopAdapter", log);
 	}
 
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
 }
