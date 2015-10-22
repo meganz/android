@@ -85,7 +85,10 @@ import android.widget.Toast;
 public class CameraUploadFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
 
 	
-	public static int GRID_WIDTH =300;
+	public static int GRID_WIDTH = 154;
+	
+	public static int GRID_LARGE = 2;
+	public static int GRID_SMALL = 7;
 	
 	Context context;
 	ActionBar aB;
@@ -115,6 +118,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 //	long parentHandle = -1;
 	boolean isList = true;
+	boolean isLargeGridCameraUploads;
 	boolean firstTimeCam = false;
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
@@ -805,17 +809,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		    int totalHeight = outMetrics.heightPixels;
 		    float dpWidth  = outMetrics.widthPixels / density;
 		    		    
-		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-		    	if (numberOfCells < 4){
-					numberOfCells = 4;
-				}	
+		    int gridWidth = 0;
+		    int numberOfCells = 0;
+		    if (isLargeGridCameraUploads){
+		    	gridWidth = totalWidth / GRID_LARGE;
+		    	numberOfCells = GRID_LARGE;
 		    }
-		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-		    	if (numberOfCells < 3){
-					numberOfCells = 3;
-				}	
+		    else{
+		    	gridWidth = totalWidth / GRID_SMALL;
+		    	numberOfCells = GRID_SMALL;
 		    }
+		    
+//		    int numberOfCells = totalWidth / GRID_WIDTH;
+//		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//		    	if (numberOfCells < 4){
+//					numberOfCells = 4;
+//				}	
+//		    }
+//		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+//		    	if (numberOfCells < 3){
+//					numberOfCells = 3;
+//				}	
+//		    }
 		    
 			
 			if (monthPics != null){
@@ -898,10 +913,11 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			if (adapterGrid == null){
 				log("ADAPTERGRID.MONTHPICS(NEW) = " + monthPics.size());
-				adapterGrid = new MegaPhotoSyncGridAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, this, ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER);
+				adapterGrid = new MegaPhotoSyncGridAdapterLollipop(context, monthPics, photosyncHandle, listView, emptyImageView, emptyTextView, aB, nodes, numberOfCells, gridWidth, this, ManagerActivityLollipop.CAMERA_UPLOAD_ADAPTER);
 			}
 			else{
 				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
+				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
 				adapterGrid.setNodes(monthPics, nodes);
 			}
 			
@@ -1654,6 +1670,10 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public void setIsList(boolean isList){
 		this.isList = isList;
+	}
+	
+	public void setIsLargeGrid(boolean isLargeGridCameraUploads){
+		this.isLargeGridCameraUploads = isLargeGridCameraUploads;
 	}
 	
 	public boolean getIsList(){

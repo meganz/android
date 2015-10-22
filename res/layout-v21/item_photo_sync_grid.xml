@@ -1,31 +1,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cell_photosync_layout"
-   	android:layout_width="fill_parent"
+   	android:layout_width="match_parent"
    	android:layout_height="wrap_content"
    	android:layout_gravity="center|fill_horizontal"
    	android:orientation="horizontal"
-  	android:background="@color/grid_background">
+  	android:background="@color/grid_background"
+  	android:layout_marginLeft="3dp"
+    android:layout_marginTop="3dp"
+    android:layout_marginRight="3dp">
   	
     <RelativeLayout
-	    android:layout_width="fill_parent"
+	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/cell_photosync_grid_month_layout" 
-	    android:background="@color/photo_sync_month_layout"
-	    android:layout_marginLeft="0dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginRight="0dp" >
+	    android:background="@color/photo_sync_month_layout" >
 	    
     	<TextView
 	        android:id="@+id/cell_photosync_grid_month_name"
 	        android:layout_width="225dp"
 	        android:layout_height="30dp"
-	        android:layout_marginLeft="10dp"
+	        android:layout_marginLeft="30dp"
 	        android:layout_marginTop="4dp"
 	        android:layout_marginBottom="4dp"
 	        android:singleLine="false" 
-	        android:textColor="@color/white"
-	        android:textSize="18sp"/>
+	        android:textColor="@color/photo_sync_month_text"
+	        android:textSize="14sp"/>
     
 	</RelativeLayout>
 </LinearLayout>

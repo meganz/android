@@ -359,6 +359,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	ActionBar aB;
 	
 	int numberOfCells;
+	int gridWidth;
 	
 	boolean multipleSelect;
 	
@@ -531,7 +532,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
     	public ArrayList<Long> documents;
     }
 	
-    public MegaPhotoSyncGridAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, Object fragment, int type) {
+    public MegaPhotoSyncGridAdapterLollipop(Context _context, ArrayList<MegaMonthPicLollipop> _monthPics, long _photosyncHandle, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, ArrayList<MegaNode> _nodes, int numberOfCells, int gridWidth, Object fragment, int type) {
     	this.context = _context;
 		this.monthPics = _monthPics;
 		this.photosyncHandle = _photosyncHandle;
@@ -544,6 +545,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		this.fragment = fragment;
 		this.type = type;
 		this.numberOfCells = numberOfCells;
+		this.gridWidth = gridWidth;
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
@@ -551,6 +553,11 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		this.app = ((MegaApplication) ((Activity) context).getApplication());
 		this.hm = initDBHM();
 	}
+    
+    public void setNumberOfCells(int numberOfCells, int gridWidth){
+    	this.numberOfCells = numberOfCells;
+    	this.gridWidth = gridWidth;
+    }
 	
 	public void setNodes(ArrayList<MegaMonthPicLollipop> monthPics, ArrayList<MegaNode> nodes){
 		this.monthPics = monthPics;
@@ -1037,6 +1044,11 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
 		
+		float dpHeight = outMetrics.heightPixels / density;
+		float dpWidth  = outMetrics.widthPixels / density;
+		
+//		Toast.makeText(context, "W: " + dpWidth + "__H: " + dpHeight, Toast.LENGTH_SHORT).show();
+//		Toast.makeText(context, "Wpx: " + outMetrics.widthPixels + "__H: " + outMetrics.heightPixels, Toast.LENGTH_SHORT).show();
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
 		View v = inflater.inflate(R.layout.item_photo_sync_grid, parent, false);
@@ -1054,7 +1066,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			View rLView = inflater.inflate(R.layout.cell_photosync_grid_fill, holder.cellLayout, false);
 			
 			RelativeLayout rL = (RelativeLayout) rLView.findViewById(R.id.cell_photosync_grid_item_complete_layout);
-			rL.setLayoutParams(new LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+//			rL.setLayoutParams(new LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+			rL.setLayoutParams(new LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, gridWidth, 1f));
 			holder.cellLayout.addView(rL);
 			holder.relativeLayoutsComplete.add(rL);
 			
@@ -1062,12 +1075,15 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			holder.relativeLayoutsEmpty.add(rLE);
 			
 			ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
+			iV.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
 			holder.imageViews.add(iV);
 			
 			LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_selected);
+			lcLS.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
 			holder.longClickLayoutsSelected.add(lcLS);
 			
 			LinearLayout lcLU = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_unselected);
+			lcLU.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
 			holder.longClickLayoutsUnselected.add(lcLU);
 			
 			holder.documents.add(-1l);
