@@ -19,11 +19,12 @@ import nz.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import nz.mega.android.MegaBrowserNewGridAdapter.ViewHolderBrowserNewGrid;
 import nz.mega.android.MegaExplorerAdapter.ViewHolderExplorer;
 import nz.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import nz.mega.android.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import nz.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
 import nz.mega.android.NavigationDrawerAdapter.ViewHolderNavigationDrawer;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter;
+import nz.mega.android.lollipop.MegaPhotoSyncGridAdapterLollipop;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
+import nz.mega.android.lollipop.MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid;
 import nz.mega.android.lollipop.MegaTransfersLollipopAdapter;
 import nz.mega.android.lollipop.MegaTransfersLollipopAdapter.ViewHolderTransfer;
 import nz.mega.android.lollipop.providers.MegaProviderLollipopAdapter;
@@ -135,10 +136,10 @@ public class ThumbnailUtilsLollipop {
 	static class ThumbnailDownloadListenerPhotoSyncGrid implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderPhotoSyncGrid holder;
-		MegaPhotoSyncGridAdapter adapter;
+		MegaPhotoSyncGridAdapterLollipop adapter;
 		int numView;
 		
-		ThumbnailDownloadListenerPhotoSyncGrid(Context context, ViewHolderPhotoSyncGrid holder, MegaPhotoSyncGridAdapter adapter, int numView){
+		ThumbnailDownloadListenerPhotoSyncGrid(Context context, ViewHolderPhotoSyncGrid holder, MegaPhotoSyncGridAdapterLollipop adapter, int numView){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -898,7 +899,7 @@ public class ThumbnailUtilsLollipop {
 		return thumbnailCache.get(document.getHandle());
 	}
 	
-	public static Bitmap getThumbnailFromMegaPhotoSyncGrid(MegaNode document, Context context, ViewHolderPhotoSyncGrid viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapter adapter, int numView){
+	public static Bitmap getThumbnailFromMegaPhotoSyncGrid(MegaNode document, Context context, ViewHolderPhotoSyncGrid viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapterLollipop adapter, int numView){
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");
 //			return thumbnailCache.get(document.getHandle());

@@ -41,7 +41,7 @@
     <color name="color_default_avatar_mega">#d90007</color>
     <color name="color_default_avatar_phone">#777777</color>
  	<color name="content_text_folder">#80333333</color>
- 	<color name="fragment_background">#EEEEEE</color>
+ 	<color name="fragment_background">#ffffff</color>
  	<color name="adapters_background">#333333</color>
  	<color name="file_properties_bottom">#292929</color>
  	<color name="file_properties_top">#222222</color>

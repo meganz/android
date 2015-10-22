@@ -87,7 +87,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	public static int GRID_WIDTH = 154;
 	
-	public static int GRID_LARGE = 2;
+	public static int GRID_LARGE = 3;
 	public static int GRID_SMALL = 7;
 	
 	Context context;

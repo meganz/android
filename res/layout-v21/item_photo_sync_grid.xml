@@ -5,7 +5,6 @@
    	android:layout_gravity="center|fill_horizontal"
    	android:orientation="horizontal"
   	android:background="@color/grid_background"
-  	android:layout_marginLeft="3dp"
     android:layout_marginTop="3dp"
     android:layout_marginRight="3dp">
   	
@@ -14,18 +13,18 @@
 	    android:layout_height="wrap_content"
 	    android:descendantFocusability="blocksDescendants"
 	    android:id="@+id/cell_photosync_grid_month_layout" 
-	    android:background="@color/photo_sync_month_layout" >
+	    android:background="@color/photo_sync_month_layout"
+	    android:layout_marginLeft="72dp"
+	    android:layout_gravity="left" >
 	    
     	<TextView
 	        android:id="@+id/cell_photosync_grid_month_name"
-	        android:layout_width="225dp"
-	        android:layout_height="30dp"
-	        android:layout_marginLeft="30dp"
-	        android:layout_marginTop="4dp"
-	        android:layout_marginBottom="4dp"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
 	        android:singleLine="false" 
 	        android:textColor="@color/photo_sync_month_text"
-	        android:textSize="14sp"/>
+	        android:textSize="14sp"
+	        android:textStyle="bold"/>
     
 	</RelativeLayout>
 </LinearLayout>

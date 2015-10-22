@@ -15,9 +15,11 @@ import nz.mega.android.MegaStreamingService;
 import nz.mega.android.MimeTypeThumbnail;
 import nz.mega.android.R;
 import nz.mega.android.TourActivity;
+import nz.mega.android.MegaPhotoSyncGridAdapter.ViewHolderPhotoSyncGrid;
 import nz.mega.android.lollipop.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
+import nz.mega.android.utils.ThumbnailUtilsLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -116,12 +118,12 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		MegaApplication app;
 		ViewHolderPhotoSyncGrid holder;
 		MegaApiAndroid megaApi;
-		MegaPhotoSyncGridAdapter adapter;
+		MegaPhotoSyncGridAdapterLollipop adapter;
 		MegaNode node;
 		Bitmap thumb = null;
 		int index;
 		
-		public MediaDBTask(Context context, ViewHolderPhotoSyncGrid holder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapter adapter, int index) {
+		public MediaDBTask(Context context, ViewHolderPhotoSyncGrid holder, MegaApiAndroid megaApi, MegaPhotoSyncGridAdapterLollipop adapter, int index) {
 			this.context = context;
 			this.app = (MegaApplication)(((Activity)(this.context)).getApplication());
 			this.holder = holder;
@@ -294,7 +296,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				log("megaApi.getThumbnail");
 				if (this.node != null){
 					try {
-						/*thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(node, context, holder, megaApi, adapter, index);*/
+						thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncGrid(node, context, holder, megaApi, adapter, index);
 					} 
 					catch (Exception e) {
 					} // Too many AsyncTasks
@@ -872,7 +874,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 								else{
 //									new MediaDBTask(context, holder, megaApi, this, i).execute(n);
 									try{
-										/*thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);*/
+										thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
 									}
 									catch(Exception e){} //Too many AsyncTasks
 									
@@ -954,7 +956,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 							else{ 
 //								new MediaDBTask(context, holder, megaApi, this, i).execute(n);
 								try{
-									/*thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);*/
+									thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncGrid(n, context, holder, megaApi, this, i);
 								}
 								catch(Exception e){} //Too many AsyncTasks
 								
@@ -1076,6 +1078,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 			
 			ImageView iV = (ImageView) rLView.findViewById(R.id.cell_photosync_grid_thumbnail);
 			iV.setLayoutParams(new RelativeLayout.LayoutParams(gridWidth, gridWidth));
+			iV.setPadding(2, 2, 2, 2);
 			holder.imageViews.add(iV);
 			
 			LinearLayout lcLS = (LinearLayout) rLView.findViewById(R.id.cell_photosync_menu_long_click_selected);
