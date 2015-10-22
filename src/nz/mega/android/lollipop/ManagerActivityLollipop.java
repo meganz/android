@@ -293,6 +293,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isListOffline = true;
 	private boolean isListRubbishBin = true;
 	private boolean isListCameraUploads = true;
+	private boolean isLargeGridCameraUploads = true; 
 	private boolean isListInbox = true;
 	private boolean isListContacts = true;
 	private boolean isListSharedItems = true;
@@ -337,6 +338,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private AlertDialog clearRubbishBinDialog;
 	
 	private MenuItem searchMenuItem;
+	private MenuItem gridSmallLargeMenuItem;
 	private MenuItem addContactMenuItem;
 	private MenuItem addMenuItem;
 	private MenuItem pauseRestartTransfersItem;
@@ -1430,6 +1432,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	    			refreshMenuItem.setVisible(false);
 	    					helpMenuItem.setVisible(false);
 	    					settingsMenuItem.setVisible(false);
+	    					gridSmallLargeMenuItem.setVisible(false);
 	    	    			
 	    	    			if (isListRubbishBin){	
 	    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
@@ -1483,7 +1486,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	    			refreshMenuItem.setVisible(false);
 	    					helpMenuItem.setVisible(false);
 	    					settingsMenuItem.setVisible(false);
-	    					killAllSessions.setVisible(false);					
+	    					killAllSessions.setVisible(false);		
+	    					gridSmallLargeMenuItem.setVisible(false);
 	
 	    					if(fbFLol.getItemCount()>0){
 	    						selectMenuItem.setVisible(true);
@@ -1553,6 +1557,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			settingsMenuItem.setVisible(false);
     				refreshMenuItem.setVisible(false);
     				helpMenuItem.setVisible(false);
+    				gridSmallLargeMenuItem.setVisible(false);
+    				searchMenuItem.setVisible(true);
     			}
     			
     			break;
@@ -1561,10 +1567,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (cuF == null){
     				cuF = new CameraUploadFragmentLollipop();
     				cuF.setIsList(isListCameraUploads);
+    				cuF.setIsLargeGrid(isLargeGridCameraUploads);
     				cuF.setFirstTimeCam(firstTimeCam);
 				}
 				else{
 					cuF.setIsList(isListCameraUploads);
+					cuF.setIsLargeGrid(isLargeGridCameraUploads);
 					cuF.setFirstTimeCam(firstTimeCam);
 				}
 				
@@ -1576,7 +1584,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, cuF, "cuF");
+				ft.replace(R.id.fragment_container, cuF, "cuFLol");
     			ft.commit();
     			
     			
@@ -1602,12 +1610,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				helpMenuItem.setVisible(false);
 	    			if (isListCameraUploads){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+	    				gridSmallLargeMenuItem.setVisible(false);
+	    				searchMenuItem.setVisible(true);
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+						if (isLargeGridCameraUploads){
+	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+	        			}
+	        			else{
+	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+	        			}
+						gridSmallLargeMenuItem.setVisible(true);
+						searchMenuItem.setVisible(false);
 	    			}
 	    			rubbishBinMenuItem.setVisible(false);
-	    			clearRubbishBinMenuitem.setVisible(false);
+	    			clearRubbishBinMenuitem.setVisible(false);	    			
     			}
       			break;
     		}
@@ -1675,6 +1693,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			clearRubbishBinMenuitem.setVisible(false);
         			rubbishBinMenuItem.setVisible(false);
         			upgradeAccountMenuItem.setVisible(false);
+        			gridSmallLargeMenuItem.setVisible(false);
 	    		}
 
     			break;
@@ -1829,7 +1848,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					else{
     						selectMenuItem.setVisible(false);
     					}
-
+    					searchMenuItem.setVisible(true);
+    					
     					//Hide
     					pauseRestartTransfersItem.setVisible(false);
     					createFolderMenuItem.setVisible(false);
@@ -1848,6 +1868,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					helpMenuItem.setVisible(false);
     					settingsMenuItem.setVisible(false);
     					upgradeAccountMenuItem.setVisible(false);
+    					gridSmallLargeMenuItem.setVisible(false);
     				}
     			}
     			else if(index==1){
@@ -1872,7 +1893,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					else{
     						selectMenuItem.setVisible(false);
     					}
-
+    					searchMenuItem.setVisible(true);
+    					
     					//Hide
     					upgradeAccountMenuItem.setVisible(false);
     					pauseRestartTransfersItem.setVisible(false);
@@ -1891,6 +1913,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	    			refreshMenuItem.setVisible(false);
     					helpMenuItem.setVisible(false);
     					settingsMenuItem.setVisible(false);
+    					gridSmallLargeMenuItem.setVisible(false);
     				}
     			}   			
     			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
@@ -1990,7 +2013,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
-	    			}	    			
+	    			}
+	    			searchMenuItem.setVisible(true);
+	    			gridSmallLargeMenuItem.setVisible(false);
     			}
     			break;
     		}
@@ -2058,6 +2083,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			settingsMenuItem.setVisible(false);
     				refreshMenuItem.setVisible(false);
     				helpMenuItem.setVisible(false);
+    				gridSmallLargeMenuItem.setVisible(false);
     			}
     			break;
     		}
@@ -2118,6 +2144,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
         			settingsMenuItem.setVisible(false);
+        			gridSmallLargeMenuItem.setVisible(false);
+        			searchMenuItem.setVisible(false);
 	    		}
     			break;
     		}
@@ -2412,6 +2440,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			searchView.setIconifiedByDefault(true);
 		}
 		
+		gridSmallLargeMenuItem = menu.findItem(R.id.action_grid_view_large_small);
 		addContactMenuItem =menu.findItem(R.id.action_add_contact);
 		addMenuItem = menu.findItem(R.id.action_add);
 		pauseRestartTransfersItem = menu.findItem(R.id.action_pause_restart_transfers);
@@ -2487,6 +2516,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			selectMenuItem.setVisible(true);
 	    			thumbViewMenuItem.setVisible(true);
 	    			clearRubbishBinMenuitem.setVisible(true);
+	    			searchMenuItem.setVisible(true);
 	    			
 					//Hide
 	    			refreshMenuItem.setVisible(false);
@@ -2526,7 +2556,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}        			
 	   			
 	    			rubbishBinMenuItem.setVisible(false);
-	    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));    			
+	    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));  
+	    			gridSmallLargeMenuItem.setVisible(false);
 				}
 			}			
 			else{
@@ -2545,6 +2576,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			importLinkMenuItem.setVisible(true);
 	    			takePicture.setVisible(true);
 	    			selectMenuItem.setVisible(true);
+	    			searchMenuItem.setVisible(true);
 	    			
 					//Hide
 	    			pauseRestartTransfersItem.setVisible(false);
@@ -2572,6 +2604,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
+	    			gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
 			return super.onCreateOptionsMenu(menu);
@@ -2589,6 +2622,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					selectMenuItem.setVisible(false);
 				}
+    			searchMenuItem.setVisible(true);
     			
 				//Hide
     			upgradeAccountMenuItem.setVisible(false);
@@ -2616,7 +2650,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				else{
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
-    			}    			
+    			}    	
+    			gridSmallLargeMenuItem.setVisible(false);
 			}
 		}
 	    
@@ -2651,9 +2686,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			if (isListCameraUploads){	
     				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+    				gridSmallLargeMenuItem.setVisible(false);
+    				searchMenuItem.setVisible(true);
 				}
 				else{
 					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+					if (isLargeGridCameraUploads){
+        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+        			}
+        			else{
+        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+        			}
+					gridSmallLargeMenuItem.setVisible(true);
+					searchMenuItem.setVisible(false);
     			}
 			}
 		}
@@ -2669,7 +2714,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					selectMenuItem.setVisible(false);
 				}
-    			    			
+    			searchMenuItem.setVisible(true);
+    			
 				//Hide
     			refreshMenuItem.setVisible(false);
     			thumbViewMenuItem.setVisible(false);
@@ -2692,6 +2738,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
     			clearRubbishBinMenuitem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
+    			gridSmallLargeMenuItem.setVisible(false);
 			}
 		}
 	    
@@ -2722,7 +2769,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else{
 						selectMenuItem.setVisible(false);
 					}
-
+					searchMenuItem.setVisible(true);
+					
 					//Hide
 					pauseRestartTransfersItem.setVisible(false);
 					createFolderMenuItem.setVisible(false);
@@ -2741,6 +2789,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
 					upgradeAccountMenuItem.setVisible(false);
+					gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
 			else if(index==1){
@@ -2765,7 +2814,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else{
 						selectMenuItem.setVisible(false);
 					}
-
+					searchMenuItem.setVisible(true);
+					
 					//Hide
 					upgradeAccountMenuItem.setVisible(false);
 					pauseRestartTransfersItem.setVisible(false);
@@ -2784,6 +2834,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
+					gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
 		}
@@ -2800,6 +2851,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					sortByMenuItem.setVisible(true);
 					thumbViewMenuItem.setVisible(true);
 	    			upgradeAccountMenuItem.setVisible(false);
+	    			searchMenuItem.setVisible(true);
 	    			
 	    			//Hide	
 	    			pauseRestartTransfersItem.setVisible(false);
@@ -2825,11 +2877,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}    
 	    			
+	    			gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
 			else{
 				//Show
     			upgradeAccountMenuItem.setVisible(false);
+    			searchMenuItem.setVisible(false);
     			
     			//Hide	
     			addContactMenuItem.setVisible(false);
@@ -2851,6 +2905,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
+				gridSmallLargeMenuItem.setVisible(false);
 			}
 		}
 	    
@@ -2883,6 +2938,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
+					gridSmallLargeMenuItem.setVisible(false);
 				}
 			}
 		}
@@ -2930,6 +2986,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				exportMK.setVisible(true); 
 	    			removeMK.setVisible(false); 		
     			}
+    			
+    			gridSmallLargeMenuItem.setVisible(false);
  
 			}
 		}
@@ -3241,6 +3299,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}  
 	        	return true;
 	        }
+	        case R.id.action_grid_view_large_small:{
+	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+	        		if (cuF != null){
+	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
+	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(currentFragment);
+	        			fragTransaction.commit();
+	        			
+	        			isLargeGridCameraUploads = !isLargeGridCameraUploads;
+	        			if (isLargeGridCameraUploads){
+	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview_small));
+	        			}
+	        			else{
+	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
+	        			}
+	        			cuF.setIsLargeGrid(isLargeGridCameraUploads);
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(currentFragment);
+	        			fragTransaction.commit();
+	        		}
+	        	}
+	        	return true;
+	        }
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -3337,7 +3419,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         		}
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		if (cuF != null){        			
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuF");
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
         				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.detach(currentFragment);
         				fragTransaction.commit();
@@ -3345,9 +3427,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				isListCameraUploads = !isListCameraUploads;
         				if (isListCameraUploads){	
     	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+    	    				gridSmallLargeMenuItem.setVisible(false);
+    	    				searchMenuItem.setVisible(true);
     					}
     					else{
     						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+    						gridSmallLargeMenuItem.setVisible(true);
+    						searchMenuItem.setVisible(false);
+    						
     	    			}
         				cuF.setIsList(isListCameraUploads);
 
@@ -5862,7 +5949,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			cameraUploads.setChecked(true);
 		}
 		
-		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuF");
+		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 		FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 		fragTransaction.detach(currentFragment);
 		fragTransaction.commit();

@@ -26,7 +26,7 @@
     <color name="file_properties_text_available">#666666</color>
     <color name="file_properties_info_menu">#999999</color>
     <color name="file_properties_info_data">#999999</color>
-    <color name="grid_background">#ececec</color>
+    <color name="grid_background">#ffffff</color>
     <color name="grid_item_border">#d4d4d4</color>
     <color name="grid_item_separator">#e5e5e5</color>
     <color name="contact_properties_content_layout">#eeeeee</color>
@@ -35,7 +35,8 @@
     <color name="contact_properties_info_menu">#404040</color>
     <color name="contact_properties_info_data">#999999</color>
     <color name="contact_list_second_row">#848484</color>
-    <color name="photo_sync_month_layout">#333333</color>
+    <color name="photo_sync_month_layout">#FFFFFF</color>
+    <color name="photo_sync_month_text">#787878</color>
     <color name="switch_selector_layout">#555555</color>
     <color name="color_default_avatar_mega">#d90007</color>
     <color name="color_default_avatar_phone">#777777</color>
