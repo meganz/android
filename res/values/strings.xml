@@ -66,6 +66,8 @@
     <string name="action_upload" context="Button text when choosing the destination location in MEGA">Upload to</string>
     <string name="action_settings" context="Menu item">Settings</string>
     <string name="action_search" context="Search button">Search</string>
+    <string name="action_play" context="Search button">Play</string>
+    <string name="action_pause" context="Search button">Pause</string>
     <string name="action_refresh" context="Menu item">Refresh</string>
     <string name="action_sort_by" context="Menu item">Sort by&#8230;</string>
     <string name="action_help" context="Menu item">Help</string>
