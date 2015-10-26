@@ -171,6 +171,7 @@
     
     <string name="cancel_transfer_title">Cancelar Transferencia</string>
     <string name="cancel_transfer_confirmation">La transferencia será cancelada, ¿está seguro?</string>
+        <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias, ¿está seguro?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
@@ -243,6 +244,7 @@
     <string name="download_began" context="message when the download starts">La descarga ha comenzado</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">¿Desea cancelar la descarga?</string>
     <string name="download_touch_to_cancel" context="Hint how to cancel the download">Toca para cancelar la descarga </string>
+    <string name="download_touch_to_show" context="Hint how to cancel the download">Toca para ver todas las transferencias</string>
     <string name="error_file_size_greater_than_4gb" context="Warning message">La mayoría de dispositivos no pueden descargar archivos mayores a 4 GB.   Es muy probable que tu descarga falle.</string>
     <string name="intent_not_available" context="message when trying to open a downloaded file but there isn\'t any app that open that file. Example: a user downloads a pdf but doesn\'t have any app to read a pdf">No dispone de una aplicación en su dispositivo capaz de reproducir este archivo</string>
 	
@@ -415,6 +417,7 @@
     <string name="transfers_pause" context="File uploading or downloading has been paused (until the user continues at a later stage)">Todas las transferencias están pausadas</string>
     <string name="menu_pause_transfers" context="menu item">Pausar transferencias</string>
     <string name="menu_restart_transfers" context="menu item">Reiniciar transferencias</string>
+    <string name="menu_cancel_all_transfers" context="menu item">Cancelar todas las transferencias</string>
     <string name="menu_take_picture" context="menu item">Hacer foto</string>
     
     <string name="cam_sync_wifi" context="how to upload the camera images. only when Wi-Fi connected">Solo Wi-fi</string>
