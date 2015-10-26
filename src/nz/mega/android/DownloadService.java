@@ -702,14 +702,26 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 		
 		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 		{
-			mBuilder
-				.setSmallIcon(R.drawable.ic_stat_notify_download)
-				.setProgress(100, progressPercent, false)
-				.setContentIntent(pendingIntent)
-				.setOngoing(true).setContentTitle(message).setContentInfo(info)
-				.setContentText(getString(R.string.download_touch_to_cancel))
-				.setOnlyAlertOnce(true);
-			notification = mBuilder.getNotification();
+			if (currentapiVersion >= android.os.Build.VERSION_CODES.LOLLIPOP){
+					mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message).setContentInfo(info)
+					.setContentText(getString(R.string.download_touch_to_show))
+					.setOnlyAlertOnce(true);
+				notification = mBuilder.getNotification();
+			}
+			else{
+					mBuilder
+					.setSmallIcon(R.drawable.ic_stat_notify_download)
+					.setProgress(100, progressPercent, false)
+					.setContentIntent(pendingIntent)
+					.setOngoing(true).setContentTitle(message).setContentInfo(info)
+					.setContentText(getString(R.string.download_touch_to_cancel))
+					.setOnlyAlertOnce(true);
+				notification = mBuilder.getNotification();
+			}		
 		}
 		else
 		{

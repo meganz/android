@@ -234,7 +234,7 @@
 	    android:id="@+id/action_menu_cancel_all_transfers"
 	    android:orderInCategory="165"
 	    android:showAsAction="never"
-	    android:title="@string/action_cancel_subscriptions"
+	    android:title="@string/menu_cancel_all_transfers"
 	    android:icon="@drawable/ic_action_bar_null"
 	    MEGA:showAsAction="never" />	
 </menu>
