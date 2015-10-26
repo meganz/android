@@ -11,6 +11,7 @@ import nz.mega.android.MegaOffline;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.utils.ThumbnailUtils;
+import nz.mega.android.utils.ThumbnailUtilsLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -438,7 +439,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						}
 					} else {
 						try {
-//							thumb = ThumbnailUtils.getThumbnailFromMegaList(node, context, holder, megaApi, this);
+							thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaList(node, context, holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
 
@@ -473,7 +474,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						}
 					} else {
 						try {
-//							ThumbnailUtils.createThumbnailList(context, node,holder, megaApi, this);
+							ThumbnailUtilsLollipop.createThumbnailList(context, node,holder, megaApi, this);
 						} catch (Exception e) {
 						} // Too many AsyncTasks
 					}

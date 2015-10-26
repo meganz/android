@@ -12,6 +12,7 @@ import nz.mega.android.R;
 import nz.mega.android.lollipop.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
+import nz.mega.android.utils.ThumbnailUtilsLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -281,7 +282,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 				log("megaApi.getThumbnail");
 				if (this.node != null){
 					try {
-						/*thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, adapter);*/
+						thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, adapter);
 					} 
 					catch (Exception e) {
 					} // Too many AsyncTasks
@@ -598,7 +599,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 						else{ 
 //							new MediaDBTask(context, holder, megaApi, this).execute(node);
 							try{
-								/*thumb = ThumbnailUtils.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);*/
+								thumb = ThumbnailUtilsLollipop.getThumbnailFromMegaPhotoSyncList(node, context, holder, megaApi, this);
 							}
 							catch(Exception e){} //Too many AsyncTasks
 							
@@ -620,7 +621,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 						}
 						else{ 
 							try{
-								/*ThumbnailUtils.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);*/
+								ThumbnailUtilsLollipop.createThumbnailPhotoSyncList(context, node, holder, megaApi, this);
 							}
 							catch(Exception e){} //Too many AsyncTasks
 						}
