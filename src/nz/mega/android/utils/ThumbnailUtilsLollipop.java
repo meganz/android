@@ -15,16 +15,18 @@ import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.ThumbnailCache;
 import nz.mega.android.MegaBrowserGridAdapter.ViewHolderBrowserGrid;
-import nz.mega.android.MegaBrowserListAdapter.ViewHolderBrowserList;
 import nz.mega.android.MegaBrowserNewGridAdapter.ViewHolderBrowserNewGrid;
 import nz.mega.android.MegaExplorerAdapter.ViewHolderExplorer;
 import nz.mega.android.MegaFullScreenImageAdapter.ViewHolderFullImage;
-import nz.mega.android.MegaPhotoSyncListAdapter.ViewHolderPhotoSyncList;
 import nz.mega.android.NavigationDrawerAdapter.ViewHolderNavigationDrawer;
+import nz.mega.android.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
+import nz.mega.android.lollipop.MegaBrowserLollipopAdapter;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter;
 import nz.mega.android.lollipop.MegaPhotoSyncGridAdapterLollipop;
+import nz.mega.android.lollipop.MegaPhotoSyncListAdapterLollipop;
 import nz.mega.android.lollipop.MegaExplorerLollipopAdapter.ViewHolderExplorerLollipop;
 import nz.mega.android.lollipop.MegaPhotoSyncGridAdapterLollipop.ViewHolderPhotoSyncGrid;
+import nz.mega.android.lollipop.MegaPhotoSyncListAdapterLollipop.ViewHolderPhotoSyncList;
 import nz.mega.android.lollipop.MegaTransfersLollipopAdapter;
 import nz.mega.android.lollipop.MegaTransfersLollipopAdapter.ViewHolderTransfer;
 import nz.mega.android.lollipop.providers.MegaProviderLollipopAdapter;
@@ -68,9 +70,9 @@ public class ThumbnailUtilsLollipop {
 	static class ThumbnailDownloadListenerPhotoSyncList implements MegaRequestListenerInterface{
 		Context context;
 		ViewHolderPhotoSyncList holder;
-		MegaPhotoSyncListAdapter adapter;
+		MegaPhotoSyncListAdapterLollipop adapter;
 		
-		ThumbnailDownloadListenerPhotoSyncList(Context context, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapter adapter){
+		ThumbnailDownloadListenerPhotoSyncList(Context context, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapterLollipop adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -206,10 +208,10 @@ public class ThumbnailUtilsLollipop {
 	
 	static class ThumbnailDownloadListenerListBrowser implements MegaRequestListenerInterface{
 		Context context;
-		ViewHolderBrowserList holder;
-		MegaBrowserListAdapter adapter;
+		ViewHolderBrowser holder;
+		MegaBrowserLollipopAdapter adapter;
 		
-		ThumbnailDownloadListenerListBrowser(Context context, ViewHolderBrowserList holder, MegaBrowserListAdapter adapter){
+		ThumbnailDownloadListenerListBrowser(Context context, ViewHolderBrowser holder, MegaBrowserLollipopAdapter adapter){
 			this.context = context;
 			this.holder = holder;
 			this.adapter = adapter;
@@ -753,7 +755,7 @@ public class ThumbnailUtilsLollipop {
 
 	}
 	
-	public static Bitmap getThumbnailFromMegaList(MegaNode document, Context context, ViewHolderBrowserList viewHolder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
+	public static Bitmap getThumbnailFromMegaList(MegaNode document, Context context, ViewHolderBrowser viewHolder, MegaApiAndroid megaApi, MegaBrowserLollipopAdapter adapter){
 		
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");
@@ -775,7 +777,7 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 	
-	public static Bitmap getThumbnailFromMegaPhotoSyncList(MegaNode document, Context context, ViewHolderPhotoSyncList viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapter adapter){
+	public static Bitmap getThumbnailFromMegaPhotoSyncList(MegaNode document, Context context, ViewHolderPhotoSyncList viewHolder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapterLollipop adapter){
 		
 //		if (pendingThumbnails.contains(document.getHandle()) || !document.hasThumbnail()){
 //			log("the thumbnail is already downloaded or added to the list");
@@ -1167,9 +1169,9 @@ public class ThumbnailUtilsLollipop {
 		File thumbFile;
 		ResizerParams param;
 		ViewHolderPhotoSyncList holder;
-		MegaPhotoSyncListAdapter adapter;
+		MegaPhotoSyncListAdapterLollipop adapter;
 		
-		AttachThumbnailTaskPhotoSyncList(Context context, MegaApiAndroid megaApi, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapter adapter)
+		AttachThumbnailTaskPhotoSyncList(Context context, MegaApiAndroid megaApi, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapterLollipop adapter)
 		{
 			this.context = context;
 			this.megaApi = megaApi;
@@ -1199,7 +1201,7 @@ public class ThumbnailUtilsLollipop {
 		}
 	}
 	
-	private static void onThumbnailGeneratedPhotoSyncList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapter adapter){
+	private static void onThumbnailGeneratedPhotoSyncList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderPhotoSyncList holder, MegaPhotoSyncListAdapterLollipop adapter){
 		log("onPreviewGenerated");
 		//Tengo que mostrarla
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1218,10 +1220,10 @@ public class ThumbnailUtilsLollipop {
 		MegaApiAndroid megaApi;
 		File thumbFile;
 		ResizerParams param;
-		ViewHolderBrowserList holder;
-		MegaBrowserListAdapter adapter;
+		ViewHolderBrowser holder;
+		MegaBrowserLollipopAdapter adapter;
 		
-		AttachThumbnailTaskList(Context context, MegaApiAndroid megaApi, ViewHolderBrowserList holder, MegaBrowserListAdapter adapter)
+		AttachThumbnailTaskList(Context context, MegaApiAndroid megaApi, ViewHolderBrowser holder, MegaBrowserLollipopAdapter adapter)
 		{
 			this.context = context;
 			this.megaApi = megaApi;
@@ -1251,7 +1253,7 @@ public class ThumbnailUtilsLollipop {
 		}
 	}	
 		
-	private static void onThumbnailGeneratedList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderBrowserList holder, MegaBrowserListAdapter adapter){
+	private static void onThumbnailGeneratedList(MegaApiAndroid megaApi, File thumbFile, MegaNode document, ViewHolderBrowser holder, MegaBrowserLollipopAdapter adapter){
 		log("onPreviewGenerated");
 		//Tengo que mostrarla
 		BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1264,7 +1266,7 @@ public class ThumbnailUtilsLollipop {
 		log("AttachThumbnailTask end");		
 	}
 	
-	public static void createThumbnailPhotoSyncList(Context context, MegaNode document, ViewHolderPhotoSyncList holder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapter adapter){
+	public static void createThumbnailPhotoSyncList(Context context, MegaNode document, ViewHolderPhotoSyncList holder, MegaApiAndroid megaApi, MegaPhotoSyncListAdapterLollipop adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
@@ -1283,7 +1285,7 @@ public class ThumbnailUtilsLollipop {
 		
 	}
 	
-	public static void createThumbnailList(Context context, MegaNode document, ViewHolderBrowserList holder, MegaApiAndroid megaApi, MegaBrowserListAdapter adapter){
+	public static void createThumbnailList(Context context, MegaNode document, ViewHolderBrowser holder, MegaApiAndroid megaApi, MegaBrowserLollipopAdapter adapter){
 		
 		if (!MimeTypeList.typeForName(document.getName()).isImage()) {
 			log("no image");
