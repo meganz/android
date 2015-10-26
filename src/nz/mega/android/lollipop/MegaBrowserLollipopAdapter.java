@@ -641,6 +641,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				else if(type==ManagerActivityLollipop.FOLDER_LINK_ADAPTER){
 					((FolderLinkActivityLollipop) context).itemClick(currentPosition);
 				}
+				else if(type==ManagerActivityLollipop.SEARCH_ADAPTER){
+					((SearchFragmentLollipop) fragment).itemClick(currentPosition);
+				}
 				else{
 					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
 				}				

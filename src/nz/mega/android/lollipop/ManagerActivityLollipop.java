@@ -30,7 +30,6 @@ import nz.mega.android.OldPreferences;
 import nz.mega.android.PaymentFragment;
 import nz.mega.android.Product;
 import nz.mega.android.R;
-import nz.mega.android.SearchFragment;
 import nz.mega.android.SettingsActivity;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.SortByDialogActivity;
@@ -308,7 +307,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private UpgradeAccountFragment upAF;
 	private PaymentFragment pF;
 	private CreditCardFragment ccF;
-	private SearchFragment sF;
 	private CameraUploadFragmentLollipop cuF;
 	
 	//LOLLIPOP FRAGMENTS
@@ -323,6 +321,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private SentRequestsFragmentLollipop sRFLol;
 	private MyAccountFragmentLollipop maFLol;
 	private TransfersFragmentLollipop tFLol;
+	private SearchFragmentLollipop sFLol;
 	
 	ProgressDialog statusDialog;
 	
@@ -2058,26 +2057,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case SEARCH:{
     					
-    			if (sF == null){
-        			sF = new SearchFragment();
+    			if (sFLol == null){
+    				sFLol = new SearchFragmentLollipop();
         		}
     			
     			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
     			
     			drawerItem = DrawerItem.SEARCH;
     			
-    			sF.setSearchNodes(searchNodes);
-    			sF.setNodes(searchNodes);
-    			sF.setSearchQuery(searchQuery);
-    			sF.setParentHandle(parentHandleSearch);
-    			sF.setLevels(levelsSearch);
+    			sFLol.setSearchNodes(searchNodes);
+    			sFLol.setNodes(searchNodes);
+    			sFLol.setSearchQuery(searchQuery);
+    			sFLol.setParentHandle(parentHandleSearch);
+    			sFLol.setLevels(levelsSearch);
     			
+    			mTabHostCDrive.setVisibility(View.GONE);    			
+    			viewPagerCDrive.setVisibility(View.GONE);
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, sF, "sF");
+				ft.replace(R.id.fragment_container, sFLol, "sFLol");
     			ft.commit();
     			
     			if (createFolderMenuItem != null){
@@ -2974,7 +2975,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	    
 	    else if (drawerItem == DrawerItem.SEARCH){
-	    	if (sF != null){			
+	    	if (sFLol != null){			
 				if (createFolderMenuItem != null){
 					
 					//Show
@@ -3168,9 +3169,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				return true;
 		    			}
 		    		}
-		    		if (sF != null){
+		    		if (sFLol != null){
 		    			if (drawerItem == DrawerItem.SEARCH){
-		    				sF.onBackPressed();
+		    				sFLol.onBackPressed();
 		    				return true;
 		    			}
 		    		}
@@ -4617,7 +4618,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				return;
     			}
     		}
+    	}		
+		else if (drawerItem == DrawerItem.SEARCH){
+    		if (sFLol != null){
+    			if (sFLol.onBackPressed() == 0){
+    				drawerItem = DrawerItem.CLOUD_DRIVE;
+    				if (nV != null){
+						Menu nVMenu = nV.getMenu();
+						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+						cloudDrive.setChecked(true);
+					}
+    				selectDrawerItemLollipop(drawerItem);
+    				return;
+    			}
+    		}
     	}
+
+		
 	}
 	
 	@Override
@@ -6133,6 +6150,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (rbFLol != null){
 					rbFLol.showOptionsPanel(node);
 				}				
+			}
+		}
+		else if(drawerItem == DrawerItem.SEARCH){
+			if (sFLol != null){				
+				sFLol.showOptionsPanel(node);				
 			}
 		}
 		else if (drawerItem == DrawerItem.INBOX){
