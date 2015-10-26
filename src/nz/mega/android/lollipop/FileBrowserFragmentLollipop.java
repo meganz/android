@@ -154,7 +154,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	        int position = listView.getChildPosition(view);
 
 	        // handle long press
-			if (adapterList.getPositionClicked() == -1){
+	        if (!adapterList.isMultipleSelect()){
 				adapterList.setMultipleSelect(true);
 			
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
