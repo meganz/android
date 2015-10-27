@@ -186,9 +186,14 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					((ManagerActivityLollipop) context).moveToTrash(handleList);
 					break;
 				}
-				
-				
-				
+				case R.id.cab_menu_select_all:{
+					selectAll();
+					break;
+				}
+				case R.id.cab_menu_unselect_all:{
+					clearSelections();
+					break;
+				}				
 			}
 			return false;
 		}
@@ -775,6 +780,38 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		if (actionMode != null) {
 			actionMode.finish();
 		}
+	}
+	
+	public void selectAll(){
+		log("selectAll");
+//		if (isList){
+			if(adapterList.isMultipleSelect()){
+				adapterList.selectAll();
+			}
+			else{			
+				
+				adapterList.setMultipleSelect(true);
+				adapterList.selectAll();
+				
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			}
+			
+			updateActionModeTitle();
+//		}
+//		else{
+//			if (adapterGrid != null){
+//				adapterGrid.selectAll();
+//			}
+//		}
+	}
+	
+	public boolean showSelectMenuItem(){
+
+		if (adapterList != null){
+			return adapterList.isMultipleSelect();
+		}
+		
+		return false;
 	}
 	
 	public int onBackPressed(){

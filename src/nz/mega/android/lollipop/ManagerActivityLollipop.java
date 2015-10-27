@@ -2061,6 +2061,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				sFLol = new SearchFragmentLollipop();
         		}
     			
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					hidden.setChecked(true);
+				}
+    			
     			searchNodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
     			
     			drawerItem = DrawerItem.SEARCH;
@@ -2977,11 +2983,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    else if (drawerItem == DrawerItem.SEARCH){
 	    	if (sFLol != null){			
 				if (createFolderMenuItem != null){
-					
-					//Show
-	    			upgradeAccountMenuItem.setVisible(false);	    			
-
 					//Hide
+	    			upgradeAccountMenuItem.setVisible(false);	    			
+					cancelAllTransfersMenuItem.setVisible(false);
 	    			thumbViewMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
@@ -2990,7 +2994,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			addMenuItem.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
 	    			sortByMenuItem.setVisible(false);
-	    			selectMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			changePass.setVisible(false); 
 	    			exportMK.setVisible(false); 
@@ -3005,6 +3008,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
+					
+					//Show
+	    			selectMenuItem.setVisible(true);
 				}
 			}
 		}
@@ -3433,6 +3439,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		if (iFLol != null){	        		
 	        			iFLol.selectAll();
 	    				if (iFLol.showSelectMenuItem()){
+	        				selectMenuItem.setVisible(true);
+	        				unSelectMenuItem.setVisible(false);
+	        			}
+	        			else{
+	        				selectMenuItem.setVisible(false);
+	        				unSelectMenuItem.setVisible(true);
+	        			}
+	        		}
+    			}
+	        	if (drawerItem == DrawerItem.SEARCH){
+	        		if (sFLol != null){	        		
+	        			sFLol.selectAll();
+	    				if (sFLol.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
 	        			}
@@ -4632,9 +4651,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				return;
     			}
     		}
-    	}
-
-		
+    	}		
 	}
 	
 	@Override
