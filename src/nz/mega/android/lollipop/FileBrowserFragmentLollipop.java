@@ -8,7 +8,6 @@ import java.util.List;
 
 import nz.mega.android.CreateThumbPreviewService;
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaBrowserNewGridAdapter;
 import nz.mega.android.MegaPreferences;
@@ -1071,7 +1070,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				else{
 					//Is file
 					if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
+						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 						intent.putExtra("position", position);
 						intent.putExtra("adapterType", ManagerActivityLollipop.FILE_BROWSER_ADAPTER);
 						intent.putExtra("isFolderLink", false);
