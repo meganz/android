@@ -7,11 +7,9 @@ import java.util.List;
 
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MimeTypeList;
-import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
 import nz.mega.android.lollipop.CameraUploadFragmentLollipop.PhotoSyncHolder;
 import nz.mega.android.utils.PreviewUtils;
-import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.ThumbnailUtilsLollipop;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -21,7 +19,6 @@ import nz.mega.sdk.MegaUtils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -33,20 +30,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
 
@@ -144,7 +134,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			boolean previewCreated = false;
 			
 			File previewDir = PreviewUtils.getPreviewFolder(context);
-			File thumbDir = ThumbnailUtils.getThumbFolder(context);
+			File thumbDir = ThumbnailUtilsLollipop.getThumbFolder(context);
 			File previewFile = new File(previewDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
 			File thumbFile = new File(thumbDir, MegaApiAndroid.handleToBase64(node.getHandle())+".jpg");
 							
@@ -304,14 +294,14 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			else{
 				log("From folder: " + res);
 				if (this.node != null){
-					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 					if (thumb != null) {
 						if ((holder.document == node.getHandle())){
 							holder.imageView.setImageBitmap(thumb);
 						}
 					} 
 					else {
-						thumb = ThumbnailUtils
+						thumb = ThumbnailUtilsLollipop
 								.getThumbnailFromFolder(node, context);
 						if (thumb != null) {
 							if ((holder.document == node.getHandle())){
@@ -587,12 +577,12 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 				holder.imageView.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 				
 				if (node.hasThumbnail()){
-					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
-						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}
@@ -610,12 +600,12 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 					}
 				}
 				else{
-					thumb = ThumbnailUtils.getThumbnailFromCache(node);
+					thumb = ThumbnailUtilsLollipop.getThumbnailFromCache(node);
 					if (thumb != null){
 						holder.imageView.setImageBitmap(thumb);
 					}
 					else{
-						thumb = ThumbnailUtils.getThumbnailFromFolder(node, context);
+						thumb = ThumbnailUtilsLollipop.getThumbnailFromFolder(node, context);
 						if (thumb != null){
 							holder.imageView.setImageBitmap(thumb);
 						}

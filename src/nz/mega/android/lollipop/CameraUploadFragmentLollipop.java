@@ -13,6 +13,7 @@ import nz.mega.android.CreateThumbPreviewService;
 import nz.mega.android.DatabaseHandler;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaPreferences;
+import nz.mega.android.MegaStreamingService;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
 import nz.mega.android.utils.Util;
@@ -1154,11 +1155,75 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public void itemClick(int position) {
 		log("itemClick");
 		
+		PhotoSyncHolder psHPosition = nodesArray.get(position);
+		
 		if (isList){
 			if (adapterList.isMultipleSelect()){
 				adapterList.toggleSelection(position);
 				updateActionModeTitle();
 				adapterList.notifyDataSetChanged();
+			}
+			else{
+				if (psHPosition.isNode){
+					MegaNode psHMegaNode = megaApi.getNodeByHandle(psHPosition.handle);
+					if (psHMegaNode != null){
+						if (MimeTypeList.typeForName(psHMegaNode.getName()).isImage()){
+							int positionInNodes = 0;
+							for (int i=0;i<nodes.size();i++){
+								if(nodes.get(i).getHandle() == psHMegaNode.getHandle()){
+									positionInNodes = i;
+								}
+							}
+							Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+							intent.putExtra("position", positionInNodes);
+							intent.putExtra("adapterType", ManagerActivityLollipop.FILE_BROWSER_ADAPTER);
+							intent.putExtra("isFolderLink", false);
+							if (megaApi.getParentNode(psHMegaNode).getType() == MegaNode.TYPE_ROOT){
+								intent.putExtra("parentNodeHandle", -1L);
+							}
+							else{
+								intent.putExtra("parentNodeHandle", megaApi.getParentNode(psHMegaNode).getHandle());
+							}
+							intent.putExtra("orderGetChildren", orderGetChildren);
+							startActivity(intent);
+									
+						}
+						else if (MimeTypeList.typeForName(psHMegaNode.getName()).isVideo() || MimeTypeList.typeForName(psHMegaNode.getName()).isAudio() ){
+							Intent service = new Intent(context, MegaStreamingService.class);
+					  		context.startService(service);
+					  		String fileName = psHMegaNode.getName();
+							try {
+								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
+							} 
+							catch (UnsupportedEncodingException e) {
+								e.printStackTrace();
+							}
+							
+					  		String url = "http://127.0.0.1:4443/" + psHMegaNode.getBase64Handle() + "/" + fileName;
+					  		String mimeType = MimeTypeList.typeForName(psHMegaNode.getName()).getType();
+					  		System.out.println("FILENAME: " + fileName);
+					  		
+					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
+					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
+					  		if (ManagerActivityLollipop.isIntentAvailable(context, mediaIntent)){
+					  			startActivity(mediaIntent);
+					  		}
+					  		else{
+					  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+					  			adapterList.notifyDataSetChanged();
+								ArrayList<Long> handleList = new ArrayList<Long>();
+								handleList.add(psHMegaNode.getHandle());
+								((ManagerActivityLollipop) context).onFileClick(handleList);
+					  		}
+						}
+						else{
+							adapterList.notifyDataSetChanged();
+							ArrayList<Long> handleList = new ArrayList<Long>();
+							handleList.add(psHMegaNode.getHandle());
+							((ManagerActivityLollipop) context).onFileClick(handleList);
+						}
+					}
+				}
 			}
 		}
 	}

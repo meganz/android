@@ -182,6 +182,14 @@
         </activity>
         
         <activity
+            android:name="nz.mega.android.lollipop.FullScreenImageViewerLollipop"
+            android:label="@string/full_screen_image_viewer_label"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Megaactionbar.FullScreen"
+            android:uiOptions="splitActionBarWhenNarrow" >
+        </activity>
+        
+        <activity
             android:name="SecureSelfiePreviewActivity"
             android:label="@string/full_screen_image_viewer_label"
             android:launchMode="singleTop"
