@@ -175,7 +175,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	    loginTitle = (TextView) findViewById(R.id.login_text_view);
 		//Left margin
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)loginTitle.getLayoutParams();
-		textParams.setMargins(Util.scaleHeightPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		loginTitle.setLayoutParams(textParams);
 		
 		loginTitle.setText(R.string.login_text);

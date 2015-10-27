@@ -1,0 +1,87 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+	<LinearLayout
+	    android:id="@+id/sortby_dialog_layout"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical">
+	    
+	    <TextView 
+	        android:id="@+id/sortby_dialog_name_text"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textStyle="bold"/>
+	    
+	    <CheckedTextView
+		    android:id="@+id/sortby_dialog_ascending_check"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+		    android:ellipsize="marquee"
+		    android:gravity="center_vertical"
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>	    
+	    
+	    <CheckedTextView
+		    android:id="@+id/sortby_dialog_descending_check"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+		    android:ellipsize="marquee"
+		    android:gravity="center_vertical"
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+	    
+	    
+	    <TextView 
+	        android:id="@+id/sortby_dialog_date_text"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textStyle="bold"/>	    
+	    
+	    <CheckedTextView
+		    android:id="@+id/sortby_dialog_newest_check"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+		    android:ellipsize="marquee"
+		    android:gravity="center_vertical"
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+	    
+	    <CheckedTextView
+		    android:id="@+id/sortby_dialog_oldest_check"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+		    android:ellipsize="marquee"
+		    android:gravity="center_vertical"
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+		
+		<TextView 
+	        android:id="@+id/sortby_dialog_size_text"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:textStyle="bold"/>
+	    
+	    <CheckedTextView
+		    android:id="@+id/sortby_dialog_largest_first_check"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+		    android:ellipsize="marquee"
+		    android:gravity="center_vertical"
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+	    
+	    <CheckedTextView
+		    android:id="@+id/sortby_dialog_smallest_first_check"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:drawableLeft="?android:attr/listChoiceIndicatorSingle"
+		    android:ellipsize="marquee"
+		    android:gravity="center_vertical"
+		    android:textAppearance="?android:attr/textAppearanceMedium"/>
+	    -->
+	</LinearLayout>
+</ScrollView>

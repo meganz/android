@@ -524,17 +524,17 @@
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">The zip file will be downloaded and unzipped</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">The zip file will be unzipped </string>
     
-    <string name="sortby_name" context="category in sort by action">By name</string>
-    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascending</string>
-    <string name="sortby_name_descending" context="sort files alphabetically descending">descending</string>
+    <string name="sortby_name" context="category in sort by action">Name</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascending</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">Descending</string>
     
-    <string name="sortby_date" context="category in sort by action">By date</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">newest</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">oldest</string>
+    <string name="sortby_date" context="category in sort by action">Date</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">Newest</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">Oldest</string>
     
-    <string name="sortby_size" context="category in sort by action">By size</string>
-    <string name="sortby_size_largest_first" context="sort files by size largest first">largest first</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">smallest first</string>
+    <string name="sortby_size" context="category in sort by action">Size</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Largest</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">Smallest</string>
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">per month</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">per year</string>
