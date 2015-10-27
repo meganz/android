@@ -158,6 +158,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final public static int OFFLINE_ADAPTER = 2004;
 	final public static int FOLDER_LINK_ADAPTER = 2005;
 	final public static int SEARCH_ADAPTER = 2006;
+	final public static int PHOTO_SYNC_ADAPTER = 2007;
+	final public static int ZIP_ADAPTER = 2008;
 	final public static int OUTGOING_SHARES_ADAPTER = 2009;
 	final public static int INCOMING_SHARES_ADAPTER = 2010;
 	final public static int INBOX_ADAPTER = 2011;
@@ -6091,7 +6093,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	public void cameraUploadsClicked(){
 		log("cameraUplaodsClicked");
-		drawerItem = DrawerItem.CAMERA_UPLOADS;		
+		drawerItem = DrawerItem.CAMERA_UPLOADS;
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem hidden = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+			hidden.setChecked(true);
+		}
 		selectDrawerItemLollipop(drawerItem);		
 	}
 	
