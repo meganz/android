@@ -278,11 +278,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			if(adapterList.isMultipleSelect()){
 				adapterList.selectAll();
 			}
-			else{
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-				
+			else{					
 				adapterList.setMultipleSelect(true);
 				adapterList.selectAll();
+				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 			}
 			
 			updateActionModeTitle();
