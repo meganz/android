@@ -2526,9 +2526,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		rubbishBinMenuItem = menu.findItem(R.id.action_rubbish_bin);
 		clearRubbishBinMenuitem = menu.findItem(R.id.action_menu_clear_rubbish_bin);
 		cancelAllTransfersMenuItem = menu.findItem(R.id.action_menu_cancel_all_transfers);
-		
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
+		cancelAllTransfersMenuItem.setVisible(false);
+
 		
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
@@ -3112,6 +3113,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					playTransfersMenuIcon.setVisible(true);
 					pauseTransfersMenuIcon.setVisible(false);
 				}
+
 			}
 	    }
 	    
