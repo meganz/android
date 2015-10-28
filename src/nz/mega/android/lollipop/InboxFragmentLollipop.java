@@ -342,7 +342,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
 			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.INBOX_ADAPTER);
+				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);

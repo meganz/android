@@ -436,7 +436,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			}
 
 			if (adapter == null) {
-				adapter = new MegaBrowserLollipopAdapter(context, this, contactNodes, -1,listView, aB,ManagerActivityLollipop.CONTACT_FILE_ADAPTER);
+				adapter = new MegaBrowserLollipopAdapter(context, this, contactNodes, -1,listView, aB,ManagerActivityLollipop.CONTACT_FILE_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				if (mTHash != null){
 					adapter.setTransfers(mTHash);
 				}

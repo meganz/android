@@ -328,7 +328,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
 			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
+				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
 				adapterList.setParentHandle(parentHandle);

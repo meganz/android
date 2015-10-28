@@ -650,7 +650,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				supportInvalidateOptionsMenu();
 				
 				if (adapterList == null){
-					adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, ManagerActivityLollipop.FOLDER_LINK_ADAPTER);
+					adapterList = new MegaBrowserLollipopAdapter(this, null, nodes, parentHandle, listView, aB, ManagerActivityLollipop.FOLDER_LINK_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				}
 				else{
 					adapterList.setParentHandle(parentHandle);

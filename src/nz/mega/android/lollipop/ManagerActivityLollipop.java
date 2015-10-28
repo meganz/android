@@ -3505,27 +3505,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        case R.id.action_grid:{	    			
 	        	//TODO: gridView
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		if (fbFLol != null){	        		
-	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("fbFLol");
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(currentFragment);
-	        			fragTransaction.commit();
+	        		int index = viewPagerCDrive.getCurrentItem();
+	    			if(index==1){	
+	    				//Rubbish Bin
+	    				/*String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+	    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	    				if (rbFLol != null){
+	    					if (rbFLol.onBackPressed() == 0){
+	    						super.onBackPressed();
+	    						return;
+	    					}
+	    				}*/
+	    			}
+	    			else if(index==0){
+	    				//Cloud Drive
+	    				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+	    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	    				if (fbFLol != null){
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(fbFLol);
+		        			fragTransaction.commit();
 
-	        			isListCloudDrive = !isListCloudDrive;
-	        			if (isListCloudDrive){	
-		    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
-						}
-						else{
-							thumbViewMenuItem.setTitle(getString(R.string.action_list));
-		    			}
-	        			fbFLol.setIsList(isListCloudDrive);
-	        			fbFLol.setParentHandle(parentHandleBrowser);
+		        			isListCloudDrive = !isListCloudDrive;
+		        			if (isListCloudDrive){	
+			    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+							}
+							else{
+								thumbViewMenuItem.setTitle(getString(R.string.action_list));
+			    			}
+		        			fbFLol.setIsList(isListCloudDrive);
+		        			fbFLol.setParentHandle(parentHandleBrowser);
 
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(currentFragment);
-	        			fragTransaction.commit();
-
-	        		}
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(fbFLol);
+		        			fragTransaction.commit();
+	    				}
+	    			}
 	        	}
 	        	if (drawerItem == DrawerItem.CONTACTS){
 		        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
@@ -6412,7 +6427,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 				fbFLol.setOrder(orderGetChildren);
 				fbFLol.setNodes(nodes);
-				fbFLol.getListView().invalidate();						
+				fbFLol.getRecyclerView().invalidate();						
 			}
 		}
 		else{
@@ -6420,7 +6435,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 				fbFLol.setOrder(orderGetChildren);
 				fbFLol.setNodes(nodes);
-				fbFLol.getListView().invalidate();					
+				fbFLol.getRecyclerView().invalidate();					
 			}
 		}
 	}
@@ -7069,14 +7084,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (fbFLol != null){						
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						fbFLol.setNodes(nodes);
-						fbFLol.getListView().invalidate();						
+						fbFLol.getRecyclerView().invalidate();						
 					}
 				}
 				else{
 					if (fbFLol != null){						
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 						fbFLol.setNodes(nodes);
-						fbFLol.getListView().invalidate();						
+						fbFLol.getRecyclerView().invalidate();						
 					}
 				}
 			}
@@ -7147,7 +7162,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
 						fbFLol.setOrder(orderGetChildren);
 						fbFLol.setNodes(nodes);
-						fbFLol.getListView().invalidate();						
+						fbFLol.getRecyclerView().invalidate();						
 					}
 				}
 				else{
@@ -7155,7 +7170,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
 						fbFLol.setOrder(orderGetChildren);
 						fbFLol.setNodes(nodes);
-						fbFLol.getListView().invalidate();					
+						fbFLol.getRecyclerView().invalidate();					
 					}
 				}
 			}
@@ -7711,7 +7726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (fbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
-    						fbFLol.getListView().invalidate();
+    						fbFLol.getRecyclerView().invalidate();
         				}	        			
 					}
 					else{
@@ -7734,7 +7749,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				if (fbFLol != null){
 	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 	    						fbFLol.setNodes(nodes);
-	    						fbFLol.getListView().invalidate();
+	    						fbFLol.getRecyclerView().invalidate();
 	        				}
 	        			}
 					}					
@@ -7761,7 +7776,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				if (fbFLol != null){
 	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 	    						fbFLol.setNodes(nodes);
-	    						fbFLol.getListView().invalidate();
+	    						fbFLol.getRecyclerView().invalidate();
 	        				}
 						}
 					}
@@ -7801,7 +7816,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (fbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
-    						fbFLol.getListView().invalidate();
+    						fbFLol.getRecyclerView().invalidate();
         				}
 					}
 				}
@@ -7816,7 +7831,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (fbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
-    						fbFLol.getListView().invalidate();
+    						fbFLol.getRecyclerView().invalidate();
         				}						
 					}
 				}	
@@ -7952,7 +7967,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (fbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
-    						fbFLol.getListView().invalidate();
+    						fbFLol.getRecyclerView().invalidate();
         				}
         			}
 				}	
@@ -8037,7 +8052,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (fbFLol != null){					
     						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
     						fbFLol.setNodes(nodes);
-    						fbFLol.getListView().invalidate();
+    						fbFLol.getRecyclerView().invalidate();
     					}
         			}					
 				}
@@ -8130,7 +8145,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				if (fbFLol != null){						
 								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 								fbFLol.setNodes(nodes);
-								fbFLol.getListView().invalidate();
+								fbFLol.getRecyclerView().invalidate();
 							}
 	        			}		
 					}										
@@ -8164,7 +8179,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (drawerItem == DrawerItem.CLOUD_DRIVE){
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 						fbFLol.setNodes(nodes);
-						fbFLol.getListView().invalidate();
+						fbFLol.getRecyclerView().invalidate();
 					}
 				}
 			}
@@ -8227,7 +8242,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(fbFLol.getParentHandle()), orderGetChildren);
 					fbFLol.setNodes(nodes);
 					fbFLol.setContentText();
-					fbFLol.getListView().invalidate();
+					fbFLol.getRecyclerView().invalidate();
 				}
 			}
 			if (rbFLol != null){
