@@ -520,17 +520,17 @@
     <string name="ZIP_download_permission" context="A compressed file will be downloaded and decompressed.">El fichero zip será descargado y descomprimido</string>
     <string name="ZIP_unzip_permission" context="A compressed file will be decompressed.">El fichero zip será descomprimido</string>
 
-    <string name="sortby_name" context="category in sort by action">Por nombre</string>
-    <string name="sortby_name_ascending" context="sort files alphabetically ascending">ascendente</string>
-    <string name="sortby_name_descending" context="sort files alphabetically descending">descendente</string>
+    <string name="sortby_name" context="category in sort by action">Nombre</string>
+    <string name="sortby_name_ascending" context="sort files alphabetically ascending">Ascendente</string>
+    <string name="sortby_name_descending" context="sort files alphabetically descending">Descendente</string>
     
-    <string name="sortby_date" context="category in sort by action">Por fecha</string>
-    <string name="sortby_date_newest" context="sort files by date newest first">la más reciente</string>
-    <string name="sortby_date_oldest" context="sort files by date oldest first">la más antigua</string>
+    <string name="sortby_date" context="category in sort by action">Fecha</string>
+    <string name="sortby_date_newest" context="sort files by date newest first">Más reciente</string>
+    <string name="sortby_date_oldest" context="sort files by date oldest first">Más antigua</string>
     
-    <string name="sortby_size" context="category in sort by action">Por tamaño</string>
-    <string name="sortby_size_largest_first" context="sort files by size largest first">más grande</string>
-    <string name="sortby_size_smallest_first" context="sort files by size smallest first">más pequeña</string>
+    <string name="sortby_size" context="category in sort by action">Tamaño</string>
+    <string name="sortby_size_largest_first" context="sort files by size largest first">Más grande</string>
+    <string name="sortby_size_smallest_first" context="sort files by size smallest first">Más pequeña</string>
     
     <string name="per_month" context="in payments, for example: 4.99€ per month">al mes</string>
     <string name="per_year" context="in payments, for example: 49.99€ per year">al año</string>

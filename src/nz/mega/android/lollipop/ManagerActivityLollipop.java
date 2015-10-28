@@ -117,6 +117,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckedTextView;
@@ -198,6 +199,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	Handler handler;
     ArrayList<MegaTransfer> tL;	
 	DisplayMetrics outMetrics;
+    float scaleText;
     FrameLayout fragmentContainer;
 	boolean tranfersPaused = false;	
     Toolbar tB;
@@ -708,6 +710,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
+	    if (scaleH < scaleW){
+	    	scaleText = scaleH;
+	    }
+	    else{
+	    	scaleText = scaleW;
+	    }
 	    
 	    if (dbH.getCredentials() == null){
 	    	if (OldPreferences.getOldCredentials(this) != null){
@@ -3715,82 +3723,162 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_menu_sort_by:{
+	        	
+        		AlertDialog sortByDialog;		        		
+        		LayoutInflater inflater = getLayoutInflater();
+        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
+        		
+        		TextView sortByNameTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_name_text);
+        		sortByNameTV.setText(getString(R.string.sortby_name));
+        		ViewGroup.MarginLayoutParams nameMLP = (ViewGroup.MarginLayoutParams) sortByNameTV.getLayoutParams();
+        		sortByNameTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));		        		
+        		nameMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics)); 
+        		
+        		TextView sortByDateTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_date_text);
+        		sortByDateTV.setText(getString(R.string.sortby_date));
+        		ViewGroup.MarginLayoutParams dateMLP = (ViewGroup.MarginLayoutParams) sortByDateTV.getLayoutParams();
+        		sortByDateTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		dateMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		TextView sortBySizeTV = (TextView) dialoglayout.findViewById(R.id.sortby_dialog_size_text);
+        		sortBySizeTV.setText(getString(R.string.sortby_size));
+        		ViewGroup.MarginLayoutParams sizeMLP = (ViewGroup.MarginLayoutParams) sortBySizeTV.getLayoutParams();
+        		sortBySizeTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		sizeMLP.setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		final CheckedTextView ascendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_ascending_check);
+        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
+        		ascendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		ascendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ViewGroup.MarginLayoutParams ascendingMLP = (ViewGroup.MarginLayoutParams) ascendingCheck.getLayoutParams();
+        		ascendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		final CheckedTextView descendingCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_descending_check);
+        		descendingCheck.setText(getString(R.string.sortby_name_descending));
+        		descendingCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		descendingCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ViewGroup.MarginLayoutParams descendingMLP = (ViewGroup.MarginLayoutParams) descendingCheck.getLayoutParams();
+        		descendingMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		final CheckedTextView newestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_newest_check);
+        		newestCheck.setText(getString(R.string.sortby_date_newest));
+        		newestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		newestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ViewGroup.MarginLayoutParams newestMLP = (ViewGroup.MarginLayoutParams) newestCheck.getLayoutParams();
+        		newestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		final CheckedTextView oldestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_oldest_check);
+        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
+        		oldestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		oldestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ViewGroup.MarginLayoutParams oldestMLP = (ViewGroup.MarginLayoutParams) oldestCheck.getLayoutParams();
+        		oldestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		final CheckedTextView largestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_largest_first_check);
+        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
+        		largestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		largestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ViewGroup.MarginLayoutParams largestMLP = (ViewGroup.MarginLayoutParams) largestCheck.getLayoutParams();
+        		largestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));
+        		
+        		final CheckedTextView smallestCheck = (CheckedTextView) dialoglayout.findViewById(R.id.sortby_dialog_smallest_first_check);
+        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
+        		smallestCheck.setTextSize(TypedValue.COMPLEX_UNIT_SP, (16*scaleText));
+        		smallestCheck.setCompoundDrawablePadding(Util.scaleWidthPx(10, outMetrics));
+        		ViewGroup.MarginLayoutParams smallestMLP = (ViewGroup.MarginLayoutParams) smallestCheck.getLayoutParams();
+        		smallestMLP.setMargins(Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(10, outMetrics));	
+		        		
+        		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+        		builder.setView(dialoglayout);
+        		builder.setTitle(getString(R.string.action_sort_by));
+		
+        		sortByDialog = builder.create();
+        		sortByDialog.show();
+        		if(drawerItem!=DrawerItem.CONTACTS){
+        		
+	        		switch(orderGetChildren){
+		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+		        			ascendingCheck.setChecked(true);
+		        			descendingCheck.setChecked(false);
+		        			newestCheck.setChecked(false);
+		        			oldestCheck.setChecked(false);
+		        			largestCheck.setChecked(false);
+		        			smallestCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(true);
+		        			newestCheck.setChecked(false);
+		        			oldestCheck.setChecked(false);
+		        			largestCheck.setChecked(false);
+		        			smallestCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_CREATION_DESC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(false);
+		        			newestCheck.setChecked(true);
+		        			oldestCheck.setChecked(false);
+		        			largestCheck.setChecked(false);
+		        			smallestCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_CREATION_ASC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(false);
+		        			newestCheck.setChecked(false);
+		        			oldestCheck.setChecked(true);
+		        			largestCheck.setChecked(false);
+		        			smallestCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_SIZE_ASC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(false);
+		        			newestCheck.setChecked(false);
+		        			oldestCheck.setChecked(false);
+		        			largestCheck.setChecked(false);
+		        			smallestCheck.setChecked(true);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_SIZE_DESC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(false);
+		        			newestCheck.setChecked(false);
+		        			oldestCheck.setChecked(false);
+		        			largestCheck.setChecked(true);
+		        			smallestCheck.setChecked(false);
+		        			break;
+		        		}
+	        		}
+	        	}
+        		else if(drawerItem==DrawerItem.CONTACTS){
+        			switch(orderContacts){
+		        		case MegaApiJava.ORDER_DEFAULT_ASC:{
+		        			ascendingCheck.setChecked(true);
+		        			descendingCheck.setChecked(false);
+		        			break;
+		        		}
+		        		case MegaApiJava.ORDER_DEFAULT_DESC:{
+		        			ascendingCheck.setChecked(false);
+		        			descendingCheck.setChecked(true);
+		        			break;
+		        		}
+	        		}		 
+        		}
+        		
+        		final AlertDialog dialog = sortByDialog;
 	        	switch(drawerItem){
 		        	case CONTACTS:{
-		        		AlertDialog sortByDialog;		        		
-		        		LayoutInflater inflater = getLayoutInflater();
-		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
-		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        		builder.setView(dialoglayout);
-		        		builder.setTitle(getString(R.string.action_sort_by));
-		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						});
 		        		
-		        		sortByDialog = builder.create();
-		        		sortByDialog.show();
-//		        		Util.brandAlertDialog(sortByDialog);
-		        		
-		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
-		        		byNameTextView.setText(getString(R.string.sortby_name));
-		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
-		        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
-		        		descendingCheck.setText(getString(R.string.sortby_name_descending));
-		        		
-		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
-		        		byDateTextView.setText(getString(R.string.sortby_date));
-		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
-		        		newestCheck.setText(getString(R.string.sortby_date_newest));
-		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
-		        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
-		        		
-		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
-		        		bySizeTextView.setText(getString(R.string.sortby_size));
-		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
-		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
-		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
-		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-		        		
-		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
-		        		separator4.setVisibility(View.GONE);
-		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
-		        		separator5.setVisibility(View.GONE);
-		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
-		        		separator6.setVisibility(View.GONE);
-		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
-		        		separator7.setVisibility(View.GONE);
-		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
-		        		separator8.setVisibility(View.GONE);
-		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
-		        		separator9.setVisibility(View.GONE);
-		        		
-		        		byDateTextView.setVisibility(View.GONE);
+		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-		        		bySizeTextView.setVisibility(View.GONE);
+		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
-		        		smallestCheck.setVisibility(View.GONE);
-		        		
-		        		switch(orderContacts){
-			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-			        			ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			break;
-			        		}
-		        		}
-		        		
-		        		final AlertDialog dialog = sortByDialog;
-		        		
+		        		smallestCheck.setVisibility(View.GONE);     		
+	        		
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 							
 							@Override
@@ -3820,79 +3908,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		break;
 		        	}
 		        	case SAVED_FOR_OFFLINE: {
-		        		AlertDialog sortByDialog;		        		
-		        		LayoutInflater inflater = getLayoutInflater();
-		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
-		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        		builder.setView(dialoglayout);
-		        		builder.setTitle(getString(R.string.action_sort_by));
-		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						});
 		        		
-		        		sortByDialog = builder.create();
-		        		sortByDialog.show();
-//		        		Util.brandAlertDialog(sortByDialog);
-		        		
-		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
-		        		byNameTextView.setText(getString(R.string.sortby_name));
-		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
-		        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
-		        		descendingCheck.setText(getString(R.string.sortby_name_descending));
-		        		
-		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
-		        		byDateTextView.setText(getString(R.string.sortby_date));
-		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
-		        		newestCheck.setText(getString(R.string.sortby_date_newest));
-		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
-		        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
-		        		
-		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
-		        		bySizeTextView.setText(getString(R.string.sortby_size));
-		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
-		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
-		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
-		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-		        		
-		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
-		        		separator4.setVisibility(View.GONE);
-		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
-		        		separator5.setVisibility(View.GONE);
-		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
-		        		separator6.setVisibility(View.GONE);
-		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
-		        		separator7.setVisibility(View.GONE);
-		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
-		        		separator8.setVisibility(View.GONE);
-		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
-		        		separator9.setVisibility(View.GONE);
-		        		
-		        		byDateTextView.setVisibility(View.GONE);
+		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-		        		bySizeTextView.setVisibility(View.GONE);
+		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
-		        		
-		        		switch(orderOffline){
-			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-			        			ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			break;
-			        		}
-		        		}
-		        		
-		        		final AlertDialog dialog = sortByDialog;
 		        		
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 							
@@ -3923,81 +3945,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        		break;
 		        		
 		        	}
-		        	case SHARED_ITEMS: {		        		
- 		
-		         		AlertDialog sortByDialog;		        		
-		        		LayoutInflater inflater = getLayoutInflater();
-		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
-		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        		builder.setView(dialoglayout);
-		        		builder.setTitle(getString(R.string.action_sort_by));
-		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						});
+		        	case SHARED_ITEMS: {	
 		        		
-		        		sortByDialog = builder.create();
-		        		sortByDialog.show();
-//		        		Util.brandAlertDialog(sortByDialog);
-		        		
-		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
-		        		byNameTextView.setText(getString(R.string.sortby_name));
-		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
-		        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
-		        		descendingCheck.setText(getString(R.string.sortby_name_descending));
-		        		
-		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
-		        		byDateTextView.setText(getString(R.string.sortby_date));
-		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
-		        		newestCheck.setText(getString(R.string.sortby_date_newest));
-		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
-		        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
-		        		
-		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
-		        		bySizeTextView.setText(getString(R.string.sortby_size));
-		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
-		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
-		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
-		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-		        		
-		        		View separator4 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator4);
-		        		separator4.setVisibility(View.GONE);
-		        		View separator5 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator5);
-		        		separator5.setVisibility(View.GONE);
-		        		View separator6 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator6);
-		        		separator6.setVisibility(View.GONE);
-		        		View separator7 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator7);
-		        		separator7.setVisibility(View.GONE);
-		        		View separator8 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator8);
-		        		separator8.setVisibility(View.GONE);
-		        		View separator9 = (View) sortByDialog.findViewById(R.id.sortby_dialog_separator9);
-		        		separator9.setVisibility(View.GONE);
-		        		
-		        		byDateTextView.setVisibility(View.GONE);
+		        		sortByDateTV.setVisibility(View.GONE);
 		        		newestCheck.setVisibility(View.GONE);
 		        		oldestCheck.setVisibility(View.GONE);
-		        		bySizeTextView.setVisibility(View.GONE);
+		        		sortBySizeTV.setVisibility(View.GONE);
 		        		largestCheck.setVisibility(View.GONE);
 		        		smallestCheck.setVisibility(View.GONE);
-		        		
-		        		switch(orderOffline){
-			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-			        			ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			break;
-			        		}
-		        		}
-		        		
-		        		final AlertDialog dialog = sortByDialog;
 		        		int tab =-1;
 		        				        		
 		        		if (viewPagerShares.getCurrentItem()==0){
@@ -4061,103 +4016,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		
 		        	}
 		        	case CLOUD_DRIVE:{
-		        		AlertDialog sortByDialog;		        		
-		        		LayoutInflater inflater = getLayoutInflater();
-		        		View dialoglayout = inflater.inflate(R.layout.sortby_dialog, null);
-		        		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        		builder.setView(dialoglayout);
-		        		builder.setTitle(getString(R.string.action_sort_by));
-		        		builder.setPositiveButton(getString(R.string.general_cancel), new DialogInterface.OnClickListener() {
-							
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						});
-		        		
-		        		sortByDialog = builder.create();
-		        		sortByDialog.show();
-//		        		Util.brandAlertDialog(sortByDialog);
-		        		
-		        		TextView byNameTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_name_text);
-		        		byNameTextView.setText(getString(R.string.sortby_name));
-		        		final CheckedTextView ascendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_ascending_check);
-		        		ascendingCheck.setText(getString(R.string.sortby_name_ascending));
-		        		final CheckedTextView descendingCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_descending_check);
-		        		descendingCheck.setText(getString(R.string.sortby_name_descending));
-		        		
-		        		TextView byDateTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_date_text);
-		        		byDateTextView.setText(getString(R.string.sortby_date));
-		        		final CheckedTextView newestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_newest_check);
-		        		newestCheck.setText(getString(R.string.sortby_date_newest));
-		        		final CheckedTextView oldestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_oldest_check);
-		        		oldestCheck.setText(getString(R.string.sortby_date_oldest));
-		        		
-		        		TextView bySizeTextView = (TextView) sortByDialog.findViewById(R.id.sortby_dialog_size_text);
-		        		bySizeTextView.setText(getString(R.string.sortby_size));
-		        		final CheckedTextView largestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_largest_first_check);
-		        		largestCheck.setText(getString(R.string.sortby_size_largest_first));
-		        		final CheckedTextView smallestCheck = (CheckedTextView) sortByDialog.findViewById(R.id.sortby_dialog_smallest_first_check);
-		        		smallestCheck.setText(getString(R.string.sortby_size_smallest_first));
-		        		
-		        		switch(orderGetChildren){
-			        		case MegaApiJava.ORDER_DEFAULT_ASC:{
-			        			ascendingCheck.setChecked(true);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_DEFAULT_DESC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(true);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_CREATION_DESC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(true);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_CREATION_ASC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(true);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(false);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_SIZE_ASC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(false);
-			        			smallestCheck.setChecked(true);
-			        			break;
-			        		}
-			        		case MegaApiJava.ORDER_SIZE_DESC:{
-			        			ascendingCheck.setChecked(false);
-			        			descendingCheck.setChecked(false);
-			        			newestCheck.setChecked(false);
-			        			oldestCheck.setChecked(false);
-			        			largestCheck.setChecked(true);
-			        			smallestCheck.setChecked(false);
-			        			break;
-			        		}
-		        		}
-		        		
-		        		final AlertDialog dialog = sortByDialog;
 		        		
 		        		ascendingCheck.setOnClickListener(new OnClickListener() {
 							
