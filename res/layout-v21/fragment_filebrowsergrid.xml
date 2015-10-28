@@ -149,13 +149,14 @@
      </LinearLayout>        
       
 		 
-	<android.support.v7.widget.RecyclerView
+	<nz.mega.components.AutofitRecyclerView
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
         android:choiceMode="multipleChoice"
         android:layout_below="@id/content_grid_text"
-        android:layout_above="@id/buttons_grid_layout"/>
+        android:layout_above="@id/buttons_grid_layout"
+        android:columnWidth="172dp"/>
     
 	<ImageButton
         android:id="@+id/file_upload_button_grid"

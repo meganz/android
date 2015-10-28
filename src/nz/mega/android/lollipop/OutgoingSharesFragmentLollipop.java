@@ -408,7 +408,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 			
 			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER);
+				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				if (mTHash != null){
 					adapterList.setTransfers(mTHash);
 				}

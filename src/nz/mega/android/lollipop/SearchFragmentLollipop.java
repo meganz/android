@@ -330,7 +330,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
 		if (adapterList == null){
-			adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.SEARCH_ADAPTER);
+			adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.SEARCH_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 		}
 		else{
 			adapterList.setParentHandle(parentHandle);
