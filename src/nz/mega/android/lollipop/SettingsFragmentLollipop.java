@@ -27,6 +27,7 @@ import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.SwitchPreference;
 import android.support.design.widget.Snackbar;
 
 @SuppressLint("NewApi")
@@ -77,7 +78,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
 	
-	Preference pinLockEnable;
+	SwitchPreference pinLockEnable;
 	EditTextPreference pinLockCode;
 	Preference downloadLocation;
 	Preference cameraUploadOn;
@@ -142,7 +143,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);	
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
 		
-		pinLockEnable = findPreference(KEY_PIN_LOCK_ENABLE);
+		pinLockEnable = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
 		pinLockEnable.setOnPreferenceClickListener(this);
 		
 		pinLockCode = (EditTextPreference) findPreference(KEY_PIN_LOCK_CODE);
@@ -382,9 +383,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setPinLockCode("");
 				pinLockCode.setText("");
 				pinLock = false;
+				pinLockEnable.setChecked(pinLock);
 			}
 			else{
 				pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
+				pinLockEnable.setChecked(pinLock);
 				pinLockCodeTxt = prefs.getPinLockCode();
 				if (pinLockCodeTxt == null){
 					pinLockCodeTxt = "";
@@ -866,39 +869,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
 				cameraUploadHow.setSummary(wifi);
 				localCameraUploadFolder.setSummary(camSyncLocalPath);				
-				
-				/*
-				
-				if(secondaryUpload){
-					
-					File checkSecondaryFile = new File(localSecondaryFolderPath);
-					if(!checkSecondaryFile.exists()){
-						dbH.setSecondaryUploadEnabled(true);
-						dbH.setSecondaryFolderPath("-1");
-						//If the secondary folder does not exist
-						Util.showToast(this, getString(R.string.secondary_media_service_error_local_folder));
-						secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));					
-						prefs = dbH.getPreferences();
-						localSecondaryFolderPath = prefs.getLocalPathSecondaryFolder();
-						log("Sencondary folder in database: "+localSecondaryFolderPath);
-						if(localSecondaryFolderPath==null || localSecondaryFolderPath.equals("-1")){
-							localSecondaryFolderPath = getString(R.string.settings_empty_folder);
-							localSecondaryFolder.setSummary(localSecondaryFolderPath);
-						}	
-						cameraUploadCategory.addPreference(localSecondaryFolder);
-						cameraUploadCategory.addPreference(megaSecondaryFolder);								
-					}
-					else{
-						secondaryMediaFolderOn.setTitle(getString(R.string.settings_secondary_upload_off));
-						cameraUploadCategory.addPreference(localSecondaryFolder);
-						cameraUploadCategory.addPreference(megaSecondaryFolder);	
-					}							
-				}
-				else{
-					secondaryMediaFolderOn.setTitle(getString(R.string.settings_camera_upload_on));
-					cameraUploadCategory.removePreference(localSecondaryFolder);
-					cameraUploadCategory.removePreference(megaSecondaryFolder);
-				}*/
 					
 				cameraUploadWhat.setSummary(fileUpload);
 				cameraUploadCategory.addPreference(cameraUploadHow);
@@ -938,6 +908,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_ENABLE) == 0){
 			pinLock = !pinLock;
 			if (pinLock){
+				//Intent to set the PIN
+				((ManagerActivityLollipop)getActivity()).setPinLock();
+				
+				
+				//TODO move to function after Manager
 				pinLockCodeTxt = prefs.getPinLockCode();
 				if (pinLockCodeTxt == null){
 					pinLockCodeTxt = "";

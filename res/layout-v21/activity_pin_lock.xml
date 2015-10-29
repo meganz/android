@@ -1,0 +1,69 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    android:orientation="vertical"
+    tools:context=".PinLockActivityLollipop" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp" >
+
+        <EditText
+            android:id="@+id/pass_first"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:maxLength="1"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword" />
+
+        <EditText
+            android:id="@+id/pass_second"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:maxLength="1"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword" />
+
+        <EditText
+            android:id="@+id/pass_third"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:maxLength="1"
+            android:imeOptions="actionNext"
+            android:inputType="numberPassword" />
+
+        <EditText
+            android:id="@+id/pass_fourth"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:maxLength="1"
+            android:imeOptions="actionDone"
+            android:inputType="numberPassword" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/pin_lock_pin_code"
+        style="@style/InputField"
+        android:hint="@string/settings_pin_lock_code"
+        android:imeOptions="actionDone"
+        android:inputType="numberPassword" >
+    </EditText>
+
+    <Button
+        android:id="@+id/pin_lock_enter_pin"
+        style="@style/button_MEGA"
+        android:layout_gravity="center"
+        android:text="@string/pin_lock_enter" >
+    </Button>
+
+</LinearLayout>
