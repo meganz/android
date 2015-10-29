@@ -1,8 +1,10 @@
 package nz.mega.android;
 
+import nz.mega.android.lollipop.PinLockActivityLollipop;
 import nz.mega.android.utils.Util;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 
 
 public class PinUtil {
@@ -54,8 +56,14 @@ public class PinUtil {
 	// Display lock screen
 	public static void showLock(Context context) {
 		log("showLock");
-		Intent intent = new Intent(context, PinLockActivity.class);
-		context.startActivity(intent);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			Intent intent = new Intent(context, PinLockActivityLollipop.class);
+			context.startActivity(intent);
+		}
+		else{
+			Intent intent = new Intent(context, PinLockActivity.class);
+			context.startActivity(intent);
+		}
 	}
 	
 	// Update time since last check

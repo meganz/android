@@ -47,6 +47,6 @@ public class PinActivityLollipop extends AppCompatActivity{
 	}
 	
 	public static void log(String message) {
-		Util.log("PinActivity", message);
+		Util.log("PinActivityLollipop", message);
 	}
 }

@@ -5729,6 +5729,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}		
 	}
 	
+	public void setPinLock(){
+		Intent intent = new Intent(this, PinLockActivityLollipop.class);
+		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
+		this.startActivity(intent);
+	}
+	
 	public void showNewContactDialog(String editText){
 		log("showNewContactDialog");
 		
