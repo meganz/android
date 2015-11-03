@@ -7,14 +7,12 @@
         
          <SwitchPreference
 	        android:key="settings_pin_lock_enable"
-	        android:title="@string/settings_pin_lock_on" 
+	        android:title="@string/settings_pin_lock_switch" 
 	        android:defaultValue="false"/>
 		
-		<EditTextPreference
+		<Preference
 	        android:key="settings_pin_lock_code"
-	        android:title="@string/settings_pin_lock_code"
-	        android:password="true"
-	        android:inputType="numberPassword" />
+	        android:title="@string/settings_reset_lock_code"/>
     </nz.mega.components.MEGAPreferenceCategory>
     
     <PreferenceCategory 

@@ -1,16 +1,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_container_pin_lock"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_secondary"
+    android:fitsSystemWindows="true"
+    android:stackFromBottom="true"
+    android:background="@color/white"
+    android:windowSoftInputMode="stateVisible"
     android:orientation="vertical"
     tools:context=".PinLockActivityLollipop" >
+    
+     <TextView
+        android:id="@+id/unlock_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/mega_text"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background"
-        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:background="@color/white"
+        android:orientation="horizontal"
         android:paddingBottom="20dp"
         android:paddingTop="20dp" >
 
@@ -50,20 +63,5 @@
             android:imeOptions="actionDone"
             android:inputType="numberPassword" />
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/pin_lock_pin_code"
-        style="@style/InputField"
-        android:hint="@string/settings_pin_lock_code"
-        android:imeOptions="actionDone"
-        android:inputType="numberPassword" >
-    </EditText>
-
-    <Button
-        android:id="@+id/pin_lock_enter_pin"
-        style="@style/button_MEGA"
-        android:layout_gravity="center"
-        android:text="@string/pin_lock_enter" >
-    </Button>
 
 </LinearLayout>

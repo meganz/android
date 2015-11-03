@@ -4,7 +4,6 @@ import java.io.File;
 
 import nz.mega.android.CameraSyncService;
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.FileStorageActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.R;
@@ -79,7 +78,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory cameraUploadCategory;
 	
 	SwitchPreference pinLockEnable;
-	EditTextPreference pinLockCode;
+	Preference pinLockCode;
 	Preference downloadLocation;
 	Preference cameraUploadOn;
 	ListPreference cameraUploadHow;
@@ -146,8 +145,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		pinLockEnable = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
 		pinLockEnable.setOnPreferenceClickListener(this);
 		
-		pinLockCode = (EditTextPreference) findPreference(KEY_PIN_LOCK_CODE);
-		pinLockCode.setOnPreferenceChangeListener(this);
+		pinLockCode = findPreference(KEY_PIN_LOCK_CODE);
 		pinLockCode.setOnPreferenceClickListener(this);
 		
 		downloadLocation = findPreference(KEY_STORAGE_DOWNLOAD_LOCATION);
@@ -216,7 +214,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setPinLockEnabled(false);
 			dbH.setPinLockCode("");
 			dbH.setStorageAdvancedDevices(false);
-			pinLockCode.setText("");
 			cameraUpload = false;
 			charging = true;
 			fileNames = false;
@@ -381,7 +378,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			if (prefs.getPinLockEnabled() == null){
 				dbH.setPinLockEnabled(false);
 				dbH.setPinLockCode("");
-				pinLockCode.setText("");
 				pinLock = false;
 				pinLockEnable.setChecked(pinLock);
 			}
@@ -392,7 +388,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				if (pinLockCodeTxt == null){
 					pinLockCodeTxt = "";
 					dbH.setPinLockCode(pinLockCodeTxt);
-					pinLockCode.setText(pinLockCodeTxt);
 				}
 			}
 			
@@ -572,7 +567,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		}
 		
 		if (pinLock){
-			pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
+//			pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
 			ast = "";
 			if (pinLockCodeTxt.compareTo("") == 0){
 				ast = getString(R.string.settings_pin_lock_code_not_set);
@@ -586,7 +581,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			pinLockCategory.addPreference(pinLockCode);
 		}
 		else{
-			pinLockEnable.setTitle(getString(R.string.settings_pin_lock_on));
+//			pinLockEnable.setTitle(getString(R.string.settings_pin_lock_on));
 			pinLockCategory.removePreference(pinLockCode);
 		}
 		
@@ -683,7 +678,6 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
 			pinLockCodeTxt = (String) newValue;
 			dbH.setPinLockCode(pinLockCodeTxt);
-			pinLockCode.setText(pinLockCodeTxt);
 			
 			ast = "";
 			if (pinLockCodeTxt.compareTo("") == 0){
@@ -708,9 +702,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public boolean onPreferenceClick(Preference preference) {
 		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
-			Intent intent = new Intent(context, FileStorageActivity.class);
-			intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
@@ -784,9 +778,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setStorageAdvancedDevices(advancedDevices);
 		}
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
-			Intent intent = new Intent(context, FileStorageActivity.class);
-			intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.general_select));
+			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.general_select));
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
@@ -909,17 +903,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			pinLock = !pinLock;
 			if (pinLock){
 				//Intent to set the PIN
-				((ManagerActivityLollipop)getActivity()).setPinLock();
-				
+				((ManagerActivityLollipop)getActivity()).setPinLock();				
 				
 				//TODO move to function after Manager
 				pinLockCodeTxt = prefs.getPinLockCode();
 				if (pinLockCodeTxt == null){
 					pinLockCodeTxt = "";
 					dbH.setPinLockCode(pinLockCodeTxt);
-					pinLockCode.setText(pinLockCodeTxt);
+
 				}
-				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
+//				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
 				ast = "";
 				if (pinLockCodeTxt.compareTo("") == 0){
 					ast = getString(R.string.settings_pin_lock_code_not_set);
@@ -936,10 +929,13 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			else{
 				dbH.setPinLockEnabled(false);
 				dbH.setPinLockCode("");
-				pinLockCode.setText("");
-				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_on));
+//				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_on));
 				pinLockCategory.removePreference(pinLockCode);
 			}
+		}
+		else if (preference.getKey().compareTo(KEY_PIN_LOCK_CODE) == 0){
+			//Intent to reset the PIN
+			((ManagerActivityLollipop)getActivity()).resetPinLock();	
 		}
 		else if (preference.getKey().compareTo(KEY_STORAGE_ASK_ME_ALWAYS) == 0){
 			askMe = storageAskMeAlways.isChecked();
@@ -962,9 +958,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setKeepFileNames(fileNames);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER) == 0){
-			Intent intent = new Intent(context, FileStorageActivity.class);
-			intent.setAction(FileStorageActivity.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivity.EXTRA_BUTTON_PREFIX, getString(R.string.general_select));
+			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
+			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.general_select));
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
