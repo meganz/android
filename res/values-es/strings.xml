@@ -477,9 +477,16 @@
     <string name="settings_pin_lock_off" context="settings of the pin lock">Desactivar Bloqueo con PIN</string>
     <string name="settings_pin_lock_code" context="settings of the pin lock">Código PIN</string> 
     <string name="settings_pin_lock_code_not_set" context="status text when no custom photo sync folder has been set">No configurado</string>
+    <string name="settings_reset_lock_code" context="settings of the pin lock">Restaurar PIN</string> 
+    <string name="settings_pin_lock_switch" context="settings of the pin lock">Bloqueo con PIN</string>
     
     <string name="pin_lock_enter" context="Button after the pin code input field">Entrar</string>
-    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código incorrecto</string>
+    <string name="pin_lock_incorrect" context="error message when not typing the pin code correctly">Código Incorrecto</string>
+    <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Los códigos no coinciden</string>
+    <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Introduce tu código</string>
+    <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu código</string>
+     <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introduce tu nuevo código</string>
+    <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu nuevo código</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>    
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>
