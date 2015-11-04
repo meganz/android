@@ -1,7 +1,9 @@
 package nz.mega.android.lollipop;
 
 import nz.mega.android.DatabaseHandler;
+import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
+import nz.mega.android.MegaAttributes;
 import nz.mega.android.MegaPreferences;
 import nz.mega.android.PinUtil;
 import nz.mega.android.R;
@@ -40,6 +42,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 	public static String ACTION_SET_PIN_LOCK = "ACTION_SET";
 	public static String ACTION_RESET_PIN_LOCK = "ACTION_RESET";
 	
+	final public static int MAX_ATTEMPS = 10;
 	final public static int SET = 0;
 	final public static int UNLOCK = 1;
 	final public static int RESET_UNLOCK = 2;
@@ -52,7 +55,10 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 	
 	MegaApiAndroid megaApi;
     LinearLayout fragmentContainer;
+    LinearLayout pinLayout;
+    LinearLayout warningLayout;
 	TextView unlockText;
+	TextView warningText;
 	EditText passFirstLetter;
 	EditText passSecondLetter;
 	EditText passThirdLetter;
@@ -64,6 +70,9 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 	
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
+	MegaAttributes att = null;
+	
+	int attemps = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -100,14 +109,49 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 //		dbH = new DatabaseHandler(this);
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		prefs = dbH.getPreferences();
+		att = dbH.getAttributes();
+		attemps = att.getAttemps();
+		log("onCreate Attemps number: "+attemps);
 		
-		fragmentContainer=(LinearLayout) findViewById(R.id.fragment_container_pin_lock);
+		fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container_pin_lock);
+		warningLayout = (LinearLayout) findViewById(R.id.warning_layout);
+		//Margins
+		LinearLayout.LayoutParams warningParams = (LinearLayout.LayoutParams)warningLayout.getLayoutParams();
+		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		warningLayout.setLayoutParams(warningParams);
+		
+		if(attemps>5){
+			//Show alert
+			log("attemps less than 5: "+attemps);
+		}
+		else if (attemps==8){
+			//Last intent available!!
+			log("last intent: "+attemps);
+		}
+		else{
+			//Hide alert
+			log("number of attemps: "+attemps);
+		}
+		
+		warningLayout.setVisibility(View.VISIBLE);
+		warningText = (TextView) findViewById(R.id.warning_text);
+		//Margins
+		LinearLayout.LayoutParams textWarningParams = (LinearLayout.LayoutParams)warningText.getLayoutParams();
+		textWarningParams.setMargins(Util.scaleWidthPx(3, outMetrics), 0, Util.scaleWidthPx(3, outMetrics), 0); 
+		warningText.setLayoutParams(textWarningParams);
+		
+		pinLayout = (LinearLayout) findViewById(R.id.pin_layout);
+		//Margins
+		LinearLayout.LayoutParams pinParams = (LinearLayout.LayoutParams)pinLayout.getLayoutParams();
+		pinParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		pinLayout.setLayoutParams(pinParams);
+		
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
 		unlockText.setText(R.string.unlock_pin_title);		
 		unlockText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (24*scaleText));
-		//Left margin
+		//Margins
 		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)unlockText.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(100, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		textParams.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(90, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		unlockText.setLayoutParams(textParams);
 		
 		//PIN
@@ -360,29 +404,53 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 				
 				if (code.compareTo(codePref) == 0){
 					PinUtil.update();
+					attemps=0;
+					att.setAttemps(attemps);
+					dbH.setAttrAttemps(attemps);
 					finish();
 				}
 				else{
-					log("PIN INCORRECT - show snackBar");
-//		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-		        	Snackbar snack = Snackbar.make(fragmentContainer, getString(R.string.pin_lock_incorrect), Snackbar.LENGTH_LONG);
-		        	View view = snack.getView();
-		        	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
-		        	params.gravity = Gravity.TOP;
-		        	view.setLayoutParams(params);
-		        	snack.show();
-		        	
-		            //Re-enter pass
-		            passFirstLetter.setText("");
-		            passSecondLetter.setText("");
-		            passThirdLetter.setText("");
-		            passFourthLetter.setText("");
-		            
-		            passFirstLetter.requestFocus();
-		            passFirstLetter.setCursorVisible(true);
-		            sbFirst.setLength(0);
-		            sbSecond.setLength(0);
-		            unlockText.setText(R.string.unlock_pin_title);        
+					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
+					attemps=attemps+1;
+					if(attemps==9){
+						//Log out!!
+						log("INTENTS==9 - LOGOUT");
+						ManagerActivity.logout(this, megaApi, false);
+//						megaApi.logout();
+					}
+					else{			
+						
+						att.setAttemps(attemps);
+//						dbH.setAttributes(att);
+						dbH.setAttrAttemps(attemps);
+						
+						String message = null;
+		            	if(attemps<5){
+		            		message = getString(R.string.pin_lock_incorrect);
+		            	}
+		            	else{
+		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            	}
+		            	
+			        	Snackbar snack = Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG);
+			        	View view = snack.getView();
+			        	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+			        	params.gravity = Gravity.TOP;
+			        	view.setLayoutParams(params);
+			        	snack.show();
+			        	
+			            //Re-enter pass
+			            passFirstLetter.setText("");
+			            passSecondLetter.setText("");
+			            passThirdLetter.setText("");
+			            passFourthLetter.setText("");
+			            
+			            passFirstLetter.requestFocus();
+			            passFirstLetter.setCursorVisible(true);
+			            sbFirst.setLength(0);
+			            sbSecond.setLength(0);
+			            unlockText.setText(R.string.unlock_pin_title);        
+					}					
 				}
 				break;
 			}
@@ -397,6 +465,11 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 				if (code.compareTo(codePref) == 0){
 					//Old PIN OK
 					PinUtil.update();
+					
+					attemps = 0;
+					att.setAttemps(attemps);
+					dbH.setAttrAttemps(attemps);
+					
 					mode=RESET_SET;
 					//Enter new PIN
 		            passFirstLetter.setText("");
@@ -412,26 +485,46 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 					
 				}
 				else{
-					log("PIN INCORRECT - show snackBar");
+					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 //		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-		        	Snackbar snack = Snackbar.make(fragmentContainer, getString(R.string.pin_lock_incorrect), Snackbar.LENGTH_LONG);
-		        	View view = snack.getView();
-		        	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
-		        	params.gravity = Gravity.TOP;
-		        	view.setLayoutParams(params);
-		        	snack.show();
-		        	
-		            //Re-enter pass
-		            passFirstLetter.setText("");
-		            passSecondLetter.setText("");
-		            passThirdLetter.setText("");
-		            passFourthLetter.setText("");
-		            
-		            passFirstLetter.requestFocus();
-		            passFirstLetter.setCursorVisible(true);
-		            sbFirst.setLength(0);
-		            sbSecond.setLength(0);
-		            unlockText.setText(R.string.unlock_pin_title);        
+					attemps=attemps+1;
+					if(attemps==9){
+						//Log out!!
+						log("INTENTS==9 - LOGOUT");
+						ManagerActivity.logout(this, megaApi, false);
+//						megaApi.logout();
+					}
+					else{					
+					
+						att.setAttemps(attemps);
+						dbH.setAttrAttemps(attemps);
+						
+		            	String message = null;
+		            	if(attemps<5){
+		            		message = getString(R.string.pin_lock_incorrect);
+		            	}
+		            	else{
+		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            	}
+			        	Snackbar snack = Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG);
+			        	View view = snack.getView();
+			        	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+			        	params.gravity = Gravity.TOP;
+			        	view.setLayoutParams(params);
+			        	snack.show();
+			        	
+			            //Re-enter pass
+			            passFirstLetter.setText("");
+			            passSecondLetter.setText("");
+			            passThirdLetter.setText("");
+			            passFourthLetter.setText("");
+			            
+			            passFirstLetter.requestFocus();
+			            passFirstLetter.setCursorVisible(true);
+			            sbFirst.setLength(0);
+			            sbSecond.setLength(0);
+			            unlockText.setText(R.string.unlock_pin_title);        
+					}
 				}
 				break;
 			}
