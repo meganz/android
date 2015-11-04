@@ -1,0 +1,9 @@
+--- wait.h	2015-09-08 00:39:27.240728131 +0200
++++ wait.h	2015-09-08 00:39:19.111011595 +0200
+@@ -2,6 +2,7 @@
+ #define CRYPTOPP_WAIT_H
+ 
+ #include "config.h"
++#include "sys/select.h"
+ 
+ #ifdef SOCKETS_AVAILABLE
