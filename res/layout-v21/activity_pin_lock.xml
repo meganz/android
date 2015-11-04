@@ -3,65 +3,90 @@
     android:id="@+id/fragment_container_pin_lock"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    android:stackFromBottom="true"
     android:background="@color/white"
-    android:windowSoftInputMode="stateVisible"
+    android:fitsSystemWindows="true"
     android:orientation="vertical"
+    android:stackFromBottom="true"
+    android:windowSoftInputMode="stateVisible"
     tools:context=".PinLockActivityLollipop" >
-    
-     <TextView
+
+    <TextView
         android:id="@+id/unlock_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:fontFamily="sans-serif-medium"
-        android:textColor="@color/mega_text"/>
+        android:textColor="@color/mega_text" />
 
     <LinearLayout
+        android:id="@+id/pin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         android:background="@color/white"
-        android:orientation="horizontal"
-        android:paddingBottom="20dp"
-        android:paddingTop="20dp" >
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
 
         <EditText
             android:id="@+id/pass_first"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
-            android:maxLength="1"
             android:imeOptions="actionNext"
-            android:inputType="numberPassword" />
+            android:inputType="numberPassword"
+            android:maxLength="1" />
 
         <EditText
             android:id="@+id/pass_second"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
-            android:maxLength="1"
             android:imeOptions="actionNext"
-            android:inputType="numberPassword" />
+            android:inputType="numberPassword"
+            android:maxLength="1" />
 
         <EditText
             android:id="@+id/pass_third"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
-            android:maxLength="1"
             android:imeOptions="actionNext"
-            android:inputType="numberPassword" />
+            android:inputType="numberPassword"
+            android:maxLength="1" />
 
         <EditText
             android:id="@+id/pass_fourth"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="left"
-            android:maxLength="1"
             android:imeOptions="actionDone"
-            android:inputType="numberPassword" />
+            android:inputType="numberPassword"
+            android:maxLength="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/warning_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingTop="20dp" >
+
+        <ImageView
+            android:id="@+id/warning_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal|center_vertical"
+            android:src="@drawable/ic_warning_black" />
+
+        <TextView
+            android:id="@+id/warning_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/pin_lock_alert"
+            android:textColor="@color/black" />
     </LinearLayout>
 
 </LinearLayout>

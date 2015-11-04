@@ -17,7 +17,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 14; 
+	private static final int DATABASE_VERSION = 15; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -45,6 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_LAST_UPLOAD_FOLDER = "lastuploadfolder";
     private static final String KEY_LAST_CLOUD_FOLDER_HANDLE = "lastcloudfolder";
     private static final String KEY_ATTR_ONLINE = "online";
+    private static final String KEY_ATTR_INTENTS = "intents";
     private static final String KEY_OFF_HANDLE = "handle";
     private static final String KEY_OFF_PATH = "path";
     private static final String KEY_OFF_NAME = "name";
@@ -105,7 +106,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
         String CREATE_ATTRIBUTES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_ATTRIBUTES + "("
-        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT" + ")";
+        		+ KEY_ID + " INTEGER PRIMARY KEY, " + KEY_ATTR_ONLINE + " TEXT, " + KEY_ATTR_INTENTS + " TEXT" + ")";
         db.execSQL(CREATE_ATTRIBUTES_TABLE);
   
 	}
@@ -206,6 +207,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (oldVersion <=13){
 			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_STORAGE_ADVANCED_DEVICES + " BOOLEAN;");
 			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_STORAGE_ADVANCED_DEVICES + " = '" + encrypt("false") + "';");
+		}
+		
+		if (oldVersion <=14){
+			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_ATTR_INTENTS + " TEXT;");
+			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + " = '" + encrypt("0") + "';");
 		}
 	} 
 	
@@ -340,8 +346,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void setAttributes (MegaAttributes attr){
+		log("setAttributes");
         ContentValues values = new ContentValues();
         values.put(KEY_ATTR_ONLINE, encrypt(attr.getOnline()));
+        values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attr.getAttemps())));
         db.insert(TABLE_ATTRIBUTES, null, values);
 	}
 	
@@ -353,7 +361,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		if (cursor.moveToFirst()){
 			int id = Integer.parseInt(cursor.getString(0));
 			String online = decrypt(cursor.getString(1));
-			attr = new MegaAttributes(online);
+			String intents =  decrypt(cursor.getString(2));
+			if(intents!=null){
+				attr = new MegaAttributes(online, Integer.parseInt(intents));
+			}
+			else{
+				attr = new MegaAttributes(online, 0);
+			}
 		}
 		cursor.close();
 		
@@ -1066,6 +1080,22 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 			values.put(KEY_ATTR_ONLINE, encrypt(online + ""));
+			db.insert(TABLE_ATTRIBUTES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setAttrAttemps (int attemp){
+		String selectQuery = "SELECT * FROM " + TABLE_ATTRIBUTES;
+		ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_ATTRIBUTES_TABLE = "UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + "='" + encrypt(Integer.toString(attemp) + "") + "' WHERE " + KEY_ID + " ='1'";
+			db.execSQL(UPDATE_ATTRIBUTES_TABLE);
+			log("UPDATE_ATTRIBUTES_TABLE : " + UPDATE_ATTRIBUTES_TABLE);
+		}
+		else{
+			values.put(KEY_ATTR_INTENTS, encrypt(Integer.toString(attemp) + ""));
 			db.insert(TABLE_ATTRIBUTES, null, values);
 		}
 		cursor.close();
