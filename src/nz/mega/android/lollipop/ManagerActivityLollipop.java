@@ -1734,6 +1734,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			    			
     			if (mTabsAdapterShares == null){
+    				mTabHostShares.setVisibility(View.VISIBLE);    			
+        			viewPagerShares.setVisibility(View.VISIBLE);
     				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
     				
         			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
@@ -1755,7 +1757,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			}
     			else{
     				log("mTabsAdapterShares NOT null");
-        			mTabHostShares.setVisibility(View.VISIBLE);    			
+    				mTabHostShares.setVisibility(View.VISIBLE);    			
         			viewPagerShares.setVisibility(View.VISIBLE);
         			
         			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
