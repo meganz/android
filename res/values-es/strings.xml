@@ -488,6 +488,7 @@
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu código</string>
      <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Introduce tu nuevo código</string>
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-introduce tu nuevo código</string>
+    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">Se van a borrar todos tus datos locales y tu sesión será inválida en 5 segundos.</string>
 
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">Sobre nosotros</string>    
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Política de privacidad</string>

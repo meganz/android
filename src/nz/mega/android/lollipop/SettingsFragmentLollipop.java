@@ -19,11 +19,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
+//import android.support.v4.preference.PreferenceFragment;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.SwitchPreference;
@@ -903,28 +903,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			pinLock = !pinLock;
 			if (pinLock){
 				//Intent to set the PIN
-				((ManagerActivityLollipop)getActivity()).setPinLock();				
-				
-				//TODO move to function after Manager
-				pinLockCodeTxt = prefs.getPinLockCode();
-				if (pinLockCodeTxt == null){
-					pinLockCodeTxt = "";
-					dbH.setPinLockCode(pinLockCodeTxt);
-
-				}
-//				pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
-				ast = "";
-				if (pinLockCodeTxt.compareTo("") == 0){
-					ast = getString(R.string.settings_pin_lock_code_not_set);
-				}
-				else{
-					for (int i=0;i<pinLockCodeTxt.length();i++){
-						ast = ast + "*";
-					}
-				}
-				pinLockCode.setSummary(ast);
-				pinLockCategory.addPreference(pinLockCode);
-				dbH.setPinLockEnabled(true);
+				((ManagerActivityLollipop)getActivity()).setPinLock();	
 			}
 			else{
 				dbH.setPinLockEnabled(false);
@@ -982,6 +961,31 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("KEY = " + preference.getKey());
 		
 		return true;
+	}
+	
+	public void afterSetPinLock(){
+		log("afterSetPinLock");
+
+		prefs=dbH.getPreferences();
+		pinLockCodeTxt = prefs.getPinLockCode();
+		if (pinLockCodeTxt == null){
+			pinLockCodeTxt = "";
+			dbH.setPinLockCode(pinLockCodeTxt);
+
+		}
+//		pinLockEnable.setTitle(getString(R.string.settings_pin_lock_off));
+		ast = "";
+		if (pinLockCodeTxt.compareTo("") == 0){
+			ast = getString(R.string.settings_pin_lock_code_not_set);
+		}
+		else{
+			for (int i=0;i<pinLockCodeTxt.length();i++){
+				ast = ast + "*";
+			}
+		}
+		pinLockCode.setSummary(ast);
+		pinLockCategory.addPreference(pinLockCode);
+		dbH.setPinLockEnabled(true);
 	}
 	
 	private static void log(String log) {

@@ -1116,6 +1116,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 	
+	public void clearAttributes(){
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTRIBUTES);
+		onCreate(db);
+	}
+	
 	private static void log(String log) {
 		Util.log("DatabaseHandler", log);
 	}

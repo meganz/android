@@ -181,6 +181,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public static int TAKE_PHOTO_CODE = 1010;
 	private static int WRITE_SD_CARD_REQUEST_CODE = 1011;
 	private static int REQUEST_CODE_SELECT_FILE = 1012;
+	private static int SET_PIN = 1013;
 	
 	public int accountFragment;
 	final public static int MY_ACCOUNT_FRAGMENT = 5000;
@@ -326,6 +327,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MyAccountFragmentLollipop maFLol;
 	private TransfersFragmentLollipop tFLol;
 	private SearchFragmentLollipop sFLol;
+	private SettingsFragmentLollipop sttFLol;
 	
 	ProgressDialog statusDialog;
 	
@@ -2063,10 +2065,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			mTabHostCDrive.setVisibility(View.GONE);    			
     			viewPagerCDrive.setVisibility(View.GONE);
     			
-    			getFragmentManager().beginTransaction().replace(R.id.fragment_container, new SettingsFragmentLollipop()).commit();
-//				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//				ft.replace(R.id.fragment_container, sF, "sF");
-//    			ft.commit();
+    			Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    			if (currentFragment != null){
+    				getSupportFragmentManager().beginTransaction().remove(currentFragment).commit();
+    			}
+    			
+    			if(sttFLol==null){
+    				sttFLol = new SettingsFragmentLollipop();
+    			} 
+    			
+    			android.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+    			ft.replace(R.id.fragment_container, sttFLol, "sttF");
+    			ft.commit();
     			
 //    			drawerItem = lastDrawerItem;
 //    			selectDrawerItemLollipop(drawerItem);
@@ -4623,6 +4633,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				lastDrawerItem = drawerItem;
 				drawerItem = DrawerItem.SETTINGS;
+				menuItem.setChecked(true);
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -5769,7 +5780,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log("setPinLock");
 		Intent intent = new Intent(this, PinLockActivityLollipop.class);
 		intent.setAction(PinLockActivityLollipop.ACTION_SET_PIN_LOCK);
-		this.startActivity(intent);
+		this.startActivityForResult(intent, SET_PIN);
 	}
 	
 	public void resetPinLock(){
@@ -6541,6 +6552,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;
 			}
 			statusDialog = temp;
+		}
+		else if(requestCode == SET_PIN && resultCode == RESULT_OK){
+			log("Set PIN Ok");
+			if(sttFLol!=null){
+				sttFLol.afterSetPinLock();
+			}
 		}
 		else if (requestCode == WRITE_SD_CARD_REQUEST_CODE && resultCode == RESULT_OK) {
 			
