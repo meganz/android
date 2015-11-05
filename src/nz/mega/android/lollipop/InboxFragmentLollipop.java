@@ -3,9 +3,7 @@ package nz.mega.android.lollipop;
 import java.util.ArrayList;
 import java.util.List;
 
-import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
-import nz.mega.android.MegaBrowserNewGridAdapter;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
@@ -34,6 +32,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -66,11 +65,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	
 	Context context;
 	ActionBar aB;
-	RecyclerView listView;
+	RecyclerView recyclerView;
 	RecyclerView.LayoutManager mLayoutManager;
 	GestureDetectorCompat detector;
-	MegaBrowserLollipopAdapter adapterList;
-	MegaBrowserNewGridAdapter adapterGrid;
+	MegaBrowserLollipopAdapter adapter;
 	public InboxFragmentLollipop inboxFragment = this;
 	MegaNode inboxNode;
 	boolean isList = true;
@@ -119,12 +117,12 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 //	    }
 
 	    public void onLongPress(MotionEvent e) {
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
+	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
+	        int position = recyclerView.getChildPosition(view);
 
 	        // handle long press
-			if (adapterList.getPositionClicked() == -1){
-				adapterList.setMultipleSelect(true);
+	        if (!adapter.isMultipleSelect()){
+				adapter.setMultipleSelect(true);
 			
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
@@ -138,7 +136,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaNode> documents = adapterList.getSelectedNodes();
+			List<MegaNode> documents = adapter.getSelectedNodes();
 			
 			switch(item.getItemId()){
 				case R.id.cab_menu_download:{
@@ -210,13 +208,13 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapterList.setMultipleSelect(false);
+			adapter.setMultipleSelect(false);
 			clearSelections();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = adapterList.getSelectedNodes();
+			List<MegaNode> selected = adapter.getSelectedNodes();
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -259,37 +257,21 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	}
 	
 	public boolean showSelectMenuItem(){
-		if (isList){
-			if (adapterList != null){
-				return adapterList.isMultipleSelect();
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				return adapterGrid.isMultipleSelect();
-			}
+		if (adapter != null){
+			return adapter.isMultipleSelect();
 		}
 		
 		return false;
 	}
 
 	public void selectAll(){
-		if (isList){
-			if(adapterList.isMultipleSelect()){
-				adapterList.selectAll();
-			}
-			else{					
-				adapterList.setMultipleSelect(true);
-				adapterList.selectAll();
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-			}
-			
-			updateActionModeTitle();
+		if(adapter.isMultipleSelect()){
+			adapter.selectAll();
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.selectAll();
-			}
+		else{					
+			adapter.setMultipleSelect(true);
+			adapter.selectAll();
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
 		}
 	}
 	
@@ -329,24 +311,25 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			listView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_list_view);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
-			listView.setLayoutManager(mLayoutManager);
-			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator());      
+			recyclerView.setLayoutManager(mLayoutManager);
+			recyclerView.addOnItemTouchListener(this);
+			recyclerView.setItemAnimator(new DefaultItemAnimator());      
 	
 			emptyImageView = (ImageView) v.findViewById(R.id.inbox_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
-			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			if (adapter == null){
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapterList.setParentHandle(parentHandle);
-				adapterList.setNodes(nodes);
+				adapter.setParentHandle(parentHandle);
+				adapter.setNodes(nodes);
+				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_inbox);
@@ -392,10 +375,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				outSpaceLayout.setVisibility(View.GONE);
 			}
 
-			adapterList.setPositionClicked(-1);
-			adapterList.setMultipleSelect(false);
+			adapter.setPositionClicked(-1);
+			adapter.setMultipleSelect(false);
 
-			listView.setAdapter(adapterList);
+			recyclerView.setAdapter(adapter);
 			contentText.setText(getInfoFolder(inboxNode));
 			setNodes(nodes);
 			
@@ -466,7 +449,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
-			/*
+			
 			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 			DisplayMetrics outMetrics = new DisplayMetrics ();
 		    display.getMetrics(outMetrics);
@@ -489,10 +472,22 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 					numberOfCells = 2;
 				}	
 		    }
-				        
-	        listView = (ListView) v.findViewById(R.id.inbox_grid_view);
-	        listView.setOnItemClickListener(null);
-	        listView.setItemsCanFocus(false);
+		    
+		    
+		    detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+			
+			recyclerView = (RecyclerView) v.findViewById(R.id.inbox_grid_view);
+			recyclerView.setHasFixedSize(true);
+			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+				@Override
+			      public int getSpanSize(int position) {
+					return 1;
+				}
+			});
+			
+			recyclerView.addOnItemTouchListener(this);
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
 
 	        emptyImageView = (ImageView) v.findViewById(R.id.inbox_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_grid_empty_text);
@@ -500,19 +495,30 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);
 			
-			if (adapterGrid == null){
-				adapterGrid = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivityLollipop.INBOX_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
+			if (adapter == null){
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+			else{
+				adapter.setParentHandle(parentHandle);
+				adapter.setNodes(nodes);
+				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+			
+			
+			
+			/*if (adapter == null){
+				adapter = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivityLollipop.INBOX_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
 			}
 			else{
 				adapterGrid.setParentHandle(parentHandle);
 				adapterGrid.setNodes(nodes);
-			}			
+			}*/			
 			
-			adapterGrid.setPositionClicked(-1);
-			listView.setAdapter(adapterGrid);
+			adapter.setPositionClicked(-1);
+			recyclerView.setAdapter(adapter);
 			contentText.setText(getInfoFolder(inboxNode));
 			setNodes(nodes);
-			*/
+			
 			return v;	
 		}
 	}
@@ -521,22 +527,15 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		log("refresh");
 		nodes = megaApi.getChildren(inboxNode, orderGetChildren);
 		setNodes(nodes);
-		if (isList){
-			if(adapterList!=null){				
-				adapterList.notifyDataSetChanged();
-			}
-		}
-		else{
-			if(adapterGrid!=null){
-				adapterGrid.notifyDataSetChanged();
-			}
-		}
+		if(adapter != null){				
+			adapter.notifyDataSetChanged();
+		}		
 	}
 	
 	public void hideOptionsPanel(){
 		log("hideOptionsPanel");
 				
-		adapterList.setPositionClicked(-1);
+		adapter.setPositionClicked(-1);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
@@ -668,36 +667,34 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
     public void itemClick(int position) {
 		
-		if (isList){
-			if (adapterList.isMultipleSelect()){
-				adapterList.toggleSelection(position);
-				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
-			}
-			else{
+		if (adapter.isMultipleSelect()){
+			adapter.toggleSelection(position);
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
+		}
+		else{
 
-				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
-					intent.putExtra("position", position);
-					intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
-					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
-						intent.putExtra("parentNodeHandle", -1L);
-					}
-					else{
-						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-					}
-					intent.putExtra("orderGetChildren", orderGetChildren);
-					startActivity(intent);
+			if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
+				Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+				intent.putExtra("position", position);
+				intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
+				if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
+					intent.putExtra("parentNodeHandle", -1L);
 				}
 				else{
-					adapterList.setPositionClicked(-1);
-					adapterList.notifyDataSetChanged();
-					ArrayList<Long> handleList = new ArrayList<Long>();
-					handleList.add(nodes.get(position).getHandle());
-					((ManagerActivityLollipop) context).onFileClick(handleList);
+					intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 				}
-				
+				intent.putExtra("orderGetChildren", orderGetChildren);
+				startActivity(intent);
 			}
+			else{
+				adapter.setPositionClicked(-1);
+				adapter.notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(nodes.get(position).getHandle());
+				((ManagerActivityLollipop) context).onFileClick(handleList);
+			}
+			
 		}
     }
 	
@@ -705,7 +702,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
-		List<MegaNode> documents = adapterList.getSelectedNodes();
+		List<MegaNode> documents = adapter.getSelectedNodes();
 		int files = documents.size();
 
 		Resources res = getActivity().getResources();
@@ -728,8 +725,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
-			adapterList.clearSelections();
+		if(adapter.isMultipleSelect()){
+			adapter.clearSelections();
 		}
 		updateActionModeTitle();
 	}
@@ -738,53 +735,30 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
-		adapterList.setMultipleSelect(false);
+		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
 	}
 	
 	public int onBackPressed(){
+					
+		if (adapter == null){
+			return 0;
+		}
 		
-		if (isList){
-			
-			if (adapterList == null){
-				return 0;
-			}
-			
-			if (adapterList.isMultipleSelect()){
-				hideMultipleSelect();
-				return 2;
-			}
-			
-			if (adapterList.getPositionClicked() != -1){
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-				return 1;
-			}
-			else{
-					return 0;
-			}
+		if (adapter.isMultipleSelect()){
+			hideMultipleSelect();
+			return 2;
+		}
+		
+		if (adapter.getPositionClicked() != -1){
+			adapter.setPositionClicked(-1);
+			adapter.notifyDataSetChanged();
+			return 1;
 		}
 		else{
-			
-			if (adapterGrid == null){
 				return 0;
-			}
-			
-			if (adapterGrid.isMultipleSelect()){
-				adapterGrid.hideMultipleSelect();
-				return 2;
-			}
-			
-			if (adapterGrid.getPositionClicked() != -1){
-				adapterGrid.setPositionClicked(-1);
-				adapterGrid.notifyDataSetChanged();
-				return 1;
-			}
-			else{				
-				return 0;				
-			}
 		}
 	}
 	
@@ -811,109 +785,56 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	}
 	
 	public long getParentHandle(){
-		if (isList){
-			return adapterList.getParentHandle();
-		}
-		else{
-			return adapterGrid.getParentHandle();
-		}
+		return adapter.getParentHandle();
 	}
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setParentHandle(parentHandle);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(parentHandle);
-			}
+		if (adapter != null){
+			adapter.setParentHandle(parentHandle);
 		}
 	}
 	
-	public RecyclerView getListView(){
-		return listView;
+	public RecyclerView getRecyclerView(){
+		return recyclerView;
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setNodes(nodes);
-				if (adapterList.getItemCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);					
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}			
-			}	
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setNodes(nodes);
-				if (adapterGrid.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}			
+		if (adapter != null){
+			adapter.setNodes(nodes);
+			if (adapter.getItemCount() == 0){
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				
+				emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+				emptyTextView.setText(R.string.file_browser_empty_folder);					
 			}
-		}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}			
+		}	
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		if (isList){
-			if (adapterList != null){
-				adapterList.setPositionClicked(positionClicked);
-			}
+		if (adapter != null){
+			adapter.setPositionClicked(positionClicked);
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setPositionClicked(positionClicked);
-			}	
-		}		
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
-			if (adapterList != null){
-				adapterList.notifyDataSetChanged();
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.notifyDataSetChanged();
-			}
+		if (adapter != null){
+			adapter.notifyDataSetChanged();
 		}
 	}
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setOrder(orderGetChildren);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setOrder(orderGetChildren);
-			}
+		if (adapter != null){
+			adapter.setOrder(orderGetChildren);
 		}
 	}
 	
@@ -978,8 +899,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	}
 	
 	public int getItemCount(){
-		if(adapterList!=null){
-			return adapterList.getItemCount();
+		if(adapter != null){
+			return adapter.getItemCount();
 		}
 		return 0;
 	}
