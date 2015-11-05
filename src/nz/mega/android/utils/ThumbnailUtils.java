@@ -32,7 +32,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
-import nz.mega.sdk.MegaUtils;
+import nz.mega.sdk.MegaUtilsAndroid;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -978,7 +978,7 @@ public class ThumbnailUtils {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1017,7 +1017,7 @@ public class ThumbnailUtils {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1084,7 +1084,7 @@ public class ThumbnailUtils {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
 			
 			return thumbCreated;
 		}
@@ -1125,7 +1125,7 @@ public class ThumbnailUtils {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
 			
 			return thumbCreated;
 		}
@@ -1196,7 +1196,7 @@ public class ThumbnailUtils {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}
@@ -1248,7 +1248,7 @@ public class ThumbnailUtils {
 			
 			File thumbDir = getThumbFolder(context);
 			thumbFile = new File(thumbDir, param.document.getBase64Handle()+".jpg");
-			boolean thumbCreated = MegaUtils.createThumbnail(param.file, thumbFile);
+			boolean thumbCreated = MegaUtilsAndroid.createThumbnail(param.file, thumbFile);
 
 			return thumbCreated;
 		}

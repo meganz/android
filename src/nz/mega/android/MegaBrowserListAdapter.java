@@ -13,7 +13,7 @@ import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
-import nz.mega.sdk.MegaUtils;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -157,7 +157,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					if (f != null){
 						if (f.length() == node.getSize()){
 							log("IDEM: " + filePath + "____" + node.getName());
-							thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+							thumbCreated = MegaUtilsAndroid.createThumbnail(f, thumbFile);
 							if (!node.hasThumbnail()){
 								log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
 								megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
@@ -167,7 +167,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							}
 							
 							if (!previewFile.exists()){
-								previewCreated = MegaUtils.createPreview(f, previewFile);
+								previewCreated = MegaUtilsAndroid.createPreview(f, previewFile);
 								if (!node.hasPreview()){
 									log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
 									megaApi.setPreview(node, previewFile.getAbsolutePath());
@@ -191,7 +191,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 							if (f != null){
 								if (f.length() == node.getSize()){
 									log("IDEM(por nombre): " + filePath + "____" + node.getName());
-									thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+									thumbCreated = MegaUtilsAndroid.createThumbnail(f, thumbFile);
 									if (!node.hasThumbnail()){
 										log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
 										megaApi.setThumbnail(node, thumbFile.getAbsolutePath());
@@ -201,7 +201,7 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 									}
 									
 									if (!previewFile.exists()){
-										previewCreated = MegaUtils.createPreview(f, previewFile);
+										previewCreated = MegaUtilsAndroid.createPreview(f, previewFile);
 										if (!node.hasPreview()){
 											log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
 											megaApi.setPreview(node, previewFile.getAbsolutePath());
@@ -238,13 +238,13 @@ public class MegaBrowserListAdapter extends BaseAdapter implements OnClickListen
 					if (f != null){
 						if (f.length() == node.getSize()){
 							log("IDEM: " + filePath + "____" + node.getName());
-							previewCreated = MegaUtils.createPreview(f, previewFile);
+							previewCreated = MegaUtilsAndroid.createPreview(f, previewFile);
 							if (!node.hasPreview()){
 								log("Upload preview -> " + node.getName() + "___" + previewFile.getAbsolutePath());
 								megaApi.setPreview(node, previewFile.getAbsolutePath());
 							}
 							if (!thumbFile.exists()){
-								thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+								thumbCreated = MegaUtilsAndroid.createThumbnail(f, thumbFile);
 								if (!node.hasThumbnail()){
 									log("Upload thumbnail -> " + node.getName() + "___" + thumbFile.getAbsolutePath());
 									megaApi.setThumbnail(node, thumbFile.getAbsolutePath());

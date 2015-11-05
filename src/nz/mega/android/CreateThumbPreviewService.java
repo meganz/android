@@ -17,7 +17,8 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUtils;
+import nz.mega.sdk.MegaUtilsAndroid;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -287,13 +288,13 @@ public class CreateThumbPreviewService extends Service {
 						if (f != null){
 							if (f.length() == n.getSize()){
 								log("IDEM: " + filePath + "____" + n.getName());
-								boolean thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+								boolean thumbCreated = MegaUtilsAndroid.createThumbnail(f, thumbFile);
 								if (!n.hasThumbnail()){
 									log("Upload thumbnail -> " + n.getName() + "___" + thumbFile.getAbsolutePath());
 									megaApi.setThumbnail(n, thumbFile.getAbsolutePath());
 								}
 								if (!previewFile.exists()){
-									boolean previewCreated = MegaUtils.createPreview(f, previewFile);
+									boolean previewCreated = MegaUtilsAndroid.createPreview(f, previewFile);
 									if (!n.hasPreview()){
 										log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
 										megaApi.setPreview(n, previewFile.getAbsolutePath());
@@ -322,13 +323,13 @@ public class CreateThumbPreviewService extends Service {
 												if (f != null){
 													if (f.length() == n.getSize()){
 														log("IDEM(by name): " + filePath + "____" + n.getName());
-														boolean thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+														boolean thumbCreated = MegaUtilsAndroid.createThumbnail(f, thumbFile);
 														if (!n.hasThumbnail()){
 															log("Upload thumbnail -> " + n.getName() + "___" + thumbFile.getAbsolutePath());
 															megaApi.setThumbnail(n, thumbFile.getAbsolutePath());
 														}
 														if (!previewFile.exists()){
-															boolean previewCreated = MegaUtils.createPreview(f, previewFile);
+															boolean previewCreated = MegaUtilsAndroid.createPreview(f, previewFile);
 															if (!n.hasPreview()){
 																log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
 																megaApi.setPreview(n, previewFile.getAbsolutePath());
@@ -365,13 +366,13 @@ public class CreateThumbPreviewService extends Service {
 						if (f != null){
 							if (f.length() == n.getSize()){
 								log("IDEM: " + filePath + "____" + n.getName());
-								boolean previewCreated = MegaUtils.createPreview(f, previewFile);
+								boolean previewCreated = MegaUtilsAndroid.createPreview(f, previewFile);
 								if (!n.hasPreview()){
 									log("Upload preview -> " + n.getName() + "___" + previewFile.getAbsolutePath());
 									megaApi.setPreview(n, previewFile.getAbsolutePath());
 								}
 								if (!thumbFile.exists()){
-									boolean thumbCreated = MegaUtils.createThumbnail(f, thumbFile);
+									boolean thumbCreated = MegaUtilsAndroid.createThumbnail(f, thumbFile);
 									if (!n.hasThumbnail()){
 										log("Upload thumbnail -> " + n.getName() + "___" + thumbFile.getAbsolutePath());
 										megaApi.setThumbnail(n, thumbFile.getAbsolutePath());
