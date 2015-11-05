@@ -4952,6 +4952,7 @@ public class ManagerActivity extends PinActivity implements OnItemClickListener,
 			context.startService(stopIntent);
 		}
 		dbH.clearOffline();
+		dbH.clearAttributes();
 		
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();

@@ -1,6 +1,7 @@
 package nz.mega.android.lollipop;
 
 import nz.mega.android.DatabaseHandler;
+import nz.mega.android.DownloadService;
 import nz.mega.android.ManagerActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaAttributes;
@@ -19,6 +20,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.transition.Visibility;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -88,6 +90,10 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 			}
 		}
 		
+		Intent intent1 = new Intent(this, IncorrectPinActivityLollipop.class);
+		startActivity(intent1);
+		finish();
+		
 		setContentView(R.layout.activity_pin_lock);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
@@ -119,26 +125,27 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		LinearLayout.LayoutParams warningParams = (LinearLayout.LayoutParams)warningLayout.getLayoutParams();
 		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
 		warningLayout.setLayoutParams(warningParams);
-		
-		if(attemps>5){
-			//Show alert
-			log("attemps less than 5: "+attemps);
-		}
-		else if (attemps==8){
-			//Last intent available!!
-			log("last intent: "+attemps);
-		}
-		else{
-			//Hide alert
-			log("number of attemps: "+attemps);
-		}
-		
-		warningLayout.setVisibility(View.VISIBLE);
+
 		warningText = (TextView) findViewById(R.id.warning_text);
 		//Margins
 		LinearLayout.LayoutParams textWarningParams = (LinearLayout.LayoutParams)warningText.getLayoutParams();
 		textWarningParams.setMargins(Util.scaleWidthPx(3, outMetrics), 0, Util.scaleWidthPx(3, outMetrics), 0); 
 		warningText.setLayoutParams(textWarningParams);
+		
+		if (attemps==MAX_ATTEMPS-1){
+			//Last intent available!!
+			log("last intent: "+attemps);
+		}
+		else if(attemps>=5){
+			//Show alert
+			log("attemps less than 5: "+attemps);
+			warningLayout.setVisibility(View.VISIBLE);
+		}
+		else{
+			//Hide alert
+			log("number of attemps: "+attemps);
+			warningLayout.setVisibility(View.GONE);
+		}	
 		
 		pinLayout = (LinearLayout) findViewById(R.id.pin_layout);
 		//Margins
@@ -389,6 +396,9 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 			dbH.setPinLockCode(pin);
 		}
 		PinUtil.update();
+		Intent intent = new Intent();
+		setResult(RESULT_OK, intent);
+		log("finish!");
 		finish();
 	}
 	
@@ -412,11 +422,12 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 				else{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 					attemps=attemps+1;
-					if(attemps==9){
+					if(attemps==10){
 						//Log out!!
 						log("INTENTS==9 - LOGOUT");
-						ManagerActivity.logout(this, megaApi, false);
-//						megaApi.logout();
+						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
+						startActivity(intent);
+						finish();
 					}
 					else{			
 						
@@ -427,9 +438,11 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 						String message = null;
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
+		            		warningLayout.setVisibility(View.GONE);
 		            	}
 		            	else{
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 		            	
 			        	Snackbar snack = Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG);
@@ -488,10 +501,12 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 					log("PIN INCORRECT RESET_UNLOCK - show snackBar");
 //		        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
 					attemps=attemps+1;
-					if(attemps==9){
+					if(attemps==10){
 						//Log out!!
 						log("INTENTS==9 - LOGOUT");
-						ManagerActivity.logout(this, megaApi, false);
+						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
+						startActivity(intent);
+						finish();
 //						megaApi.logout();
 					}
 					else{					
@@ -500,11 +515,14 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 						dbH.setAttrAttemps(attemps);
 						
 		            	String message = null;
+       	
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
+		            		warningLayout.setVisibility(View.GONE);
 		            	}
 		            	else{
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
+		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 			        	Snackbar snack = Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG);
 			        	View view = snack.getView();

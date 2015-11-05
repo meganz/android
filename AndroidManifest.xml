@@ -449,6 +449,12 @@
         </activity>
         
         <activity
+            android:name="nz.mega.android.lollipop.IncorrectPinActivityLollipop"
+            android:label="@string/settings_pin_lock"
+            android:screenOrientation="portrait" >
+        </activity>
+        
+        <activity
             android:name="PinLockActivity"
             android:label="@string/settings_pin_lock"
             android:screenOrientation="portrait" >

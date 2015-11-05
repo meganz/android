@@ -490,8 +490,9 @@
     <string name="pin_lock_not_match" context="error message when not typing the pin code correctly (two times)">Pin Codes don\'t match</string>
     <string name="unlock_pin_title" context="title of the screen to unlock screen with pin code">Enter your Pin Code</string>
     <string name="unlock_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-Enter your Pin Code</string>
-     <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Enter your new Pin Code</string>
+    <string name="reset_pin_title" context="title of the screen to unlock screen with pin code">Enter your new Pin Code</string>
     <string name="reset_pin_title_2" context="title of the screen to unlock screen with pin code in second round">Re-Enter your new Pin Code</string>
+    <string name="incorrect_pin_activity" context="text of the screen after 10 attemps with a wrong PIN">All your local data will be deleted and you will be logged out in 5 seconds.</string>
     
     <string name="settings_about" context="Caption of a title, in the context of &quot;About MEGA&quot; or &quot;About us&quot;">About</string>
     <string name="settings_about_privacy_policy" context="App means &quot;Application&quot;">Privacy Policy</string>
