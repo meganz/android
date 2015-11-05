@@ -1688,11 +1688,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						selectMenuItem.setVisible(true);
 					}
         			searchMenuItem.setVisible(true);
+        			thumbViewMenuItem.setVisible(true);
         			
     				//Hide
         			refreshMenuItem.setVisible(false);
-        			thumbViewMenuItem.setVisible(false);
-					pauseTransfersMenuIcon.setVisible(false);
+        			pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
     				createFolderMenuItem.setVisible(false);
         			addMenuItem.setVisible(false);
@@ -1707,12 +1707,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			refreshMenuItem.setVisible(false);
     				helpMenuItem.setVisible(false);
     				settingsMenuItem.setVisible(false);
-        			thumbViewMenuItem.setVisible(false);
         			clearRubbishBinMenuitem.setVisible(false);
         			rubbishBinMenuItem.setVisible(false);
         			upgradeAccountMenuItem.setVisible(false);
         			gridSmallLargeMenuItem.setVisible(false);
         			cancelAllTransfersMenuItem.setVisible(false);
+        			
+        			if (isListInbox){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
 	    		}
 
     			break;
@@ -2793,11 +2799,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				else{
 					selectMenuItem.setVisible(false);
 				}
+    			
+    			if (isListInbox){	
+    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+    			}
+    			
     			searchMenuItem.setVisible(true);
+    			thumbViewMenuItem.setVisible(true);
     			
 				//Hide
     			refreshMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
 				pauseTransfersMenuIcon.setVisible(false);
 				playTransfersMenuIcon.setVisible(false);
 				createFolderMenuItem.setVisible(false);
@@ -2814,8 +2828,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			refreshMenuItem.setVisible(false);
 				helpMenuItem.setVisible(false);
 				settingsMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-//    			rubbishBinMenuItem.setTitle(getString(R.string.section_cloud_drive));
     			clearRubbishBinMenuitem.setVisible(false);
     			rubbishBinMenuItem.setVisible(false);
     			gridSmallLargeMenuItem.setVisible(false);
@@ -3553,6 +3565,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			fragTransaction.commit();
 	    				}
 	    			}
+	        	}
+	        	if (drawerItem == DrawerItem.INBOX){
+	        		if (iFLol != null){        			
+        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("iFLol");
+        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+        				fragTransaction.detach(currentFragment);
+        				fragTransaction.commit();
+
+        				isListInbox = !isListInbox;
+        				if (isListInbox){	
+    	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+    					}
+    					else{
+    						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+    	    			}
+        				iFLol.setIsList(isListInbox);						
+
+        				fragTransaction = getSupportFragmentManager().beginTransaction();
+        				fragTransaction.attach(currentFragment);
+        				fragTransaction.commit();
+        				
+	        		}
 	        	}
 	        	if (drawerItem == DrawerItem.CONTACTS){
 		        	String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
@@ -7938,7 +7972,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						inSFLol.setNodes(nodes);
-						iFLol.getListView().invalidate();
+						iFLol.getRecyclerView().invalidate();
 					}			
 				}
 				else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
@@ -8027,7 +8061,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}										
 					else if (drawerItem == DrawerItem.INBOX){
 						if (iFLol != null){
-							iFLol.getListView().invalidate();
+							iFLol.getRecyclerView().invalidate();
 						}
 					}
 				}
