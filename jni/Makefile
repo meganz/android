@@ -19,7 +19,7 @@ CRYPTOPP_DOWNLOAD_URL=http://www.cryptopp.com/$(CRYPTOPP_SOURCE_FILE)
 CRYPTOPP_VERIFIED_SOURCES=$(CRYPTOPP)/$(CRYPTOPP_SOURCE_FILE)_verified
 
 CURL=curl
-CURL_VERSION=7.44.0
+CURL_VERSION=7.45.0
 C_ARES_VERSION=1.10.0
 CURL_EXTRA=--disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --disable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smtp --disable-gopher --disable-sspi
 CURL_SOURCE_FILE=curl-$(CURL_VERSION).tar.gz
@@ -54,7 +54,7 @@ SODIUM_BUILT=$(SODIUM)/$(SODIUM_SOURCE_FILE)_built
 MEGA=mega
 MEGA_JAVA_OUTPUT_PATH=$(JNI_PATH)/../src
 MEGA_CONFIGURED=java_wrap.cxx
-MEGA_WRAPPER=megaapi.i
+MEGA_WRAPPER=sdk/bindings/megaapi.i
 
 all: $(CRYPTOPP) $(CURL) $(MEGA) #$(SODIUM) 
 	$(NDK_BUILD)

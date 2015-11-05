@@ -15,7 +15,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaTransfer;
 import nz.mega.sdk.MegaTransferListenerInterface;
-import nz.mega.sdk.MegaUtils;
+import nz.mega.sdk.MegaUtilsAndroid;
 
 import android.app.Activity;
 import android.content.Context;
@@ -150,7 +150,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 						File previewDir = PreviewUtils.getPreviewFolder(activity);
 						File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
 						log("BASE64: " + node.getBase64Handle() + "name: " + node.getName());
-						boolean previewCreated = MegaUtils.createPreview(destination, previewFile);
+						boolean previewCreated = MegaUtilsAndroid.createPreview(destination, previewFile);
 						
 						if (previewCreated){
 							preview = PreviewUtils.getBitmapForCache(previewFile, activity);
@@ -223,7 +223,7 @@ public class MegaFullScreenImageAdapter extends PagerAdapter implements OnClickL
 			
 			File previewDir = PreviewUtils.getPreviewFolder(activity);
 			File previewFile = new File(previewDir, node.getBase64Handle()+".jpg");
-			boolean previewCreated = MegaUtils.createPreview(fullImage, previewFile);
+			boolean previewCreated = MegaUtilsAndroid.createPreview(fullImage, previewFile);
 			
 			if (previewCreated){
 				fullImage.delete();

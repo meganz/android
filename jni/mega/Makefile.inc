@@ -134,4 +134,4 @@ JAVA_BINDINGS=$(addprefix $(JAVA_OUTPUT_PATH)/, \
 				TreeProcessor.java AccountTransaction.java MegaError.java MegaRequest.java \
 				Node.java Share.java User.java)
 
-SWIG_INTERFACE=megaapi.i
+SWIG_INTERFACE=sdk/bindings/megaapi.i
