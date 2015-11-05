@@ -110,6 +110,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			super(v);
 		}
 		
+		public View separator;
+		
 		/*public ImageView savedOffline;
 //		public ImageView savedOfflineMultiselect;
 		public ImageButton imageButtonThreeDots;
@@ -313,6 +315,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_grid_three_dots);
 			holderGrid.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_grid_browser_bar);
 			
+			holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
+			
 			holderGrid.transferProgressBar.setVisibility(View.GONE);
 			holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
 			
@@ -366,6 +370,47 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		holder.textViewFileName.setText(node.getName());
 		holder.textViewFileSize.setText("");
+		
+		if (!multipleSelect) {
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			
+			if (positionClicked != -1) {
+				if (positionClicked == position) {
+					//				holder.arrowSelection.setVisibility(View.VISIBLE);
+//					holder.optionsLayout.setVisibility(View.GONE);
+					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					listFragment.smoothScrollToPosition(positionClicked);
+				}
+				else {
+					//				holder.arrowSelection.setVisibility(View.GONE);
+					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				}
+			} 
+			else {
+				//			holder.arrowSelection.setVisibility(View.GONE);
+				
+				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+			}
+	
+		} 
+		else {
+			holder.imageButtonThreeDots.setVisibility(View.GONE);		
+
+			if(this.isItemChecked(position)){
+				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
+				holder.separator.setBackgroundColor(Color.WHITE);
+			}
+			else{
+				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+			}
+		}
 		
 		if (node.isFolder()) {
 			holder.textViewFileSize.setText(getInfoFolder(node));
@@ -544,7 +589,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 	
-		} else {
+		} 
+		else {
 			holder.imageButtonThreeDots.setVisibility(View.GONE);		
 
 			if(this.isItemChecked(position)){
@@ -582,7 +628,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				} else {
 					holder.imageView.setImageResource(R.drawable.ic_folder_list);
 				}
-			} else {
+			} 
+			else {
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			}			
 
@@ -826,7 +873,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		final MegaNode n = (MegaNode) getItem(currentPosition);
 
 		switch (v.getId()) {		
-			case R.id.file_list_three_dots: {	
+			case R.id.file_list_three_dots:
+			case R.id.file_grid_three_dots:{	
 				
 				log("onClick: file_list_three_dots: "+currentPosition);			
 	
@@ -854,33 +902,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				
 				break;
 			}
-			case R.id.file_list_item_layout:{
-				if(type==ManagerActivityLollipop.RUBBISH_BIN_ADAPTER){
-					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else if(type==ManagerActivityLollipop.INBOX_ADAPTER){
-					((InboxFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else if(type==ManagerActivityLollipop.INCOMING_SHARES_ADAPTER){
-					((IncomingSharesFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else if(type==ManagerActivityLollipop.OUTGOING_SHARES_ADAPTER){
-					((OutgoingSharesFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else if(type==ManagerActivityLollipop.CONTACT_FILE_ADAPTER){
-					((ContactFileListFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else if(type==ManagerActivityLollipop.FOLDER_LINK_ADAPTER){
-					((FolderLinkActivityLollipop) context).itemClick(currentPosition);
-				}
-				else if(type==ManagerActivityLollipop.SEARCH_ADAPTER){
-					((SearchFragmentLollipop) fragment).itemClick(currentPosition);
-				}
-				else{
-					((FileBrowserFragmentLollipop) fragment).itemClick(currentPosition);
-				}				
-				break;
-			}
+			case R.id.file_list_item_layout:
 			case R.id.file_grid_item_layout:{
 				if(type==ManagerActivityLollipop.RUBBISH_BIN_ADAPTER){
 					((RubbishBinFragmentLollipop) fragment).itemClick(currentPosition);

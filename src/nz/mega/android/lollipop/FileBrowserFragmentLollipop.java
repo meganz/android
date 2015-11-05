@@ -492,14 +492,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 				adapter.setNodes(nodes);				
+			}
+			
+			if (mTHash != null){
+				adapter.setTransfers(mTHash);
 			}
 			
 			if (parentHandle == megaApi.getRootNode().getHandle()){
@@ -624,7 +625,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
-			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			recyclerView.setHasFixedSize(true);
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
@@ -706,14 +706,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
-				if (mTHash != null){
-					adapter.setTransfers(mTHash);
-				}
 			}
 			else{
 				adapter.setParentHandle(parentHandle);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 				adapter.setNodes(nodes);
+			}
+			
+			if (mTHash != null){
+				adapter.setTransfers(mTHash);
 			}
 			
 			if (parentHandle == megaApi.getRootNode().getHandle()){
@@ -795,7 +796,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
 			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+			/*slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
@@ -826,7 +827,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });
+	        });*/
 			
 			
 			
@@ -1040,33 +1041,48 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void onClick(View v) {
 
 		switch(v.getId()){
-		case R.id.btnLeft_grid_new:
-			((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
-			break;
+			case R.id.btnLeft_new:
+			case R.id.btnLeft_grid_new:{
+				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
+				break;
+			}
 			
-		case R.id.btnRight_grid_upload:
-			((ManagerActivityLollipop)getActivity()).uploadFile();
-			break;			
-		case R.id.file_upload_button:
-			((ManagerActivityLollipop)getActivity()).uploadFile();
-			break;			
-		case R.id.out_space_btn:
-			((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
-			break;
-		case R.id.file_list_out_options:
-			hideOptionsPanel();
-			break;
-		case R.id.file_list_option_download_layout: {
-			log("Download option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(selectedNode.getHandle());
-			((ManagerActivityLollipop) context).onFileClick(handleList);
-			break;
-		}
+			case R.id.btnRight_upload:
+			case R.id.btnRight_grid_upload:{
+				((ManagerActivityLollipop)getActivity()).uploadFile();
+				break;			
+			}
+			
+			case R.id.file_upload_button:
+			case R.id.file_upload_button_grid:{
+				((ManagerActivityLollipop)getActivity()).uploadFile();
+				break;			
+			}
+			
+			case R.id.out_space_btn:
+			case R.id.out_space_btn_grid:{
+				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
+				break;
+			}
+		
+			case R.id.file_list_out_options:
+			case R.id.file_grid_out_options:{
+				hideOptionsPanel();
+				break;
+			}
+		
+			case R.id.file_list_option_download_layout:
+			case R.id.file_grid_option_download_layout: {
+				log("Download option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+				((ManagerActivityLollipop) context).onFileClick(handleList);
+				break;
+			}
 //		case R.id.file_list_option_leave_share_layout: {
 //			positionClicked = -1;	
 //			notifyDataSetChanged();
@@ -1080,97 +1096,109 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //			//Toast.makeText(context, context.getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
 //			break;
 //		}
-		case R.id.file_list_option_move_layout:{
-			log("Move option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(selectedNode.getHandle());									
-			((ManagerActivityLollipop) context).showMoveLollipop(handleList);
-
-			break;
-		}
-		case R.id.file_list_option_properties_layout: {
-			log("Properties option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
-			i.putExtra("handle", selectedNode.getHandle());
-			
-			if (selectedNode.isFolder()) {
-				if (megaApi.isShared(selectedNode)){
-					i.putExtra("imageId", R.drawable.folder_shared_mime);	
-				}
-				else{
-					i.putExtra("imageId", R.drawable.folder_mime);
-				}
-			} 
-			else {
-				i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+			case R.id.file_list_option_move_layout:
+			case R.id.file_grid_option_move_layout: {
+				log("Move option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());									
+				((ManagerActivityLollipop) context).showMoveLollipop(handleList);
+	
+				break;
 			}
-			i.putExtra("name", selectedNode.getName());
-			context.startActivity(i);
-
-			break;
+			
+			case R.id.file_list_option_properties_layout: 
+			case R.id.file_grid_option_properties_layout: {
+				log("Properties option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
+				i.putExtra("handle", selectedNode.getHandle());
+				
+				if (selectedNode.isFolder()) {
+					if (megaApi.isShared(selectedNode)){
+						i.putExtra("imageId", R.drawable.folder_shared_mime);	
+					}
+					else{
+						i.putExtra("imageId", R.drawable.folder_mime);
+					}
+				} 
+				else {
+					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+				}
+				i.putExtra("name", selectedNode.getName());
+				context.startActivity(i);
+	
+				break;
+			}
+			
+			case R.id.file_list_option_delete_layout: 
+			case R.id.file_grid_option_delete_layout: {
+				log("Delete option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());
+	
+				((ManagerActivityLollipop) context).moveToTrash(handleList);
+	
+				break;
+			}
+			
+			case R.id.file_list_option_public_link_layout: 
+			case R.id.file_grid_option_public_link_layout: {
+				log("Public link option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).getPublicLinkAndShareIt(selectedNode);
+	
+				break;
+			}
+			
+			case R.id.file_list_option_rename_layout: 
+			case R.id.file_grid_option_rename_layout: {
+				log("Rename option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
+				break;
+			}	
+			
+			case R.id.file_list_option_share_layout: 
+			case R.id.file_grid_option_share_layout: {
+				log("Share option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).shareFolderLollipop(selectedNode);
+				break;
+			}	
+			
+			case R.id.file_list_option_copy_layout: 
+			case R.id.file_grid_option_copy_layout: {
+				log("Copy option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				ArrayList<Long> handleList = new ArrayList<Long>();
+				handleList.add(selectedNode.getHandle());									
+				((ManagerActivityLollipop) context).showCopyLollipop(handleList);
+				break;
+			}
 		}
-		case R.id.file_list_option_delete_layout: {
-			log("Delete option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(selectedNode.getHandle());
-
-			((ManagerActivityLollipop) context).moveToTrash(handleList);
-
-			break;
-		}
-		case R.id.file_list_option_public_link_layout: {
-			log("Public link option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			((ManagerActivityLollipop) context).getPublicLinkAndShareIt(selectedNode);
-
-			break;
-		}
-		case R.id.file_list_option_rename_layout: {
-			log("Rename option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
-			break;
-		}	
-		
-		case R.id.file_list_option_share_layout: {	
-			log("Share option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			((ManagerActivityLollipop) context).shareFolderLollipop(selectedNode);
-			break;
-		}			
-		case R.id.file_list_option_copy_layout: {
-			log("Copy option");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
-			notifyDataSetChanged();
-			ArrayList<Long> handleList = new ArrayList<Long>();
-			handleList.add(selectedNode.getHandle());									
-			((ManagerActivityLollipop) context).showCopyLollipop(handleList);
-			break;
-		}
-	}
 	}
 	
 	private String getInfoFolder(MegaNode n) {
