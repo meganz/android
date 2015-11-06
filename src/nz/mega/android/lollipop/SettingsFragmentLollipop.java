@@ -963,6 +963,29 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		return true;
 	}
 	
+	@Override
+	public void onResume() {
+	    super.onResume();
+	    log("onResume");
+	    prefs=dbH.getPreferences();
+	    
+	    if (prefs.getPinLockEnabled() == null){
+			dbH.setPinLockEnabled(false);
+			dbH.setPinLockCode("");
+			pinLock = false;
+			pinLockEnable.setChecked(pinLock);
+		}
+		else{
+			pinLock = Boolean.parseBoolean(prefs.getPinLockEnabled());
+			pinLockEnable.setChecked(pinLock);
+			pinLockCodeTxt = prefs.getPinLockCode();
+			if (pinLockCodeTxt == null){
+				pinLockCodeTxt = "";
+				dbH.setPinLockCode(pinLockCodeTxt);
+			}
+		}
+	}
+	
 	public void afterSetPinLock(){
 		log("afterSetPinLock");
 

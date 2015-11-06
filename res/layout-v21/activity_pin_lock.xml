@@ -1,11 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_container_pin_lock"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:gravity="center_horizontal"
     android:fitsSystemWindows="true"
-    android:orientation="vertical"
     android:stackFromBottom="true"
     android:windowSoftInputMode="stateVisible"
     tools:context=".PinLockActivityLollipop" >
@@ -20,6 +20,7 @@
 
     <LinearLayout
         android:id="@+id/pin_layout"
+        android:layout_below="@id/unlock_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
@@ -65,13 +66,12 @@
 
     <LinearLayout
         android:id="@+id/warning_layout"
+        android:layout_below="@id/pin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:gravity="center_horizontal|center_vertical"
-        android:orientation="horizontal"
-        android:paddingBottom="20dp"
-        android:paddingTop="20dp" >
+        android:orientation="horizontal" >
 
         <ImageView
             android:id="@+id/warning_image"
@@ -89,4 +89,21 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/red_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/mega_transparency"
+        android:gravity="center_horizontal|center_vertical">
+
+        <TextView
+            android:id="@+id/alert_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="@string/incorrect_pin_activity"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
+</RelativeLayout>
