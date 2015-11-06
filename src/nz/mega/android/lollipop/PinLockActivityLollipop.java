@@ -12,6 +12,7 @@ import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +36,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -55,10 +57,14 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 	DisplayMetrics outMetrics;
 	Display display;
 	
+	Handler handler;
+	
 	MegaApiAndroid megaApi;
-    LinearLayout fragmentContainer;
+	RelativeLayout fragmentContainer;
     LinearLayout pinLayout;
     LinearLayout warningLayout;
+    RelativeLayout redLayout;
+	TextView textLogout;
 	TextView unlockText;
 	TextView warningText;
 	EditText passFirstLetter;
@@ -67,6 +73,8 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 	EditText passFourthLetter;
 	final StringBuilder sbFirst=new StringBuilder();
 	final StringBuilder sbSecond=new StringBuilder();
+	
+	InputMethodManager imm;
 	
 	int mode = UNLOCK;
 	
@@ -89,11 +97,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 				mode=RESET_UNLOCK;
 			}
 		}
-		
-		Intent intent1 = new Intent(this, IncorrectPinActivityLollipop.class);
-		startActivity(intent1);
-		finish();
-		
+
 		setContentView(R.layout.activity_pin_lock);
 		megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		
@@ -119,10 +123,20 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		attemps = att.getAttemps();
 		log("onCreate Attemps number: "+attemps);
 		
-		fragmentContainer = (LinearLayout) findViewById(R.id.fragment_container_pin_lock);
+		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_pin_lock);
+		
+		redLayout = (RelativeLayout) findViewById(R.id.red_layout);
+		redLayout.setVisibility(View.GONE);
+		textLogout = (TextView) findViewById(R.id.alert_text);
+		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		//Margins
+		RelativeLayout.LayoutParams textLogoutParams = (RelativeLayout.LayoutParams)textLogout.getLayoutParams();
+		textLogoutParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0); 
+		textLogout.setLayoutParams(textLogoutParams);
+		
 		warningLayout = (LinearLayout) findViewById(R.id.warning_layout);
 		//Margins
-		LinearLayout.LayoutParams warningParams = (LinearLayout.LayoutParams)warningLayout.getLayoutParams();
+		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
 		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
 		warningLayout.setLayoutParams(warningParams);
 
@@ -149,17 +163,18 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		
 		pinLayout = (LinearLayout) findViewById(R.id.pin_layout);
 		//Margins
-		LinearLayout.LayoutParams pinParams = (LinearLayout.LayoutParams)pinLayout.getLayoutParams();
+		RelativeLayout.LayoutParams pinParams = (RelativeLayout.LayoutParams)pinLayout.getLayoutParams();
 		pinParams.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		pinLayout.setLayoutParams(pinParams);
 		
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
+		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
 		unlockText.setText(R.string.unlock_pin_title);		
 		unlockText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (24*scaleText));
 		//Margins
-		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)unlockText.getLayoutParams();
-		textParams.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(90, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
-		unlockText.setLayoutParams(textParams);
+		RelativeLayout.LayoutParams unlockParams = (RelativeLayout.LayoutParams)unlockText.getLayoutParams();
+		unlockParams.setMargins(Util.scaleWidthPx(75, outMetrics), Util.scaleHeightPx(90, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		unlockText.setLayoutParams(unlockParams);
 		
 		//PIN
 		passFirstLetter = (EditText) findViewById(R.id.pass_first);
@@ -168,7 +183,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		paramsb1.width = Util.scaleWidthPx(40, outMetrics);		
 		passFirstLetter.setLayoutParams(paramsb1);	
 		//Margins
-		textParams = (LinearLayout.LayoutParams)passFirstLetter.getLayoutParams();
+		LinearLayout.LayoutParams textParams = (LinearLayout.LayoutParams)passFirstLetter.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(0, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
 		passFirstLetter.setLayoutParams(textParams);
 		
@@ -203,7 +218,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		passFourthLetter.setLayoutParams(textParams);
 		
 		passFirstLetter.requestFocus();	
-		InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
 //		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
@@ -214,7 +229,6 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 if(sbFirst.length()==0 & passFirstLetter.length()==1)
                 {
                 	sbFirst.append(s);
-                    log("onTextChanged1: sb: "+sbFirst+" s: "+s+"//");
 //                    passFirstLetter.clearFocus();
                     passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
@@ -223,7 +237,6 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 else if(sbSecond.length()==0 & passFirstLetter.length()==1)
                 {
                 	sbSecond.append(s);
-                    log("onTextChanged1: sb: "+sbSecond+" s: "+s+"//");
 //                    passFirstLetter.clearFocus();
                     passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
@@ -243,7 +256,6 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 if(sbFirst.length()==1 & passSecondLetter.length()==1)
                 {
                 	sbFirst.append(s);
-                    log("onTextChanged2: sb: "+sbFirst+" s: "+s+"//");
                     passSecondLetter.clearFocus();
                     passThirdLetter.requestFocus();
                     passThirdLetter.setCursorVisible(true);
@@ -252,7 +264,6 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 else if(sbSecond.length()==1 & passSecondLetter.length()==1)
                 {
                 	sbSecond.append(s);
-                    log("onTextChanged2: sb: "+sbSecond+" s: "+s+"//");
                     passSecondLetter.clearFocus();
                     passThirdLetter.requestFocus();
                     passThirdLetter.setCursorVisible(true);
@@ -271,7 +282,6 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 if(sbFirst.length()==2 & passThirdLetter.length()==1)
                 {
                 	sbFirst.append(s);
-                    log("onTextChanged3: sb: "+sbFirst+" s: "+s+"//");
                     passThirdLetter.clearFocus();
                     
                     passFourthLetter.requestFocus();
@@ -281,7 +291,6 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 else if(sbSecond.length()==2 & passThirdLetter.length()==1)
                 {
                 	sbSecond.append(s);
-                    log("onTextChanged3: sb: "+sbSecond+" s: "+s+"//");
                     passThirdLetter.clearFocus();
                     
                     passFourthLetter.requestFocus();
@@ -300,8 +309,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 
                 if(sbFirst.length()==3 & passFourthLetter.length()==1)
                 {
-                	sbFirst.append(s);
-                    log("onTextChanged4: sb: "+sbFirst+" s: "+s+"//");                    
+                	sbFirst.append(s);                
                     
                     switch(mode){
 	                    case RESET_SET:
@@ -342,11 +350,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                 else if(sbSecond.length()==3 & passFourthLetter.length()==1)
                 {
                 	log("SECOND TIME 4thletter");
-                	sbSecond.append(s);
-                    log("onTextChanged3: sb: "+sbSecond+" s: "+s+"//");
-
-                    //Action to set/enter
-                    log("El pin del primer intento: "+sbFirst+" el pin del segundo intento: "+sbSecond);
+                	sbSecond.append(s);                             
                     
                     if(sbFirst.toString().equals(sbSecond.toString())){
                     	log("PIN match - submit form");
@@ -372,7 +376,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
                         passFirstLetter.setCursorVisible(true);
                         sbFirst.setLength(0);
                         sbSecond.setLength(0);
-                        if(getMode()==RESET_UNLOCK){
+                        if(getMode()==RESET_SET){
                         	unlockText.setText(R.string.reset_pin_title);
                         }
                         else{
@@ -424,10 +428,24 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 					attemps=attemps+1;
 					if(attemps==10){
 						//Log out!!
-						log("INTENTS==9 - LOGOUT");
-						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
-						startActivity(intent);
-						finish();
+						log("INTENTS==10 - LOGOUT");
+						redLayout.setVisibility(View.VISIBLE);
+						passFourthLetter.setCursorVisible(false);
+						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+//						imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
+						//						startActivity(intent);
+						//						finish();
+						handler = new Handler();
+						handler.postDelayed(new Runnable() {
+
+							@Override
+							public void run() {
+								log("Logout!!!");
+								ManagerActivity.logout(getApplication(), megaApi, false);
+								finish();
+							}
+						}, 5 * 1000);
 					}
 					else{			
 						
@@ -504,10 +522,22 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 					if(attemps==10){
 						//Log out!!
 						log("INTENTS==9 - LOGOUT");
-						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
-						startActivity(intent);
-						finish();
-//						megaApi.logout();
+						passFirstLetter.setCursorVisible(false);
+						passFourthLetter.setCursorVisible(false);
+						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
+						//						startActivity(intent);
+						//						finish();
+						handler = new Handler();
+						handler.postDelayed(new Runnable() {
+
+							@Override
+							public void run() {
+								log("Logout!!!");
+								ManagerActivity.logout(getApplication(), megaApi, false);
+								finish();
+							}
+						}, 5 * 1000);
 					}
 					else{					
 					
@@ -557,7 +587,22 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 	
 	@Override
 	public void onBackPressed() {
-        moveTaskToBack(true);
+		log("onBackPressed");
+		if(attemps<10){
+			log("attemps<10");
+			switch(mode){
+				case UNLOCK:{
+					moveTaskToBack(true);
+					break;
+				}
+				default:
+					finish();
+			}
+		}
+		else{
+			log("attemps MORE 10");
+			moveTaskToBack(false);
+		}
 	}
 	
 	public static void log(String message) {
