@@ -72,9 +72,9 @@
 	    android:layout_marginTop="@dimen/standard_margin"
 	    android:layout_centerHorizontal="true"/>
     
-         <nz.mega.components.SlidingUpPanelLayout
+   <nz.mega.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/sliding_layout"
+        android:id="@+id/sliding_layout_inbox"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"

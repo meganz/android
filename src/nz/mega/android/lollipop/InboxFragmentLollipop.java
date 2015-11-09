@@ -382,7 +382,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			contentText.setText(getInfoFolder(inboxNode));
 			setNodes(nodes);
 			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_inbox);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.file_list_options);
 			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_options);
 			optionRename = (LinearLayout) v.findViewById(R.id.file_list_option_rename_layout);
@@ -519,6 +519,66 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			contentText.setText(getInfoFolder(inboxNode));
 			setNodes(nodes);
 			
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_inbox_grid);
+			optionsLayout = (LinearLayout) v.findViewById(R.id.file_grid_options);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_options);
+			optionRename = (LinearLayout) v.findViewById(R.id.file_grid_option_rename_layout);
+			optionRename.setVisibility(View.GONE);
+			
+			optionDownload = (LinearLayout) v.findViewById(R.id.file_grid_option_download_layout);
+			optionProperties = (LinearLayout) v.findViewById(R.id.file_grid_option_properties_layout);
+			propertiesText = (TextView) v.findViewById(R.id.file_grid_option_properties_text);			
+			
+			optionDelete = (LinearLayout) v.findViewById(R.id.file_grid_option_delete_layout);			
+
+			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
+			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);			
+			
+			optionDownload.setOnClickListener(this);
+			optionProperties.setOnClickListener(this);
+			optionRename.setOnClickListener(this);
+			optionDelete.setOnClickListener(this);
+			optionMoveTo.setOnClickListener(this);
+			optionCopyTo.setOnClickListener(this);
+			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingOptionsPanel.setVisibility(View.INVISIBLE);
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+	            @Override
+	            public void onPanelSlide(View panel, float slideOffset) {
+	            	log("onPanelSlide, offset " + slideOffset);
+	            	if(slideOffset==0){
+	            		hideOptionsPanel();
+	            	}
+	            }
+
+	            @Override
+	            public void onPanelExpanded(View panel) {
+	            	log("onPanelExpanded");
+
+	            }
+
+	            @Override
+	            public void onPanelCollapsed(View panel) {
+	            	log("onPanelCollapsed");
+	            	
+
+	            }
+
+	            @Override
+	            public void onPanelAnchored(View panel) {
+	            	log("onPanelAnchored");
+	            }
+
+	            @Override
+	            public void onPanelHidden(View panel) {
+	                log("onPanelHidden");                
+	            }
+	        });
+			
 			return v;	
 		}
 	}
@@ -581,7 +641,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
-			case R.id.file_list_option_download_layout: {
+			case R.id.file_list_option_download_layout:
+			case R.id.file_grid_option_download_layout: {
 				log("Download option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -592,7 +653,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				((ManagerActivityLollipop) context).onFileClick(handleList);
 				break;
 			}
-			case R.id.file_list_option_move_layout:{
+			case R.id.file_list_option_move_layout:
+			case R.id.file_grid_option_move_layout: {
 				log("Move option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -604,7 +666,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 				break;
 			}
-			case R.id.file_list_option_properties_layout: {
+			case R.id.file_list_option_properties_layout: 
+			case R.id.file_grid_option_properties_layout: {
 				log("Properties option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -629,7 +692,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 				break;
 			}
-			case R.id.file_list_option_delete_layout: {
+			case R.id.file_list_option_delete_layout: 
+			case R.id.file_grid_option_delete_layout: {
 				log("Delete option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -642,7 +706,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 				break;
 			}
-			case R.id.file_list_option_rename_layout: {
+			case R.id.file_list_option_rename_layout: 
+			case R.id.file_grid_option_rename_layout: {
 				log("Rename option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -651,7 +716,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
 				break;
 			}
-			case R.id.file_list_option_copy_layout: {
+			case R.id.file_list_option_copy_layout: 
+			case R.id.file_grid_option_copy_layout: {
 				log("Copy option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
