@@ -6,10 +6,7 @@ import java.util.List;
 import nz.mega.components.SlidingUpPanelLayout;
 import nz.mega.components.SlidingUpPanelLayout.PanelState;
 
-import nz.mega.android.ContactPropertiesMainActivity;
-import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
-import nz.mega.android.MegaBrowserNewGridAdapter;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
@@ -19,7 +16,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaShare;
 
 import android.app.Activity;
 import android.content.Context;
@@ -36,6 +32,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -68,11 +65,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	
 	Context context;
 	ActionBar aB;
-	RecyclerView listView;
+	RecyclerView recyclerView;
 	RecyclerView.LayoutManager mLayoutManager;
 	GestureDetectorCompat detector;
-	MegaBrowserLollipopAdapter adapterList;
-	MegaBrowserNewGridAdapter adapterGrid;
+	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
 	
 	LinearLayout outSpaceLayout=null;
@@ -108,12 +104,12 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
 		public void onLongPress(MotionEvent e) {
-			View view = listView.findChildViewUnder(e.getX(), e.getY());
-			int position = listView.getChildPosition(view);
+			View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
+			int position = recyclerView.getChildPosition(view);
 
 			// handle long press
-			if (adapterList.getPositionClicked() == -1){
-				adapterList.setMultipleSelect(true);
+			if (adapter.getPositionClicked() == -1){
+				adapter.setMultipleSelect(true);
 
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
@@ -127,7 +123,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaNode> documents = adapterList.getSelectedNodes();
+			List<MegaNode> documents = adapter.getSelectedNodes();
 			
 			switch(item.getItemId()){
 
@@ -172,13 +168,13 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapterList.setMultipleSelect(false);
+			adapter.setMultipleSelect(false);
 			clearSelections();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaNode> selected = adapterList.getSelectedNodes();
+			List<MegaNode> selected = adapter.getSelectedNodes();
 			boolean showDownload = false;
 			boolean showRename = false;
 			boolean showCopy = false;
@@ -219,39 +215,25 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public boolean showSelectMenuItem(){
-		if (isList){
-			if (adapterList != null){
-				return adapterList.isMultipleSelect();
-			}
+		if (adapter != null){
+			return adapter.isMultipleSelect();
 		}
-		else{
-			if (adapterGrid != null){
-				return adapterGrid.isMultipleSelect();
-			}
-		}
-		
+				
 		return false;
 	}
 	
 	public void selectAll(){
-		if (isList){
-			if(adapterList.isMultipleSelect()){
-				adapterList.selectAll();
-			}
-			else{
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-				
-				adapterList.setMultipleSelect(true);
-				adapterList.selectAll();
-			}
-			
-			updateActionModeTitle();
+		if(adapter.isMultipleSelect()){
+			adapter.selectAll();
 		}
 		else{
-			if (adapterGrid != null){
-				adapterGrid.selectAll();
-			}
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			
+			adapter.setMultipleSelect(true);
+			adapter.selectAll();
 		}
+		
+		updateActionModeTitle();
 	}
 	
 	@Override
@@ -315,24 +297,25 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			listView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_list_view);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
-			listView.setLayoutManager(mLayoutManager);
-			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator()); 
+			recyclerView.setLayoutManager(mLayoutManager);
+			recyclerView.addOnItemTouchListener(this);
+			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
-			if (adapterList == null){
-				adapterList = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, listView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
+			if (adapter == null){
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapterList.setParentHandle(parentHandle);
-				adapterList.setNodes(nodes);
+				adapter.setParentHandle(parentHandle);
+				adapter.setNodes(nodes);
+				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish);
@@ -388,26 +371,26 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				contentText.setText(getInfoFolder(infoNode));
 			}
 			
-			adapterList.setPositionClicked(-1);
-			adapterList.setMultipleSelect(false);
+			adapter.setPositionClicked(-1);
+			adapter.setMultipleSelect(false);
 
-			listView.setAdapter(adapterList);
+			recyclerView.setAdapter(adapter);
 			
 			setNodes(nodes);
 			
-			if (adapterList.getItemCount() == 0){
+			if (adapter.getItemCount() == 0){
 				
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}	
 			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_list_options);
 			optionsOutLayout = (FrameLayout) v.findViewById(R.id.rubbishbin_list_out_options);
 			
@@ -466,6 +449,170 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
+			
+			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
+			
+			recyclerView = (RecyclerView) v.findViewById(R.id.rubbishbin_grid_view);
+			recyclerView.setHasFixedSize(true);
+			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+				@Override
+			      public int getSpanSize(int position) {
+					return 1;
+				}
+			});
+			
+			recyclerView.addOnItemTouchListener(this);
+			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
+			
+			emptyImageView = (ImageView) v.findViewById(R.id.rubbishbin_grid_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
+			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
+			emptyTextView.setText(R.string.file_browser_empty_folder);
+			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);
+			if (adapter == null){
+				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+			else{
+				adapter.setParentHandle(parentHandle);
+				adapter.setNodes(nodes);
+				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish_grid);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_rubbish_grid);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_rubbish_grid);
+			outSpaceButton.setOnClickListener(this);
+			
+			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
+			
+			if(usedSpacePerc>95){
+				//Change below of ListView
+				log("usedSpacePerc>95");
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
+//				listView.setLayoutParams(p);
+				outSpaceLayout.setVisibility(View.VISIBLE);
+				outSpaceLayout.bringToFront();
+				
+				Handler handler = new Handler();
+				handler.postDelayed(new Runnable() {					
+					
+					@Override
+					public void run() {
+						log("BUTTON DISAPPEAR");
+						log("altura: "+outSpaceLayout.getHeight());
+						
+						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+						animTop.setDuration(2000);
+						animTop.setFillAfter(true);
+						outSpaceLayout.setAnimation(animTop);
+					
+						outSpaceLayout.setVisibility(View.GONE);
+						outSpaceLayout.invalidate();
+//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//						listView.setLayoutParams(p);
+					}
+				}, 15 * 1000);
+				
+			}	
+			else{
+				outSpaceLayout.setVisibility(View.GONE);
+			}	
+			
+			if (parentHandle == megaApi.getRubbishNode().getHandle()){
+//				aB.setTitle(getString(R.string.section_rubbish_bin));
+				MegaNode infoNode = megaApi.getRubbishNode();
+				contentText.setText(getInfoFolder(infoNode));
+			}
+			else{
+				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
+				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				contentText.setText(getInfoFolder(infoNode));
+			}
+			
+			adapter.setPositionClicked(-1);
+			adapter.setMultipleSelect(false);
+
+			recyclerView.setAdapter(adapter);
+			
+			setNodes(nodes);
+			
+			if (adapter.getItemCount() == 0){
+				
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}	
+			
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish_grid);
+			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_options);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.rubbishbin_grid_out_options);
+			
+			optionProperties = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_properties_layout);
+			propertiesText = (TextView) v.findViewById(R.id.rubbishbin_grid_option_properties_text);			
+		
+			optionRemoveTotal = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_remove_layout);
+
+//				holder.optionDelete.getLayoutParams().width = Util.px2dp((60 * scaleW), outMetrics);
+//				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
+	
+			optionMoveTo = (LinearLayout) v.findViewById(R.id.rubbishbin_grid_option_move_layout);		
+
+			optionProperties.setOnClickListener(this);
+			optionRemoveTotal.setOnClickListener(this);
+			optionMoveTo.setOnClickListener(this);			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingOptionsPanel.setVisibility(View.INVISIBLE);
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+	            @Override
+	            public void onPanelSlide(View panel, float slideOffset) {
+	            	log("onPanelSlide, offset " + slideOffset);
+	            	if(slideOffset==0){
+	            		hideOptionsPanel();
+	            	}
+	            }
+
+	            @Override
+	            public void onPanelExpanded(View panel) {
+	            	log("onPanelExpanded");
+
+	            }
+
+	            @Override
+	            public void onPanelCollapsed(View panel) {
+	            	log("onPanelCollapsed");
+	            	
+
+	            }
+
+	            @Override
+	            public void onPanelAnchored(View panel) {
+	            	log("onPanelAnchored");
+	            }
+
+	            @Override
+	            public void onPanelHidden(View panel) {
+	                log("onPanelHidden");                
+	            }
+	        });
+			
+			return v;
+			
+			
+			
+			
+			
+			
 //			
 //			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 //			DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -569,7 +716,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			
 			//TODO comprobar la vista vacía
 			
-			return v;	
+//			return v;	
 		}
 	}
 	
@@ -596,7 +743,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void hideOptionsPanel(){
 		log("hideOptionsPanel");
 				
-		adapterList.setPositionClicked(-1);
+		adapter.setPositionClicked(-1);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
@@ -624,7 +771,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
-			case R.id.rubbishbin_list_option_move_layout:{
+			case R.id.rubbishbin_list_option_move_layout:
+			case R.id.rubbishbin_grid_option_move_layout:{
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
@@ -634,7 +782,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop) context).showMoveLollipop(handleList);	
 				break;
 			}
-			case R.id.rubbishbin_list_option_properties_layout: {
+			case R.id.rubbishbin_list_option_properties_layout: 
+			case R.id.rubbishbin_grid_option_properties_layout: {
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
 				setPositionClicked(-1);
@@ -658,7 +807,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				notifyDataSetChanged();
 				break;
 			}
-			case R.id.rubbishbin_list_option_remove_layout: {
+			case R.id.rubbishbin_list_option_remove_layout: 
+			case R.id.rubbishbin_grid_option_remove_layout: {
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
 				ArrayList<Long> handleList = new ArrayList<Long>();
@@ -673,70 +823,68 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 
     public void itemClick(int position) {
 		
-		if (isList){
-			if (adapterList.isMultipleSelect()){
-				adapterList.toggleSelection(position);
-				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
-			}
-			else{
-				if (nodes.get(position).isFolder()){
-					MegaNode n = nodes.get(position);
-					
-					aB.setTitle(n.getName());
-					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = nodes.get(position).getHandle();
-					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-					contentText.setText(getInfoFolder(infoNode));
-					((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-					adapterList.setParentHandle(parentHandle);
-					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
-					adapterList.setNodes(nodes);
-					listView.scrollToPosition(0);
-					
-					//If folder has no files
-					if (adapterList.getItemCount() == 0){
-						listView.setVisibility(View.GONE);
-						emptyImageView.setVisibility(View.VISIBLE);
-						emptyTextView.setVisibility(View.VISIBLE);
-						if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
-							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-							emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
-						} else {
-							emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-							emptyTextView.setText(R.string.file_browser_empty_folder);
-						}
-					}
-					else{
-						listView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
+		if (adapter.isMultipleSelect()){
+			adapter.toggleSelection(position);
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
+		}
+		else{
+			if (nodes.get(position).isFolder()){
+				MegaNode n = nodes.get(position);
+				
+				aB.setTitle(n.getName());
+				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+				((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
+				parentHandle = nodes.get(position).getHandle();
+				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+				contentText.setText(getInfoFolder(infoNode));
+				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
+				adapter.setParentHandle(parentHandle);
+				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
+				adapter.setNodes(nodes);
+				recyclerView.scrollToPosition(0);
+				
+				//If folder has no files
+				if (adapter.getItemCount() == 0){
+					recyclerView.setVisibility(View.GONE);
+					emptyImageView.setVisibility(View.VISIBLE);
+					emptyTextView.setVisibility(View.VISIBLE);
+					if (megaApi.getRubbishNode().getHandle()==n.getHandle()) {
+						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
+					} else {
+						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+						emptyTextView.setText(R.string.file_browser_empty_folder);
 					}
 				}
 				else{
-					if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-						Intent intent = new Intent(context, FullScreenImageViewer.class);
-						intent.putExtra("position", position);
-						intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
-						if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
-							intent.putExtra("parentNodeHandle", -1L);
-						}
-						else{
-							intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
-						}
-						intent.putExtra("orderGetChildren", orderGetChildren);
-						startActivity(intent);
+					recyclerView.setVisibility(View.VISIBLE);
+					emptyImageView.setVisibility(View.GONE);
+					emptyTextView.setVisibility(View.GONE);
+				}
+			}
+			else{
+				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
+					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
+					intent.putExtra("position", position);
+					intent.putExtra("adapterType", ManagerActivityLollipop.RUBBISH_BIN_ADAPTER);
+					if (megaApi.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_RUBBISH){
+						intent.putExtra("parentNodeHandle", -1L);
 					}
 					else{
-						adapterList.setPositionClicked(-1);
-						adapterList.notifyDataSetChanged();
-						ArrayList<Long> handleList = new ArrayList<Long>();
-						handleList.add(nodes.get(position).getHandle());
-						((ManagerActivityLollipop) context).onFileClick(handleList);
+						intent.putExtra("parentNodeHandle", megaApi.getParentNode(nodes.get(position)).getHandle());
 					}
+					intent.putExtra("orderGetChildren", orderGetChildren);
+					startActivity(intent);
+				}
+				else{
+					adapter.setPositionClicked(-1);
+					adapter.notifyDataSetChanged();
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					handleList.add(nodes.get(position).getHandle());
+					((ManagerActivityLollipop) context).onFileClick(handleList);
 				}
 			}
 		}
@@ -747,7 +895,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			return;
 		}
 
-		List<MegaNode> documents = adapterList.getSelectedNodes();
+		List<MegaNode> documents = adapter.getSelectedNodes();
 		int files = 0;
 		int folders = 0;
 		for (MegaNode document : documents) {
@@ -787,8 +935,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
-			adapterList.clearSelections();
+		if(adapter.isMultipleSelect()){
+			adapter.clearSelections();
 		}
 		updateActionModeTitle();
 	}
@@ -797,7 +945,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	 * Disable selection
 	 */
 	void hideMultipleSelect() {
-		adapterList.setMultipleSelect(false);
+		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
@@ -833,131 +981,65 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		
 		log("Sliding not shown");
 		
-		if (isList){
-			parentHandle = adapterList.getParentHandle();
-			((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-			
-			if (adapterList == null){
-				return 0;
-			}
-			
-			if (adapterList.isMultipleSelect()){
-				hideMultipleSelect();
-				return 2;
-			}
-			
-			if (adapterList.getPositionClicked() != -1){
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-				return 1;
-			}
-			else{
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-				if (parentNode != null){
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-						aB.setTitle(getString(R.string.section_rubbish_bin));	
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-					}
-					
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = parentNode.getHandle();
-					((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					adapterList.setNodes(nodes);
-					listView.post(new Runnable() 
-				    {
-				        @Override
-				        public void run() 
-				        {
-				        	listView.scrollToPosition(0);
-				            View v = listView.getChildAt(0);
-				            if (v != null) 
-				            {
-				                v.requestFocus();
-				            }
-				        }
-				    });
-					adapterList.setParentHandle(parentHandle);
-					contentText.setText(getInfoFolder(parentNode));
-					return 2;
-				}
-				else{
-					return 0;
-				}
-			}
+		parentHandle = adapter.getParentHandle();
+		((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
+		
+		if (adapter == null){
+			return 0;
+		}
+		
+		if (adapter.isMultipleSelect()){
+			hideMultipleSelect();
+			return 2;
+		}
+		
+		if (adapter.getPositionClicked() != -1){
+			adapter.setPositionClicked(-1);
+			adapter.notifyDataSetChanged();
+			return 1;
 		}
 		else{
-			parentHandle = adapterGrid.getParentHandle();
-			((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-			
-			if (adapterGrid == null){
-				return 0;
-			}
-			
-			if (adapterGrid.isMultipleSelect()){
-				adapterGrid.hideMultipleSelect();
-				return 2;
-			}
-			
-			if (adapterGrid.getPositionClicked() != -1){
-				adapterGrid.setPositionClicked(-1);
-				adapterGrid.notifyDataSetChanged();
-				return 1;
-			}
-			else{
-				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-				if (parentNode != null){
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-					if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-						aB.setTitle(getString(R.string.section_rubbish_bin));	
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-					}
-					else{
-						aB.setTitle(parentNode.getName());
-						aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-						((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
-					}
-					
-					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
-					
-					parentHandle = parentNode.getHandle();
-					((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
-					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					adapterGrid.setNodes(nodes);
-					listView.post(new Runnable() 
-				    {
-				        @Override
-				        public void run() 
-				        {
-				        	listView.scrollToPosition(0);
-				            View v = listView.getChildAt(0);
-				            if (v != null) 
-				            {
-				                v.requestFocus();
-				            }
-				        }
-				    });
-					adapterGrid.setParentHandle(parentHandle);
-					contentText.setText(getInfoFolder(parentNode));
-					contentText.setText(getInfoFolder(parentNode));
-					return 2;
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
+			if (parentNode != null){
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
+					aB.setTitle(getString(R.string.section_rubbish_bin));	
+					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				}
 				else{
-					return 0;
+					aB.setTitle(parentNode.getName());
+					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);
 				}
+				
+				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+				
+				parentHandle = parentNode.getHandle();
+				((ManagerActivityLollipop)context).setParentHandleRubbish(parentHandle);
+				nodes = megaApi.getChildren(parentNode, orderGetChildren);
+				adapter.setNodes(nodes);
+				recyclerView.post(new Runnable() 
+			    {
+			        @Override
+			        public void run() 
+			        {
+			        	recyclerView.scrollToPosition(0);
+			            View v = recyclerView.getChildAt(0);
+			            if (v != null) 
+			            {
+			                v.requestFocus();
+			            }
+			        }
+			    });
+				adapter.setParentHandle(parentHandle);
+				contentText.setText(getInfoFolder(parentNode));
+				return 2;
+			}
+			else{
+				return 0;
 			}
 		}
 	}
@@ -1017,118 +1099,62 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public long getParentHandle(){
-		if (isList){
-			return adapterList.getParentHandle();
-		}
-		else{
-			return adapterGrid.getParentHandle();
-		}
+		return adapter.getParentHandle();
 	}
 	
 	public void setParentHandle(long parentHandle){
 		this.parentHandle = parentHandle;
-		if (isList){
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(parentHandle);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setParentHandle(parentHandle);
-			}
+		if (adapter != null){
+			adapter.setParentHandle(parentHandle);
 		}
 	}
 	
-	public RecyclerView getListView(){
-		return listView;
+	public RecyclerView getRecyclerView(){
+		return recyclerView;
 	}
 	
 	public void setNodes(ArrayList<MegaNode> nodes){
 		this.nodes = nodes;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setNodes(nodes);
-				if (adapterList.getItemCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRubbishNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
+		if (adapter != null){
+			adapter.setNodes(nodes);
+			if (adapter.getItemCount() == 0){
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+				if (megaApi.getRubbishNode().getHandle()==parentHandle) {
+					emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
+					emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
+				} else {
+					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+					emptyTextView.setText(R.string.file_browser_empty_folder);
 				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}			
-			}	
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setNodes(nodes);
-				if (adapterGrid.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.VISIBLE);
-					if (megaApi.getRubbishNode().getHandle()==parentHandle) {
-						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
-						emptyTextView.setText(R.string.file_browser_empty_rubbish_bin);
-					} else {
-						emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-						emptyTextView.setText(R.string.file_browser_empty_folder);
-					}
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}			
 			}
-		}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
+				emptyImageView.setVisibility(View.GONE);
+				emptyTextView.setVisibility(View.GONE);
+			}			
+		}	
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		if (isList){
-			if (adapterList != null){
-				adapterList.setPositionClicked(positionClicked);
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setPositionClicked(positionClicked);
-			}	
-		}		
+		if (adapter != null){
+			adapter.setPositionClicked(positionClicked);
+		}	
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
-			if (adapterList != null){
-				adapterList.notifyDataSetChanged();
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.notifyDataSetChanged();
-			}
+		if (adapter != null){
+			adapter.notifyDataSetChanged();
 		}
 	}
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
-		if (isList){
-			if (adapterList != null){
-				adapterList.setOrder(orderGetChildren);
-			}
+		if (adapter != null){
+			adapter.setOrder(orderGetChildren);
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setOrder(orderGetChildren);
-			}
-		}
+		
 	}
 	
 	@Override
@@ -1188,7 +1214,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public int getItemCount(){
-		return adapterList.getItemCount();
+		return adapter.getItemCount();
 	}
 	
 	private static void log(String log) {
