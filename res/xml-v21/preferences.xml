@@ -85,6 +85,20 @@
 	        android:title="@string/settings_storage_download_location" />
 	</PreferenceCategory>
 	
+	<PreferenceCategory
+	    android:key="advanced_features"
+	    android:textColor="@color/pressed_mega"
+	    android:title="@string/settings_advanced_features" >
+		
+	    <Preference
+	        android:key="settings_advanced_features_cache"
+	        android:title="@string/settings_advanced_features_cache" />
+	    
+	    <Preference
+	        android:key="settings_advanced_features_offline"
+	        android:title="@string/settings_advanced_features_offline" />
+	</PreferenceCategory>
+	
     <PreferenceCategory 
         android:key="settings_about"
         android:title="@string/settings_about"

@@ -449,6 +449,97 @@ public class Util {
 		return sizeString;
 	}
 	
+	private static long getDirSize(File dir) {
+
+        long size = 0;
+        File[] files = dir.listFiles();
+
+        for (File file : files) {
+            if (file.isFile()) {
+                size += file.length();
+            }
+            else{
+                size += getDirSize(file);
+            }
+        }
+
+        return size;
+    }
+	
+    private static void cleanDir(File dir, long bytes) {
+
+        long bytesDeleted = 0;
+        File[] files = dir.listFiles();
+
+        for (File file : files) {
+            bytesDeleted += file.length();
+            file.delete();
+
+            if (bytesDeleted >= bytes) {
+                break;
+            }
+        }
+    }
+    
+    private static void cleanDir(File dir) {
+        File[] files = dir.listFiles();       
+        
+        for (File file : files) {
+            
+            if (file.isFile()) {
+            	file.delete();
+            }
+            else{
+            	cleanDir(file);
+            	file.delete();
+            }            
+        }
+    }
+    
+    public static String getCacheSize(Context context){
+    	log("getCacheSize");
+    	File cacheIntDir = context.getCacheDir();
+    	File cacheExtDir = context.getExternalCacheDir();
+    	
+    	long size = getDirSize(cacheIntDir)+getDirSize(cacheExtDir);    	
+    	
+    	String sizeCache = getSizeString(size);
+    	return sizeCache; 
+    }
+	
+    public static void clearCache(Context context){
+    	log("clearCache");
+    	File cacheIntDir = context.getCacheDir();
+    	File cacheExtDir = context.getExternalCacheDir();
+
+    	cleanDir(cacheIntDir);
+    	cleanDir(cacheExtDir);    	
+    }
+    
+    public static String getOfflineSize(Context context){
+    	log("getOfflineSize");
+    	File offline = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR);
+    	long size = 0;
+    	if(offline.exists()){
+    		size = getDirSize(offline);    	
+        	
+        	String sizeOffline = getSizeString(size);
+        	return sizeOffline; 
+    	}
+    	else{
+    		return getSizeString(0);
+    	}        	
+    }
+	
+    public static void clearOffline(Context context){
+    	log("clearOffline");
+    	File offline = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + offlineDIR);
+    	if(offline.exists()){
+        	cleanDir(offline);
+        	offline.delete();
+    	}
+    }
+    
 	public static String getDateString(long date){
 		DateFormat datf = DateFormat.getDateTimeInstance();
 		String dateString = "";

@@ -45,6 +45,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String CATEGORY_PIN_LOCK = "settings_pin_lock";
 	public static String CATEGORY_STORAGE = "settings_storage";
 	public static String CATEGORY_CAMERA_UPLOAD = "settings_camera_upload";
+	public static String CATEGORY_ADVANCED_FEATURES = "advanced_features";
 
 	public static String KEY_PIN_LOCK_ENABLE = "settings_pin_lock_enable";
 	public static String KEY_PIN_LOCK_CODE = "settings_pin_lock_code";
@@ -63,6 +64,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	public static String KEY_LOCAL_SECONDARY_MEDIA_FOLDER = "settings_local_secondary_media_folder";
 	public static String KEY_MEGA_SECONDARY_MEDIA_FOLDER = "settings_mega_secondary_media_folder";
 	
+	public static String KEY_CACHE = "settings_advanced_features_cache";
+	public static String KEY_OFFLINE = "settings_advanced_features_offline";
+	
 	public static String KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy";
 	public static String KEY_ABOUT_TOS = "settings_about_terms_of_service";
 	
@@ -76,6 +80,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	PreferenceCategory pinLockCategory;
 	PreferenceCategory storageCategory;
 	PreferenceCategory cameraUploadCategory;
+	PreferenceCategory advancedFeaturesCategory;
 	
 	SwitchPreference pinLockEnable;
 	Preference pinLockCode;
@@ -92,6 +97,8 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 	Preference secondaryMediaFolderOn;
 	Preference localSecondaryFolder;
 	Preference megaSecondaryFolder;
+	Preference advancedFeaturesCache;
+	Preference advancedFeaturesOffline;
 	
 	TwoLineCheckPreference storageAskMeAlways;
 	TwoLineCheckPreference storageAdvancedDevices;
@@ -141,6 +148,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
         storageCategory = (PreferenceCategory) findPreference(CATEGORY_STORAGE);
 		cameraUploadCategory = (PreferenceCategory) findPreference(CATEGORY_CAMERA_UPLOAD);	
 		pinLockCategory = (PreferenceCategory) findPreference(CATEGORY_PIN_LOCK);
+		advancedFeaturesCategory = (PreferenceCategory) findPreference(CATEGORY_ADVANCED_FEATURES);
 		
 		pinLockEnable = (SwitchPreference) findPreference(KEY_PIN_LOCK_ENABLE);
 		pinLockEnable.setOnPreferenceClickListener(this);
@@ -186,6 +194,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		megaSecondaryFolder= findPreference(KEY_MEGA_SECONDARY_MEDIA_FOLDER);	
 		megaSecondaryFolder.setOnPreferenceClickListener(this);
+		
+		advancedFeaturesCache = findPreference(KEY_CACHE);	
+		advancedFeaturesCache.setOnPreferenceClickListener(this);
+		advancedFeaturesOffline = findPreference(KEY_OFFLINE);
+		advancedFeaturesOffline.setOnPreferenceClickListener(this);
 		
 		aboutPrivacy = findPreference(KEY_ABOUT_PRIVACY_POLICY);
 		aboutPrivacy.setOnPreferenceClickListener(this);
@@ -461,6 +474,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 		}		
 
+		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
+		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
+
 		if (cameraUpload){
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
 			cameraUploadHow.setSummary(wifi);
@@ -706,6 +722,16 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
+		}
+		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
+			log("Clear Cache!");			
+			Util.clearCache(getActivity());
+			advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
+		}
+		else if (preference.getKey().compareTo(KEY_OFFLINE) == 0){
+			log("Clear Offline!");
+			Util.clearOffline(getActivity());
+			advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
 			log("Changing the secondaty uploads");
@@ -983,7 +1009,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				pinLockCodeTxt = "";
 				dbH.setPinLockCode(pinLockCodeTxt);
 			}
-		}
+		}	    
+	    
+		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
+		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
 	}
 	
 	public void afterSetPinLock(){
