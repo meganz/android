@@ -6,7 +6,7 @@
     tools:context=".RubbishBinFragmentLollipop" >
    
     <TextView
-	    android:id="@+id/rubbishbin_list_content_text"
+	    android:id="@+id/rubbishbin_grid_content_text"
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
 	    android:paddingLeft="8dp"
@@ -17,7 +17,7 @@
 	    android:textSize="14sp"/>
     
     <LinearLayout
-         android:id="@+id/out_space_rubbish"
+         android:id="@+id/out_space_rubbish_grid"
     	 android:layout_width="fill_parent"
     	 android:layout_height="wrap_content"
     	 android:layout_alignParentBottom="true"
@@ -26,7 +26,7 @@
     	 android:orientation="vertical">
 
 		<TextView
-		    android:id="@+id/out_space_text_rubbish"
+		    android:id="@+id/out_space_text_rubbish_grid"
 		    android:layout_width="fill_parent"
 		    android:layout_height="wrap_content"
 		    android:textColor="@color/white"
@@ -41,40 +41,41 @@
 		    android:text="@string/warning_out_space"/>  
          
          <Button
-            android:id="@+id/out_space_btn_rubbish"
+            android:id="@+id/out_space_btn_rubbish_grid"
        		android:layout_height="48dp"       		
        		android:layout_width="fill_parent"
             android:background="@drawable/btn_default_holo_light_without_corners"
             android:textColor="@color/button_text"
             android:text="@string/my_account_upgrade_pro" />
      </LinearLayout>          
-    
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rubbishbin_list_view"
+        
+    <nz.mega.components.AutofitRecyclerView
+        android:id="@+id/rubbishbin_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:choiceMode="multipleChoice"
-        android:layout_below="@id/rubbishbin_list_content_text" />
+        android:choiceMode="multipleChoice" 
+		android:layout_below="@id/rubbishbin_grid_content_text"
+		android:columnWidth="172dp" />
     
     <ImageView
-	    android:id="@+id/rubbishbin_list_empty_image"
+	    android:id="@+id/rubbishbin_grid_empty_image"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_centerInParent="true" />
     
     <TextView
-	    android:id="@+id/rubbishbin_list_empty_text"
+	    android:id="@+id/rubbishbin_grid_empty_text"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:textColor="@color/text_secondary"
 	    android:textSize="16sp"
-	    android:layout_below="@id/rubbishbin_list_empty_image"
+	    android:layout_below="@id/rubbishbin_grid_empty_image"
 	    android:layout_marginTop="@dimen/standard_margin"
 	    android:layout_centerHorizontal="true"/>
     
   <nz.mega.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/sliding_layout_rubbish"
+        android:id="@+id/sliding_layout_rubbish_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
@@ -87,7 +88,7 @@
    <!-- MAIN CONTENT -->
         
      <FrameLayout
-            android:id="@+id/rubbishbin_list_out_options"
+            android:id="@+id/rubbishbin_grid_out_options"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
@@ -106,7 +107,7 @@
        
         <!-- SLIDING LAYOUT -->
 		 <LinearLayout 
-            android:id="@+id/rubbishbin_list_options"
+            android:id="@+id/rubbishbin_grid_options"
             android:layout_width="match_parent"
         	android:layout_height="wrap_content"
         	android:padding="0dp"
@@ -114,14 +115,14 @@
         	android:orientation="vertical">                  	
            
 			<LinearLayout
-                android:id="@+id/rubbishbin_list_option_properties_layout"
+                android:id="@+id/rubbishbin_grid_option_properties_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                	android:orientation="horizontal"
                	android:gravity="center_vertical">
 		        
 		        <ImageView
-		            android:id="@+id/rubbishbin_list_option_properties"
+		            android:id="@+id/rubbishbin_grid_option_properties"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/info_ic"		            
@@ -130,7 +131,7 @@
 		            android:paddingBottom="2dp"/>
 		        
 		        <TextView 
-                    android:id="@+id/rubbishbin_list_option_properties_text"
+                    android:id="@+id/rubbishbin_grid_option_properties_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
 		            android:paddingTop="2dp"
@@ -142,14 +143,14 @@
  
 	    
 		    <LinearLayout
-                android:id="@+id/rubbishbin_list_option_move_layout"
+                android:id="@+id/rubbishbin_grid_option_move_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 		            
 		         <ImageView
-		            android:id="@+id/rubbishbin_list_option_move"
+		            android:id="@+id/rubbishbin_grid_option_move"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_move"
@@ -158,7 +159,7 @@
 		            android:paddingBottom="2dp"/>
 		         
 		         <TextView 
-                    android:id="@+id/rubbishbin_list_option_move_text"
+                    android:id="@+id/rubbishbin_grid_option_move_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/general_move_to"
@@ -169,14 +170,14 @@
 		      </LinearLayout>
 		    
 		    <LinearLayout
-                android:id="@+id/rubbishbin_list_option_remove_layout"
+                android:id="@+id/rubbishbin_grid_option_remove_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 		            
 		         <ImageView
-		            android:id="@+id/rubbishbin_list_option_remove"
+		            android:id="@+id/rubbishbin_grid_option_remove"
 		            android:layout_width="wrap_content"
 		            android:layout_height="wrap_content"
 		            android:src="@drawable/ic_delete"
@@ -185,7 +186,7 @@
 		            android:paddingBottom="2dp"/>
 		         
 		         <TextView 
-                    android:id="@+id/rubbishbin_list_option_remove_text"
+                    android:id="@+id/rubbishbin_grid_option_remove_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/context_delete"

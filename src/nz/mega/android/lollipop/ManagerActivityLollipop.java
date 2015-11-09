@@ -1360,12 +1360,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 				if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
                 					aB.setTitle(getResources().getString(R.string.section_cloud_drive));
                 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+                					fbFLol.setNodes(megaApi.getChildren(megaApi.getRootNode(), orderGetChildren));
                 					firstNavigationLevel = true;
                 				}
                 				else {
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleBrowser);
 	            					aB.setTitle(node.getName());
 	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+	            					fbFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
 	            					firstNavigationLevel = false;
             					}          					   				
                 			}
@@ -1377,15 +1379,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         		textViewBrowser.setTypeface(null, Typeface.NORMAL);
                 				textViewRubbish.setTypeface(null, Typeface.BOLD);
                         		log("parentHandleRubbish: "+ parentHandleRubbish);
-                        		if(parentHandleRubbish==megaApi.getRubbishNode().getHandle()||parentHandleRubbish==-1){
+                        		if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
                         			aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
                         			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+                        			rbFLol.setNodes(megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren));
                     				firstNavigationLevel = true;
                         		}
                         		else{                        			
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleRubbish);
                 					aB.setTitle(node.getName());
                 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+                					rbFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
                 					firstNavigationLevel = false;
             					}		
                 			}                           	
@@ -3550,6 +3554,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    						return;
 	    					}
 	    				}*/
+	    				
+	    				String cFTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+	    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+	    				if (rbFLol != null){
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(rbFLol);
+		        			fragTransaction.commit();
+
+		        			isListRubbishBin = !isListRubbishBin;
+		        			if (isListRubbishBin){	
+			    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+							}
+							else{
+								thumbViewMenuItem.setTitle(getString(R.string.action_list));
+			    			}
+		        			rbFLol.setIsList(isListRubbishBin);
+		        			rbFLol.setParentHandle(parentHandleRubbish);
+
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(rbFLol);
+		        			fragTransaction.commit();
+	    				}
 	    			}
 	    			else if(index==0){
 	    				//Cloud Drive
@@ -7646,7 +7672,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (rbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
     						rbFLol.setNodes(nodes);
-    						rbFLol.getListView().invalidate();
+    						rbFLol.getRecyclerView().invalidate();
             			}	
 
         				//Cloud Drive
@@ -7666,7 +7692,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				if (rbFLol != null){
 	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
 	    						rbFLol.setNodes(nodes);
-	    						rbFLol.getListView().invalidate();
+	    						rbFLol.getRecyclerView().invalidate();
 	            			}		
 	        			}
 	        			else{
@@ -7693,7 +7719,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				if (rbFLol != null){
 	        					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
 	    						rbFLol.setNodes(nodes);
-	    						rbFLol.getListView().invalidate();
+	    						rbFLol.getRecyclerView().invalidate();
 	            			}	
 						}
 						else{
@@ -7733,7 +7759,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (rbFLol != null){
         					ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
     						rbFLol.setNodes(nodes);
-    						rbFLol.getListView().invalidate();
+    						rbFLol.getRecyclerView().invalidate();
             			}	
 					}
 					else{
@@ -7875,7 +7901,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     							rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
     							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
     							rbFLol.setNodes(nodes);
-    							rbFLol.getListView().invalidate();
+    							rbFLol.getRecyclerView().invalidate();
     							aB.setTitle(getString(R.string.section_rubbish_bin));	
     							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
     							this.firstNavigationLevel = true;
@@ -7883,7 +7909,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     						else{
     							ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
     							rbFLol.setNodes(nodes);
-    							rbFLol.getListView().invalidate();
+    							rbFLol.getRecyclerView().invalidate();
     						}
             			}		
         			}
@@ -8062,7 +8088,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				if (rbFLol != null){						
 								ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
 								rbFLol.setNodes(nodes);
-								rbFLol.getListView().invalidate();
+								rbFLol.getRecyclerView().invalidate();
 							}
 	        			}
 	        			else{
@@ -8186,7 +8212,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getRubbishNode(), orderGetChildren);
 						rbFLol.setParentHandle(megaApi.getRubbishNode().getHandle());
 						rbFLol.setNodes(nodes);
-						rbFLol.getListView().invalidate();
+						rbFLol.getRecyclerView().invalidate();
 					}
 				}
 				else{
@@ -8195,7 +8221,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(rbFLol.getParentHandle()), orderGetChildren);
 						rbFLol.setNodes(nodes);
 						rbFLol.setContentText();
-						rbFLol.getListView().invalidate();
+						rbFLol.getRecyclerView().invalidate();
 					}
 				}				
 			}
