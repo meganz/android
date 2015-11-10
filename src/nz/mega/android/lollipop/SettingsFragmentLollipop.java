@@ -474,8 +474,11 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			}
 		}		
 
-		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
-		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
+		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_calculating));
+		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_calculating));
+		
+		((ManagerActivityLollipop)getActivity()).taskGetSizeCache();
+		((ManagerActivityLollipop)getActivity()).taskGetSizeOffline();
 
 		if (cameraUpload){
 			cameraUploadOn.setTitle(getString(R.string.settings_camera_upload_off));
@@ -712,6 +715,14 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		
 		return true;
 	}
+	
+	public void setCacheSize(String size){
+		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, size));
+	}
+	
+	public void setOfflineSize(String size){
+		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, size));
+	}
 
 
 	@Override
@@ -724,14 +735,15 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
-			log("Clear Cache!");			
-			Util.clearCache(getActivity());
-			advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
+			log("Clear Cache!");		
+			((ManagerActivityLollipop)getActivity()).taskClearCache();
+//			advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
 		}
 		else if (preference.getKey().compareTo(KEY_OFFLINE) == 0){
 			log("Clear Offline!");
-			Util.clearOffline(getActivity());
-			advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
+			((ManagerActivityLollipop)getActivity()).taskClearOffline();
+//			Util.clearOffline(getActivity());
+//			advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
 		}
 		else if (preference.getKey().compareTo(KEY_SECONDARY_MEDIA_FOLDER_ON) == 0){
 			log("Changing the secondaty uploads");
@@ -1010,9 +1022,9 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 				dbH.setPinLockCode(pinLockCodeTxt);
 			}
 		}	    
-	    
-		advancedFeaturesCache.setSummary(getString(R.string.settings_advanced_features_size, Util.getCacheSize(getActivity())));
-		advancedFeaturesOffline.setSummary(getString(R.string.settings_advanced_features_size, Util.getOfflineSize(getActivity())));
+
+		((ManagerActivityLollipop)getActivity()).taskGetSizeCache();
+		((ManagerActivityLollipop)getActivity()).taskGetSizeOffline();
 	}
 	
 	public void afterSetPinLock(){

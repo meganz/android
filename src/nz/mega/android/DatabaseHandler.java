@@ -1112,6 +1112,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void clearOffline(){
+		log("clearOffline");
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_OFFLINE);
 		onCreate(db);
 	}

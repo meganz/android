@@ -438,7 +438,8 @@
     <string name="settings_advanced_features_cache" context="Settings preference title for cache">Limpiar Caché</string>
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Limpiar Ficheros Disponibles sin Conexión</string>
     
-        <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actuamente en uso %s</string> 
+    <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Actuamente en uso %s</string>
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculando&#8230;</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Destino descarga por defecto</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Preguntar siempre la ruta de descarga</string>
