@@ -7278,6 +7278,140 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	/*
+	 * Background task to clear cache
+	 */
+	private class ClearCacheTask extends AsyncTask<String, Void, String> {
+		Context context;
+		
+		ClearCacheTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			log("doInBackground-Async Task ClearCacheTask");
+			
+			Util.clearCache(context);
+			String size = Util.getCacheSize(context);
+			return size;
+		}		
+		
+		@Override
+		protected void onPostExecute(String size) {
+			log("ClearCacheTask::onPostExecute");
+			if(sttFLol!=null){
+					sttFLol.setCacheSize(size);	
+			}
+		}
+	}
+	
+	/*
+	 * Background task to clear offline files
+	 */
+	private class ClearOfflineTask extends AsyncTask<String, Void, String> {
+		Context context;
+		
+		ClearOfflineTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			log("doInBackground-Async Task ClearOfflineTask");
+			
+			Util.clearOffline(context);
+			dbH.clearOffline();
+			String size = Util.getOfflineSize(context);
+			return size;
+		}		
+		
+		@Override
+		protected void onPostExecute(String size) {
+			log("ClearOfflineTask::onPostExecute");
+			if(sttFLol!=null){
+					sttFLol.setOfflineSize(size);				
+			}
+		}
+	}
+	
+	/*
+	 * Background task to calculate the size of offline folder
+	 */
+	private class GetOfflineSizeTask extends AsyncTask<String, Void, String> {
+		Context context;
+		
+		GetOfflineSizeTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			log("doInBackground-Async Task GetOfflineSizeTask");
+			
+			String size = Util.getOfflineSize(context);
+			return size;
+		}		
+		
+		@Override
+		protected void onPostExecute(String size) {
+			log("GetOfflineSizeTask::onPostExecute");
+			if(sttFLol!=null){
+					sttFLol.setOfflineSize(size);	
+			}
+		}
+	}
+	
+	/*
+	 * Background task to calculate the size of cache folder
+	 */
+	private class GetCacheSizeTask extends AsyncTask<String, Void, String> {
+		Context context;
+		
+		GetCacheSizeTask(Context context){
+			this.context = context;
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			log("doInBackground-Async Task GetCacheSizeTask");
+			
+			String size = Util.getCacheSize(context);
+			return size;
+		}		
+		
+		@Override
+		protected void onPostExecute(String size) {
+			log("GetCacheSizeTask::onPostExecute");
+			if(sttFLol!=null){
+					sttFLol.setCacheSize(size);			
+			}
+		}
+	}
+	
+	public void taskGetSizeCache (){
+		log("taskGetSizeCache");
+		GetCacheSizeTask getCacheSizeTask = new GetCacheSizeTask(this);
+		getCacheSizeTask.execute();
+	}
+	
+	public void taskGetSizeOffline (){
+		log("taskGetSizeOffline");
+		GetOfflineSizeTask getOfflineSizeTask = new GetOfflineSizeTask(this);
+		getOfflineSizeTask.execute();
+	}
+	
+	public void taskClearCache (){
+		ClearCacheTask clearCacheTask = new ClearCacheTask(this);
+		clearCacheTask.execute();
+	}
+	
+	public void taskClearOffline (){
+		ClearOfflineTask clearOfflineTask = new ClearOfflineTask(this);
+		clearOfflineTask.execute();
+//		dbH.clearOffline();
+	}
+	
+	/*
 	 * Handle processed upload intent
 	 */
 	public void onIntentProcessed() {

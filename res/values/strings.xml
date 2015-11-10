@@ -442,6 +442,7 @@
     <string name="settings_advanced_features_offline" context="Settings preference title for offline files">Clear Offline Files</string>
     
     <string name="settings_advanced_features_size" context="Size of files in offline or cache folders">Currently using %s</string>    
+    <string name="settings_advanced_features_calculating" context="Calculating Size of files in offline or cache folders">Calculating&#8230;</string>
     
     <string name="settings_storage_download_location" context="title of the setting to set the default download location">Default download location</string>
     <string name="settings_storage_ask_me_always" context="Whether to always ask the user each time.">Always ask download location</string>
