@@ -108,7 +108,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			int position = recyclerView.getChildPosition(view);
 
 			// handle long press
-			if (adapter.getPositionClicked() == -1){
+			if (!adapter.isMultipleSelect()){
 				adapter.setMultipleSelect(true);
 
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			

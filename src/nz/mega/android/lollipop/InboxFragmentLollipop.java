@@ -105,17 +105,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//		@Override
-//	    public boolean onSingleTapConfirmed(MotionEvent e) {
-//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//	        int position = listView.getChildPosition(view);
-//
-//	        // handle single tap
-//	        itemClick(view, position);
-//
-//	        return super.onSingleTapConfirmed(e);
-//	    }
-
 	    public void onLongPress(MotionEvent e) {
 	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
 	        int position = recyclerView.getChildPosition(view);
