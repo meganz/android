@@ -13,6 +13,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import nz.mega.android.lollipop.FileExplorerActivityLollipop;
 import nz.mega.android.utils.Util;
 
 import android.content.ContentProviderClient;
@@ -20,7 +21,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.provider.MediaStore;
 
 
@@ -73,7 +76,7 @@ public class ShareInfo {
 	public static List<ShareInfo> processIntent(Intent intent, Context context) {
 		log(intent.getAction() + " of action");
 		
-		if (intent.getAction() == null || intent.getAction().equals(FileExplorerActivity.ACTION_PROCESSED)) {
+		if (intent.getAction() == null || intent.getAction().equals(FileExplorerActivity.ACTION_PROCESSED)||intent.getAction().equals(FileExplorerActivityLollipop.ACTION_PROCESSED)) {
 			return null;
 		}
 		if (context == null) {
@@ -118,7 +121,13 @@ public class ShareInfo {
 			log("share info file is null");
 			return null;
 		}
-		intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+		}
+		else{
+			intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
+		}
+		
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
 		result.add(shareInfo);
 		return result;
@@ -147,7 +156,13 @@ public class ShareInfo {
 			}
 			result.add(info);
 		}
-		intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+		}
+		else{
+			intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
+		}
+		
 		return result;
 	}
 	
@@ -155,11 +170,16 @@ public class ShareInfo {
 	 * Get info from Uri
 	 */
 	private void processUri(Uri uri, Context context) {
+		log("processUri: "+uri);
 		// getting input stream
 		inputStream = null;
 		try {
 			inputStream = context.getContentResolver().openInputStream(uri);
 		} catch (Exception e) {
+			log("inputStream EXCEPTION!");
+			log(""+e);
+			String path = uri.getPath();
+			log("processUri-path en la exception: "+path);
 		}
 
 		String scheme = uri.getScheme();
@@ -173,13 +193,20 @@ public class ShareInfo {
 				processFile(uri, context);
 			}
 		}
+		else{
+			log("scheme NULL");
+		}
 
 		if (inputStream != null) {
 			try {
 				file = null;
 				String path = uri.getPath();
+				log("processUri-path: "+path);
 				try{ file = new File(path); }
-				catch(Exception e){}
+				catch(Exception e){
+					log("error when creating File!");
+//					log(e.getMessage());
+				}
 				if((file != null) && file.exists() && file.canRead())
 				{
 					size = file.length();
@@ -234,56 +261,63 @@ public class ShareInfo {
 				}
 			}
 		}
+		else{
+			log("inputStream is NULL");
+		}
+		log("END processUri");
 	}
 	
 	/*
 	 * Get info from content provider
 	 */
 	private void processContent(Uri uri, Context context) {
+		log("processContent: "+uri);
 		ContentProviderClient client = null;
-		try {
-			client = context.getContentResolver().acquireContentProviderClient(uri);
-			Cursor cursor = null;
-			cursor = client.query(uri, null, null, null, null);
-			if(cursor.getCount()==0) return;
-			cursor.moveToFirst();
-			int displayIndex = cursor.getColumnIndex("_display_name");
-			if(displayIndex != -1)
-				title = cursor.getString(displayIndex);
-			int sizeIndex = cursor.getColumnIndex("_size");
-			if (sizeIndex != -1) {
-				long size = Long.valueOf(cursor.getString(sizeIndex));
-				if (size > 0) {
-					this.size = size;
-				}
-			}
 
-			if (size == -1 || inputStream == null) {
-				int dataIndex = cursor.getColumnIndex("_data");
-				if (dataIndex != -1) {
-					String data = cursor.getString(dataIndex);
-					File dataFile = new File(data);
-					if (dataFile.exists() && dataFile.canRead()) {
-						if (size == -1) {
-							long size = dataFile.length();
-							if (size > 0) {
-								this.size = size;
-							}
+		client = context.getContentResolver().acquireContentProviderClient(uri);
+		Cursor cursor = null;
+		try {
+			cursor = client.query(uri, null, null, null, null);
+		} catch (RemoteException e1) {
+			log("cursor EXCEPTION!!!");
+		}
+		if(cursor.getCount()==0) return;
+		cursor.moveToFirst();
+		int displayIndex = cursor.getColumnIndex("_display_name");
+		if(displayIndex != -1)
+			title = cursor.getString(displayIndex);
+		int sizeIndex = cursor.getColumnIndex("_size");
+		if (sizeIndex != -1) {
+			long size = Long.valueOf(cursor.getString(sizeIndex));
+			if (size > 0) {
+				this.size = size;
+			}
+		}
+
+		if (size == -1 || inputStream == null) {
+			int dataIndex = cursor.getColumnIndex("_data");
+			if (dataIndex != -1) {
+				String data = cursor.getString(dataIndex);
+				File dataFile = new File(data);
+				if (dataFile.exists() && dataFile.canRead()) {
+					if (size == -1) {
+						long size = dataFile.length();
+						if (size > 0) {
+							this.size = size;
 						}
-						if (inputStream == null) {
-							try {
-								inputStream = new FileInputStream(dataFile);
-							} catch (FileNotFoundException e) {
-							}
+					}
+					if (inputStream == null) {
+						try {
+							inputStream = new FileInputStream(dataFile);
+						} catch (FileNotFoundException e) {
 						}
 					}
 				}
 			}
-		
-			client.release();
-		} 
-		catch (Exception e) {
 		}
+	
+		client.release();
+		 
 	}
 	
 	/*
