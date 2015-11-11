@@ -299,7 +299,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private boolean isLargeGridCameraUploads = true; 
 	private boolean isListInbox = true;
 	private boolean isListContacts = true;
-	private boolean isListSharedItems = true;
+	private boolean isListIncoming = true;
+	private boolean isListOutgoing = true;
 	
 	long parentHandleBrowser;
 	long parentHandleRubbish;
@@ -1782,10 +1783,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
         				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
         				if (inSFLol != null){
-                			inSFLol.setIsList(isListSharedItems);
                 			inSFLol.setParentHandle(parentHandleIncoming);
                 			inSFLol.setOrder(orderGetChildren);
-                			inSFLol.refresh(parentHandleIncoming);
+                			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+        					if (node != null){
+        						inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
+        						aB.setTitle(node.getName());
+            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            					firstNavigationLevel = false;
+        					}
+        					else{
+        						inSFLol.refresh();
+        						aB.setTitle(getResources().getString(R.string.section_shared_items));
+            					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+            					firstNavigationLevel = true;
+        					}
         				}
         			}
         			else{
@@ -1794,10 +1806,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
         				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
         				if (outSFLol != null){
-        					outSFLol.setIsList(isListSharedItems);
-        					outSFLol.setParentHandle(parentHandleIncoming);
+        					outSFLol.setParentHandle(parentHandleOutgoing);
         					outSFLol.setOrder(orderGetChildren);
-        					outSFLol.refresh(parentHandleIncoming);
+//        					outSFLol.refresh(parentHandleIncoming);
+        					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+        					if (node != null){
+        						outSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
+        						aB.setTitle(node.getName());
+            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+            					firstNavigationLevel = false;
+        					}
+        					else{
+        						outSFLol.refresh();
+        						aB.setTitle(getResources().getString(R.string.section_shared_items));
+            					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+            					firstNavigationLevel = true;
+        					}
         				}
         			}  		
     			}
@@ -1805,7 +1829,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			mTabHostShares.setVisibility(View.VISIBLE);
     			
     			mTabHostShares.setOnTabChangedListener(new OnTabChangeListener(){
-                    @Override
+    				@Override
                     public void onTabChanged(String tabId) {
                     	log("TabId :"+ tabId);
                     	supportInvalidateOptionsMenu();
@@ -1815,16 +1839,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 			if (outSFLol != null){    
                 				textViewOutgoing.setTypeface(null, Typeface.BOLD);
                 				textViewIncoming.setTypeface(null, Typeface.NORMAL);
-            					outSFLol.setIsList(isListSharedItems);
-                				if(parentHandleOutgoing!=-1){
+            					
+            					if(parentHandleOutgoing!=-1){
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
 	            					aB.setTitle(node.getName());
+	            					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+	            					firstNavigationLevel = false;
+	            					outSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
             					}
                 				else{
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+                					firstNavigationLevel = true;
                 				}
-                				outSFLol.refresh();
-                				outSFLol.getRecyclerView().invalidate();
                 			}
                 			else{
                 				log("outSFLol == null");
@@ -1836,16 +1863,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         	if (inSFLol != null){    
                         		textViewOutgoing.setTypeface(null, Typeface.NORMAL);
                 				textViewIncoming.setTypeface(null, Typeface.BOLD);
-            					inSFLol.setIsList(isListSharedItems);
-                        		if(parentHandleIncoming!=-1){
+            					
+            					if(parentHandleIncoming!=-1){
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
                 					aB.setTitle(node.getName());	
+                					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+	            					firstNavigationLevel = false;
+	            					inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
             					}
                 				else{
                 					aB.setTitle(getResources().getString(R.string.section_shared_items));
+                					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+                					firstNavigationLevel = true;
                 				}
-                        		inSFLol.refresh();
-                        		inSFLol.getRecyclerView().invalidate();
                 			}   
                         	else{
                         		log("inSFLol == null");
@@ -1917,7 +1947,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					gridSmallLargeMenuItem.setVisible(false);
     					cancelAllTransfersMenuItem.setVisible(false);
     					
-    					if (isListSharedItems){	
+    					if (isListIncoming){	
     	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
     					}
     					else{
@@ -1971,7 +2001,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					gridSmallLargeMenuItem.setVisible(false);
     					cancelAllTransfersMenuItem.setVisible(false);
     					
-    					if (isListSharedItems){	
+    					if (isListOutgoing){	
     	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
     					}
     					else{
@@ -1979,19 +2009,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	    			}
     				}
     			}   			
-    			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);    			
-    			if (inSFLol != null){
-    				aB.setTitle(getString(R.string.section_shared_items));	
-    				inSFLol.refresh();			
-    				
-    			} 
-    			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);	
-    			if (outSFLol != null){    				
-					aB.setTitle(getString(R.string.section_shared_items));				
-					outSFLol.refresh();    				
-    			}
+//    			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+//				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);    			
+//    			if (inSFLol != null){
+//    				aB.setTitle(getString(R.string.section_shared_items));	
+//    				inSFLol.refresh();			
+//    				
+//    			} 
+//    			sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+//        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);	
+//    			if (outSFLol != null){    				
+//					aB.setTitle(getString(R.string.section_shared_items));				
+//					outSFLol.refresh();    				
+//    			}
     			
     			break;
     		}
@@ -2924,7 +2954,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					upgradeAccountMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					
-					if (isListSharedItems){	
+					if (isListIncoming){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
 					else{
@@ -2977,7 +3007,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					settingsMenuItem.setVisible(false);
 					gridSmallLargeMenuItem.setVisible(false);
 					
-					if (isListSharedItems){	
+					if (isListOutgoing){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
 					else{
@@ -3700,14 +3730,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			fragTransaction.detach(inSFLol);
 		        			fragTransaction.commit();
 
-		        			isListSharedItems = !isListSharedItems;
-		        			if (isListSharedItems){	
+		        			isListIncoming = !isListIncoming;
+		        			if (isListIncoming){	
 			    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 							}
 							else{
 								thumbViewMenuItem.setTitle(getString(R.string.action_list));
 			    			}
-		        			inSFLol.setIsList(isListSharedItems);
+		        			inSFLol.setIsList(isListIncoming);
 		        			inSFLol.setParentHandle(parentHandleOutgoing);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -3724,14 +3754,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        			fragTransaction.detach(outSFLol);
 		        			fragTransaction.commit();
 
-		        			isListSharedItems = !isListSharedItems;
-		        			if (isListSharedItems){	
+		        			isListOutgoing = !isListOutgoing;
+		        			if (isListOutgoing){	
 			    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 							}
 							else{
 								thumbViewMenuItem.setTitle(getString(R.string.action_list));
 			    			}
-		        			outSFLol.setIsList(isListSharedItems);
+		        			outSFLol.setIsList(isListOutgoing);
 		        			outSFLol.setParentHandle(parentHandleOutgoing);
 
 		        			fragTransaction = getSupportFragmentManager().beginTransaction();
@@ -6533,14 +6563,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		this.parentHandleSearch = parentHandleSearch;
 	}
 	
-	public void setParentHandleIncoming(long parentHandleSharedWithMe){
-		log("setParentHandleSharedWithMe");
-		this.parentHandleIncoming = parentHandleSharedWithMe;
+	public void setParentHandleIncoming(long parentHandleIncoming){
+		log("setParentHandleIncoming: " + parentHandleIncoming);
+		this.parentHandleIncoming = parentHandleIncoming;
 	}
 	
-	public void setParentHandleOutgoing(long parentHandleSharedWithMe){
-		log("setParentHandleSharedWithMe");
-		this.parentHandleOutgoing = parentHandleSharedWithMe;
+	public void setParentHandleOutgoing(long parentHandleOutgoing){
+		log("setParentHandleOutgoing: " + parentHandleOutgoing);
+		this.parentHandleOutgoing = parentHandleOutgoing;
 	}
 	
 	@Override
@@ -8448,8 +8478,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("Tag: "+ cFTag2);
 				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
 				if (outSFLol != null){					
-					aB.setTitle(getString(R.string.section_shared_items));				
-					outSFLol.refresh(this.parentHandleOutgoing);				
+					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
+					if (node != null){
+						outSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
+						aB.setTitle(node.getName());
+    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+    					firstNavigationLevel = false;
+					}
+					else{
+						outSFLol.refresh();
+						aB.setTitle(getResources().getString(R.string.section_shared_items));
+    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    					firstNavigationLevel = true;
+					}				
 				}
 			}
 			else{			
@@ -8458,8 +8499,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("Tag: "+ cFTag1);
 				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 				if (inSFLol != null){					
-					aB.setTitle(getString(R.string.section_shared_items));	
-					inSFLol.refresh(this.parentHandleIncoming);			
+					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+					if (node != null){
+						inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
+						aB.setTitle(node.getName());
+    					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+    					firstNavigationLevel = false;
+					}
+					else{
+						inSFLol.refresh();
+						aB.setTitle(getResources().getString(R.string.section_shared_items));
+    					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    					firstNavigationLevel = true;
+					}		
 				}				
 			}	
 		}

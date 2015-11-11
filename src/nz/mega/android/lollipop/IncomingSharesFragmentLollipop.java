@@ -1525,6 +1525,16 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 	}
 	
+	public void setNodes(ArrayList<MegaNode> nodes){
+		this.nodes = nodes;
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
+	}
+	
 	public void sortByNameDescending(){
 		
 		ArrayList<MegaNode> folderNodes = new ArrayList<MegaNode>();
