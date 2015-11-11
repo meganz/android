@@ -359,6 +359,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
 						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
 						uriData = intentReceived.getData();
+						log("URI: "+uriData);
 						extras = intentReceived.getExtras();
 						url = null;
 					}
@@ -1099,7 +1100,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 	
 	
 	public static void log(String message) {
-		Util.log("LoginActivity", message);
+		Util.log("LoginActivityLollipop", message);
 	}
 	
 	@Override

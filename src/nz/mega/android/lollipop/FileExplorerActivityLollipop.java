@@ -3,14 +3,14 @@ package nz.mega.android.lollipop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import nz.mega.android.DatabaseHandler;
-import nz.mega.android.LoginActivity;
 import nz.mega.android.MegaApplication;
-import nz.mega.android.PinActivity;
 import nz.mega.android.R;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.TabsAdapter;
 import nz.mega.android.UploadService;
+import nz.mega.android.UserCredentials;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -21,13 +21,13 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,14 +42,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.TabHost.OnTabChangeListener;
+import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
@@ -87,6 +83,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	Toolbar tB;
     ActionBar aB;
 
+	private String gSession;
+    UserCredentials credentials;
+	private String lastEmail;
 //	private ImageView windowBack;
 //	private boolean backVisible = false;
 //	private TextView windowTitle;
@@ -125,6 +124,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	long gParentHandle;
 	String gcFTag = "";
 	boolean selectFile = false;
+	
+	Intent intent = null;
 	
 	/*
 	 * Background task to process files for uploading
@@ -167,7 +168,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
-		if (dbH.getCredentials() == null){
+		credentials = dbH.getCredentials();
+		
+		if (credentials == null){
 			ManagerActivityLollipop.logout(this, megaApi, false);
 			return;
 		}
@@ -190,29 +193,49 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
         		
-		Intent intent = getIntent();
+		intent = getIntent();
 		if (megaApi.getRootNode() == null){
 			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
-			Intent loginIntent = new Intent(this, LoginActivity.class);
+			/*
+			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.setAction(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD);
 			if (intent != null){
 				if(intent.getExtras() != null)
 				{
+					Bundle bundle = intent.getExtras();
+					Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
+					log("URI in bundle: "+uri);
 					loginIntent.putExtras(intent.getExtras());
 				}
 				
 				if(intent.getData() != null)
 				{
+					log("URI: "+intent.getData());
 					loginIntent.setData(intent.getData());
 				}
 			}
+			else{
+				log("intent==null");
+			}
 			startActivity(loginIntent);
 			finish();
-			return;
+			return;*/
+			gSession = credentials.getSession();
+			megaApi.fastLogin(gSession, this);
 		}
-		
+		else{
+			afterLoginAndFetch();
+		}		
+	
+		aB.setTitle(getString(R.string.section_cloud_drive));	
+
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
+	}
+	
+	private void afterLoginAndFetch(){
 		handler = new Handler();		
-			
+		
 		if ((intent != null) && (intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
 				mode = MOVE;
@@ -356,11 +379,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			});
 		}
-	
-		aB.setTitle(getString(R.string.section_cloud_drive));	
-
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 	}
 	
 	private View getTabIndicator(Context context, String title) {
@@ -473,8 +491,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
-				Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
-						true, this);
+				Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),true, this);
 				return;
 			}
 			else {
@@ -489,8 +506,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
-						Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), getString(R.string.upload_began),Toast.LENGTH_SHORT).show();
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -500,6 +516,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					startService(intent);
 				}
 				filePreparedInfos = null;
+				log("finish!!!");
 				finish();
 			}	
 		}
@@ -565,6 +582,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			log("mode UPLOAD");
 			
 			if (filePreparedInfos == null){
+//				Intent prueba = getIntent();
+//				Bundle bundle = prueba.getExtras();
+//				Uri uri = (Uri)bundle.get(Intent.EXTRA_STREAM);
+//				log("URI mode UPLOAD in bundle: "+uri);
+				
 				FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 				filePrepareTask.execute(getIntent());
 				ProgressDialog temp = null;
@@ -911,8 +933,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError error) {
 		log("onRequestFinish");
 		if (request.getType() == MegaRequest.TYPE_CREATE_FOLDER){
 			try { 
@@ -920,7 +941,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			} 
 			catch (Exception ex) {}
 			
-			if (e.getErrorCode() == MegaError.API_OK){
+			if (error.getErrorCode() == MegaError.API_OK){
 				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
 				if(tabShown==CLOUD_TAB){
 					long parentHandle;
@@ -946,6 +967,76 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 					}
 				}
 			}
+		}
+		if (request.getType() == MegaRequest.TYPE_LOGIN){
+			if (error.getErrorCode() != MegaError.API_OK) {
+				//ERROR LOGIN
+				String errorMessage;
+				if (error.getErrorCode() == MegaError.API_ENOENT) {
+					errorMessage = getString(R.string.error_incorrect_email_or_password);
+				}
+				else if (error.getErrorCode() == MegaError.API_ENOENT) {
+					errorMessage = getString(R.string.error_server_connection_problem);
+				}
+				else if (error.getErrorCode() == MegaError.API_ESID){
+					errorMessage = getString(R.string.error_server_expired_session);
+				}
+				else{
+					errorMessage = error.getErrorString();
+				}
+				/*
+				loginLoggingIn.setVisibility(View.GONE);
+				loginLogin.setVisibility(View.VISIBLE);
+				loginDelimiter.setVisibility(View.VISIBLE);
+				loginCreateAccount.setVisibility(View.VISIBLE);
+				queryingSignupLinkText.setVisibility(View.GONE);
+				confirmingAccountText.setVisibility(View.GONE);
+				generatingKeysText.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.GONE);
+				fetchingNodesText.setVisibility(View.GONE);
+				prepareNodesText.setVisibility(View.GONE);
+
+				Snackbar.make(scrollView,errorMessage,Snackbar.LENGTH_LONG).show();*/
+				
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				dbH.clearCredentials();
+				if (dbH.getPreferences() != null){
+					dbH.clearPreferences();
+					dbH.setFirstTime(false);
+				}
+			}
+			else{
+				//LOGIN OK
+				/*
+				loginProgressBar.setVisibility(View.VISIBLE);
+				loginFetchNodesProgressBar.setVisibility(View.GONE);
+				loggingInText.setVisibility(View.VISIBLE);
+				fetchingNodesText.setVisibility(View.VISIBLE);
+				prepareNodesText.setVisibility(View.GONE);*/
+				
+				gSession = megaApi.dumpSession();
+				credentials = new UserCredentials(lastEmail, gSession);
+
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				dbH.clearCredentials();
+				
+				log("Logged in: " + gSession);
+			
+				megaApi.fetchNodes(this);
+			}
+		}
+		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
+			if (error.getErrorCode() == MegaError.API_OK){
+				DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
+				
+				gSession = megaApi.dumpSession();
+				lastEmail = megaApi.getMyEmail();
+				credentials = new UserCredentials(lastEmail, gSession);
+				
+				dbH.saveCredentials(credentials);
+				
+				afterLoginAndFetch();
+			}	
 		}
 	}
 
