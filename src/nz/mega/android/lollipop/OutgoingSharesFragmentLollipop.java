@@ -549,7 +549,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		else{
 			log("Grid View");
 			
-View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
+			View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
@@ -1217,8 +1217,18 @@ View v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false);
 		
 		return false;
 	}
+
+	public void setNodes(ArrayList<MegaNode> nodes){
+		this.nodes = nodes;
+		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
+			sortByNameDescending();
+		}
+		else{
+			sortByNameAscending();
+		}
+	}
 	
-public void sortByNameDescending(){
+	public void sortByNameDescending(){
 		
 		ArrayList<String> foldersOrder = new ArrayList<String>();
 		ArrayList<String> filesOrder = new ArrayList<String>();
