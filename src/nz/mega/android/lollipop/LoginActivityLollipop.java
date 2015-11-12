@@ -356,13 +356,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_UPLOAD) || intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD) || intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC)){
 						action = intentReceived.getAction();
 					}
-					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
-						uriData = intentReceived.getData();
-						log("URI: "+uriData);
-						extras = intentReceived.getExtras();
-						url = null;
-					}
+//					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//						action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
+//						uriData = intentReceived.getData();
+//						log("URI: "+uriData);
+//						extras = intentReceived.getExtras();
+//						url = null;
+//						Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
+//					}
 					else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
 						action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
 						uriData = intentReceived.getData();
@@ -374,14 +375,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					if (rootNode != null){
 						Intent intent = new Intent(this, ManagerActivityLollipop.class);
 						if (action != null){
-							if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-								intent = new Intent(this, FileExplorerActivityLollipop.class);
-								if(extras != null)
-								{
-									intent.putExtras(extras);
-								}
-								intent.setData(uriData);
-							}
+//							if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//								intent = new Intent(this, FileExplorerActivityLollipop.class);
+//								if(extras != null)
+//								{
+//									intent.putExtras(extras);
+//								}
+//								intent.setData(uriData);
+//							}
 							if (action.equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
 								intent = new Intent(this, FileProviderActivity.class);
 								if(extras != null)
@@ -440,14 +441,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					log("rootNode != null");
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					if (action != null){
-						if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-							intent = new Intent(this, FileExplorerActivityLollipop.class);
-							if(extras != null)
-							{
-								intent.putExtras(extras);
-							}
-							intent.setData(uriData);
-						}
+//						if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//							intent = new Intent(this, FileExplorerActivityLollipop.class);
+//							if(extras != null)
+//							{
+//								intent.putExtras(extras);
+//							}
+//							intent.setData(uriData);
+//						}
 						if (action.equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
 							intent = new Intent(this, FileProviderActivity.class);
 							if(extras != null)
@@ -523,6 +524,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 					intent.setAction(action);
 					
 					action = ManagerActivityLollipop.ACTION_FILE_PROVIDER;
+				}
+				else if (intentReceived.getAction().equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+					action = ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD;
+//					uriData = intentReceived.getData();
+//					log("URI: "+uriData);
+//					extras = intentReceived.getExtras();
+//					url = null;
+					Snackbar.make(scrollView,getString(R.string.login_before_share),Snackbar.LENGTH_LONG).show();
 				}
 			}
 			if (OldPreferences.getOldCredentials(this) != null){
@@ -947,14 +956,14 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 								if (!initialCam){
 									intent = new Intent(loginActivity,ManagerActivityLollipop.class);
 									if (action != null){
-										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
-											intent = new Intent(this, FileExplorerActivityLollipop.class);
-											if(extras != null)
-											{
-												intent.putExtras(extras);
-											}
-											intent.setData(uriData);
-										}
+//										if (action.equals(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD)){
+//											intent = new Intent(this, FileExplorerActivityLollipop.class);
+//											if(extras != null)
+//											{
+//												intent.putExtras(extras);
+//											}
+//											intent.setData(uriData);
+//										}
 										if (action.equals(ManagerActivityLollipop.ACTION_FILE_PROVIDER)){
 											intent = new Intent(this, FileProviderActivity.class);
 											if(extras != null)

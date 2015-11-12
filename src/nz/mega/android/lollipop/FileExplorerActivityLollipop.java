@@ -27,10 +27,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -43,12 +43,13 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
-
 
 public class FileExplorerActivityLollipop extends PinActivityLollipop implements OnClickListener, MegaRequestListenerInterface, MegaGlobalListenerInterface{
 	
@@ -82,6 +83,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	Toolbar tB;
     ActionBar aB;
+    
+    RelativeLayout fragmentContainer;
+	LinearLayout loginLoggingIn;
+	ProgressBar loginProgressBar;
+	ProgressBar loginFetchNodesProgressBar;
+	TextView generatingKeysText;
+	TextView queryingSignupLinkText;
+	TextView confirmingAccountText;
+	TextView loggingInText;
+	TextView fetchingNodesText;
+	TextView prepareNodesText;
 
 	private String gSession;
     UserCredentials credentials;
@@ -147,8 +159,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		protected void onPostExecute(List<ShareInfo> info) {
 			filePreparedInfos = info;			
 			onIntentProcessed();
-		}	
-		
+		}			
 	}
 	
 	@Override
@@ -171,35 +182,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		credentials = dbH.getCredentials();
 		
 		if (credentials == null){
+			log("User credentials NULL");
 			ManagerActivityLollipop.logout(this, megaApi, false);
-			return;
-		}
-		
-		if (savedInstanceState != null){
-			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
-		}
-	
-		megaApi = ((MegaApplication)getApplication()).getMegaApi();
-		
-		megaApi.addGlobalListener(this);
-		
-		setContentView(R.layout.activity_file_explorer);
-		
-		//Set toolbar
-		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
-		setSupportActionBar(tB);
-		aB = getSupportActionBar();
-		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-		aB.setDisplayHomeAsUpEnabled(true);
-		aB.setDisplayShowHomeEnabled(true);
-        		
-		intent = getIntent();
-		if (megaApi.getRootNode() == null){
-			//TODO Mando al login con un ACTION -> que loguee, haga el fetchnodes y vuelva aquí.
-			/*
+			
 			Intent loginIntent = new Intent(this, LoginActivityLollipop.class);
 			loginIntent.setAction(ManagerActivityLollipop.ACTION_FILE_EXPLORER_UPLOAD);
-			if (intent != null){
+			/*if (intent != null){
 				if(intent.getExtras() != null)
 				{
 					Bundle bundle = intent.getExtras();
@@ -216,10 +204,58 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else{
 				log("intent==null");
-			}
+			}*/	
 			startActivity(loginIntent);
-			finish();
-			return;*/
+			return;
+//			finish();
+		}
+		else{
+			log("User has credentials");
+		}
+		
+		if (savedInstanceState != null){
+			folderSelected = savedInstanceState.getBoolean("folderSelected", false);
+		}
+	
+		megaApi = ((MegaApplication)getApplication()).getMegaApi();
+		
+		megaApi.addGlobalListener(this);
+		
+		setContentView(R.layout.activity_file_explorer);
+		
+		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_file_explorer);
+				
+		//Set toolbar
+		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
+		setSupportActionBar(tB);
+		aB = getSupportActionBar();
+		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		aB.setDisplayHomeAsUpEnabled(true);
+		aB.setDisplayShowHomeEnabled(true);
+		
+		//Layout for login if needed
+		loginLoggingIn = (LinearLayout) findViewById(R.id.file_logging_in_layout);
+		loginProgressBar = (ProgressBar) findViewById(R.id.file_login_progress_bar);
+		loginFetchNodesProgressBar = (ProgressBar) findViewById(R.id.file_login_fetching_nodes_bar);
+		generatingKeysText = (TextView) findViewById(R.id.file_login_generating_keys_text);
+		queryingSignupLinkText = (TextView) findViewById(R.id.file_login_query_signup_link_text);
+		confirmingAccountText = (TextView) findViewById(R.id.file_login_confirm_account_text);
+		loggingInText = (TextView) findViewById(R.id.file_login_logging_in_text);
+		fetchingNodesText = (TextView) findViewById(R.id.file_login_fetch_nodes_text);
+		prepareNodesText = (TextView) findViewById(R.id.file_login_prepare_nodes_text); 
+        		
+		intent = getIntent();
+		if (megaApi.getRootNode() == null){
+			getSupportActionBar().hide();
+			queryingSignupLinkText.setVisibility(View.GONE);
+			confirmingAccountText.setVisibility(View.GONE);
+			loginLoggingIn.setVisibility(View.VISIBLE);
+//			generatingKeysText.setVisibility(View.VISIBLE);
+			loginProgressBar.setVisibility(View.VISIBLE);
+			loginFetchNodesProgressBar.setVisibility(View.GONE);
+			loggingInText.setVisibility(View.VISIBLE);
+			fetchingNodesText.setVisibility(View.GONE);
+			prepareNodesText.setVisibility(View.GONE);
 			gSession = credentials.getSession();
 			megaApi.fastLogin(gSession, this);
 		}
@@ -491,7 +527,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		log("intent processed!");
 		if (folderSelected) {
 			if (infos == null) {
-				Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),true, this);
+				Snackbar.make(fragmentContainer,getString(R.string.upload_can_not_open),Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			else {
@@ -506,7 +542,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				if(parentNode == null){
 					parentNode = megaApi.getRootNode();
 				}
-				Toast.makeText(getApplicationContext(), getString(R.string.upload_began),Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer,getString(R.string.upload_began),Snackbar.LENGTH_LONG).show();
 				for (ShareInfo info : infos) {
 					Intent intent = new Intent(this, UploadService.class);
 					intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -822,8 +858,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			}
 		});
-		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_new_folder),
-				null, input);
+		AlertDialog.Builder builder = Util.getCustomAlertBuilder(this, getString(R.string.menu_new_folder),null, input);
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
@@ -842,7 +877,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	private void createFolder(String title) {
 	
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer,getString(R.string.error_server_connection_problem),Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -900,7 +935,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				megaApi.createFolder(title, parentNode, this);
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_folder_already_exists), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer,getString(R.string.context_folder_already_exists),Snackbar.LENGTH_LONG).show();
 			}
 		}
 		
@@ -942,7 +977,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			catch (Exception ex) {}
 			
 			if (error.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_folder_created), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer,getString(R.string.context_folder_created),Snackbar.LENGTH_LONG).show();
 				if(tabShown==CLOUD_TAB){
 					long parentHandle;
 					if (cDriveExplorer != null){
@@ -984,6 +1019,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				else{
 					errorMessage = error.getErrorString();
 				}
+				
+				//Go to the login activity
 				/*
 				loginLoggingIn.setVisibility(View.GONE);
 				loginLogin.setVisibility(View.VISIBLE);
@@ -1007,12 +1044,12 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			}
 			else{
 				//LOGIN OK
-				/*
+				
 				loginProgressBar.setVisibility(View.VISIBLE);
 				loginFetchNodesProgressBar.setVisibility(View.GONE);
 				loggingInText.setVisibility(View.VISIBLE);
 				fetchingNodesText.setVisibility(View.VISIBLE);
-				prepareNodesText.setVisibility(View.GONE);*/
+				prepareNodesText.setVisibility(View.GONE);
 				
 				gSession = megaApi.dumpSession();
 				credentials = new UserCredentials(lastEmail, gSession);
@@ -1035,7 +1072,10 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				
 				dbH.saveCredentials(credentials);
 				
-				afterLoginAndFetch();
+				loginLoggingIn.setVisibility(View.GONE);
+				getSupportActionBar().show();
+				afterLoginAndFetch();				
+ 
 			}	
 		}
 	}
