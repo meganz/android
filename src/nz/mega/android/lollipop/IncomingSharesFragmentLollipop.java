@@ -982,23 +982,22 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 		switch(v.getId()){
 			case R.id.btnLeft_new:
-				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
-				break;
-				
-			case R.id.btnRight_upload:
-				((ManagerActivityLollipop)getActivity()).uploadFile();
-				break;
 			case R.id.btnLeft_grid_new:
 				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
 				break;
 				
+			case R.id.btnRight_upload:
 			case R.id.btnRight_grid_upload:
 				((ManagerActivityLollipop)getActivity()).uploadFile();
 				break;
+				
 			case R.id.out_space_btn:
+			case R.id.out_space_btn_grid:
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
-			case R.id.file_list_option_download_layout: {
+				
+			case R.id.file_list_option_download_layout: 
+			case R.id.file_grid_option_download_layout: {
 				log("Download option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1009,7 +1008,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).onFileClick(handleList);
 				break;
 			}
-			case R.id.file_list_option_leave_share_layout: {
+			case R.id.file_list_option_leave_share_layout: 
+			case R.id.file_grid_option_leave_share_layout: {
 				log("Leave share option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1018,7 +1018,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).leaveIncomingShare(selectedNode);
 				break;
 			}
-			case R.id.file_list_option_move_layout:{
+			case R.id.file_list_option_move_layout:
+			case R.id.file_grid_option_move_layout:{
 				log("Move option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1030,7 +1031,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case R.id.file_list_option_properties_layout: {
+			case R.id.file_list_option_properties_layout:
+			case R.id.file_grid_option_properties_layout: {
 				log("Properties option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1055,7 +1057,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case R.id.file_list_option_rename_layout: {
+			case R.id.file_list_option_rename_layout: 
+			case R.id.file_grid_option_rename_layout: {
 				log("Rename option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1064,7 +1067,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
 				break;
 			}	
-			case R.id.file_list_option_copy_layout: {
+			case R.id.file_list_option_copy_layout: 
+			case R.id.file_grid_option_copy_layout: {
 				log("Copy option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);

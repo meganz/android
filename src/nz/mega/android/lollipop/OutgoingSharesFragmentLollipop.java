@@ -8,14 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import nz.mega.android.FileContactListActivity;
-import nz.mega.android.FullScreenImageViewer;
 import nz.mega.android.MegaApplication;
-import nz.mega.android.MegaBrowserGridAdapter;
 import nz.mega.android.MegaStreamingService;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.MimeTypeMime;
 import nz.mega.android.R;
-import nz.mega.android.lollipop.IncomingSharesFragmentLollipop.RecyclerViewOnGestureListener;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
 import nz.mega.components.SlidingUpPanelLayout;
@@ -928,24 +925,22 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 		switch(v.getId()){
 			case R.id.btnLeft_new:
-				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
-				break;
-				
-			case R.id.btnRight_upload:
-				((ManagerActivityLollipop)getActivity()).uploadFile();
-				break;
 			case R.id.btnLeft_grid_new:
 				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
 				break;
 				
+			case R.id.btnRight_upload:
 			case R.id.btnRight_grid_upload:
-				((ManagerActivityLollipop)getActivity()).uploadFile();
+				((ManagerActivityLollipop)getActivity()).uploadFile();			
 				break;
 				
 			case R.id.out_space_btn:
+			case R.id.out_space_btn_grid:
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
-			case R.id.file_list_option_download_layout: {
+				
+			case R.id.file_list_option_download_layout: 
+			case R.id.file_grid_option_download_layout: {
 				log("Download option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -956,7 +951,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).onFileClick(handleList);
 				break;
 			}
-			case R.id.file_list_option_properties_layout: {
+			case R.id.file_list_option_properties_layout:
+			case R.id.file_grid_option_properties_layout: {
 				log("Properties option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -981,7 +977,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case R.id.file_list_option_rename_layout: {
+			case R.id.file_list_option_rename_layout: 
+			case R.id.file_grid_option_rename_layout:{
 				log("Rename option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -990,7 +987,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
 				break;
 			}	
-			case R.id.file_list_option_copy_layout: {
+			case R.id.file_list_option_copy_layout: 
+			case R.id.file_grid_option_copy_layout: {
 				log("Copy option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1001,7 +999,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 				break;
 			}
-			case R.id.file_list_option_move_layout:{
+			case R.id.file_list_option_move_layout:
+			case R.id.file_grid_option_move_layout:{
 				log("Move option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1013,7 +1012,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 				break;
 			}
-			case R.id.file_list_option_clear_share_layout: {
+			case R.id.file_list_option_clear_share_layout: 
+			case R.id.file_grid_option_clear_share_layout: {
 				log("Clear shares");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1023,7 +1023,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop) context).removeAllSharingContacts(shareList, selectedNode);
 				break;				
 			}
-			case R.id.file_list_option_share_layout: {	
+			case R.id.file_list_option_share_layout: 
+			case R.id.file_grid_option_share_layout: {
 				log("Share option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1033,7 +1034,8 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			
-			case R.id.file_list_option_permissions_layout: {
+			case R.id.file_list_option_permissions_layout: 
+			case R.id.file_grid_option_permissions_layout: {
 				log("Share with");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -1141,7 +1143,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			else{
 				//Is file
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", ManagerActivityLollipop.FILE_BROWSER_ADAPTER);
 					intent.putExtra("isFolderLink", false);

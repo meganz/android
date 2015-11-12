@@ -7,6 +7,7 @@ import nz.mega.android.ContactPropertiesMainActivity;
 import nz.mega.android.MegaApplication;
 import nz.mega.android.MegaContactsGridAdapter;
 import nz.mega.android.R;
+import nz.mega.android.lollipop.FileBrowserFragmentLollipop.RecyclerViewOnGestureListener;
 import nz.mega.android.utils.Util;
 import nz.mega.components.SimpleDividerItemDecoration;
 import nz.mega.components.SlidingUpPanelLayout;
@@ -29,6 +30,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
@@ -60,10 +62,9 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	
 	Context context;
 	ActionBar aB;
-	RecyclerView listView;
+	RecyclerView recyclerView;
 	GestureDetectorCompat detector;
-	MegaContactsLollipopAdapter adapterList;
-	MegaContactsGridAdapter adapterGrid;
+	MegaContactsLollipopAdapter adapter;
 	ImageView emptyImageView;
 	TextView emptyTextView;
     ImageButton fabButton;
@@ -96,24 +97,13 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
 
-//		@Override
-//	    public boolean onSingleTapConfirmed(MotionEvent e) {
-//	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-//	        int position = listView.getChildPosition(view);
-//
-//	        // handle single tap
-//	        itemClick(view, position);
-//
-//	        return super.onSingleTapConfirmed(e);
-//	    }
-
 	    public void onLongPress(MotionEvent e) {
-	        View view = listView.findChildViewUnder(e.getX(), e.getY());
-	        int position = listView.getChildPosition(view);
+	        View view = recyclerView.findChildViewUnder(e.getX(), e.getY());
+	        int position = recyclerView.getChildPosition(view);
 
 	        // handle long press
-			if (adapterList.getPositionClicked() == -1){
-				adapterList.setMultipleSelect(true);
+			if (!adapter.isMultipleSelect()){
+				adapter.setMultipleSelect(true);
 			
 				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());			
 
@@ -131,7 +121,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			List<MegaUser> users = adapterList.getSelectedUsers();
+			List<MegaUser> users = adapter.getSelectedUsers();
 			final List<MegaUser> multipleContacts = users;;
 			
 			switch(item.getItemId()){
@@ -194,19 +184,19 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			adapterList.setMultipleSelect(false);
+			adapter.setMultipleSelect(false);
 			clearSelections();
 		}
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			List<MegaUser> selected = adapterList.getSelectedUsers();
+			List<MegaUser> selected = adapter.getSelectedUsers();
 
 			if (selected.size() != 0) {
 				menu.findItem(R.id.cab_menu_delete).setVisible(true);
 				menu.findItem(R.id.cab_menu_share_folder).setVisible(true);
 				
-				if(selected.size()==adapterList.getItemCount()){
+				if(selected.size()==adapter.getItemCount()){
 					menu.findItem(R.id.cab_menu_select_all).setVisible(false);
 					menu.findItem(R.id.cab_menu_unselect_all).setVisible(true);			
 				}
@@ -234,39 +224,32 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	 */
 	void hideMultipleSelect() {
 		log("hideMultipleSelect");
-		adapterList.setMultipleSelect(false);
+		adapter.setMultipleSelect(false);
 		if (actionMode != null) {
 			actionMode.finish();
 		}
 	}
 	
 	public void selectAll(){
-		if (isList){
-			if(adapterList.isMultipleSelect()){
-				adapterList.selectAll();
-			}
-			else{
-				actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
-				
-				adapterList.setMultipleSelect(true);
-				adapterList.selectAll();
-			}
-			
-			updateActionModeTitle();
+		if(adapter.isMultipleSelect()){
+			adapter.selectAll();
 		}
 		else{
-			if (adapterGrid != null){
-				adapterGrid.selectAll();
-			}
+			actionMode = ((AppCompatActivity)context).startSupportActionMode(new ActionBarCallBack());
+			
+			adapter.setMultipleSelect(true);
+			adapter.selectAll();
 		}
+		
+		updateActionModeTitle();
 	}
 	
 	/*
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
-			adapterList.clearSelections();
+		if(adapter.isMultipleSelect()){
+			adapter.clearSelections();
 		}
 		updateActionModeTitle();
 	}
@@ -275,7 +258,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		if (actionMode == null || getActivity() == null) {
 			return;
 		}
-		List<MegaUser> users = adapterList.getSelectedUsers();
+		List<MegaUser> users = adapter.getSelectedUsers();
 		
 		Resources res = getResources();
 		String format = "%d %s";
@@ -319,13 +302,13 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			listView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
-			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
-			listView.setHasFixedSize(true);
+			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
+			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
+			recyclerView.setHasFixedSize(true);
 		    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-		    listView.setLayoutManager(linearLayoutManager);			
-			listView.addOnItemTouchListener(this);
-			listView.setItemAnimator(new DefaultItemAnimator()); 
+		    recyclerView.setLayoutManager(linearLayoutManager);			
+		    recyclerView.addOnItemTouchListener(this);
+		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_contacts);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_contacts);
@@ -375,31 +358,32 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button);
 			fabButton.setOnClickListener(this);
 			
-			if (adapterList == null){
-				adapterList = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, listView);
+			if (adapter == null){
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			else{
-				adapterList.setContacts(visibleContacts);
+				adapter.setContacts(visibleContacts);
+				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 		
-			adapterList.setPositionClicked(-1);
-			listView.setAdapter(adapterList);
+			adapter.setPositionClicked(-1);
+			recyclerView.setAdapter(adapter);
 						
-			if (adapterList.getItemCount() == 0){				
+			if (adapter.getItemCount() == 0){				
 		
 				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
 				emptyTextView.setText(R.string.contacts_list_empty_text);
-				listView.setVisibility(View.GONE);
+				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
 			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_contacts_list);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_list_options);
 			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_list_out_options);
 			optionProperties = (LinearLayout) v.findViewById(R.id.contact_list_option_properties_layout);
@@ -454,37 +438,25 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_contactsgrid, container, false);
-			/*
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
 			
-		    float scaleW = Util.getScaleW(outMetrics, density);
-		    float scaleH = Util.getScaleH(outMetrics, density);
-		    
-		    int totalWidth = outMetrics.widthPixels;
-		    int totalHeight = outMetrics.heightPixels;
-		    
-		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-		    	if (numberOfCells < 3){
-					numberOfCells = 3;
-				}	
-		    }
-		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-		    	if (numberOfCells < 2){
-					numberOfCells = 2;
-				}	
-		    }
+			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
-			listView = (RecyclerView) v.findViewById(R.id.contact_grid_view_browser);
-	        listView.setOnItemClickListener(null);
-	        listView.setItemsCanFocus(false);
-	        
-	        outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid_contacts);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid_contacts);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid_contacts);
+			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
+			recyclerView.setHasFixedSize(true);
+			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+				@Override
+			      public int getSpanSize(int position) {
+					return 1;
+				}
+			});
+			
+			recyclerView.addOnItemTouchListener(this);
+			recyclerView.setItemAnimator(new DefaultItemAnimator());
+			
+			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_contacts_grid);
+			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_contacts_grid);
+			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_contacts_grid);
 			outSpaceButton.setOnClickListener(this);
 			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
@@ -523,36 +495,88 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
 			}
-	        
-	        emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
-	        
-	        if (adapterGrid == null){
-	        	adapterGrid = new MegaContactsGridAdapter(context, visibleContacts, listView, numberOfCells);
-	        }
-	        else{
-	        	adapterGrid.setContacts(visibleContacts);
-	        }
-	        
-	        adapterGrid.setPositionClicked(-1);   
-			listView.setAdapter(adapterGrid);
-			addContactButton = (Button) v.findViewById(R.id.add_contact_button);
-			addContactButton.setOnClickListener(this);			
 			
-			if (adapterGrid.getCount() == 0){
-				listView.setVisibility(View.GONE);
-				emptyImageView.setVisibility(View.VISIBLE);
-				emptyTextView.setVisibility(View.VISIBLE);
-				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
-				emptyTextView.setText(R.string.contacts_list_empty_text);
-				addContactButton.setVisibility(View.VISIBLE);
+			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
+			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
+			
+			fabButton = (ImageButton) v.findViewById(R.id.invite_contact_button_grid);
+			fabButton.setOnClickListener(this);
+			
+			if (adapter == null){
+				adapter = new MegaContactsLollipopAdapter(context, this, visibleContacts, emptyImageView, emptyTextView, recyclerView, MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
-				listView.setVisibility(View.VISIBLE);
+				adapter.setContacts(visibleContacts);
+				adapter.setAdapterType(MegaContactsLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+		
+			adapter.setPositionClicked(-1);
+			recyclerView.setAdapter(adapter);
+						
+			if (adapter.getItemCount() == 0){				
+		
+				emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
+				emptyTextView.setText(R.string.contacts_list_empty_text);
+				recyclerView.setVisibility(View.GONE);
+				emptyImageView.setVisibility(View.VISIBLE);
+				emptyTextView.setVisibility(View.VISIBLE);
+			}
+			else{
+				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				addContactButton.setVisibility(View.GONE);
-			}		*/	
+			}
+			
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_contacts_grid);
+			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_grid_options);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_grid_out_options);
+			optionProperties = (LinearLayout) v.findViewById(R.id.contact_grid_option_properties_layout);
+			optionShare = (LinearLayout) v.findViewById(R.id.contact_grid_option_share_layout);
+			optionSendFile = (LinearLayout) v.findViewById(R.id.contact_grid_option_send_file_layout);
+			optionRemove = (LinearLayout) v.findViewById(R.id.contact_grid_option_remove_layout);		
+			
+			optionRemove.setOnClickListener(this);
+			optionShare.setOnClickListener(this);
+			optionProperties.setOnClickListener(this);
+			optionSendFile.setOnClickListener(this);
+			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingOptionsPanel.setVisibility(View.INVISIBLE);
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+	            @Override
+	            public void onPanelSlide(View panel, float slideOffset) {
+	            	log("onPanelSlide, offset " + slideOffset);
+	            	if(slideOffset==0){
+	            		hideOptionsPanel();
+	            	}
+	            }
+
+	            @Override
+	            public void onPanelExpanded(View panel) {
+	            	log("onPanelExpanded");
+
+	            }
+
+	            @Override
+	            public void onPanelCollapsed(View panel) {
+	            	log("onPanelCollapsed");
+	            	
+
+	            }
+
+	            @Override
+	            public void onPanelAnchored(View panel) {
+	            	log("onPanelAnchored");
+	            }
+
+	            @Override
+	            public void onPanelHidden(View panel) {
+	                log("onPanelHidden");                
+	            }
+	        });	
 			
 			return v;
 		}			
@@ -570,7 +594,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	public void hideOptionsPanel(){
 		log("hideOptionsPanel");
 				
-		adapterList.setPositionClicked(-1);
+		adapter.setPositionClicked(-1);
 		fabButton.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
@@ -587,13 +611,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 		}
 		
-		if (isList){
-			adapterList.setContacts(visibleContacts);
-		}
-		else{
-			adapterGrid.setContacts(visibleContacts);
-		}
-		
+		adapter.setContacts(visibleContacts);		
 	}
 	
 	@Override
@@ -607,7 +625,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	public void onClick(View v) {
 
 		switch(v.getId()){
-			case R.id.invite_contact_button:{				
+			case R.id.invite_contact_button:
+			case R.id.invite_contact_button_grid:{
 				((ManagerActivityLollipop)context).showNewContactDialog(null);				
 				break;
 			}
@@ -616,7 +635,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
-			case R.id.contact_list_option_send_file_layout:{
+			case R.id.contact_list_option_send_file_layout:
+			case R.id.contact_grid_option_send_file_layout:{
 				log("optionSendFile");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -627,7 +647,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				((ManagerActivityLollipop) context).pickContacToSendFile(user);
 				break;
 			}
-			case R.id.contact_list_option_properties_layout:{
+			case R.id.contact_list_option_properties_layout:
+			case R.id.contact_grid_option_properties_layout:{
 				log("optionProperties");
 //				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				log("optionSendFile");
@@ -640,7 +661,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				context.startActivity(i);			
 				break;
 			}
-			case R.id.contact_list_option_share_layout:{
+			case R.id.contact_list_option_share_layout:
+			case R.id.contact_grid_option_share_layout:{
 				log("optionShare");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -651,7 +673,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				((ManagerActivityLollipop) context).pickFolderToShare(user);
 				break;
 			}
-			case R.id.contact_list_option_remove_layout:{
+			case R.id.contact_list_option_remove_layout:
+			case R.id.contact_grid_option_remove_layout:{
 				log("Remove contact");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
 				slidingOptionsPanel.setVisibility(View.GONE);
@@ -664,20 +687,17 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	}
 			
     public void itemClick(int position) {
-		
-		if (isList){
-			
-			if (adapterList.isMultipleSelect()){
-				adapterList.toggleSelection(position);
-				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
-			}
-			else{
-		
-				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
-				i.putExtra("name", visibleContacts.get(position).getEmail());
-				startActivity(i);
-			}
+					
+		if (adapter.isMultipleSelect()){
+			adapter.toggleSelection(position);
+			updateActionModeTitle();
+			adapter.notifyDataSetChanged();
+		}
+		else{
+	
+			Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
+			i.putExtra("name", visibleContacts.get(position).getEmail());
+			startActivity(i);
 		}
     }
 	
@@ -713,35 +733,17 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		log("Sliding not shown");
 		
-		if (isList){
-			if (adapterList.isMultipleSelect()){
-				hideMultipleSelect();
-				return 2;
-			}
-			
-			if (adapterList.getPositionClicked() != -1){
-				adapterList.setPositionClicked(-1);
-				adapterList.notifyDataSetChanged();
-				return 1;
-			}
-			else{
-				return 0;
-			}
+		if (adapter.isMultipleSelect()){
+			hideMultipleSelect();
+			return 2;
+		}
+		
+		if (adapter.getPositionClicked() != -1){
+			adapter.setPositionClicked(-1);
+			adapter.notifyDataSetChanged();
+			return 1;
 		}
 		else{
-//			if (adapterGrid.isMultipleSelect()){
-//				adapterGrid.hideMultipleSelect();
-//				return 2;
-//			}
-//			
-//			if (adapterGrid.getPositionClicked() != -1){
-//				adapterGrid.setPositionClicked(-1);
-//				adapterGrid.notifyDataSetChanged();
-//				return 1;
-//			}
-//			else{
-//				return 0;
-//			}
 			return 0;
 		}
 	}
@@ -755,33 +757,19 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		if (isList){
-			if (adapterList != null){
-				adapterList.setPositionClicked(positionClicked);
-			}
+		if (adapter != null){
+			adapter.setPositionClicked(positionClicked);
 		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.setPositionClicked(positionClicked);
-			}	
-		}		
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
-			if (adapterList != null){
-				adapterList.notifyDataSetChanged();
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				adapterGrid.notifyDataSetChanged();
-			}
+		if (adapter != null){
+			adapter.notifyDataSetChanged();
 		}
 	}
 	
-	public RecyclerView getListView(){
-		return listView;
+	public RecyclerView getRecyclerView(){
+		return recyclerView;
 	}
 	
 	private static void log(String log) {
@@ -795,7 +783,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		if (visibleContacts.size() == 0){
 			log("CONTACTS SIZE == 0");
-			listView.setVisibility(View.GONE);
+			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
 			emptyImageView.setImageResource(R.drawable.ic_empty_contacts);
@@ -803,7 +791,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		}
 		else{
 			log("CONTACTS SIZE != 0");
-			listView.setVisibility(View.VISIBLE);
+			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 		}	
@@ -815,27 +803,15 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			visibleContacts.add(i, visibleContacts.remove(j));
 		}
 		
-		if (isList){
-			adapterList.setContacts(visibleContacts);
-		}
-		else{
-			adapterGrid.setContacts(visibleContacts);
-		}
+		adapter.setContacts(visibleContacts);
 	}
 	public void sortByNameAscending(){
 		updateView();
 	}
 	
 	public boolean showSelectMenuItem(){
-		if (isList){
-			if (adapterList != null){
-				return adapterList.isMultipleSelect();
-			}
-		}
-		else{
-			if (adapterGrid != null){
-				return adapterGrid.isMultipleSelect();
-			}
+		if (adapter != null){
+			return adapter.isMultipleSelect();
 		}
 		
 		return false;
