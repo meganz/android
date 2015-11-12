@@ -19,24 +19,28 @@
         android:id="@+id/cab_menu_delete"
         android:orderInCategory="105"
         android:title="@string/context_delete"
+        android:showAsAction="never"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_share_folder"
         android:orderInCategory="110"
         android:title="@string/context_share_folder"
+        android:showAsAction="never"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_help"
         android:orderInCategory="115"
         android:title="@string/action_help"
+        android:showAsAction="never"
         MEGA:showAsAction="never" />
     
     <item
         android:id="@+id/cab_menu_upgrade_account"
         android:orderInCategory="120"
         android:title="@string/action_upgrade_account"
+        android:showAsAction="never"
         MEGA:showAsAction="never" />
     
     <item
@@ -44,6 +48,7 @@
         android:icon="@drawable/ic_delete"
         android:orderInCategory="125"
         android:title="@string/action_settings"
+        android:showAsAction="never"
         MEGA:showAsAction="never" />           
     
 </menu>

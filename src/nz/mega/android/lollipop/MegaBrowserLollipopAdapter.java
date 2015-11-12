@@ -98,7 +98,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}	
 		
 		public ImageView savedOffline;
-//		public ImageView savedOfflineMultiselect;
 		public ImageView publicLinkImageMultiselect;
 		public ImageView publicLinkImage;
 		public RelativeLayout itemLayout;
@@ -111,13 +110,6 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		public View separator;
-		
-		/*public ImageView savedOffline;
-//		public ImageView savedOfflineMultiselect;
-		public ImageButton imageButtonThreeDots;
-		public ImageView publicLinkImageMultiselect;
-		public ImageView publicLinkImage;
-		public ProgressBar transferProgressBar;*/
 	}
 	
 	public void toggleSelection(int pos) {
