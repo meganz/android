@@ -271,6 +271,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	long handleToDownload=0;
 	long lastTimeOnTransferUpdate = -1;	
 	
+	String nameText = "";
+	String firstNameText = "";
+	boolean name = false;
+	boolean firstName = false;
+	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
 	private int orderContacts = MegaApiJava.ORDER_DEFAULT_ASC;
 	private int orderOffline = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -882,7 +887,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (contact != null){
 				nVEmail.setVisibility(View.VISIBLE);
 				nVEmail.setText(contact.getEmail());
-				megaApi.getUserData(this);
+//				megaApi.getUserData(this);
+				megaApi.getUserAttribute(1, this);
+				megaApi.getUserAttribute(2, this);
 				
 				Bitmap defaultAvatar = Bitmap.createBitmap(DEFAULT_AVATAR_WIDTH_HEIGHT,DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
 				Canvas c = new Canvas(defaultAvatar);
@@ -7652,6 +7659,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 					}
 				}
+				
+				if(request.getParamType()==1){
+					log("(1)request.getText(): "+request.getText());
+					nameText=request.getText();
+					name=true;
+				}
+				else if(request.getParamType()==2){
+					log("(2)request.getText(): "+request.getText());
+					firstNameText = request.getText();
+					firstName = true;
+				}
+				if(name && firstName){
+					String fullName = nameText + " " + firstNameText;
+					if (fullName.trim().length() > 0){
+						nVDisplayName.setText(nameText+" "+firstNameText);
+						name= false;
+						firstName = false;
+					}
+				}
+			}
+			else{
+				log("ERRR:R " + e.getErrorString() + "_" + e.getErrorCode());
 			}
 			
 			log("avatar user downloaded");
