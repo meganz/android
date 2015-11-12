@@ -146,6 +146,7 @@
     <string name="login_querying_signup_link" context="when the user clicks on the link sent by MEGA after creating the account, this message is shown">Checking validation link</string>
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
+    <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please, loggin in before sharing with MEGA.</string>
     
     <string name="tour_space_title">Mega Space</string>
     <string name="tour_speed_title">Mega Speed</string>
