@@ -34,12 +34,10 @@ import nz.mega.android.SettingsActivity;
 import nz.mega.android.ShareInfo;
 import nz.mega.android.SortByDialogActivity;
 import nz.mega.android.TabsAdapter;
-import nz.mega.android.TransfersFragment;
 import nz.mega.android.UpgradeAccountFragment;
 import nz.mega.android.UploadHereDialog;
 import nz.mega.android.UploadService;
 import nz.mega.android.ZipBrowserActivity;
-import nz.mega.android.ManagerActivity.DrawerItem;
 import nz.mega.android.lollipop.FileStorageActivityLollipop.Mode;
 import nz.mega.android.utils.PreviewUtils;
 import nz.mega.android.utils.ThumbnailUtils;
@@ -4525,6 +4523,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					return;
 				}
 			}
+		}
+		else if (drawerItem == DrawerItem.SETTINGS){
+			drawerItem = DrawerItem.CLOUD_DRIVE;
+			if (nV != null){
+				Menu nVMenu = nV.getMenu();
+				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+				cloudDrive.setChecked(true);
+			}
+			selectDrawerItemLollipop(drawerItem);
+			return;
 		}
 		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();

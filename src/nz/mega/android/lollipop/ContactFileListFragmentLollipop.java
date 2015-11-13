@@ -327,13 +327,13 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+		log("onCreateView");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
-
+		
 		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
@@ -450,7 +450,8 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 
 			listView.setAdapter(adapter);
 			
-			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
+			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_contact_file);
+
 			optionsLayout = (LinearLayout) v.findViewById(R.id.contact_file_list_options);
 			optionsOutLayout = (FrameLayout) v.findViewById(R.id.contact_file_list_out_options);
 			optionRename = (LinearLayout) v.findViewById(R.id.contact_file_list_option_rename_layout);
@@ -477,7 +478,9 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
+			log("SliddingPanel invisible!");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			log("SliddingPanel hidden!");
 			
 			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 	            @Override
@@ -734,7 +737,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((ActionBarActivity)activity).getSupportActionBar();
+		aB = ((AppCompatActivity)activity).getSupportActionBar();
 		if (aB != null){
 			aB.show();
 		}
