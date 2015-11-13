@@ -16,6 +16,8 @@ import java.util.List;
 import nz.mega.android.lollipop.FileExplorerActivityLollipop;
 import nz.mega.android.utils.Util;
 
+import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
@@ -113,6 +115,11 @@ public class ShareInfo {
 			Uri dataUri = intent.getData();
 			if (dataUri == null) {
 				log("data uri is null");
+
+				if(Intent.ACTION_GET_CONTENT.equals(intent.getAction())) {
+					log("Multiple ACTION_GET_CONTENT");
+					return processGetContentMultiple(intent, context);
+				}
 				return null;
 			}
 			shareInfo.processUri(dataUri, context);
@@ -134,14 +141,57 @@ public class ShareInfo {
 	}
 	
 	/*
+	 * Process Multiple files from GET_CONTENT Intent
+	 */
+	@SuppressLint("NewApi")
+	public static List<ShareInfo> processGetContentMultiple(Intent intent,Context context) {
+		log("processIntentMultiple");
+		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
+		ClipData cD = intent.getClipData();
+		if(cD!=null&&cD.getItemCount()!=0){
+		
+            for(int i = 0; i < cD.getItemCount(); i++){
+            	ClipData.Item item = cD.getItemAt(i);
+            	Uri uri = item.getUri();
+            	log("ClipData uri: "+uri);
+            	if (uri == null)
+    				continue;
+    			log("----: "+uri.toString());
+    			ShareInfo info = new ShareInfo();
+    			info.processUri(uri, context);
+    			if (info.file == null) {
+    				continue;
+    			}
+    			result.add(info);
+            }
+		}
+		else{
+			log("ClipData NUll or size=0");
+			return null;
+		}
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PROCESSED);
+		}
+		else{
+			intent.setAction(FileExplorerActivity.ACTION_PROCESSED);
+		}
+		
+		return result;
+	}
+	
+	
+	/*
 	 * Process Multiple files
 	 */
-	public static List<ShareInfo> processIntentMultiple(Intent intent,
-			Context context) {
+	public static List<ShareInfo> processIntentMultiple(Intent intent,Context context) {
 		log("processIntentMultiple");
 		ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+		
+		ArrayList<Uri> imageUri = intent.getParcelableArrayListExtra(Intent.EXTRA_ALLOW_MULTIPLE);
 
 		if (imageUris == null || imageUris.size() == 0) {
+			log("imageUris == null || imageUris.size() == 0");
 			return null;
 		}
 		ArrayList<ShareInfo> result = new ArrayList<ShareInfo>();
@@ -186,10 +236,10 @@ public class ShareInfo {
 		if(scheme != null)
 		{
 			if (scheme.equals("content")) {
-				log("scheme content");
+				log("processUri go to scheme content");
 				processContent(uri, context);
 			} else if (scheme.equals("file")) {
-				log("file content");
+				log("processUri go to file content");
 				processFile(uri, context);
 			}
 		}
@@ -198,11 +248,14 @@ public class ShareInfo {
 		}
 
 		if (inputStream != null) {
+			log("inputStream != null");
 			try {
 				file = null;
 				String path = uri.getPath();
 				log("processUri-path: "+path);
-				try{ file = new File(path); }
+				try{ 
+					file = new File(path); 
+				}
 				catch(Exception e){
 					log("error when creating File!");
 //					log(e.getMessage());
@@ -210,14 +263,21 @@ public class ShareInfo {
 				if((file != null) && file.exists() && file.canRead())
 				{
 					size = file.length();
+					log("The file is accesible!");
 					return;
 				}
 				
 				file = null;
 				path = getRealPathFromURI(context, uri);
 				try
-				{ file = new File(path); }
-				catch(Exception e){}
+				{ 
+					file = new File(path); 				
+					log("Real path from URI: "+path);
+				}
+				catch(Exception e){
+					log("No real path from URI");
+				}
+				
 				if((file != null) && file.exists() && file.canRead())
 				{
 					size = file.length();
@@ -240,6 +300,8 @@ public class ShareInfo {
 						return;
 					}
 				}
+				log("Start copy to: "+file.getAbsolutePath());
+				
 				OutputStream stream = new BufferedOutputStream(new FileOutputStream(file));
 				int bufferSize = 1024;
 				byte[] buffer = new byte[bufferSize];

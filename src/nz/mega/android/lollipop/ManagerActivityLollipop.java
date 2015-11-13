@@ -6673,7 +6673,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return;						
 			}
 			
-			Uri uri = intent.getData();
 			intent.setAction(Intent.ACTION_GET_CONTENT);
 			FilePrepareTask filePrepareTask = new FilePrepareTask(this);
 			filePrepareTask.execute(intent);

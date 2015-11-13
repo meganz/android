@@ -875,12 +875,14 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			if (getApplicationContext().getExternalCacheDir() != null){
 				File localFile = new File (getApplicationContext().getExternalCacheDir(), transfer.getFileName());
 				if (localFile.exists()){
+					log("Delete file!: "+localFile.getAbsolutePath());
 					localFile.delete();
 				}
 			}
 			else{
 				File localFile = new File (getApplicationContext().getCacheDir(), transfer.getFileName());
 				if (localFile.exists()){
+					log("Delete file!: "+localFile.getAbsolutePath());
 					localFile.delete();
 				}
 			}
