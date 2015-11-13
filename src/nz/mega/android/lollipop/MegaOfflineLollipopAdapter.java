@@ -8,7 +8,6 @@ import nz.mega.android.DatabaseHandler;
 import nz.mega.android.MegaOffline;
 import nz.mega.android.MimeTypeList;
 import nz.mega.android.R;
-import nz.mega.android.lollipop.MegaBrowserLollipopAdapter.ViewHolderBrowser;
 import nz.mega.android.utils.ThumbnailUtils;
 import nz.mega.android.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -53,7 +52,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 
-public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOfflineList> implements OnClickListener {
+public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOfflineLollipopAdapter.ViewHolderOffline> implements OnClickListener {
+	
+	public static final int ITEM_VIEW_TYPE_LIST = 0;
+	public static final int ITEM_VIEW_TYPE_GRID = 1;
 	
 	Context context;
  
@@ -63,6 +65,8 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	public DatabaseHandler dbH;
 
 	ArrayList<MegaOffline> mOffList = new ArrayList<MegaOffline>();	
+	
+	int adapterType;
 	
 	RecyclerView listFragment;
 	ImageView emptyImageViewFragment;
@@ -75,9 +79,9 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	boolean multipleSelect;
 	
 	/*public static view holder class*/
-    public class ViewHolderOfflineList extends RecyclerView.ViewHolder{
-        public ViewHolderOfflineList(View arg0) {
-			super(arg0);
+    public class ViewHolderOffline extends RecyclerView.ViewHolder{
+        public ViewHolderOffline(View v) {
+			super(v);
 			// TODO Auto-generated constructor stub
 		}
 		ImageView imageView;
@@ -91,12 +95,26 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
         String currentHandle;
     }
     
+    public class ViewHolderOfflineList extends ViewHolderOffline{
+    	public ViewHolderOfflineList (View v){
+    		super(v);
+    	}
+    }
+    
+    public class ViewHolderOfflineGrid extends ViewHolderOffline{
+    	public ViewHolderOfflineGrid (View v){
+    		super(v);
+    	}
+    	
+    	public View separator;
+    }
+    
     private class OfflineThumbnailAsyncTask extends AsyncTask<String, Void, Bitmap>{
 
-    	ViewHolderOfflineList holder;
+    	ViewHolderOffline holder;
     	String currentPath;
     	
-    	public OfflineThumbnailAsyncTask(ViewHolderOfflineList holder) {
+    	public OfflineThumbnailAsyncTask(ViewHolderOffline holder) {
     		log("OfflineThumbnailAsyncTask::OfflineThumbnailAsyncTask");
 			this.holder = holder;
 		}
@@ -212,11 +230,12 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		return nodes;
 	}
 	
-	public MegaOfflineLollipopAdapter(OfflineFragmentLollipop _fragment, Context _context, ArrayList<MegaOffline> _mOffList, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB) {
+	public MegaOfflineLollipopAdapter(OfflineFragmentLollipop _fragment, Context _context, ArrayList<MegaOffline> _mOffList, RecyclerView listView, ImageView emptyImageView, TextView emptyTextView, ActionBar aB, int adapterType) {
 		log("MegaOfflineListAdapter");
 		this.fragment = _fragment;
 		this.context = _context;
 		this.mOffList = _mOffList;
+		this.adapterType =  adapterType;
 
 		this.listFragment = listView;
 		this.emptyImageViewFragment = emptyImageView;
@@ -235,12 +254,10 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	}
 	
 	@Override
-	public ViewHolderOfflineList onCreateViewHolder(ViewGroup parent, int viewType) {
+	public ViewHolderOffline onCreateViewHolder(ViewGroup parent, int viewType) {
 		log("onCreateViewHolder");
 		
-		listFragment = (RecyclerView) parent;		
-		
-		ViewHolderOfflineList holder = null;
+		listFragment = (RecyclerView) parent;
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -250,27 +267,208 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	    float scaleW = Util.getScaleW(outMetrics, density);
 	    float scaleH = Util.getScaleH(outMetrics, density);
 		
-		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = inflater.inflate(R.layout.item_offline_list, parent, false);	
-			
-		holder = new ViewHolderOfflineList(v);
-		holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_list_item_layout);
-		holder.itemLayout.setOnClickListener(this);
-		holder.imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
-		holder.textViewFileName = (TextView) v.findViewById(R.id.offline_list_filename);
-		holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
-		holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
-		holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
-		holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_list_three_dots);
-	
-		v.setTag(holder);
-		return holder;
+	    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	    
+		if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST){
 		
+			ViewHolderOfflineList holder = null;
+			
+			View v = inflater.inflate(R.layout.item_offline_list, parent, false);	
+				
+			holder = new ViewHolderOfflineList(v);
+			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_list_item_layout);
+			holder.imageView = (ImageView) v.findViewById(R.id.offline_list_thumbnail);
+			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_list_filename);
+			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
+			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_list_three_dots);
+		
+			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setTag(holder);
+			
+			v.setTag(holder);
+			
+			return holder;
+		}
+		else if (viewType == MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+			ViewHolderOfflineGrid holder = null;
+			
+			View v = inflater.inflate(R.layout.item_offline_grid, parent, false);	
+			
+			holder = new ViewHolderOfflineGrid(v);
+			holder.itemLayout = (RelativeLayout) v.findViewById(R.id.offline_grid_item_layout);
+			holder.imageView = (ImageView) v.findViewById(R.id.offline_grid_thumbnail);
+			holder.textViewFileName = (TextView) v.findViewById(R.id.offline_grid_filename);
+			holder.textViewFileName.getLayoutParams().height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
+			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_grid_filesize);
+			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_grid_three_dots);
+			holder.separator = (View) v.findViewById(R.id.offline_grid_separator);
+		
+			holder.itemLayout.setOnClickListener(this);
+			holder.itemLayout.setTag(holder);
+			
+			v.setTag(holder);
+			
+			return holder;
+		}
+		else{
+			return null;
+		}
 	}
 
 	@Override
-	public void onBindViewHolder(ViewHolderOfflineList holder, int position) {
+	public void onBindViewHolder(ViewHolderOffline holder, int position) {
 		log("onBindViewHolder");
+		if (adapterType == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_LIST){
+			ViewHolderOfflineList holderList = (ViewHolderOfflineList) holder;
+			onBindViewHolderList(holderList, position);
+		}
+		else if (adapterType == MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID){
+			ViewHolderOfflineGrid holderGrid = (ViewHolderOfflineGrid) holder;
+			onBindViewHolderGrid(holderGrid, position);
+		}
+	}
+	
+	public void onBindViewHolderGrid (ViewHolderOfflineGrid holder, int position){
+		log("onBindViewHolderGrid");
+		
+		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		DisplayMetrics outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+		
+	    float scaleW = Util.getScaleW(outMetrics, density);
+	    float scaleH = Util.getScaleH(outMetrics, density);
+	    
+		holder.currentPosition = position;
+		
+		if (!multipleSelect) {
+			holder.imageButtonThreeDots.setVisibility(View.VISIBLE);
+			
+			if (positionClicked != -1) {
+				if (positionClicked == position) {
+					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+					listFragment.smoothScrollToPosition(positionClicked);
+				}
+				else {
+					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+				}
+			} 
+			else {
+				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
+			}
+		} 
+		else {
+			holder.imageButtonThreeDots.setVisibility(View.GONE);		
+
+			if(this.isItemChecked(position)){
+				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid_long_click_lollipop));
+				holder.separator.setBackgroundColor(Color.WHITE);
+			}
+			else{
+				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
+				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
+			}
+		}
+				
+		MegaOffline currentNode = (MegaOffline) getItem(position);
+		
+		String path=null;
+		
+		if(currentNode.isIncoming()){
+			path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + currentNode.getHandleIncoming() + "/";
+		}
+		else{
+			path= Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR;
+		}	
+		
+		File currentFile = null;
+		if (Environment.getExternalStorageDirectory() != null){
+			currentFile = new File(path + currentNode.getPath()+currentNode.getName());
+		}
+		else{
+			currentFile = context.getFilesDir();
+		}
+		
+		holder.currentPath = currentFile.getAbsolutePath();
+		holder.currentHandle = currentNode.getHandle();
+		holder.currentPosition = position;
+		
+		holder.textViewFileName.setText(currentNode.getName());
+		
+		int folders=0;
+		int files=0;
+		if (currentFile.isDirectory()){
+			
+			File[] fList = currentFile.listFiles();
+			for (File f : fList){
+				
+				if (f.isDirectory()){
+					folders++;						
+				}
+				else{
+					files++;
+				}
+			}
+			
+			String info = "";
+			if (folders > 0){
+				info = folders +  " " + context.getResources().getQuantityString(R.plurals.general_num_folders, folders);
+				if (files > 0){
+					info = info + ", " + files + " " + context.getResources().getQuantityString(R.plurals.general_num_files, folders);
+				}
+			}
+			else {
+				info = files +  " " + context.getResources().getQuantityString(R.plurals.general_num_files, files);
+			}			
+					
+			holder.textViewFileSize.setText(info);			
+		}
+		else{
+			long nodeSize = currentFile.length();
+			holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+		}
+		
+		holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+		if (currentFile.isFile()){
+			log("...........................Busco Thumb");
+			if (MimeTypeList.typeForName(currentNode.getName()).isImage()){
+				Bitmap thumb = null;
+								
+				if (currentFile.exists()){
+					thumb = ThumbnailUtils.getThumbnailFromCache(Long.parseLong(currentNode.getHandle()));
+					if (thumb != null){
+						holder.imageView.setImageBitmap(thumb);
+					}
+					else{
+						try{
+							new OfflineThumbnailAsyncTask(holder).execute(currentFile.getAbsolutePath());
+						}
+						catch(Exception e){
+							//Too many AsyncTasks
+						}
+					}
+				}
+			}
+		}
+		else{
+			holder.imageView.setImageResource(R.drawable.ic_folder_list);
+		}
+		
+		holder.imageButtonThreeDots.setTag(holder);
+		holder.imageButtonThreeDots.setOnClickListener(this);
+	}
+	
+	public void onBindViewHolderList (ViewHolderOfflineList holder, int position){
+		log("onBindViewHolderList");
 		
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -410,6 +608,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		log("getItemCount");
 		return mOffList.size();
 	} 
+	
+	@Override
+	public int getItemViewType(int position) {
+		return adapterType;
+	}
  
 	public Object getItem(int position) {
 		return mOffList.get(position);
@@ -431,21 +634,27 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
     	positionClicked = p;
 		notifyDataSetChanged();
     }
+    
+    public void setAdapterType(int adapterType){
+    	this.adapterType = adapterType;
+    }
 
 	@Override
 	public void onClick(View v) {
 		log("onClick");
-		ViewHolderOfflineList holder = (ViewHolderOfflineList) v.getTag();
+		ViewHolderOffline holder = (ViewHolderOffline) v.getTag();
 		
 		int currentPosition = holder.currentPosition;
 		MegaOffline mOff = (MegaOffline) getItem(currentPosition);
 		
 		switch (v.getId()){
-			case R.id.offline_list_item_layout:{				
+			case R.id.offline_list_item_layout:
+			case R.id.offline_grid_item_layout:{
 				fragment.itemClick(currentPosition);								
 				break;
 			}			
-			case R.id.offline_list_three_dots:{
+			case R.id.offline_list_three_dots:
+			case R.id.offline_grid_three_dots:{
 				if (positionClicked == -1){
 					positionClicked = currentPosition;
 					notifyDataSetChanged();
