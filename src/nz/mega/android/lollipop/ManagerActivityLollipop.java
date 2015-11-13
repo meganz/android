@@ -1567,7 +1567,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(false);
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
@@ -1587,6 +1586,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				helpMenuItem.setVisible(false);
     				gridSmallLargeMenuItem.setVisible(false);
     				searchMenuItem.setVisible(true);
+    				thumbViewMenuItem.setVisible(true);
     			}
     			
     			break;
@@ -2772,7 +2772,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (oFLol != null){	
 				//Show
     			sortByMenuItem.setVisible(true);
-    			thumbViewMenuItem.setVisible(false); //TODO
+    			thumbViewMenuItem.setVisible(true); 
     			
     			if(oFLol.getItemCount()>0){
 					selectMenuItem.setVisible(true);
@@ -8296,7 +8296,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						ArrayList<MegaNode> nodes = megaApi.getChildren(megaApi.getNodeByHandle(inSFLol.getParentHandle()), orderGetChildren);
 						//TODO: ojo con los hijos
 //						inSFLol.setNodes(nodes);
-						oFLol.getListView().invalidate();
+						oFLol.getRecyclerView().invalidate();
 					}			
 				}
 				else if (drawerItem == DrawerItem.SHARED_ITEMS){
