@@ -113,7 +113,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		separator = (View) v.findViewById(R.id.separator);
 		
-		optionsBar = (LinearLayout) v.findViewById(R.id.options_layout);
+		optionsBar = (LinearLayout) v.findViewById(R.id.options_explorer_layout);
 		optionText = (TextView) v.findViewById(R.id.action_text);
 		optionText.setOnClickListener(this);
 		android.view.ViewGroup.LayoutParams paramsb2 = optionText.getLayoutParams();		
