@@ -683,7 +683,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 				dbH = DatabaseHandler.getDbHandler(getApplicationContext());	
 			}
 			if (dbH.getCredentials() == null){
-				intent.setAction(ManagerActivity.ACTION_CANCEL_DOWNLOAD);
+				intent.setAction(ManagerActivityLollipop.ACTION_CANCEL_DOWNLOAD);
 			}
 			else{
 				intent.setAction(ManagerActivityLollipop.ACTION_SHOW_TRANSFERS);
