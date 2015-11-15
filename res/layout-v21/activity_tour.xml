@@ -20,7 +20,7 @@
             android:paddingBottom="0dp"
             android:paddingTop="0dp" >
 
-            <nz.mega.components.LoopViewPager
+            <mega.privacy.android.app.components.LoopViewPager
                 android:id="@+id/pager"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:background="#000000">
     
-    <nz.mega.components.TouchImageView
+    <mega.privacy.android.app.components.TouchImageView
         android:id="@+id/secure_selfie_viewer_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

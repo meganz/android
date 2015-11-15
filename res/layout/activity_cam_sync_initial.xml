@@ -118,7 +118,7 @@
             android:paddingTop="0dp" 
             android:background="@color/background" >
 	       
-	       <nz.mega.components.LoopViewPager
+	       <mega.privacy.android.app.components.LoopViewPager
 	           android:id="@+id/cam_sync_pager"
 	           android:layout_width="wrap_content"
 	           android:layout_height="wrap_content"

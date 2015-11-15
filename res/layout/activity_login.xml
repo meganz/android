@@ -68,7 +68,7 @@
 		                android:paddingTop="20dp"
 		                android:layout_marginBottom="4dp"/>
 
-		            <nz.mega.components.MySwitch
+		            <mega.privacy.android.app.components.MySwitch
 				        android:id="@+id/switch_login"
 				        style="@style/mySwitchStyle"
 				        android:layout_width="wrap_content"

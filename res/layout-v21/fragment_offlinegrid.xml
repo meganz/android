@@ -49,7 +49,7 @@
             android:textColor="@color/button_text" />
     </LinearLayout>
 
-    <nz.mega.components.AutofitRecyclerView
+    <mega.privacy.android.app.components.AutofitRecyclerView
         android:id="@+id/offline_view_browser_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
@@ -72,7 +72,7 @@
         android:textColor="@color/text_secondary"
         android:textSize="16sp" />
 
-    <nz.mega.components.SlidingUpPanelLayout
+    <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout_offline_grid"
         android:layout_width="match_parent"
@@ -333,6 +333,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
-    </nz.mega.components.SlidingUpPanelLayout>
+    </mega.privacy.android.app.components.SlidingUpPanelLayout>
 
 </RelativeLayout>

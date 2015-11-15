@@ -149,7 +149,7 @@
      </LinearLayout>        
       
 		 
-	<nz.mega.components.AutofitRecyclerView
+	<mega.privacy.android.app.components.AutofitRecyclerView
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
@@ -198,7 +198,7 @@
        	android:layout_below="@id/buttons_grid_layout">
     </Button>   
     
-     <nz.mega.components.SlidingUpPanelLayout
+     <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout_grid"
         android:layout_width="match_parent"
@@ -571,6 +571,6 @@
 					android:textStyle="bold"/>
 		      </LinearLayout>  
         </LinearLayout>
-    </nz.mega.components.SlidingUpPanelLayout>
+    </mega.privacy.android.app.components.SlidingUpPanelLayout>
 
 </RelativeLayout>

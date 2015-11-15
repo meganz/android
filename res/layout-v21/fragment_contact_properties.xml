@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
-        <nz.mega.android.utils.FixedCenterCrop
+        <mega.privacy.android.app.android.utils.FixedCenterCrop
             android:id="@+id/contact_properties_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

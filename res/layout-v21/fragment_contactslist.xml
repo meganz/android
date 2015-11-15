@@ -76,7 +76,7 @@
         android:text="+"
         android:tint="@android:color/white" />
 
-    <nz.mega.components.SlidingUpPanelLayout
+    <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout_contacts_list"
         android:layout_width="match_parent"
@@ -228,6 +228,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
-    </nz.mega.components.SlidingUpPanelLayout>
+    </mega.privacy.android.app.components.SlidingUpPanelLayout>
 
 </RelativeLayout>

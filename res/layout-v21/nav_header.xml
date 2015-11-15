@@ -49,7 +49,7 @@
 			android:layout_height="64dp"
 			android:layout_above="@id/navigation_drawer_account_information">
 	        
-	        <nz.mega.components.RoundedImageView 
+	        <mega.privacy.android.app.components.RoundedImageView 
 				android:id="@+id/navigation_drawer_user_account_picture_profile"
 				android:layout_width="64dp"
 				android:layout_height="64dp"

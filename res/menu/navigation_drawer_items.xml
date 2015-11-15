@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="nz.mega.android.lollipop.ManagerActivityLollipop" >
+    tools:context="mega.privacy.android.app.lollipop.ManagerActivityLollipop" >
 
     <group android:checkableBehavior="single">
 	    <item

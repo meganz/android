@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-     <nz.mega.components.MEGAPreferenceCategory 
+     <mega.privacy.android.app.components.MEGAPreferenceCategory 
         android:key="settings_pin_lock"
         android:title="@string/settings_pin_lock">
  <!--        android:textColor="@color/pressed_mega">  -->
@@ -14,7 +14,7 @@
 	        android:title="@string/settings_pin_lock_code"
 	        android:password="true"
 	        android:inputType="numberPassword" />
-    </nz.mega.components.MEGAPreferenceCategory>
+    </mega.privacy.android.app.components.MEGAPreferenceCategory>
     
     <PreferenceCategory 
         android:key="settings_camera_upload"
@@ -37,11 +37,11 @@
 	        android:entries="@array/settings_camera_upload_file_upload_entries"
 	        android:entryValues="@array/settings_camera_upload_file_upload_values" />
 		
-		<nz.mega.components.TwoLineCheckPreference
+		<mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_camera_upload_charging"
         	android:title="@string/settings_camera_upload_charging" />
 		
-		<nz.mega.components.TwoLineCheckPreference
+		<mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_keep_file_names"
         	android:title="@string/settings_keep_file_names" />
 		
@@ -71,11 +71,11 @@
         android:title="@string/settings_storage"
         android:textColor="@color/pressed_mega">
 		
-        <nz.mega.components.TwoLineCheckPreference
+        <mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_storage_ask_me_always"
         	android:title="@string/settings_storage_ask_me_always" />
         
-        <nz.mega.components.TwoLineCheckPreference
+        <mega.privacy.android.app.components.TwoLineCheckPreference
             android:key="settings_storage_advanced_devices"
         	android:title="@string/settings_storage_advanced_devices" />
         
