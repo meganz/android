@@ -447,7 +447,7 @@
 
     Content of the Sliding Panel
 
-    <nz.mega.components.SlidingUpPanelLayout
+    <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/file_properties_sliding_layout"
         android:layout_width="match_parent"
@@ -838,7 +838,7 @@
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
-    </nz.mega.components.SlidingUpPanelLayout>
+    </mega.privacy.android.app.components.SlidingUpPanelLayout>
 
 </RelativeLayout>
 -->

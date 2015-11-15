@@ -45,7 +45,7 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
     
-	    <nz.mega.components.RoundedImageView
+	    <mega.privacy.android.app.components.RoundedImageView
 	        android:id="@+id/contact_properties_image"
 	        android:layout_width="270dp"
 	        android:layout_height="270dp"

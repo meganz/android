@@ -87,7 +87,7 @@
 			 android:textColor="@color/white" 
 			 android:layout_weight="1"/>
                
-           	<nz.mega.components.MySwitch
+           	<mega.privacy.android.app.components.MySwitch
 		        android:id="@+id/file_properties_switch_online"
 		        style="@style/mySwitchStyle"
 		        android:layout_width="wrap_content"
@@ -102,7 +102,7 @@
 		        mySwitch:trackMySwitch="@drawable/switch_track_online" 
 		        android:layout_weight="1"/>
            	
-           	<nz.mega.components.MySwitch
+           	<mega.privacy.android.app.components.MySwitch
 	        android:id="@+id/file_properties_switch_offline"
 	        style="@style/mySwitchStyle"
 	        android:layout_width="wrap_content"

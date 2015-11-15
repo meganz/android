@@ -28,7 +28,7 @@
 		        android:paddingBottom="10dp"
 		        android:paddingTop="10dp">
 		    
-			    <nz.mega.components.RoundedImageView
+			    <mega.privacy.android.app.components.RoundedImageView
 			        android:id="@+id/my_avatar_image"
 			        android:layout_width="100dp"
 			         android:layout_height="100dp"

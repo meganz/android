@@ -14,7 +14,7 @@
 	    android:background="@color/content_text_folder"
 	    android:textSize="14sp"/>
     
-    <nz.mega.components.AutofitRecyclerView
+    <mega.privacy.android.app.components.AutofitRecyclerView
         android:id="@+id/inbox_grid_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -38,7 +38,7 @@
 	    android:layout_marginTop="@dimen/standard_margin"
 	    android:layout_centerHorizontal="true"/>
 
-    <nz.mega.components.SlidingUpPanelLayout
+    <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout_inbox_grid"
         android:layout_width="match_parent"
@@ -248,6 +248,6 @@
 		      </LinearLayout>	
 
         </LinearLayout>
-    </nz.mega.components.SlidingUpPanelLayout>
+    </mega.privacy.android.app.components.SlidingUpPanelLayout>
     
 </RelativeLayout>

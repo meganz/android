@@ -29,7 +29,7 @@
 		    android:layout_marginTop="5dp"
 		    android:layout_marginRight="5dp">
 		
-		    <nz.mega.components.RoundedImageView 
+		    <mega.privacy.android.app.components.RoundedImageView 
 			    android:id="@+id/contact_grid_thumbnail"
 			    android:layout_width="156dp"
 			    android:layout_height="156dp"

@@ -1,4 +1,4 @@
-<nz.mega.components.LinearLayoutCheckable xmlns:android="http://schemas.android.com/apk/res/android"
+<mega.privacy.android.app.components.LinearLayoutCheckable xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center_vertical"
@@ -74,4 +74,4 @@
                 android:focusable="false" />
     </RelativeLayout>
 
-</nz.mega.components.LinearLayoutCheckable>
+</mega.privacy.android.app.components.LinearLayoutCheckable>

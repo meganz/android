@@ -193,7 +193,7 @@
         android:layout_below="@id/content_text"
         android:choiceMode="multipleChoice" />
 
-    <nz.mega.components.SlidingUpPanelLayout
+    <mega.privacy.android.app.components.SlidingUpPanelLayout
         xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
@@ -289,6 +289,6 @@
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
-    </nz.mega.components.SlidingUpPanelLayout>
+    </mega.privacy.android.app.components.SlidingUpPanelLayout>
 
 </RelativeLayout>

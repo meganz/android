@@ -116,7 +116,7 @@
 			    android:paddingBottom="5dp"
 			    android:paddingRight="5dp" >
             
-	            <nz.mega.components.RoundedImageView 
+	            <mega.privacy.android.app.components.RoundedImageView 
 				    android:id="@+id/profile_photo" 
 				    android:layout_width="50dp"
 				    android:layout_height="50dp"

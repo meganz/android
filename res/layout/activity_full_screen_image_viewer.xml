@@ -6,7 +6,7 @@
     android:id="@+id/full_image_viewer_parent_layout" 
     android:background="#000000">
 
-    <nz.mega.components.ExtendedViewPager 
+    <mega.privacy.android.app.components.ExtendedViewPager 
 	    android:id="@+id/image_viewer_pager"
 	    android:layout_width="match_parent"
 	    android:layout_height="match_parent" />

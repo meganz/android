@@ -184,7 +184,7 @@
 	    android:longClickable="false"
 		android:clickable="false">
 	    
-	    <nz.mega.components.RoundedImageView 
+	    <mega.privacy.android.app.components.RoundedImageView 
 	         android:id="@+id/contact_list_thumbnail_share"
 	         android:layout_width="54dp"
 	         android:layout_height="54dp"
