@@ -405,9 +405,9 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -724,8 +724,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
 			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
+			hideOptionsPanel();
 			setPositionClicked(-1);
 			notifyDataSetChanged();
 			return 4;

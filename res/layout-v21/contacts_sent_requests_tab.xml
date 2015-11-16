@@ -38,7 +38,7 @@
         android:background="@drawable/ripple"
         android:elevation="@dimen/elevation_low"
         android:stateListAnimator="@anim/button_elevation"
-        android:text="+"
+        android:src="@drawable/ic_add_white"
         android:tint="@android:color/white" />
 
     <mega.privacy.android.app.components.SlidingUpPanelLayout

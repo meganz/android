@@ -78,9 +78,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
-	LinearLayout buttonsLayout=null;	
-	Button leftNewFolder;
-	Button rightUploadButton;
 	TextView contentText;
 	LinearLayout outSpaceLayout=null;
 	TextView outSpaceText;
@@ -419,14 +416,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);			
 			
-//			outSpaceButton.setVisibility(View.INVISIBLE);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);			
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
-			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
@@ -447,7 +436,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				
 				//Change below of ListView
 				log("usedSpacePerc>95");
-				buttonsLayout.setVisibility(View.GONE);				
+			
 //				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 //				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
 //				listView.setLayoutParams(p);
@@ -515,16 +504,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				//TODO set below of the ListView
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
 			}	
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
@@ -575,9 +559,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -633,14 +617,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
 			
-//			outSpaceButton.setVisibility(View.INVISIBLE);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);			
-			
-			leftNewFolder.setOnClickListener(this);
-			rightUploadButton.setOnClickListener(this);
-			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
@@ -661,7 +637,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				
 				//Change below of ListView
 				log("usedSpacePerc>95");
-				buttonsLayout.setVisibility(View.GONE);				
 //				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 //				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
 //				listView.setLayoutParams(p);
@@ -729,16 +704,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);
-				//TODO set below of the ListView
-				leftNewFolder.setVisibility(View.VISIBLE);
-				rightUploadButton.setVisibility(View.VISIBLE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
 			}
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
@@ -1276,8 +1246,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						recyclerView.setVisibility(View.GONE);
 						emptyImageView.setVisibility(View.VISIBLE);
 						emptyTextView.setVisibility(View.VISIBLE);
-						leftNewFolder.setVisibility(View.VISIBLE);
-						rightUploadButton.setVisibility(View.VISIBLE);
 
 						if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 							emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
@@ -1291,8 +1259,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						recyclerView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
-						leftNewFolder.setVisibility(View.GONE);
-						rightUploadButton.setVisibility(View.GONE);
 					}
 				}
 				else{
@@ -1537,8 +1503,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						recyclerView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
-						leftNewFolder.setVisibility(View.GONE);
-						rightUploadButton.setVisibility(View.GONE);
+
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));	
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -1600,8 +1565,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						recyclerView.setVisibility(View.VISIBLE);
 						emptyImageView.setVisibility(View.GONE);
 						emptyTextView.setVisibility(View.GONE);
-						leftNewFolder.setVisibility(View.GONE);
-						rightUploadButton.setVisibility(View.GONE);
+
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
 							aB.setTitle(getString(R.string.section_cloud_drive));	
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -1692,8 +1656,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					leftNewFolder.setVisibility(View.VISIBLE);
-					rightUploadButton.setVisibility(View.VISIBLE);
+
 					if (megaApi.getRootNode().getHandle()==parentHandle) {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
@@ -1706,8 +1669,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 				}			
 			}	
 		}
@@ -1718,8 +1679,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					leftNewFolder.setVisibility(View.VISIBLE);
-					rightUploadButton.setVisibility(View.VISIBLE);
+
 					if (megaApi.getRootNode().getHandle()==parentHandle) {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
 						emptyTextView.setText(R.string.file_browser_empty_cloud_drive);
@@ -1732,8 +1692,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 				}			
 			}
 		}

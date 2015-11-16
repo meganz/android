@@ -4603,21 +4603,62 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if (drawerItem == DrawerItem.CONTACTS){
-    		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
-    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
-    		if (cFLol != null){			
-    			if (cFLol.onBackPressed() == 0){
-    				drawerItem = DrawerItem.CLOUD_DRIVE;
-    				if (nV != null){
-						Menu nVMenu = nV.getMenu();
-						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-						cloudDrive.setChecked(true);
-					}
-					selectDrawerItemLollipop(drawerItem);
-    				return;
-    			}
-    		}
-    	}
+			int index = viewPagerContacts.getCurrentItem();
+			switch (index) {
+				case 0:{
+					//CONTACTS FRAGMENT
+		    		String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		    		if (cFLol != null){			
+		    			if (cFLol.onBackPressed() == 0){
+		    				drawerItem = DrawerItem.CLOUD_DRIVE;
+		    				if (nV != null){
+								Menu nVMenu = nV.getMenu();
+								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								cloudDrive.setChecked(true);
+							}
+							selectDrawerItemLollipop(drawerItem);
+		    				return;
+		    			}
+		    		}
+					break;
+				}
+				case 1:{
+					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 1);		
+					sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		    		if (sRFLol != null){			
+		    			if (sRFLol.onBackPressed() == 0){
+		    				drawerItem = DrawerItem.CLOUD_DRIVE;
+		    				if (nV != null){
+								Menu nVMenu = nV.getMenu();
+								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								cloudDrive.setChecked(true);
+							}
+							selectDrawerItemLollipop(drawerItem);
+		    				return;
+		    			}
+		    		}
+					break;
+				}
+				case 2:{
+					String cFTag = getFragmentTag(R.id.contact_tabs_pager, 2);		
+					rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+		    		if (rRFLol != null){			
+		    			if (rRFLol.onBackPressed() == 0){
+		    				drawerItem = DrawerItem.CLOUD_DRIVE;
+		    				if (nV != null){
+								Menu nVMenu = nV.getMenu();
+								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								cloudDrive.setChecked(true);
+							}
+							selectDrawerItemLollipop(drawerItem);
+		    				return;
+		    			}
+		    		}
+					break;
+				}
+			}		
+		}
 		else if (drawerItem == DrawerItem.ACCOUNT){
 
     		switch(accountFragment){
