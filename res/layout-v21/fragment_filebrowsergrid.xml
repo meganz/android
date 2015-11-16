@@ -167,7 +167,7 @@
         android:layout_marginBottom="@dimen/fab_button_margin_bottom"
         android:layout_marginRight="@dimen/fab_button_margin_right"
         android:background="@drawable/ripple"
-        android:text="+"
+        android:src="@drawable/ic_add_white"
         android:tint="@android:color/white"
         android:elevation="@dimen/elevation_low"
         android:stateListAnimator="@anim/button_elevation"/>

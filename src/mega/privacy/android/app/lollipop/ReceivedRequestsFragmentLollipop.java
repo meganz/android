@@ -163,9 +163,9 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -313,6 +313,52 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 			}
+		}
+	}
+	
+	public int onBackPressed(){
+		
+		log("onBackPressed");	
+		
+		PanelState pS=slidingOptionsPanel.getPanelState();
+		
+		if(pS==null){
+			log("NULLL");
+		}
+		else{
+			if(pS==PanelState.HIDDEN){
+				log("Hidden");
+			}
+			else if(pS==PanelState.COLLAPSED){
+				log("Collapsed");
+			}
+			else{
+				log("ps: "+pS);
+			}
+		}		
+		
+		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
+			log("getPanelState()!=PanelState.HIDDEN");
+			hideOptionsPanel();
+			setPositionClicked(-1);
+			notifyDataSetChanged();
+			return 4;
+		}
+		
+		log("Sliding not shown");
+		
+//		if (adapterList.isMultipleSelect()){
+//			adapterList.hideMultipleSelect();
+//			return 2;
+//		}
+		
+		if (adapterList.getPositionClicked() != -1){
+			adapterList.setPositionClicked(-1);
+			adapterList.notifyDataSetChanged();
+			return 1;
+		}
+		else{
+			return 0;
 		}
 	}
 	

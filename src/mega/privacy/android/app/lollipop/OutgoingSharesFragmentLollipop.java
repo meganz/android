@@ -52,6 +52,7 @@ import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -76,6 +77,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	Button leftNewFolder;
 	Button rightUploadButton;
 	TextView contentText;
+    ImageButton fabButton;
 
 	LinearLayout outSpaceLayout=null;
 	LinearLayout getProLayout=null;
@@ -360,6 +362,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 			getProLayout.setVisibility(View.GONE);
 			
+			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+			fabButton.setVisibility(View.GONE);
+			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
@@ -576,6 +581,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
+			
+			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+			fabButton.setVisibility(View.GONE);
 			
 			outSpaceButton.setOnClickListener(this);
 			

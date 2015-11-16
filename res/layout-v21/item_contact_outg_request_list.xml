@@ -54,11 +54,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/contact_request_list_name"
         android:background="@null"
-        android:paddingLeft="5dp"
-        android:paddingRight="15dp"
-        android:paddingTop="12dp"
-        android:src="@drawable/action_selector_ic" />
+		android:layout_centerVertical="true"
+        android:src="@drawable/ic_dots_vertical_grey" />
 
 </RelativeLayout>

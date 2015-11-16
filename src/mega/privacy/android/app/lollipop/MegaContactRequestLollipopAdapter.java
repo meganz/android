@@ -112,17 +112,14 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			if (positionClicked != -1){
 				if (positionClicked == position){
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
-					listFragment.smoothScrollToPosition(positionClicked);
+							listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else{
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		} else {
 			holder.imageButtonThreeDots.setVisibility(View.GONE);		
@@ -218,6 +215,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
 			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
+			//Right margin
+			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
+			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 			v.setTag(holder);	
 		}
@@ -232,6 +233,10 @@ public class MegaContactRequestLollipopAdapter extends RecyclerView.Adapter<Mega
 			holder.textViewContactName = (TextView) v.findViewById(R.id.contact_request_list_name);
 			holder.textViewContent = (TextView) v.findViewById(R.id.contact_request_list_content);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_request_list_three_dots);
+			//Right margin
+			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
+			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 			holder.optionsLayout = (LinearLayout) v.findViewById(R.id.contact_request_list_options);
 			
 			v.setTag(holder);		

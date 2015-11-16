@@ -237,6 +237,11 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 		    holderList.textViewContent = (TextView) v.findViewById(R.id.contact_list_content);
 		    holderList.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.contact_list_three_dots);
 			
+			//Right margin
+			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holderList.imageButtonThreeDots.getLayoutParams();
+			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+			holderList.imageButtonThreeDots.setLayoutParams(actionButtonParams);
+			
 		    holderList.itemLayout.setTag(holderList);
 		    holderList.itemLayout.setOnClickListener(this);
 		    
@@ -299,19 +304,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 				if (positionClicked == position) {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			} 
 			else {
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		} 
 		else {
@@ -410,19 +412,16 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 					//				holder.arrowSelection.setVisibility(View.VISIBLE);
 //					holder.optionsLayout.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					//				holder.arrowSelection.setVisibility(View.GONE);
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			} 
 			else {
 				//			holder.arrowSelection.setVisibility(View.GONE);
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		} else {
 			holder.imageButtonThreeDots.setVisibility(View.GONE);		

@@ -59,6 +59,7 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -84,6 +85,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	int usedSpacePerc;
 	Button leftNewFolder;
 	Button rightUploadButton;
+    ImageButton fabButton;
 	TextView contentText;
 	MegaApiAndroid megaApi;
 
@@ -351,6 +353,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			
 			outSpaceButton.setOnClickListener(this);
 			
+			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+			fabButton.setVisibility(View.GONE);
+			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 			
 			if(usedSpacePerc>95){
@@ -596,6 +601,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
 			
 			outSpaceButton.setOnClickListener(this);
+			
+			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+			fabButton.setVisibility(View.GONE);
 			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 			
