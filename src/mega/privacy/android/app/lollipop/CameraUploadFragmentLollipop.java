@@ -28,6 +28,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -56,6 +57,7 @@ import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -71,6 +73,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -101,7 +104,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
-	LinearLayout buttonsLayout;
 	TextView contentText;
 //	Button turnOnOff;
 	
@@ -328,7 +330,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 		
 		dbH = DatabaseHandler.getDbHandler(context);
-		prefs = dbH.getPreferences();
 		
 		super.onCreate(savedInstanceState);
 		log("onCreate");
@@ -350,6 +351,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		if (megaApi.getRootNode() == null){
 			return null;
 		}
+		
+		prefs = dbH.getPreferences();
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -383,7 +386,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			camSyncData = (RadioButton) v.findViewById(R.id.cam_sync_data);
 			camSyncWifi = (RadioButton) v.findViewById(R.id.cam_sync_wifi);
 			layoutRadioGroup = (RelativeLayout) v.findViewById(R.id.cam_sync_relative_radio);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.cam_buttons_layout);
 			
 			bSkip.setText(getString(R.string.cam_sync_skip).toUpperCase(Locale.getDefault()));
 			android.view.ViewGroup.LayoutParams paramsb2 = bSkip.getLayoutParams();		
@@ -428,17 +430,28 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
 			slidingOptionsPanel.setVisibility(View.GONE);
 			
-			final Button turnOnOff = (Button) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
+			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
-			turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_on));
+			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
+		    
+			android.view.ViewGroup.LayoutParams paramsb2 = turnOnOff.getLayoutParams();		
+			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+			turnOnOff.setLayoutParams(paramsb2);
+			
+			turnOnOff.setGravity(Gravity.CENTER);
+
+			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+			
 			boolean camEnabled = false;
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
 					if (Boolean.parseBoolean(prefs.getCamSyncEnabled())){
+						log("Hide option Turn on Camera Uploads");
 						turnOnOff.setVisibility(View.GONE);
 						camEnabled = true;
 					}
 					else{
+						log("SHOW option Turn on Camera Uploads");
 						camEnabled = false;
 					}
 				}
@@ -446,10 +459,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			turnOnOff.setOnClickListener(this);
 	
 			contentText = (TextView) v.findViewById(R.id.content_text);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
 			
 			contentText.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 			getProLayout.setVisibility(View.GONE);
 			
@@ -464,7 +475,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if(usedSpacePerc>95){
 				//Change below of ListView
 				log("usedSpacePerc>95");
-				buttonsLayout.setVisibility(View.GONE);				
 //				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 //				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
 //				listView.setLayoutParams(p);
@@ -504,7 +514,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 											@Override
 											public void run() {
 												log("BUTTON DISAPPEAR");
-												TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
+												TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.scaleHeightPx(48, outMetrics));
 												animTop.setDuration(1000);
 												animTop.setFillAfter( true );
 												turnOnOff.setAnimation(animTop);
@@ -659,9 +669,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
 			slidingOptionsPanel.setVisibility(View.GONE);
 			
-			final Button turnOnOff = (Button) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
+			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
-			turnOnOff.setText(context.getResources().getString(R.string.settings_camera_upload_on));
+			turnOnOff.setText(getString(R.string.settings_camera_upload_turn_on).toUpperCase(Locale.getDefault()));		    
+		    
+			android.view.ViewGroup.LayoutParams paramsb2 = turnOnOff.getLayoutParams();		
+			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+			turnOnOff.setLayoutParams(paramsb2);
+			
+			turnOnOff.setGravity(Gravity.CENTER);
+
+			turnOnOff.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));			
+			
 			boolean camEnabled = false;
 			if (prefs != null){
 				if (prefs.getCamSyncEnabled() != null){
@@ -677,10 +696,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			turnOnOff.setOnClickListener(this);
 	
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
 			
 			contentText.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
 			getProLayout.setVisibility(View.GONE);
 			
@@ -695,7 +712,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			if(usedSpacePerc>95){
 				//Change below of ListView
 				log("usedSpacePerc>95");
-				buttonsLayout.setVisibility(View.GONE);				
+	
 //				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
 //				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
 //				listView.setLayoutParams(p);
@@ -796,19 +813,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-			
-		    float scaleW = Util.getScaleW(outMetrics, density);
-		    float scaleH = Util.getScaleH(outMetrics, density);
-		    
+			emptyTextView.setVisibility(View.GONE);			
+ 
 		    int totalWidth = outMetrics.widthPixels;
-		    int totalHeight = outMetrics.heightPixels;
-		    float dpWidth  = outMetrics.widthPixels / density;
 		    		    
 		    int gridWidth = 0;
 		    int numberOfCells = 0;
@@ -1034,6 +1041,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void onClick(View v) {
 
@@ -1066,16 +1074,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 					AlertDialog wifiDialog;
 					
 					final ListAdapter adapter = new ArrayAdapter<String>(context, R.layout.select_dialog_singlechoice, android.R.id.text1, new String[] {getResources().getString(R.string.cam_sync_wifi), getResources().getString(R.string.cam_sync_data)});
-					AlertDialog.Builder builder = new AlertDialog.Builder(context);
+					AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+										
+					
 					builder.setTitle(getString(R.string.section_photo_sync));
 					builder.setSingleChoiceItems(adapter,  0,  new DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							log("onClick AlertDialog");
 							dbH.setCamSyncTimeStamp(0);
 							dbH.setCamSyncEnabled(true);
 							dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS);
-							dbH.setCamSyncEnabled(true);
 							File localFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
 							String localPath = localFile.getAbsolutePath();
 							dbH.setCamSyncLocalPath(localPath);
@@ -1115,7 +1125,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 
 					wifiDialog = builder.create();
 					wifiDialog.show();
-					Util.brandAlertDialog(wifiDialog);
 				}
 				break;
 			}
@@ -1783,7 +1792,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	private static void log(String log) {
-		Util.log("CameraUploadFragment", log);
+		Util.log("CameraUploadFragmentLollipop", log);
 	}
 
 	@Override

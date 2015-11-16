@@ -278,28 +278,17 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	}
 	
 	public void setPositionClicked(int positionClicked){
-		if (isList){
-			if (adapterList != null){
-				adapterList.setPositionClicked(positionClicked);
-			}
+
+		if (adapterList != null){
+			adapterList.setPositionClicked(positionClicked);
 		}
-		else{
-//			if (adapterGrid != null){
-//				adapterGrid.setPositionClicked(positionClicked);
-//			}	
-		}		
+
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
-			if (adapterList != null){
-				adapterList.notifyDataSetChanged();
-			}
-		}
-		else{
-//			if (adapterGrid != null){
-//				adapterGrid.notifyDataSetChanged();
-//			}
+
+		if (adapterList != null){
+			adapterList.notifyDataSetChanged();
 		}
 	}
 
@@ -313,19 +302,13 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 			}
 			case R.id.contact_list_option_reinvite_layout:{
 				log("optionReinvite");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).reinviteContact(selectedRequest);				
 				break;
 			}
 			case R.id.contact_list_option_delete_layout:{
 				log("Remove Invitation");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).removeInvitationContact(selectedRequest);
 				break;
 			}
