@@ -37,6 +37,7 @@ import mega.privacy.android.app.UpgradeAccountFragment;
 import mega.privacy.android.app.UploadHereDialog;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.ZipBrowserActivity;
+import mega.privacy.android.app.ManagerActivity.DrawerItem;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.lollipop.FileStorageActivityLollipop.Mode;
@@ -5303,6 +5304,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		intent.putExtra("MOVE_FROM", longArray);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
+	}
+	
+	public void sentToInboxLollipop(MegaNode node){
+		log("sentToInbox MegaNode");
+		
+		if((drawerItem == DrawerItem.SHARED_ITEMS) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+			sendToInbox = true;			
+			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
+	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
+	    	//Multiselect=0
+	    	intent.putExtra("MULTISELECT", 0);
+	    	intent.putExtra("SEND_FILE",1);
+	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
 	}
 	
 	public void shareFolderLollipop(ArrayList<Long> handleList){
