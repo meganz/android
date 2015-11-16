@@ -140,19 +140,16 @@
         android:src="@drawable/ic_add_white"
         android:stateListAnimator="@anim/button_elevation"
         android:tint="@android:color/white" />
-
-    <Button
+    
+    <TextView
         android:id="@+id/file_list_browser_camera_upload_on_off"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/buttons_layout"
-        android:layout_gravity="center"
-        android:background="@drawable/btn_default_holo_light_without_corners"
-        android:text="@string/settings_camera_upload_on"
-        android:textColor="@color/button_text"
-        android:visibility="gone" >
-    </Button>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/accentColor"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/file_explorer_button"

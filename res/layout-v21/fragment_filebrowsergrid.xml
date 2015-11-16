@@ -35,33 +35,6 @@
         android:textSize="16sp" />
 
     <LinearLayout
-        android:id="@+id/buttons_grid_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_gravity="center|fill_horizontal"
-        android:orientation="horizontal" >
-
-        <Button
-            android:id="@+id/btnLeft_grid_new"
-            android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/grey_btn_default_holo_light"
-            android:text="@string/menu_new_folder"
-            android:textColor="@color/button_text" />
-
-        <Button
-            android:id="@+id/btnRight_grid_upload"
-            android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:background="@drawable/btn_default_holo_light_without_corners"
-            android:text="@string/general_upload"
-            android:textColor="@color/button_text" />
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/out_space_grid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -169,18 +142,15 @@
         android:stateListAnimator="@anim/button_elevation"
         android:tint="@android:color/white" />
 
-    <Button
+    <TextView
         android:id="@+id/file_grid_browser_camera_upload_on_off"
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/buttons_grid_layout"
-        android:layout_gravity="center"
-        android:background="@drawable/btn_default_holo_light_without_corners"
-        android:text="@string/settings_camera_upload_on"
-        android:textColor="@color/button_text"
-        android:visibility="gone" >
-    </Button>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/accentColor"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/file_explorer_button_grid"

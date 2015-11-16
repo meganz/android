@@ -450,6 +450,7 @@
     <string name="settings_storage_advanced_devices" context="Whether to enable the storage in advanced devices">Display advanced devices (external SD)</string>
     
     <string name="settings_camera_upload_on" context="settings option">Enable Camera Uploads</string>
+    <string name="settings_camera_upload_turn_on" context="settings option">Turn on Camera Uploads</string>
     <string name="settings_camera_upload_off" context="settings option">Disable Camera Uploads</string>
     <string name="settings_camera_upload_how_to_upload" context="settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan">How to upload</string>
     

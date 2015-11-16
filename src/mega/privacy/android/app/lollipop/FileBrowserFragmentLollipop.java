@@ -1028,10 +1028,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_download_layout:
 			case R.id.file_grid_option_download_layout: {
 				log("Download option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
 				((ManagerActivityLollipop) context).onFileClick(handleList);
@@ -1040,11 +1037,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			case R.id.file_list_option_send_inbox_layout:
 			case R.id.file_grid_option_send_inbox_layout: {
-				log("Send to inbox option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).sentToInboxLollipop(selectedNode);
 //				ArrayList<Long> handleList = new ArrayList<Long>();
 //				handleList.add(selectedNode.getHandle());
@@ -1067,10 +1060,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_move_layout:
 			case R.id.file_grid_option_move_layout: {
 				log("Move option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
 				((ManagerActivityLollipop) context).showMoveLollipop(handleList);
@@ -1081,10 +1071,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_properties_layout: 
 			case R.id.file_grid_option_properties_layout: {
 				log("Properties option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 				i.putExtra("handle", selectedNode.getHandle());
 				
@@ -1108,10 +1095,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_delete_layout: 
 			case R.id.file_grid_option_delete_layout: {
 				log("Delete option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
 	
@@ -1123,10 +1107,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_public_link_layout: 
 			case R.id.file_grid_option_public_link_layout: {
 				log("Public link option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).getPublicLinkAndShareIt(selectedNode);
 	
 				break;
@@ -1135,10 +1116,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_rename_layout: 
 			case R.id.file_grid_option_rename_layout: {
 				log("Rename option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).showRenameDialog(selectedNode, selectedNode.getName());
 				break;
 			}	
@@ -1146,10 +1124,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_share_layout: 
 			case R.id.file_grid_option_share_layout: {
 				log("Share option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).shareFolderLollipop(selectedNode);
 				break;
 			}	
@@ -1157,16 +1132,19 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_copy_layout: 
 			case R.id.file_grid_option_copy_layout: {
 				log("Copy option");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());									
 				((ManagerActivityLollipop) context).showCopyLollipop(handleList);
 				break;
 			}
 		}
+	}
+	
+	public void setPositionClicked(int positionClicked){		
+		if (adapter!= null){
+			adapter.setPositionClicked(positionClicked);
+		}			
 	}
 	
 	private String getInfoFolder(MegaNode n) {
@@ -1483,7 +1461,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			log("getPanelState()!=PanelState.HIDDEN");
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 			slidingOptionsPanel.setVisibility(View.GONE);
-			setPositionClicked(-1);
+			adapter.setPositionClicked(-1);
 			notifyDataSetChanged();
 			return 4;
 		}
@@ -1704,19 +1682,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				}			
 			}
 		}
-	}
-	
-	public void setPositionClicked(int positionClicked){
-		if (isList){
-			if (adapter != null){
-				adapter.setPositionClicked(positionClicked);
-			}
-		}
-		else{
-			if (adapter != null){
-				adapter.setPositionClicked(positionClicked);
-			}	
-		}		
 	}
 	
 	public void notifyDataSetChanged(){

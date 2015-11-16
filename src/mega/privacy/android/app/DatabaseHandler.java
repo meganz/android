@@ -843,7 +843,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 	
 	public void setCamSyncEnabled (boolean enabled){
-		log("setCamSyncEnabled");
+		log("setCamSyncEnabled: "+enabled);
 		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
         ContentValues values = new ContentValues();
 		Cursor cursor = db.rawQuery(selectQuery, null);

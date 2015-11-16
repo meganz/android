@@ -70,12 +70,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	OutgoingSharesFragmentLollipop outgoingSharesFragment = this;
-	LinearLayout buttonsLayout=null;
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;
-	Button leftNewFolder;
-	Button rightUploadButton;
 	TextView contentText;
     ImageButton fabButton;
 
@@ -352,13 +349,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);			
 			
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
-			buttonsLayout.setVisibility(View.GONE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
-			
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 			getProLayout.setVisibility(View.GONE);
 			
@@ -624,13 +614,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
 			}			
-		
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);	
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
 			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);

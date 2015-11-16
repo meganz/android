@@ -638,10 +638,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			case R.id.contact_list_option_send_file_layout:
 			case R.id.contact_grid_option_send_file_layout:{
 				log("optionSendFile");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(selectedUser);
 				((ManagerActivityLollipop) context).pickContacToSendFile(user);
@@ -652,10 +649,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 				log("optionProperties");
 //				Intent i = new Intent(context, ContactPropertiesMainActivity.class);
 				log("optionSendFile");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				Intent i = new Intent(context, ContactPropertiesActivityLollipop.class);
 				i.putExtra("name", selectedUser.getEmail());
 				context.startActivity(i);			
@@ -664,10 +658,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			case R.id.contact_list_option_share_layout:
 			case R.id.contact_grid_option_share_layout:{
 				log("optionShare");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				List<MegaUser> user = new ArrayList<MegaUser>();
 				user.add(selectedUser);
 				((ManagerActivityLollipop) context).pickFolderToShare(user);
@@ -676,10 +667,7 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			case R.id.contact_list_option_remove_layout:
 			case R.id.contact_grid_option_remove_layout:{
 				log("Remove contact");
-				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
-				slidingOptionsPanel.setVisibility(View.GONE);
-				setPositionClicked(-1);
-				notifyDataSetChanged();
+				hideOptionsPanel();
 				((ManagerActivityLollipop) context).removeContact(selectedUser);
 				break;
 			}

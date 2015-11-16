@@ -79,12 +79,9 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	IncomingSharesFragmentLollipop incomingSharesFragment = this;
-	LinearLayout buttonsLayout=null;
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;
-	Button leftNewFolder;
-	Button rightUploadButton;
     ImageButton fabButton;
 	TextView contentText;
 	MegaApiAndroid megaApi;
@@ -393,13 +390,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
 			}			
-		
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_upload);	
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
 			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
@@ -642,13 +632,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
 			}			
-		
-			buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_grid_layout);
-			leftNewFolder = (Button) v.findViewById(R.id.btnLeft_grid_new);
-			rightUploadButton = (Button) v.findViewById(R.id.btnRight_grid_upload);	
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
-			buttonsLayout.setVisibility(View.GONE);
 			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INCOMING_SHARES_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -863,8 +846,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			recyclerView.setVisibility(View.GONE);
 			emptyImageView.setVisibility(View.VISIBLE);
 			emptyTextView.setVisibility(View.VISIBLE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
 
 			if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 				emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
@@ -878,8 +859,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
 		}
 	
 	}
@@ -1173,8 +1152,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					recyclerView.setVisibility(View.GONE);
 					emptyImageView.setVisibility(View.VISIBLE);
 					emptyTextView.setVisibility(View.VISIBLE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 
 					if (megaApi.getRootNode().getHandle()==n.getHandle()) {
 						emptyImageView.setImageResource(R.drawable.ic_empty_cloud_drive);
@@ -1188,8 +1165,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					recyclerView.setVisibility(View.VISIBLE);
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
-					leftNewFolder.setVisibility(View.GONE);
-					rightUploadButton.setVisibility(View.GONE);
 				}
 			}
 			else{
@@ -1407,8 +1382,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentText.setText(getInfoNode());
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
 			return 3;
 		}
 		else if (deepBrowserTree>0){
@@ -1421,8 +1394,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				leftNewFolder.setVisibility(View.GONE);
-				rightUploadButton.setVisibility(View.GONE);
 
 				aB.setTitle(parentNode.getName());	
 				aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
@@ -1445,8 +1416,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
-			leftNewFolder.setVisibility(View.GONE);
-			rightUploadButton.setVisibility(View.GONE);
 			deepBrowserTree=0;
 			return 0;
 		}
