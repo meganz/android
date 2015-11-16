@@ -188,11 +188,15 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 		//Left margin
 		textParams = (LinearLayout.LayoutParams)et_user.getLayoutParams();
 		textParams.setMargins(Util.scaleWidthPx(30, outMetrics), 0, 0, Util.scaleHeightPx(10, outMetrics)); 
-		et_user.setLayoutParams(textParams);		
+		et_user.setLayoutParams(textParams);	
+		
+		et_user.setCursorVisible(true);
 		
 		et_password = (EditText) findViewById(R.id.login_password_text);	
 		et_password.setLayoutParams(paramsb1);
 		et_password.setLayoutParams(textParams);	
+		
+		et_password.setCursorVisible(true);
 		
 		et_password.setOnEditorActionListener(new OnEditorActionListener() {
 			

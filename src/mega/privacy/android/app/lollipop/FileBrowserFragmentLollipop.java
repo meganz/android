@@ -8,6 +8,7 @@ import java.util.List;
 
 import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
+import mega.privacy.android.app.ManagerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaBrowserNewGridAdapter;
 import mega.privacy.android.app.MegaPreferences;
@@ -120,13 +121,14 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public LinearLayout optionDownload;
 	public LinearLayout optionProperties;
 	public LinearLayout optionRename;
-	public LinearLayout optionPublicLink;
+	public LinearLayout optionPublicLink;	
 	public LinearLayout optionShare;
 	public LinearLayout optionPermissions;
 	public LinearLayout optionDelete;
 	public LinearLayout optionRemoveTotal;
 	public LinearLayout optionClearShares;
 	public LinearLayout optionLeaveShare;
+	public LinearLayout optionSendToInbox;	
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;	
 	public TextView propertiesText;
@@ -539,6 +541,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			optionClearShares = (LinearLayout) v.findViewById(R.id.file_list_option_clear_share_layout);	
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_list_option_move_layout);		
 			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_list_option_copy_layout);			
+			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_list_option_send_inbox_layout);	
 			
 			optionDownload.setOnClickListener(this);
 			optionShare.setOnClickListener(this);
@@ -549,6 +552,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			optionPublicLink.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);
+			optionSendToInbox.setOnClickListener(this);
 			
 			optionsOutLayout.setOnClickListener(this);
 			
@@ -942,9 +946,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		if (selectedNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
 			optionShare.setVisibility(View.VISIBLE);
+			optionSendToInbox.setVisibility(View.GONE);
 		}else{
 			propertiesText.setText(R.string.general_file_info);
 			optionShare.setVisibility(View.GONE);
+			optionSendToInbox.setVisibility(View.VISIBLE);
 		}
 		
 		optionDownload.setVisibility(View.VISIBLE);
@@ -1000,18 +1006,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void onClick(View v) {
 
 		switch(v.getId()){
-			case R.id.btnLeft_new:
-			case R.id.btnLeft_grid_new:{
-				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
-				break;
-			}
-			
-			case R.id.btnRight_upload:
-			case R.id.btnRight_grid_upload:{
-				((ManagerActivityLollipop)getActivity()).uploadFile();
-				break;			
-			}
-			
+	
 			case R.id.file_upload_button:
 			case R.id.file_upload_button_grid:{
 				((ManagerActivityLollipop)getActivity()).uploadFile();
@@ -1040,6 +1035,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				ArrayList<Long> handleList = new ArrayList<Long>();
 				handleList.add(selectedNode.getHandle());
 				((ManagerActivityLollipop) context).onFileClick(handleList);
+				break;
+			}
+			
+			case R.id.file_list_option_send_inbox_layout:
+			case R.id.file_grid_option_send_inbox_layout: {
+				log("Send to inbox option");
+				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				
+				slidingOptionsPanel.setVisibility(View.GONE);
+				setPositionClicked(-1);
+				notifyDataSetChanged();
+				((ManagerActivityLollipop) context).sentToInboxLollipop(selectedNode);
+//				ArrayList<Long> handleList = new ArrayList<Long>();
+//				handleList.add(selectedNode.getHandle());
+//				((ManagerActivityLollipop) context).onFileClick(handleList);
 				break;
 			}
 //		case R.id.file_list_option_leave_share_layout: {
