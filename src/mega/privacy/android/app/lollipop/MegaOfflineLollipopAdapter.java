@@ -284,6 +284,11 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 			holder.textViewFileName.getLayoutParams().width = Util.px2dp((225*scaleW), outMetrics);
 			holder.textViewFileSize = (TextView) v.findViewById(R.id.offline_list_filesize);
 			holder.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.offline_list_three_dots);
+			
+			//Right margin
+			RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.imageButtonThreeDots.getLayoutParams();
+			actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+			holder.imageButtonThreeDots.setLayoutParams(actionButtonParams);
 		
 			holder.itemLayout.setOnClickListener(this);
 			holder.itemLayout.setTag(holder);
@@ -352,19 +357,16 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if (positionClicked == position) {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 					listFragment.smoothScrollToPosition(positionClicked);
 				}
 				else {
 					holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 					holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			} 
 			else {
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}
 		} 
 		else {
@@ -488,18 +490,15 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				if (positionClicked == position){
 					
 					holder.itemLayout.setBackgroundColor(context.getResources().getColor(R.color.file_list_selected_row));
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 					listFragment.smoothScrollToPosition(positionClicked);				
 				}
 				else{
 					//				
 					holder.itemLayout.setBackgroundColor(Color.WHITE);
-					holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 				}
 			}
 			else{
 				holder.itemLayout.setBackgroundColor(Color.WHITE);
-				holder.imageButtonThreeDots.setImageResource(R.drawable.action_selector_ic);
 			}			
 		}
 		else{

@@ -252,7 +252,11 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 				notifyDataSetChanged();
 				((ManagerActivityLollipop) context).ignoreInvitationContact(selectedRequest);
 				break;
-			}			
+			}
+			case R.id.contact_request_list_out_options:{
+				hideOptionsPanel();
+				break;
+			}
 		}			
 	}
 	

@@ -67,7 +67,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapterList;
-	LinearLayout buttonsLayout;
 	LinearLayout outSpaceLayout=null;
 	LinearLayout getProLayout=null;
 	SearchFragmentLollipop searchFragment = this;
@@ -315,9 +314,6 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		listView.setLayoutManager(mLayoutManager);
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
-		
-		buttonsLayout = (LinearLayout) v.findViewById(R.id.buttons_layout);
-		buttonsLayout.setVisibility(View.GONE);
 		
 		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);

@@ -771,6 +771,11 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
+			case R.id.rubbishbin_list_out_options:
+			case R.id.rubbishbin_grid_out_options:{
+				hideOptionsPanel();
+				break;
+			}
 			case R.id.rubbishbin_list_option_move_layout:
 			case R.id.rubbishbin_grid_option_move_layout:{
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);

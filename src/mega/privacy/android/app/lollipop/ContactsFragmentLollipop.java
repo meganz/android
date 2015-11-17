@@ -625,6 +625,11 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	public void onClick(View v) {
 
 		switch(v.getId()){
+			case R.id.contact_list_out_options:
+			case R.id.contact_grid_out_options:{
+				hideOptionsPanel();
+				break;
+			}
 			case R.id.invite_contact_button:
 			case R.id.invite_contact_button_grid:{
 				((ManagerActivityLollipop)context).showNewContactDialog(null);				

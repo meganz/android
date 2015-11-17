@@ -572,7 +572,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
 			
-			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
 			fabButton.setVisibility(View.GONE);
 			
 			outSpaceButton.setOnClickListener(this);
@@ -749,9 +749,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -930,6 +930,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 				
+			case R.id.file_list_out_options:
+			case R.id.file_grid_out_options:{
+				hideOptionsPanel();
+				break;
+			}
 			case R.id.file_list_option_download_layout: 
 			case R.id.file_grid_option_download_layout: {
 				log("Download option");
