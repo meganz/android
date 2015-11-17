@@ -604,6 +604,25 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		holder.publicLinkImageMultiselect.setVisibility(View.GONE);
 		holder.publicLinkImage.setVisibility(View.GONE);
 		
+		if(node.isExported()){
+			//Node has public link
+			if(multipleSelect){
+				holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
+				holder.publicLinkImage.setVisibility(View.GONE);
+			}
+			else
+			{
+				holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+				holder.publicLinkImage.setVisibility(View.VISIBLE);
+			}
+		}
+		else{
+			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+			holder.publicLinkImage.setVisibility(View.GONE);
+			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
+			holder.publicLinkImage.setVisibility(View.GONE);
+		}
+		
 		if (node.isFolder()) {
 //			holder.propertiesText.setText(R.string.general_folder_info);
 			holder.textViewFileSize.setText(getInfoFolder(node));
@@ -630,31 +649,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			else {
 				holder.imageView.setImageResource(R.drawable.ic_folder_list);
 			}			
-
-			if (sl != null && sl.size() != 0){				
-				for(int i=0; i<sl.size();i++){
-					//Check if one of the ShareNodes is the public link
-					if(sl.get(i).getUser()==null){
-
-						if(multipleSelect){
-							holder.publicLinkImageMultiselect.setVisibility(View.VISIBLE);
-							holder.publicLinkImage.setVisibility(View.GONE);
-						}
-						else
-						{
-							holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-							holder.publicLinkImage.setVisibility(View.VISIBLE);
-						}
-						//
-						break;
-					}
-				}
-			}
+			
 		} 
 		else {
-			
-			holder.publicLinkImageMultiselect.setVisibility(View.GONE);
-			holder.publicLinkImage.setVisibility(View.GONE);
 			
 //			holder.propertiesText.setText(R.string.general_file_info);
 			long nodeSize = node.getSize();
