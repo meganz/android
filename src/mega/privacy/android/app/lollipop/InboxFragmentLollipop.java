@@ -630,6 +630,11 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
+			case R.id.file_list_out_options:
+			case R.id.file_grid_out_options:{
+				hideOptionsPanel();
+				break;
+			}
 			case R.id.file_list_option_download_layout:
 			case R.id.file_grid_option_download_layout: {
 				log("Download option");

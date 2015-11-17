@@ -669,9 +669,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
+//	            	if(slideOffset==0){
+//	            		hideOptionsPanel();
+//	            	}
 	            }
 
 	            @Override
@@ -1305,6 +1305,11 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 				log("Click Account Button");
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
+				break;
+			}
+			case R.id.offline_list_out_options:
+			case R.id.offline_grid_out_options:{
+				hideOptionsPanel();
 				break;
 			}
 			case R.id.offline_list_option_download_layout: 

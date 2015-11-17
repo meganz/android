@@ -300,6 +300,10 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 				((ManagerActivityLollipop)context).showNewContactDialog(null);				
 				break;
 			}
+			case R.id.contact_request_list_out_options:{
+				hideOptionsPanel();
+				break;
+			}
 			case R.id.contact_list_option_reinvite_layout:{
 				log("optionReinvite");
 				hideOptionsPanel();

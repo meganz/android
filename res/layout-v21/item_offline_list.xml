@@ -36,12 +36,10 @@
         android:id="@+id/offline_list_three_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/action_selector_ic"
+        android:src="@drawable/ic_dots_vertical_grey"
 		android:background="@null" 
-        android:layout_alignTop="@id/offline_list_filename"
         android:layout_alignParentRight="true"
-		android:paddingTop="12dp"
-        android:paddingRight="15dp" />
+		android:layout_centerVertical="true" />
      <!--
     <ImageView
         android:id="@+id/offline_list_arrow_selection"

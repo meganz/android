@@ -54,6 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
         android:choiceMode="multipleChoice"
+        android:layout_below="@id/offline_content_text_grid"
         android:columnWidth="172dp"/>
     
     <ImageView
