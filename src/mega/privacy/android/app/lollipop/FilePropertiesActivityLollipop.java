@@ -53,6 +53,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -82,7 +84,6 @@ import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 
 @SuppressLint("NewApi")
@@ -96,7 +97,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	static int FROM_OFFLINE= 15;
 
 	ImageView imageView;
-	
+	CoordinatorLayout container;
 	LinearLayout optionsLayout;
 	TextView nameView;
 	LinearLayout availableOfflineLayout;
@@ -171,8 +172,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	public static int REQUEST_CODE_SELECT_LOCAL_FOLDER = 1004;
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
-	
-	
+		
 	MenuItem downloadMenuItem; 
 	MenuItem shareFolderMenuItem;
 	MenuItem getLinkMenuItem;
@@ -185,6 +185,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	ImageView statusImageView;
 	MenuItem copyMenuItem;
 	MenuItem removeMenuItem;
+	
+	Display display;
+	DisplayMetrics outMetrics;
+	float density;
+	float scaleW;
+	float scaleH;
 	
 	boolean shareIt = true;
 	int imageId;
@@ -215,13 +221,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //		dbH = new DatabaseHandler(getApplicationContext());
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
-		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    float density  = getResources().getDisplayMetrics().density;
+	    density  = getResources().getDisplayMetrics().density;
 		
-	    float scaleW = Util.getScaleW(outMetrics, density);
-	    float scaleH = Util.getScaleH(outMetrics, density);
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null){
@@ -238,6 +244,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			name = node.getName();
 					
 			setContentView(R.layout.activity_file_properties);
+	        container = (CoordinatorLayout) findViewById(R.id.fragment_container_file_properties);
 			tB = (Toolbar) findViewById(R.id.file_properties_toolbar);
 			setSupportActionBar(tB);
 			aB = getSupportActionBar();
@@ -346,7 +353,14 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			permissionLabel.setVisibility(View.GONE);
 			permissionInfo.setVisibility(View.GONE);
 
-			File offlineFile = null;
+			if(node.isExported()){
+				publicLink=true;
+				publicLinkImage.setVisibility(View.VISIBLE);
+			}	
+			else{
+				publicLink=false;
+				publicLinkImage.setVisibility(View.GONE);
+			}
 			
 			if (node.isFile()){				
 				
@@ -381,16 +395,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						i++;
 					}
 				}
-
-				sl = megaApi.getOutShares(node);		
-
-				if (sl != null){
-					
-					if (sl.size() != 0){
-						publicLink=true;
-						publicLinkImage.setVisibility(View.VISIBLE);
-					}
-				}				
 				
 				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);	
 				
@@ -572,19 +576,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 					}
 					else{		
-						publicLink=false;
-						for(int i=0; i<sl.size();i++){
-
-							//Check if one of the ShareNodes is the public link
-
-							if(sl.get(i).getUser()==null){
-								//Public link + users								
-								publicLink=true;
-								publicLinkImage.setVisibility(View.VISIBLE);
-								break;
-
-							}
-						}
 						if(publicLink){
 //							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
 //	
@@ -595,7 +586,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 								imageView.setImageResource(R.drawable.folder_shared_mime);
 								sharedLayout.setVisibility(View.VISIBLE);
 								dividerSharedLayout.setVisibility(View.VISIBLE);	
-								publicLinkImage.setVisibility(View.VISIBLE);
 								usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 							}
 							else{
@@ -603,7 +593,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 								imageView.setImageResource(R.drawable.folder_mime);
 								sharedLayout.setVisibility(View.GONE);
 								dividerSharedLayout.setVisibility(View.GONE);	
-								publicLinkImage.setVisibility(View.VISIBLE);
 //								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
 							}
 							
@@ -612,7 +601,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
 							//It is private and shared
 							imageView.setImageResource(R.drawable.folder_shared_mime);
-							publicLinkImage.setVisibility(View.GONE);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);	
 							usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
@@ -644,8 +632,20 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	
 	
 	private void refresh(){		
+		log("refresh");
 	
 		File offlineFile = null;
+		
+		if(node.isExported()){
+			log("node is Exported");
+			publicLink=true;
+			publicLinkImage.setVisibility(View.VISIBLE);
+		}	
+		else{
+			log("node is NOT Exported");
+			publicLink=false;
+			publicLinkImage.setVisibility(View.GONE);
+		}
 		
 		if (node.isFolder()){ //Folder			
 
@@ -666,8 +666,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
 						
 					}
-					else{	
-						
+					else{							
 						//If I am not the owner
 						owner = false;
 						permissionLabel.setVisibility(View.VISIBLE);
@@ -691,8 +690,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 								break;
 							}
 						}
-					}
-					
+					}					
 				}
 				else{		
 					publicLink=false;
@@ -715,7 +713,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						if(sl.size()>1){
 							//It is public and shared
 							imageView.setImageResource(R.drawable.folder_shared_mime);
-							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);	
 							usersSharedWithText.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
@@ -725,7 +722,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 							imageView.setImageResource(R.drawable.folder_mime);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);	
-							publicLinkImage.setVisibility(View.VISIBLE);
 							usersSharedWithText.setText(R.string.file_properties_shared_folder_public_link);
 						}
 						
@@ -736,7 +732,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						imageView.setImageResource(R.drawable.folder_shared_mime);
 						sharedLayout.setVisibility(View.VISIBLE);
 						dividerSharedLayout.setVisibility(View.VISIBLE);	
-						publicLinkImage.setVisibility(View.GONE);
 						usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
 					}
 					
@@ -1166,7 +1161,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						startActivity(intent);
 					}
 					else{
-						Toast.makeText(this, getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
+						Snackbar.make(container, getString(R.string.intent_not_available), Snackbar.LENGTH_LONG).show();
 					}
 		    	}
 				return true;
@@ -1194,18 +1189,18 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		    case R.id.action_file_properties_remove_link:{
 		    	shareIt = false;
 		    	AlertDialog removeLinkDialog;
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				builder.setTitle(getString(R.string.context_remove_link_menu));
 				
 				LayoutInflater inflater = getLayoutInflater();
 				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
 				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
 				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
 				TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
 				TextView removeText = (TextView) dialoglayout.findViewById(R.id.dialog_link_text_remove);
 				
-				thumb.setVisibility(View.GONE);
+				((RelativeLayout.LayoutParams) removeText.getLayoutParams()).setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(10, outMetrics), 0);
+				
 				url.setVisibility(View.GONE);
 				key.setVisibility(View.GONE);
 				symbol.setVisibility(View.GONE);
@@ -1244,7 +1239,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				
 				removeLinkDialog = builder.create();
 				removeLinkDialog.show();
-				Util.brandAlertDialog(removeLinkDialog);
 		    	return true;
 		    }
 		    case R.id.action_file_properties_send_link:{
@@ -1309,7 +1303,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		    }
 		};
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 	    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
@@ -1461,13 +1455,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		};
 		
 		if (moveToRubbish){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
@@ -1756,6 +1750,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_EXPORT){
+			log("MegaRequest.TYPE_EXPORT");
 			try { 
 				statusDialog.dismiss();	
 			} 
@@ -1764,11 +1759,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			if (e.getErrorCode() == MegaError.API_OK){
 				
 				if((typeExport==TYPE_EXPORT_GET) || (typeExport == TYPE_EXPORT_MANAGE)){
+					log("typeExport==TYPE_EXPORT_GET or typeExport == TYPE_EXPORT_MANAGE");
 					
 					final String link = request.getLink();
 					
 					AlertDialog getLinkDialog;
-					AlertDialog.Builder builder = new AlertDialog.Builder(this);
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 					if (typeExport == TYPE_EXPORT_GET){
 						builder.setTitle(getString(R.string.context_get_link_menu));
 					}
@@ -1778,9 +1774,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					
 					LayoutInflater inflater = getLayoutInflater();
 					View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-					ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
 					TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+					((RelativeLayout.LayoutParams) url.getLayoutParams()).setMargins(Util.scaleWidthPx(25, outMetrics), Util.scaleHeightPx(15, outMetrics), Util.scaleWidthPx(25, outMetrics), 0);					
+					TextView symbol = (TextView) dialoglayout.findViewById(R.id.dialog_link_symbol);
+					((RelativeLayout.LayoutParams) symbol.getLayoutParams()).setMargins(Util.scaleWidthPx(25, outMetrics), 0, 0, 0);		
 					TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+					((RelativeLayout.LayoutParams) key.getLayoutParams()).setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), 0);					
 					
 					String urlString = "";
 					String keyString = "";
@@ -1788,28 +1787,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					if (s.length == 3){
 						urlString = s[0] + "!" + s[1];
 						keyString = s[2];
-					}
-					if (node.isFolder()){
-						thumb.setImageResource(R.drawable.folder_thumbnail);
-					}
-					else{
-						thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-					}
-					
-					Display display = getWindowManager().getDefaultDisplay();
-					DisplayMetrics outMetrics = new DisplayMetrics();
-					display.getMetrics(outMetrics);
-					float density = getResources().getDisplayMetrics().density;
-
-					float scaleW = Util.getScaleW(outMetrics, density);
-					float scaleH = Util.getScaleH(outMetrics, density);
+					}					
 					
 					url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
 					key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
 					
 					url.setText(urlString);
-					key.setText(keyString);
-					
+					key.setText(keyString);					
 					
 					builder.setView(dialoglayout);
 					
@@ -1836,27 +1820,23 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
 					            clipboard.setPrimaryClip(clip);
 							}
-							
-							Toast.makeText(filePropertiesActivity, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+
+							Snackbar.make(container, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
 						}
 					});
 					
 					getLinkDialog = builder.create();
 					getLinkDialog.show();
-					Util.brandAlertDialog(getLinkDialog);
 				}
 				else if(typeExport==TYPE_EXPORT_REMOVE)
 				{		
-					
-					publicLinkImage.setVisibility(View.GONE);
-					publicLink=false;
-					invalidateOptionsMenu();
-					Toast.makeText(this, getString(R.string.file_properties_remove_link), Toast.LENGTH_LONG).show();
+					log("TYPE_EXPORT_REMOVE");
+					Snackbar.make(container, getString(R.string.file_properties_remove_link), Snackbar.LENGTH_LONG).show();
 				}					
 				
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_no_link), Snackbar.LENGTH_LONG).show();
 			}
 			log("export request finished");
 		}
@@ -1868,11 +1848,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
+				Snackbar.make(container, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
 				nameView.setText(megaApi.getNodeByHandle(request.getNodeHandle()).getName());
 			}			
 			else{
-				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -1883,22 +1863,22 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
 					finish();
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+					Snackbar.make(container, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
 					finish();
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+					Snackbar.make(container, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
 				}
 				log("move nodes request finished");
 			}
@@ -1910,7 +1890,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				finish();				
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
 			}			
 			
 		}
@@ -1922,14 +1902,14 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			if (e.getErrorCode() == MegaError.API_OK){
 				if (request.getEmail() != null){
-					Toast.makeText(this, getString(R.string.context_correctly_copied_contact) + " " + request.getEmail(), Toast.LENGTH_LONG).show();
+					Snackbar.make(container, getString(R.string.context_correctly_copied_contact), Snackbar.LENGTH_LONG).show();
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 				}
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 			}
 			log("copy nodes request finished");
 		}
@@ -1939,11 +1919,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			} 
 			catch (Exception ex) {}
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_shared), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_correctly_shared), Snackbar.LENGTH_LONG).show();
 				ArrayList<MegaShare> sl = megaApi.getOutShares(node);
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_shared), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_no_shared), Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -2040,7 +2020,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			if (megaContacts){
 				if (node.isFolder()){
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 					dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 					final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 					dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
@@ -2105,13 +2085,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						String type = contactsData.get(i);
 						if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
 							i++;
-							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-//							Toast.makeText(this, "Sharing a folder: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+							Snackbar.make(container, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 						}
 						else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
 							i++;
-							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-//							Toast.makeText(this, "Sharing a folder: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+							Snackbar.make(container, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 						}
 					}
 				}
@@ -2120,13 +2098,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						String type = contactsData.get(i);
 						if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_EMAIL) == 0){
 							i++;
-							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-//							Toast.makeText(this, "Sending a file: An email will be sent to the email address: " + contactsData.get(i) + ".\n", Toast.LENGTH_LONG).show();
+							Snackbar.make(container, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 						}
 						else if (type.compareTo(ContactsExplorerActivityLollipop.EXTRA_PHONE) == 0){
 							i++;
-							Toast.makeText(this, getString(R.string.general_not_yet_implemented), Toast.LENGTH_LONG).show();
-//							Toast.makeText(this, "Sending a file: A Text Message will be sent to the phone number: " + contactsData.get(i) , Toast.LENGTH_LONG).show();
+							Snackbar.make(container, getString(R.string.general_not_yet_implemented), Snackbar.LENGTH_LONG).show();
 						}
 					}
 				}
@@ -2239,6 +2215,17 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		
 		supportInvalidateOptionsMenu();
 		
+		if(!node.isExported()){
+			log("Node HAS public link");
+			publicLink=true;
+			publicLinkImage.setVisibility(View.VISIBLE);
+		}	
+		else{
+			log("Node NOT public link");
+			publicLink=false;
+			publicLinkImage.setVisibility(View.GONE);
+		}
+		
 		if (node.isFolder()){
 			imageView.setImageResource(imageId);
 			sl = megaApi.getOutShares(node);
@@ -2287,20 +2274,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					
 				}
 				else{	
-
-					publicLink=false;
-					for(int i=0; i<sl.size();i++){
-
-						//Check if one of the ShareNodes is the public link
-
-						if(sl.get(i).getUser()==null){
-							//Public link + users
-							log(sl.get(i).getUser());
-							publicLink=true;
-							break;
-
-						}
-					}
 					if(publicLink){
 //						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
 //
@@ -2309,7 +2282,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						if(sl.size()>1){
 							//It is public and shared
 							imageView.setImageResource(R.drawable.folder_shared_mime);
-							publicLinkImage.setVisibility(View.VISIBLE);
 							sharedLayout.setVisibility(View.VISIBLE);
 							dividerSharedLayout.setVisibility(View.VISIBLE);	
 							usersSharedWithText.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
@@ -2319,7 +2291,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 							imageView.setImageResource(R.drawable.folder_mime);
 							sharedLayout.setVisibility(View.GONE);
 							dividerSharedLayout.setVisibility(View.GONE);	
-							publicLinkImage.setVisibility(View.VISIBLE);
 							usersSharedWithText.setText(R.string.file_properties_shared_folder_public_link);
 						}
 						
@@ -2330,10 +2301,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						imageView.setImageResource(R.drawable.folder_shared_mime);
 						sharedLayout.setVisibility(View.VISIBLE);
 						dividerSharedLayout.setVisibility(View.VISIBLE);	
-						publicLinkImage.setVisibility(View.GONE);
 						usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-					}
-					
+					}					
 				}
 
 
@@ -2354,18 +2323,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			}
 
 //			iconView.setImageResource(imageId);
-		}
-		else
-		{
-			sl = megaApi.getOutShares(node);
-
-			if (sl != null){
-				
-				if (sl.size() != 0){
-					publicLink=true;
-					publicLinkImage.setVisibility(View.VISIBLE);
-				}
-			}
 		}
 	}
 
@@ -2449,7 +2406,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+							Snackbar.make(container, toastMessage, Snackbar.LENGTH_LONG).show();
 						}								
 						return;
 					}
@@ -2471,7 +2428,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						String path = dlFiles.get(document);
 						
 						if(availableFreeSpace < document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							Snackbar.make(container, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 							continue;
 						}
 						
@@ -2485,7 +2442,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+						Snackbar.make(container, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 						continue;
 					}
 					

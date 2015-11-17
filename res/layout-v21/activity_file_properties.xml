@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:id="@+id/fragment_container_file_properties"
     android:background="#ffffff">
     
     <android.support.design.widget.AppBarLayout
