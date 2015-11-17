@@ -11,6 +11,7 @@ import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
+import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.FileStorageActivity.Mode;
 import mega.privacy.android.app.components.EditTextCursorWatcher;
 import mega.privacy.android.app.components.ExtendedViewPager;
@@ -87,6 +88,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private ImageView overflowIcon;
 	private ImageView shareIcon;
 	private ImageView downloadIcon;
+	private ImageView propertiesIcon;
+	private ImageView linkIcon;
 	private ListView overflowMenuList;
 	private boolean overflowVisible = false; 
 	
@@ -270,6 +273,12 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			downloadIcon = (ImageView) findViewById(R.id.full_image_viewer_download);
 			downloadIcon.setVisibility(View.GONE);
 			
+			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+			propertiesIcon.setVisibility(View.GONE);
+			
+			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+			linkIcon.setVisibility(View.GONE);
+			
 			shareIcon = (ImageView) findViewById(R.id.full_image_viewer_share);
 			shareIcon.setOnClickListener(this);
 			shareIcon.setVisibility(View.VISIBLE);
@@ -339,12 +348,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			downloadIcon.setVisibility(View.VISIBLE);
 			downloadIcon.setOnClickListener(this);
 			
-			String menuOptions[] = new String[5];
-			menuOptions[0] = getString(R.string.context_get_link_menu);
-			menuOptions[1] = getString(R.string.context_rename);
-			menuOptions[2] = getString(R.string.context_move);
-			menuOptions[3] = getString(R.string.context_copy);
-			menuOptions[4] = getString(R.string.context_remove);
+			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+			propertiesIcon.setVisibility(View.VISIBLE);
+			propertiesIcon.setOnClickListener(this);
+			
+			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+			linkIcon.setVisibility(View.VISIBLE);
+			linkIcon.setOnClickListener(this);
+			
+			String menuOptions[] = new String[4];
+//			menuOptions[0] = getString(R.string.context_get_link_menu);
+			menuOptions[0] = getString(R.string.context_rename);
+			menuOptions[1] = getString(R.string.context_move);
+			menuOptions[2] = getString(R.string.context_copy);
+			menuOptions[3] = getString(R.string.context_remove);
 			
 			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
@@ -456,12 +473,20 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			downloadIcon.setVisibility(View.VISIBLE);
 			downloadIcon.setOnClickListener(this);
 			
-			String menuOptions[] = new String[5];
-			menuOptions[0] = getString(R.string.context_get_link_menu);
-			menuOptions[1] = getString(R.string.context_rename);
-			menuOptions[2] = getString(R.string.context_move);
-			menuOptions[3] = getString(R.string.context_copy);
-			menuOptions[4] = getString(R.string.context_remove);
+			propertiesIcon = (ImageView) findViewById(R.id.full_image_viewer_properties);
+			propertiesIcon.setVisibility(View.VISIBLE);
+			propertiesIcon.setOnClickListener(this);
+			
+			linkIcon = (ImageView) findViewById(R.id.full_image_viewer_get_link);
+			linkIcon.setVisibility(View.VISIBLE);
+			linkIcon.setOnClickListener(this);
+			
+			String menuOptions[] = new String[4];
+//			menuOptions[0] = getString(R.string.context_get_link_menu);
+			menuOptions[0] = getString(R.string.context_rename);
+			menuOptions[1] = getString(R.string.context_move);
+			menuOptions[2] = getString(R.string.context_copy);
+			menuOptions[3] = getString(R.string.context_remove);
 			
 			overflowMenuList = (ListView) findViewById(R.id.image_viewer_overflow_menu_list);
 			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, menuOptions);
@@ -647,6 +672,19 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			switch (v.getId()){
 				case R.id.full_image_viewer_icon:{
 					finish();
+					break;
+				}
+				case R.id.full_image_viewer_get_link:{
+					shareIt = false;
+			    	getPublicLinkAndShareIt();
+					break;
+				}
+				case R.id.full_image_viewer_properties:{
+					Intent i = new Intent(this, FilePropertiesActivityLollipop.class);
+					i.putExtra("handle", node.getHandle());
+					i.putExtra("imageId", MimeTypeMime.typeForName(node.getName()).getIconResourceId());
+					i.putExtra("name", node.getName());
+					startActivity(i);
 					break;
 				}
 				case R.id.full_image_viewer_overflow:{
@@ -969,9 +1007,10 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		startActivityForResult(intent, REQUEST_CODE_SELECT_COPY_FOLDER);
 	}
 	
-public void moveToTrash(){
+	public void moveToTrash(){
+log("moveToTrash");
 		
-		long handle = node.getHandle();
+		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
 			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
@@ -982,45 +1021,75 @@ public void moveToTrash(){
 			return;	
 		}
 		
-		MegaNode rubbishNode = megaApi.getRubbishNode();
-
-		//Check if the node is not yet in the rubbish bin (if so, remove it)
+		final MegaNode rubbishNode = megaApi.getRubbishNode();
+		
 		MegaNode parent = megaApi.getNodeByHandle(handle);
 		while (megaApi.getParentNode(parent) != null){
 			parent = megaApi.getParentNode(parent);
 		}
-			
+		
 		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
-			moveToRubbish = true;
-			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, this);
+			moveToRubbish = true;			
 		}
 		else{
-			megaApi.remove(megaApi.getNodeByHandle(handle), this);
+			moveToRubbish = false;
 		}
 		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	//TODO remove the outgoing shares
+		    		//Check if the node is not yet in the rubbish bin (if so, remove it)			
+		    		
+		    		if (moveToRubbish){
+		    			megaApi.moveNode(megaApi.getNodeByHandle(handle), rubbishNode, fullScreenImageViewer);
+		    			ProgressDialog temp = null;
+		    			try{
+		    				temp = new ProgressDialog(fullScreenImageViewer);
+		    				temp.setMessage(getString(R.string.context_move_to_trash));
+		    				temp.show();
+		    			}
+		    			catch(Exception e){
+		    				return;
+		    			}
+		    			statusDialog = temp;
+		    		}
+		    		else{
+		    			megaApi.remove(megaApi.getNodeByHandle(handle), fullScreenImageViewer);
+		    			ProgressDialog temp = null;
+		    			try{
+		    				temp = new ProgressDialog(fullScreenImageViewer);
+		    				temp.setMessage(getString(R.string.context_delete_from_mega));
+		    				temp.show();
+		    			}
+		    			catch(Exception e){
+		    				return;
+		    			}
+		    			statusDialog = temp;
+		    		}
+		        	
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		
 		if (moveToRubbish){
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_move_to_trash));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
+			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
-			ProgressDialog temp = null;
-			try{
-				temp = new ProgressDialog(this);
-				temp.setMessage(getString(R.string.context_delete_from_mega));
-				temp.show();
-			}
-			catch(Exception e){
-				return;
-			}
-			statusDialog = temp;
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			String message= getResources().getString(R.string.confirmation_delete_from_mega);
+			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 	}
 	
@@ -1220,24 +1289,24 @@ public void moveToTrash(){
 		adapterMega.setMenuVisible(overflowVisible);
 		
 		switch(position){
+//			case 0:{
+//				shareIt = false;
+//		    	getPublicLinkAndShareIt();
+//				break;
+//			}
 			case 0:{
-				shareIt = false;
-		    	getPublicLinkAndShareIt();
-				break;
-			}
-			case 1:{
 				showRenameDialog();
 				break;
 			}
-			case 2:{
+			case 1:{
 				showMove();
 				break;
 			}
-			case 3:{
+			case 2:{
 				showCopy();
 				break;
 			}
-			case 4:{
+			case 3:{
 				moveToTrash();
 				break;
 			}
