@@ -819,6 +819,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			}
 			
 			if (adapter == null){
+
 				adapter = new MegaOfflineLollipopAdapter(this, context, mOffList, recyclerView, emptyImageView, emptyTextView, aB, MegaOfflineLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			else{
@@ -1431,6 +1432,11 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			File currentFile=null;
 			
+			if(currentNode.getHandle().equals("0")){
+				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
+				return;
+			}
+			
 			if(currentNode.isIncoming()){
 				String handleString = currentNode.getHandleIncoming();
 				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
@@ -1948,5 +1954,9 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public void onTouchEvent(RecyclerView arg0, MotionEvent arg1) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public String getPathNavigation() {
+		return pathNavigation;
 	}
 }

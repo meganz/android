@@ -248,6 +248,21 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 	
 	public void setNodes(ArrayList<MegaOffline> mOffList){
 		log("setNodes");
+		if (fragment.getPathNavigation().equals("/")){
+			if (mOffList != null && !mOffList.isEmpty()) {
+				MegaOffline lastItem = mOffList.get(mOffList.size()-1);
+				if(!(lastItem.getHandle().equals("0"))){
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+					log("Export in: "+path);
+					File file= new File(path);
+					if(file.exists()){
+						MegaOffline masterKeyFile = new MegaOffline("0", path, "MEGAMasterKey.txt", 0, "0", false, "0");
+						mOffList.add(masterKeyFile);
+					}
+				}	
+			}						
+		}
+
 		this.mOffList = mOffList;
 		
 		positionClicked = -1;	
@@ -516,6 +531,23 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 		}
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
+		
+		if(currentNode.getHandle().equals("0")){
+			//The node is the MasterKey File
+			holder.currentPosition = position;
+			holder.textViewFileName.setText(currentNode.getName());
+			
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			File file= new File(path);
+			long nodeSize;
+			if(file.exists()){
+				nodeSize = file.length();
+				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+			}			
+			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			return;
+		}
 		
 		String path=null;
 		
