@@ -5,11 +5,16 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 
 public class OfflineActivityLollipop extends PinActivityLollipop{
 	
 	OfflineFragmentLollipop oFLol;
+    Toolbar tB;
+    ActionBar aB;
 	
 	boolean isListOffline = true;
 
@@ -28,6 +33,14 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		}		
 		
 		setContentView(R.layout.activity_offline);
+		
+		//Set toolbar
+		tB = (Toolbar) findViewById(R.id.toolbar_activity_offline);
+		setSupportActionBar(tB);
+		aB = getSupportActionBar();
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        aB.setHomeButtonEnabled(true);
+        aB.setDisplayHomeAsUpEnabled(true);
 		
 		if (savedInstanceState != null){
 			this.pathNavigation = "/";
@@ -65,6 +78,18 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 	}
 	
 	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		int id = item.getItemId();
+		switch(id){
+			case android.R.id.home:{
+				onBackPressed();
+			}
+		}
+		return true;
+	}
+	
+	@Override
 	public void onBackPressed() {
 		log("onBackPressed");
 		
@@ -80,6 +105,9 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 					else{
 						super.onBackPressed();
 					}
+				}
+				else{
+					
 				}
 			}
 		}

@@ -10,7 +10,6 @@ import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.OfflineActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
@@ -1455,8 +1454,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 					((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					((ManagerActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				}
-				else if (context instanceof OfflineActivity){
-					((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+				else if (context instanceof OfflineActivityLollipop){
+					((OfflineActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 				}
 
 				mOffList=dbH.findByPath(currentNode.getPath()+currentNode.getName()+"/");
@@ -1705,12 +1704,12 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 					}
 				}
-				else if (context instanceof OfflineActivity){
-					((OfflineActivity)context).setPathNavigationOffline(pathNavigation);
+				else if (context instanceof OfflineActivityLollipop){
+					((OfflineActivityLollipop)context).setPathNavigationOffline(pathNavigation);
 					
 					if (pathNavigation.equals("/")){
 						aB.setTitle(getString(R.string.section_saved_for_offline));
-						((OfflineActivity)context).supportInvalidateOptionsMenu();
+						((OfflineActivityLollipop)context).supportInvalidateOptionsMenu();
 					}
 					else{
 						
@@ -1720,7 +1719,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						index=title.lastIndexOf("/");				
 						title=title.substring(index+1,title.length());			
 						aB.setTitle(title);	
-						((OfflineActivity)context).supportInvalidateOptionsMenu();
+						((OfflineActivityLollipop)context).supportInvalidateOptionsMenu();
 					}
 				}
 				ArrayList<MegaOffline> mOffListNavigation= new ArrayList<MegaOffline>();				

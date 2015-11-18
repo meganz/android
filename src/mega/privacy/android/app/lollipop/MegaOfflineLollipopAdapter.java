@@ -399,6 +399,23 @@ public class MegaOfflineLollipopAdapter extends RecyclerView.Adapter<MegaOffline
 				
 		MegaOffline currentNode = (MegaOffline) getItem(position);
 		
+		if(currentNode.getHandle().equals("0")){
+			//The node is the MasterKey File
+			holder.currentPosition = position;
+			holder.textViewFileName.setText(currentNode.getName());
+			
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+			File file= new File(path);
+			long nodeSize;
+			if(file.exists()){
+				nodeSize = file.length();
+				holder.textViewFileSize.setText(Util.getSizeString(nodeSize));
+			}			
+			holder.imageView.setImageResource(MimeTypeList.typeForName(currentNode.getName()).getIconResourceId());
+			holder.imageButtonThreeDots.setVisibility(View.GONE);
+			return;
+		}
+		
 		String path=null;
 		
 		if(currentNode.isIncoming()){
