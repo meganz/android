@@ -260,10 +260,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		((FileExplorerActivityLollipop) context).changeTitle(folder);
 	}
 	
-	public void changeBackVisibility(boolean backVisibility){
-		((FileExplorerActivityLollipop) context).changeBackVisibility(backVisibility);
-	}
-	
 	@Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -297,7 +293,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			name = temp[temp.length-1];
 
 			changeActionBarTitle(name);
-			changeBackVisibility(true);
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
@@ -355,7 +350,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		if(deepBrowserTree==0){
 			parentHandle=-1;
 			changeActionBarTitle(getString(R.string.title_incoming_shares_explorer));
-			changeBackVisibility(false);
 //			uploadButton.setText(getString(R.string.choose_folder_explorer));
 			findNodes();
 			
@@ -381,7 +375,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 				emptyTextView.setVisibility(View.GONE);
 
 				changeActionBarTitle(parentNode.getName());	
-				changeBackVisibility(true);
 				
 				parentHandle = parentNode.getHandle();
 				nodes = megaApi.getChildren(parentNode);

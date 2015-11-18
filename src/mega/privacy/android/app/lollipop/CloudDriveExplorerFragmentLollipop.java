@@ -178,24 +178,50 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		MegaNode chosenNode = megaApi.getNodeByHandle(parentHandle);
 		if(chosenNode == null)
 		{
+			log("chosenNode is NULL");
+		
 			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(megaApi.getRootNode());
 			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-			changeBackVisibility(false);
 		}
-		else
+		else if(chosenNode.getType() == MegaNode.TYPE_ROOT)
 		{
+			log("chosenNode is ROOT");
+			parentHandle = megaApi.getRootNode().getHandle();
 			nodes = megaApi.getChildren(chosenNode);
-			if(chosenNode.getType() != MegaNode.TYPE_ROOT)
-			{
-				changeActionBarTitle(chosenNode.getName());	
-				changeBackVisibility(true);
+			changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+		}
+		else {
+			log("ChosenNode not null and not ROOT");
+			
+			MegaNode parentNode = megaApi.getParentNode(chosenNode);			
+			if(parentNode!=null){
+				log("ParentNode NOT NULL");
+				MegaNode grandParentNode = megaApi.getParentNode(parentNode);
+				while(grandParentNode!=null){
+					parentNode=grandParentNode;
+					grandParentNode = megaApi.getParentNode(parentNode);
+				}
+				if(parentNode.getType() == MegaNode.TYPE_ROOT){
+					nodes = megaApi.getChildren(chosenNode);
+					changeActionBarTitle(chosenNode.getName());
+					log("chosenNode is: "+chosenNode.getName());
+				}
+				else{
+					log("Parent node exists but is not Cloud!");
+					parentHandle = megaApi.getRootNode().getHandle();
+					nodes = megaApi.getChildren(megaApi.getRootNode());
+					changeActionBarTitle(context.getString(R.string.section_cloud_drive));
+				}
+				
 			}
-			else
-			{
+			else{
+				log("parentNode is NULL");
+				parentHandle = megaApi.getRootNode().getHandle();
+				nodes = megaApi.getChildren(megaApi.getRootNode());
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-				changeBackVisibility(false);
-			}
+			}		
+			
 		}
 		
 		if (context instanceof FileExplorerActivityLollipop){
@@ -265,9 +291,9 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		((FileExplorerActivityLollipop) context).changeTitle(folder);
 	}
 	
-	public void changeBackVisibility(boolean backVisibility){
-		((FileExplorerActivityLollipop) context).changeBackVisibility(backVisibility);
-	}
+//	public void setBackVisibility(boolean backVisibility){
+//		((FileExplorerActivityLollipop) context).setBackVisibility(backVisibility);
+//	}
 	
 	@Override
     public void onAttach(Activity activity) {
@@ -303,12 +329,10 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if(n.getType() != MegaNode.TYPE_ROOT)
 			{
 				changeActionBarTitle(name);
-				changeBackVisibility(true);
 			}
 			else
 			{
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-				changeBackVisibility(false);
 			}
 			
 			parentHandle = nodes.get(position).getHandle();
@@ -367,7 +391,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 			if(parentNode.getType()==MegaNode.TYPE_ROOT){
 				parentHandle=-1;
 				changeActionBarTitle(context.getString(R.string.section_cloud_drive));
-				changeBackVisibility(false);
 			}
 			else{
 				String path=parentNode.getName();	
@@ -376,15 +399,13 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 				name = temp[temp.length-1];
 
 				changeActionBarTitle(name);
-				changeBackVisibility(true);
 				
 				parentHandle = parentNode.getHandle();
 			}
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
-			emptyTextView.setVisibility(View.GONE);
-			
+			emptyTextView.setVisibility(View.GONE);			
 			
 			nodes = megaApi.getChildren(parentNode);
 			adapter.setNodes(nodes);
@@ -409,7 +430,7 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	}
 	
 	private static void log(String log) {
-		Util.log("CloudDriveExplorerFragment", log);
+		Util.log("CloudDriveExplorerFragmentLollipop", log);
 	}
 	
 	public long getParentHandle(){

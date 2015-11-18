@@ -36,6 +36,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -230,6 +231,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setDisplayHomeAsUpEnabled(true);
 		aB.setDisplayShowHomeEnabled(true);
 		
@@ -270,10 +272,13 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	}
 	
 	private void afterLoginAndFetch(){
+		log("afterLoginAndFetch");
+		
 		handler = new Handler();		
 		
 		if ((intent != null) && (intent.getAction() != null)){
 			if (intent.getAction().equals(ACTION_PICK_MOVE_FOLDER)){
+				log("ACTION_PICK_MOVE_FOLDER");
 				mode = MOVE;
 				moveFromHandles = intent.getLongArrayExtra("MOVE_FROM");
 				
@@ -289,6 +294,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}				
 			}					
 			else if (intent.getAction().equals(ACTION_PICK_COPY_FOLDER)){
+				log("ACTION_PICK_COPY_FOLDER");
 				mode = COPY;
 				copyFromHandles = intent.getLongArrayExtra("COPY_FROM");
 				
@@ -309,19 +315,23 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				mode = SELECT_CAMERA_FOLDER;
 			}	
 			else if (intent.getAction().equals(ACTION_PICK_IMPORT_FOLDER)){
+				log("action = ACTION_PICK_IMPORT_FOLDER");
 				mode = IMPORT;
 			}
 			else if (intent.getAction().equals(ACTION_SELECT_FOLDER)){
+				log("action = ACTION_SELECT_FOLDER");
 				mode = SELECT;
 				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");			
 				
 			}
 			else if (intent.getAction().equals(ACTION_SELECT_FILE)){
+				log("action = ACTION_SELECT_FILE");
 				mode = SELECT;
 				selectFile = true;
 				selectedContacts=intent.getStringArrayExtra("SELECTED_CONTACTS");				
 			}
 			else if(intent.getAction().equals(ACTION_UPLOAD_SELFIE)){
+				log("action = ACTION_UPLOAD_SELFIE");
 				mode = UPLOAD_SELFIE;
 				imagePath=intent.getStringExtra("IMAGE_PATH");
 			}
@@ -375,11 +385,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     				if(cDriveExplorer!=null){
     					if(cDriveExplorer.parentHandle==-1|| cDriveExplorer.parentHandle==megaApi.getRootNode().getHandle()){
     						changeTitle(getString(R.string.section_cloud_drive));
-    						changeBackVisibility(false);
     					}
     					else{
     						changeTitle(megaApi.getNodeByHandle(cDriveExplorer.parentHandle).getName());
-    						changeBackVisibility(true);
     					}    					
     				}	
                 }
@@ -394,11 +402,9 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
     				if(iSharesExplorer!=null){
     					if(iSharesExplorer.deepBrowserTree==0){
     						changeTitle(getString(R.string.title_incoming_shares_explorer));
-    						changeBackVisibility(false);
     					}
     					else{
     						changeTitle(iSharesExplorer.name);
-    						changeBackVisibility(true);
     					}    					
     				}        			                      	
                 }
@@ -425,17 +431,25 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         return view;
     }
 	
-	public void changeBackVisibility(boolean backVisible){
-//		this.backVisible = backVisible;
-//		if (windowBack != null){
-//			if (!backVisible){
-//				windowBack.setVisibility(View.INVISIBLE);
-//			}
-//			else{
-//				windowBack.setVisibility(View.VISIBLE);
-//			}
+//	public void setBackVisibility(boolean backVisible){
+////		this.backVisible = backVisible;
+////		if (windowBack != null){
+////			if (!backVisible){
+////				windowBack.setVisibility(View.INVISIBLE);
+////			}
+////			else{
+////				windowBack.setVisibility(View.VISIBLE);
+////			}
+////		}
+//		if(backVisible){
+//			aB.setDisplayHomeAsUpEnabled(true);
+//			aB.setDisplayShowHomeEnabled(true);
 //		}
-	}
+//		else{
+//			aB.setDisplayHomeAsUpEnabled(false);
+//			aB.setDisplayShowHomeEnabled(false);
+//		}
+//	}
 	
 	public void changeTitle (String title){
 		aB.setTitle(title);	
@@ -1139,5 +1153,17 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			ArrayList<MegaContactRequest> requests) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+		log("onOptionsItemSelected");
+		int id = item.getItemId();
+		switch(id){
+			case android.R.id.home:{
+				onBackPressed();
+			}
+		}
+		return true;
 	}
 }
