@@ -30,6 +30,7 @@
 	    android:textColor="@color/white"
 	    android:background="@color/content_text_folder"
 	    android:textSize="14sp"/>
+    
     <LinearLayout
         android:id="@+id/options_file_storage_layout"
         android:layout_width="fill_parent"

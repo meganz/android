@@ -25,7 +25,6 @@ import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.OfflineActivity;
 import mega.privacy.android.app.OldPreferences;
 import mega.privacy.android.app.PaymentFragment;
 import mega.privacy.android.app.Product;
@@ -818,7 +817,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         
         if (!Util.isOnline(this)){
         	
-        	Intent offlineIntent = new Intent(this, OfflineActivity.class);
+        	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
 			startActivity(offlineIntent);
 			finish();
         	return;
@@ -5059,6 +5058,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
+	}
+	
+	public void clickOnMasterKeyFile(){
+		Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
+		if (isIntentAvailable(this, viewIntent)){
+			log("if isIntentAvailable");
+			startActivity(viewIntent);
+		}								
+		else{
+			log("ELSE isIntentAvailable");
+			Intent intentShare = new Intent(Intent.ACTION_SEND);
+			intentShare.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
+			if (isIntentAvailable(this, intentShare)){
+				log("call to startActivity(intentShare)");
+				startActivity(intentShare);
+			}									
+			Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
+		}		
 	}
 	
 	/*
