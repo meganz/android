@@ -4,10 +4,10 @@
     xmlns:rounded="http://schemas.android.com/apk/res-auto"
     android:id="@+id/navigation_drawer_account_view"
     android:layout_width="match_parent"
-    android:layout_height="164dp"
+    android:layout_height="100dp"
     android:clickable="true"
     android:foreground="?selectableItemBackground"
-    tools:layout_height="164dp"
+    tools:layout_height="100dp"
     android:background="#333333">
     
     <RelativeLayout
@@ -20,34 +20,13 @@
 		android:paddingRight="16dp"
 		android:paddingStart="16dp">
 		
-	    <LinearLayout
-		    android:id="@+id/navigation_drawer_account_information"
-		    android:layout_width="wrap_content"
-		    android:layout_height="56dp"
-		    android:layout_alignParentBottom="true"
-		    android:gravity="center_vertical"
-		    android:orientation="vertical">
-		    
-	        <TextView
-		        android:id="@+id/navigation_drawer_account_information_display_name"
-		        style="@style/NavDrawerAccountInfoText"
-		        android:text="User Name"
-		        android:textStyle="bold"
-		        tools:fontFamily="sans-serif-medium"/>
-	        
-	        <TextView
-		        android:id="@+id/navigation_drawer_account_information_email"
-		        style="@style/NavDrawerAccountInfoText"
-		        android:text="email@domain.com"
-		        tools:fontFamily="sans-serif"/>
-	        
-		</LinearLayout>		
-		
-	    <RelativeLayout 
+        <RelativeLayout 
 	        android:id="@+id/navigation_drawer_user_account_relative_layout_profile_avatar"
 	        android:layout_width="64dp"
 			android:layout_height="64dp"
-			android:layout_above="@id/navigation_drawer_account_information">
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true"
+			android:layout_marginTop="30dp">
 	        
 	        <mega.privacy.android.app.components.RoundedImageView 
 				android:id="@+id/navigation_drawer_user_account_picture_profile"
@@ -65,8 +44,36 @@
 			    android:gravity="center_horizontal|center_vertical" />
 	        
 	    </RelativeLayout>
-		
-	    
+        
+	    <LinearLayout
+		    android:id="@+id/navigation_drawer_account_information"
+		    android:layout_width="wrap_content"
+		    android:layout_height="56dp"
+		    android:layout_alignParentTop="true"
+		    android:layout_toRightOf="@id/navigation_drawer_user_account_relative_layout_profile_avatar"
+		    android:gravity="center_vertical"
+		    android:orientation="vertical"
+		    android:layout_marginTop="30dp"
+		    android:layout_marginLeft="10dp">
+		    
+	        <TextView
+		        android:id="@+id/navigation_drawer_account_information_display_name"
+		        style="@style/NavDrawerAccountInfoText"
+		        android:text="User Name"
+		        android:textStyle="bold"
+		        android:singleLine="true"
+		        android:ellipsize="end"
+		        tools:fontFamily="sans-serif-medium"/>
+	        
+	        <TextView
+		        android:id="@+id/navigation_drawer_account_information_email"
+		        style="@style/NavDrawerAccountInfoText"
+		        android:text="email@domain.com"
+		        android:singleLine="true"
+		        android:ellipsize="end"
+		        tools:fontFamily="sans-serif"/>
+	        
+		</LinearLayout>		
 	</RelativeLayout>
 </FrameLayout>
 
