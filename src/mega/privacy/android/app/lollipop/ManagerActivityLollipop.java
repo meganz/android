@@ -2165,6 +2165,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
     			
@@ -2282,6 +2283,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
 				
@@ -2639,9 +2641,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		Menu nVMenu = nV.getMenu();
 	    		if (nVMenu != null){
 	    			drawerItem = DrawerItem.CLOUD_DRIVE;
+	    			resetNavigationViewMenu(nVMenu);
 	    			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 	    			if (drawerMenuItem != null){
+	    				resetNavigationViewMenu(nVMenu);
 	    				drawerMenuItem.setChecked(true);
+	    				drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 	    				if (drawerLayout != null){
 	    					drawerLayout.openDrawer(Gravity.LEFT);
 	    				}
@@ -2660,7 +2665,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    		case CLOUD_DRIVE:{
 		    			drawerMenuItem = nVMenu.findItem(R.id.navigation_item_cloud_drive);
 		    			if (drawerMenuItem != null){
+		    				resetNavigationViewMenu(nVMenu);
 		    				drawerMenuItem.setChecked(true);
+		    				drawerMenuItem.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 		    			}
 		    			break;
 		    		}
@@ -4511,7 +4518,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
+						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 					}
     				selectDrawerItemLollipop(drawerItem);
     				return;
@@ -4525,7 +4534,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
+						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
 					return;
@@ -4537,7 +4548,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (nV != null){
 				Menu nVMenu = nV.getMenu();
 				MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+				resetNavigationViewMenu(nVMenu);
 				cloudDrive.setChecked(true);
+				cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 			}
 			selectDrawerItemLollipop(drawerItem);
 			return;
@@ -4555,7 +4568,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (nV != null){
 							Menu nVMenu = nV.getMenu();
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
@@ -4573,7 +4588,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (nV != null){
 							Menu nVMenu = nV.getMenu();
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 						return;
@@ -4599,7 +4616,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (nV != null){
 							Menu nVMenu = nV.getMenu();
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);
 					}
@@ -4623,7 +4642,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				if (nV != null){
 								Menu nVMenu = nV.getMenu();
 								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								resetNavigationViewMenu(nVMenu);
 								cloudDrive.setChecked(true);
+								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 							}
 							selectDrawerItemLollipop(drawerItem);
 		    				return;
@@ -4640,7 +4661,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				if (nV != null){
 								Menu nVMenu = nV.getMenu();
 								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								resetNavigationViewMenu(nVMenu);
 								cloudDrive.setChecked(true);
+								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 							}
 							selectDrawerItemLollipop(drawerItem);
 		    				return;
@@ -4657,7 +4680,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				if (nV != null){
 								Menu nVMenu = nV.getMenu();
 								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								resetNavigationViewMenu(nVMenu);
 								cloudDrive.setChecked(true);
+								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 							}
 							selectDrawerItemLollipop(drawerItem);
 		    				return;
@@ -4677,7 +4702,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (nV != null){
 							Menu nVMenu = nV.getMenu();
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);					
 	    			}
@@ -4690,6 +4717,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (nV != null){
 	    					Menu nVMenu = nV.getMenu();
 	    					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+	    					resetNavigationViewMenu(nVMenu);
 	    					hidden.setChecked(true);
 	    				}				
 	    			}
@@ -4719,7 +4747,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (nV != null){
 							Menu nVMenu = nV.getMenu();
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);					
 	    			}
@@ -4731,7 +4761,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				if (nV != null){
 							Menu nVMenu = nV.getMenu();
 							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+							resetNavigationViewMenu(nVMenu);
 							cloudDrive.setChecked(true);
+							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);					
 	    			}
@@ -4746,7 +4778,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
+						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 					}
 					selectDrawerItemLollipop(drawerItem);
     				return;
@@ -4760,7 +4794,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				if (nV != null){
 						Menu nVMenu = nV.getMenu();
 						MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+						resetNavigationViewMenu(nVMenu);
 						cloudDrive.setChecked(true);
+						cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 					}
     				selectDrawerItemLollipop(drawerItem);
     				return;
@@ -4777,7 +4813,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CLOUD_DRIVE;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}				
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -4785,7 +4826,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SAVED_FOR_OFFLINE;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}	
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -4793,7 +4839,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CAMERA_UPLOADS;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}	
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.camera_uploads_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -4801,7 +4852,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.INBOX;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}	
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.inbox_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -4809,7 +4865,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.SHARED_ITEMS;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}	
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.shared_items_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -4817,7 +4878,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				drawerMenuItem = menuItem;
 				drawerItem = DrawerItem.CONTACTS;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}	
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.contacts_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -4825,7 +4891,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				Snackbar.make(fragmentContainer, menuItem.getTitle() + " (" + menuItem.getItemId() + ")", Snackbar.LENGTH_LONG).show();
 				lastDrawerItem = drawerItem;
 				drawerItem = DrawerItem.SETTINGS;
+				if (nV != null){
+					Menu nVMenu = nV.getMenu();
+					resetNavigationViewMenu(nVMenu);
+				}	
 				menuItem.setChecked(true);
+				menuItem.setIcon(getResources().getDrawable(R.drawable.settings_red));
 				selectDrawerItemLollipop(drawerItem);
 				break;
 			}
@@ -6260,6 +6331,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
 			MenuItem hidden = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+			resetNavigationViewMenu(nVMenu);
 			hidden.setChecked(true);
 		}
 		selectDrawerItemLollipop(drawerItem);		
@@ -6295,7 +6367,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
 			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+			resetNavigationViewMenu(nVMenu);
 			cloudDrive.setChecked(true);
+			cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 		}
 		selectDrawerItemLollipop(drawerItem);
 		drawerLayout.openDrawer(Gravity.LEFT);
@@ -6307,7 +6381,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		if (nV != null){
 			Menu nVMenu = nV.getMenu();
 			MenuItem cameraUploads = nVMenu.findItem(R.id.navigation_item_camera_uploads);
+			resetNavigationViewMenu(nVMenu);
 			cameraUploads.setChecked(true);
+			cameraUploads.setIcon(getResources().getDrawable(R.drawable.camera_uploads_red));
 		}
 		
 		Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
@@ -7609,6 +7685,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		ClearOfflineTask clearOfflineTask = new ClearOfflineTask(this);
 		clearOfflineTask.execute();
 //		dbH.clearOffline();
+	}
+	
+	void resetNavigationViewMenu(Menu menu){
+		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.cloud_drive_grey));
+		}
+		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_grey));
+		}
+		mi = menu.findItem(R.id.navigation_item_camera_uploads);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.camera_uploads_grey));
+		}
+		mi = menu.findItem(R.id.navigation_item_inbox);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+		}
+		mi = menu.findItem(R.id.navigation_item_shared_items);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.shared_items_grey));
+		}
+		mi = menu.findItem(R.id.navigation_item_contacts);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.contacts_grey));
+		}
+		mi = menu.findItem(R.id.navigation_item_settings);
+		if (mi != null){
+			mi.setIcon(getResources().getDrawable(R.drawable.settings_grey));
+		}
 	}
 	
 	/*
