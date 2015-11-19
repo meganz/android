@@ -34,8 +34,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -73,6 +75,11 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	Button outSpaceButton;
 	int usedSpacePerc;
 	private ActionMode actionMode;
+	
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	boolean isList = true;
 	
@@ -297,12 +304,19 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			}
 		}		
 		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_contactslist, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_list_view);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			recyclerView.setHasFixedSize(true);
 		    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
@@ -442,6 +456,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.contacts_grid_view);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.setHasFixedSize(true);
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
 			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {

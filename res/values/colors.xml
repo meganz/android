@@ -6,7 +6,7 @@
     <color name="separator_grey">#c0c0c0</color>
     <color name="background">#ffffff</color>
     <color name="background_secondary">#eeeeee</color>
-    <color name="mega">#db0605</color>
+    <color name="mega">#d90007</color>
     <color name="mega_transparency">#CCdb0605</color>
     <color name="mega_text">#d90007</color>
     <color name="text_login">#333333</color>
@@ -42,6 +42,7 @@
     <color name="color_default_avatar_mega">#d90007</color>
     <color name="color_default_avatar_phone">#777777</color>
  	<color name="content_text_folder">#80333333</color>
+ 	<color name="content_text_background">#f4f4f4</color>
  	<color name="fragment_background">#ffffff</color>
  	<color name="adapters_background">#333333</color>
  	<color name="file_properties_bottom">#292929</color>
@@ -60,8 +61,12 @@
     <color name="orange">#FFFFBB33</color>
     <color name="blue">#FF33B5E5</color>
     
+    <color name="tab_pressed">#ee0008</color>
+    
     <color name="transparent_black">#80000000</color>
     <color name="transparent_mega">#80db0605</color>
+    
+    <color name="delimiterColor">#e6e6e6</color>
     
     <color name="accentColor">#00BFA5</color>
     <color name="textGrey">#6d6f70</color> 

@@ -344,6 +344,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 
 		dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		
+		root = new File("/");
+		
 //		dbH.setLastUploadFolder("/storage/emulated/0/Pictures");		
 		
 		prefs = dbH.getPreferences();
@@ -367,7 +369,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		if (path == null) {
 			path = new File(Environment.getExternalStorageDirectory().toString());
 		}
-		root = new File("/");
 		changeFolder(path);
 		log("Path to show: "+path);
 	}

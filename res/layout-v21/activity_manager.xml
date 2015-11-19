@@ -33,6 +33,7 @@
 	        android:id="@+id/tabhost_cloud_drive"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
+	        android:background="@color/mega"
 	        android:layout_below="@id/toolbar">
 	
 	        <LinearLayout
@@ -69,6 +70,7 @@
 	        android:id="@+id/tabhost_contacts"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
+	        android:background="@color/mega"
 	        android:layout_below="@id/toolbar">
 	
 	        <LinearLayout
@@ -103,6 +105,7 @@
 		
 		<TabHost
 	        android:id="@+id/tabhost_shares"
+	        android:background="@color/mega"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
 	        android:layout_below="@id/toolbar">

@@ -25,6 +25,8 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -52,6 +54,11 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
 	TextView emptyTextView;
 	RecyclerView.LayoutManager mLayoutManager;
 	MegaContactRequest selectedRequest = null;
+	
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
     ImageButton fabButton;
 	private ActionMode actionMode;
@@ -86,6 +93,11 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
     	log("onCreateView");
     	
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+    	
     	contacts = megaApi.getOutgoingContactRequests();
     	if(contacts!=null)
     	{
@@ -104,7 +116,9 @@ public class SentRequestsFragmentLollipop extends Fragment implements OnClickLis
     	if (isList){
 	        View v = inflater.inflate(R.layout.contacts_sent_requests_tab, container, false);			
 	        listView = (RecyclerView) v.findViewById(R.id.incoming_contacts_list_view);
-
+	        listView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+	        listView.setClipToPadding(false);;
+			
 			listView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			listView.setLayoutManager(mLayoutManager);
