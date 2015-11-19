@@ -5,16 +5,26 @@
     android:background="@color/fragment_background"
     tools:context=".FileBrowserListFragment" >
 
-    <TextView
-        android:id="@+id/content_text"
+    <RelativeLayout
+        android:id="@+id/content_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/content_text_folder"
-        android:paddingBottom="3dp"
-        android:paddingLeft="8dp"
-        android:paddingTop="3dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        android:background="@color/content_text_background">
+
+        <TextView
+            android:id="@+id/content_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"            
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@id/content_text_layout"
+        android:background="@color/delimiterColor" />
 
     <ImageView
         android:id="@+id/file_list_empty_image"
@@ -123,8 +133,7 @@
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/buttons_layout"
-        android:layout_below="@id/content_text"
+        android:layout_below="@id/separator"
         android:choiceMode="multipleChoice" />
 
     <ImageButton
@@ -140,12 +149,12 @@
         android:src="@drawable/ic_add_white"
         android:stateListAnimator="@anim/button_elevation"
         android:tint="@android:color/white" />
-    
+
     <TextView
         android:id="@+id/file_list_browser_camera_upload_on_off"
-        android:layout_alignParentBottom="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/accentColor"
@@ -156,7 +165,6 @@
         android:layout_width="fill_parent"
         android:layout_height="55dp"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/buttons_layout"
         android:layout_gravity="center"
         android:background="@drawable/btn_default_holo_light_without_corners"
         android:textColor="@color/button_text"

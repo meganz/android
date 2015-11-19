@@ -63,6 +63,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -405,6 +406,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_list_view_browser);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics));
+			recyclerView.setClipToPadding(false);
 			recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 			mLayoutManager = new LinearLayoutManager(context);
 			recyclerView.setLayoutManager(mLayoutManager);
@@ -417,6 +420,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 			contentText = (TextView) v.findViewById(R.id.content_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
@@ -602,6 +609,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
 			recyclerView = (RecyclerView) v.findViewById(R.id.file_grid_view_browser);
+			recyclerView.setPadding(0, 0, 0, Util.scaleHeightPx(80, outMetrics));
+			recyclerView.setClipToPadding(false);
 
 			recyclerView.setHasFixedSize(true);
 			final GridLayoutManager gridLayoutManager = (GridLayoutManager) recyclerView.getLayoutManager();

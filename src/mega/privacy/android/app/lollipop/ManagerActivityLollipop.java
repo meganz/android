@@ -802,14 +802,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         totalSpaceTV = (TextView) findViewById(R.id.navigation_drawer_total_space);
         usedSpacePB = (ProgressBar) findViewById(R.id.manager_used_space_bar);
         
-        mTabHostCDrive = (TabHost)findViewById(R.id.tabhost_cloud_drive);
+        mTabHostCDrive = (TabHost)findViewById(R.id.tabhost_cloud_drive);        
         mTabHostCDrive.setup();
+        mTabHostCDrive.getTabWidget().setDividerDrawable(null);
+        
+//        BackgroundColor(getResources().getColor(R.color.tab_text_color));
                       
         mTabHostContacts = (TabHost)findViewById(R.id.tabhost_contacts);
         mTabHostContacts.setup();
+        mTabHostContacts.getTabWidget().setDividerDrawable(null);
         
         mTabHostShares = (TabHost)findViewById(R.id.tabhost_shares);
         mTabHostShares.setup();
+        mTabHostShares.getTabWidget().setDividerDrawable(null);
         
         viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);  
         viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);  
@@ -1296,6 +1301,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				log("mTabsAdapterCloudDrive == null");
     				mTabHostCDrive.setVisibility(View.VISIBLE);    			
         			viewPagerCDrive.setVisibility(View.VISIBLE);
+        	        mTabHostCDrive.getTabWidget().setDividerDrawable(null);
     				
     				mTabsAdapterCDrive= new TabsAdapter(this, mTabHostCDrive, viewPagerCDrive);   	
     				
@@ -1314,6 +1320,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	        firstNavigationLevel = true;
         	        
         			textViewBrowser = (TextView) mTabHostCDrive.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
+//        			textViewBrowser.setBackgroundColor(R.color.tab_text_color);
         			textViewRubbish = (TextView) mTabHostCDrive.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
         			textViewBrowser.setTypeface(null, Typeface.BOLD);
     				textViewRubbish.setTypeface(null, Typeface.NORMAL); 
@@ -1754,7 +1761,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (mTabsAdapterShares == null){
     				mTabHostShares.setVisibility(View.VISIBLE);    			
         			viewPagerShares.setVisibility(View.VISIBLE);
-    				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   	
+    				mTabsAdapterShares= new TabsAdapter(this, mTabHostShares, viewPagerShares);   
+    				mTabHostShares.getTabWidget().setDividerDrawable(null);
     				
         			TabHost.TabSpec tabSpec3 = mTabHostShares.newTabSpec("incomingSharesFragment");
         			String titleTab3 = getString(R.string.tab_incoming_shares);
