@@ -65,7 +65,7 @@
             android:id="@+id/separator"
             android:layout_width="fill_parent"
             android:layout_height="1dip"
-            android:background="@color/text_secondary" />
+            android:background="@color/delimiterColor" />
 
         <LinearLayout
             android:id="@+id/options_layout"

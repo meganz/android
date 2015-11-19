@@ -1,5 +1,7 @@
 package mega.privacy.android.app.lollipop;
 
+import java.util.Locale;
+
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.ManagerActivity;
@@ -41,7 +43,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 
-public class PinLockActivityLollipop extends AppCompatActivity{
+public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener{
 	
 	public static String ACTION_SET_PIN_LOCK = "ACTION_SET";
 	public static String ACTION_RESET_PIN_LOCK = "ACTION_RESET";
@@ -65,6 +67,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
     LinearLayout warningLayout;
     RelativeLayout redLayout;
 	TextView textLogout;
+	TextView logoutButton;
 	TextView unlockText;
 	TextView warningText;
 	EditText passFirstLetter;
@@ -137,7 +140,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		warningLayout = (LinearLayout) findViewById(R.id.warning_layout);
 		//Margins
 		RelativeLayout.LayoutParams warningParams = (RelativeLayout.LayoutParams)warningLayout.getLayoutParams();
-		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		warningParams.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(10, outMetrics), 0); 
 		warningLayout.setLayoutParams(warningParams);
 
 		warningText = (TextView) findViewById(R.id.warning_text);
@@ -145,6 +148,26 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		LinearLayout.LayoutParams textWarningParams = (LinearLayout.LayoutParams)warningText.getLayoutParams();
 		textWarningParams.setMargins(Util.scaleWidthPx(3, outMetrics), 0, Util.scaleWidthPx(3, outMetrics), 0); 
 		warningText.setLayoutParams(textWarningParams);
+
+		logoutButton = (TextView) findViewById(R.id.button_logout);
+		logoutButton.setText(getString(R.string.action_logout).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsbLogin = logoutButton.getLayoutParams();		
+		paramsbLogin.height = Util.scaleHeightPx(48, outMetrics);
+		paramsbLogin.width = Util.scaleWidthPx(63, outMetrics);
+		logoutButton.setLayoutParams(paramsbLogin);
+		//Margin
+		RelativeLayout.LayoutParams textParamsLogin = (RelativeLayout.LayoutParams)logoutButton.getLayoutParams();
+		textParamsLogin.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(40, outMetrics), 0, 0); 
+		logoutButton.setLayoutParams(textParamsLogin);
+		
+		logoutButton.setOnClickListener(this);
+		
+		if(mode!=SET){
+			logoutButton.setVisibility(View.VISIBLE);
+		}
+		else{
+			logoutButton.setVisibility(View.GONE);
+		}
 		
 		if (attemps==MAX_ATTEMPS-1){
 			//Last intent available!!
@@ -158,7 +181,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		else{
 			//Hide alert
 			log("number of attemps: "+attemps);
-			warningLayout.setVisibility(View.GONE);
+			warningLayout.setVisibility(View.INVISIBLE);
 		}	
 		
 		pinLayout = (LinearLayout) findViewById(R.id.pin_layout);
@@ -168,12 +191,12 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 		pinLayout.setLayoutParams(pinParams);
 		
 		unlockText = (TextView) findViewById(R.id.unlock_text_view);
-		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
+//		unlockText.setGravity(Gravity.CENTER_HORIZONTAL); //NOT WORKING!!!
 		unlockText.setText(R.string.unlock_pin_title);		
 		unlockText.setTextSize(TypedValue.COMPLEX_UNIT_SP, (24*scaleText));
 		//Margins
 		RelativeLayout.LayoutParams unlockParams = (RelativeLayout.LayoutParams)unlockText.getLayoutParams();
-		unlockParams.setMargins(Util.scaleWidthPx(75, outMetrics), Util.scaleHeightPx(90, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
+		unlockParams.setMargins(0, Util.scaleHeightPx(70, outMetrics), 0, Util.scaleHeightPx(20, outMetrics)); 
 		unlockText.setLayoutParams(unlockParams);
 		
 		//PIN
@@ -456,7 +479,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 						String message = null;
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
-		            		warningLayout.setVisibility(View.GONE);
+		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
@@ -548,7 +571,7 @@ public class PinLockActivityLollipop extends AppCompatActivity{
        	
 		            	if(attemps<5){
 		            		message = getString(R.string.pin_lock_incorrect);
-		            		warningLayout.setVisibility(View.GONE);
+		            		warningLayout.setVisibility(View.INVISIBLE);
 		            	}
 		            	else{
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
@@ -617,5 +640,18 @@ public class PinLockActivityLollipop extends AppCompatActivity{
 
 	public void setMode(int mode) {
 		this.mode = mode;
+	}
+
+
+	@Override
+	public void onClick(View v) {
+		log("onClick");
+		switch(v.getId()){
+		case R.id.button_logout:
+			ManagerActivity.logout(getApplication(), megaApi, false);
+			finish();
+			break;
+	}
+		
 	}
 }

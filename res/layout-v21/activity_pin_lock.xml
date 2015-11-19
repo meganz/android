@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:gravity="center_horizontal"
     android:fitsSystemWindows="true"
+    android:gravity="center_horizontal"
     android:stackFromBottom="true"
     android:windowSoftInputMode="stateVisible"
     tools:context=".PinLockActivityLollipop" >
@@ -14,15 +14,15 @@
         android:id="@+id/unlock_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/mega_text" />
 
     <LinearLayout
         android:id="@+id/pin_layout"
-        android:layout_below="@id/unlock_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/unlock_text_view"
         android:background="@color/white"
         android:gravity="center_horizontal"
         android:orientation="horizontal" >
@@ -66,9 +66,9 @@
 
     <LinearLayout
         android:id="@+id/warning_layout"
-        android:layout_below="@id/pin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/pin_layout"
         android:background="@color/white"
         android:gravity="center_horizontal|center_vertical"
         android:orientation="horizontal" >
@@ -89,12 +89,22 @@
             android:textColor="@color/black" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/button_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_below="@id/warning_layout"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/accentColor"
+        android:textSize="14sp" />
+
     <RelativeLayout
         android:id="@+id/red_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@color/mega_transparency"
-        android:gravity="center_horizontal|center_vertical">
+        android:gravity="center_horizontal|center_vertical" >
 
         <TextView
             android:id="@+id/alert_text"
