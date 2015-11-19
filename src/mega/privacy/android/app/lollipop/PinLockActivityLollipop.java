@@ -3,44 +3,33 @@ package mega.privacy.android.app.lollipop;
 import java.util.Locale;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.ManagerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaAttributes;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.PinUtil;
-import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
+import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.CountDownTimer;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
-import android.transition.Visibility;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 
 
 public class PinLockActivityLollipop extends AppCompatActivity implements OnClickListener{
@@ -58,8 +47,6 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	float density;
 	DisplayMetrics outMetrics;
 	Display display;
-	
-	Handler handler;
 	
 	MegaApiAndroid megaApi;
 	RelativeLayout fragmentContainer;
@@ -130,6 +117,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		
 		redLayout = (RelativeLayout) findViewById(R.id.red_layout);
 		redLayout.setVisibility(View.GONE);
+		
 		textLogout = (TextView) findViewById(R.id.alert_text);
 		textLogout.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
 		//Margins
@@ -452,23 +440,28 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 					if(attemps==10){
 						//Log out!!
 						log("INTENTS==10 - LOGOUT");
-						redLayout.setVisibility(View.VISIBLE);
+				    	redLayout.setVisibility(View.VISIBLE);
+				    	textLogout.setText(getString(R.string.incorrect_pin_activity, 5));
 						passFourthLetter.setCursorVisible(false);
 						imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 //						imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
 						//						startActivity(intent);
 						//						finish();
-						handler = new Handler();
-						handler.postDelayed(new Runnable() {
+						
+						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
-							@Override
-							public void run() {
-								log("Logout!!!");
-								ManagerActivity.logout(getApplication(), megaApi, false);
-								finish();
-							}
-						}, 5 * 1000);
+						     public void onTick(long millisUntilFinished) {
+						    	 redLayout.setVisibility(View.VISIBLE);
+						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
+						     }
+
+						     public void onFinish() {
+						    	 log("Logout!!!");
+									ManagerActivity.logout(getApplication(), megaApi, false);
+									finish();
+						     }
+						  }.start();						
 					}
 					else{			
 						
@@ -551,16 +544,20 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 						//						Intent intent = new Intent(this, IncorrectPinActivityLollipop.class);
 						//						startActivity(intent);
 						//						finish();
-						handler = new Handler();
-						handler.postDelayed(new Runnable() {
+						CountDownTimer cDT = new CountDownTimer(6000, 1000) {
 
-							@Override
-							public void run() {
-								log("Logout!!!");
-								ManagerActivity.logout(getApplication(), megaApi, false);
-								finish();
-							}
-						}, 5 * 1000);
+						     public void onTick(long millisUntilFinished) {
+//						         mTextField.setText("seconds remaining: " + );
+						    	 redLayout.setVisibility(View.VISIBLE);
+						    	 textLogout.setText(getString(R.string.incorrect_pin_activity, millisUntilFinished / 1000));
+						     }
+
+						     public void onFinish() {
+						    	 log("Logout!!!");
+									ManagerActivity.logout(getApplication(), megaApi, false);
+									finish();
+						     }
+						  }.start();
 					}
 					else{					
 					

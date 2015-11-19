@@ -112,7 +112,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:gravity="center_horizontal|center_vertical"
-            android:text="@string/incorrect_pin_activity"
             android:textColor="@color/white" />
     </RelativeLayout>
 
