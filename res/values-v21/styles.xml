@@ -57,7 +57,7 @@
         
     </style>
     
-    <style name="Theme.Megaactionbar.Properties" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.Megaactionbar.Properties" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
  
         <!-- colorPrimary is used for the default action bar background -->
