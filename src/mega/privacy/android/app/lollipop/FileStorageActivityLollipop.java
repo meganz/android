@@ -92,6 +92,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	DatabaseHandler dbH;
 	private Mode mode;
 	
+	private MenuItem newFolderMenuItem;
+	
 	private File path;
 	private File root;
 	DisplayMetrics metrics;
@@ -102,7 +104,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private TextView contentText;
 	private RecyclerView listView;
 	RecyclerView.LayoutManager mLayoutManager;
-	private TextView createFolderButton;
+	private TextView cancelButton;
 	GestureDetectorCompat detector;
 	
 	private String url;
@@ -155,6 +157,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    switch (item.getItemId()) {
 		    case android.R.id.home:{
 		    	onBackPressed();
+		    	return true;
+		    }
+		    case R.id.cab_menu_create_folder:{
+		    	onNewFolderClick();
 		    	return true;
 		    }
 		    default:{
@@ -234,7 +240,69 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	
 	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+		
+		
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.file_storage_action, menu);
+	    getSupportActionBar().setDisplayShowCustomEnabled(true);
+	    
+	    newFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+		if (mode == Mode.PICK_FOLDER) {
+			newFolderMenuItem.setVisible(true);
+			
+		}
+		else{
+			newFolderMenuItem.setVisible(false);
+		}
+		
+		if (mode == Mode.PICK_FOLDER) {
+			boolean writable = path.canWrite();
+			button.setEnabled(writable);
+			if (writable) {				
+				newFolderMenuItem.setVisible(true);
+			} else {
+				newFolderMenuItem.setVisible(false);
+			}
+		}
+		else{
+			newFolderMenuItem.setVisible(false);
+		}
+	    
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+		log("onPrepareOptionsMenu");
+		if (mode == Mode.PICK_FOLDER) {
+			newFolderMenuItem.setVisible(true);
+			
+		}
+		else{
+			newFolderMenuItem.setVisible(false);
+		}
+		
+		if (mode == Mode.PICK_FOLDER) {
+			boolean writable = path.canWrite();
+			button.setEnabled(writable);
+			if (writable) {				
+				newFolderMenuItem.setVisible(true);
+			} else {
+				newFolderMenuItem.setVisible(false);
+			}
+		}
+		else{
+			newFolderMenuItem.setVisible(false);
+		}
+		return super.onPrepareOptionsMenu(menu);
+	}
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		log("onCreate");
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
@@ -294,19 +362,18 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		
 //		optionsBar = (LinearLayout) v.findViewById(R.id.options_file_storage_layout);
-		createFolderButton = (TextView) findViewById(R.id.file_storage_create_folder);
+		cancelButton = (TextView) findViewById(R.id.file_storage_cancel_button);
 		button = (TextView) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, metrics);
 		
 		if (mode == Mode.PICK_FOLDER) {
-			button.setText(getString(R.string.general_download_here).toUpperCase(Locale.getDefault()));
-			paramsb2.width = Util.scaleWidthPx(140, metrics);
+			button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+			paramsb2.width = Util.scaleWidthPx(95, metrics);
 			
 		}
 		else{
-			createFolderButton.setVisibility(View.GONE);
 			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
 			paramsb2.width = Util.scaleWidthPx(73, metrics);
 		}
@@ -317,16 +384,17 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
 		button.setLayoutParams(optionTextParams);		
 		
-		createFolderButton.setOnClickListener(this);		
-		createFolderButton.setText(getString(R.string.action_create_folder).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = createFolderButton.getLayoutParams();		
+		cancelButton.setOnClickListener(this);		
+		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));		
+		
+		android.view.ViewGroup.LayoutParams paramsb1 = cancelButton.getLayoutParams();		
 		paramsb1.height = Util.scaleHeightPx(48, metrics);
-		paramsb1.width = Util.scaleWidthPx(145, metrics);
-		createFolderButton.setLayoutParams(paramsb1);
+//		paramsb1.width = Util.scaleWidthPx(145, metrics);
+		cancelButton.setLayoutParams(paramsb1);
 		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)createFolderButton.getLayoutParams();
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
 		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
-		createFolderButton.setLayoutParams(cancelTextParams);		
+		cancelButton.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
 		listView.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -383,6 +451,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Open new folder
 	 * @param newPath New folder path
 	 */
+	@SuppressLint("NewApi")
 	private void changeFolder(File newPath) {
 		log("changeFolder: "+newPath);
 		
@@ -390,20 +459,12 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		path = newPath;
 		contentText.setText(Util.makeBold(path.getAbsolutePath(), path.getName()));
 //		windowTitle.setText(Util.makeBold(path.getAbsolutePath(), path.getName()));
+		invalidateOptionsMenu();
 		if (mode == Mode.PICK_FOLDER) {
 			boolean writable = newPath.canWrite();
 			button.setEnabled(writable);
-			LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)createFolderButton.getLayoutParams();
-			if (writable) {
-				createFolderButton.setVisibility(View.VISIBLE);
-				params.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-			} else {
-				createFolderButton.setVisibility(View.INVISIBLE);
-				params.width = 1;
-			}
-			createFolderButton.setLayoutParams(params);
 		}
-		if (mode == Mode.PICK_FILE) {
+		else if (mode == Mode.PICK_FILE) {
 			clearSelections();
 		}
 	}
@@ -638,8 +699,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				}
 				break;
 			}
-			case R.id.file_storage_create_folder:{
-				onNewFolderClick();
+			case R.id.file_storage_cancel_button:{
+				finish();
 				break;
 			}
 		}

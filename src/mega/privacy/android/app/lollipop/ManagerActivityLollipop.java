@@ -1058,8 +1058,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        else{
 				drawerLayout.closeDrawer(Gravity.LEFT);
-			}
-	        
+			}	        
 	        
 	        parentHandleBrowser = -1;
 	        parentHandleRubbish = -1;
@@ -1094,7 +1093,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			logout(this, megaApi, false);
     			return;
     		}			
-		}
+		}  	
     	   	
     	if (intent != null) {  
     		log("intent not null! "+intent.getAction());
@@ -2621,7 +2620,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		playTransfersMenuIcon = menu.findItem(R.id.action_play);
 		pauseTransfersMenuIcon = menu.findItem(R.id.action_pause);
 		cancelAllTransfersMenuItem.setVisible(false);
-
 		
 		changePass = menu.findItem(R.id.action_menu_change_pass);
 		exportMK = menu.findItem(R.id.action_menu_export_MK);
