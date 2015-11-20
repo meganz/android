@@ -2581,8 +2581,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			ft.replace(R.id.fragment_container, upAF, "upAF");
 			ft.commit();
 		}
-	}
-	
+	}	
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {

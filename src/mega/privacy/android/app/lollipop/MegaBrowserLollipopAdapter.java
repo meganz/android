@@ -83,6 +83,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		public ImageView imageView;
+		public ImageView savedOffline;
+		public ImageView publicLinkImage;
 		public TextView textViewFileName;
 		public TextView textViewFileSize;
 		public int currentPosition;
@@ -96,11 +98,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		public ViewHolderBrowserList(View v){
 			super(v);
-		}	
-		
-		public ImageView savedOffline;
+		}			
+
 		public ImageView publicLinkImageMultiselect;
-		public ImageView publicLinkImage;
 		public RelativeLayout itemLayout;
 	}
 	
@@ -111,6 +111,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		public View separator;
+		
 	}
 	
 	public void toggleSelection(int pos) {
@@ -312,13 +313,16 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			holderGrid.textViewFileSize = (TextView) v.findViewById(R.id.file_grid_filesize);
 			holderGrid.imageButtonThreeDots = (ImageButton) v.findViewById(R.id.file_grid_three_dots);
 			holderGrid.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_grid_browser_bar);
-			
+			holderGrid.savedOffline = (ImageView) v.findViewById(R.id.file_grid_saved_offline);
 			holderGrid.separator = (View) v.findViewById(R.id.file_grid_separator);
-			
+			holderGrid.publicLinkImage = (ImageView) v.findViewById(R.id.file_grid_public_link);
 			holderGrid.transferProgressBar.setVisibility(View.GONE);
 			holderGrid.textViewFileSize.setVisibility(View.VISIBLE);
 			
 			v.setTag(holderGrid);
+			
+			holderGrid.savedOffline.setVisibility(View.INVISIBLE);
+			holderGrid.publicLinkImage.setVisibility(View.GONE);
 			
 			holderGrid.itemLayout.setTag(holderGrid);
 			holderGrid.itemLayout.setOnClickListener(this);
@@ -408,6 +412,14 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				holder.itemLayout.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.background_item_grid));
 				holder.separator.setBackgroundColor(context.getResources().getColor(R.color.grid_item_separator));
 			}
+		}
+		
+		if(node.isExported()){
+			//Node has public link			
+			holder.publicLinkImage.setVisibility(View.VISIBLE);
+		}
+		else{
+			holder.publicLinkImage.setVisibility(View.GONE);
 		}
 		
 		if (node.isFolder()) {
@@ -537,6 +549,48 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 					}
 				}
 			}
+		}
+		
+		//Check if is an offline file to show the red arrow
+		File offlineDirectory = null;
+		
+		if(incoming){
+			log("Incoming tab: MegaBrowserListAdapter: "+node.getHandle());
+			//Find in the database
+			MegaOffline offlineNode = dbH.findByHandle(node.getHandle());
+			if(offlineNode!=null){
+				//Find in the filesystem
+				if (Environment.getExternalStorageDirectory() != null){
+					offlineDirectory = new File (Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + offlineNode.getHandleIncoming());
+					log("offline Directory: "+offlineDirectory.getAbsolutePath());
+				}
+				else{
+					offlineDirectory = context.getFilesDir();
+				}
+			}
+		}
+		else{
+			//Find in the filesystem
+			if (Environment.getExternalStorageDirectory() != null){
+				offlineDirectory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" +megaApi.getNodePath(node));
+			}
+			else{
+				offlineDirectory = context.getFilesDir();
+			}
+		}		
+		
+		if (offlineDirectory!=null){
+			if (offlineDirectory.exists()){
+				log("Directory EXISTS!!!");
+				holder.savedOffline.setVisibility(View.VISIBLE);
+			}
+			else{
+				log("Directory NOT exists!!!");
+				holder.savedOffline.setVisibility(View.INVISIBLE);
+			}
+		}
+		else{
+			holder.savedOffline.setVisibility(View.INVISIBLE);
 		}
 		
 	}
@@ -751,6 +805,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 			}
 		}
 		
+		//Check if is an offline file to show the red arrow
 		File offlineDirectory = null;
 		
 		if(incoming){
@@ -780,13 +835,14 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		
 		if (offlineDirectory!=null){
 			if (offlineDirectory.exists()){
-				if(multipleSelect){
-					holder.savedOffline.setVisibility(View.VISIBLE);
-				}
-				else{
-					holder.savedOffline.setVisibility(View.VISIBLE);
-				}
+				holder.savedOffline.setVisibility(View.VISIBLE);
 			}
+			else{
+				holder.savedOffline.setVisibility(View.INVISIBLE);
+			}
+		}
+		else{
+			holder.savedOffline.setVisibility(View.INVISIBLE);
 		}
 	}
 	

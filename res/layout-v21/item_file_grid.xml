@@ -1,87 +1,106 @@
-<!-- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+ <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/file_grid_item_complete_layout"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:background="@color/grid_background">
--->    
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/file_grid_item_layout"
+    android:layout_width="172dp"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true"
+    android:layout_margin="3dp"
+    android:background="@drawable/background_item_grid"
+    android:descendantFocusability="blocksDescendants" >
+
+    <ImageView
+        android:id="@+id/file_grid_thumbnail"
         android:layout_width="172dp"
+        android:layout_height="172dp"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp"
+        android:background="@null"
+        android:scaleType="fitCenter" />
+
+    <ImageView
+        android:id="@+id/file_grid_saved_offline"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/file_grid_item_layout"
-        android:background="@drawable/background_item_grid"
-        android:layout_alignParentTop="true"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="15dp"
+        android:background="@null"
+        android:src="@drawable/ic_cloud_saved_offline" />
+
+    <ImageView
+        android:id="@+id/file_grid_public_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:src="@drawable/ic_public_link_list"  
+        android:layout_alignParentRight="true"       
+        android:layout_marginRight="22dp"
+        android:layout_marginTop="10dp"/>
+
+    <View
+        android:id="@+id/file_grid_separator"
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:layout_below="@id/file_grid_thumbnail"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="6dp"
+        android:background="@color/grid_item_separator"
+        android:scaleType="fitCenter" />
+
+    <ImageButton
+        android:id="@+id/file_grid_three_dots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/file_grid_separator"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="22dp"
+        android:background="@null"
+        android:src="@drawable/ic_dots_vertical_grey" />
+
+    <TextView
+        android:id="@+id/file_grid_filename"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_margin="3dp"
-        android:descendantFocusability="blocksDescendants" >
-        
-        <ImageView
-	        android:id="@+id/file_grid_thumbnail"
-	        android:layout_width="172dp"
-	        android:layout_height="172dp"
-	        android:layout_margin="5dp"
-	        android:layout_centerHorizontal="true"
-	        android:scaleType="fitCenter"
-	        android:background="@null" />
-        
-        <View
-	        android:id="@+id/file_grid_separator"
-	 		android:layout_width="wrap_content"
-	 		android:layout_height="2dp"
-	 		android:background="@color/grid_item_separator"
-	        android:scaleType="fitCenter"
-	        android:layout_marginLeft="6dp"
-	        android:layout_centerHorizontal="true"
-	        android:layout_below="@id/file_grid_thumbnail"
-	 		 />
-        
-        <ImageButton 
-	        android:id="@+id/file_grid_three_dots"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:src="@drawable/ic_dots_vertical_grey"
-			android:background="@null" 
-			android:layout_marginLeft="2dp"
-			android:layout_marginTop="22dp"
-			android:layout_marginRight="8dp"
-	        android:layout_below="@id/file_grid_separator"
-	        android:layout_alignParentRight="true" /> 
-        
-        <TextView
-	        android:id="@+id/file_grid_filename"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentLeft="true"	
-	        android:layout_marginLeft="12dp"
-	        android:layout_marginTop="15dp"
-	        android:layout_toLeftOf="@id/file_grid_three_dots"
-	        android:layout_below="@id/file_grid_separator"
-	        android:textColor="@color/black"
-	        android:ellipsize="end"
-        	android:maxLines="1" />              
-        
-        <TextView
-	        android:id="@+id/file_grid_filesize"
-	        android:layout_width="wrap_content"
-	        android:layout_height="30dp"
-	        android:layout_alignParentLeft="true"	
-	        android:layout_marginLeft="12dp"
-	        android:layout_marginBottom="7dp"
-	        android:textColor="@color/file_list_second_row"
-	        android:layout_below="@id/file_grid_filename"
-	        android:textSize="12sp" />       
-        
-       <ProgressBar
-	    android:id="@+id/transfers_grid_browser_bar"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content" 
-		android:layout_marginRight="10dp"
-		android:layout_marginBottom="10dp"
-		style="@style/MEGAProgressBarTransfers"  
-		android:layout_margin="5dip" 
+        android:layout_below="@id/file_grid_separator"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="15dp"
         android:layout_toLeftOf="@id/file_grid_three_dots"
-        android:layout_below="@id/file_grid_filename" /> 
-    </RelativeLayout>
-<!--    
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/file_grid_filesize"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/file_grid_filename"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="12dp"
+        android:textColor="@color/file_list_second_row"
+        android:textSize="12sp" />
+
+    <ProgressBar
+        android:id="@+id/transfers_grid_browser_bar"
+        style="@style/MEGAProgressBarTransfers"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/file_grid_filename"
+        android:layout_margin="5dip"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_toLeftOf="@id/file_grid_three_dots" />
+
+</RelativeLayout><!--
     <RelativeLayout
         android:id="@+id/file_grid_options1"
         android:layout_width="match_parent"
@@ -296,6 +315,4 @@
         </TableLayout>
     </RelativeLayout>
 -->
-<!--     
-</RelativeLayout>
--->
+<!-- </RelativeLayout> -->
