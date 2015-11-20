@@ -1033,6 +1033,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				notifyDataSetChanged();
 				Intent i = new Intent(context, FilePropertiesActivityLollipop.class);
 				i.putExtra("handle", selectedNode.getHandle());
+				i.putExtra("from", FilePropertiesActivityLollipop.FROM_INCOMING_SHARES);
 				
 				if (selectedNode.isFolder()) {
 					if (megaApi.isShared(selectedNode)){

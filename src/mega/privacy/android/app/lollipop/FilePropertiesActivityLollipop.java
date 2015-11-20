@@ -206,8 +206,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	
 		super.onCreate(savedInstanceState);
 		
-		boolean result=true;;
-		
 		if (megaApi == null){
 			MegaApplication app = (MegaApplication)getApplication();
 			megaApi = app.getMegaApi();
@@ -353,73 +351,271 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			permissionLabel.setVisibility(View.GONE);
 			permissionInfo.setVisibility(View.GONE);
 
-			if(node.isExported()){
-				publicLink=true;
-				publicLinkImage.setVisibility(View.VISIBLE);
-			}	
-			else{
-				publicLink=false;
-				publicLinkImage.setVisibility(View.GONE);
+		}
+		
+		refreshProperties();
+	}
+	
+	
+	private void refreshProperties(){		
+		log("refresh");
+	
+		boolean result=true;
+		
+		if(node.isExported()){
+			publicLink=true;
+			publicLinkImage.setVisibility(View.VISIBLE);
+		}	
+		else{
+			publicLink=false;
+			publicLinkImage.setVisibility(View.GONE);
+		}
+		
+		if (node.isFile()){				
+			log("onCreate node is FILE");
+			sharedLayout.setVisibility(View.GONE);				
+			dividerSharedLayout.setVisibility(View.GONE);		
+			sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
+			
+			sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
+			
+			contentLayout.setVisibility(View.GONE);	
+			
+			if(from==FROM_INCOMING_SHARES){
+				log("from FROM_INCOMING_SHARES");
+				//Show who is the owner
+				owner=false;
+				ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
+				boolean found=false;
+				int i=0;
+				while(!found && i<usersIncoming.size()){
+					MegaUser user = usersIncoming.get(i);
+					ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
+					
+					for(int j=0; j<nodesIncoming.size();j++){
+						MegaNode nI = nodesIncoming.get(j);
+						
+						if(nI.getName().equals(node.getName())){
+							ownerInfo.setText(user.getEmail());
+							ownerInfo.setVisibility(View.VISIBLE);	
+							found=true;
+							break;
+						}
+					}
+					i++;
+				}
 			}
 			
-			if (node.isFile()){				
-				
-				sharedLayout.setVisibility(View.GONE);				
-				dividerSharedLayout.setVisibility(View.GONE);		
-				sizeTitleTextView.setText(getString(R.string.file_properties_info_size_file));
-				
-				sizeTextView.setText(Formatter.formatFileSize(this, node.getSize()));
-				
-				contentLayout.setVisibility(View.GONE);	
-				
-				if(from==FROM_INCOMING_SHARES){
-					//Show who is the owner
-					owner=false;
-					ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
-					boolean found=false;
-					int i=0;
-					while(!found && i<usersIncoming.size()){
-						MegaUser user = usersIncoming.get(i);
-						ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
-						
-						for(int j=0; j<nodesIncoming.size();j++){
-							MegaNode nI = nodesIncoming.get(j);
-							
-							if(nI.getName().equals(node.getName())){
-								ownerInfo.setText(user.getEmail());
-								ownerInfo.setVisibility(View.VISIBLE);	
-								found=true;
-								break;
-							}
-						}
-						i++;
-					}
-				}
-				
-				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);	
-				
-				//Choose the button offlineSwitch
-				
-				if(dbH.exists(node.getHandle())){
-					log("Exists OFFLINE: setChecket TRUE");
-					availableOfflineBoolean = true;
-					offlineSwitch.setChecked(true);
+			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);	
+			
+			//Choose the button offlineSwitch
+			
+			if(dbH.exists(node.getHandle())){
+				log("Exists OFFLINE: setChecket TRUE");
+				availableOfflineBoolean = true;
+				offlineSwitch.setChecked(true);
+			}
+			else{
+				log("NOT Exists OFFLINE: setChecket FALSE");
+				availableOfflineBoolean = false;
+				offlineSwitch.setChecked(false);
+			}
+			
+			if(offlineSwitch.isChecked())
+			{
+				log("isChecked!");
+			}
+			else{
+				log(" NOOOOT Checked!");
+			}
+			
+//			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
+			
+			if (node.getCreationTime() != 0){
+				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
+
+				if (node.getModificationTime() != 0){
+					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
 				}
 				else{
-					log("NOT Exists OFFLINE: setChecket FALSE");
+					try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}	
+				}
+			}
+			else{
+				addedTextView.setText("");
+				modifiedTextView.setText("");
+			}
+			
+			Bitmap thumb = null;
+			Bitmap preview = null;
+			thumb = ThumbnailUtils.getThumbnailFromCache(node);
+			if (thumb != null){
+				imageView.setImageBitmap(thumb);
+			}
+			else{
+				thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
+				if (thumb != null){
+					imageView.setImageBitmap(thumb);
+				}
+			}
+			preview = PreviewUtils.getPreviewFromCache(node);
+			if (preview != null){
+				PreviewUtils.previewCache.put(node.getHandle(), preview);
+				imageView.setImageBitmap(preview);
+			}
+			else{
+				preview = PreviewUtils.getPreviewFromFolder(node, this);
+				if (preview != null){
+					PreviewUtils.previewCache.put(node.getHandle(), preview);
+					imageView.setImageBitmap(preview);	
+				}
+				else{
+					if (node.hasPreview()){	
+						File previewFile = new File(PreviewUtils.getPreviewFolder(this), node.getBase64Handle()+".jpg");
+						megaApi.getPreview(node, previewFile.getAbsolutePath(), this);
+					}
+				}
+			}
+		}
+		else{ //Folder
+			
+			contentTextView.setVisibility(View.VISIBLE);
+			contentTitleTextView.setVisibility(View.VISIBLE);
+			
+			contentTextView.setText(getInfoFolder(node));
+			
+			long sizeFile=megaApi.getSize(node);				
+			sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));				
+			
+			//Choose the button availableSwitch
+			
+			if(dbH.exists(node.getHandle())){
+				
+				ArrayList<MegaNode> childrenList=megaApi.getChildren(node);
+				if(childrenList.size()>0){
+					
+					result=checkChildrenStatus(childrenList);
+					
+				}
+				
+				if(!result){
+					log("false checkChildrenStatus: "+result);
 					availableOfflineBoolean = false;
 					offlineSwitch.setChecked(false);
 				}
-				
-				if(offlineSwitch.isChecked())
-				{
-					log("isChecked!");
-				}
 				else{
-					log(" NOOOOT Checked!");
+					log("true checkChildrenStatus: "+result);
+					availableOfflineBoolean = true;
+					offlineSwitch.setChecked(true);
 				}
 				
-//				availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
+			}
+			else{
+				availableOfflineBoolean = false;
+				offlineSwitch.setChecked(false);
+			}
+
+			availableOfflineView.setPadding(Util.px2dp(15*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);
+			
+			imageView.setImageResource(imageId);
+
+			if(from==FROM_INCOMING_SHARES){
+				//Show who is the owner
+				ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
+				boolean found=false;
+				int i=0;
+				while(!found && i<usersIncoming.size()){
+					MegaUser user = usersIncoming.get(i);
+					ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
+					
+					for(int j=0; j<nodesIncoming.size();j++){
+						MegaNode nI = nodesIncoming.get(j);
+						
+						if(nI.getName().equals(node.getName())){
+							ownerInfo.setText(user.getEmail());
+							ownerInfo.setVisibility(View.VISIBLE);	
+							found=true;
+							break;
+						}
+					}
+					i++;
+				}
+			}
+			
+			sl = megaApi.getOutShares(node);		
+
+			if (sl != null){
+
+				if (sl.size() == 0){						
+					sharedLayout.setVisibility(View.GONE);
+					dividerSharedLayout.setVisibility(View.GONE);	
+//					If I am the owner
+					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
+						
+						permissionLabel.setVisibility(View.GONE);
+						permissionInfo.setVisibility(View.GONE);
+						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
+						
+					}
+					else{	
+						
+						owner = false;
+						//If I am not the owner
+						permissionLabel.setVisibility(View.VISIBLE);
+						permissionInfo.setVisibility(View.VISIBLE);
+						
+						int accessLevel= megaApi.getAccess(node);
+						log("Node: "+node.getName());
+																				
+						switch(accessLevel){
+							case MegaShare.ACCESS_OWNER:
+							case MegaShare.ACCESS_FULL:{
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));	
+								break;
+							}
+							case MegaShare.ACCESS_READ:{
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
+								break;
+							}						
+							case MegaShare.ACCESS_READWRITE:{								
+								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
+								break;
+							}
+						}
+					}
+					
+				}
+				else{		
+					if(publicLink){
+//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
+//
+//						publicLinkTextView.setVisibility(View.VISIBLE);
+						
+						if(sl.size()>1){
+							//It is public and shared
+							imageView.setImageResource(R.drawable.folder_shared_mime);
+							sharedLayout.setVisibility(View.VISIBLE);
+							dividerSharedLayout.setVisibility(View.VISIBLE);	
+							usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+						}
+						else{
+							//It is just public
+							imageView.setImageResource(R.drawable.folder_mime);
+							sharedLayout.setVisibility(View.GONE);
+							dividerSharedLayout.setVisibility(View.GONE);	
+//							sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
+						}
+						
+					}
+					else{
+//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
+						//It is private and shared
+						imageView.setImageResource(R.drawable.folder_shared_mime);
+						sharedLayout.setVisibility(View.VISIBLE);
+						dividerSharedLayout.setVisibility(View.VISIBLE);	
+						usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
+					}						
+				}					
 				
 				if (node.getCreationTime() != 0){
 					try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
@@ -435,359 +631,10 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					addedTextView.setText("");
 					modifiedTextView.setText("");
 				}
-				
-				Bitmap thumb = null;
-				Bitmap preview = null;
-				thumb = ThumbnailUtils.getThumbnailFromCache(node);
-				if (thumb != null){
-					imageView.setImageBitmap(thumb);
-				}
-				else{
-					thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
-					if (thumb != null){
-						imageView.setImageBitmap(thumb);
-					}
-				}
-				preview = PreviewUtils.getPreviewFromCache(node);
-				if (preview != null){
-					PreviewUtils.previewCache.put(node.getHandle(), preview);
-					imageView.setImageBitmap(preview);
-				}
-				else{
-					preview = PreviewUtils.getPreviewFromFolder(node, this);
-					if (preview != null){
-						PreviewUtils.previewCache.put(node.getHandle(), preview);
-						imageView.setImageBitmap(preview);	
-					}
-					else{
-						if (node.hasPreview()){	
-							File previewFile = new File(PreviewUtils.getPreviewFolder(this), node.getBase64Handle()+".jpg");
-							megaApi.getPreview(node, previewFile.getAbsolutePath(), this);
-						}
-					}
-				}
-			}
-			else{ //Folder
-				
-				contentTextView.setVisibility(View.VISIBLE);
-				contentTitleTextView.setVisibility(View.VISIBLE);
-				
-				contentTextView.setText(getInfoFolder(node));
-				
-				long sizeFile=megaApi.getSize(node);				
-				sizeTextView.setText(Formatter.formatFileSize(this, sizeFile));				
-				
-				//Choose the button availableSwitch
-				
-				if(dbH.exists(node.getHandle())){
-					
-					ArrayList<MegaNode> childrenList=megaApi.getChildren(node);
-					if(childrenList.size()>0){
-						
-						result=checkChildrenStatus(childrenList);
-						
-					}
-					
-					if(!result){
-						log("false checkChildrenStatus: "+result);
-						availableOfflineBoolean = false;
-						offlineSwitch.setChecked(false);
-					}
-					else{
-						log("true checkChildrenStatus: "+result);
-						availableOfflineBoolean = true;
-						offlineSwitch.setChecked(true);
-					}
-					
-				}
-				else{
-					availableOfflineBoolean = false;
-					offlineSwitch.setChecked(false);
-				}
-
-				availableOfflineView.setPadding(Util.px2dp(15*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);
-				
-				imageView.setImageResource(imageId);
-
-				if(from==FROM_INCOMING_SHARES){
-					//Show who is the owner
-					ArrayList<MegaUser> usersIncoming = megaApi.getContacts();
-					boolean found=false;
-					int i=0;
-					while(!found && i<usersIncoming.size()){
-						MegaUser user = usersIncoming.get(i);
-						ArrayList<MegaNode> nodesIncoming = megaApi.getInShares(user);
-						
-						for(int j=0; j<nodesIncoming.size();j++){
-							MegaNode nI = nodesIncoming.get(j);
-							
-							if(nI.getName().equals(node.getName())){
-								ownerInfo.setText(user.getEmail());
-								ownerInfo.setVisibility(View.VISIBLE);	
-								found=true;
-								break;
-							}
-						}
-						i++;
-					}
-				}
-				
-				sl = megaApi.getOutShares(node);		
-
-				if (sl != null){
-
-					if (sl.size() == 0){						
-						sharedLayout.setVisibility(View.GONE);
-						dividerSharedLayout.setVisibility(View.GONE);	
-//						If I am the owner
-						if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-							
-							permissionLabel.setVisibility(View.GONE);
-							permissionInfo.setVisibility(View.GONE);
-							//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
-							
-						}
-						else{	
-							
-							owner = false;
-							//If I am not the owner
-							permissionLabel.setVisibility(View.VISIBLE);
-							permissionInfo.setVisibility(View.VISIBLE);
-							
-							int accessLevel= megaApi.getAccess(node);
-							log("Node: "+node.getName());
-																					
-							switch(accessLevel){
-								case MegaShare.ACCESS_OWNER:
-								case MegaShare.ACCESS_FULL:{
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));	
-									break;
-								}
-								case MegaShare.ACCESS_READ:{
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
-									break;
-								}						
-								case MegaShare.ACCESS_READWRITE:{								
-									permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
-									break;
-								}
-							}
-						}
-						
-					}
-					else{		
-						if(publicLink){
-//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-//	
-//							publicLinkTextView.setVisibility(View.VISIBLE);
-							
-							if(sl.size()>1){
-								//It is public and shared
-								imageView.setImageResource(R.drawable.folder_shared_mime);
-								sharedLayout.setVisibility(View.VISIBLE);
-								dividerSharedLayout.setVisibility(View.VISIBLE);	
-								usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-							}
-							else{
-								//It is just public
-								imageView.setImageResource(R.drawable.folder_mime);
-								sharedLayout.setVisibility(View.GONE);
-								dividerSharedLayout.setVisibility(View.GONE);	
-//								sharedWithButton.setText(R.string.file_properties_shared_folder_public_link);
-							}
-							
-						}
-						else{
-//							publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-							//It is private and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
-							sharedLayout.setVisibility(View.VISIBLE);
-							dividerSharedLayout.setVisibility(View.VISIBLE);	
-							usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-						}						
-					}					
-					
-					if (node.getCreationTime() != 0){
-						try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
-
-						if (node.getModificationTime() != 0){
-							try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getModificationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}
-						}
-						else{
-							try {modifiedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{modifiedTextView.setText("");}	
-						}
-					}
-					else{
-						addedTextView.setText("");
-						modifiedTextView.setText("");
-					}
-				}
-				else{
-					sharedLayout.setVisibility(View.GONE);
-					dividerSharedLayout.setVisibility(View.GONE);	
-				}
-			}
-		}
-	}
-	
-	
-	private void refresh(){		
-		log("refresh");
-	
-		File offlineFile = null;
-		
-		if(node.isExported()){
-			log("node is Exported");
-			publicLink=true;
-			publicLinkImage.setVisibility(View.VISIBLE);
-		}	
-		else{
-			log("node is NOT Exported");
-			publicLink=false;
-			publicLinkImage.setVisibility(View.GONE);
-		}
-		
-		if (node.isFolder()){ //Folder			
-
-			imageView.setImageResource(imageId);
-			sl = megaApi.getOutShares(node);		
-
-			if (sl != null){
-
-				if (sl.size() == 0){						
-					sharedLayout.setVisibility(View.GONE);
-					dividerSharedLayout.setVisibility(View.GONE);	
-					
-//					If I am the owner
-					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
-						
-						permissionLabel.setVisibility(View.GONE);
-						permissionInfo.setVisibility(View.GONE);
-						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
-						
-					}
-					else{							
-						//If I am not the owner
-						owner = false;
-						permissionLabel.setVisibility(View.VISIBLE);
-						permissionInfo.setVisibility(View.VISIBLE);
-						
-						int accessLevel= megaApi.getAccess(node);
-						log("Node: "+node.getName());
-						
-						switch(accessLevel){
-							case MegaShare.ACCESS_OWNER:
-							case MegaShare.ACCESS_FULL:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_full_access));
-								break;
-							}
-							case MegaShare.ACCESS_READ:{
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_only));
-								break;
-							}						
-							case MegaShare.ACCESS_READWRITE:{								
-								permissionInfo.setText(getResources().getString(R.string.file_properties_shared_folder_read_write));
-								break;
-							}
-						}
-					}					
-				}
-				else{		
-					publicLink=false;
-					for(int i=0; i<sl.size();i++){
-
-						//Check if one of the ShareNodes is the public link
-
-						if(sl.get(i).getUser()==null){
-							//Public link + users								
-							publicLink=true;
-							break;
-
-						}
-					}
-					if(publicLink){
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_public_link));							
-//
-//						publicLinkTextView.setVisibility(View.VISIBLE);
-						
-						if(sl.size()>1){
-							//It is public and shared
-							imageView.setImageResource(R.drawable.folder_shared_mime);
-							sharedLayout.setVisibility(View.VISIBLE);
-							dividerSharedLayout.setVisibility(View.VISIBLE);	
-							usersSharedWithText.setText((sl.size()-1)+" "+getResources().getQuantityString(R.plurals.general_num_users,(sl.size()-1)));
-						}
-						else{
-							//It is just public
-							imageView.setImageResource(R.drawable.folder_mime);
-							sharedLayout.setVisibility(View.GONE);
-							dividerSharedLayout.setVisibility(View.GONE);	
-							usersSharedWithText.setText(R.string.file_properties_shared_folder_public_link);
-						}
-						
-					}
-					else{
-//						publicLinkTextView.setText(getResources().getString(R.string.file_properties_shared_folder_private_folder));
-						//It is private and shared
-						imageView.setImageResource(R.drawable.folder_shared_mime);
-						sharedLayout.setVisibility(View.VISIBLE);
-						dividerSharedLayout.setVisibility(View.VISIBLE);	
-						usersSharedWithText.setText(sl.size()+" "+getResources().getQuantityString(R.plurals.general_num_users,sl.size()));
-					}
-					
-				}
 			}
 			else{
 				sharedLayout.setVisibility(View.GONE);
 				dividerSharedLayout.setVisibility(View.GONE);	
-			}
-			
-			Bitmap thumb = null;
-			Bitmap preview = null;
-			//If image
-			if (node.isFile()){
-				if (node.hasThumbnail()){
-					if (availableOfflineBoolean){
-						if (offlineFile != null){
-
-							BitmapFactory.Options options = new BitmapFactory.Options();
-							options.inJustDecodeBounds = true;
-							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-
-							ExifInterface exif;
-							int orientation = ExifInterface.ORIENTATION_NORMAL;
-							try {
-								exif = new ExifInterface(offlineFile.getAbsolutePath());
-								orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-							} catch (IOException e) {}  
-
-							// Calculate inSampleSize
-							options.inSampleSize = Util.calculateInSampleSize(options, 270, 270);
-
-							// Decode bitmap with inSampleSize set
-							options.inJustDecodeBounds = false;
-
-							thumb = BitmapFactory.decodeFile(offlineFile.getAbsolutePath(), options);
-							if (thumb != null){
-								thumb = Util.rotateBitmap(thumb, orientation);
-
-								imageView.setImageBitmap(thumb);
-							}
-						}
-					}
-					else{
-						thumb = ThumbnailUtils.getThumbnailFromCache(node);
-						if (thumb != null){
-							imageView.setImageBitmap(thumb);
-						}
-						else{
-							thumb = ThumbnailUtils.getThumbnailFromFolder(node, this);
-							if (thumb != null){
-								imageView.setImageBitmap(thumb);
-							}
-						}
-					}
-				}
 			}
 		}
 	}
@@ -912,9 +759,14 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				log("Comprobando el node"+node.getName());
 				
 				//check the parent
-				long result = findIncomingParentHandle(node);
+				long result = -1;
+				result=findIncomingParentHandle(node);
 				log("IncomingParentHandle: "+result);
 				if(result!=-1){
+					MegaNode megaNode = megaApi.getNodeByHandle(result);
+					if(megaNode!=null){
+						log("ParentHandleIncoming: "+megaNode.getName());
+					}
 					String handleString = Long.toString(result);
 					String destinationPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+createStringTree(node);
 					log("Not owner path destination: "+destinationPath);
@@ -935,12 +787,15 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					}				
 					saveOffline(destination);
 				}
-								
+				else{
+					log("result=findIncomingParentHandle NOT result!");
+				}
 			}
 		}
 	}
 	
 	public long findIncomingParentHandle(MegaNode nodeToFind){
+		log("findIncomingParentHandle");
 		
 		MegaNode parentNodeI = megaApi.getParentNode(nodeToFind);
 		long result=-1;
@@ -2358,7 +2213,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		log("onResume-FilePropertiesActivityLollipop");
 		super.onResume();		
 		
-		refresh();
+		refreshProperties();
 	}
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
