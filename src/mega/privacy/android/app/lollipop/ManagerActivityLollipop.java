@@ -4994,7 +4994,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{
 				log("NOT advancedDevices");
 				Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-				intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 				intent.setClass(this, FileStorageActivityLollipop.class);
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);
@@ -6851,7 +6851,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		log("onActivityResult "+requestCode + "____" + resultCode);
+		log("-------------------onActivityResult "+requestCode + "____" + resultCode);
 		
 		if (requestCode == REQUEST_CODE_GET){
 			log("resultCode = " + resultCode);

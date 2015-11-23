@@ -770,7 +770,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 			
 		if (askMe){
 			Intent intent = new Intent(Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS,false);
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_SIZE, size);
 			intent.setClass(this, FileStorageActivityLollipop.class);
 			intent.putExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES, hashes);

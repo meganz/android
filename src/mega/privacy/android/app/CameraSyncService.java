@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop;
 import mega.privacy.android.app.utils.PreviewUtils;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.app.utils.Util;
@@ -498,7 +499,8 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		else{
 			MegaNode n = megaApi.getNodeByHandle(cameraUploadHandle);
 			//If ERROR with the handler (the node may not longer exist): Create the folder Camera Uploads
-			if(n==null){				
+			if(n==null){
+				cameraUploadHandle = -1;
 				//Find the "Camera Uploads" folder of the old "PhotoSync"
 				for (int i=0;i<nl.size();i++){
 					if ((CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
@@ -785,7 +787,9 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		
 		cameraUploadNode = megaApi.getNodeByHandle(cameraUploadHandle);
 		if(cameraUploadNode == null){
-			showSyncError(R.string.settings_camera_notif_error_no_folder);
+			log("ERROR: cameraUploadNode == null");
+//			showSyncError(R.string.settings_camera_notif_error_no_folder);
+			retryLater();
 			finish();
 			return;
 		}
@@ -1589,8 +1593,15 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 						totalUploaded), getString(R.string.upload_uploaded),
 				Formatter.formatFileSize(CameraSyncService.this, totalSizeUploaded));
 		String title = getString(R.string.settings_camera_notif_complete);
-		Intent intent = new Intent(CameraSyncService.this, ManagerActivity.class);
-		intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, cameraUploadHandle);
+		Intent intent = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
+			intent.putExtra(ManagerActivityLollipop.EXTRA_OPEN_FOLDER, cameraUploadHandle);
+		}
+		else{
+			intent = new Intent(CameraSyncService.this, ManagerActivity.class);
+			intent.putExtra(ManagerActivity.EXTRA_OPEN_FOLDER, cameraUploadHandle);
+		}
 
 		mBuilderCompat
 			.setSmallIcon(R.drawable.ic_stat_camera_sync)
@@ -1640,31 +1651,38 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 		return null;
 	}
 	
-	private void showSyncError(final int errResId) {
-		handler.post(new Runnable() 
-		{
-			public void run()
-			{
-				log("show sync error");
-				Intent intent = new Intent(CameraSyncService.this, ManagerActivity.class);
-						
-				mBuilderCompat
-					.setSmallIcon(R.drawable.ic_stat_camera_sync)
-					.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
-					.setContentTitle(getString(R.string.settings_camera_notif_error))
-					.setContentText(getString(errResId))
-					.setOngoing(false);
-		
-				if (!isForeground) {
-					log("starting foreground!");
-					startForeground(notificationId, mBuilderCompat.build());
-					isForeground = true;
-				} else {
-					mNotificationManager.notify(notificationId, mBuilderCompat.build());
-				}
-			}}
-		);
-	}
+//	private void showSyncError(final int errResId) {
+//		handler.post(new Runnable() 
+//		{
+//			public void run()
+//			{
+//				log("show sync error");
+//				Intent intent = null;
+//				
+//				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+//					intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
+//				}
+//				else{
+//					intent = new Intent(CameraSyncService.this, ManagerActivity.class);
+//				}
+//						
+//				mBuilderCompat
+//					.setSmallIcon(R.drawable.ic_stat_camera_sync)
+//					.setContentIntent(PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0))
+//					.setContentTitle(getString(R.string.settings_camera_notif_error))
+//					.setContentText(getString(errResId))
+//					.setOngoing(false);
+//		
+////				if (!isForeground) {
+////					log("starting foreground!");
+////					startForeground(notificationId, mBuilderCompat.build());
+////					isForeground = true;
+////				} else {
+////					mNotificationManager.notify(notificationId, mBuilderCompat.build());
+////				}
+//			}}
+//		);
+//	}
 	
 	public static void log(String log){
 		Util.log("CameraSyncService", log);
@@ -1874,9 +1892,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
 				log("OVERQUOTA ERROR: "+e.getErrorCode());
 				
-				Intent intent = new Intent(this, ManagerActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
+				Intent intent = null;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+					intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+				}
+				else{
+					intent = new Intent(this, ManagerActivity.class);
+					intent.setAction(ManagerActivity.ACTION_OVERQUOTA_ALERT);
+				}			
+				
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);				
 				startActivity(intent);
 	
 			}
@@ -1941,8 +1967,17 @@ public class CameraSyncService extends Service implements MegaRequestListenerInt
 			}
 		}
 
-		Intent intent = new Intent(CameraSyncService.this, ManagerActivity.class);
-		intent.setAction(ManagerActivity.ACTION_CANCEL_CAM_SYNC);	
+		Intent intent = null;		
+		
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
+			intent = new Intent(CameraSyncService.this, ManagerActivityLollipop.class);
+			intent.setAction(ManagerActivityLollipop.ACTION_CANCEL_CAM_SYNC);	
+		}
+		else{
+			intent = new Intent(CameraSyncService.this, ManagerActivity.class);
+			intent.setAction(ManagerActivity.ACTION_CANCEL_CAM_SYNC);	
+		}
+		
 		String info = Util.getProgressSize(CameraSyncService.this, progress, totalSizeToUpload);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(CameraSyncService.this, 0, intent, 0);

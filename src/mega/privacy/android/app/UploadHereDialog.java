@@ -92,6 +92,7 @@ public class UploadHereDialog extends DialogFragment implements OnItemClickListe
 		if (item.type == null) {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {	
 				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
 				getActivity().startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
 			}
