@@ -29,11 +29,13 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -115,6 +117,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	private RecyclerView.LayoutManager mLayoutManager;
 	MegaNode selectedNode = null;
 	
+	SlidingUpPanelLayout.PanelSlideListener slidingPanelListener;
+	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
@@ -133,6 +137,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;	
 	public TextView propertiesText;
+	////
+	
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingUploadPanel;
+	public FrameLayout uploadOutLayout;
+	public LinearLayout uploadLayout;
+	public LinearLayout uploadImage;
+	public LinearLayout uploadAudio;
+	public LinearLayout uploadVideo;
+	public LinearLayout uploadFromSystem;	
 	////
 	
 	public class RecyclerViewOnGestureListener extends SimpleOnGestureListener{
@@ -564,9 +578,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);	
 			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+			slidingPanelListener = new SlidingUpPanelLayout.PanelSlideListener() {
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
@@ -597,7 +611,29 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });			
+	        };			
+			
+			slidingOptionsPanel.setPanelSlideListener(slidingPanelListener);			
+			
+			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
+			uploadLayout = (LinearLayout) v.findViewById(R.id.file_list_upload);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_upload);
+			uploadImage = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
+			uploadAudio= (LinearLayout) v.findViewById(R.id.file_list_upload_audio_layout);
+			uploadVideo = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
+			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_list_upload_from_system_layout);
+			
+			uploadImage.setOnClickListener(this);
+			uploadAudio.setOnClickListener(this);
+			uploadVideo.setOnClickListener(this);
+			uploadFromSystem.setOnClickListener(this);
+			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingUploadPanel.setVisibility(View.INVISIBLE);
+			slidingUploadPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingUploadPanel.setPanelSlideListener(slidingPanelListener);			
 			
 			return v;
 		}
@@ -946,6 +982,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}		
 	}
 	
+	public void showUploadPanel(){
+		log("showUploadPanel");
+		
+		fabButton.setVisibility(View.GONE);
+		slidingUploadPanel.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(PanelState.EXPANDED);
+	}
+	
+	public void hideUploadPanel(){
+		log("hideUploadPanel");
+		fabButton.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(PanelState.HIDDEN);
+		slidingUploadPanel.setVisibility(View.GONE);
+	}
+	
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");
 		
@@ -1012,6 +1063,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				
 	}
 		
+	@SuppressLint("InlinedApi")
 	@Override
 	public void onClick(View v) {
 
@@ -1019,8 +1071,45 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 			case R.id.file_upload_button:
 			case R.id.file_upload_button_grid:{
-				((ManagerActivityLollipop)getActivity()).uploadFile();
+//				((ManagerActivityLollipop)getActivity()).uploadFile();
+				showUploadPanel();
 				break;			
+			}
+			
+			case R.id.file_list_upload_audio_layout:{
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				intent.setType("audio/*");
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				break;
+			}
+			
+			case R.id.file_list_upload_video_layout:{
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				intent.setType("video/*");
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				break;
+			}
+			
+			case R.id.file_list_upload_image_layout:{
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				intent.setType("image/*");
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				break;
+			}
+			
+			case R.id.file_list_upload_from_system_layout:{
+				Intent intent = new Intent();
+				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
+				break;
 			}
 			
 			case R.id.out_space_btn:
