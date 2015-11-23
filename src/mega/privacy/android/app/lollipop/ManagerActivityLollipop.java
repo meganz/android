@@ -6015,8 +6015,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void uploadFile(){
-		uploadDialog = new UploadHereDialog();
-		uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+//		uploadDialog = new UploadHereDialog();
+//		uploadDialog.show(getSupportFragmentManager(), "fragment_upload");
+		fbFLol.showUploadPanel();
 	}
 	
 	public void upgradeAccountButton(){
