@@ -59,9 +59,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static String EXTRA_URL = "fileurl";
 	public static String EXTRA_SIZE = "filesize";
 	public static String EXTRA_DOCUMENT_HASHES = "document_hash";
-	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
+	public static String EXTRA_FROM_SETTINGS = "from_settings";
+//	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static String EXTRA_PATH = "filepath";
-	public static String EXTRA_FILES = "fileslist";
+	public static String EXTRA_FILES = "fileslist";	
 	
 	// Pick modes
 	public enum Mode {
@@ -106,6 +107,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	RecyclerView.LayoutManager mLayoutManager;
 	private TextView cancelButton;
 	GestureDetectorCompat detector;
+	
+	private Boolean fromSettings;
 	
 	private String url;
 	private long size;
@@ -336,10 +339,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		aB.setDisplayShowHomeEnabled(true);
 		
 		Intent intent = getIntent();
-		buttonPrefix = intent.getStringExtra(EXTRA_BUTTON_PREFIX);
-		if (buttonPrefix == null) {
-			buttonPrefix = "";
-		}
+		fromSettings = intent.getBooleanExtra(EXTRA_FROM_SETTINGS, true);
+
 		mode = Mode.getFromIntent(intent);
 		if (mode == Mode.PICK_FOLDER) {
 			documentHashes = intent.getExtras().getLongArray(EXTRA_DOCUMENT_HASHES);
@@ -368,15 +369,21 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
 		paramsb2.height = Util.scaleHeightPx(48, metrics);
 		
-		if (mode == Mode.PICK_FOLDER) {
-			button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-			paramsb2.width = Util.scaleWidthPx(95, metrics);
-			
-		}
-		else{
-			button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+		if(fromSettings){
+			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
 			paramsb2.width = Util.scaleWidthPx(73, metrics);
 		}
+		else{
+			if (mode == Mode.PICK_FOLDER) {
+				button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
+				paramsb2.width = Util.scaleWidthPx(95, metrics);
+				
+			}
+			else{
+				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
+				paramsb2.width = Util.scaleWidthPx(73, metrics);
+			}
+		}		
 		
 		button.setLayoutParams(paramsb2);
 		//Left and Right margin

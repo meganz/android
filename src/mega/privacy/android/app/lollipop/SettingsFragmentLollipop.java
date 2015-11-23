@@ -727,11 +727,12 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 
 	@Override
 	public boolean onPreferenceClick(Preference preference) {
+		log("onPreferenceClick");
 		prefs = dbH.getPreferences();
 		if (preference.getKey().compareTo(KEY_STORAGE_DOWNLOAD_LOCATION) == 0){
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.context_download_to));
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_DOWNLOAD_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CACHE) == 0){
@@ -818,7 +819,7 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		else if (preference.getKey().compareTo(KEY_LOCAL_SECONDARY_MEDIA_FOLDER) == 0){
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.general_select));
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_MEGA_SECONDARY_MEDIA_FOLDER) == 0){
@@ -975,9 +976,10 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 			dbH.setKeepFileNames(fileNames);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_CAMERA_FOLDER) == 0){
+			log("Changing the LOCAL folder for camera uploads");
 			Intent intent = new Intent(context, FileStorageActivityLollipop.class);
 			intent.setAction(FileStorageActivityLollipop.Mode.PICK_FOLDER.getAction());
-			intent.putExtra(FileStorageActivityLollipop.EXTRA_BUTTON_PREFIX, getString(R.string.general_select));
+			intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, true);
 			startActivityForResult(intent, REQUEST_CAMERA_FOLDER);
 		}
 		else if (preference.getKey().compareTo(KEY_CAMERA_UPLOAD_MEGA_FOLDER) == 0){
@@ -999,6 +1001,131 @@ public class SettingsFragmentLollipop extends PreferenceFragment implements OnPr
 		log("KEY = " + preference.getKey());
 		
 		return true;
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		log("onActivityResult");
+		
+		prefs = dbH.getPreferences();
+		if (requestCode == REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK && intent != null) {
+			String path = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			dbH.setStorageDownloadLocation(path);
+			downloadLocation.setSummary(path);
+		}		
+		else if (requestCode == REQUEST_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
+			//Local folder to sync
+			String cameraPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			dbH.setCamSyncLocalPath(cameraPath);
+			localCameraUploadFolder.setSummary(cameraPath);
+			dbH.setCamSyncTimeStamp(0);
+			
+			Intent photosVideosIntent = null;
+			photosVideosIntent = new Intent(context, CameraSyncService.class);
+			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+			context.startService(photosVideosIntent);
+			
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					log("Now I start the service");
+					context.startService(new Intent(context, CameraSyncService.class));		
+				}
+			}, 5 * 1000);
+		}
+		else if (requestCode == REQUEST_LOCAL_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
+			//Local folder to sync
+			String secondaryPath = intent.getStringExtra(FileStorageActivityLollipop.EXTRA_PATH);
+			
+			dbH.setSecondaryFolderPath(secondaryPath);
+			localSecondaryFolder.setSummary(secondaryPath);
+			dbH.setSecSyncTimeStamp(0);
+			
+			Intent photosVideosIntent = null;
+			photosVideosIntent = new Intent(context, CameraSyncService.class);
+			photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+			context.startService(photosVideosIntent);
+			
+			handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					log("Now I start the service");
+					context.startService(new Intent(context, CameraSyncService.class));		
+				}
+			}, 5 * 1000);
+		}		
+		else if (requestCode == REQUEST_MEGA_SECONDARY_MEDIA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
+			//Mega folder to sync
+			
+			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
+			if(handle!=-1){
+				dbH.setSecondaryFolderHandle(handle);						
+				
+				handleSecondaryMediaFolder = handle;
+				megaNodeSecondaryMediaFolder = megaApi.getNodeByHandle(handleSecondaryMediaFolder);
+				megaPathSecMediaFolder = megaNodeSecondaryMediaFolder.getName();
+				
+				megaSecondaryFolder.setSummary(megaPathSecMediaFolder);
+				dbH.setSecSyncTimeStamp(0);
+				
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+				
+				handler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						log("Now I start the service");
+						context.startService(new Intent(context, CameraSyncService.class));		
+					}
+				}, 5 * 1000);
+				
+				log("Mega folder to secondary uploads change!!");
+			}
+			else{
+				log("Error choosing the secondary uploads");
+			}
+			
+		}
+		else if (requestCode == REQUEST_MEGA_CAMERA_FOLDER && resultCode == Activity.RESULT_OK && intent != null){
+			//Mega folder to sync
+			
+			Long handle = intent.getLongExtra("SELECT_MEGA_FOLDER",-1);
+			if(handle!=-1){
+				dbH.setCamSyncHandle(handle);
+				
+				camSyncHandle = handle;
+				camSyncMegaNode = megaApi.getNodeByHandle(camSyncHandle);	
+				camSyncMegaPath = camSyncMegaNode.getName();
+				
+				megaCameraFolder.setSummary(camSyncMegaPath);
+				dbH.setCamSyncTimeStamp(0);
+				
+				Intent photosVideosIntent = null;
+				photosVideosIntent = new Intent(context, CameraSyncService.class);
+				photosVideosIntent.setAction(CameraSyncService.ACTION_LIST_PHOTOS_VIDEOS_NEW_FOLDER);
+				context.startService(photosVideosIntent);
+				
+				handler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						log("Now I start the service");
+						context.startService(new Intent(context, CameraSyncService.class));		
+					}
+				}, 5 * 1000);
+				
+				log("Mega folder to sync the Camera CHANGED!!");
+			}
+			else{
+				log("Error choosing the Mega folder to sync the Camera");
+			}
+			
+		}
 	}
 	
 	@Override
