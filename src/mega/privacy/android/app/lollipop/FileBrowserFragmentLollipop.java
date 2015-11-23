@@ -1695,16 +1695,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	}
 	
 	public void notifyDataSetChanged(){
-		if (isList){
-			if (adapter != null){
-				adapter.notifyDataSetChanged();
-			}
-		}
-		else{
-			if (adapter != null){
-				adapter.notifyDataSetChanged();
-			}
-		}
+		log("notifyDataSetChanged");
+		if (adapter != null){
+			adapter.notifyDataSetChanged();
+		}		
 	}
 	
 	public void setIsList(boolean isList){

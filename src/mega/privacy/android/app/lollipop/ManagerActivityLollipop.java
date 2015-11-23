@@ -1247,6 +1247,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			intent.setAction(null);
 				setIntent(null);
     		}
+    	}    	
+    	
+    	if (nV != null){
+    		switch(drawerItem){
+	    		case CLOUD_DRIVE:{
+	    			if(fbFLol!=null){
+	    				fbFLol.notifyDataSetChanged();
+	    				break;
+	    			}
+	    		}
+	    		case SHARED_ITEMS:{
+	    			if (viewPagerShares != null){
+	    				int index = viewPagerShares.getCurrentItem();
+	        			if(index==0){		        				
+	        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);
+	        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+	        				if (inSFLol != null){
+		   						inSFLol.refresh(parentHandleIncoming);
+	        				}
+	        			}
+	        			else{
+	        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+	        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+	        				if (outSFLol != null){
+	        					outSFLol.refresh(parentHandleOutgoing);
+	        				}
+	        			}	    			
+		    		}
+		    		break;	
+	    		}
+    		}
     	}
 	}
 	
