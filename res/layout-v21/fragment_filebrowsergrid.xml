@@ -4,17 +4,35 @@
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
     tools:context=".FileBrowserGridFragment" >
-
-    <TextView
-        android:id="@+id/content_grid_text"
+    
+   <RelativeLayout
+        android:id="@+id/content_grid_text_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/content_text_folder"
-        android:paddingBottom="3dp"
-        android:paddingLeft="8dp"
-        android:paddingTop="3dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        android:background="@color/content_text_background">
+
+        <TextView
+            android:id="@+id/content_grid_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"            
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+        
+       <ProgressBar
+		    android:id="@+id/file_grid_download_progress_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" 
+			android:layout_below="@id/content_grid_text" 
+			style="@style/UsedSpaceProgressBar"
+			android:visibility="gone"/>
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator_grid"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@id/content_grid_text_layout"
+        android:background="@color/delimiterColor" />    
 
     <ImageView
         android:id="@+id/file_grid_empty_image"
@@ -123,8 +141,7 @@
         android:id="@+id/file_grid_view_browser"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/buttons_grid_layout"
-        android:layout_below="@id/content_grid_text"
+        android:layout_below="@id/separator_grid"
         android:choiceMode="multipleChoice"
         android:columnWidth="172dp" />
 
@@ -157,7 +174,6 @@
         android:layout_width="fill_parent"
         android:layout_height="55dp"
         android:layout_alignParentBottom="true"
-        android:layout_below="@id/buttons_grid_layout"
         android:layout_gravity="center"
         android:background="@drawable/btn_default_holo_light_without_corners"
         android:textColor="@color/button_text"
