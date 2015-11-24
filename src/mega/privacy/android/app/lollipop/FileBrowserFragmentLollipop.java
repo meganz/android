@@ -618,7 +618,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
 			uploadLayout = (LinearLayout) v.findViewById(R.id.file_list_upload);
 			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_upload);
-			uploadImage = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
+			uploadImage = (LinearLayout) v.findViewById(R.id.file_list_upload_image_layout);
 			uploadAudio= (LinearLayout) v.findViewById(R.id.file_list_upload_audio_layout);
 			uploadVideo = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
 			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_list_upload_from_system_layout);
@@ -804,6 +804,24 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
+			uploadLayout = (LinearLayout) v.findViewById(R.id.file_grid_upload);
+			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_upload);
+			uploadImage = (LinearLayout) v.findViewById(R.id.file_grid_upload_image_layout);
+			uploadAudio= (LinearLayout) v.findViewById(R.id.file_grid_upload_audio_layout);
+			uploadVideo = (LinearLayout) v.findViewById(R.id.file_grid_upload_video_layout);
+			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_grid_upload_from_system_layout);
+			
+			uploadImage.setOnClickListener(this);
+			uploadAudio.setOnClickListener(this);
+			uploadVideo.setOnClickListener(this);
+			uploadFromSystem.setOnClickListener(this);
+			
+			optionsOutLayout.setOnClickListener(this);
+			
+			slidingUploadPanel.setVisibility(View.INVISIBLE);
+			slidingUploadPanel.setPanelState(PanelState.HIDDEN);
 			
 			/*slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
 	            @Override
@@ -1066,7 +1084,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	@SuppressLint("InlinedApi")
 	@Override
 	public void onClick(View v) {
-
+		log("onClick");
 		switch(v.getId()){
 	
 			case R.id.file_upload_button:
@@ -1076,7 +1094,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;			
 			}
 			
-			case R.id.file_list_upload_audio_layout:{
+			case R.id.file_list_upload_audio_layout:
+			case R.id.file_grid_upload_audio_layout:{
+				log("click upload audio");
+				hideUploadPanel();
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -1085,7 +1106,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;
 			}
 			
-			case R.id.file_list_upload_video_layout:{
+			case R.id.file_list_upload_video_layout:
+			case R.id.file_grid_upload_video_layout:{
+				log("click upload video");
+				hideUploadPanel();
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -1094,7 +1118,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;
 			}
 			
-			case R.id.file_list_upload_image_layout:{
+			case R.id.file_list_upload_image_layout:
+			case R.id.file_grid_upload_image_layout:{
+				log("click upload image");
+				hideUploadPanel();
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_GET_CONTENT);
 				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
@@ -1103,12 +1130,21 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;
 			}
 			
-			case R.id.file_list_upload_from_system_layout:{
+			case R.id.file_list_upload_from_system_layout:
+			case R.id.file_grid_upload_from_system_layout:{
+				log("click upload from_system");
+				hideUploadPanel();
 				Intent intent = new Intent();
 				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
 				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
 				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
 				((ManagerActivityLollipop)getActivity()).startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
+				break;
+			}
+			
+			case R.id.file_list_out_upload:
+			case R.id.file_grid_out_upload:{
+				hideUploadPanel();
 				break;
 			}
 			
