@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -85,7 +84,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		}
 		
 		if (aB == null){
-			aB = ((ActionBarActivity)context).getSupportActionBar();
+			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
 		aB.setTitle(getResources().getString(R.string.section_transfers));					

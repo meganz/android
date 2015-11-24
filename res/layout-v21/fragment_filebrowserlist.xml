@@ -17,6 +17,14 @@
             android:layout_height="wrap_content"            
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
+        
+       <ProgressBar
+		    android:id="@+id/file_list_download_progress_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" 
+			android:layout_below="@id/content_text" 
+			style="@style/UsedSpaceProgressBar"
+			android:visibility="gone"/>
     </RelativeLayout>
 
     <View
@@ -574,6 +582,7 @@
         android:id="@+id/sliding_layout_upload"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:gravity="bottom"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="true"

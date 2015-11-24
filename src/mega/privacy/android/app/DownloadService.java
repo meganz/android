@@ -642,8 +642,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	@SuppressLint("NewApi")
 	private void updateProgressNotification(final long progress) {
 		log("updateProgressNotification");
-		int progressPercent = (int) Math.round((double) progress / totalSizeToDownload
-				* 100);
+		int progressPercent = (int) Math.round((double) progress / totalSizeToDownload * 100);
 		log(progressPercent + " " + progress + " " + totalSizeToDownload);
 		int left = totalToDownload - (totalDownloaded + totalDownloadedError);
 		int current = totalToDownload - left + 1;

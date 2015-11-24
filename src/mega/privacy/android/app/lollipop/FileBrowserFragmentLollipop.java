@@ -8,18 +8,17 @@ import java.util.List;
 
 import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.ManagerActivity;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.MegaBrowserNewGridAdapter;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -35,7 +34,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -65,6 +63,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,11 +110,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
 	
+	ProgressBar progressBar;
+	
 	private ActionMode actionMode;
 
     ImageButton fabButton;
 	private RecyclerView.LayoutManager mLayoutManager;
 	MegaNode selectedNode = null;
+	
+	RelativeLayout contentTextLayout;
 	
 	SlidingUpPanelLayout.PanelSlideListener slidingPanelListener;
 	
@@ -380,6 +383,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 
 			nodes = megaApi.getChildren(megaApi.getRootNode(), orderGetChildren);
+			log("aB.setTitle fbF 1");
 			aB.setTitle(getString(R.string.section_cloud_drive));	
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -392,6 +396,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			nodes = megaApi.getChildren(parentNode, orderGetChildren);
 			
 			if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+				log("aB.setTitle fbF 2");
 				aB.setTitle(getString(R.string.section_cloud_drive));
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -428,15 +433,18 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
+			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
+			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
 			fabButton.setOnClickListener(this);
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.content_text);			
 			//Margins
 			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
-			contentTextParams.setMargins(Util.scaleWidthPx(60, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
@@ -507,6 +515,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (parentHandle == megaApi.getRootNode().getHandle()){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
+				log("aB.setTitle fbF 3");
 				aB.setTitle(getString(R.string.section_cloud_drive));
 			}
 			else{
@@ -660,12 +669,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.addOnItemTouchListener(this);
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
+			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
+			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
 			fabButton.setOnClickListener(this);
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
-			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
+			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);			
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
+
 			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
@@ -734,6 +751,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			if (parentHandle == megaApi.getRootNode().getHandle()){
 				MegaNode infoNode = megaApi.getRootNode();
 				contentText.setText(getInfoFolder(infoNode));
+				log("aB.setTitle fbF 4");
 				aB.setTitle(getString(R.string.section_cloud_drive));
 			}
 			else{
@@ -1015,6 +1033,24 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		slidingUploadPanel.setVisibility(View.GONE);
 	}
 	
+	public void showProgressBar(){
+		log("showProgressBar");
+		progressBar.setVisibility(View.VISIBLE);			
+		contentText.setText(R.string.text_downloading);
+		contentTextLayout.setOnClickListener(this);
+	}
+	
+	public void hideProgressBar(){
+		log("hideProgressBar");
+		progressBar.setVisibility(View.GONE);	
+		setContentText();
+		contentTextLayout.setOnClickListener(null);
+	}
+	
+	public void updateProgressBar(int progress){
+		progressBar.setProgress(progress);
+	}
+	
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");
 		
@@ -1086,6 +1122,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
+		
+			case R.id.content_text_layout:
+			case R.id.content_grid_text_layout:{
+				log("click show transfersFragment");
+				if(((ManagerActivityLollipop)getActivity()).transferInProgress()){
+					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
+				}				
+				break;
+			}
 	
 			case R.id.file_upload_button:
 			case R.id.file_upload_button_grid:{
@@ -1627,6 +1672,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						emptyTextView.setVisibility(View.GONE);
 
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+							log("aB.setTitle fbF 5");
 							aB.setTitle(getString(R.string.section_cloud_drive));	
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -1689,6 +1735,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						emptyTextView.setVisibility(View.GONE);
 
 						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+							log("aB.setTitle fbF 6");
 							aB.setTitle(getString(R.string.section_cloud_drive));	
 							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 							((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
@@ -1887,14 +1934,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			MegaNode infoNode = megaApi.getRootNode();
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_cloud_drive));
+				log("aB.setTitle fbF 10");
+//				aB.setTitle(getString(R.string.section_cloud_drive));
 			}
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(infoNode.getName());
+//				aB.setTitle(infoNode.getName());
 			}
 		}
 	}
