@@ -35,8 +35,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,6 +52,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 public class OfflineFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
@@ -84,6 +87,11 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;
+	RelativeLayout contentTextLayout;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -476,6 +484,11 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		}
 		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		
 		//Check pathNAvigation
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
@@ -492,7 +505,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text);		
 					
-			contentText = (TextView) v.findViewById(R.id.offline_content_text);
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_text_layout);
+
+			contentText = (TextView) v.findViewById(R.id.offline_content_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.offline_out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text);
@@ -719,8 +738,14 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			emptyImageView = (ImageView) v.findViewById(R.id.offline_empty_image_grid);
 			emptyTextView = (TextView) v.findViewById(R.id.offline_empty_text_grid);		
-					
-			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);
+
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.offline_content_grid_text_layout);
+
+			contentText = (TextView) v.findViewById(R.id.offline_content_text_grid);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.offline_out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text_grid);
