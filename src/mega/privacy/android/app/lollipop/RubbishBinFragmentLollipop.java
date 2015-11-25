@@ -9,6 +9,7 @@ import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 
 import mega.privacy.android.app.R;
@@ -56,6 +57,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -76,6 +79,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	Button outSpaceButton;
 	int usedSpacePerc;
 	
+	ProgressBar progressBar;
+	
 	boolean isList = true;
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -86,10 +91,16 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+	RelativeLayout contentTextLayout;
+	boolean downloadInProgress = false;
 	
 	MegaApiAndroid megaApi;
 	
 	private ActionMode actionMode;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -247,8 +258,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+		log("onCreateView");
 		
 		if (aB == null){
 			aB = ((AppCompatActivity)context).getSupportActionBar();
@@ -291,8 +302,14 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}			
 		}
+		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
 
 		if (isList){
+			log("isList View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbinlist, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
@@ -308,7 +325,16 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_list_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
-			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);
+			
+			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_list_download_progress_bar);
+			
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
+			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
+			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -358,18 +384,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			}	
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
-			}	
-			
-			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_rubbish_bin));
-				MegaNode infoNode = megaApi.getRubbishNode();
-				contentText.setText(getInfoFolder(infoNode));
-			}
-			else{
-				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(getInfoFolder(infoNode));
-			}
+			}				
 			
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
@@ -388,7 +403,26 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-			}	
+			}
+			
+			if (parentHandle == megaApi.getRubbishNode().getHandle()){
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+				}
+				else{
+					MegaNode infoNode = megaApi.getRubbishNode();
+					contentText.setText(getInfoFolder(infoNode));
+				}				
+			}
+			else{
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+				}
+				else{
+					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					contentText.setText(getInfoFolder(infoNode));
+				}
+			}
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_rubbish);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.rubbishbin_list_options);
@@ -448,6 +482,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			return v;
 		}
 		else{
+			log("isGrid View");
 			View v = inflater.inflate(R.layout.fragment_rubbishbingrid, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
@@ -469,7 +504,16 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyTextView = (TextView) v.findViewById(R.id.rubbishbin_grid_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
-			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);
+			
+			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_grid_download_progress_bar);
+			
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
+			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);			
+			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.RUBBISH_BIN_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -477,6 +521,25 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				adapter.setParentHandle(parentHandle);
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
+			}
+			
+			if (parentHandle == megaApi.getRubbishNode().getHandle()){
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+				}
+				else{
+					MegaNode infoNode = megaApi.getRubbishNode();
+					contentText.setText(getInfoFolder(infoNode));
+				}				
+			}
+			else{
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+				}
+				else{
+					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+					contentText.setText(getInfoFolder(infoNode));
+				}
 			}
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish_grid);
@@ -520,17 +583,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
 			}	
-			
-			if (parentHandle == megaApi.getRubbishNode().getHandle()){
-//				aB.setTitle(getString(R.string.section_rubbish_bin));
-				MegaNode infoNode = megaApi.getRubbishNode();
-				contentText.setText(getInfoFolder(infoNode));
-			}
-			else{
-				aB.setTitle(megaApi.getNodeByHandle(parentHandle).getName());
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(getInfoFolder(infoNode));
-			}
 			
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
@@ -606,13 +658,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	            }
 	        });
 			
-			return v;
-			
-			
-			
-			
-			
-			
+			return v;			
 //			
 //			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 //			DisplayMetrics outMetrics = new DisplayMetrics ();
@@ -748,6 +794,32 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		slidingOptionsPanel.setVisibility(View.GONE);
 	}
 	
+	public void showProgressBar(){
+		log("showProgressBar");
+		downloadInProgress = true;
+		progressBar.setVisibility(View.VISIBLE);			
+		contentText.setText(R.string.text_downloading);
+		contentTextLayout.setOnClickListener(this);
+	}
+	
+	public void hideProgressBar(){
+		log("hideProgressBar");
+		downloadInProgress = false;
+		progressBar.setVisibility(View.GONE);	
+		setContentText();
+		contentTextLayout.setOnClickListener(null);
+	}
+	
+	public void updateProgressBar(int progress){
+		if(downloadInProgress){
+			progressBar.setProgress(progress);
+		}
+		else{
+			showProgressBar();
+			progressBar.setProgress(progress);
+		}
+	}
+	
 	public PanelState getPanelState ()
 	{
 		log("getPanelState: "+slidingOptionsPanel.getPanelState());
@@ -765,6 +837,15 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void onClick(View v) {
 
 		switch(v.getId()){
+		
+			case R.id.rubbishbin_content_text_layout:
+			case R.id.rubbishbin_grid_content_text_layout:{
+				log("click show transfersFragment");
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
+				}				
+				break;
+			}
 		 	case R.id.out_space_btn_grid_rubbish:
 			case R.id.out_space_btn_rubbish:
 			{
@@ -1010,7 +1091,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
 				if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
-					aB.setTitle(getString(R.string.section_rubbish_bin));	
+//					aB.setTitle(getString(R.string.section_rubbish_bin));	
 					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 				}
@@ -1078,19 +1159,17 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	}
 	
 	public void setContentText(){
-		
+		log("setContentText");
 		if (parentHandle == megaApi.getRubbishNode().getHandle()){
 			MegaNode infoNode = megaApi.getRubbishNode();
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(getString(R.string.section_rubbish_bin));
 			}
 		}
 		else{
 			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 			if (infoNode !=  null){
 				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(infoNode.getName());
 			}
 		}
 	}

@@ -1375,30 +1375,90 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				fbFLol.setIsList(isListCloudDrive);
     				fbFLol.setParentHandle(parentHandleBrowser);
     				fbFLol.setOrder(orderGetChildren);
-    				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
-					if (parentNode != null){
-						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-							log("aB.setTitle3");
-							aB.setTitle(getString(R.string.section_cloud_drive));
-							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-							firstNavigationLevel = true;
-						}
-						else{
-							aB.setTitle(parentNode.getName());
-							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
-							firstNavigationLevel = false;
-						}
-					}
-					else{
-						parentHandleBrowser = megaApi.getRootNode().getHandle();
-						parentNode = megaApi.getRootNode();
-						log("aB.setTitle4");
-						aB.setTitle(getString(R.string.section_cloud_drive));
-						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-						firstNavigationLevel = true;
-					}
-					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
-					fbFLol.setNodes(nodes);
+    				//Check viewPager to determine the tab shown
+    				
+    				if(viewPagerCDrive!=null){
+    					int index = viewPagerCDrive.getCurrentItem();
+            			log("Fragment Index: " + index);
+            			if(index == 1){
+            				//Rubbish Bin TAB
+            				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleRubbish);
+        					if (parentNode != null){
+        						if (parentNode.getHandle() == megaApi.getRubbishNode().getHandle()){
+        							log("aB.setTitle3");
+        							aB.setTitle(getString(R.string.section_rubbish_bin));
+        							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        							firstNavigationLevel = true;
+        						}
+        						else{
+        							aB.setTitle(parentNode.getName());
+        							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        							firstNavigationLevel = false;
+        						}
+        					}
+        					else{
+        						parentHandleRubbish = megaApi.getRubbishNode().getHandle();
+        						parentNode = megaApi.getRootNode();
+        						aB.setTitle(getString(R.string.section_rubbish_bin));
+        						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        						firstNavigationLevel = true;
+        					}
+        					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+        					rbFLol.setNodes(nodes);
+            			}
+            			else{
+            				MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+        					if (parentNode != null){
+        						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+        							log("aB.setTitle3");
+        							aB.setTitle(getString(R.string.section_cloud_drive));
+        							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        							firstNavigationLevel = true;
+        						}
+        						else{
+        							aB.setTitle(parentNode.getName());
+        							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+        							firstNavigationLevel = false;
+        						}
+        					}
+        					else{
+        						parentHandleBrowser = megaApi.getRootNode().getHandle();
+        						parentNode = megaApi.getRootNode();
+        						log("aB.setTitle4");
+        						aB.setTitle(getString(R.string.section_cloud_drive));
+        						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        						firstNavigationLevel = true;
+        					}
+        					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+        					fbFLol.setNodes(nodes);
+            			}
+    				}
+    				else{
+    					MegaNode parentNode = megaApi.getNodeByHandle(parentHandleBrowser);
+    					if (parentNode != null){
+    						if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
+    							log("aB.setTitle3");
+    							aB.setTitle(getString(R.string.section_cloud_drive));
+    							aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    							firstNavigationLevel = true;
+    						}
+    						else{
+    							aB.setTitle(parentNode.getName());
+    							aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
+    							firstNavigationLevel = false;
+    						}
+    					}
+    					else{
+    						parentHandleBrowser = megaApi.getRootNode().getHandle();
+    						parentNode = megaApi.getRootNode();
+    						log("aB.setTitle4");
+    						aB.setTitle(getString(R.string.section_cloud_drive));
+    						aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+    						firstNavigationLevel = true;
+    					}
+    					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
+    					fbFLol.setNodes(nodes);
+    				}    				
     			} 
     			
     			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){
@@ -8347,6 +8407,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (fbFLol != null){
 							fbFLol.hideProgressBar();
 						}
+						if (rbFLol != null){						
+							rbFLol.hideProgressBar();
+						}
 					}
 				}
 				else{
@@ -8354,6 +8417,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					//Hide Transfer ProgressBar
 					if (fbFLol != null){						
 						fbFLol.hideProgressBar();
+					}
+					if (rbFLol != null){						
+						rbFLol.hideProgressBar();
 					}
 
 				}				
@@ -8901,6 +8967,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					fbFLol.showProgressBar();
 					fbFLol.updateProgressBar(progressPercent);
 				}
+				if (rbFLol != null){						
+					rbFLol.showProgressBar();
+					rbFLol.updateProgressBar(progressPercent);
+				}
 			}
 		}
 
@@ -8958,6 +9028,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (fbFLol != null){	
 				fbFLol.updateProgressBar(progressPercent);
 			}
+			if (rbFLol != null){	
+				rbFLol.updateProgressBar(progressPercent);
+			}
 		}
 		else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
 			
@@ -8972,6 +9045,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (fbFLol != null){	
 				fbFLol.updateProgressBar(progressPercent);
 			}
+			if (rbFLol != null){	
+				rbFLol.updateProgressBar(progressPercent);
+			}
 		}
 
 		//Update transfer list
@@ -8984,6 +9060,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (fbFLol != null){						
 					fbFLol.hideProgressBar();
 				}
+				if (rbFLol != null){						
+					rbFLol.hideProgressBar();
+				}
 			}
 		}
 		else{
@@ -8991,6 +9070,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			//Hide Transfer ProgressBar
 			if (fbFLol != null){						
 				fbFLol.hideProgressBar();
+			}
+			if (rbFLol != null){						
+				rbFLol.hideProgressBar();
 			}
 		}
 		
@@ -9048,6 +9130,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
 		if (fbFLol != null){	
 			fbFLol.updateProgressBar(progressPercent);
+		}
+		if (rbFLol != null){	
+			rbFLol.updateProgressBar(progressPercent);
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -9116,7 +9201,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return true;
 	}
 	
-	public boolean transferInProgress(){
+	public boolean isTransferInProgress(){
 		//Update transfer list
 		tL = megaApi.getTransfers();		
 		if (tL != null){
