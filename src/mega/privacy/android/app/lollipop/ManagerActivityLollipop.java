@@ -1850,6 +1850,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			if (aB == null){
     				aB = getSupportActionBar();
     			}
+    			log("aB.setTitle SHARED_ITEMS");
     			aB.setTitle(getString(R.string.section_shared_items));
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -2410,41 +2411,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			ft.commit();
     			
     			drawerLayout.closeDrawer(Gravity.LEFT);
-    			
-    			//Options menu
-				searchMenuItem.setVisible(false);				
-				//Hide
-				createFolderMenuItem.setVisible(false);
-				addContactMenuItem.setVisible(false);
-    			addMenuItem.setVisible(false);
-    			sortByMenuItem.setVisible(false);
-    			selectMenuItem.setVisible(false);
-    			unSelectMenuItem.setVisible(false);
-    			thumbViewMenuItem.setVisible(false);
-    			addMenuItem.setEnabled(false);
-    			createFolderMenuItem.setEnabled(false);
-    			rubbishBinMenuItem.setVisible(false);
-    			clearRubbishBinMenuitem.setVisible(false);
-    			importLinkMenuItem.setVisible(false);
-    			takePicture.setVisible(false);
-				settingsMenuItem.setVisible(false);
-				refreshMenuItem.setVisible(false);
-				helpMenuItem.setVisible(false);
-				upgradeAccountMenuItem.setVisible(false);
-				changePass.setVisible(false);
-				cancelSubscription.setVisible(false);				
-				killAllSessions.setVisible(false);
-				
-				cancelAllTransfersMenuItem.setVisible(true);
-				
-				if(tranfersPaused){
-					playTransfersMenuIcon.setVisible(true);
-					pauseTransfersMenuIcon.setVisible(false);
-				}
-				else{
-					playTransfersMenuIcon.setVisible(true);
-					pauseTransfersMenuIcon.setVisible(false);
-				}
+    			if (createFolderMenuItem != null){
+        			//Options menu
+    				searchMenuItem.setVisible(false);				
+    				//Hide
+    				createFolderMenuItem.setVisible(false);
+    				addContactMenuItem.setVisible(false);
+        			addMenuItem.setVisible(false);
+        			sortByMenuItem.setVisible(false);
+        			selectMenuItem.setVisible(false);
+        			unSelectMenuItem.setVisible(false);
+        			thumbViewMenuItem.setVisible(false);
+        			addMenuItem.setEnabled(false);
+        			createFolderMenuItem.setEnabled(false);
+        			rubbishBinMenuItem.setVisible(false);
+        			clearRubbishBinMenuitem.setVisible(false);
+        			importLinkMenuItem.setVisible(false);
+        			takePicture.setVisible(false);
+    				settingsMenuItem.setVisible(false);
+    				refreshMenuItem.setVisible(false);
+    				helpMenuItem.setVisible(false);
+    				upgradeAccountMenuItem.setVisible(false);
+    				changePass.setVisible(false);
+    				cancelSubscription.setVisible(false);				
+    				killAllSessions.setVisible(false);
+    				
+    				cancelAllTransfersMenuItem.setVisible(true);
+    				
+    				if(tranfersPaused){
+    					playTransfersMenuIcon.setVisible(true);
+    					pauseTransfersMenuIcon.setVisible(false);
+    				}
+    				else{
+    					playTransfersMenuIcon.setVisible(true);
+    					pauseTransfersMenuIcon.setVisible(false);
+    				}
+    			}
 
     			break;
     		}
@@ -3555,12 +3557,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(swmTag);	
 	        		if (viewPagerShares.getCurrentItem()==1){	
 		        		if (outSFLol != null){        			
-		        			this.uploadFile();
+//		        			this.uploadFile();
+		        			outSFLol.showUploadPanel();
 		        		}
 	        		}
 	        	}	
 	        	else {
-	        		this.uploadFile();
+	        		fbFLol.showUploadPanel();
 	        	}
 	        	
 	        	return true;     	
@@ -8399,6 +8402,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFER){
 			if (e.getErrorCode() == MegaError.API_OK){
+				totalSizeToDownload = 0;
 				tL = megaApi.getTransfers();				
 				if (tL != null){
 					log("Hide Transfer ProgressBar: "+tL.size());
@@ -8410,6 +8414,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (rbFLol != null){						
 							rbFLol.hideProgressBar();
 						}
+						if (iFLol != null){						
+							iFLol.hideProgressBar();
+						}
+						if (outSFLol != null){						
+							outSFLol.hideProgressBar();
+						}
 					}
 				}
 				else{
@@ -8420,6 +8430,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					if (rbFLol != null){						
 						rbFLol.hideProgressBar();
+					}
+					if (iFLol != null){						
+						iFLol.hideProgressBar();
+					}
+					if (outSFLol != null){						
+						outSFLol.hideProgressBar();
 					}
 
 				}				
@@ -8451,12 +8467,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					
 					fbFLol.setTransfers(mTHash);
 				}
-			}
-		}
-		if (request.getType() == MegaRequest.TYPE_CANCEL_TRANSFERS){
-			log("cancel_transfers received");
-			if (e.getErrorCode() == MegaError.API_OK){
-				totalSizeToDownload = 0;
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
@@ -8835,7 +8845,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if(index==1){				
 				//OUTGOING				
 				String cFTag2 = getFragmentTag(R.id.shares_tabs_pager, 1);		
-				log("Tag: "+ cFTag2);
+				log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag2);
 				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
 				if (outSFLol != null){					
 					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
@@ -8856,7 +8866,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			else{			
 				//InCOMING
 				String cFTag1 = getFragmentTag(R.id.shares_tabs_pager, 0);	
-				log("Tag: "+ cFTag1);
+				log("DrawerItem.SHARED_ITEMS Tag: "+ cFTag1);
 				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
 				if (inSFLol != null){					
 					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
@@ -8971,6 +8981,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rbFLol.showProgressBar();
 					rbFLol.updateProgressBar(progressPercent);
 				}
+				if (iFLol != null){
+					iFLol.showProgressBar();
+					iFLol.updateProgressBar(progressPercent);
+				}
+				if (outSFLol != null){
+					outSFLol.showProgressBar();
+					outSFLol.updateProgressBar(progressPercent);
+				}
 			}
 		}
 
@@ -9031,6 +9049,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (rbFLol != null){	
 				rbFLol.updateProgressBar(progressPercent);
 			}
+			if (iFLol != null){	
+				iFLol.updateProgressBar(progressPercent);
+			}
+			if (outSFLol != null){	
+				outSFLol.updateProgressBar(progressPercent);
+			}
 		}
 		else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
 			
@@ -9048,6 +9072,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (rbFLol != null){	
 				rbFLol.updateProgressBar(progressPercent);
 			}
+			if (iFLol != null){	
+				iFLol.updateProgressBar(progressPercent);
+			}
+			if (outSFLol != null){	
+				outSFLol.updateProgressBar(progressPercent);
+			}
 		}
 
 		//Update transfer list
@@ -9063,6 +9093,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (rbFLol != null){						
 					rbFLol.hideProgressBar();
 				}
+				if (iFLol != null){	
+					iFLol.hideProgressBar();
+				}
+				if (outSFLol != null){	
+					outSFLol.hideProgressBar();
+				}
 			}
 		}
 		else{
@@ -9073,6 +9109,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			if (rbFLol != null){						
 				rbFLol.hideProgressBar();
+			}
+			if (iFLol != null){	
+				iFLol.hideProgressBar();
+			}
+			if (outSFLol != null){	
+				outSFLol.hideProgressBar();
 			}
 		}
 		
@@ -9133,6 +9175,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		if (rbFLol != null){	
 			rbFLol.updateProgressBar(progressPercent);
+		}
+		if (iFLol != null){	
+			iFLol.updateProgressBar(progressPercent);
+		}
+		if (outSFLol != null){	
+			outSFLol.updateProgressBar(progressPercent);
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){

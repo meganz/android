@@ -241,6 +241,7 @@
 	<string name="download_failed" context="Error message">Descarga fallida</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">descargado</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Descargando</string>
+		<string name="text_downloading" context="Text located in each fragment when a download is in progress">Transfiriendo&#8230;</string>
 	<string name="download_preparing_files" context="message before the download or upload start ">Preparando archivos</string>
     <string name="download_began" context="message when the download starts">La descarga ha comenzado</string>
     <string name="download_cancel_downloading" context="Confirmation text when attempting to cancel the download">¿Desea cancelar la descarga?</string>

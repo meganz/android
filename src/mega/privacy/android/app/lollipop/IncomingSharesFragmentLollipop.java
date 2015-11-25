@@ -474,7 +474,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				aB.setTitle(getInfoNode());
 				contentText.setVisibility(View.VISIBLE);
 			}	
 //			setNodes(nodes);	
