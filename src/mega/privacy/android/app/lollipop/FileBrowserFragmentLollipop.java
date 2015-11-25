@@ -84,6 +84,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	TextView contentText;	
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
+	ProgressBar progressBar;
+	
 	LinearLayout outSpaceLayout=null;
 	TextView outSpaceText;
 	Button outSpaceButton;
@@ -110,8 +112,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ArrayList<MegaNode> nodes;
 	
 	HashMap<Long, MegaTransfer> mTHash = null;
-	
-	ProgressBar progressBar;
 	
 	private ActionMode actionMode;
 
@@ -443,10 +443,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
-				showProgressBar();
-			}
-			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
@@ -633,7 +629,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
 			uploadLayout = (LinearLayout) v.findViewById(R.id.file_list_upload);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_upload);
+			uploadOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_upload);
 			uploadImage = (LinearLayout) v.findViewById(R.id.file_list_upload_image_layout);
 			uploadAudio= (LinearLayout) v.findViewById(R.id.file_list_upload_audio_layout);
 			uploadVideo = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
@@ -644,7 +640,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			uploadVideo.setOnClickListener(this);
 			uploadFromSystem.setOnClickListener(this);
 			
-			optionsOutLayout.setOnClickListener(this);
+			uploadOutLayout.setOnClickListener(this);
 			
 			slidingUploadPanel.setVisibility(View.INVISIBLE);
 			slidingUploadPanel.setPanelState(PanelState.HIDDEN);		
@@ -850,7 +846,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			uploadVideo.setOnClickListener(this);
 			uploadFromSystem.setOnClickListener(this);
 			
-			optionsOutLayout.setOnClickListener(this);
+			uploadOutLayout.setOnClickListener(this);
 			
 			slidingUploadPanel.setVisibility(View.INVISIBLE);
 			slidingUploadPanel.setPanelState(PanelState.HIDDEN);
@@ -1415,7 +1411,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					
 					parentHandle = nodes.get(position).getHandle();
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-					contentText.setText(getInfoFolder(infoNode));
+					if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+						showProgressBar();
+					}
+					else{					
+						contentText.setText(getInfoFolder(infoNode));
+					}
 					((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
 					adapter.setParentHandle(parentHandle);
 					nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -1668,6 +1669,11 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			return 4;
 		}
 		
+		if(slidingUploadPanel.getVisibility()==View.VISIBLE){
+			hideUploadPanel();
+			return 4;
+		}
+		
 		log("Sliding not shown");
 
 		if (isList){
@@ -1725,7 +1731,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					        }
 					    });
 						adapter.setParentHandle(parentHandle);
-						contentText.setText(getInfoFolder(parentNode));
+						if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+							showProgressBar();
+						}
+						else{					
+							contentText.setText(getInfoFolder(parentNode));
+						}
 						return 2;
 					}
 					else{
@@ -1788,7 +1799,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					        }
 					    });
 						adapter.setParentHandle(parentHandle);
-						contentText.setText(getInfoFolder(parentNode));
+						if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+							showProgressBar();
+						}
+						else{					
+							contentText.setText(getInfoFolder(parentNode));
+						}						
 						return 2;
 					}
 					else{

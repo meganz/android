@@ -10,6 +10,7 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.FileBrowserFragmentLollipop.RecyclerViewOnGestureListener;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -56,6 +57,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -85,10 +88,17 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
+	RelativeLayout contentTextLayout;
+	boolean downloadInProgress = false;
+	ProgressBar progressBar;
 	
 	MegaApiAndroid megaApi;
 	
 	private ActionMode actionMode;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -275,8 +285,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	}
 	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		log("onCreateView");
 		
 		if (aB == null){
@@ -294,6 +303,11 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
 
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
@@ -311,7 +325,16 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_list_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
-			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);
+			
+			progressBar = (ProgressBar) v.findViewById(R.id.inbox_list_download_progress_bar);
+			
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
+			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
+			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -368,7 +391,14 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			adapter.setMultipleSelect(false);
 
 			recyclerView.setAdapter(adapter);
-			contentText.setText(getInfoFolder(inboxNode));
+			
+			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+				showProgressBar();
+			}
+			else{					
+				contentText.setText(getInfoFolder(inboxNode));
+			}			
+			
 			setNodes(nodes);
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_inbox);
@@ -430,23 +460,12 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	                log("onPanelHidden");                
 	            }
 	        });
-			
-			
-			
-			
+						
 			return v;
 		}
 		else{
 			View v = inflater.inflate(R.layout.fragment_inboxgrid, container, false);
-			
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
-			
-		    float scaleW = Util.getScaleW(outMetrics, density);
-		    float scaleH = Util.getScaleH(outMetrics, density);
-		    
+    
 		    int totalWidth = outMetrics.widthPixels;
 		    int totalHeight = outMetrics.heightPixels;
 		    
@@ -460,8 +479,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		    	if (numberOfCells < 2){
 					numberOfCells = 2;
 				}	
-		    }
-		    
+		    }		    
 		    
 		    detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 			
@@ -482,7 +500,15 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView = (TextView) v.findViewById(R.id.inbox_grid_empty_text);
 			emptyImageView.setImageResource(R.drawable.rubbish_bin_empty);
 			emptyTextView.setText(R.string.file_browser_empty_folder);
-			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);
+			
+			progressBar = (ProgressBar) v.findViewById(R.id.inbox_grid_download_progress_bar);
+			
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
+			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
 			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.INBOX_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
@@ -493,19 +519,16 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
 			
-			
-			
-			/*if (adapter == null){
-				adapter = new MegaBrowserNewGridAdapter(context, nodes, parentHandle, listView, aB, numberOfCells, ManagerActivityLollipop.INBOX_ADAPTER, orderGetChildren, emptyImageView, emptyTextView, null, null, contentText);
-			}
-			else{
-				adapterGrid.setParentHandle(parentHandle);
-				adapterGrid.setNodes(nodes);
-			}*/			
-			
 			adapter.setPositionClicked(-1);
 			recyclerView.setAdapter(adapter);
-			contentText.setText(getInfoFolder(inboxNode));
+
+			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+				showProgressBar();
+			}
+			else{					
+				contentText.setText(getInfoFolder(inboxNode));
+			}
+			
 			setNodes(nodes);
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_inbox_grid);
@@ -609,6 +632,32 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		log("Show the slidingPanel");
 	}
 	
+	public void showProgressBar(){
+		log("showProgressBar");
+		downloadInProgress = true;
+		progressBar.setVisibility(View.VISIBLE);			
+		contentText.setText(R.string.text_downloading);
+		contentTextLayout.setOnClickListener(this);
+	}
+	
+	public void hideProgressBar(){
+		log("hideProgressBar");
+		downloadInProgress = false;
+		progressBar.setVisibility(View.GONE);	
+		contentText.setText(getInfoFolder(inboxNode));
+		contentTextLayout.setOnClickListener(null);
+	}
+	
+	public void updateProgressBar(int progress){
+		if(downloadInProgress){
+			progressBar.setProgress(progress);
+		}
+		else{
+			showProgressBar();
+			progressBar.setProgress(progress);
+		}
+	}
+	
 	public PanelState getPanelState ()
 	{
 		log("getPanelState: "+slidingOptionsPanel.getPanelState());
@@ -626,6 +675,15 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public void onClick(View v) {
 
 		switch(v.getId()){
+			case R.id.inbox_list_content_text_layout:
+			case R.id.inbox_grid_content_text_layout:{
+				log("click show transfersFragment");
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
+				}				
+				break;
+			}
+		
 			case R.id.out_space_btn_inbox:{
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
