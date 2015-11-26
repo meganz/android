@@ -3039,14 +3039,34 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					thumbViewMenuItem.setVisible(true); 
 
 					addMenuItem.setEnabled(true);
-					addMenuItem.setVisible(true);
 
 					log("parentHandleIncoming: "+parentHandleIncoming);
 					if(parentHandleIncoming==-1){
 						addMenuItem.setVisible(false);
 					}
 					else{
-						addMenuItem.setVisible(true);
+						MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+						if(node!=null){
+							//Check the folder's permissions
+							int accessLevel= megaApi.getAccess(node);
+							log("Node: "+node.getName());
+																					
+							switch(accessLevel){
+								case MegaShare.ACCESS_OWNER:
+								case MegaShare.ACCESS_READWRITE:
+								case MegaShare.ACCESS_FULL:{
+									addMenuItem.setVisible(true);
+									break;
+								}
+								case MegaShare.ACCESS_READ:{
+									addMenuItem.setVisible(false);
+									break;
+								}						
+							}			
+						}
+						else{
+							addMenuItem.setVisible(false);
+						}						
 					}
 					
 					if(inSFLol.getItemCount()>0){
