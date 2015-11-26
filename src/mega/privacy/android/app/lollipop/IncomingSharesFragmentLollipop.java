@@ -102,6 +102,16 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	private ActionMode actionMode;
 	
+	SlidingUpPanelLayout.PanelSlideListener slidingPanelListener;
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingUploadPanel;
+	public FrameLayout uploadOutLayout;
+	public LinearLayout uploadLayout;
+	public LinearLayout uploadImage;
+	public LinearLayout uploadAudio;
+	public LinearLayout uploadVideo;
+	public LinearLayout uploadFromSystem;	
+	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
 	public FrameLayout optionsOutLayout;
@@ -351,6 +361,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			outSpaceButton.setOnClickListener(this);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+			fabButton.setOnClickListener(this);
 			fabButton.setVisibility(View.GONE);
 			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
@@ -520,7 +531,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
 			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);		
 			
-			slidingOptionsPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+			slidingPanelListener = new SlidingUpPanelLayout.PanelSlideListener() {
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
@@ -551,7 +562,29 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	            public void onPanelHidden(View panel) {
 	                log("onPanelHidden");                
 	            }
-	        });
+	        };			
+			
+			slidingOptionsPanel.setPanelSlideListener(slidingPanelListener);	
+			
+			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
+			uploadLayout = (LinearLayout) v.findViewById(R.id.file_list_upload);
+			uploadOutLayout = (FrameLayout) v.findViewById(R.id.file_list_out_upload);
+			uploadImage = (LinearLayout) v.findViewById(R.id.file_list_upload_image_layout);
+			uploadAudio= (LinearLayout) v.findViewById(R.id.file_list_upload_audio_layout);
+			uploadVideo = (LinearLayout) v.findViewById(R.id.file_list_upload_video_layout);
+			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_list_upload_from_system_layout);
+			
+			uploadImage.setOnClickListener(this);
+			uploadAudio.setOnClickListener(this);
+			uploadVideo.setOnClickListener(this);
+			uploadFromSystem.setOnClickListener(this);
+			
+			uploadOutLayout.setOnClickListener(this);
+			
+			slidingUploadPanel.setVisibility(View.INVISIBLE);
+			slidingUploadPanel.setPanelState(PanelState.HIDDEN);		
+			
+			slidingUploadPanel.setPanelSlideListener(slidingPanelListener);
 			
 			return v;
 		}
@@ -592,6 +625,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			outSpaceButton.setOnClickListener(this);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
+			fabButton.setOnClickListener(this);
 			fabButton.setVisibility(View.GONE);
 			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
@@ -795,6 +829,24 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	            }
 	        });
 			
+			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
+			uploadLayout = (LinearLayout) v.findViewById(R.id.file_grid_upload);
+			uploadOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_upload);
+			uploadImage = (LinearLayout) v.findViewById(R.id.file_grid_upload_image_layout);
+			uploadAudio= (LinearLayout) v.findViewById(R.id.file_grid_upload_audio_layout);
+			uploadVideo = (LinearLayout) v.findViewById(R.id.file_grid_upload_video_layout);
+			uploadFromSystem = (LinearLayout) v.findViewById(R.id.file_grid_upload_from_system_layout);
+			
+			uploadImage.setOnClickListener(this);
+			uploadAudio.setOnClickListener(this);
+			uploadVideo.setOnClickListener(this);
+			uploadFromSystem.setOnClickListener(this);
+			
+			uploadOutLayout.setOnClickListener(this);
+			
+			slidingUploadPanel.setVisibility(View.INVISIBLE);
+			slidingUploadPanel.setPanelState(PanelState.HIDDEN);
+			
 			return v;
 		}		
 	}
@@ -862,10 +914,32 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	}
 	
+	public void showUploadPanel(){
+		log("showUploadPanel");
+		
+		fabButton.setVisibility(View.GONE);
+		slidingUploadPanel.setVisibility(View.VISIBLE);
+		slidingUploadPanel.setPanelState(PanelState.EXPANDED);
+	}
+	
+	public void hideUploadPanel(){
+		log("hideUploadPanel");
+		if(deepBrowserTree==0){
+			fabButton.setVisibility(View.GONE);
+		}
+		else{
+			fabButton.setVisibility(View.VISIBLE);
+		}
+		slidingUploadPanel.setPanelState(PanelState.HIDDEN);
+		slidingUploadPanel.setVisibility(View.GONE);
+	}
+	
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");		
 	
 		this.selectedNode = sNode;
+		
+		fabButton.setVisibility(View.GONE);
 		
 		if (selectedNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
@@ -944,6 +1018,13 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	public void hideOptionsPanel(){
 		log("hideOptionsPanel");
+		
+		if(deepBrowserTree==0){
+			fabButton.setVisibility(View.GONE);
+		}
+		else{
+			fabButton.setVisibility(View.VISIBLE);
+		}
 				
 		adapter.setPositionClicked(-1);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
@@ -982,6 +1063,68 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 				
+			case R.id.file_upload_button:
+			case R.id.file_upload_button_grid:{
+				log("file_upload_button");
+//				((ManagerActivityLollipop)getActivity()).uploadFile();
+				showUploadPanel();
+				break;			
+			}
+			
+			case R.id.file_list_upload_audio_layout:
+			case R.id.file_grid_upload_audio_layout:{
+				log("click upload audio");
+				hideUploadPanel();
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				intent.setType("audio/*");
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				break;
+			}
+			
+			case R.id.file_list_upload_video_layout:
+			case R.id.file_grid_upload_video_layout:{
+				log("click upload video");
+				hideUploadPanel();
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				intent.setType("video/*");
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				break;
+			}
+			
+			case R.id.file_list_upload_image_layout:
+			case R.id.file_grid_upload_image_layout:{
+				log("click upload image");
+				hideUploadPanel();
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_GET_CONTENT);
+				intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				intent.setType("image/*");
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(Intent.createChooser(intent, null), ManagerActivityLollipop.REQUEST_CODE_GET);
+				break;
+			}
+			
+			case R.id.file_list_upload_from_system_layout:
+			case R.id.file_grid_upload_from_system_layout:{
+				log("click upload from_system");
+				hideUploadPanel();
+				Intent intent = new Intent();
+				intent.setAction(FileStorageActivityLollipop.Mode.PICK_FILE.getAction());
+				intent.putExtra(FileStorageActivityLollipop.EXTRA_FROM_SETTINGS, false);
+				intent.setClass(getActivity(), FileStorageActivityLollipop.class);
+				((ManagerActivityLollipop)getActivity()).startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_GET_LOCAL);
+				break;
+			}
+			
+			case R.id.file_list_out_upload:
+			case R.id.file_grid_out_upload:{
+				hideUploadPanel();
+				break;
+			}
+			
 			case R.id.file_list_out_options:
 			case R.id.file_grid_out_options:{
 				hideOptionsPanel();
@@ -1172,6 +1315,23 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
+				
+				//Check the folder's permissions
+				int accessLevel= megaApi.getAccess(n);
+				log("Node: "+n.getName());
+																		
+				switch(accessLevel){
+					case MegaShare.ACCESS_OWNER:
+					case MegaShare.ACCESS_READWRITE:
+					case MegaShare.ACCESS_FULL:{
+						fabButton.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaShare.ACCESS_READ:{
+						fabButton.setVisibility(View.GONE);
+						break;
+					}						
+				}
 			}
 			else{
 				//Is file
@@ -1330,7 +1490,6 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	
 	public int onBackPressed(){
 		log("onBackPressed "+deepBrowserTree);
-		deepBrowserTree = deepBrowserTree-1;
 		
 		PanelState pS=slidingOptionsPanel.getPanelState();
 		
@@ -1369,9 +1528,18 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			return 2;
 		}
 		
+		if(slidingUploadPanel.getVisibility()==View.VISIBLE){
+			log("hideUploadPanel");
+			hideUploadPanel();
+			return 4;
+		}
+		
+		deepBrowserTree = deepBrowserTree-1;
 		if(deepBrowserTree==0){
 			//In the beginning of the navigation
+			log("deepTree==0");
 			((ManagerActivityLollipop)context).setParentHandleIncoming(-1);
+			fabButton.setVisibility(View.GONE);
 			parentHandle=-1;
 			aB.setTitle(getString(R.string.section_shared_items));	
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -1391,8 +1559,10 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			return 3;
 		}
 		else if (deepBrowserTree>0){
+			log("deepTree>0");
 			parentHandle = adapter.getParentHandle();
 			//((ManagerActivityLollipop)context).setParentHandleSharedWithMe(parentHandle);			
+			fabButton.setVisibility(View.VISIBLE);
 			
 			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
 			contentText.setText(getInfoFolder(parentNode));
@@ -1413,11 +1583,30 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				adapter.setNodes(nodes);
 				setPositionClicked(-1);
 				adapter.setParentHandle(parentHandle);
+				
+				//Check the folder's permissions
+				int accessLevel= megaApi.getAccess(parentNode);
+				log("Node: "+parentNode.getName());
+																		
+				switch(accessLevel){
+					case MegaShare.ACCESS_OWNER:
+					case MegaShare.ACCESS_READWRITE:
+					case MegaShare.ACCESS_FULL:{
+						fabButton.setVisibility(View.VISIBLE);
+						break;
+					}
+					case MegaShare.ACCESS_READ:{
+						fabButton.setVisibility(View.GONE);
+						break;
+					}						
+				}			
+				
 				return 2;
 			}	
 			return 2;
 		}
 		else{
+			log("ELSE deepTree");
 			((ManagerActivityLollipop)context).setParentHandleBrowser(megaApi.getRootNode().getHandle());
 			recyclerView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
