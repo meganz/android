@@ -1679,6 +1679,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 		deepBrowserTree = deepBrowserTree-1;
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		if(deepBrowserTree==0){
 			log("deepBrowserTree==0");
 			fabButton.setVisibility(View.GONE);

@@ -1535,6 +1535,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		
 		deepBrowserTree = deepBrowserTree-1;
+		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		if(deepBrowserTree==0){
 			//In the beginning of the navigation
 			log("deepTree==0");
