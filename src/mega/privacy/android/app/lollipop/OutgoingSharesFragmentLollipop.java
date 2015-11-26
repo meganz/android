@@ -1635,7 +1635,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	public int onBackPressed(){
 
 		log("onBackPressed");
-		deepBrowserTree = deepBrowserTree-1;
+
 		log("deepBrowserTree "+deepBrowserTree);
 					
 		if (adapter == null){
@@ -1678,6 +1678,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			return 4;
 		}
 		
+		deepBrowserTree = deepBrowserTree-1;
 		if(deepBrowserTree==0){
 			log("deepBrowserTree==0");
 			fabButton.setVisibility(View.GONE);
