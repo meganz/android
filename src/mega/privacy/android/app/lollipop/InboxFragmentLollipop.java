@@ -91,6 +91,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
 	ProgressBar progressBar;
+	ImageView transferArrow;
 	
 	MegaApiAndroid megaApi;
 	
@@ -327,6 +328,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.inbox_list_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.inbox_list_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
 			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_list_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_list_content_text);			
@@ -394,6 +399,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			
 			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 				showProgressBar();
+				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{					
 				contentText.setText(getInfoFolder(inboxNode));
@@ -502,6 +508,10 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.inbox_grid_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.inbox_grid_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
 			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.inbox_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.inbox_content_grid_text);			
@@ -524,6 +534,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 
 			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 				showProgressBar();
+				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 			}
 			else{					
 				contentText.setText(getInfoFolder(inboxNode));
@@ -635,7 +646,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);			
+		progressBar.setVisibility(View.VISIBLE);
+		transferArrow.setVisibility(View.VISIBLE);
 		contentText.setText(R.string.text_downloading);
 		contentTextLayout.setOnClickListener(this);
 	}
@@ -644,6 +656,7 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 		log("hideProgressBar");
 		downloadInProgress = false;
 		progressBar.setVisibility(View.GONE);	
+		transferArrow.setVisibility(View.GONE);
 		contentText.setText(getInfoFolder(inboxNode));
 		contentTextLayout.setOnClickListener(null);
 	}

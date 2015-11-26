@@ -25,6 +25,15 @@
 			android:layout_below="@id/rubbishbin_list_content_text" 
 			style="@style/UsedSpaceProgressBar"
 			android:visibility="gone"/>
+       
+      	<ImageView
+	        android:id="@+id/rubbishbin_list_transfer_arrow"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:src="@drawable/ic_chevron_right_grey"
+	        android:layout_above="@id/rubbishbin_list_download_progress_bar" 
+	        android:layout_alignParentRight="true" 
+	        android:visibility="gone"/> 
     </RelativeLayout>
 
     <View
