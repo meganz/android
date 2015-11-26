@@ -40,7 +40,9 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,6 +65,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,8 +86,18 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	Button outSpaceButton;
 	int usedSpacePerc;
     ImageButton fabButton;
-	TextView contentText;
+
 	MegaApiAndroid megaApi;
+	
+	TextView contentText;	
+	RelativeLayout contentTextLayout;
+	boolean downloadInProgress = false;
+	ProgressBar progressBar;
+	ImageView transferArrow;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 
 	LinearLayout outSpaceLayout=null;
 	LinearLayout getProLayout=null;
@@ -331,6 +344,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (megaApi.getRootNode() == null){
 			return null;
 		}
+		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
 				
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -346,7 +364,20 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
-			contentText = (TextView) v.findViewById(R.id.content_text);
+
+			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
+
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
+			contentText = (TextView) v.findViewById(R.id.content_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
+			
 			
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			
@@ -451,17 +482,17 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 			}	
 
-			if (deepBrowserTree == 0){
-				contentText.setText(getInfoNode());
-				aB.setTitle(getString(R.string.section_shared_items));
-				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
-				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
-			}
-			else{
-				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(getInfoFolder(infoNode));
-				aB.setTitle(infoNode.getName());
-			}						
+//			if (deepBrowserTree == 0){
+//				contentText.setText(getInfoNode());
+//				aB.setTitle(getString(R.string.section_shared_items));
+//				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+//				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
+//			}
+//			else{
+//				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+//				contentText.setText(getInfoFolder(infoNode));
+//				aB.setTitle(infoNode.getName());
+//			}						
 			
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
@@ -479,15 +510,21 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);	
-				contentText.setVisibility(View.GONE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				contentText.setVisibility(View.VISIBLE);
 			}	
 //			setNodes(nodes);	
+			
+			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+				showProgressBar();
+				progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+			}
+			else{					
+				contentText.setText(getInfoNode());
+			}
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
 			optionsLayout = (LinearLayout) v.findViewById(R.id.file_list_options);
@@ -610,7 +647,19 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		
 			emptyImageView = (ImageView) v.findViewById(R.id.file_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.file_grid_empty_text);
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);
+
+			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
+
+			contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_grid_text_layout);
+			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
+			//Margins
+			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+			contentText.setLayoutParams(contentTextParams);
 			
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			
@@ -716,14 +765,25 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}	
 
 			if (deepBrowserTree == 0){
-				contentText.setText(getInfoNode());
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+				}
+				else{					
+					contentText.setText(getInfoNode());
+				}
 				aB.setTitle(getString(R.string.section_shared_items));
 				aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 				((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			}
 			else{
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
-				contentText.setText(getInfoFolder(infoNode));
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+				}
+				else{					
+					contentText.setText(getInfoFolder(infoNode));
+				};
 				aB.setTitle(infoNode.getName());
 			}						
 			
@@ -743,14 +803,11 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				recyclerView.setVisibility(View.GONE);
 				emptyImageView.setVisibility(View.VISIBLE);
 				emptyTextView.setVisibility(View.VISIBLE);	
-				contentText.setVisibility(View.GONE);
 			}
 			else{
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);
 				emptyTextView.setVisibility(View.GONE);
-				aB.setTitle(getInfoNode());
-				contentText.setVisibility(View.VISIBLE);
 			}	
 //			setNodes(nodes);	
 			
@@ -880,7 +937,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 		
 		parentHandle = n.getHandle();												
-		contentText.setText(getInfoFolder(n));
+
+		if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+			showProgressBar();
+		}
+		else{					
+			contentText.setText(getInfoFolder(n));
+		}		
+		
 		adapter.setParentHandle(parentHandle);
 		nodes = megaApi.getChildren(n, orderGetChildren);
 		if(orderGetChildren == MegaApiJava.ORDER_DEFAULT_DESC){
@@ -1029,6 +1093,40 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		adapter.setPositionClicked(-1);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
+	}
+	
+	public void showProgressBar(){
+		log("showProgressBar");
+		downloadInProgress = true;
+		progressBar.setVisibility(View.VISIBLE);	
+		transferArrow.setVisibility(View.VISIBLE);
+		contentText.setText(R.string.text_downloading);
+		contentTextLayout.setOnClickListener(this);
+	}
+	
+	public void hideProgressBar(){
+		log("hideProgressBar");
+		downloadInProgress = false;
+		progressBar.setVisibility(View.GONE);
+		transferArrow.setVisibility(View.GONE);
+		if (deepBrowserTree == 0){		
+			contentText.setText(getInfoNode());			
+		}
+		else{
+			MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
+			contentText.setText(getInfoFolder(infoNode));			
+		}
+		contentTextLayout.setOnClickListener(null);
+	}
+	
+	public void updateProgressBar(int progress){
+		if(downloadInProgress){
+			progressBar.setProgress(progress);
+		}
+		else{
+			showProgressBar();
+			progressBar.setProgress(progress);
+		}
 	}
 	
 	public PanelState getPanelState ()
@@ -1283,7 +1381,12 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 				parentHandle = nodes.get(position).getHandle();
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 														
-				contentText.setText(getInfoFolder(infoNode));
+				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+					showProgressBar();
+				}
+				else{					
+					contentText.setText(getInfoFolder(infoNode));
+				}
 				((ManagerActivityLollipop)context).setParentHandleIncoming(parentHandle);
 				adapter.setParentHandle(parentHandle);
 				nodes = megaApi.getChildren(nodes.get(position), orderGetChildren);
@@ -1554,7 +1657,13 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			}
 //				adapterList.setNodes(nodes);
 			recyclerView.setVisibility(View.VISIBLE);
-			contentText.setText(getInfoNode());
+			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+				showProgressBar();
+			}
+			else{					
+				contentText.setText(getInfoNode());
+			}
+
 			emptyImageView.setVisibility(View.GONE);
 			emptyTextView.setVisibility(View.GONE);
 			return 3;
@@ -1565,8 +1674,14 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			//((ManagerActivityLollipop)context).setParentHandleSharedWithMe(parentHandle);			
 			fabButton.setVisibility(View.VISIBLE);
 			
-			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));				
-			contentText.setText(getInfoFolder(parentNode));
+			MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));	
+			if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
+				showProgressBar();
+			}
+			else{					
+				contentText.setText(getInfoFolder(parentNode));
+			}
+
 			if (parentNode != null){
 				recyclerView.setVisibility(View.VISIBLE);
 				emptyImageView.setVisibility(View.GONE);

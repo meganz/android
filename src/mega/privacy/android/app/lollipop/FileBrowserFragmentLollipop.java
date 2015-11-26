@@ -78,6 +78,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RecyclerView recyclerView;
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
+	ImageView transferArrow;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;
@@ -430,6 +431,12 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
+//			progressBar.setVisibility(View.VISIBLE);
+//			transferArrow.setVisibility(View.VISIBLE);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
 			fabButton.setOnClickListener(this);
@@ -512,6 +519,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				MegaNode infoNode = megaApi.getRootNode();
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
 					contentText.setText(getInfoFolder(infoNode));
@@ -521,6 +529,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
 					contentText.setText(getInfoFolder(infoNode));
@@ -673,6 +682,10 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			recyclerView.setItemAnimator(new DefaultItemAnimator()); 
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.file_grid_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.file_grid_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button_grid);
 			fabButton.setOnClickListener(this);
@@ -755,6 +768,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				MegaNode infoNode = megaApi.getRootNode();
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
 					contentText.setText(getInfoFolder(infoNode));
@@ -764,6 +778,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{					
 					contentText.setText(getInfoFolder(infoNode));
@@ -1046,7 +1061,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);			
+		progressBar.setVisibility(View.VISIBLE);	
+		transferArrow.setVisibility(View.VISIBLE);
 		contentText.setText(R.string.text_downloading);
 		contentTextLayout.setOnClickListener(this);
 	}
@@ -1054,7 +1070,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	public void hideProgressBar(){
 		log("hideProgressBar");
 		downloadInProgress = false;
-		progressBar.setVisibility(View.GONE);	
+		progressBar.setVisibility(View.GONE);
+		transferArrow.setVisibility(View.GONE);
 		setContentText();
 		contentTextLayout.setOnClickListener(null);
 	}

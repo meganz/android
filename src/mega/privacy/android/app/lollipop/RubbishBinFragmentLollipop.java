@@ -78,9 +78,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;
-	
-	ProgressBar progressBar;
-	
+		
 	boolean isList = true;
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -93,6 +91,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	TextView contentText;
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
+	ProgressBar progressBar;
+	ImageView transferArrow;
 	
 	MegaApiAndroid megaApi;
 	
@@ -327,6 +327,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_list_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.rubbishbin_list_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
 			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_list_content_text);			
@@ -408,6 +412,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{
 					MegaNode infoNode = megaApi.getRubbishNode();
@@ -417,6 +422,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			else{
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
@@ -506,6 +512,10 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			emptyTextView.setText(R.string.file_browser_empty_folder);
 			
 			progressBar = (ProgressBar) v.findViewById(R.id.rubbishbin_grid_download_progress_bar);
+			transferArrow = (ImageView) v.findViewById(R.id.rubbishbin_grid_transfer_arrow);
+			RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams)transferArrow.getLayoutParams();
+			lp.setMargins(0, 0, Util.scaleWidthPx(15, outMetrics), Util.scaleHeightPx(4, outMetrics)); 
+			transferArrow.setLayoutParams(lp);
 			
 			contentTextLayout = (RelativeLayout) v.findViewById(R.id.rubbishbin_grid_content_text_layout);
 			contentText = (TextView) v.findViewById(R.id.rubbishbin_grid_content_text);			
@@ -526,6 +536,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			if (parentHandle == megaApi.getRubbishNode().getHandle()){
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{
 					MegaNode infoNode = megaApi.getRubbishNode();
@@ -535,6 +546,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			else{
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					showProgressBar();
+					progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
 				}
 				else{
 					MegaNode infoNode = megaApi.getNodeByHandle(parentHandle);
@@ -797,7 +809,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	public void showProgressBar(){
 		log("showProgressBar");
 		downloadInProgress = true;
-		progressBar.setVisibility(View.VISIBLE);			
+		progressBar.setVisibility(View.VISIBLE);
+		transferArrow.setVisibility(View.VISIBLE);
 		contentText.setText(R.string.text_downloading);
 		contentTextLayout.setOnClickListener(this);
 	}
@@ -806,6 +819,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 		log("hideProgressBar");
 		downloadInProgress = false;
 		progressBar.setVisibility(View.GONE);	
+		transferArrow.setVisibility(View.GONE);
 		setContentText();
 		contentTextLayout.setOnClickListener(null);
 	}

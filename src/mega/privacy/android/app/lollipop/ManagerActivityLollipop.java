@@ -3500,6 +3500,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					pauseTransfersMenuIcon.setVisible(false);
     					playTransfersMenuIcon.setVisible(true);
     	    			
+    					//Update the progress in fragments
+    					if (fbFLol != null){	
+    						fbFLol.updateProgressBar(progressPercent);
+    					}
+    					if (rbFLol != null){	
+    						rbFLol.updateProgressBar(progressPercent);
+    					}
+    					if (iFLol != null){	
+    						iFLol.updateProgressBar(progressPercent);
+    					}
+    					if (outSFLol != null){	
+    						outSFLol.updateProgressBar(progressPercent);
+    					}
+    					if (inSFLol != null){	
+    						inSFLol.updateProgressBar(progressPercent);
+    					}
+    					
     	    			megaApi.pauseTransfers(true, this);
     				}
 	        	}
@@ -7919,8 +7936,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
+	public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
 		log("onRequestFinish: " + request.getRequestString());
 		
 		if (request.getType() == MegaRequest.TYPE_FETCH_NODES){
@@ -8440,6 +8456,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						if (outSFLol != null){						
 							outSFLol.hideProgressBar();
 						}
+						if (inSFLol != null){						
+							inSFLol.hideProgressBar();
+						}
 					}
 				}
 				else{
@@ -8457,7 +8476,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (outSFLol != null){						
 						outSFLol.hideProgressBar();
 					}
-
+					if (inSFLol != null){						
+						inSFLol.hideProgressBar();
+					}
 				}				
 				
 				if (tFLol != null){
@@ -9009,6 +9030,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					outSFLol.showProgressBar();
 					outSFLol.updateProgressBar(progressPercent);
 				}
+				if (inSFLol != null){
+					inSFLol.showProgressBar();
+					inSFLol.updateProgressBar(progressPercent);
+				}
 			}
 		}
 
@@ -9075,6 +9100,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (outSFLol != null){	
 				outSFLol.updateProgressBar(progressPercent);
 			}
+			if (inSFLol != null){
+				inSFLol.updateProgressBar(progressPercent);
+			}
 		}
 		else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
 			
@@ -9098,6 +9126,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (outSFLol != null){	
 				outSFLol.updateProgressBar(progressPercent);
 			}
+			if (inSFLol != null){
+				inSFLol.updateProgressBar(progressPercent);
+			}
 		}
 
 		//Update transfer list
@@ -9119,6 +9150,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (outSFLol != null){	
 					outSFLol.hideProgressBar();
 				}
+				if (inSFLol != null){	
+					inSFLol.hideProgressBar();
+				}
 			}
 		}
 		else{
@@ -9135,6 +9169,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			if (outSFLol != null){	
 				outSFLol.hideProgressBar();
+			}
+			if (inSFLol != null){
+				inSFLol.hideProgressBar();
 			}
 		}
 		
@@ -9201,6 +9238,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		if (outSFLol != null){	
 			outSFLol.updateProgressBar(progressPercent);
+		}
+		if (inSFLol != null){	
+			inSFLol.updateProgressBar(progressPercent);
 		}
 
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
@@ -9285,5 +9325,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	public static void log(String message) {
 		Util.log("ManagerActivityLollipop", message);
+	}
+
+	public int getProgressPercent() {
+		return progressPercent;
+	}
+
+	public void setProgressPercent(int progressPercent) {
+		this.progressPercent = progressPercent;
 	}
 }
