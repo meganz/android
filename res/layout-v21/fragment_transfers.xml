@@ -5,6 +5,35 @@
     android:background="@color/white"
     tools:context=".TransfersFragmentLollipop" >
 
+    <RelativeLayout
+        android:id="@+id/transfers_list_content_text_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/content_text_background">
+
+        <TextView
+            android:id="@+id/transfers_list_content_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"    
+            android:text="@string/text_downloading"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />   
+        
+       <ProgressBar
+		    android:id="@+id/transfers_list_download_progress_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content" 
+			android:layout_below="@id/transfers_list_content_text" 
+			style="@style/UsedSpaceProgressBar"/>  
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_below="@id/transfers_list_content_text_layout"
+        android:background="@color/delimiterColor" />    
+    
     <LinearLayout
          android:id="@+id/out_space_tranfers"
     	 android:layout_width="fill_parent"
@@ -43,6 +72,7 @@
         android:id="@+id/transfers_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" 
+        android:layout_below="@id/separator"
         android:choiceMode="multipleChoice"/>
     
     <ImageView

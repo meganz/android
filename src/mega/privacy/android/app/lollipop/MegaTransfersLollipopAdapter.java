@@ -216,6 +216,11 @@ public class MegaTransfersLollipopAdapter extends RecyclerView.Adapter<MegaTrans
 		holder.textViewRate = (TextView) v.findViewById(R.id.transfers_list_transfer_rate);
 		holder.transferProgressBar = (ProgressBar) v.findViewById(R.id.transfers_list_bar); 
 		holder.optionRemove = (ImageButton) v.findViewById(R.id.transfers_list_option_remove);		
+		//Right margin
+		RelativeLayout.LayoutParams actionButtonParams = (RelativeLayout.LayoutParams)holder.optionRemove.getLayoutParams();
+		actionButtonParams.setMargins(0, 0, Util.scaleWidthPx(10, outMetrics), 0); 
+		holder.optionRemove.setLayoutParams(actionButtonParams);
+		
 		holder.optionRemove.setOnClickListener(this);
 		v.setTag(holder);
     	

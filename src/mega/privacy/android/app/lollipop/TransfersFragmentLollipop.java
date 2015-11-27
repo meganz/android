@@ -18,6 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,6 +30,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -39,16 +43,21 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 	MegaTransfersLollipopAdapter adapter;
 	
 	MegaApiAndroid megaApi;
-	
+	RelativeLayout contentTextLayout;
+	TextView contentText;
 	ImageView emptyImage;
 	TextView emptyText;
 	ImageView pauseImage;
 	TextView pauseText;
-	
+	ProgressBar progressBar;
 	LinearLayout outSpaceLayout=null;
 	TextView outSpaceText;
 	Button outSpaceButton;
 	int usedSpacePerc;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	boolean pause = false;
 	private RecyclerView.LayoutManager mLayoutManager;
@@ -90,6 +99,11 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		aB.setTitle(getResources().getString(R.string.section_transfers));					
 //		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+	    
 		View v = inflater.inflate(R.layout.fragment_transfers, container, false);
 		
 		
@@ -126,6 +140,15 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		outSpaceButton.setOnClickListener(this);
 		
 		usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
+		
+		contentTextLayout = (RelativeLayout) v.findViewById(R.id.transfers_list_content_text_layout);
+		progressBar = (ProgressBar) v.findViewById(R.id.transfers_list_download_progress_bar);
+		progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
+		contentText = (TextView) v.findViewById(R.id.transfers_list_content_text);			
+		//Margins
+		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+		contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+		contentText.setLayoutParams(contentTextParams);
 		
 		if(usedSpacePerc>95){
 			//Change below of ListView
@@ -184,7 +207,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 			emptyImage.setVisibility(View.GONE);
 			emptyText.setVisibility(View.GONE);
 			listView.setVisibility(View.GONE);
-			
+			contentTextLayout.setVisibility(View.VISIBLE);
 			pauseImage.setVisibility(View.VISIBLE);
 			pauseText.setVisibility(View.VISIBLE);
 		}
@@ -192,6 +215,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 			if (tL.size() == 0){
 				emptyImage.setVisibility(View.VISIBLE);
 				emptyText.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
 				((ManagerActivityLollipop)context).hideTransfersIcons();
 			}
@@ -199,6 +223,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.VISIBLE);
+				contentTextLayout.setVisibility(View.VISIBLE);
 				((ManagerActivityLollipop)context).setPauseIconVisible(true);
 			}
 			
@@ -283,7 +308,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
-				
+				contentTextLayout.setVisibility(View.VISIBLE);
 				pauseImage.setVisibility(View.VISIBLE);
 				pauseText.setVisibility(View.VISIBLE);
 			}
@@ -291,6 +316,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 				if (tL.size() == 0){
 					emptyImage.setVisibility(View.VISIBLE);
 					emptyText.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 					((ManagerActivityLollipop)context).hideTransfersIcons();
 				}
@@ -298,6 +324,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 					emptyImage.setVisibility(View.GONE);
 					emptyText.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					((ManagerActivityLollipop)context).setPauseIconVisible(true);
 				}	
 				
@@ -327,7 +354,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 				emptyImage.setVisibility(View.GONE);
 				emptyText.setVisibility(View.GONE);
 				listView.setVisibility(View.GONE);
-				
+				contentTextLayout.setVisibility(View.VISIBLE);
 				pauseImage.setVisibility(View.VISIBLE);
 				pauseText.setVisibility(View.VISIBLE);
 			}
@@ -335,6 +362,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 				if (tL.size() == 0){
 					emptyImage.setVisibility(View.VISIBLE);
 					emptyText.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.GONE);
 					listView.setVisibility(View.GONE);
 					((ManagerActivityLollipop)context).hideTransfersIcons();
 				}
@@ -342,6 +370,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 					emptyImage.setVisibility(View.GONE);
 					emptyText.setVisibility(View.GONE);
 					listView.setVisibility(View.VISIBLE);
+					contentTextLayout.setVisibility(View.VISIBLE);
 					((ManagerActivityLollipop)context).setPauseIconVisible(true);
 				}
 				
@@ -351,12 +380,18 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		}
 	} 
 	
+	public void updateProgressBar(int progress){
+		if(progressBar!=null){
+			progressBar.setProgress(progress);
+		}			
+	}
 	
 	public void setNoActiveTransfers(){
 		this.pause = false;
 		if (emptyImage != null){
 			emptyImage.setVisibility(View.VISIBLE);
 			emptyText.setVisibility(View.VISIBLE);
+			contentTextLayout.setVisibility(View.VISIBLE);
 			listView.setVisibility(View.GONE);
 			pauseImage.setVisibility(View.GONE);
 			pauseText.setVisibility(View.GONE);
