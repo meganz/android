@@ -60,7 +60,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	public static String EXTRA_SIZE = "filesize";
 	public static String EXTRA_DOCUMENT_HASHES = "document_hash";
 	public static String EXTRA_FROM_SETTINGS = "from_settings";
-//	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
+	public static String EXTRA_BUTTON_PREFIX = "button_prefix";
 	public static String EXTRA_PATH = "filepath";
 	public static String EXTRA_FILES = "fileslist";	
 	

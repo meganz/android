@@ -1518,4 +1518,15 @@ log("moveToTrash");
 			}
 		}
 	}
+	
+	@Override
+	public void onBackPressed() {
+		if (overflowMenuList != null){
+			if (overflowMenuList.getVisibility() == View.VISIBLE){
+				overflowMenuList.setVisibility(View.GONE);
+				return;
+			}
+		}
+		super.onBackPressed();
+	}
 }

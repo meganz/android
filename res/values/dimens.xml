@@ -14,4 +14,7 @@
     <dimen name="fab_button_margin_right">16dp</dimen>
     <dimen name="elevation_low">1dp</dimen>
     <dimen name="elevation_high">8dp</dimen>
+    
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="left_margin_back_arrow">16dp</dimen>
 </resources>
