@@ -5057,6 +5057,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			hashes[i] = handleList.get(i);
 			size += megaApi.getNodeByHandle(hashes[i]).getSize();
 		}
+		log("Number of files: "+hashes.length);
 		
 		if (dbH == null){
 //			dbH = new DatabaseHandler(getApplicationContext());
@@ -5126,7 +5127,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	
 	public void downloadTo(String parentPath, String url, long size, long [] hashes){
 		log("downloadTo, parentPath: "+parentPath+ "url: "+url+" size: "+size);
-		log("files to download: ");
+		log("files to download: "+hashes.length);
 		if (hashes != null){
 			for (long hash : hashes) {
 				MegaNode node = megaApi.getNodeByHandle(hash);
@@ -8032,31 +8033,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				
 				accountInfo = request.getMegaAccountDetails();				
 				
-				accountType = accountInfo.getProLevel();
-				
-				switch (accountType){
-					case 0:{
-						levelAccountDetails = -1;
-						break;
-					}
-					case 1:{
-						levelAccountDetails = 1;
-						break;
-					}
-					case 2:{
-						levelAccountDetails = 2;
-						break;
-					}
-					case 3:{
-						levelAccountDetails = 3;
-						break;
-					}
-					case 4:{
-						levelAccountDetails = 0;
-						break;
-					}
-				}
-
 				accountDetailsFinished = true;
 				
 				if (inventoryFinished){
@@ -8110,6 +8086,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //				String usedSpaceString = getString(R.string.used_space, used, total);
 				usedSpaceTV.setText(used);
 				totalSpaceTV.setText(total);
+				
+				accountType = accountInfo.getProLevel();
+				
+				switch (accountType){
+					case 0:{
+						levelAccountDetails = -1;
+						log("account FREE: "+usedPerc+" percent");
+						if(drawerItem==DrawerItem.CLOUD_DRIVE){
+							if(usedPerc<95){
+								log("usedSpacePerc<95");
+								if(Util.showMessageRandom()){
+						    		log("Random: TRUE");
+						    		if(fbFLol!=null){
+						    			fbFLol.showProPanel();
+						    		}						    		
+						    	}							
+							}
+				        }						
+						break;
+					}
+					case 1:{
+						levelAccountDetails = 1;
+						break;
+					}
+					case 2:{
+						levelAccountDetails = 2;
+						break;
+					}
+					case 3:{
+						levelAccountDetails = 3;
+						break;
+					}
+					case 4:{
+						levelAccountDetails = 0;
+						break;
+					}
+				}
 
 		        if (usedPerc < 90){
 		        	usedSpacePB.setProgressDrawable(getResources().getDrawable(R.drawable.custom_progress_bar_horizontal_ok));
