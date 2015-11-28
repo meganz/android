@@ -70,9 +70,9 @@
              which is used to tint widgets -->
         <item name="colorAccent">@color/accentColor</item>
         
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-    	<item name="android:statusBarColor">@color/lollipop_dark_primary_color_file_properties</item>
-    	<item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">false</item>
+    	<item name="android:statusBarColor">@android:color/transparent</item>
+    	<item name="android:windowTranslucentStatus">true</item>
  
         <!-- You can also set colorControlNormal, colorControlActivated
              colorControlHighlight & colorSwitchThumbNormal. -->
