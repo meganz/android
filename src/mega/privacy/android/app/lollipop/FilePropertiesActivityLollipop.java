@@ -251,6 +251,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			});
 						
 			container = (RelativeLayout) findViewById(R.id.file_properties_main_layout);
+			container.setOnClickListener(this);
 			imageLayout = (RelativeLayout) findViewById(R.id.file_properties_image_layout);
 			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageLayout.getLayoutParams();
 			params.setMargins(0, -getStatusBarHeight(), 0, 0);
@@ -872,6 +873,15 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
+			case R.id.file_properties_main_layout:{
+				if (overflowMenuLayout != null){
+					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+						overflowMenuLayout.setVisibility(View.GONE);
+						return;
+					}
+				}
+				break;
+			}
 			case R.id.file_properties_shared_info:{
 				Intent i = new Intent(this, FileContactListActivityLollipop.class);
 				i.putExtra("name", node.getHandle());
