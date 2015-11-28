@@ -5,6 +5,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
@@ -69,7 +70,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, MegaRequestListenerInterface{
+public class FileBrowserFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener{
 
 	public static int GRID_WIDTH =400;
 		
@@ -94,8 +95,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	
 	LinearLayout getProLayout=null;
 	TextView getProText;
-	Button leftCancelButton;
-	Button rightUpgradeButton;
+	TextView leftCancelButton;
+	TextView rightUpgradeButton;
 	
 	MegaApiAndroid megaApi;		
 
@@ -413,8 +414,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				context.startService(intent);
 			}
 		}
-		
-		megaApi.getAccountDetails(this);
 				
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -455,18 +454,15 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
 			outSpaceButton.setOnClickListener(this);
 			
+			//PRO PANEL
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
 			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
-			leftCancelButton = (Button) v.findViewById(R.id.btnLeft_cancel);
-			rightUpgradeButton = (Button) v.findViewById(R.id.btnRight_upgrade);
-			leftCancelButton.setOnClickListener(this);
-			rightUpgradeButton.setOnClickListener(this);
+			rightUpgradeButton = (TextView) v.findViewById(R.id.btnRight_upgrade);
+			leftCancelButton = (TextView) v.findViewById(R.id.btnLeft_cancel);			
 			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 			
-			getProLayout.setVisibility(View.GONE);
-			
-			if(usedSpacePerc>95){
+			if(usedSpacePerc>=95){
 				
 				//Change below of ListView
 				log("usedSpacePerc>95");
@@ -705,16 +701,13 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
 			outSpaceButton.setOnClickListener(this);
 			
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
-			getProText= (TextView) v.findViewById(R.id.get_pro_account_text_grid);
-			leftCancelButton = (Button) v.findViewById(R.id.btnLeft_cancel_grid);
-			rightUpgradeButton = (Button) v.findViewById(R.id.btnRight_upgrade_grid);
-			leftCancelButton.setOnClickListener(this);
-			rightUpgradeButton.setOnClickListener(this);
+			//PRO PANEL
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
+			rightUpgradeButton = (TextView) v.findViewById(R.id.btnRight_upgrade);
+			leftCancelButton = (TextView) v.findViewById(R.id.btnLeft_cancel);
 			
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			getProLayout.setVisibility(View.GONE);
 			
 			if(usedSpacePerc>95){
 				
@@ -1043,6 +1036,39 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		}		
 	}
 	
+	public void showProPanel(){
+		log("showProPanel");
+		//Left and Right margin
+		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)getProText.getLayoutParams();
+		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0); 
+		getProText.setLayoutParams(proTextParams);		
+		
+		rightUpgradeButton.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = rightUpgradeButton.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		rightUpgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
+		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)rightUpgradeButton.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		rightUpgradeButton.setLayoutParams(optionTextParams);		
+		
+		leftCancelButton.setOnClickListener(this);
+		leftCancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = leftCancelButton.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(145, metrics);
+		leftCancelButton.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)leftCancelButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		leftCancelButton.setLayoutParams(cancelTextParams);		
+		
+		getProLayout.setVisibility(View.VISIBLE);
+		getProLayout.bringToFront();
+		fabButton.setVisibility(View.GONE);
+	}
+	
 	public void showUploadPanel(){
 		log("showUploadPanel");
 		
@@ -1237,6 +1263,17 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_out_options:
 			case R.id.file_grid_out_options:{
 				hideOptionsPanel();
+				break;
+			}
+			
+			case R.id.btnLeft_cancel:{
+				getProLayout.setVisibility(View.GONE);
+				fabButton.setVisibility(View.VISIBLE);
+				break;
+			}
+			
+			case R.id.btnRight_upgrade:{
+				//Add navigation to Upgrade Account
 				break;
 			}
 		
@@ -1999,59 +2036,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //				aB.setTitle(infoNode.getName());
 			}
 		}
-	}
-
-	@Override
-	public void onRequestStart(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onRequestFinish(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
-			log ("account_details request");
-			if (e.getErrorCode() == MegaError.API_OK)
-			{
-				MegaAccountDetails accountInfo = request.getMegaAccountDetails();
-				
-				int accountType = accountInfo.getProLevel();
-				switch(accountType){				
-				
-					case 0:{	
-						log("account FREE");
-						if(usedSpacePerc<96){
-							log("usedSpacePerc<96");
-							if(Util.showMessageRandom()){
-					    		log("Random: TRUE");
-					    		getProLayout.setVisibility(View.VISIBLE);
-					    		getProLayout.bringToFront();
-					    	}
-					    	else{
-					    		log("Random: FALSO");
-					    		getProLayout.setVisibility(View.GONE);
-					    	}			 
-						}
-						break;
-					}			
-					
-				}
-			}
-		}		
-	}
-
-	@Override
-	public void onRequestTemporaryError(MegaApiJava api, MegaRequest request,
-			MegaError e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
