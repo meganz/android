@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import mega.privacy.android.app.FileContactListActivity;
 import mega.privacy.android.app.MegaApplication;
@@ -95,6 +96,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 	LinearLayout outSpaceLayout=null;
 	LinearLayout getProLayout=null;
+	TextView getProText;
+	TextView leftCancelButton;
+	TextView rightUpgradeButton;
 	
 	MegaApiAndroid megaApi;
 		
@@ -392,8 +396,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
 			emptyTextView.setText(R.string.file_browser_empty_outgoing_shares);			
 			
+			//PRO PANEL
 			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
-			getProLayout.setVisibility(View.GONE);
+			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
+			rightUpgradeButton = (TextView) v.findViewById(R.id.btnRight_upgrade);
+			leftCancelButton = (TextView) v.findViewById(R.id.btnLeft_cancel);
 			
 			fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
 			fabButton.setOnClickListener(this);
@@ -441,6 +448,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			}	
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
+				log("usedSpacePerc<95");
+				if(Util.showMessageRandom()){
+		    		log("Random: TRUE");
+		    		this.showProPanel();		    							    		
+				}
 			}			
 
 			
@@ -643,11 +655,14 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			emptyImageView.setImageResource(R.drawable.ic_empty_shared);
-			
+			emptyImageView.setImageResource(R.drawable.ic_empty_shared);			
 			emptyTextView.setText(R.string.file_browser_empty_incoming_shares);
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
-			getProLayout.setVisibility(View.GONE);
+
+			//PRO PANEL
+			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
+			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
+			rightUpgradeButton = (TextView) v.findViewById(R.id.btnRight_upgrade);
+			leftCancelButton = (TextView) v.findViewById(R.id.btnLeft_cancel);
 			
 			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
 			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
@@ -695,6 +710,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			}	
 			else{
 				outSpaceLayout.setVisibility(View.GONE);
+				log("usedSpacePerc<95");
+				if(Util.showMessageRandom()){
+		    		log("Random: TRUE");
+		    		this.showProPanel();		    							    		
+				}
 			}			
 			
 			if (adapter == null){
@@ -889,6 +909,39 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			
 			return v;
 		}		
+	}
+	
+	public void showProPanel(){
+		log("showProPanel");
+		//Left and Right margin
+		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)getProText.getLayoutParams();
+		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0); 
+		getProText.setLayoutParams(proTextParams);		
+		
+		rightUpgradeButton.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = rightUpgradeButton.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		rightUpgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
+		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)rightUpgradeButton.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		rightUpgradeButton.setLayoutParams(optionTextParams);		
+		
+		leftCancelButton.setOnClickListener(this);
+		leftCancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = leftCancelButton.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(145, metrics);
+		leftCancelButton.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)leftCancelButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		leftCancelButton.setLayoutParams(cancelTextParams);		
+		
+		getProLayout.setVisibility(View.VISIBLE);
+		getProLayout.bringToFront();
+		fabButton.setVisibility(View.GONE);
 	}
 	
 	public void refresh (long _parentHandle){
@@ -1182,6 +1235,19 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			
+			case R.id.btnLeft_cancel:{
+				getProLayout.setVisibility(View.GONE);
+				if (deepBrowserTree>0){
+					fabButton.setVisibility(View.VISIBLE);
+				}	
+				break;
+			}
+			
+			case R.id.btnRight_upgrade:{
+				//Add navigation to Upgrade Account
+				break;
+			}
+			
 			case R.id.file_list_option_download_layout: 
 			case R.id.file_grid_option_download_layout: {
 				log("Download option");
@@ -1388,8 +1454,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 					emptyImageView.setVisibility(View.GONE);
 					emptyTextView.setVisibility(View.GONE);
 				}
-				
-				fabButton.setVisibility(View.VISIBLE);
+
+				if(!(getProLayout.getVisibility()==View.VISIBLE)){
+					fabButton.setVisibility(View.VISIBLE);
+				}	
 			}
 			else{
 				//Is file
@@ -1722,7 +1790,9 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		else if (deepBrowserTree>0){
 			log("Keep navigation");
-			fabButton.setVisibility(View.VISIBLE);
+			if(!(getProLayout.getVisibility()==View.VISIBLE)){
+				fabButton.setVisibility(View.VISIBLE);
+			}
 			parentHandle = adapter.getParentHandle();
 			//((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);			
 			
