@@ -8103,7 +8103,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						    		}						    		
 						    	}							
 							}
-				        }						
+				        }	
 						break;
 					}
 					case 1:{
