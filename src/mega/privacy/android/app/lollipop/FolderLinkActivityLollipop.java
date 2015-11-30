@@ -88,7 +88,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	LinearLayout outSpaceLayout=null;
 	LinearLayout buttonsLayout=null;
-	LinearLayout getProLayout=null;
 	MegaBrowserLollipopAdapter adapterList;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -276,9 +275,6 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 
 		outSpaceLayout = (LinearLayout) findViewById(R.id.out_space);
 		outSpaceLayout.setVisibility(View.GONE);
-		
-		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
-		getProLayout.setVisibility(View.GONE);
 		
 		buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
 		buttonsLayout.setVisibility(View.GONE);	
