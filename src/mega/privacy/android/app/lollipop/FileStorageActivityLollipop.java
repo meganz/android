@@ -166,6 +166,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		    	onNewFolderClick();
 		    	return true;
 		    }
+		    case R.id.cab_menu_select_all:{
+		    	selectAll();
+		    	return true;
+		    }
+		    case R.id.cab_menu_unselect_all:{
+		    	clearSelections();
+		    	return true;
+		    }
 		    default:{
 	            return super.onOptionsItemSelected(item);
 	        }
@@ -229,14 +237,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	}
 	
 	public void selectAll(){
+		log("selectAll");
 		if(adapter.isMultipleSelect()){
 			adapter.selectAll();
 		}
-		else{
-			actionMode = startSupportActionMode(new ActionBarCallBack());
-			
+		else{			
 			adapter.setMultipleSelect(true);
 			adapter.selectAll();
+			actionMode = startSupportActionMode(new ActionBarCallBack());
 		}
 		
 		updateActionModeTitle();
@@ -552,6 +560,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
+		log("clearSelections");
 		if(adapter.isMultipleSelect()){
 			adapter.clearSelections();
 		}
@@ -564,20 +573,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 //			}
 //		}
 		updateActionModeTitle();
-	}
-	
-	/*
-	 * Hide bottom action button
-	 */
-	private void hideButton() {
-		button.setVisibility(View.GONE);
-	}
-	
-	/*
-	 * Show bottom action button
-	 */
-	private void showButton() {
-		button.setVisibility(View.VISIBLE);
 	}
 	
 	/*
