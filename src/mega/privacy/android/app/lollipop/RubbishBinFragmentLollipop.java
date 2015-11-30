@@ -73,11 +73,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 	GestureDetectorCompat detector;
 	MegaBrowserLollipopAdapter adapter;
 	public RubbishBinFragmentLollipop rubbishBinFragment = this;
-	
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
 		
 	boolean isList = true;
 	long parentHandle = -1;
@@ -348,48 +343,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
 			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_rubbish);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_rubbish);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}				
-			
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 
@@ -553,49 +506,7 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 					contentText.setText(getInfoFolder(infoNode));
 				}
 			}
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_rubbish_grid);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_rubbish_grid);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_rubbish_grid);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}	
-			
+	
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
 
@@ -858,12 +769,6 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
 				}				
-				break;
-			}
-		 	case R.id.out_space_btn_grid_rubbish:
-			case R.id.out_space_btn_rubbish:
-			{
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
 			case R.id.rubbishbin_list_out_options:

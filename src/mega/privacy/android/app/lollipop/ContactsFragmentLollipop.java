@@ -70,10 +70,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 	ImageView emptyImageView;
 	TextView emptyTextView;
     ImageButton fabButton;
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
 	private ActionMode actionMode;
 	
 	float scaleH, scaleW;
@@ -322,50 +318,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
 		    recyclerView.setLayoutManager(linearLayoutManager);			
 		    recyclerView.addOnItemTouchListener(this);
-		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_contacts);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_contacts);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_contacts);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of RecyclerView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}
-			
+		    recyclerView.setItemAnimator(new DefaultItemAnimator()); 			
+		
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_list_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_list_empty_text);
 			
@@ -468,50 +422,8 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			});
 			
 			recyclerView.addOnItemTouchListener(this);
-			recyclerView.setItemAnimator(new DefaultItemAnimator());
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_contacts_grid);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_contacts_grid);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_contacts_grid);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of RecyclerView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
+			recyclerView.setItemAnimator(new DefaultItemAnimator());			
 				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}
-			
 			emptyImageView = (ImageView) v.findViewById(R.id.contact_grid_empty_image);
 			emptyTextView = (TextView) v.findViewById(R.id.contact_grid_empty_text);
 			
@@ -649,11 +561,6 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 			case R.id.invite_contact_button:
 			case R.id.invite_contact_button_grid:{
 				((ManagerActivityLollipop)context).showNewContactDialog(null);				
-				break;
-			}
-			case R.id.out_space_btn_contacts:
-			case R.id.out_space_btn_grid_contacts:{
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
 			case R.id.contact_list_option_send_file_layout:

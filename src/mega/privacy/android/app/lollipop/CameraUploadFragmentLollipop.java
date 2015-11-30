@@ -112,11 +112,6 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	
 	MegaPhotoSyncListAdapterLollipop adapterList;
 	MegaPhotoSyncGridAdapterLollipop adapterGrid;
-	LinearLayout outSpaceLayout=null;
-	LinearLayout getProLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;;
 	MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
@@ -458,72 +453,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			turnOnOff.setOnClickListener(this);
 	
-			contentText = (TextView) v.findViewById(R.id.content_text);
-			
+			contentText = (TextView) v.findViewById(R.id.content_text);			
 			contentText.setVisibility(View.GONE);
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
-			getProLayout.setVisibility(View.GONE);
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
-			outSpaceButton.setVisibility(View.VISIBLE);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler2 = new Handler();
-				handler2.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-				
-				if(!camEnabled){
-					turnOnOff.setOnClickListener(this);
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {
-						
-											@Override
-											public void run() {
-												log("BUTTON DISAPPEAR");
-												TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.scaleHeightPx(48, outMetrics));
-												animTop.setDuration(1000);
-												animTop.setFillAfter( true );
-												turnOnOff.setAnimation(animTop);
-												turnOnOff.setVisibility(View.GONE);
-											}
-										}, 30 * 1000);
-				}
-				
-			}
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_list_browser_camera_upload_on_off);
@@ -695,73 +626,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 			turnOnOff.setOnClickListener(this);
 	
-			contentText = (TextView) v.findViewById(R.id.content_grid_text);
-			
+			contentText = (TextView) v.findViewById(R.id.content_grid_text);			
 			contentText.setVisibility(View.GONE);
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account_grid);
-			getProLayout.setVisibility(View.GONE);
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
-			outSpaceButton.setVisibility(View.VISIBLE);
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-	
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler2 = new Handler();
-				handler2.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-				
-				if(!camEnabled){
-					turnOnOff.setOnClickListener(this);
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {
-						
-											@Override
-											public void run() {
-												log("BUTTON DISAPPEAR");
-												TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, Util.px2dp(48, outMetrics));
-												animTop.setDuration(1000);
-												animTop.setFillAfter( true );
-												turnOnOff.setAnimation(animTop);
-												turnOnOff.setVisibility(View.GONE);
-											}
-										}, 30 * 1000);
-				}
-				
-			}
 			
 			RelativeLayout.LayoutParams p = (RelativeLayout.LayoutParams) listView.getLayoutParams();
 			p.addRule(RelativeLayout.ABOVE, R.id.file_grid_browser_camera_upload_on_off);
@@ -1128,11 +994,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				}
 				break;
 			}
-			case R.id.out_space_btn_grid:
-			case R.id.out_space_btn:{
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
-				break;
-			}
+
 			case R.id.cam_sync_button_ok:{
 				firstTimeCam = false;
 				DatabaseHandler dbH = DatabaseHandler.getDbHandler(context);

@@ -77,10 +77,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	boolean isList = true;
 	long parentHandle = -1;
 	int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
 	
 	ArrayList<MegaNode> nodes;
 	MegaNode selectedNode;
@@ -348,49 +344,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				adapter.setNodes(nodes);
 				adapter.setAdapterType(MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}	
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_inbox);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_inbox);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_inbox);
-			
-			outSpaceButton.setOnClickListener(this);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);
-				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}
 
 			adapter.setPositionClicked(-1);
 			adapter.setMultipleSelect(false);
@@ -694,11 +647,6 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 				if(((ManagerActivityLollipop)getActivity()).isTransferInProgress()){
 					((ManagerActivityLollipop)getActivity()).selectDrawerItemLollipop(DrawerItem.TRANSFERS);
 				}				
-				break;
-			}
-		
-			case R.id.out_space_btn_inbox:{
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
 				break;
 			}
 			case R.id.file_list_out_options:

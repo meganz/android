@@ -117,6 +117,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckedTextView;
@@ -193,7 +194,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
 	private SparseArray<Long> transfersDownloadedSize;
-	int progressPercent = 0;
+	int progressPercent = 0;	
+	
+	//OVERQUOTA WARNING
+	LinearLayout outSpaceLayout=null;
+	TextView outSpaceText;
+	TextView outSpaceButton;
+	
+	//GET PRO ACCOUNT PANEL
+	LinearLayout getProLayout=null;
+	TextView getProText;
+	TextView leftCancelButton;
+	TextView rightUpgradeButton;
 		
 	DatabaseHandler dbH = null;
 	MegaPreferences prefs = null;
@@ -797,6 +809,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         nV = (NavigationView) findViewById(R.id.navigation_view);
         nV.setNavigationItemSelectedListener(this);
         
+        //OVERQUOTA WARNING PANEL
+		outSpaceLayout = (LinearLayout) findViewById(R.id.overquota_alert);
+		outSpaceText =  (TextView) findViewById(R.id.overquota_alert_text);
+		outSpaceButton = (TextView) findViewById(R.id.overquota_alert_btnRight_upgrade);
+		
+		//PRO PANEL
+		getProLayout=(LinearLayout) findViewById(R.id.get_pro_account);
+		getProText= (TextView) findViewById(R.id.get_pro_account_text);
+		rightUpgradeButton = (TextView) findViewById(R.id.btnRight_upgrade);
+		leftCancelButton = (TextView) findViewById(R.id.btnLeft_cancel);
+        
         accountInfoFrame = (FrameLayout) findViewById(R.id.navigation_drawer_account_view);
         accountInfoFrame.setOnClickListener(this);
         
@@ -826,7 +849,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         
         viewPagerContacts = (ViewPager) findViewById(R.id.contact_tabs_pager);  
         viewPagerShares = (ViewPager) findViewById(R.id.shares_tabs_pager);  
-        viewPagerCDrive = (ViewPager) findViewById(R.id.cloud_drive_tabs_pager);
+        viewPagerCDrive = (ViewPager) findViewById(R.id.cloud_drive_tabs_pager); 
         
         if (!Util.isOnline(this)){
         	
@@ -6927,6 +6950,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 				break;
 			}
+			case R.id.btnLeft_cancel:{
+				getProLayout.setVisibility(View.GONE);
+				break;
+			}
+			
+			case R.id.btnRight_upgrade:
+			case R.id.overquota_alert_btnRight_upgrade:{
+				//Add navigation to Upgrade Account
+				break;
+			}
+			
 			case R.id.navigation_drawer_account_view:{
 //				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
 				/*drawerItem = DrawerItem.ACCOUNT;
@@ -7863,6 +7897,83 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 	
+	public void showProPanel(){
+		log("showProPanel");
+		//Left and Right margin
+		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)getProText.getLayoutParams();
+		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0); 
+		getProText.setLayoutParams(proTextParams);		
+		
+		rightUpgradeButton.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = rightUpgradeButton.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		rightUpgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
+		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)rightUpgradeButton.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		rightUpgradeButton.setLayoutParams(optionTextParams);		
+		
+		leftCancelButton.setOnClickListener(this);
+		leftCancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
+		android.view.ViewGroup.LayoutParams paramsb1 = leftCancelButton.getLayoutParams();		
+		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(145, metrics);
+		leftCancelButton.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)leftCancelButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		leftCancelButton.setLayoutParams(cancelTextParams);		
+		
+		getProLayout.setVisibility(View.VISIBLE);
+		getProLayout.bringToFront();
+	}
+	
+	public void showOverquotaPanel(){
+		log("showOverquotaAlert");
+		
+		//Left and Right margin
+		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)outSpaceText.getLayoutParams();
+		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0); 
+		outSpaceText.setLayoutParams(proTextParams);		
+		
+		outSpaceButton.setOnClickListener(this);
+		android.view.ViewGroup.LayoutParams paramsb2 = outSpaceButton.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+		outSpaceButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
+		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
+		//Left and Right margin
+		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)outSpaceButton.getLayoutParams();
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(20, outMetrics), 0); 
+		outSpaceButton.setLayoutParams(optionTextParams);		
+		
+		outSpaceLayout.setVisibility(View.VISIBLE);
+		outSpaceLayout.bringToFront();
+		
+		Runnable r = new Runnable() {					
+			
+			@Override
+			public void run() {
+				log("BUTTON DISAPPEAR");
+				log("altura: "+outSpaceLayout.getHeight());
+				
+				TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
+				animTop.setDuration(2000);
+				animTop.setFillAfter(true);
+				outSpaceLayout.setAnimation(animTop);
+			
+				outSpaceLayout.setVisibility(View.GONE);
+				outSpaceLayout.invalidate();
+//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+//				p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
+//				listView.setLayoutParams(p);
+			}
+		};
+		
+		Handler handler = new Handler();
+		handler.postDelayed(r,10000);			
+	}
+	
 	/*
 	 * Handle processed upload intent
 	 */
@@ -8087,23 +8198,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				usedSpaceTV.setText(used);
 				totalSpaceTV.setText(total);
 				
-				accountType = accountInfo.getProLevel();
+				accountType = accountInfo.getProLevel();				
 				
 				switch (accountType){
 					case 0:{
-						levelAccountDetails = -1;
-						log("account FREE: "+usedPerc+" percent");
-						if(drawerItem==DrawerItem.CLOUD_DRIVE){
-							if(usedPerc<95){
-								log("usedSpacePerc<95");
-								if(Util.showMessageRandom()){
-						    		log("Random: TRUE");
-						    		if(fbFLol!=null){
-						    			fbFLol.showProPanel();
-						    		}						    		
-						    	}							
-							}
-				        }	
+						levelAccountDetails = -1;						
 						break;
 					}
 					case 1:{
@@ -8121,6 +8220,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					case 4:{
 						levelAccountDetails = 0;
 						break;
+					}
+				}
+//				usedPerc=96;	
+				if(usedPerc>=95){
+					showOverquotaPanel();			
+				}	
+				else{	
+					outSpaceLayout.setVisibility(View.GONE);		
+					if(accountType==0){
+						log("usedSpacePerc<95");
+						if(Util.showMessageRandom()){
+				    		log("Random: TRUE");
+				    		showProPanel();		    							    		
+						}
 					}
 				}
 
@@ -9342,5 +9455,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	public void setProgressPercent(int progressPercent) {
 		this.progressPercent = progressPercent;
+	}
+
+	public MegaAccountDetails getAccountInfo() {
+		return accountInfo;
+	}
+
+	public void setAccountInfo(MegaAccountDetails accountInfo) {
+		this.accountInfo = accountInfo;
 	}
 }
