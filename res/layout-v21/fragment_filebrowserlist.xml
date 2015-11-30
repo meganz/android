@@ -60,40 +60,7 @@
         android:layout_marginTop="@dimen/standard_margin"
         android:textColor="@color/text_secondary"
         android:textSize="16sp" />
-
-    <LinearLayout
-        android:id="@+id/out_space"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center|fill_horizontal"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/out_space_text"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/navigation_drawer_background"
-            android:gravity="center"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="20dp"
-            android:text="@string/warning_out_space"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/out_space_btn"
-            android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/btn_default_holo_light_without_corners"
-            android:text="@string/my_account_upgrade_pro"
-            android:textColor="@color/button_text" />
-    </LinearLayout>
-
+   
     <android.support.v7.widget.RecyclerView
         android:id="@+id/file_list_view_browser"
         android:layout_width="match_parent"
@@ -718,11 +685,4 @@
 
         </LinearLayout>
     </mega.privacy.android.app.components.SlidingUpPanelLayout>
-
-    <include
-	   android:layout_width="fill_parent"
-	   android:layout_height="wrap_content"
-	   layout="@layout/layout_get_pro_account" 
-	   android:layout_alignParentBottom="true"
-	   android:visibility="gone"/>
 </RelativeLayout>

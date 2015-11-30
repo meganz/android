@@ -83,10 +83,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public static String DB_FILE = "0";
 	public static String DB_FOLDER = "1";
 	MegaApiAndroid megaApi;
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
 	RelativeLayout contentTextLayout;
 	
 	float density;
@@ -512,55 +508,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
 			contentTextParams.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.offline_out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.offline_out_space_btn);
-			
-			if (context instanceof ManagerActivityLollipop){
-				
-				outSpaceButton.setOnClickListener(this);
-				usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-				
-				if(usedSpacePerc>95){
-					//Change below of ListView
-					log("usedSpacePerc>95");
-//					RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//					p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//					listView.setLayoutParams(p);
-					outSpaceLayout.setVisibility(View.VISIBLE);
-					outSpaceLayout.bringToFront();
-					
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {					
-						
-						@Override
-						public void run() {
-							log("BUTTON DISAPPEAR");
-							log("altura: "+outSpaceLayout.getHeight());
-							
-							TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-							animTop.setDuration(2000);
-							animTop.setFillAfter(true);
-							outSpaceLayout.setAnimation(animTop);
-						
-							outSpaceLayout.setVisibility(View.GONE);
-							outSpaceLayout.invalidate();
-//							RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//							p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//							listView.setLayoutParams(p);
-						}
-					}, 15 * 1000);
-					
-				}	
-				else{
-					outSpaceLayout.setVisibility(View.GONE);
-				}
-			}
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}		
-			
 
 			mOffList=dbH.findByPath(pathNavigation);
 			
@@ -746,55 +693,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
 			contentTextParams.setMargins(Util.scaleWidthPx(65, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.offline_out_space_grid);
-			outSpaceText =  (TextView) v.findViewById(R.id.offline_out_space_text_grid);
-			outSpaceButton = (Button) v.findViewById(R.id.offline_out_space_btn_grid);
-			
-			if (context instanceof ManagerActivityLollipop){
-				
-				outSpaceButton.setOnClickListener(this);
-				usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-				
-				if(usedSpacePerc>95){
-					//Change below of ListView
-					log("usedSpacePerc>95");
-//					RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//					p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//					listView.setLayoutParams(p);
-					outSpaceLayout.setVisibility(View.VISIBLE);
-					outSpaceLayout.bringToFront();
-					
-					Handler handler = new Handler();
-					handler.postDelayed(new Runnable() {					
-						
-						@Override
-						public void run() {
-							log("BUTTON DISAPPEAR");
-							log("altura: "+outSpaceLayout.getHeight());
-							
-							TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-							animTop.setDuration(2000);
-							animTop.setFillAfter(true);
-							outSpaceLayout.setAnimation(animTop);
-						
-							outSpaceLayout.setVisibility(View.GONE);
-							outSpaceLayout.invalidate();
-//							RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//							p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//							listView.setLayoutParams(p);
-						}
-					}, 15 * 1000);
-					
-				}	
-				else{
-					outSpaceLayout.setVisibility(View.GONE);
-				}
-			}
-			else{
-				outSpaceLayout.setVisibility(View.GONE);
-			}		
-			
 
 			mOffList=dbH.findByPath(pathNavigation);
 			
@@ -1325,13 +1223,6 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	public void onClick(View v) {
 		log("onClick");
 		switch(v.getId()){
-			case R.id.offline_out_space_btn:
-			case R.id.offline_out_space_btn_grid:{
-			
-				log("Click Account Button");
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
-				break;
-			}
 			case R.id.offline_list_out_options:
 			case R.id.offline_grid_out_options:{
 				hideOptionsPanel();

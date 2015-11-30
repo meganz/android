@@ -5,7 +5,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import mega.privacy.android.app.CreateThumbPreviewService;
 import mega.privacy.android.app.DatabaseHandler;
@@ -20,13 +19,10 @@ import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
-import nz.mega.sdk.MegaAccountDetails;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
-import nz.mega.sdk.MegaRequest;
-import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaTransfer;
 import android.annotation.SuppressLint;
@@ -36,7 +32,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
@@ -58,8 +53,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -87,16 +80,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	RelativeLayout contentTextLayout;
 	boolean downloadInProgress = false;
 	ProgressBar progressBar;
-	
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
-	
-	LinearLayout getProLayout=null;
-	TextView getProText;
-	TextView leftCancelButton;
-	TextView rightUpgradeButton;
 	
 	MegaApiAndroid megaApi;		
 
@@ -449,55 +432,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn);
-			outSpaceButton.setOnClickListener(this);
-			
-			//PRO PANEL
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
-			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
-			rightUpgradeButton = (TextView) v.findViewById(R.id.btnRight_upgrade);
-			leftCancelButton = (TextView) v.findViewById(R.id.btnLeft_cancel);			
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>=95){
-				
-				//Change below of ListView
-				log("usedSpacePerc>95");
-			
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);	    	   
-			}
-
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_LIST);
 			}
@@ -696,54 +630,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 			contentText.setLayoutParams(contentTextParams);
 			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
-			outSpaceButton.setOnClickListener(this);
-			
-			//PRO PANEL
-			getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
-			getProText= (TextView) v.findViewById(R.id.get_pro_account_text);
-			rightUpgradeButton = (TextView) v.findViewById(R.id.btnRight_upgrade);
-			leftCancelButton = (TextView) v.findViewById(R.id.btnLeft_cancel);
-			
-			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-			
-			if(usedSpacePerc>95){
-				
-				//Change below of ListView
-				log("usedSpacePerc>95");
-//				RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//				p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//				listView.setLayoutParams(p);
-				outSpaceLayout.setVisibility(View.VISIBLE);
-				outSpaceLayout.bringToFront();
-				
-				Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {					
-					
-					@Override
-					public void run() {
-						log("BUTTON DISAPPEAR");
-						log("altura: "+outSpaceLayout.getHeight());
-						
-						TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-						animTop.setDuration(2000);
-						animTop.setFillAfter(true);
-						outSpaceLayout.setAnimation(animTop);
-					
-						outSpaceLayout.setVisibility(View.GONE);
-						outSpaceLayout.invalidate();
-//						RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//						p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//						listView.setLayoutParams(p);
-					}
-				}, 15 * 1000);				
-			}	
-			else{
-				outSpaceLayout.setVisibility(View.GONE);	    	   
-			}
-			
 			if (adapter == null){
 				adapter = new MegaBrowserLollipopAdapter(context, this, nodes, parentHandle, recyclerView, aB, ManagerActivityLollipop.FILE_BROWSER_ADAPTER, MegaBrowserLollipopAdapter.ITEM_VIEW_TYPE_GRID);
 			}
@@ -938,14 +824,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			leftCancelButton = (Button) v.findViewById(R.id.btnLeft_cancel_grid);
 			rightUpgradeButton = (Button) v.findViewById(R.id.btnRight_upgrade_grid);
 			leftCancelButton.setOnClickListener(this);
-			rightUpgradeButton.setOnClickListener(this);
-			
-			outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_grid);
-			outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_grid);
-			outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_grid);
-//			outSpaceButton.setVisibility(View.INVISIBLE);
-			outSpaceButton.setOnClickListener(this);
-			
+			rightUpgradeButton.setOnClickListener(this);			
+		
 			usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
 			
 			if(usedSpacePerc>95){
@@ -1034,39 +914,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			return v;
 		}		
-	}
-	
-	public void showProPanel(){
-		log("showProPanel");
-		//Left and Right margin
-		LinearLayout.LayoutParams proTextParams = (LinearLayout.LayoutParams)getProText.getLayoutParams();
-		proTextParams.setMargins(0, Util.scaleHeightPx(15, outMetrics), 0, 0); 
-		getProText.setLayoutParams(proTextParams);		
-		
-		rightUpgradeButton.setOnClickListener(this);
-		android.view.ViewGroup.LayoutParams paramsb2 = rightUpgradeButton.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-		rightUpgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
-		paramsb2.width = Util.scaleWidthPx(73, outMetrics);			
-		//Left and Right margin
-		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)rightUpgradeButton.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		rightUpgradeButton.setLayoutParams(optionTextParams);		
-		
-		leftCancelButton.setOnClickListener(this);
-		leftCancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));
-		android.view.ViewGroup.LayoutParams paramsb1 = leftCancelButton.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-//		paramsb1.width = Util.scaleWidthPx(145, metrics);
-		leftCancelButton.setLayoutParams(paramsb1);
-		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)leftCancelButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		leftCancelButton.setLayoutParams(cancelTextParams);		
-		
-		getProLayout.setVisibility(View.VISIBLE);
-		getProLayout.bringToFront();
-		fabButton.setVisibility(View.GONE);
 	}
 	
 	public void showUploadPanel(){
@@ -1169,14 +1016,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	public void showAlertStorage(){
-		log("showAlertStorage "+usedSpacePerc);
-		
-		usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-		log("PERCENTA: "+usedSpacePerc);
-				
-	}
 		
 	@SuppressLint("InlinedApi")
 	@Override
@@ -1253,12 +1092,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				hideUploadPanel();
 				break;
 			}
-			
-			case R.id.out_space_btn:
-			case R.id.out_space_btn_grid:{
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
-				break;
-			}
 		
 			case R.id.file_list_out_options:
 			case R.id.file_grid_out_options:{
@@ -1266,17 +1099,6 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 				break;
 			}
 			
-			case R.id.btnLeft_cancel:{
-				getProLayout.setVisibility(View.GONE);
-				fabButton.setVisibility(View.VISIBLE);
-				break;
-			}
-			
-			case R.id.btnRight_upgrade:{
-				//Add navigation to Upgrade Account
-				break;
-			}
-		
 			case R.id.file_list_option_download_layout:
 			case R.id.file_grid_option_download_layout: {
 				log("Download option");

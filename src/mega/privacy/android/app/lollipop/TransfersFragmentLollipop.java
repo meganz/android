@@ -35,7 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
-public class TransfersFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener{
+public class TransfersFragmentLollipop extends Fragment implements RecyclerView.OnItemTouchListener{
 
 	Context context;
 	ActionBar aB;
@@ -50,10 +50,6 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 	ImageView pauseImage;
 	TextView pauseText;
 	ProgressBar progressBar;
-	LinearLayout outSpaceLayout=null;
-	TextView outSpaceText;
-	Button outSpaceButton;
-	int usedSpacePerc;
 	
 	float density;
 	DisplayMetrics outMetrics;
@@ -133,14 +129,6 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		adapter = new MegaTransfersLollipopAdapter(context, this, tL, aB);
 		adapter.setPositionClicked(-1);
 		
-		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space_tranfers);
-		outSpaceText =  (TextView) v.findViewById(R.id.out_space_text_tranfers);
-		outSpaceButton = (Button) v.findViewById(R.id.out_space_btn_tranfers);
-		outSpaceButton.setVisibility(View.VISIBLE);
-		outSpaceButton.setOnClickListener(this);
-		
-		usedSpacePerc=((ManagerActivityLollipop)context).getUsedPerc();
-		
 		contentTextLayout = (RelativeLayout) v.findViewById(R.id.transfers_list_content_text_layout);
 		progressBar = (ProgressBar) v.findViewById(R.id.transfers_list_download_progress_bar);
 		progressBar.setProgress(((ManagerActivityLollipop)context).getProgressPercent());
@@ -149,43 +137,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
 		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
 		contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
 		contentText.setLayoutParams(contentTextParams);
-		
-		if(usedSpacePerc>95){
-			//Change below of ListView
-			log("usedSpacePerc>95");
-//			RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//			p.addRule(RelativeLayout.ABOVE, R.id.out_space);
-//			listView.setLayoutParams(p);
-			outSpaceLayout.setVisibility(View.VISIBLE);
-			outSpaceLayout.bringToFront();
-			
-			Handler handler = new Handler();
-			handler.postDelayed(new Runnable() {					
-				
-				@Override
-				public void run() {
-					log("BUTTON DISAPPEAR");
-					log("altura: "+outSpaceLayout.getHeight());
-					
-					TranslateAnimation animTop = new TranslateAnimation(0, 0, 0, outSpaceLayout.getHeight());
-					animTop.setDuration(2000);
-					animTop.setFillAfter(true);
-					outSpaceLayout.setAnimation(animTop);
-				
-					outSpaceLayout.setVisibility(View.GONE);
-					outSpaceLayout.invalidate();
-//					RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-//					p.addRule(RelativeLayout.ABOVE, R.id.buttons_layout);
-//					listView.setLayoutParams(p);
-				}
-			}, 15 * 1000);
-			
-		}	
-		else{
-			outSpaceLayout.setVisibility(View.GONE);
-		}
-		
-		
+
 		adapter.setMultipleSelect(false);
 		
 		listView.setAdapter(adapter);
@@ -242,17 +194,7 @@ public class TransfersFragmentLollipop extends Fragment implements OnClickListen
         context = activity;
         aB = ((AppCompatActivity)activity).getSupportActionBar();
     }
-	
-	@Override
-	public void onClick(View v) {
 
-		switch(v.getId()){
-			case R.id.out_space_btn_tranfers:
-				((ManagerActivityLollipop)getActivity()).upgradeAccountButton();
-				break;
-		}
-	}
-	
     public void itemClick(AdapterView<?> parent, View view, int position, long id) {
 		
 		if (adapter != null){
