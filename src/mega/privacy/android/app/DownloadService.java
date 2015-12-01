@@ -176,6 +176,7 @@ public class DownloadService extends Service implements MegaTransferListenerInte
 	
 	@Override
 	public void onDestroy(){
+		log("onDestroy");
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))

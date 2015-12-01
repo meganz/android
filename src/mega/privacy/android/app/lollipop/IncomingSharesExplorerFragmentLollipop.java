@@ -55,7 +55,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	TextView contentText;
-	LinearLayout outSpaceLayout=null;
 	int deepBrowserTree = 0;
 	View separator;
 	TextView optionText;
@@ -145,10 +144,6 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
-		
-		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-		outSpaceLayout.setVisibility(View.GONE);
-		
 
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);

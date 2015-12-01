@@ -51,8 +51,10 @@
     <string name="confirmation_remove_contact" context="confirmation message before removing a contact. Do not write question mark">¿Quieres borrar el contacto?</string>    
     <string name="confirmation_remove_multiple_contacts" context="confirmation message before removing mutiple contacts">¿Deseas borras estos contactos?</string>  
     <string name="confirmation_move_to_rubbish" context="confirmation message before removing a file">¿Está seguro de que desea enviar este elemento a la Papelera?</string>
+    <string name="confirmation_move_to_rubbish_plural" context="confirmation message before removing a file">¿Está seguro de que desea enviar estos elementos a la Papelera?</string>
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Borrar de MEGA</string>
     <string name="confirmation_delete_from_mega" context="confirmation message before removing a file">¿Está seguro de que desear eliminar completamente este elemento de MEGA?</string>
+    <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">¿Está seguro de que desear eliminar completamente estos elementos de MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Entrantes</string>
@@ -317,7 +319,11 @@
     <string name="context_no_sent" context="error message when sending a file">Error. No se pudo enviar</string>
     <string name="context_no_copied" context="error message">Error. No se pudo copiar</string>
     <string name="context_correctly_moved" context="success message when moving a node">Movido correctamente</string>
+        <string name="number_correctly_moved" context="success message when moving a node">%d ficheros movidos correctamente</string>
+    <string name="number_incorrectly_moved" context="success message when moving a node">, %d ficheros no se han movido</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Enviado correctamente a la Papelera</string>
+    <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d ficheros enviados a la Papelera correctamente</string>
+    <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">, %d ficheros no se han enviado correctamente</string>
     <string name="context_no_moved" context="error message">Error. No se pudo mover</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Compartido correctamente</string>
     <string name="context_no_shared" context="error message">Error. No se pudo compartir</string>
