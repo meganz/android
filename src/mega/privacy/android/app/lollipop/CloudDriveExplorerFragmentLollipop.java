@@ -62,7 +62,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 	TextView contentText;
 	TextView optionText;
 	TextView cancelText;
-	LinearLayout outSpaceLayout=null;
 	View separator;
 
 	@Override
@@ -144,9 +143,6 @@ public class CloudDriveExplorerFragmentLollipop extends Fragment implements OnCl
 		
 		contentText = (TextView) v.findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
-		
-		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-		outSpaceLayout.setVisibility(View.GONE);
 		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);

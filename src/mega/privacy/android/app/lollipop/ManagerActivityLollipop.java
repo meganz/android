@@ -424,6 +424,88 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     boolean inventoryFinished = false;
     boolean accountDetailsFinished = false;
     
+    
+    //Listener for  multiselect
+    private class MultipleRequestListener implements MegaRequestListenerInterface{
+		
+		public MultipleRequestListener(boolean moveToRubbish) {
+			super();
+			this.moveToRubbishListener = moveToRubbish;
+		}
+
+		int counter = 0;
+		int error = 0;
+		int max_items = 0;
+		boolean moveToRubbishListener = false;
+		String message;
+		
+		@Override
+		public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void onRequestTemporaryError(MegaApiJava api, MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			counter--;
+			error++;
+			log("Counter on onRequestTemporaryError: "+counter);
+		}
+		
+		@Override
+		public void onRequestStart(MegaApiJava api, MegaRequest request) {
+			// TODO Auto-generated method stub
+			counter++;
+			if(counter>max_items){
+				max_items=counter;
+			}
+			log("Counter on RequestStart: "+counter);
+		}
+		
+		@Override
+		public void onRequestFinish(MegaApiJava api, MegaRequest request, MegaError e) {
+			// TODO Auto-generated method stub
+			counter--;
+			if (e.getErrorCode() != MegaError.API_OK){				
+				error++;
+			}
+			int requestType = request.getType();
+			log("Counter on RequestFinish: "+counter);
+			if(counter==0){	
+				switch (requestType) {
+					case  MegaRequest.TYPE_MOVE:{
+						if (moveToRubbishListener){					
+							log("move to rubbish request finished");
+							if(error>0){
+								message = getString(R.string.number_correctly_moved_to_rubbish, max_items-error) + getString(R.string.number_incorrectly_moved_to_rubbish, error);
+							}
+							else{
+								message = getString(R.string.number_correctly_moved_to_rubbish, max_items);
+							}
+						}
+						else{
+							log("move nodes request finished");
+							if(error>0){
+								message = getString(R.string.number_correctly_moved, max_items-error) + getString(R.string.number_incorrectly_moved, error);
+							}
+							else{
+								message = getString(R.string.number_correctly_moved, max_items);
+							}
+						}
+						break;
+					}
+					case  MegaRequest.TYPE_REMOVE:{
+						break;
+					}
+					default:
+						break;
+				}
+				Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
+			}			
+		}
+	};
+    
  // Callback for when a purchase is finished
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
         public void onIabPurchaseFinished(IabResult result, Purchase purchase) {
@@ -5697,21 +5779,47 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		        case DialogInterface.BUTTON_POSITIVE:
 		        	//TODO remove the outgoing shares
 		        	
-		        	for (int i=0;i<handleList.size();i++){
-		    			//Check if the node is not yet in the rubbish bin (if so, remove it)
-		    			MegaNode parent = megaApi.getNodeByHandle(handleList.get(i));
-		    			while (megaApi.getParentNode(parent) != null){
+		        	MultipleRequestListener moveMultipleListener = null; 
+		        	MegaNode parent;
+	    			//Check if the node is not yet in the rubbish bin (if so, remove it)
+		        	if(handleList!=null){
+		        		parent = megaApi.getNodeByHandle(handleList.get(0));
+		        		while (megaApi.getParentNode(parent) != null){
 		    				parent = megaApi.getParentNode(parent);
-		    			}
-		    				
-		    			if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
+		    			}	
+		        		if (parent.getHandle() != megaApi.getRubbishNode().getHandle()){
 		    				moveToRubbish = true;
-		    				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, managerActivity);
+		    				moveMultipleListener = new MultipleRequestListener(true);
+		        		}
+	    				else{
+	    					moveToRubbish = false;
+	    					moveMultipleListener = new MultipleRequestListener(false);
+	    				}
+		        	}
+					
+					if(handleList.size()>1){
+						log("MOVE multiple: "+handleList.size());
+						for (int i=0;i<handleList.size();i++){			    				
+			    			if (moveToRubbish){
+		    					megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(i)), rubbishNode, moveMultipleListener);
+	    				
+			    			}
+			    			else{			    				
+			    				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), moveMultipleListener);
+			    			}
+			    		}
+					}
+					else{
+						log("MOVE single");    				
+		    			if (moveToRubbish){
+		    				moveMultipleListener = new MultipleRequestListener(true);
+		    				megaApi.moveNode(megaApi.getNodeByHandle(handleList.get(0)), rubbishNode, managerActivity);
 		    			}
 		    			else{
-		    				megaApi.remove(megaApi.getNodeByHandle(handleList.get(i)), managerActivity);
+		    				moveMultipleListener = new MultipleRequestListener(false);
+		    				megaApi.remove(megaApi.getNodeByHandle(handleList.get(0)), managerActivity);
 		    			}
-		    		}
+					}		        	
 		    		
 		    		if (moveToRubbish){
 		    			ProgressDialog temp = null;
@@ -5756,7 +5864,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
-	            builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+				if (handleList.size() > 1){
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish_plural));
+				}
+				else{
+					builder.setMessage(getResources().getString(R.string.confirmation_move_to_rubbish));
+				}	            
 	            builder.setPositiveButton(R.string.general_yes, dialogClickListener);
 	            builder.setNegativeButton(R.string.general_no, dialogClickListener);
 	            builder.show();
@@ -5765,7 +5878,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				
 				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
-				builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+				if (handleList.size() > 1){
+					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega_plural));
+				}
+				else{
+					builder.setMessage(getResources().getString(R.string.confirmation_delete_from_mega));
+				}				
 				builder.setPositiveButton(R.string.general_yes, dialogClickListener);
 				builder.setNegativeButton(R.string.general_no, dialogClickListener);
 				builder.show();
@@ -7423,8 +7541,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			statusDialog = temp;
 			
-			for(int i=0; i<moveHandles.length;i++){
-				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, this);
+			MultipleRequestListener moveMultipleListener = new MultipleRequestListener(false); 
+			
+			if(moveHandles.length>1){
+				log("MOVE multiple: "+moveHandles.length);
+				moveToRubbish = false;
+				for(int i=0; i<moveHandles.length;i++){
+					megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[i]), parent, moveMultipleListener);
+				}
+			}
+			else{
+				log("MOVE single");
+				moveToRubbish = false;
+				megaApi.moveNode(megaApi.getNodeByHandle(moveHandles[0]), parent, this);
 			}
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
@@ -8520,27 +8649,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				}						
 					}
 				}	
-			}	
-			
-			if (moveToRubbish){
-				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved_to_rubbish), Snackbar.LENGTH_LONG).show();	
-				}
-				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();	
-				}
-				moveToRubbish = false;
-				log("move to rubbish request finished");
-			}
-			else{
-				if (e.getErrorCode() == MegaError.API_OK){
-					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();	
-				}
-				else{
-					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();	
-				}
-			
-				log("move nodes request finished");
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_PAUSE_TRANSFERS){
@@ -9221,7 +9329,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		else if(e.getErrorCode() == MegaError.API_EINCOMPLETE){
-			
+			log("API_EINCOMPLETE: " + transfer.getFileName());
 			totalSizeToDownload -= transfer.getTotalBytes();
 			Long currentSizeDownloaded = transfersDownloadedSize.get(transfer.getTag());
 			if (currentSizeDownloaded != null){
