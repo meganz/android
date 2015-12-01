@@ -329,7 +329,11 @@
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">, %d items not correctly sent</string>
     <string name="context_no_moved" context="error message">Error. Not moved</string>
     <string name="context_correctly_shared" context="success message when sharing a folder">Correctly shared</string>
+    <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d process of sharing not completed</string>
+    <string name="context_correctly_shared_removed" context="success message when sharing a folder">Correctly remove shares</string>
+    <string name="context_no_shared_number_removed" context="error message when sharing a folder">Error. %d process of removing shares not completed</string>
     <string name="context_no_shared" context="error message">Error. Not shared</string>
+    <string name="context_remove_sharing" context="success message when removing a sharing">Folder sharing removed</string>
     <string name="context_no_link" context="error message">Impossible to get the link</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correctly removed from MEGA</string>
     <string name="context_no_removed" context="error message">Error. Not removed from MEGA</string>
