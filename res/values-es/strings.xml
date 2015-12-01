@@ -330,6 +330,12 @@
     <string name="context_no_link" context="error message">Imposible obtener el enlace</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Borrado correctamente de MEGA</string>
     <string name="context_no_removed" context="error message">Error. No se pudo borrar de MEGA</string>
+    <string name="number_correctly_removed" context="success message when deleting a node">%d ficheros borrados de MEGA</string>
+    <string name="number_no_removed" context="success message when deleting a node">, %d so se han podido borrar</string>
+    <string name="number_correctly_sent" context="success message when sending multiple files">%d ficheros correctamente enviados</string>
+    <string name="number_no_sent" context="error message when sending multiple files">, %d ficheros no se han podido enviar</string>
+    <string name="number_correctly_copied" context="success message when sending multiple files">%d ficheros correctamente copiados</string>
+    <string name="number_no_copied" context="error message when sending multiple files">, %d ficheros no se han podido copiar</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Enviado correctamente a:</string>
     
     <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>
