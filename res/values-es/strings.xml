@@ -319,14 +319,18 @@
     <string name="context_no_sent" context="error message when sending a file">Error. No se pudo enviar</string>
     <string name="context_no_copied" context="error message">Error. No se pudo copiar</string>
     <string name="context_correctly_moved" context="success message when moving a node">Movido correctamente</string>
-        <string name="number_correctly_moved" context="success message when moving a node">%d ficheros movidos correctamente</string>
+    <string name="number_correctly_moved" context="success message when moving a node">%d ficheros movidos correctamente</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">, %d ficheros no se han movido</string>
     <string name="context_correctly_moved_to_rubbish" context="success message when moving a node">Enviado correctamente a la Papelera</string>
     <string name="number_correctly_moved_to_rubbish" context="success message when moving a node">%d ficheros enviados a la Papelera correctamente</string>
     <string name="number_incorrectly_moved_to_rubbish" context="success message when moving a node">, %d ficheros no se han enviado correctamente</string>
     <string name="context_no_moved" context="error message">Error. No se pudo mover</string>
-    <string name="context_correctly_shared" context="success message when sharing a folder">Compartido correctamente</string>
+    <string name="context_correctly_shared" context="success message when sharing a folder">Carpeta compartida correctamente</string>
+    <string name="context_no_shared_number" context="error message when sharing a folder">Error. %d comparticiones no completadas</string>
+    <string name="context_correctly_shared_removed" context="success message when sharing a folder">Compartición eliminada con éxito</string>
+    <string name="context_no_shared_number_removed" context="error message when sharing a folder">Error. %d eliminaciones de compartición han fallado</string>
     <string name="context_no_shared" context="error message">Error. No se pudo compartir</string>
+    <string name="context_remove_sharing" context="success message when removing a sharing">Compartición de carpeta eliminada</string>
     <string name="context_no_link" context="error message">Imposible obtener el enlace</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Borrado correctamente de MEGA</string>
     <string name="context_no_removed" context="error message">Error. No se pudo borrar de MEGA</string>

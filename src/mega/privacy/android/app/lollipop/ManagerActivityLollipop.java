@@ -532,6 +532,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}
 						break;
 					}
+					case MegaRequest.TYPE_SHARE:{
+						log("multiple share request finished");
+						if(error>0){
+							if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
+								message = getString(R.string.context_no_shared_number_removed, error);
+							}
+							else{
+								message = getString(R.string.context_no_shared_number, error);
+							}
+						}
+						else{
+							if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
+								message = getString(R.string.context_correctly_shared_removed);
+							}
+							else{
+								message = getString(R.string.context_correctly_shared);
+							}
+						}
+					}
 					default:
 						break;
 				}
@@ -6592,16 +6611,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
-		ProgressDialog temp = null;
-		try{
-			temp = new ProgressDialog(this);
-			temp.setMessage(getString(R.string.remove_all_sharing)); 
-			temp.show();
-		}
-		catch(Exception e){
-			return;
-		}
-		statusDialog = temp;
+		log("removeAllSharingContacts");
 		
 		for(int j=0; j<listContacts.size();j++){
 			String cMail = listContacts.get(j).getUser();
@@ -6620,13 +6630,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				megaApi.disableExport(node, this);
 			}
 		}	
-		//TODO change the place
-		try{
-			statusDialog.dismiss();
-		}
-		catch(Exception e){
-			return;
-		}		
 	}
 	
 	public void cameraUploadsClicked(){
@@ -7248,46 +7251,59 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final long folderHandle = intent.getLongExtra("SELECT", 0);			
 			
 			final MegaNode parent = megaApi.getNodeByHandle(folderHandle);
-			
+			 
 			if (parent.isFolder()){
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 				dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int item) {
-
-						ProgressDialog temp = null;
-						try{
-							temp = new ProgressDialog(managerActivity);
-							temp.setMessage(getString(R.string.context_sharing_folder));
-							temp.show();
-						}
-						catch(Exception e){
-							return;
-						}
-						statusDialog = temp;
-						permissionsDialog.dismiss();						
-						
+					public void onClick(DialogInterface dialog, int item) {			
+						MultipleRequestListener shareMultipleListener = new MultipleRequestListener(-1);;
 						switch(item) {
 						    case 0:{
-		                    	for (int i=0;i<selectedContacts.length;i++){
-		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+						    	if(selectedContacts.length>1){
+						    		log("Share READ one file multiple contacts");
+						    		for (int i=0;i<selectedContacts.length;i++){
+			                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+			                    		megaApi.share(parent, user, MegaShare.ACCESS_READ,shareMultipleListener);
+			                    	}
+						    	}
+						    	else{
+						    		log("Share READ one file one contact");
+						    		MegaUser user= megaApi.getContact(selectedContacts[0]);		                    		
 		                    		megaApi.share(parent, user, MegaShare.ACCESS_READ,managerActivity);
-		                    	}
+						    	}
+		                    	
 		                    	break;
 		                    }
-		                    case 1:{	                    	
-		                    	for (int i=0;i<selectedContacts.length;i++){
-		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
-		                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,managerActivity);
+		                    case 1:{	
+		                    	if(selectedContacts.length>1){
+						    		log("Share READWRITE one file multiple contacts");
+						    		for (int i=0;i<selectedContacts.length;i++){
+			                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+			                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,shareMultipleListener);
+			                    	}
 		                    	}
+		                    	else{
+		                    		log("Share READWRITE one file one contact");
+		                    		MegaUser user= megaApi.getContact(selectedContacts[0]);		                    		
+		                    		megaApi.share(parent, user, MegaShare.ACCESS_READWRITE,managerActivity);
+		                    	}       	
 		                        break;
 		                    }
-		                    case 2:{                   	
-		                    	for (int i=0;i<selectedContacts.length;i++){
-		                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
-		                    		megaApi.share(parent, user, MegaShare.ACCESS_FULL,managerActivity);
+		                    case 2:{   
+		                    	if(selectedContacts.length>1){
+						    		log("Share ACCESS_FULL one file multiple contacts");
+						    		for (int i=0;i<selectedContacts.length;i++){
+			                    		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
+			                    		megaApi.share(parent, user, MegaShare.ACCESS_FULL,shareMultipleListener);
+			                    	}
 		                    	}
+		                    	else{
+		                    		log("Share ACCESS_FULL one file one contact");
+		                    		MegaUser user= megaApi.getContact(selectedContacts[0]);		                    		
+		                    		megaApi.share(parent, user, MegaShare.ACCESS_FULL,managerActivity);
+		                    	} 
 		                        break;
 		                    }
 		                }
@@ -7339,16 +7355,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int item) {
-								ProgressDialog temp = null;
-								try{
-									temp = new ProgressDialog(managerActivity);
-									temp.setMessage(getString(R.string.context_sharing_folder));
-									temp.show();
-								}
-								catch(Exception e){
-									return;
-								}
-								statusDialog = temp;
+
 								permissionsDialog.dismiss();
 								
 								switch(item) {
@@ -9038,10 +9045,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			} 
 			catch (Exception ex) {log("Exception");}
 			if (e.getErrorCode() == MegaError.API_OK){
-				log("OK MegaRequest.TYPE_SHARE");				
+				log("OK MegaRequest.TYPE_SHARE");
+				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
+					Snackbar.make(fragmentContainer, getString(R.string.context_remove_sharing), Snackbar.LENGTH_LONG).show();
+				}
+				else{
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_shared), Snackbar.LENGTH_LONG).show();
+				}				
 			}
 			else{
 				log("ERROR MegaRequest.TYPE_SHARE");
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_shared), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
