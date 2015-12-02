@@ -48,6 +48,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -98,7 +99,6 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	private File path;
 	private File root;
 	DisplayMetrics metrics;
-	private String buttonPrefix;
 	private RelativeLayout viewContainer;
 //	private TextView windowTitle;
 	private TextView button;
@@ -107,6 +107,8 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	RecyclerView.LayoutManager mLayoutManager;
 	private TextView cancelButton;
 	GestureDetectorCompat detector;
+	ImageView emptyImageView;
+	TextView emptyTextView;
 	
 	private Boolean fromSettings;
 	
@@ -392,6 +394,10 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 				paramsb2.width = Util.scaleWidthPx(73, metrics);
 			}
 		}		
+		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
+		emptyTextView = (TextView) findViewById(R.id.file_storage_empty_text);
+		emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+		emptyTextView.setText(R.string.file_browser_empty_folder);
 		
 		button.setLayoutParams(paramsb2);
 		//Left and Right margin
@@ -488,6 +494,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	 * Update file list for new folder
 	 */
 	private void setFiles(File path) {
+		log("setFiles");
 		List<FileDocument> documents = new ArrayList<FileDocument>();
 		if (!path.canRead()) {
 			Util.showErrorAlertDialog(getString(R.string.error_io_problem),
@@ -507,8 +514,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 			Collections.sort(documents, new CustomComparator());
 		}
-		adapter.setFiles(documents);
-
+		if(documents.size()==0){
+			log("documents SIZE 0");
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+		}
+		else{
+			log("documents: "+documents.size());
+			adapter.setFiles(documents);
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}
 	}
 
 	private void updateActionModeTitle() {
