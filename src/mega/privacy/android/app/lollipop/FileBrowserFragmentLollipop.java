@@ -71,8 +71,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	ActionBar aB;
 	RecyclerView recyclerView;
 	GestureDetectorCompat detector;
-	ImageView emptyImageView;
 	ImageView transferArrow;
+	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapter;
 	FileBrowserFragmentLollipop fileBrowserFragment = this;

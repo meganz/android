@@ -30,6 +30,7 @@ import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -49,6 +50,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -81,13 +83,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	TextView contentText;
     RelativeLayout fragmentContainer;
 	TextView downloadButton;
+	private TextView cancelButton;
 	LinearLayout optionsBar;
 	
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
-	
-	LinearLayout outSpaceLayout=null;
-	LinearLayout buttonsLayout=null;
 	MegaBrowserLollipopAdapter adapterList;
 	
 	private int orderGetChildren = MegaApiJava.ORDER_DEFAULT_ASC;
@@ -269,15 +269,22 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		paramsb1.width = Util.scaleWidthPx(83, outMetrics);
 		downloadButton.setLayoutParams(paramsb1);
 		//Left and Right margin
-		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-		downloadButton.setLayoutParams(cancelTextParams);
-
-		outSpaceLayout = (LinearLayout) findViewById(R.id.out_space);
-		outSpaceLayout.setVisibility(View.GONE);
+		LinearLayout.LayoutParams donwlTextParams = (LinearLayout.LayoutParams)downloadButton.getLayoutParams();
+		donwlTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		downloadButton.setLayoutParams(donwlTextParams);
 		
-		buttonsLayout = (LinearLayout) findViewById(R.id.buttons_layout);
-		buttonsLayout.setVisibility(View.GONE);	
+		cancelButton = (TextView) findViewById(R.id.folder_link_cancel_button);
+		cancelButton.setOnClickListener(this);		
+		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));		
+		
+		android.view.ViewGroup.LayoutParams paramsb2 = cancelButton.getLayoutParams();		
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(145, metrics);
+		cancelButton.setLayoutParams(paramsb1);
+		//Left and Right margin
+		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+		cancelButton.setLayoutParams(cancelTextParams);	
 		
 		contentText = (TextView) findViewById(R.id.content_text);
 		contentText.setVisibility(View.GONE);
@@ -313,9 +320,9 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
             	log("onPanelSlide, offset " + slideOffset);
-            	if(slideOffset==0){
-            		hideOptionsPanel();
-            	}
+//            	if(slideOffset==0){
+//            		hideOptionsPanel();
+//            	}
             }
 
             @Override
@@ -597,6 +604,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		log("onRequestUpdate: " + request.getRequestString());
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onRequestFinish(MegaApiJava api, MegaRequest request,
 			MegaError e) {
@@ -607,9 +615,13 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				megaApiFolder.fetchNodes(this);	
 			}
 			else{
-				try{ 
-					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);
-					dialogBuilder.setPositiveButton(
+				try{
+					log("no link - show alert dialog");
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
+		            builder.setMessage(getString(R.string.general_error_folder_not_found));
+					builder.setTitle(getString(R.string.general_error_word));					
+					
+					builder.setPositiveButton(
 						getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
 							@Override
@@ -626,9 +638,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							}
 						});
 									
-					AlertDialog dialog = dialogBuilder.create();
+					AlertDialog dialog = builder.create();
 					dialog.show(); 
-					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
 					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
@@ -660,8 +671,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			else{
 				try{ 
-					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_folder_not_found), null);
-					dialogBuilder.setPositiveButton(
+					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
+		            builder.setMessage(getString(R.string.general_error_folder_not_found));
+					builder.setTitle(getString(R.string.general_error_word));
+					
+					builder.setPositiveButton(
 						getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
 							@Override
@@ -673,9 +687,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 							}
 						});
 									
-					AlertDialog dialog = dialogBuilder.create();
+					AlertDialog dialog = builder.create();
 					dialog.show(); 
-					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
 					Snackbar.make(fragmentContainer, getResources().getString(R.string.general_error_folder_not_found), Snackbar.LENGTH_LONG).show();
@@ -996,6 +1009,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				log("Out Panel");
 				hideOptionsPanel();
 				break;				
+			}
+			case R.id.folder_link_cancel_button:{
+				finish();
+				break;
 			}
 			case R.id.folder_link_list_option_download_layout: {
 				log("Download option");
