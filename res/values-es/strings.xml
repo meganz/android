@@ -305,7 +305,7 @@
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Invitación reenviada</string>
      <string name="context_invitacion_reply" context="success message when adding a contact">Contestación a la invitación enviada</string>
     <string name="context_contact_removed" context="success message when removing a contact">Contacto borrado</string>
-    <string name="context_contact_not_removed" context="error message">Error. No se pudo borrar</string>
+    <string name="context_contact_not_removed" context="error message">Error. No se pudo borrar el contacto</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permisos modificados</string>
     <string name="context_permissions_not_changed" context="error message">Error. No se pudo cambiar</string>
     <string name="context_folder_already_exists" context="message when trying to create a folder that already exists">La carpeta ya existe</string>
@@ -340,6 +340,8 @@
     <string name="number_no_sent" context="error message when sending multiple files">, %d ficheros no se han podido enviar</string>
     <string name="number_correctly_copied" context="success message when sending multiple files">%d ficheros correctamente copiados</string>
     <string name="number_no_copied" context="error message when sending multiple files">, %d ficheros no se han podido copiar</string>
+    <string name="number_contact_removed" context="success message when removing several contacts">%d contactos correctamente eliminados</string>
+    <string name="number_contact_not_removed" context="error message when removing several contacts">, %d contactos no se han podido eliminar</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Enviado correctamente a:</string>
     
     <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>

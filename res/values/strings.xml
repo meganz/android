@@ -307,7 +307,7 @@
     <string name="context_contact_invitation_deleted" context="success message when removing a contact request">Request deleted</string>
     <string name="context_contact_invitation_resent" context="success message when reinvite a contact">Request resent</string>
     <string name="context_invitacion_reply" context="success message when adding a contact">Reply to the invitation sent</string>
-    <string name="context_contact_removed" context="success message when removing a contact">Contact removed</string>
+    <string name="context_contact_removed" context="success message when removing a contact">Contact correctly removed</string>
     <string name="context_contact_not_removed" context="error message">Error. Contact not removed</string>
     <string name="context_permissions_changed" context="success message when chaning the permissionss">Permissions changed</string>
     <string name="context_permissions_not_changed" context="error message">Error. Permissions did not change</string>
@@ -343,6 +343,8 @@
     <string name="number_no_sent" context="error message when sending multiple files">, %d items not sent</string>
     <string name="number_correctly_copied" context="success message when sending multiple files">%d items correctly copied</string>
     <string name="number_no_copied" context="error message when sending multiple files">, %d items not copied</string>
+    <string name="number_contact_removed" context="success message when removing several contacts">%d contacts correctly removed</string>
+    <string name="number_contact_not_removed" context="error message when removing several contacts">, %d contacts not removed</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
     
     <string name="context_select_one_file" context="option available for just one file">Select just one file.</string>
