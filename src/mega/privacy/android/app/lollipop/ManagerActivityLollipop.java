@@ -511,6 +511,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						}						
 						break;
 					}
+					case MegaRequest.TYPE_REMOVE_CONTACT:{
+						log("multi contact remove request finish");
+						if(error>0){
+							message = getString(R.string.number_contact_removed, max_items-error) + getString(R.string.number_contact_not_removed, error);
+						}
+						else{
+							message = getString(R.string.number_contact_removed, max_items);
+						}		
+						break;
+					}
 					case MegaRequest.TYPE_COPY:{
 						if (actionListener==ManagerActivityLollipop.MULTIPLE_SEND_INBOX){	
 							log("send to inbox request finished");
@@ -6371,11 +6381,39 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void removeMultipleContacts(final List<MegaUser> contacts){
-		
+		log("removeMultipleContacts");
 		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)
-		for(int j=0; j<contacts.size();j++){
-			
-			final MegaUser c= contacts.get(j);
+		MultipleRequestListener removeMultipleListener = null; 
+		if(contacts.size()>1){
+			log("remove multiple contacts");
+			removeMultipleListener = new MultipleRequestListener(-1);
+			for(int j=0; j<contacts.size();j++){
+				
+				final MegaUser c= contacts.get(j);
+				
+				final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
+				
+				if(inShares.size() != 0)
+				{			
+				        	
+		        	for(int i=0; i<inShares.size();i++){
+		        		MegaNode removeNode = inShares.get(i);
+		        		megaApi.remove(removeNode);			        		
+		        	}
+		        	megaApi.removeContact(c, removeMultipleListener);		        	
+					
+				}
+				else{
+					//NO incoming shares				
+					        	
+		        	megaApi.removeContact(c, removeMultipleListener);
+				}	
+			}		
+		}
+		else{
+			log("remove one contact");
+
+			final MegaUser c= contacts.get(0);
 			
 			final ArrayList<MegaNode> inShares = megaApi.getInShares(c);
 			
@@ -8474,11 +8512,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					if (cFLol != null){
 						cFLol.notifyDataSetChanged();
 					}
-				}	
+				}
+				Snackbar.make(fragmentContainer, getString(R.string.context_contact_removed), Snackbar.LENGTH_LONG).show();	
 			}
 			else{
-				log("Termino con error");
-			}
+				log("Error deleting contact");
+				Snackbar.make(fragmentContainer, getString(R.string.context_contact_not_removed), Snackbar.LENGTH_LONG).show();	
+			}	
 		}
 		else if (request.getType() == MegaRequest.TYPE_INVITE_CONTACT){	
 			log("MegaRequest.TYPE_INVITE_CONTACT finished: "+request.getNumber());
