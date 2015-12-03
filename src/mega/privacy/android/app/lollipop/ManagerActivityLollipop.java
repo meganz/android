@@ -196,6 +196,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
 	final public static int MULTIPLE_SEND_INBOX = MULTIPLE_SEND_RUBBISH+1;
 	final public static int MULTIPLE_COPY = MULTIPLE_SEND_INBOX+1;
+	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = MULTIPLE_COPY+1;
+	//one file to many contacts
+	final public static int MULTIPLE_CONTACTS_SHARE = MULTIPLE_REMOVE_SHARING_CONTACTS+1;
+	//one contact, many files
+	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
 	
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
@@ -478,6 +483,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			int requestType = request.getType();
 			log("Counter on RequestFinish: "+counter);
+			log("Error on RequestFinish: "+error);
 			if(counter==0){	
 				switch (requestType) {
 					case  MegaRequest.TYPE_MOVE:{
@@ -544,20 +550,49 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					case MegaRequest.TYPE_SHARE:{
 						log("multiple share request finished");
-						if(error>0){
-							if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-								message = getString(R.string.context_no_shared_number_removed, error);
+						if(actionListener==MULTIPLE_REMOVE_SHARING_CONTACTS){
+							if(error>0){
+								message = getString(R.string.context_no_removed_sharing_contacts);
 							}
 							else{
-								message = getString(R.string.context_no_shared_number, error);
+								message = getString(R.string.context_correctly_removed_sharing_contacts);
+							}
+						}
+						else if(actionListener==MULTIPLE_CONTACTS_SHARE){
+							//TODO change UI
+							//One file shared with many contacts
+							if(error>0){
+								message = getString(R.string.number_contact_file_shared_correctly, max_items-error) + getString(R.string.number_contact_file_not_shared_, error);
+							}
+							else{
+								message = getString(R.string.number_contact_file_shared_correctly, max_items);
+							}
+						}
+						else if(actionListener==MULTIPLE_FILE_SHARE){
+							//Many files shared with one contacts
+							if(error>0){
+								message = getString(R.string.number_correctly_shared, max_items-error) + getString(R.string.number_no_shared, error);
+							}
+							else{
+								message = getString(R.string.number_correctly_shared, max_items);
 							}
 						}
 						else{
-							if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
-								message = getString(R.string.context_correctly_shared_removed);
+							if(error>0){
+								if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
+									message = getString(R.string.context_no_shared_number_removed, error);
+								}
+								else{
+									message = getString(R.string.context_no_shared_number, error);
+								}
 							}
 							else{
-								message = getString(R.string.context_correctly_shared);
+								if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
+									message = getString(R.string.context_correctly_shared_removed);
+								}
+								else{
+									message = getString(R.string.context_correctly_shared);
+								}
 							}
 						}
 					}
@@ -6625,49 +6660,71 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	public void leaveMultipleShares (ArrayList<Long> handleList){
-		
-		for (int i=0; i<handleList.size(); i++){
-			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-			this.leaveIncomingShare(node);
+		log("leaveMultipleShares");
+		MultipleRequestListener moveMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_SEND_RUBBISH);
+		if(handleList.size()>1){
+			log("handleList.size()>1");
+			for (int i=0; i<handleList.size(); i++){
+				MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+				megaApi.remove(node, moveMultipleListener);			
+			}
 		}
+		else{
+			log("handleList.size()<=1");
+			MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
+			megaApi.remove(node, this);
+		}		
 	}
 	
 	public void leaveIncomingShare (MegaNode n){
 		log("leaveIncomingShare");
-		//TODO 
-//		ProgressDialog temp = null;
-//		try{
-//			temp = new ProgressDialog(this);
-//			temp.setMessage(getString(R.string.leave_incoming_share)); 
-//			temp.show();
-//		}
-//		catch(Exception e){
-//			return;
-//		}
-//		statusDialog = temp;
 		megaApi.remove(n);
 	}
 	
 	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
 		log("removeAllSharingContacts");
 		
-		for(int j=0; j<listContacts.size();j++){
-			String cMail = listContacts.get(j).getUser();
-			if(cMail!=null){
-				MegaUser c = megaApi.getContact(cMail);
-				if (c != null){							
-					megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, this);
+		MultipleRequestListener shareMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_REMOVE_SHARING_CONTACTS);
+		if(listContacts.size()>1){
+			log("listContacts.size()>1");
+			for(int j=0; j<listContacts.size();j++){
+				String cMail = listContacts.get(j).getUser();
+				if(cMail!=null){
+					MegaUser c = megaApi.getContact(cMail);
+					if (c != null){							
+						megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, shareMultipleListener);
+					}
+					else{
+						isGetLink = false;
+						megaApi.disableExport(node);
+					}
 				}
 				else{
 					isGetLink = false;
-					megaApi.disableExport(node, this);
+					megaApi.disableExport(node);
 				}
-			}
-			else{
-				isGetLink = false;
-				megaApi.disableExport(node, this);
-			}
-		}	
+			}	
+		}
+		else{
+			log("listContacts.size()<=1");
+			for(int j=0; j<listContacts.size();j++){
+				String cMail = listContacts.get(j).getUser();
+				if(cMail!=null){
+					MegaUser c = megaApi.getContact(cMail);
+					if (c != null){							
+						megaApi.share(node, c, MegaShare.ACCESS_UNKNOWN, this);
+					}
+					else{
+						isGetLink = false;
+						megaApi.disableExport(node);
+					}
+				}
+				else{
+					isGetLink = false;
+					megaApi.disableExport(node);
+				}
+			}	
+		}		
 	}
 	
 	public void cameraUploadsClicked(){
@@ -7296,7 +7353,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 				dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int item) {			
-						MultipleRequestListener shareMultipleListener = new MultipleRequestListener(-1);;
+						MultipleRequestListener shareMultipleListener = new MultipleRequestListener(MULTIPLE_CONTACTS_SHARE);
+						permissionsDialog.dismiss();
 						switch(item) {
 						    case 0:{
 						    	if(selectedContacts.length>1){
@@ -7382,9 +7440,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (megaContacts){
 				
 				if(sentToInbox==0){
-					//Just one folder to share
+					
 					if(multiselectIntent==0){
-	
+						//One file to share 
 						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
 						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
 						
@@ -7437,59 +7495,91 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //						}						
 					}
 					else if(multiselectIntent==1){
-						//Several folder to share
-						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
-						
+						//Several folders to share
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);						
 							
 						AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 						dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 						final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
 						dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int item) {
-								ProgressDialog temp = null;
-								try{
-									temp = new ProgressDialog(managerActivity);
-									temp.setMessage(getString(R.string.context_sharing_folder));
-									temp.show();
-								}
-								catch(Exception e){
-									return;
-								}
-								statusDialog = temp;
+
 								permissionsDialog.dismiss();
-								
+								MultipleRequestListener shareMultipleListener = new MultipleRequestListener(MULTIPLE_FILE_SHARE);
 								switch(item) {
 				                    case 0:{
+				                    	log("ACCESS_READ");
 				                    	for (int i=0;i<contactsData.size();i++){
-				                    		MegaUser u = megaApi.getContact(contactsData.get(i));			                    		
-				                    		for(int j=0; j<nodeHandles.length;j++){						
-				            					
-				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-				        						megaApi.share(node, u, MegaShare.ACCESS_READ, managerActivity);
-				                    		}
+				                    		MegaUser u = megaApi.getContact(contactsData.get(i));				                    		
+					                    	if(nodeHandles.length>1){
+					                    		log("one folder to many contacts");
+					                    		for(int j=0; j<nodeHandles.length;j++){						
+					            					
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
+					        						megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
+					                    		}
+					                    	}
+					                    	else{
+					                    		log("many folders to many contacts");
+					                    		for(int j=0; j<nodeHandles.length;j++){					
+					            					
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
+					        						megaApi.share(node, u, MegaShare.ACCESS_READ, shareMultipleListener);
+					                    		}
+					                    	}			                    		
 				                    	}
 				                    	break;
 				                    }
 				                    case 1:{
+				                    	log("ACCESS_READWRITE");
 				                    	for (int i=0;i<contactsData.size();i++){
 				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		for(int j=0; j<nodeHandles.length;j++){						
-				            					
-				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-				        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
-				                    		}
-	//			                    		megaApi.share(node, u, MegaShare.ACCESS_READWRITE, managerActivity);
+				                    		
+				                    		if(nodeHandles.length>1){
+					                    		log("one folder to many contacts");
+					                    		for(int j=0; j<nodeHandles.length;j++){						
+					            					
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
+					        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
+					                    		}
+					                    	}
+					                    	else{
+					                    		log("many folders to many contacts");
+					                    		for(int j=0; j<nodeHandles.length;j++){					
+					            					
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
+					        						megaApi.share(node, u, MegaShare.ACCESS_READWRITE, shareMultipleListener);
+					                    		}
+					                    	}			                  
 				                    	}
 				                        break;
 				                    }
 				                    case 2:{
+				                    	log("ACCESS_FULL");
 				                    	for (int i=0;i<contactsData.size();i++){
 				                    		MegaUser u = megaApi.getContact(contactsData.get(i));
-				                    		for(int j=0; j<nodeHandles.length;j++){						
-				            					
-				        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
-				        						megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
-				                    		}
+				                    		if(nodeHandles.length>1){
+					                    		log("one folder to many contacts");
+					                    		for(int j=0; j<nodeHandles.length;j++){						
+					            					
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
+					        						megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
+					                    		}
+					                    	}
+					                    	else{
+					                    		log("many folders to many contacts");
+					                    		for(int j=0; j<nodeHandles.length;j++){					
+					            					
+					        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+					        						log("Share: "+ node.getName() + " to "+ u.getEmail());
+					        						megaApi.share(node, u, MegaShare.ACCESS_FULL, shareMultipleListener);
+					                    		}
+					                    	}			                  
 	//			                    		megaApi.share(node, u, MegaShare.ACCESS_FULL, managerActivity);
 				                    	}		                    	
 				                        break;
@@ -9095,7 +9185,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 			else{
 				log("ERROR MegaRequest.TYPE_SHARE");
-				Snackbar.make(fragmentContainer, getString(R.string.context_no_shared), Snackbar.LENGTH_LONG).show();
+				if(request.getAccess()==MegaShare.ACCESS_UNKNOWN){
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_removed_shared), Snackbar.LENGTH_LONG).show();
+				}
+				else{
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_shared), Snackbar.LENGTH_LONG).show();
+				}					
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){

@@ -330,6 +330,7 @@
     <string name="context_correctly_shared_removed" context="success message when sharing a folder">Compartición eliminada con éxito</string>
     <string name="context_no_shared_number_removed" context="error message when sharing a folder">Error. %d eliminaciones de compartición han fallado</string>
     <string name="context_no_shared" context="error message">Error. No se pudo compartir</string>
+    <string name="context_no_removed_shared" context="error message">Error. Compartición de carpeta no eliminada</string>
     <string name="context_remove_sharing" context="success message when removing a sharing">Compartición de carpeta eliminada</string>
     <string name="context_no_link" context="error message">Imposible obtener el enlace</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Borrado correctamente de MEGA</string>
@@ -342,8 +343,11 @@
     <string name="number_no_copied" context="error message when sending multiple files">, %d ficheros no se han podido copiar</string>
     <string name="number_contact_removed" context="success message when removing several contacts">%d contactos correctamente eliminados</string>
     <string name="number_contact_not_removed" context="error message when removing several contacts">, %d contactos no se han podido eliminar</string>
+    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">Carpeta correctamente compartida con %d contactos</string>
+    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">, con %d contactos no se ha podido compartir</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Enviado correctamente a:</string>
-    
+    <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">La carpeta ya no está compartida</string>
+    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, la carpeta todavía está compartida</string>
     <string name="context_select_one_file" context="option available for just one file">Seleccione sólo un fichero.</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">Estás a punto de cancelar tu subscripción a Mega. Por favor, indicanos en qué podemos mejorar.</string>
