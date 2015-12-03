@@ -7602,10 +7602,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if (sentToInbox==1){
-					//Send file
+					//Send file					
 					final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
 					final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
 					MegaUser u = megaApi.getContact(contactsData.get(0));
+					log("Send File to: "+u.getEmail());
 					megaApi.sendFileToUser(node, u, this);
 				}
 
@@ -9085,20 +9086,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			log("TYPE_COPY");
 			if(sendToInbox){
 				log("sendToInbox");
-				sendToInbox=false;
-				if (drawerItem == DrawerItem.INBOX||drawerItem == DrawerItem.CLOUD_DRIVE||drawerItem == DrawerItem.CONTACTS){
-					if (e.getErrorCode() == MegaError.API_OK){
-						Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_LONG).show();
-					}
-					else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-						log("OVERQUOTA ERROR: "+e.getErrorCode());
-						showOverquotaAlert();
-					}
-					else
-					{
-						Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_LONG).show();
-					}
-				}				
+				sendToInbox=false;				
+				if (e.getErrorCode() == MegaError.API_OK){
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_sent), Snackbar.LENGTH_LONG).show();
+				}
+				else if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					showOverquotaAlert();
+				}
+				else
+				{
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_sent), Snackbar.LENGTH_LONG).show();
+				}								
 			}
 			else{
 				try { 

@@ -53,6 +53,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactsFragmentLollipop extends Fragment implements OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 
@@ -293,8 +294,17 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		log("onCreateView");
 		contacts = megaApi.getContacts();
 		visibleContacts.clear();
+		
 		for (int i=0;i<contacts.size();i++){
 			log("contact: " + contacts.get(i).getEmail() + "_" + contacts.get(i).getVisibility());
+			if (contacts.get(i).getEmail().compareTo("android103@yopmail.com") == 0){
+				MegaUser cococ = contacts.get(i);
+				log(contacts.get(i).getEmail() + "__" + contacts.get(i).getVisibility() + "__" + contacts.get(i).getTimestamp() + "______________________" + megaApi.getInShares(contacts.get(i)).size());
+				ArrayList<MegaNode> ccc = megaApi.getInShares(cococ);
+				for (int j=0;j<ccc.size();j++){
+					log("NODO!!!: " + ccc.get(j).getHandle() + "___" + ccc.get(j).getName() + "____");
+				}
+			}
 			if ((contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) || (megaApi.getInShares(contacts.get(i)).size() != 0)){
 				visibleContacts.add(contacts.get(i));
 			}

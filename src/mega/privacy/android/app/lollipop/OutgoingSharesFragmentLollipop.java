@@ -118,6 +118,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 	public LinearLayout optionMoveTo;
 	public LinearLayout optionCopyTo;	
 	public TextView propertiesText;
+	public LinearLayout optionSendToInbox;
 	////
 	
 	//UPLOAD PANEL
@@ -476,7 +477,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 
 			optionClearShares = (LinearLayout) v.findViewById(R.id.file_list_option_clear_share_layout);	
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_list_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_list_option_copy_layout);			
+			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_list_option_copy_layout);
+			
+			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_list_option_send_inbox_layout);
+			optionSendToInbox.setVisibility(View.GONE);
 			
 			optionDownload.setOnClickListener(this);
 			optionShare.setOnClickListener(this);
@@ -486,7 +490,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			optionPermissions.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);
-			
+			optionSendToInbox.setOnClickListener(this);
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
@@ -717,7 +721,10 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 //				((LinearLayout.LayoutParams) holder.optionDelete.getLayoutParams()).setMargins(Util.px2dp((1 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), 0, 0);
 
 			optionClearShares = (LinearLayout) v.findViewById(R.id.file_grid_option_clear_share_layout);
-			optionClearShares.setVisibility(View.GONE);			
+			optionClearShares.setVisibility(View.GONE);	
+			
+			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_grid_option_send_inbox_layout);
+			optionSendToInbox.setVisibility(View.GONE);
 			
 			optionDownload.setOnClickListener(this);
 			optionProperties.setOnClickListener(this);
@@ -725,7 +732,7 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 			optionRename.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);			
-			
+			optionSendToInbox.setOnClickListener(this);	
 			optionsOutLayout.setOnClickListener(this);
 			
 			slidingOptionsPanel.setVisibility(View.INVISIBLE);
@@ -898,9 +905,11 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 		if (selectedNode.isFolder()) {
 			propertiesText.setText(R.string.general_folder_info);
 			optionShare.setVisibility(View.VISIBLE);
+			optionSendToInbox.setVisibility(View.GONE);	
 		}else{
 			propertiesText.setText(R.string.general_file_info);
 			optionShare.setVisibility(View.GONE);
+			optionSendToInbox.setVisibility(View.VISIBLE);	
 		}
 		
 		optionDownload.setVisibility(View.VISIBLE);
@@ -1009,6 +1018,17 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 //				((ManagerActivityLollipop)getActivity()).uploadFile();
 				showUploadPanel();
 				break;			
+			}
+			
+			case R.id.file_list_option_send_inbox_layout:
+			case R.id.file_grid_option_send_inbox_layout: {
+				log("send to inbox");
+				hideOptionsPanel();
+				((ManagerActivityLollipop) context).sentToInboxLollipop(selectedNode);
+//				ArrayList<Long> handleList = new ArrayList<Long>();
+//				handleList.add(selectedNode.getHandle());
+//				((ManagerActivityLollipop) context).onFileClick(handleList);
+				break;
 			}
 			
 			case R.id.file_list_upload_audio_layout:
