@@ -333,6 +333,7 @@
     <string name="context_correctly_shared_removed" context="success message when sharing a folder">Correctly remove shares</string>
     <string name="context_no_shared_number_removed" context="error message when sharing a folder">Error. %d process of removing shares not completed</string>
     <string name="context_no_shared" context="error message">Error. Not shared</string>
+    <string name="context_no_removed_shared" context="error message">Error. Shared not removed</string>
     <string name="context_remove_sharing" context="success message when removing a sharing">Folder sharing removed</string>
     <string name="context_no_link" context="error message">Impossible to get the link</string>
     <string name="context_correctly_removed" context="success message when removing a node from MEGA">Correctly removed from MEGA</string>
@@ -345,8 +346,13 @@
     <string name="number_no_copied" context="error message when sending multiple files">, %d items not copied</string>
     <string name="number_contact_removed" context="success message when removing several contacts">%d contacts correctly removed</string>
     <string name="number_contact_not_removed" context="error message when removing several contacts">, %d contacts not removed</string>
+    <string name="number_contact_file_shared_correctly" context="success message when sharing a file with multiple contacts">Folder correctly shared with %d contacts</string>
+    <string name="number_contact_file_not_shared_" context="error message when sharing a file with multiple contacts">, with %d contacts not shared</string>
+    <string name="number_correctly_shared" context="success message when sharing multiple files">%d folders correctly shared</string>
+    <string name="number_no_shared" context="error message when sharing multiple files">, %d folders not shared</string>
     <string name="context_correctly_copied_contact" context="success message when sending a file to a contact">Correctly sent to:</string>
-    
+    <string name="context_correctly_removed_sharing_contacts" context="success message when removing all the contacts of a shared folder">The folder is no longer shared</string>
+    <string name="context_no_removed_sharing_contacts" context="error message when removing all the contacts of a shared folder">Error, the folder is still shared with any contact</string>
     <string name="context_select_one_file" context="option available for just one file">Select just one file.</string>
     
     <string name="dialog_cancel_subscriptions" context="dialog cancel subscriptions">You are about to cancel your Mega subscription. Please let us know, if there is anything we can do to help change your mind.</string>
