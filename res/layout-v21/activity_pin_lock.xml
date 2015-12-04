@@ -10,6 +10,15 @@
     android:windowSoftInputMode="stateVisible"
     tools:context=".PinLockActivityLollipop" >
 
+    <android.support.design.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:id="@+id/myCoordinatorLayout"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true">
+	</android.support.design.widget.CoordinatorLayout>
+    
     <TextView
         android:id="@+id/unlock_text_view"
         android:layout_width="wrap_content"

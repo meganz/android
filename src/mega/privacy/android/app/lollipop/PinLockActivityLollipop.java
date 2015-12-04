@@ -14,6 +14,7 @@ import nz.mega.sdk.MegaApiAndroid;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -48,6 +49,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	DisplayMetrics outMetrics;
 	Display display;
 	
+	CoordinatorLayout coordinatorLayout;
 	MegaApiAndroid megaApi;
 	RelativeLayout fragmentContainer;
     LinearLayout pinLayout;
@@ -114,6 +116,10 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		log("onCreate Attemps number: "+attemps);
 		
 		fragmentContainer = (RelativeLayout) findViewById(R.id.fragment_container_pin_lock);
+		coordinatorLayout = (CoordinatorLayout) findViewById(R.id.myCoordinatorLayout);
+		android.view.ViewGroup.LayoutParams coordinatorLayoutParams = coordinatorLayout.getLayoutParams();		
+		coordinatorLayoutParams.height = Util.scaleHeightPx(70, outMetrics);
+		coordinatorLayout.setLayoutParams(coordinatorLayoutParams);		
 		
 		redLayout = (RelativeLayout) findViewById(R.id.red_layout);
 		redLayout.setVisibility(View.GONE);
@@ -370,9 +376,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
                     else{
                     	log("PIN NOT match - show snackBar");
 //                    	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                    	Snackbar snack = Snackbar.make(fragmentContainer, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
+                    	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
                     	View view = snack.getView();
-                    	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
                     	params.gravity = Gravity.TOP;
                     	view.setLayoutParams(params);
                     	snack.show();
@@ -479,9 +485,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
 		            	
-			        	Snackbar snack = Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG);
+			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
 			        	View view = snack.getView();
-			        	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
 			        	params.gravity = Gravity.TOP;
 			        	view.setLayoutParams(params);
 			        	snack.show();
@@ -574,9 +580,9 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		            		message = getString(R.string.pin_lock_incorrect_alert, MAX_ATTEMPS-attemps);
 		            		warningLayout.setVisibility(View.VISIBLE);
 		            	}
-			        	Snackbar snack = Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG);
+			        	Snackbar snack = Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG);
 			        	View view = snack.getView();
-			        	FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)view.getLayoutParams();
+			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
 			        	params.gravity = Gravity.TOP;
 			        	view.setLayoutParams(params);
 			        	snack.show();
