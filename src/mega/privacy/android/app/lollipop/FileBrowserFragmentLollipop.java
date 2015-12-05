@@ -212,6 +212,20 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 					((ManagerActivityLollipop) context).shareFolderLollipop(handleList);					
 					break;
 				}
+				case R.id.cab_menu_send_file:{
+					//Check that all the selected options are files
+					ArrayList<Long> handleList = new ArrayList<Long>();
+					for (int i=0;i<documents.size();i++){
+						if(documents.get(i).isFile()){
+							handleList.add(documents.get(i).getHandle());
+						}
+					}
+					clearSelections();
+					hideMultipleSelect();
+					log("sendToInbox no of files: "+handleList.size());
+					((ManagerActivityLollipop) context).sendToInboxLollipop(handleList);					
+					break;
+				}
 				case R.id.cab_menu_share_link:{
 					clearSelections();
 					hideMultipleSelect();
@@ -319,6 +333,16 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			menu.findItem(R.id.cab_menu_trash).setVisible(showTrash);
 			menu.findItem(R.id.cab_menu_leave_multiple_share).setVisible(false);
 			menu.findItem(R.id.cab_menu_share).setVisible(showShare);
+			
+			menu.findItem(R.id.cab_menu_send_file).setVisible(true);
+			
+			for(int i=0;i<selected.size();i++){
+				MegaNode n = selected.get(i);
+				if(n.isFolder()){
+					menu.findItem(R.id.cab_menu_send_file).setVisible(false);
+					break;
+				}
+			}
 			
 			return false;
 		}
@@ -1112,7 +1136,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			case R.id.file_list_option_send_inbox_layout:
 			case R.id.file_grid_option_send_inbox_layout: {
 				hideOptionsPanel();
-				((ManagerActivityLollipop) context).sentToInboxLollipop(selectedNode);
+				((ManagerActivityLollipop) context).sendToInboxLollipop(selectedNode);
 //				ArrayList<Long> handleList = new ArrayList<Long>();
 //				handleList.add(selectedNode.getHandle());
 //				((ManagerActivityLollipop) context).onFileClick(handleList);

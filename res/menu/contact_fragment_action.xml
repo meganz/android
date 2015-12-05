@@ -30,6 +30,13 @@
         MEGA:showAsAction="never" />
     
     <item
+        android:id="@+id/cab_menu_send_file"
+        android:orderInCategory="115"
+        android:title="@string/context_send_file"
+        android:showAsAction="never"
+        MEGA:showAsAction="never" />
+    
+    <item
         android:id="@+id/cab_menu_help"
         android:orderInCategory="115"
         android:title="@string/action_help"

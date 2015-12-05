@@ -233,11 +233,10 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 			nodeHandle =  intent.getLongExtra(EXTRA_NODE_HANDLE, -1);
 		}
 		else if(multipleSelectIntent==1){
+			log("onCreate multiselect YES!");
 			nodeHandles=intent.getLongArrayExtra(EXTRA_NODE_HANDLE);
 		}
-		
-		sendToInbox= intent.getIntExtra("SEND_FILE", -1);
-		
+		sendToInbox= intent.getIntExtra("SEND_FILE", -1);		
 	}
 	
 	@Override
@@ -353,10 +352,15 @@ public class ContactsExplorerActivityLollipop extends PinActivityLollipop implem
 		Intent intent = new Intent();
 		intent.putStringArrayListExtra(EXTRA_CONTACTS, emails);
 		if(multipleSelectIntent==0){
+			log("multiselectIntent == 0");
 			intent.putExtra(EXTRA_NODE_HANDLE, nodeHandle);
 			intent.putExtra("MULTISELECT", 0);
 		}
 		else if(multipleSelectIntent==1){
+			log("multiselectIntent == 1");
+			if(nodeHandles!=null){
+				log("number of items selected: "+nodeHandles.length);
+			}
 			intent.putExtra(EXTRA_NODE_HANDLE, nodeHandles);
 			intent.putExtra("MULTISELECT", 1);
 		}	

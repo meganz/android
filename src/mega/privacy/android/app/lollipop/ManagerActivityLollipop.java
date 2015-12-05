@@ -194,10 +194,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
 	final public static int MULTIPLE_SEND_RUBBISH = MULTIPLE_MOVE+1;
-	final public static int MULTIPLE_SEND_INBOX = MULTIPLE_SEND_RUBBISH+1;
-	final public static int MULTIPLE_COPY = MULTIPLE_SEND_INBOX+1;
-	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = MULTIPLE_COPY+1;
 	//one file to many contacts
+	final public static int MULTIPLE_CONTACTS_SEND_INBOX = MULTIPLE_SEND_RUBBISH+1;
+	//many files to one contacts
+	final public static int MULTIPLE_FILES_SEND_INBOX = MULTIPLE_CONTACTS_SEND_INBOX+1;
+	final public static int MULTIPLE_COPY = MULTIPLE_FILES_SEND_INBOX+1;
+	final public static int MULTIPLE_REMOVE_SHARING_CONTACTS = MULTIPLE_COPY+1;
+	//one folder to many contacts
 	final public static int MULTIPLE_CONTACTS_SHARE = MULTIPLE_REMOVE_SHARING_CONTACTS+1;
 	//one contact, many files
 	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
@@ -528,13 +531,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						break;
 					}
 					case MegaRequest.TYPE_COPY:{
-						if (actionListener==ManagerActivityLollipop.MULTIPLE_SEND_INBOX){	
-							log("send to inbox request finished");
+						if (actionListener==ManagerActivityLollipop.MULTIPLE_CONTACTS_SEND_INBOX){	
+							log("send to inbox multiple contacts request finished");
 							if(error>0){
 								message = getString(R.string.number_correctly_sent, max_items-error) + getString(R.string.number_no_sent, error);
 							}
 							else{
 								message = getString(R.string.number_correctly_sent, max_items);
+							}
+						}
+						else if (actionListener==ManagerActivityLollipop.MULTIPLE_FILES_SEND_INBOX){	
+							log("send to inbox multiple files request finished");
+							if(error>0){
+								message = getString(R.string.number_correctly_sent_multifile, max_items-error) + getString(R.string.number_no_sent_multifile, error);
+							}
+							else{
+								message = getString(R.string.number_correctly_sent_multifile, max_items);
 							}
 						}
 						else{
@@ -5751,7 +5763,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		startActivityForResult(intent, REQUEST_CODE_SELECT_MOVE_FOLDER);
 	}
 	
-	public void sentToInboxLollipop(MegaNode node){
+	public void sendToInboxLollipop(MegaNode node){
 		log("sentToInbox MegaNode");
 		
 		if((drawerItem == DrawerItem.SHARED_ITEMS) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
@@ -5762,6 +5774,27 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	intent.putExtra("MULTISELECT", 0);
 	    	intent.putExtra("SEND_FILE",1);
 	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, node.getHandle());
+	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+		}			
+	}
+	
+	public void sendToInboxLollipop(ArrayList<Long> handleList){
+		log("sentToInbox handleList");
+		
+		if((drawerItem == DrawerItem.SHARED_ITEMS) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+			sendToInbox = true;			
+			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
+	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
+	    	long[] handles=new long[handleList.size()];
+	    	int j=0;
+	    	for(int i=0; i<handleList.size();i++){
+	    		handles[j]=handleList.get(i);
+	    		j++;
+	    	}
+	    	intent.putExtra("MULTISELECT", 1);
+	    	intent.putExtra("SEND_FILE",1);
+	    	log("handles length: "+handles.length);
+	    	intent.putExtra(ContactsExplorerActivityLollipop.EXTRA_NODE_HANDLE, handles);
 	    	startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
 		}			
 	}
@@ -6415,6 +6448,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
 	}
 	
+	public void pickFileToSend(List<MegaUser> users){
+		
+		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
+		String[] longArray = new String[users.size()];
+		for (int i=0; i<users.size(); i++){
+			longArray[i] = users.get(i).getEmail();
+		}
+		intent.putExtra("SELECTED_CONTACTS", longArray);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);
+	}
+	
 	public void removeMultipleContacts(final List<MegaUser> contacts){
 		log("removeMultipleContacts");
 		//TODO (megaApi.getInShares(c).size() != 0) --> Si el contacto que voy a borrar tiene carpetas compartidas, avisar de eso y eliminar las shares (IN and ¿OUT?)
@@ -6588,17 +6633,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		megaApi.inviteContact(contactEmail, null, MegaContactRequest.INVITE_ACTION_ADD, this);
 	}
 	
-	public void pickContacToSendFile(List<MegaUser> users){
-		
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FILE);
-		String[] longArray = new String[users.size()];
-		for (int i=0; i<users.size(); i++){
-			longArray[i] = users.get(i).getEmail();
-		}
-		intent.putExtra("SELECTED_CONTACTS", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_FILE);		
-	}
+
 	
 	public void removeContact(final MegaUser c){
 		
@@ -7317,14 +7352,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				log("File to send: "+node.getName());				
 				if(selectedContacts.length>1){
 					log("File to multiple contacts");
-					sendMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_SEND_INBOX);
+					sendMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_CONTACTS_SEND_INBOX);
 					for (int i=0;i<selectedContacts.length;i++){
 	            		MegaUser user= megaApi.getContact(selectedContacts[i]);		                    		
 	            		megaApi.sendFileToUser(node, user, sendMultipleListener);
 	            	}
 				}
 				else{
-					log("File to a single contacts");
+					log("File to a single contact");
 					MegaUser user= megaApi.getContact(selectedContacts[0]);		                    		
             		megaApi.sendFileToUser(node, user, this);
 				}
@@ -7602,14 +7637,40 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 				}
 				else if (sentToInbox==1){
-					//Send file					
-					final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
-					final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
-					MegaUser u = megaApi.getContact(contactsData.get(0));
-					log("Send File to: "+u.getEmail());
-					megaApi.sendFileToUser(node, u, this);
-				}
+					if(multiselectIntent==0){
+						//Send one file to one contact					
+						final long nodeHandle = intent.getLongExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE, -1);
+						final MegaNode node = megaApi.getNodeByHandle(nodeHandle);
+						MegaUser u = megaApi.getContact(contactsData.get(0));
+						log("Send File to: "+u.getEmail());
+						megaApi.sendFileToUser(node, u, this);
+					}
+					else{
+						//Send multiple files to one contact
+						final long[] nodeHandles = intent.getLongArrayExtra(ContactsExplorerActivity.EXTRA_NODE_HANDLE);
+						MegaUser u = megaApi.getContact(contactsData.get(0));
+						if(nodeHandles!=null){
+							MultipleRequestListener sendMultipleListener = new MultipleRequestListener(MULTIPLE_FILES_SEND_INBOX);
+							if(nodeHandles.length>1){
+								log("many files to one contact");
+	                    		for(int j=0; j<nodeHandles.length;j++){						
+	            					
+	        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[j]);
+	        						log("Send: "+ node.getName() + " to "+ u.getEmail());
+	        						megaApi.sendFileToUser(node, u, sendMultipleListener);
+	                    		}
+	                    	}
+							else{
+								log("one file to many contacts");					
+	            					
+        						final MegaNode node = megaApi.getNodeByHandle(nodeHandles[0]);
+        						log("Send: "+ node.getName() + " to "+ u.getEmail());
+        						megaApi.sendFileToUser(node, u, this);
 
+							}
+						}						
+					}
+				}
 			}
 			else{
 
