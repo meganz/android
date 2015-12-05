@@ -1080,7 +1080,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 			case R.id.file_grid_option_send_inbox_layout: {
 				log("send to inbox");
 				hideOptionsPanel();
-				((ManagerActivityLollipop) context).sentToInboxLollipop(selectedNode);
+				((ManagerActivityLollipop) context).sendToInboxLollipop(selectedNode);
 //				ArrayList<Long> handleList = new ArrayList<Long>();
 //				handleList.add(selectedNode.getHandle());
 //				((ManagerActivityLollipop) context).onFileClick(handleList);
