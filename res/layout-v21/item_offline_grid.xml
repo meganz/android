@@ -26,7 +26,7 @@
         <View
 	        android:id="@+id/offline_grid_separator"
 	 		android:layout_width="wrap_content"
-	 		android:layout_height="2dp"
+	 		android:layout_height="1dp"
 	 		android:background="@color/grid_item_separator"
 	        android:scaleType="fitCenter"
 	        android:layout_marginLeft="6dp"

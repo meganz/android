@@ -46,7 +46,7 @@
     <View
         android:id="@+id/file_grid_separator"
         android:layout_width="wrap_content"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:layout_below="@id/file_grid_thumbnail"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="6dp"
