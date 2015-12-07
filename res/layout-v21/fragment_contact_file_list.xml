@@ -11,13 +11,28 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/file_list_selected_row" >
+        
+        <RelativeLayout
+	           android:id="@+id/contact_file_list_toolbar_back_options_layout"
+	           android:layout_width="match_parent"
+	           android:layout_height="56dp" >
+	        <ImageView 
+		        android:id="@+id/contact_file_list_toolbar_back"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/ic_arrow_back_white"
+		        android:layout_alignParentLeft="true"
+		        android:layout_centerVertical="true"
+		        style="@style/dialogActionButton" />
+	    </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/contact_file_list_relative_layout_avatar"
             android:layout_width="54dp"
             android:layout_height="54dp"
             android:layout_marginLeft="5dp"
-            android:paddingTop="3dp" >
+            android:paddingTop="3dp" 
+            android:layout_below="@id/contact_file_list_toolbar_back_options_layout" >
 
             <mega.privacy.android.app.components.RoundedImageView
                 android:id="@+id/contact_file_list_thumbnail"
@@ -42,16 +57,9 @@
             android:layout_height="30dp"
             android:layout_toRightOf="@id/contact_file_list_relative_layout_avatar"
             android:paddingLeft="5dp"
-            android:paddingTop="7dp" />
-
-        <ImageView
-            android:id="@+id/contact_file_list_status_dot"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_toRightOf="@id/contact_file_list_name"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp" />
-
+            android:paddingTop="7dp" 
+            android:layout_below="@id/contact_file_list_toolbar_back_options_layout" />
+ 
         <TextView
             android:id="@+id/contact_file_list_content"
             android:layout_width="wrap_content"
