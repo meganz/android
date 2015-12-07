@@ -129,6 +129,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 public class ManagerActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnNavigationItemSelectedListener, MegaGlobalListenerInterface, MegaTransferListenerInterface, OnClickListener{
 	
@@ -2534,13 +2535,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case ACCOUNT:{
     			
-    			Intent myAccountIntent = new Intent(this, MyAccountMainActivityLollipop.class);
-    			startActivity(myAccountIntent);
-    			
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			
     			if (maFLol == null){
     				maFLol = new MyAccountFragmentLollipop();
+    				maFLol.setMyEmail(megaApi.getMyEmail());
     			}
     			
     			mTabHostContacts.setVisibility(View.GONE);    			
@@ -3644,8 +3643,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		    				return true;
 		    			}
 		    		}
-		    		if (sFLol != null){
-		    			if (drawerItem == DrawerItem.SEARCH){
+		    		
+		    		if (drawerItem == DrawerItem.SEARCH){
+		    			if (sFLol != null){
 		    				sFLol.onBackPressed();
 		    				return true;
 		    			}
@@ -7236,6 +7236,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
+					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
 				selectDrawerItemLollipop(drawerItem);*/
@@ -8210,30 +8211,37 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		MenuItem mi = menu.findItem(R.id.navigation_item_cloud_drive);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.cloud_drive_grey));
+			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_saved_for_offline);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.saved_for_offline_grey));
+			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_camera_uploads);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.camera_uploads_grey));
+			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_inbox);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.inbox_grey));
+			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_shared_items);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.shared_items_grey));
+			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_contacts);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.contacts_grey));
+			mi.setChecked(false);
 		}
 		mi = menu.findItem(R.id.navigation_item_settings);
 		if (mi != null){
 			mi.setIcon(getResources().getDrawable(R.drawable.settings_grey));
+			mi.setChecked(false);
 		}
 	}
 	
