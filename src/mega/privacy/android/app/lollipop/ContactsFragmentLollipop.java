@@ -731,6 +731,11 @@ public class ContactsFragmentLollipop extends Fragment implements OnClickListene
 		
 	}
 	
+	public void updateShares(){
+		log("updateShares");
+		adapter.notifyDataSetChanged();
+	}
+	
 	public void sortByNameDescending(){
 		for(int i = 0, j = visibleContacts.size() - 1; i < j; i++) {
 			visibleContacts.add(i, visibleContacts.remove(j));
