@@ -1,9 +1,15 @@
 package mega.privacy.android.app.lollipop;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Locale;
+
+import com.nirhart.parallaxscroll.views.ParallaxScrollView;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -17,15 +23,23 @@ import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -40,16 +54,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
-public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface {
+public class MyAccountFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface, OnItemClickListener {
 	
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 150; //in pixels
 
@@ -58,11 +77,18 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public static int PAYMENT_FRAGMENT = 5002;
 
 	Context context;
-	ActionBar aB;
+	
+	ParallaxScrollView sV;
+	RelativeLayout mainLayout;
+	RelativeLayout imageLayout;
+	RelativeLayout optionsBackLayout;
+	ImageView toolbarBack;
+	ImageView toolbarOverflow;
+	RelativeLayout overflowMenuLayout;
+	ListView overflowMenuList;
 	
 	TextView initialLetter;
 	ImageView myAccountImage;
-	CollapsingToolbarLayout collapsingToolbarLayout;
 	
 	String myEmail;
 	MegaUser myUser;
@@ -81,6 +107,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	LinearLayout usedSpaceLayout;
 	LinearLayout lastSessionLayout;
 	LinearLayout connectionsLayout;
+	
+	DisplayMetrics outMetrics;
 	
 
 //	String userEmail;	
@@ -121,6 +149,15 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		super.onDestroy();
 	}
 
+	public int getStatusBarHeight() { 
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	      } 
+	      return result;
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -128,13 +165,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
 
-		if (aB == null){
-			aB = ((AppCompatActivity)context).getSupportActionBar();
-		}
-
-		aB.setTitle(R.string.section_account);
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
+		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
@@ -149,18 +181,63 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			return null;
 		}
 		
-		infoEmail = (TextView) v.findViewById(R.id.myaccount_email);
+		sV = (ParallaxScrollView) v.findViewById(R.id.my_account_scroll_view);
+		sV.post(new Runnable() { 
+	        public void run() { 
+	             sV.scrollTo(0, outMetrics.heightPixels/3);
+	        } 
+		});
+		
+		mainLayout = (RelativeLayout) v.findViewById(R.id.my_account_main_layout);
+		mainLayout.setOnClickListener(this);
+		imageLayout = (RelativeLayout) v.findViewById(R.id.my_account_image_layout);
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageLayout.getLayoutParams();
+		params.setMargins(0, -getStatusBarHeight(), 0, 0);
+		imageLayout.setLayoutParams(params);
+		
+		optionsBackLayout = (RelativeLayout) v.findViewById(R.id.my_account_toolbar_back_options_layout);
+		params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
+		params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
+		optionsBackLayout.setLayoutParams(params);
+		
+		toolbarBack = (ImageView) v.findViewById(R.id.my_account_toolbar_back);
+		params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
+		int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+		params.setMargins(leftMarginBack, 0, 0, 0);
+		toolbarBack.setLayoutParams(params);
+		toolbarBack.setOnClickListener(this);
+		
+		toolbarOverflow = (ImageView) v.findViewById(R.id.my_account_toolbar_overflow);
+		params = (RelativeLayout.LayoutParams) toolbarOverflow.getLayoutParams();
+		params.setMargins(0, 0, leftMarginBack, 0);
+		toolbarOverflow.setLayoutParams(params);
+		toolbarOverflow.setOnClickListener(this);
+		
+		overflowMenuLayout = (RelativeLayout) v.findViewById(R.id.my_account_overflow_menu_layout);
+		params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
+		params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
+		overflowMenuLayout.setLayoutParams(params);
+		overflowMenuList = (ListView) v.findViewById(R.id.my_account_overflow_menu_list);
+		overflowMenuLayout.setVisibility(View.GONE);
+		
+		createOverflowMenu(overflowMenuList);
+		overflowMenuList.setOnItemClickListener(this);
+		
+		myAccountImage = (ImageView) v.findViewById(R.id.my_account_toolbar_image);
+		initialLetter = (TextView) v.findViewById(R.id.my_account_toolbar_initial_letter);
+		
+		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
-		expirationAccount = (TextView) v.findViewById(R.id.myaccount_expiration);
-		usedSpace = (TextView) v.findViewById(R.id.myaccount_used_space);
-		lastSession = (TextView) v.findViewById(R.id.myaccount_last_session);
-		connections = (TextView) v.findViewById(R.id.myaccount_connections);
+		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
+		usedSpace = (TextView) v.findViewById(R.id.my_account_used_space);
+		lastSession = (TextView) v.findViewById(R.id.my_account_last_session);
+		connections = (TextView) v.findViewById(R.id.my_account_connections);
 		
 		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
-		expirationLayout = (LinearLayout) v.findViewById(R.id.myaccount_expiration_layout);
-		usedSpaceLayout = (LinearLayout) v.findViewById(R.id.myaccount_used_space_layout);
-		lastSessionLayout = (LinearLayout) v.findViewById(R.id.myaccount_last_session_layout);
-		connectionsLayout = (LinearLayout) v.findViewById(R.id.myaccount_connections_layout);
+		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
+		usedSpaceLayout = (LinearLayout) v.findViewById(R.id.my_account_used_space_layout);
+		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
+		connectionsLayout = (LinearLayout) v.findViewById(R.id.my_account_connections_layout);
 		
 		typeLayout.setVisibility(View.GONE);
 		expirationLayout.setVisibility(View.GONE);
@@ -170,12 +247,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
 		
 		infoEmail.setText(myEmail);
-		if (collapsingToolbarLayout != null){
-			collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
-			collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
-			collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
-			collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
-		}
 		
 		name=false;
 		firstName=false;
@@ -397,6 +468,39 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return v;
 	}
 	
+	@SuppressLint("NewApi")
+	private void createOverflowMenu(ListView list){
+		ArrayList<String> menuOptions = new ArrayList<String>();
+		
+		menuOptions.add(getString(R.string.action_kill_all_sessions));
+		menuOptions.add(getString(R.string.my_account_change_password_title));
+		
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+		log("Export in: "+path);
+		File file= new File(path);
+		if(file.exists()){
+			menuOptions.add(getString(R.string.action_remove_master_key));
+		}
+		else{
+			menuOptions.add(getString(R.string.action_export_master_key)); 
+		}
+		
+		menuOptions.add(getString(R.string.action_help));
+		menuOptions.add(getString(R.string.action_upgrade_account));
+		menuOptions.add(getString(R.string.action_logout));
+		
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
+		if (list.getAdapter() != null){
+			ArrayAdapter<String> ad = (ArrayAdapter<String>) list.getAdapter();
+			ad.clear();
+			ad.addAll(menuOptions);
+			ad.notifyDataSetChanged();
+		}
+		else{
+			list.setAdapter(arrayAdapter);
+		}
+	}
+	
 	private int getAvatarTextSize (float density){
 		float textSize = 0.0f;
 		
@@ -422,12 +526,6 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		return (int)textSize;
 	}
 	
-	public void setToolbar(ImageView myAccountImage, TextView initialLetter, CollapsingToolbarLayout collapsingToolbarLayout){
-		this.myAccountImage = myAccountImage;
-		this.initialLetter = initialLetter;
-		this.collapsingToolbarLayout = collapsingToolbarLayout;
-	}
-	
 	public void setMyEmail(String myEmail){
 		this.myEmail = myEmail;
 	}
@@ -436,13 +534,29 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		context = activity;
-		aB = ((AppCompatActivity)activity).getSupportActionBar();
 	}	
 
 	@Override
 	public void onClick(View v) {
 
 		switch (v.getId()) {
+			case R.id.my_account_main_layout:{
+				if (overflowMenuLayout != null){
+					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+						overflowMenuLayout.setVisibility(View.GONE);
+						return;
+					}
+				}
+				break;
+			}
+			case R.id.my_account_toolbar_back:{
+				((MyAccountMainActivityLollipop)context).finish();
+				break;
+			}
+			case R.id.my_account_toolbar_overflow:{
+				overflowMenuLayout.setVisibility(View.VISIBLE);
+				break;
+			}
 			case R.id.my_account_logout:{
 				ManagerActivityLollipop.logout(context, megaApi, false);
 				break;
@@ -453,7 +567,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 //					((ManagerActivityLollipop)context).paySubs();
 //				}				
 				
-				((ManagerActivityLollipop)context).showUpAF(paymentBitSet);
+				((MyAccountMainActivityLollipop)context).showUpAF(paymentBitSet);
 				break;
 			}
 		}
@@ -538,16 +652,13 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					firstName = true;
 				}
 				if(name&&firstName){
-					if (collapsingToolbarLayout != null){
-						collapsingToolbarLayout.setTitle(nameText+" "+firstNameText);
-					}
 					name= false;
 					firstName = false;
 				}
 				
 			}
 		}
-		if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
+		else if (request.getType() == MegaRequest.TYPE_GET_PAYMENT_METHODS){
 			if (e.getErrorCode() == MegaError.API_OK){
 				paymentBitSetLong = request.getNumber();
 				paymentBitSet = Util.convertToBitSet(request.getNumber());
@@ -576,7 +687,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				}
 			}
 		}
-		if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
+		else if (request.getType() == MegaRequest.TYPE_ACCOUNT_DETAILS){
 			log ("account_details request");
 			if (e.getErrorCode() == MegaError.API_OK && typeAccount != null)
 			{
@@ -689,6 +800,16 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		        usedSpaceLayout.setVisibility(View.VISIBLE);
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_KILL_SESSION){
+			if (e.getErrorCode() == MegaError.API_OK){
+				Snackbar.make(mainLayout, getString(R.string.success_kill_all_sessions), Snackbar.LENGTH_LONG).show();
+			}
+			else
+			{
+				log("error when killing sessions: "+e.getErrorString());
+				Snackbar.make(mainLayout, getString(R.string.error_kill_all_sessions), Snackbar.LENGTH_LONG).show();
+			}
+		}
 	}
 
 	@Override
@@ -707,9 +828,125 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 	}
 	
-	public void setMyInfo(){
-		//TODO
-		
-		
+	@SuppressLint("NewApi") 
+	void showAlert(String message, String title) {
+		AlertDialog.Builder bld;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
+			bld = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+		}
+		else{
+			bld = new AlertDialog.Builder(context);
+		}
+        bld.setMessage(message);
+        bld.setTitle(title);
+//        bld.setNeutralButton("OK", null);
+        bld.setPositiveButton("OK",null);
+        log("Showing alert dialog: " + message);
+        bld.create().show();
+    }
+
+	@Override
+	@SuppressLint("NewApi")
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		overflowMenuLayout.setVisibility(View.GONE);
+		String itemText = (String) parent.getItemAtPosition(position);
+		if (itemText.compareTo(getString(R.string.action_kill_all_sessions)) == 0){
+			megaApi.killSession(-1, this);
+		}
+		else if (itemText.compareTo(getString(R.string.my_account_change_password_title)) == 0){
+			Intent intent = new Intent(context, ChangePasswordActivityLollipop.class);
+			startActivity(intent);
+		}
+		else if (itemText.compareTo(getString(R.string.action_export_master_key)) == 0){
+			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        switch (which){
+			        case DialogInterface.BUTTON_POSITIVE:
+			        	String key = megaApi.exportMasterKey();
+						
+						BufferedWriter out;         
+						try {						
+
+							final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+							final File f = new File(path);
+							log("Export in: "+path);
+							FileWriter fileWriter= new FileWriter(path);	
+							out = new BufferedWriter(fileWriter);	
+							out.write(key);	
+							out.close(); 								
+							String message = getString(R.string.toast_master_key) + " " + path;
+//			    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+
+			    			showAlert(message, "MasterKey exported!");
+							/*removeMasterKeyMenuItem.setVisible(true);
+				        	exportMasterKeyMenuItem.setVisible(false);*/
+
+						}catch (FileNotFoundException e) {
+						 e.printStackTrace();
+						}catch (IOException e) {
+						 e.printStackTrace();
+						}
+			        	
+			            break;
+
+			        case DialogInterface.BUTTON_NEGATIVE:
+			            //No button clicked
+			            break;
+			        }
+			    }
+			};
+			
+			AlertDialog.Builder builder;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
+				builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+			}
+			else{
+				builder = new AlertDialog.Builder(context);
+			}
+			builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+		}
+		else if (itemText.compareTo(getString(R.string.action_remove_master_key)) == 0){
+			DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        switch (which){
+			        case DialogInterface.BUTTON_POSITIVE:
+
+						final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+						final File f = new File(path);
+			        	f.delete();	
+			        	/*removeMasterKeyMenuItem.setVisible(false);
+			        	exportMasterKeyMenuItem.setVisible(true);*/
+			        	String message = getString(R.string.toast_master_key_removed);
+			        	showAlert(message, "MasterKey removed!");
+			            break;
+
+			        case DialogInterface.BUTTON_NEGATIVE:
+			            //No button clicked
+			            break;
+			        }
+			    }
+			};
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+		}
+		else if (itemText.compareTo(getString(R.string.action_help)) == 0){
+			Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_BROWSABLE);
+            intent.setData(Uri.parse("https://mega.co.nz/#help/android"));
+            startActivity(intent);
+		}
+		else if (itemText.compareTo(getString(R.string.action_upgrade_account)) == 0){
+			((MyAccountMainActivityLollipop)context).showUpAF(null);
+		}
+		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
+			ManagerActivityLollipop.logout(context, megaApi, false);
+			((MyAccountMainActivityLollipop)context).finish();
+		}
 	}
 }
