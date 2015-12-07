@@ -10,7 +10,6 @@ import java.util.Locale;
 import java.util.Stack;
 
 import mega.privacy.android.app.DatabaseHandler;
-import mega.privacy.android.app.FullScreenImageViewer;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
@@ -21,7 +20,6 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
-import mega.privacy.android.app.lollipop.FileBrowserFragmentLollipop.RecyclerViewOnGestureListener;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -87,10 +85,10 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 
 	String userEmail;
 
+	RelativeLayout mainLayout;
 	TextView nameView;
 	RoundedImageView imageView;
 	TextView contactInitialLetter;
-	ImageView statusDot;
 	TextView textViewContent;
 
 	RelativeLayout contactLayout;
@@ -99,6 +97,8 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	GestureDetectorCompat detector;
 	ImageView emptyImageView;
 	TextView emptyTextView;
+	
+	ImageView toolbarBack;
 
 	MegaUser contact;
 	ArrayList<MegaNode> contactNodes;
@@ -324,6 +324,15 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
+	
+	public int getStatusBarHeight() { 
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	      } 
+	      return result;
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -353,14 +362,24 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 				aB.setTitle(R.string.contact_shared_files);
 				aB.setLogo(R.drawable.ic_action_navigation_accept_white);
 			}
-
+			
+			mainLayout = (RelativeLayout) v.findViewById(R.id.contact_file_list);
+			FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mainLayout.getLayoutParams();
+			params.setMargins(0, getStatusBarHeight(), 0, 0);
+			
 			nameView = (TextView) v.findViewById(R.id.contact_file_list_name);
 			imageView = (RoundedImageView) v.findViewById(R.id.contact_file_list_thumbnail);
 			contactInitialLetter = (TextView) v.findViewById(R.id.contact_file_list_initial_letter);
-			statusDot = (ImageView) v.findViewById(R.id.contact_file_list_status_dot);
 			textViewContent = (TextView) v.findViewById(R.id.contact_file_list_content);
 			contactLayout = (RelativeLayout) v.findViewById(R.id.contact_file_list_contact_layout);
 			contactLayout.setOnClickListener(this);
+			
+			toolbarBack = (ImageView) v.findViewById(R.id.contact_file_list_toolbar_back);
+			RelativeLayout.LayoutParams paramsBack = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
+			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+			paramsBack.setMargins(leftMarginBack, 0, 0, 0);
+			toolbarBack.setLayoutParams(paramsBack);
+			toolbarBack.setOnClickListener(this);
 
 			nameView.setText(userEmail);
 			contact = megaApi.getContact(userEmail);
@@ -486,9 +505,6 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 	            @Override
 	            public void onPanelSlide(View panel, float slideOffset) {
 	            	log("onPanelSlide, offset " + slideOffset);
-	            	if(slideOffset==0){
-	            		hideOptionsPanel();
-	            	}
 	            }
 
 	            @Override
@@ -925,7 +941,7 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 			} 
 			else {
 				if (MimeTypeList.typeForName(contactNodes.get(position).getName()).isImage()) {
-					Intent intent = new Intent(context, FullScreenImageViewer.class);
+					Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					if (megaApi.getParentNode(contactNodes.get(position)).getType() == MegaNode.TYPE_ROOT) {
 						intent.putExtra("parentNodeHandle", -1L);
@@ -1155,6 +1171,10 @@ public class ContactFileListFragmentLollipop extends Fragment implements OnClick
 		//			finish();
 		//			break;
 		//		}
+			case R.id.contact_file_list_toolbar_back:{
+				((ContactPropertiesActivityLollipop)context).onBackPressed();
+				break;
+			}
 			case R.id.contact_file_list_option_download_layout: {
 				log("Download option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);				

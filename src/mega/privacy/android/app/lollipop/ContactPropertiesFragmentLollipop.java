@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import com.nirhart.parallaxscroll.views.ParallaxScrollView;
+
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.utils.FixedCenterCrop;
 import mega.privacy.android.app.utils.Util;
@@ -16,6 +18,7 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import nz.mega.sdk.MegaUser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -24,6 +27,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -46,13 +50,26 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 
 
-public class ContactPropertiesFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface {
+public class ContactPropertiesFragmentLollipop extends Fragment implements OnClickListener, MegaRequestListenerInterface, OnItemClickListener {
 
 	public static int DEFAULT_AVATAR_WIDTH_HEIGHT = 250; //in pixels
 	
-	ImageView contactPropertiesImage;
-	CollapsingToolbarLayout collapsingToolbarLayout;
+	ParallaxScrollView sV;
+	RelativeLayout mainLayout;
+	RelativeLayout imageLayout;
+	RelativeLayout optionsBackLayout;
+	ImageView toolbarBack;
+	ImageView toolbarOverflow;
+	RelativeLayout overflowMenuLayout;
+	ListView overflowMenuList;
+	
 	TextView initialLetter;
+	ImageView contactPropertiesImage;
+	
+	DisplayMetrics outMetrics;
+	
+	
+	
 	RelativeLayout contentLayout;
 	TextView infoEmail;
 	TextView sharedFoldersButton;	
@@ -80,6 +97,15 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		super.onCreate(savedInstanceState);
 		log("onCreate");
 	}
+	
+	public int getStatusBarHeight() { 
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	      } 
+	      return result;
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -93,7 +119,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics();
+		outMetrics = new DisplayMetrics();
 		display.getMetrics(outMetrics);
 		float density = ((Activity) context).getResources().getDisplayMetrics().density;
 
@@ -104,42 +130,65 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 		if (userEmail != null){
 			v = inflater.inflate(R.layout.fragment_contact_properties, container, false);
-
-			//			layoutTop = (RelativeLayout) v.findViewById(R.id.contact_properties_layout_top);
-			//			closeImage = (ImageView) v.findViewById(R.id.contact_properties_close_icon);
-			//			overflowImage = (ImageView) v.findViewById(R.id.contact_properties_overflow);
-			//			
-			//			overflowImage.setOnClickListener(this);
-			//			closeImage.setOnClickListener(this);
-			//	
-//			imageView.getLayoutParams().width = Util.px2dp((270*scaleW), outMetrics);
-//			imageView.getLayoutParams().height = Util.px2dp((270*scaleW), outMetrics);
 			
-			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
-			//			contentLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_content);
-			//			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_text);
-			//			contentTextView = (TextView) v.findViewById(R.id.contact_properties_content_detailed);
-			//			eyeButton = (ImageButton) v.findViewById(R.id.contact_properties_content_eye);
-
-			//			eyeButton.setOnClickListener(this);
-			sharedFoldersLabel = (TextView) v.findViewById(R.id.shared_folders_label);
-			sharedFoldersButton = (TextView) v.findViewById(R.id.shared_folders_button);
-			sharedFoldersButton.setOnClickListener(this);
-
 			contact = megaApi.getContact(userEmail);
 			if(contact == null)
 			{
 				return null;
 			}
 			
-			infoEmail.setText(userEmail);
-			if (collapsingToolbarLayout != null){
-				collapsingToolbarLayout.setTitle(userEmail);
-				collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
-				collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
-				collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
-				collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
-			}			
+			sV = (ParallaxScrollView) v.findViewById(R.id.contact_properties_scroll_view);
+			sV.post(new Runnable() { 
+		        public void run() { 
+		             sV.scrollTo(0, outMetrics.heightPixels/3);
+		        } 
+			});
+			
+			mainLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_main_layout);
+			mainLayout.setOnClickListener(this);
+			imageLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_image_layout);
+			RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageLayout.getLayoutParams();
+			params.setMargins(0, -getStatusBarHeight(), 0, 0);
+			imageLayout.setLayoutParams(params);
+			
+			optionsBackLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_toolbar_back_options_layout);
+			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
+			params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
+			optionsBackLayout.setLayoutParams(params);
+			
+			toolbarBack = (ImageView) v.findViewById(R.id.contact_properties_toolbar_back);
+			params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
+			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+			params.setMargins(leftMarginBack, 0, 0, 0);
+			toolbarBack.setLayoutParams(params);
+			toolbarBack.setOnClickListener(this);
+			
+			toolbarOverflow = (ImageView) v.findViewById(R.id.contact_properties_toolbar_overflow);
+			params = (RelativeLayout.LayoutParams) toolbarOverflow.getLayoutParams();
+			params.setMargins(0, 0, leftMarginBack, 0);
+			toolbarOverflow.setLayoutParams(params);
+			toolbarOverflow.setOnClickListener(this);
+			
+			overflowMenuLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_overflow_menu_layout);
+			params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
+			params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
+			overflowMenuLayout.setLayoutParams(params);
+			overflowMenuList = (ListView) v.findViewById(R.id.contact_properties_overflow_menu_list);
+			overflowMenuLayout.setVisibility(View.GONE);
+			
+			createOverflowMenu(overflowMenuList);
+			overflowMenuList.setOnItemClickListener(this);
+			
+			contactPropertiesImage = (ImageView) v.findViewById(R.id.contact_properties_toolbar_image);
+			initialLetter = (TextView) v.findViewById(R.id.contact_properties_toolbar_initial_letter);
+			
+			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
+			
+			sharedFoldersLabel = (TextView) v.findViewById(R.id.contact_properties_shared_folders_label);
+			sharedFoldersButton = (TextView) v.findViewById(R.id.contact_properties_shared_folders_button);
+			sharedFoldersButton.setOnClickListener(this);
+			
+			infoEmail.setText(userEmail);		
 			name=false;
 			firstName=false;
 			megaApi.getUserAttribute(contact, 1, this);
@@ -147,35 +196,12 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
 
-			String menuOptions[] = new String[2];
-			menuOptions[0] = getString(R.string.context_share_folder);
-			menuOptions[1] = getString(R.string.context_view_shared_folders);
-
-			//			overflowMenuList = (ListView) v.findViewById(R.id.contact_properties_overflow_menu_list);
-			//			ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
-			//			overflowMenuList.setAdapter(arrayAdapter);
-			//			overflowMenuList.setOnItemClickListener(this);
-			//			if (overflowVisible){
-			//				overflowMenuList.setVisibility(View.VISIBLE);	
-			//			}
-			//			else{
-			//				overflowMenuList.setVisibility(View.GONE);
-			//			}			
-
-			
 			Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
 			Canvas c = new Canvas(defaultAvatar);
 			Paint p = new Paint();
 			p.setAntiAlias(true);
 			p.setColor(Color.TRANSPARENT);
 			c.drawPaint(p);
-//			int radius; 
-//	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-//	        	radius = defaultAvatar.getWidth()/2;
-//	        else
-//	        	radius = defaultAvatar.getHeight()/2;
-//	        
-//			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
 			contactPropertiesImage.setImageBitmap(defaultAvatar);
 			
 		    int avatarTextSize = getAvatarTextSize(density);
@@ -229,6 +255,25 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		return v;
 	}
 	
+	@SuppressLint("NewApi")
+	private void createOverflowMenu(ListView list){
+		ArrayList<String> menuOptions = new ArrayList<String>();
+		
+		menuOptions.add(getString(R.string.context_share_folder));
+		menuOptions.add(getString(R.string.context_view_shared_folders));
+		
+		ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, menuOptions);
+		if (list.getAdapter() != null){
+			ArrayAdapter<String> ad = (ArrayAdapter<String>) list.getAdapter();
+			ad.clear();
+			ad.addAll(menuOptions);
+			ad.notifyDataSetChanged();
+		}
+		else{
+			list.setAdapter(arrayAdapter);
+		}
+	}
+	
 	private int getAvatarTextSize (float density){
 		float textSize = 0.0f;
 		
@@ -258,12 +303,6 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 		this.userEmail = userEmail;
 	}
 	
-	public void setToolbar(ImageView contactPropertiesImage, TextView initialLetter, CollapsingToolbarLayout collapsingToolbarLayout){
-		this.contactPropertiesImage = contactPropertiesImage;
-		this.initialLetter = initialLetter;
-		this.collapsingToolbarLayout = collapsingToolbarLayout;
-	}
-
 	public String getUserEmail(){
 		return this.userEmail;
 	}
@@ -279,10 +318,27 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	public void onClick(View v) {
 
 		switch (v.getId()) {
-		case R.id.shared_folders_button:{
-			((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
-			break;
-		}
+			case R.id.contact_properties_main_layout:{
+				if (overflowMenuLayout != null){
+					if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+						overflowMenuLayout.setVisibility(View.GONE);
+						return;
+					}
+				}
+				break;
+			}
+			case R.id.contact_properties_toolbar_back:{
+				((ContactPropertiesActivityLollipop)context).finish();
+				break;
+			}
+			case R.id.contact_properties_toolbar_overflow:{
+				overflowMenuLayout.setVisibility(View.VISIBLE);
+				break;
+			}
+			case R.id.contact_properties_shared_folders_button:{
+				((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
+				break;
+			}
 		}
 	}
 
@@ -366,9 +422,9 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 					firstName = true;
 				}
 				if(name&&firstName){
-					if (collapsingToolbarLayout != null){
+					/*if (collapsingToolbarLayout != null){
 						collapsingToolbarLayout.setTitle(nameText+" "+firstNameText);
-					}
+					}*/
 					name= false;
 					firstName = false;
 				}
@@ -414,5 +470,17 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	public void onRequestUpdate(MegaApiJava api, MegaRequest request) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		overflowMenuLayout.setVisibility(View.GONE);
+		String itemText = (String) parent.getItemAtPosition(position);
+		if (itemText.compareTo(getString(R.string.context_share_folder)) == 0){
+			((ContactPropertiesActivityLollipop)context).pickFolderToShare(userEmail);
+		}
+		else if (itemText.compareTo(getString(R.string.context_view_shared_folders)) == 0){
+			((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
+		}
 	}
 }

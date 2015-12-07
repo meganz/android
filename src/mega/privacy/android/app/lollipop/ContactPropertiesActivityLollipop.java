@@ -54,6 +54,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -65,24 +66,9 @@ import android.widget.Toast;
 
 public class ContactPropertiesActivityLollipop extends PinActivityLollipop implements MegaGlobalListenerInterface, MegaTransferListenerInterface, MegaRequestListenerInterface {
 
-	TextView nameView;
-	TextView contentTextView;
-	FixedCenterCrop imageView;
-	RelativeLayout contentLayout;
-	TextView contentDetailedTextView;
-	TextView infoEmail;
-	TextView infoAdded;
-	ImageView statusImageView;
-	ImageButton eyeButton;
-	TableLayout contentTable;
-	Toolbar tB;
-    ActionBar aB;
+	FrameLayout fragmentContainer;
     
-    ImageView contactPropertiesImage;
-    CollapsingToolbarLayout collapsingToolbarLayout;
-    TextView initialLetter;
-
-	String userEmail;
+    String userEmail;
 
 	MegaApiAndroid megaApi;
 	AlertDialog permissionsDialog;
@@ -148,19 +134,9 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			userEmail = extras.getString("name");
 
 			setContentView(R.layout.activity_main_contact_properties);
-			
-			//Set toolbar
-			tB = (Toolbar) findViewById(R.id.contact_properties_toolbar);
-			setSupportActionBar(tB);
-			aB = getSupportActionBar();
-//			aB.setLogo(R.drawable.ic_arrow_back_black);
-			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setDisplayShowHomeEnabled(true);
-			
-			contactPropertiesImage = (ImageView) findViewById(R.id.contact_properties_toolbar_image);
-			collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.contact_properties_collapsing_toolbar);
-			initialLetter = (TextView) findViewById(R.id.contact_properties_toolbar_initial_letter);
 
+			fragmentContainer = (FrameLayout) findViewById(R.id.fragment_container_myaccount);
+			
 			int currentFragment = CONTACT_PROPERTIES;
 			selectContactFragment(currentFragment);
 		}
@@ -221,7 +197,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 					cpF = new ContactPropertiesFragmentLollipop();
 				}
 				cpF.setUserEmail(userEmail);
-				cpF.setToolbar(contactPropertiesImage, initialLetter, collapsingToolbarLayout);
 				getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_contact_properties, cpF, "cpF").commit();
 	
 				break;
@@ -261,48 +236,6 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 			MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
 			this.leaveIncomingShare(node);
 		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		// Respond to the action bar's Up/Home button
-		case android.R.id.home: {
-			onBackPressed();
-			return true;
-		}
-		case R.id.action_contact_file_list_share: {
-			
-    		cpF = (ContactPropertiesFragmentLollipop) getSupportFragmentManager().findFragmentByTag("cpF");
-        	if (cpF != null){
-        		MegaUser user = megaApi.getContact(cpF.getUserEmail());
-    			if(user == null)
-    			{
-    				return true;
-    			}
-    			
-    			this.pickFolderToShare(user);
-        	}
-        	else{
-        		MegaUser user = megaApi.getContact(cflF.getUserEmail());
-    			if(user == null)
-    			{
-    				return true;
-    			}
-    			
-    			this.pickFolderToShare(user);   	}
-			return true;
-		}
-		case R.id.action_contact_file_list_view_share: {
-			if (userEmail.compareTo(this.userEmail) == 0){
-				selectContactFragment(CONTACT_FILE_LIST);
-			}
-			return true;
-		}			
-		default: {
-			return super.onOptionsItemSelected(item);
-		}
-		}	    
 	}
 	
 	public String getDescription(ArrayList<MegaNode> nodes){
@@ -395,44 +328,21 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		log("onCreateOptionsMenu-----------------------------------");		
-
-		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.activity_contact_file_list, menu);
-		shareMenuItem = menu.findItem(R.id.action_contact_file_list_share);
-		viewSharedItem = menu.findItem(R.id.action_contact_file_list_view_share);		
-
-		if(cflF!=null){
-			if(cflF.isVisible()){
-				shareMenuItem.setVisible(true);		
-				viewSharedItem.setVisible(false);
-			}
-		}		
-		if(cpF!=null){
-			if(cpF.isVisible()){
-				shareMenuItem.setVisible(true);		
-				viewSharedItem.setVisible(true);
-			}
-		}	
-		return super.onCreateOptionsMenu(menu);
-	}
-
 	public void setParentHandle(long parentHandle) {
 		this.parentHandle = parentHandle;
 	}
 
-	public void pickFolderToShare(MegaUser user){
+	public void pickFolderToShare(String email){
 
-		Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
-		intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
-		String[] longArray = new String[1];		
-		longArray[0] = user.getEmail();		
-		intent.putExtra("SELECTED_CONTACTS", longArray);
-		startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
-
+		MegaUser user = megaApi.getContact(email);
+		if (user != null){
+			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_SELECT_FOLDER);
+			String[] longArray = new String[1];		
+			longArray[0] = email;		
+			intent.putExtra("SELECTED_CONTACTS", longArray);
+			startActivityForResult(intent, REQUEST_CODE_SELECT_FOLDER);
+		}
 	}
 
 
