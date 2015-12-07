@@ -917,6 +917,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 		log("retryPendingConnections()");
 		if (megaApi != null){
+			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
 		}
 		
@@ -3584,6 +3585,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		
 		if (megaApi != null){
+			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
 		}
 		
@@ -4834,8 +4836,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			megaApi = ((MegaApplication)getApplication()).getMegaApi();
 		}
 
-		log("retryPendingConnections()");
 		if (megaApi != null){
+			log("---------retryPendingConnections");
 			megaApi.retryPendingConnections();
 		}
 		try { 
@@ -9337,7 +9339,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}				
 			}
 		}
-		if (drawerItem == DrawerItem.INBOX){
+		else if (drawerItem == DrawerItem.INBOX){
 			log("INBOX shown");
 			if (iFLol != null){
 				iFLol.refresh();
@@ -9345,7 +9347,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}		
 		
-		if (drawerItem == DrawerItem.SHARED_ITEMS){
+		else if (drawerItem == DrawerItem.SHARED_ITEMS){
 			int index = viewPagerShares.getCurrentItem();
 			if(index==1){				
 				//OUTGOING				
@@ -9390,7 +9392,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}				
 			}	
 		}
-		if (drawerItem == DrawerItem.CAMERA_UPLOADS){
+		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 			if (cuF != null){			
 				if(cuF.isAdded()){
 					long cameraUploadHandle = cuF.getPhotoSyncHandle();
@@ -9404,10 +9406,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}				
 			}
 		}
-		if (cFLol != null){
-			if (drawerItem == DrawerItem.CONTACTS){
-				log("Share finish");
-				cFLol.updateView();
+		else if (drawerItem == DrawerItem.CONTACTS){
+			int index = viewPagerContacts.getCurrentItem();
+			if (index == 0){
+				String cFTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
+				if (cFLol != null){				
+					log("Share finish");
+					cFLol.updateShares();
+				}
 			}
 		}
 	}
@@ -9423,8 +9430,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 
 	@Override
-	public void onContactRequestsUpdate(MegaApiJava api,
-			ArrayList<MegaContactRequest> requests) {
+	public void onContactRequestsUpdate(MegaApiJava api,ArrayList<MegaContactRequest> requests) {
 		log("---------------------onContactRequestsUpdate");
 		// TODO Auto-generated method stub
 		if (drawerItem == DrawerItem.CONTACTS){
@@ -9693,7 +9699,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
 	@Override
 	public void onTransferUpdate(MegaApiJava api, MegaTransfer transfer) {
-		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
+//		log("onTransferUpdate: " + transfer.getFileName() + " - " + transfer.getTag());
 		
 		long currentSizeDownloaded = 0;
 		if (transfersDownloadedSize.get(transfer.getTag()) != null){
@@ -9703,7 +9709,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		transfersDownloadedSize.put(transfer.getTag(), transfer.getTransferredBytes());
 		
 		progressPercent = (int) Math.round((double) totalSizeDownloaded / totalSizeToDownload * 100);
-		log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
+//		log(progressPercent + " " + totalSizeDownloaded + " " + totalSizeToDownload);
 		if (fbFLol != null){	
 			fbFLol.updateProgressBar(progressPercent);
 		}

@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -37,7 +38,9 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -52,8 +55,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,12 +73,14 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	ImageView emptyImageView;
 	TextView emptyTextView;
 	MegaBrowserLollipopAdapter adapterList;
-	LinearLayout outSpaceLayout=null;
-	LinearLayout getProLayout=null;
 	SearchFragmentLollipop searchFragment = this;
 	TextView contentText;
+	RelativeLayout contentTextLayout;
+	ProgressBar progressBar;
 	MegaNode selectedNode = null;
-	MegaApiAndroid megaApi;
+	MegaApiAndroid megaApi;	
+    ImageButton fabButton;
+	ImageView transferArrow;
 		
 	long parentHandle = -1;
 	int levels = -1;
@@ -84,6 +92,10 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		
 	private ActionMode actionMode;
 	GestureDetectorCompat detector;
+	
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	//OPTIONS PANEL
 	private SlidingUpPanelLayout slidingOptionsPanel;
@@ -304,6 +316,11 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 			nodes = megaApi.getChildren(n, orderGetChildren);
 		}
 		
+		display = ((Activity)context).getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
+		
 		detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
 		
 		View v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false);
@@ -315,13 +332,20 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		listView.addOnItemTouchListener(this);
 		listView.setItemAnimator(new DefaultItemAnimator()); 
 		
-		outSpaceLayout = (LinearLayout) v.findViewById(R.id.out_space);
-		outSpaceLayout.setVisibility(View.GONE);
-		
-		getProLayout=(LinearLayout) v.findViewById(R.id.get_pro_account);
-		getProLayout.setVisibility(View.GONE);
+		fabButton = (ImageButton) v.findViewById(R.id.file_upload_button);
+		fabButton.setVisibility(View.GONE);
+		progressBar = (ProgressBar) v.findViewById(R.id.file_list_download_progress_bar);
+		progressBar.setVisibility(View.GONE);
+		transferArrow = (ImageView) v.findViewById(R.id.file_list_transfer_arrow);
+		transferArrow.setVisibility(View.GONE);
 				
-		contentText = (TextView) v.findViewById(R.id.content_text);
+		contentTextLayout = (RelativeLayout) v.findViewById(R.id.content_text_layout);
+		contentText = (TextView) v.findViewById(R.id.content_text);			
+		//Margins
+		RelativeLayout.LayoutParams contentTextParams = (RelativeLayout.LayoutParams)contentText.getLayoutParams();
+		contentTextParams.setMargins(Util.scaleWidthPx(78, outMetrics), Util.scaleHeightPx(5, outMetrics), 0, Util.scaleHeightPx(5, outMetrics)); 
+		contentText.setLayoutParams(contentTextParams);
+		
 		emptyImageView = (ImageView) v.findViewById(R.id.file_list_empty_image);
 		emptyTextView = (TextView) v.findViewById(R.id.file_list_empty_text);
 		
@@ -811,7 +835,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 	}
 	
 	public int onBackPressed(){
-		
+		log("onBackPressed");
 		
 		PanelState pS=slidingOptionsPanel.getPanelState();
 		
@@ -856,7 +880,7 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 		}
 		else{
 			if (levels > 0){
-				
+				log("levels > 0");
 				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
 				if (parentNode != null){
 					listView.setVisibility(View.VISIBLE);
@@ -878,6 +902,19 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 					parentHandle = parentNode.getHandle();
 					((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 					nodes = megaApi.getChildren(parentNode, orderGetChildren);
+					if(nodes!=null){
+						log("nodes.size: "+nodes.size());
+						if(nodes.size()>0){
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+						}
+						else{						
+							listView.setVisibility(View.GONE);
+							emptyImageView.setVisibility(View.VISIBLE);
+							emptyTextView.setVisibility(View.VISIBLE);
+						}
+					}
 					adapterList.setNodes(nodes);
 					listView.scrollToPosition(0);
 					adapterList.setParentHandle(parentHandle);
@@ -889,13 +926,28 @@ public class SearchFragmentLollipop extends Fragment implements OnClickListener,
 				}
 			}
 			else if (levels == -1){
+				log("levels == -1");
 				return 0;
 			}
 			else{
+				log("levels searchQuery");
 				parentHandle = -1;
 				((ManagerActivityLollipop)context).setParentHandleSearch(parentHandle);
 				nodes = megaApi.search(megaApi.getRootNode(), searchQuery, true);
 				adapterList.setNodes(nodes);
+				if(nodes!=null){
+					log("nodes.size: "+nodes.size());
+					if(nodes.size()>0){
+						listView.setVisibility(View.VISIBLE);
+						emptyImageView.setVisibility(View.GONE);
+						emptyTextView.setVisibility(View.GONE);
+					}
+					else{						
+						listView.setVisibility(View.GONE);
+						emptyImageView.setVisibility(View.VISIBLE);
+						emptyTextView.setVisibility(View.VISIBLE);
+					}
+				}				
 				listView.scrollToPosition(0);
 				adapterList.setParentHandle(parentHandle);
 				levels--;

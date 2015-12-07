@@ -149,7 +149,8 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 	
 	@Override
-	public void onDestroy(){				
+	public void onDestroy(){	
+		log("onDestroy");
 		if((lock != null) && (lock.isHeld()))
 			try{ lock.release(); } catch(Exception ex) {}
 		if((wl != null) && (wl.isHeld()))
@@ -296,6 +297,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	 * Stop uploading service
 	 */
 	private void cancel() {
+		log("cancel");
 		canceled = true;
 		isForeground = false;
 		stopForeground(true);
@@ -353,7 +355,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 		stopForeground(true);
 		mNotificationManager.cancel(notificationId);
 		stopSelf();
-		
+		log("after stopSelf");
 		String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;						
 		File f = new File(pathSelfie);
 		//Delete recursively all files and folder
@@ -841,8 +843,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 	}
 
 	@Override
-	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,
-			MegaError error) {
+	public void onTransferFinish(MegaApiJava api, MegaTransfer transfer,MegaError error) {
 		log("Upload finished: " + transfer.getFileName() + " size " + transfer.getTransferredBytes());
 		log("transfer.getPath:" + transfer.getPath());
 		if (canceled) {
@@ -854,7 +855,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 				try{ wl.release(); } catch(Exception ex) {}
 				
 			UploadService.this.cancel();
-			
+			log("after cancel");
 			String pathSelfie = Environment.getExternalStorageDirectory().getAbsolutePath() +"/"+ Util.temporalPicDIR;						
 			File f = new File(pathSelfie);
 			//Delete recursively all files and folder
@@ -969,6 +970,7 @@ public class UploadService extends Service implements MegaTransferListenerInterf
 			
 			megaApi.cancelTransfer(transfer);
 			UploadService.this.cancel();
+			log("after cancel");
 			return;
 		}
 				
