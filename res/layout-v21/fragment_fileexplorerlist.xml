@@ -102,7 +102,7 @@
      
     <View 
      android:id="@+id/separator" 
-	 android:background="@color/text_secondary"
+	 android:background="@color/separator_grey"
 	 android:layout_width = "fill_parent"
 	 android:layout_height="1dip"
 	 android:layout_above="@id/options_explorer_layout"/>

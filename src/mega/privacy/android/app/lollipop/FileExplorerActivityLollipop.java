@@ -343,7 +343,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
         
         //Create tabs
         mTabHostExplorer.getTabWidget().setBackgroundColor(Color.BLACK);
-		
+        mTabHostExplorer.getTabWidget().setDividerDrawable(null);
         mTabHostExplorer.setVisibility(View.VISIBLE);    			
 		
 		

@@ -3785,7 +3785,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_new_folder:{
 	        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
-	        		showNewFolderDialog(null);
+	        		showNewFolderDialog();
 	        	}
 	        	else if (drawerItem == DrawerItem.CONTACTS){
 	        		showNewContactDialog(null);
@@ -5578,7 +5578,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 	
 		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
 		input.setId(EDIT_TEXT_ID);
@@ -5587,7 +5587,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		input.setHint(getString(R.string.context_new_folder_name));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-		input.setImeActionLabel(getString(R.string.context_rename),KeyEvent.KEYCODE_ENTER);
+		input.setImeActionLabel(getString(R.string.context_rename),EditorInfo.IME_ACTION_DONE);
 		input.setText(text);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
@@ -5991,7 +5991,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 	    layout.addView(input, params);
-		input.setImeActionLabel(getString(R.string.context_open_link_title),KeyEvent.KEYCODE_ENTER);
+		input.setImeActionLabel(getString(R.string.context_open_link_title),EditorInfo.IME_ACTION_DONE);
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 		builder.setTitle(getString(R.string.context_open_link_title));
@@ -6179,7 +6179,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 	}
 	
-	public void showNewFolderDialog(String editText){
+	public void showNewFolderDialog(){
 		log("showNewFolderDialogKitLollipop");
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 			fbFLol.setPositionClicked(-1);
@@ -6215,7 +6215,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.general_create),KeyEvent.KEYCODE_ENTER);
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -6532,7 +6532,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 		
 		final EditText input = new EditText(this);
 	    layout.addView(input, params);
@@ -6548,19 +6548,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,	KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					String value = v.getText().toString().trim();
-					if (value.length() == 0) {
-						return true;
-					}
-					inviteContact(value);
-					addContactDialog.dismiss();
-					return true;
+					String value = input.getText().toString().trim();
+					String emailError = getEmailError(value);
+					if (emailError != null) {
+						input.setError(emailError);
+						input.requestFocus();
+					} else {
+						inviteContact(value);
+						addContactDialog.dismiss();
+					}				
+				}
+				else{
+					log("other IME" + actionId);
 				}
 				return false;
 			}
 		});
-		input.setImeActionLabel(getString(R.string.general_add),
-				KeyEvent.KEYCODE_ENTER);
+		input.setImeActionLabel(getString(R.string.general_add),EditorInfo.IME_ACTION_DONE);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -6582,29 +6586,26 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setView(layout);
 		addContactDialog = builder.create();
 		addContactDialog.show();
-		addContactDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
-	      {            
-	          @Override
-	          public void onClick(View v)
-	          {
-	        	  String value = input.getText().toString().trim();
-					String emailError = getEmailError(value);
-					if (emailError != null) {
-						input.setError(emailError);			
-					}
-					else{
-						inviteContact(value);
-						addContactDialog.dismiss();	   
-					}            	           
-	          }
-	      });
+		addContactDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String value = input.getText().toString().trim();
+				String emailError = getEmailError(value);
+				if (emailError != null) {
+					input.setError(emailError);
+				} else {
+					inviteContact(value);
+					addContactDialog.dismiss();
+				}
+			}
+		});
 	}
 	
 	/*
 	 * Validate email
 	 */
 	private String getEmailError(String value) {
-		
+		log("getEmailError");
 		if (value.length() == 0) {
 			return getString(R.string.error_enter_email);
 		}

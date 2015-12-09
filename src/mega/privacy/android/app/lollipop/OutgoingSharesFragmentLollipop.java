@@ -1008,12 +1008,6 @@ public class OutgoingSharesFragmentLollipop extends Fragment implements OnClickL
 				break;
 			}
 			
-			case R.id.btnLeft_new:
-			case R.id.btnLeft_grid_new:{
-				((ManagerActivityLollipop)getActivity()).showNewFolderDialog(null);				
-				break;
-			}
-			
 			case R.id.file_upload_button:
 			case R.id.file_upload_button_grid:{
 				log("file_upload_button");
