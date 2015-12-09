@@ -423,6 +423,9 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		if (node.isFolder()) {
+			holder.transferProgressBar.setVisibility(View.GONE);		
+			holder.textViewFileSize.setVisibility(View.VISIBLE);
+			
 			holder.textViewFileSize.setText(getInfoFolder(node));
 			
 			ArrayList<MegaShare> sl = megaApi.getOutShares(node);
@@ -458,7 +461,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 				log("NODE: " + mTHash.get(node.getHandle()));
 				MegaTransfer tempT = mTHash.get(node.getHandle());
 
-				if (tempT!=null){
+				if (tempT != null){
 					holder.transferProgressBar.setVisibility(View.VISIBLE);		
 					holder.textViewFileSize.setVisibility(View.GONE);	
 
@@ -472,7 +475,17 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.textViewFileSize.setVisibility(View.GONE);	
 						double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
 						holder.transferProgressBar.setProgress((int)progressValue);
+						holder.transferProgressBar.setVisibility(View.VISIBLE);		
+						holder.textViewFileSize.setVisibility(View.GONE);
 					}
+					else{
+						holder.transferProgressBar.setVisibility(View.GONE);		
+						holder.textViewFileSize.setVisibility(View.VISIBLE);
+					}
+				}
+				else{
+					holder.transferProgressBar.setVisibility(View.GONE);		
+					holder.textViewFileSize.setVisibility(View.VISIBLE);
 				}
 
 				if(mTHash.size() == 0){
@@ -678,6 +691,8 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		}
 		
 		if (node.isFolder()) {
+			holder.transferProgressBar.setVisibility(View.GONE);		
+			holder.textViewFileSize.setVisibility(View.VISIBLE);
 //			holder.propertiesText.setText(R.string.general_folder_info);
 			holder.textViewFileSize.setText(getInfoFolder(node));
 
@@ -730,7 +745,17 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 						holder.textViewFileSize.setVisibility(View.GONE);	
 						double progressValue = 100.0 * currentTransfer.getTransferredBytes() / currentTransfer.getTotalBytes();
 						holder.transferProgressBar.setProgress((int)progressValue);
+						holder.transferProgressBar.setVisibility(View.VISIBLE);		
+						holder.textViewFileSize.setVisibility(View.GONE);
 					}
+					else{
+						holder.transferProgressBar.setVisibility(View.GONE);		
+						holder.textViewFileSize.setVisibility(View.VISIBLE);
+					}
+				}
+				else{
+					holder.transferProgressBar.setVisibility(View.GONE);		
+					holder.textViewFileSize.setVisibility(View.VISIBLE);
 				}
 
 				if(mTHash.size() == 0){
@@ -1006,7 +1031,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		switch (type) {
 		case ManagerActivityLollipop.FILE_BROWSER_ADAPTER: {
 			log("setParentHandleBrowser -FILE_BROWSER_ADAPTER");
-//			((ManagerActivityLollipop) context).setParentHandleCloud(parentHandle);
+			((ManagerActivityLollipop) context).setParentHandleBrowser(parentHandle);
 			break;
 		}
 		case ManagerActivityLollipop.CONTACT_FILE_ADAPTER: {
@@ -1073,7 +1098,7 @@ public class MegaBrowserLollipopAdapter extends RecyclerView.Adapter<MegaBrowser
 		this.currentTransfer = mT;
 		MegaNode nodeT = megaApi.getNodeByHandle(mT.getNodeHandle());
 		if (megaApi.getParentNode(nodeT) != null){
-			if(megaApi.getParentNode(nodeT).getHandle()==parentHandle){    		
+			if(megaApi.getParentNode(nodeT).getHandle() == parentHandle){    		
 				notifyDataSetChanged();    		
 			}
 		}
