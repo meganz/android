@@ -11,6 +11,7 @@ import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import android.annotation.SuppressLint;
@@ -41,6 +42,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -98,7 +100,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	
 	private File path;
 	private File root;
-	DisplayMetrics metrics;
+//	DisplayMetrics outMetrics;
 	private RelativeLayout viewContainer;
 //	private TextView windowTitle;
 	private TextView button;
@@ -119,6 +121,11 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	FileStorageLollipopAdapter adapter;
 	Toolbar tB;
 	ActionBar aB;
+	
+	float scaleH, scaleW;
+	float density;
+	DisplayMetrics outMetrics;
+	Display display;
 	
 	private ActionMode actionMode;
 	
@@ -165,7 +172,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		    	return true;
 		    }
 		    case R.id.cab_menu_create_folder:{
-		    	onNewFolderClick();
+		    	showNewFolderDialog();
 		    	return true;
 		    }
 		    case R.id.cab_menu_select_all:{
@@ -319,15 +326,14 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate(savedInstanceState);
 		
-		Display display = getWindowManager().getDefaultDisplay();
 		
-		metrics = new DisplayMetrics();
-		display.getMetrics(metrics);
+		display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    density  = getResources().getDisplayMetrics().density;
 		
-		float density  = getResources().getDisplayMetrics().density;
-		
-	    float scaleW = Util.getScaleW(metrics, density);
-	    float scaleH = Util.getScaleH(metrics, density);
+	    scaleW = Util.getScaleW(outMetrics, density);
+	    scaleH = Util.getScaleH(outMetrics, density);
 	    float scaleText;
 	    if (scaleH < scaleW){
 	    	scaleText = scaleH;
@@ -335,7 +341,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 	    else{
 	    	scaleText = scaleW;
 	    }
-	    
+					    
 		setContentView(R.layout.activity_filestorage);
 		
 		detector = new GestureDetectorCompat(this, new RecyclerViewOnGestureListener());
@@ -377,21 +383,21 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button = (TextView) findViewById(R.id.file_storage_button);
 		button.setOnClickListener(this);
 		android.view.ViewGroup.LayoutParams paramsb2 = button.getLayoutParams();		
-		paramsb2.height = Util.scaleHeightPx(48, metrics);
+		paramsb2.height = Util.scaleHeightPx(48, outMetrics);
 		
 		if(fromSettings){
 			button.setText(getString(R.string.general_select).toUpperCase(Locale.getDefault()));
-			paramsb2.width = Util.scaleWidthPx(73, metrics);
+			paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 		}
 		else{
 			if (mode == Mode.PICK_FOLDER) {
 				button.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
-				paramsb2.width = Util.scaleWidthPx(95, metrics);
+				paramsb2.width = Util.scaleWidthPx(95, outMetrics);
 				
 			}
 			else{
 				button.setText(getString(R.string.context_upload).toUpperCase(Locale.getDefault()));
-				paramsb2.width = Util.scaleWidthPx(73, metrics);
+				paramsb2.width = Util.scaleWidthPx(73, outMetrics);
 			}
 		}		
 		emptyImageView = (ImageView) findViewById(R.id.file_storage_empty_image);
@@ -402,19 +408,19 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		button.setLayoutParams(paramsb2);
 		//Left and Right margin
 		LinearLayout.LayoutParams optionTextParams = (LinearLayout.LayoutParams)button.getLayoutParams();
-		optionTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		optionTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
 		button.setLayoutParams(optionTextParams);		
 		
 		cancelButton.setOnClickListener(this);		
 		cancelButton.setText(getString(R.string.general_cancel).toUpperCase(Locale.getDefault()));		
 		
 		android.view.ViewGroup.LayoutParams paramsb1 = cancelButton.getLayoutParams();		
-		paramsb1.height = Util.scaleHeightPx(48, metrics);
-//		paramsb1.width = Util.scaleWidthPx(145, metrics);
+		paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+//		paramsb1.width = Util.scaleWidthPx(145, outMetrics);
 		cancelButton.setLayoutParams(paramsb1);
 		//Left and Right margin
 		LinearLayout.LayoutParams cancelTextParams = (LinearLayout.LayoutParams)cancelButton.getLayoutParams();
-		cancelTextParams.setMargins(Util.scaleWidthPx(6, metrics), 0, Util.scaleWidthPx(8, metrics), 0); 
+		cancelTextParams.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
 		cancelButton.setLayoutParams(cancelTextParams);		
 		
 		listView = (RecyclerView) findViewById(R.id.file_storage_list_view);
@@ -876,14 +882,13 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		}
 	}
 	
-	@SuppressLint("NewApi")
-	public void onNewFolderClick(){
-		log("file storage activity ne FOLDER!!");
+	public void showNewFolderDialog(){
+		log("showNewFolderDialogKitLollipop");
 		
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-	    params.setMargins(Util.scaleWidthPx(20, metrics), Util.scaleWidthPx(20, metrics), Util.scaleWidthPx(17, metrics), 0);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 
 	    final EditText input = new EditText(this);
 	    layout.addView(input, params);		
@@ -896,7 +901,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
 		input.setOnEditorActionListener(new OnEditorActionListener() {
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String value = v.getText().toString().trim();
 					if (value.length() == 0) {
