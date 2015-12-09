@@ -321,6 +321,7 @@
     <string name="context_correctly_sent" context="success message when sending a file">File correctly sent</string>
     <string name="context_no_sent" context="error message when sending a file">Error. File not sent</string>
     <string name="context_no_copied" context="error message">Error. Not copied</string>
+    <string name="context_no_destination_folder" context="message that appears when a user tries to move/copy/upload a file but doesn't choose a destination folder">A destination folder has to be chosen</string>
     <string name="context_correctly_moved" context="success message when moving a node">Correctly moved</string>
     <string name="number_correctly_moved" context="success message when moving a node">%d items correctly moved</string>
     <string name="number_incorrectly_moved" context="success message when moving a node">, %d items not correctly moved</string>

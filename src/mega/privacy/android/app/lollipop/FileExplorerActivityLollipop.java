@@ -575,6 +575,15 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void buttonClick(long handle){
 		log("buttonClick");
 		
+		if (tabShown == INCOMING_TAB){
+			if (iSharesExplorer.deepBrowserTree==0){
+				Intent intent = new Intent();
+				setResult(RESULT_FIRST_USER, intent);
+				finish();
+				return;
+			}
+		}
+		
 		folderSelected = true;
 		this.gParentHandle = handle;
 		
@@ -1135,7 +1144,6 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	public void onDestroy(){
 		if(megaApi != null)
 		{	
-			megaApi.removeRequestListener(this);
 			megaApi.removeGlobalListener(this);
 		}
 		

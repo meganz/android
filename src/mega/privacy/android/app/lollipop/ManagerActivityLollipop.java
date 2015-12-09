@@ -7280,6 +7280,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		log("-------------------onActivityResult "+requestCode + "____" + resultCode);
 		
+		if (resultCode == RESULT_FIRST_USER){
+			Snackbar.make(fragmentContainer, getString(R.string.context_no_destination_folder), Snackbar.LENGTH_LONG).show();
+			return;
+		}
+		
 		if (requestCode == REQUEST_CODE_GET){
 			log("resultCode = " + resultCode);
 			if (intent == null){
@@ -7758,6 +7763,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 //			final int totalMoves = moveHandles.length;
+			
+			Toast.makeText(this, "TOHANDLE:" + toHandle, Toast.LENGTH_LONG).show();
 			
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
