@@ -6521,13 +6521,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}
 		}
 		
-		String text;
-		if ((editText == null) || (editText.compareTo("") == 0)){
-			text = getString(R.string.context_new_contact_name);
-		}
-		else{
-			text = editText;
-		}
+//		String text;
+//		if ((editText == null) || (editText.compareTo("") == 0)){
+//			text = ;
+//		}
+//		else{
+//			text = editText;
+//		}
 		
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
@@ -6539,6 +6539,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
+		input.setHint(getString(R.string.context_new_contact_name));
 		input.setTextColor(getResources().getColor(R.color.text_secondary));
 //		input.setSelectAllOnFocus(true);
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -6560,7 +6561,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		});
 		input.setImeActionLabel(getString(R.string.general_add),
 				KeyEvent.KEYCODE_ENTER);
-		input.setText(text);
 		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
@@ -6575,17 +6575,43 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		builder.setPositiveButton(getString(R.string.general_add),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
-						String value = input.getText().toString().trim();
-						if (value.length() == 0) {
-							return;
-						}
-						inviteContact(value);
+														
 					}
 				});
 		builder.setNegativeButton(getString(android.R.string.cancel), null);
 		builder.setView(layout);
 		addContactDialog = builder.create();
 		addContactDialog.show();
+		addContactDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener()
+	      {            
+	          @Override
+	          public void onClick(View v)
+	          {
+	        	  String value = input.getText().toString().trim();
+					String emailError = getEmailError(value);
+					if (emailError != null) {
+						input.setError(emailError);			
+					}
+					else{
+						inviteContact(value);
+						addContactDialog.dismiss();	   
+					}            	           
+	          }
+	      });
+	}
+	
+	/*
+	 * Validate email
+	 */
+	private String getEmailError(String value) {
+		
+		if (value.length() == 0) {
+			return getString(R.string.error_enter_email);
+		}
+		if (!android.util.Patterns.EMAIL_ADDRESS.matcher(value).matches()) {
+			return getString(R.string.error_invalid_email);
+		}
+		return null;
 	}
 	
 	public void inviteContact(String contactEmail){
