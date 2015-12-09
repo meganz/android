@@ -260,6 +260,35 @@ public class ReceivedRequestsFragmentLollipop extends Fragment implements OnClic
 		}			
 	}
 	
+	
+	public void updateView(){
+		contacts = megaApi.getIncomingContactRequests();
+		if (adapterList == null){
+			adapterList = new MegaContactRequestLollipopAdapter(context, this, contacts, emptyImageView, emptyTextView, listView, ManagerActivityLollipop.INCOMING_REQUEST_ADAPTER);
+			listView.setAdapter(adapterList);
+		}
+		else{
+			adapterList.setContacts(contacts);
+		}
+	
+		adapterList.setPositionClicked(-1);
+		
+		if (adapterList.getItemCount() == 0){				
+			log("adapterList.getCount() == 0");
+			emptyImageView.setImageResource(R.drawable.ic_empty_folder);
+			emptyTextView.setText(R.string.received_requests_empty);
+			listView.setVisibility(View.GONE);
+			emptyImageView.setVisibility(View.VISIBLE);
+			emptyTextView.setVisibility(View.VISIBLE);
+		}
+		else{
+			log("adapterList.getCount() NOT = 0");
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);
+		}		
+	}
+	
 	public void setPositionClicked(int positionClicked){
 		if (isList){
 			if (adapterList != null){
