@@ -9269,6 +9269,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				cFLol.updateView();
 			}
 		}
+		String cFTagSR = getFragmentTag(R.id.contact_tabs_pager, 1);		
+		sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagSR);
+		if (sRFLol != null){
+			if (drawerItem == DrawerItem.CONTACTS){					
+				sRFLol.updateView();
+			}
+		}
+		String cFTagRR = getFragmentTag(R.id.contact_tabs_pager, 2);		
+		rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRR);
+		if (rRFLol != null){
+			if (drawerItem == DrawerItem.CONTACTS){					
+				rRFLol.updateView();
+			}
+		}
 	}
 
 	@Override
