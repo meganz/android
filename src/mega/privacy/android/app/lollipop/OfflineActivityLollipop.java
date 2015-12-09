@@ -56,15 +56,6 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		}
 		
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commit();
-//		if (isListOffline){					
-//			customListGrid.setImageResource(R.drawable.ic_menu_gridview);
-//		}
-//		else{
-//			customListGrid.setImageResource(R.drawable.ic_menu_listview);
-//		}
-//		    			
-//		customListGrid.setVisibility(View.VISIBLE);
-//		customSearch.setVisibility(View.VISIBLE);
 	}
 	
 	@Override

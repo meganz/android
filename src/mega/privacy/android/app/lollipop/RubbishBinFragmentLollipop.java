@@ -260,6 +260,8 @@ public class RubbishBinFragmentLollipop extends Fragment implements OnClickListe
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
+		isList = ((ManagerActivityLollipop)context).isList();
+		
 		if (parentHandle == -1){
 			if (megaApi.getRubbishNode() != null){
 				parentHandle = megaApi.getRubbishNode().getHandle();

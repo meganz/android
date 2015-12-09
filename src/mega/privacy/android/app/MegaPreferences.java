@@ -24,6 +24,8 @@ public class MegaPreferences{
 	String secSyncTimeStamp = "";
 	String keepFileNames = "";
 	String storageAdvancedDevices = "";
+	String preferredViewList = "";
+	String preferredViewListCameraUploads = "";
 		
 	public final static int ONLY_PHOTOS = 1001;
 	public final static int ONLY_VIDEOS = 1002;
@@ -31,7 +33,7 @@ public class MegaPreferences{
 	
 	MegaPreferences(String firstTime, String camSyncWifi, String camSyncEnabled, String camSyncHandle, String camSyncLocalPath, String camSyncFileUpload, String camSyncTimeStamp, String pinLockEnabled, String pinLockCode, String storageAskAlways, 
 			String storageDownloadLocation, String camSyncCharging, String lastFolderUpload, String lastFolderCloud, String secondaryMediaFolderEnabled, String localPathSecondaryFolder, String megaHandleSecondaryFolder, String secSyncTimeStamp, 
-			String keepFileNames, String storageAdvancedDevices){
+			String keepFileNames, String storageAdvancedDevices, String preferredViewList, String preferredViewListCameraUploads){
 		this.firstTime = firstTime;
 		this.camSyncWifi = camSyncWifi;
 		this.camSyncEnabled = camSyncEnabled;
@@ -52,6 +54,8 @@ public class MegaPreferences{
 		this.secSyncTimeStamp = secSyncTimeStamp;
 		this.keepFileNames = keepFileNames;
 		this.storageAdvancedDevices = storageAdvancedDevices;
+		this.preferredViewList = preferredViewList;
+		this.preferredViewListCameraUploads = preferredViewListCameraUploads;
 	}
 	
 	public String getFirstTime (){
@@ -221,6 +225,23 @@ public class MegaPreferences{
 
 	public void setStorageAdvancedDevices(String storageAdvancedDevices) {
 		this.storageAdvancedDevices = storageAdvancedDevices;
+	}
+
+	public String getPreferredViewList() {
+		return preferredViewList;
+	}
+
+	public void setPreferredViewList(String preferredViewList) {
+		this.preferredViewList = preferredViewList;
+	}
+
+	public String getPreferredViewListCameraUploads() {
+		return preferredViewListCameraUploads;
+	}
+
+	public void setPreferredViewListCameraUploads(
+			String preferredViewListCameraUploads) {
+		this.preferredViewListCameraUploads = preferredViewListCameraUploads;
 	}
 }
 

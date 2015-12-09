@@ -17,7 +17,7 @@ import android.util.Base64;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	
-	private static final int DATABASE_VERSION = 15; 
+	private static final int DATABASE_VERSION = 16; 
     private static final String DATABASE_NAME = "megapreferences"; 
     private static final String TABLE_PREFERENCES = "preferences";
     private static final String TABLE_CREDENTIALS = "credentials";
@@ -55,6 +55,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_OFF_HANDLE_INCOMING = "incomingHandle";
     private static final String KEY_SEC_SYNC_TIMESTAMP = "secondarySyncTimeStamp";
     private static final String KEY_STORAGE_ADVANCED_DEVICES = "storageadvanceddevices";
+    private static final String KEY_PREFERRED_VIEW_LIST = "preferredviewlist";
+    private static final String KEY_PREFERRED_VIEW_LIST_CAMERA = "preferredviewlistcamera";
 
     private static DatabaseHandler instance;
     
@@ -101,7 +103,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         		KEY_CAM_SYNC_CHARGING + " BOOLEAN, " + KEY_LAST_UPLOAD_FOLDER + " TEXT, "+
         		KEY_LAST_CLOUD_FOLDER_HANDLE + " TEXT, " + KEY_SEC_FOLDER_ENABLED + " TEXT, " + KEY_SEC_FOLDER_LOCAL_PATH + 
         		" TEXT, "+ KEY_SEC_FOLDER_HANDLE + " TEXT, " + KEY_SEC_SYNC_TIMESTAMP+" TEXT, "+KEY_KEEP_FILE_NAMES + " BOOLEAN, "+
-        		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN"+")";
+        		KEY_STORAGE_ADVANCED_DEVICES+ "	BOOLEAN, "+ KEY_PREFERRED_VIEW_LIST+ "	BOOLEAN, "+KEY_PREFERRED_VIEW_LIST_CAMERA+ " BOOLEAN"+")";
         
         db.execSQL(CREATE_PREFERENCES_TABLE);
         
@@ -213,6 +215,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			db.execSQL("ALTER TABLE " + TABLE_ATTRIBUTES + " ADD COLUMN " + KEY_ATTR_INTENTS + " TEXT;");
 			db.execSQL("UPDATE " + TABLE_ATTRIBUTES + " SET " + KEY_ATTR_INTENTS + " = '" + encrypt("0") + "';");
 		}
+		
+		if (oldVersion <=15){
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_VIEW_LIST + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST + " = '" + encrypt("true") + "';");
+			db.execSQL("ALTER TABLE " + TABLE_PREFERENCES + " ADD COLUMN " + KEY_PREFERRED_VIEW_LIST_CAMERA + " BOOLEAN;");
+			db.execSQL("UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST_CAMERA + " = '" + encrypt("false") + "';");
+		}
 	} 
 	
 	public static String encrypt(String original) {
@@ -304,6 +313,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_SEC_FOLDER_HANDLE, encrypt(prefs.getMegaHandleSecondaryFolder()));
         values.put(KEY_SEC_SYNC_TIMESTAMP, encrypt(prefs.getSecSyncTimeStamp())); 
         values.put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(prefs.getStorageAdvancedDevices()));
+        values.put(KEY_PREFERRED_VIEW_LIST, encrypt(prefs.getPreferredViewList()));
+        values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(prefs.getPreferredViewListCameraUploads()));
         db.insert(TABLE_PREFERENCES, null, values);
 	}
 	
@@ -335,10 +346,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 			String secSyncTimeStamp = decrypt(cursor.getString(18));
 			String keepFileNames = decrypt(cursor.getString(19));
 			String storageAdvancedDevices= decrypt(cursor.getString(20));
+			String preferredViewList = decrypt(cursor.getString(21));
+			String preferredViewListCamera = decrypt(cursor.getString(22));
 			
 			prefs = new MegaPreferences(firstTime, wifi, camSyncEnabled, camSyncHandle, camSyncLocalPath, fileUpload, camSyncTimeStamp, pinLockEnabled, 
 					pinLockCode, askAlways, downloadLocation, camSyncCharging, lastFolderUpload, lastFolderCloud, secondaryFolderEnabled, secondaryPath, secondaryHandle, 
-					secSyncTimeStamp, keepFileNames, storageAdvancedDevices);
+					secSyncTimeStamp, keepFileNames, storageAdvancedDevices, preferredViewList, preferredViewListCamera);
 		}
 		cursor.close();
 		
@@ -772,6 +785,38 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		}
 		else{
 	        values.put(KEY_CAM_SYNC_WIFI, encrypt(wifi + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setPreferredViewList (boolean list){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST + "= '" + encrypt(list + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_PREFERRED_VIEW_LIST, encrypt(list + ""));
+	        db.insert(TABLE_PREFERENCES, null, values);
+		}
+		cursor.close();
+	}
+	
+	public void setPreferredViewListCamera (boolean list){
+		String selectQuery = "SELECT * FROM " + TABLE_PREFERENCES;
+        ContentValues values = new ContentValues();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			String UPDATE_PREFERENCES_TABLE = "UPDATE " + TABLE_PREFERENCES + " SET " + KEY_PREFERRED_VIEW_LIST_CAMERA + "= '" + encrypt(list + "") + "' WHERE " + KEY_ID + " = '1'";
+			db.execSQL(UPDATE_PREFERENCES_TABLE);
+//			log("UPDATE_PREFERENCES_TABLE SYNC WIFI: " + UPDATE_PREFERENCES_TABLE);
+		}
+		else{
+	        values.put(KEY_PREFERRED_VIEW_LIST_CAMERA, encrypt(list + ""));
 	        db.insert(TABLE_PREFERENCES, null, values);
 		}
 		cursor.close();

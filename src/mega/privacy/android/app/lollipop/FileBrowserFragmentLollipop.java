@@ -383,6 +383,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 		
+	    isList = ((ManagerActivityLollipop)context).isList();
+	    
 		if (parentHandle == -1){
 			parentHandle = megaApi.getRootNode().getHandle();
 			((ManagerActivityLollipop)context).setParentHandleBrowser(parentHandle);
@@ -753,7 +755,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			
 			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
 			uploadLayout = (LinearLayout) v.findViewById(R.id.file_grid_upload);
-			optionsOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_upload);
+			uploadOutLayout = (FrameLayout) v.findViewById(R.id.file_grid_out_upload);
 			uploadImage = (LinearLayout) v.findViewById(R.id.file_grid_upload_image_layout);
 			uploadAudio= (LinearLayout) v.findViewById(R.id.file_grid_upload_audio_layout);
 			uploadVideo = (LinearLayout) v.findViewById(R.id.file_grid_upload_video_layout);
