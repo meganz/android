@@ -101,6 +101,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	private RecyclerView.LayoutManager mLayoutManager;
 	ImageButton fabButton;
 	SlidingUpPanelLayout slidingOptionsPanel;
+	//UPLOAD PANEL
+	private SlidingUpPanelLayout slidingUploadPanel;
 	
 	ImageView emptyImageView;
 	TextView emptyTextView;
@@ -115,7 +117,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	MegaApiAndroid megaApi;
 		
 //	long parentHandle = -1;
-	boolean isList = true;
+	boolean isList = false;
 	boolean isLargeGridCameraUploads;
 	boolean firstTimeCam = false;
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
@@ -348,7 +350,8 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 		
 		prefs = dbH.getPreferences();
-		
+		isList = ((ManagerActivityLollipop)context).isListCameraUploads();
+		log("Value of isList: "+isList);
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
@@ -424,6 +427,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			
+			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_upload);
+			slidingUploadPanel.setVisibility(View.GONE);			
 			
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_list_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);
@@ -599,6 +605,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			
 			slidingOptionsPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid);
 			slidingOptionsPanel.setVisibility(View.GONE);
+			
+			slidingUploadPanel = (SlidingUpPanelLayout) v.findViewById(R.id.sliding_layout_grid_upload);
+			slidingUploadPanel.setVisibility(View.GONE);
 			
 			final TextView turnOnOff = (TextView) v.findViewById(R.id.file_grid_browser_camera_upload_on_off);
 			turnOnOff.setVisibility(View.VISIBLE);

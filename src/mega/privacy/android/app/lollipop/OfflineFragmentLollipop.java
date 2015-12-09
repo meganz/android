@@ -484,7 +484,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
-		
+	    
+	    isList = ((ManagerActivityLollipop)context).isList();
 		//Check pathNAvigation
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);

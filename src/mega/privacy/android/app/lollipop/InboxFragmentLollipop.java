@@ -306,6 +306,8 @@ public class InboxFragmentLollipop extends Fragment implements OnClickListener, 
 	    display.getMetrics(outMetrics);
 	    density  = getResources().getDisplayMetrics().density;
 
+	    isList = ((ManagerActivityLollipop)context).isList();
+	    
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_inboxlist, container, false);
 			
