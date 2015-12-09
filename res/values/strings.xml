@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" context="Not translate">MEGA</string>
+    <string name="app_name" context="Not translate">MEGAv3</string>
     <string name="app_version" context="Not translate">3.0.beta_0</string>
     <string name="sdk_version" context="Not translate">6ff13a9</string>
     

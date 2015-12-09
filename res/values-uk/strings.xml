@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name" context="Not translate">MEGA</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">буде доступно через</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA — це Хмарний сервіс збереження даних з потужною системою безпеки. 50 ГБ безкоштовно</string>
