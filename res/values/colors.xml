@@ -2,6 +2,7 @@
 <resources>
 	<color name="pressed_mega">#CCcc0000</color>
     <color name="button_text">#ffffff</color>
+    <color name="text_tab_alpha">#b3ffffff</color>
     <color name="text_secondary">#7a7a7a</color>
     <color name="separator_grey">#c0c0c0</color>
     <color name="background">#ffffff</color>

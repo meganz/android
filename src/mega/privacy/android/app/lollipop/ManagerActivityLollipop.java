@@ -276,6 +276,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	TextView textViewRubbish;
     TextView textViewIncoming; 
 	TextView textViewOutgoing;
+	TextView textViewContacts; 
+	TextView textViewSent;
+	TextView textViewReceived;
 	
 	//Tabs in Contacts
     private TabHost mTabHostContacts;
@@ -1599,10 +1602,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         	        firstNavigationLevel = true;
         	        
         			textViewBrowser = (TextView) mTabHostCDrive.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
-//        			textViewBrowser.setBackgroundColor(R.color.tab_text_color);
         			textViewRubbish = (TextView) mTabHostCDrive.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
         			textViewBrowser.setTypeface(null, Typeface.BOLD);
     				textViewRubbish.setTypeface(null, Typeface.NORMAL); 
+    				textViewBrowser.setTextColor(getResources().getColor(R.color.white));
+    				textViewRubbish.setTextColor(getResources().getColor(R.color.text_tab_alpha));
     				
     			}
     			else{
@@ -1739,6 +1743,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 			if (fbFLol != null){ 
                 				textViewBrowser.setTypeface(null, Typeface.BOLD);
                 				textViewRubbish.setTypeface(null, Typeface.NORMAL);
+                				textViewBrowser.setTextColor(getResources().getColor(R.color.white));
+                				textViewRubbish.setTextColor(getResources().getColor(R.color.text_tab_alpha));
                 				log("parentHandleCloud: "+ parentHandleBrowser);
                 				if(parentHandleBrowser==megaApi.getRootNode().getHandle()||parentHandleBrowser==-1){
                 					log("aB.setTitle2");
@@ -1762,6 +1768,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         	if (rbFLol != null){  
                         		textViewBrowser.setTypeface(null, Typeface.NORMAL);
                 				textViewRubbish.setTypeface(null, Typeface.BOLD);
+                				textViewBrowser.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                				textViewRubbish.setTextColor(getResources().getColor(R.color.white));
                         		log("parentHandleRubbish: "+ parentHandleRubbish);
                         		if(parentHandleRubbish == megaApi.getRubbishNode().getHandle() || parentHandleRubbish == -1){
                         			aB.setTitle(getResources().getString(R.string.section_rubbish_bin));
@@ -2213,14 +2221,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView); 
         			textViewIncoming.setTypeface(null, Typeface.BOLD);
         			textViewOutgoing.setTypeface(null, Typeface.NORMAL);
+        			textViewIncoming.setTextColor(getResources().getColor(R.color.white));
+        			textViewOutgoing.setTextColor(getResources().getColor(R.color.text_tab_alpha));
     			}
     			else{
     				log("mTabsAdapterShares NOT null");
     				mTabHostShares.setVisibility(View.VISIBLE);    			
         			viewPagerShares.setVisibility(View.VISIBLE);
-        			
-        			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
-        			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView);        			
         			
         			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
     				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
@@ -2253,15 +2260,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(outSFLol);
 	        			fragTransaction.commit();
-    				}
-        			
-        			
-    				
+    				}		
         			
         			int index = viewPagerShares.getCurrentItem();
         			if(index==0){	
-        				textViewOutgoing.setTypeface(null, Typeface.NORMAL);
-        				textViewIncoming.setTypeface(null, Typeface.BOLD);
 //        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
 //        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
         				if (inSFLol != null){
@@ -2281,8 +2283,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				}
         			}
         			else{
-        				textViewOutgoing.setTypeface(null, Typeface.BOLD);
-        				textViewIncoming.setTypeface(null, Typeface.NORMAL);
 //        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
 //        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
         				if (outSFLol != null){        					
@@ -2317,6 +2317,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                 			if (outSFLol != null){    
                 				textViewOutgoing.setTypeface(null, Typeface.BOLD);
                 				textViewIncoming.setTypeface(null, Typeface.NORMAL);
+                				textViewOutgoing.setTextColor(getResources().getColor(R.color.white));
+                				textViewIncoming.setTextColor(getResources().getColor(R.color.text_tab_alpha));
             					
             					if(parentHandleOutgoing!=-1){
 	                				MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
@@ -2341,6 +2343,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                         	if (inSFLol != null){    
                         		textViewOutgoing.setTypeface(null, Typeface.NORMAL);
                 				textViewIncoming.setTypeface(null, Typeface.BOLD);
+                				textViewOutgoing.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                				textViewIncoming.setTextColor(getResources().getColor(R.color.white));
             					
             					if(parentHandleIncoming!=-1){
                         			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
@@ -2538,6 +2542,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				mTabsAdapterContacts.addTab(tabSpec1, ContactsFragmentLollipop.class, null);
     				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragmentLollipop.class, null);
     				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragmentLollipop.class, null);
+    				
+        			textViewContacts = (TextView) mTabHostContacts.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
+        			textViewSent = (TextView) mTabHostContacts.getTabWidget().getChildAt(1).findViewById(R.id.textView);
+        			textViewReceived = (TextView) mTabHostContacts.getTabWidget().getChildAt(2).findViewById(R.id.textView);
+        			textViewContacts.setTypeface(null, Typeface.BOLD);
+        			textViewSent.setTypeface(null, Typeface.NORMAL);
+        			textViewReceived.setTypeface(null, Typeface.NORMAL);
+        			textViewContacts.setGravity(Gravity.CENTER);
+        			textViewSent.setGravity(Gravity.CENTER);
+        			textViewReceived.setGravity(Gravity.CENTER);
+        			textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+        			textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+        			
     			}		
     			else{
     				String sharesTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
@@ -2590,6 +2607,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     @Override
                     public void onTabChanged(String tabId) {
                     	managerActivity.supportInvalidateOptionsMenu();
+                    	if(tabId.compareTo("contactsFragment") == 0){
+                    		textViewContacts.setTypeface(null, Typeface.BOLD);
+                			textViewSent.setTypeface(null, Typeface.NORMAL);
+                			textViewReceived.setTypeface(null, Typeface.NORMAL);
+                			textViewContacts.setTextColor(getResources().getColor(R.color.white));
+                			textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                			textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                    	}
+                    	else if(tabId.compareTo("sentRequests") == 0){
+                    		textViewContacts.setTypeface(null, Typeface.NORMAL);
+                			textViewSent.setTypeface(null, Typeface.BOLD);
+                			textViewReceived.setTypeface(null, Typeface.NORMAL);
+                			textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                			textViewSent.setTextColor(getResources().getColor(R.color.white));
+                			textViewReceived.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                    	}
+                    	else if(tabId.compareTo("receivedRequests") == 0){
+                    		textViewContacts.setTypeface(null, Typeface.NORMAL);
+                			textViewSent.setTypeface(null, Typeface.NORMAL);
+                			textViewReceived.setTypeface(null, Typeface.BOLD);
+                			textViewContacts.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                			textViewSent.setTextColor(getResources().getColor(R.color.text_tab_alpha));
+                			textViewReceived.setTextColor(getResources().getColor(R.color.white));
+                    	}
                     }
     			});
     			
