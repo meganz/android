@@ -1610,9 +1610,38 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			mTabHostCDrive.setVisibility(View.VISIBLE);    			
         			viewPagerCDrive.setVisibility(View.VISIBLE);
     				
-    				fbFLol.setIsList(isList);
-    				fbFLol.setParentHandle(parentHandleBrowser);
-    				fbFLol.setOrder(orderGetChildren);
+        			String sharesTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				sharesTag = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				
+    				if (fbFLol != null){
+    					fbFLol.setIsList(isList);
+        				fbFLol.setParentHandle(parentHandleBrowser);
+        				fbFLol.setOrder(orderGetChildren);
+            			
+            			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.detach(fbFLol);
+            			fragTransaction.commit();
+
+            			fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.attach(fbFLol);
+            			fragTransaction.commit();
+    				}
+    				
+    				if (rbFLol != null){
+    					rbFLol.setIsList(isList);
+    					rbFLol.setParentHandle(parentHandleRubbish);
+    					rbFLol.setOrder(orderGetChildren);
+        				
+    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.detach(rbFLol);
+            			fragTransaction.commit();
+
+            			fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.attach(rbFLol);
+            			fragTransaction.commit();
+    				}
     				//Check viewPager to determine the tab shown
     				
     				if(viewPagerCDrive!=null){
@@ -1697,7 +1726,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					ArrayList<MegaNode> nodes = megaApi.getChildren(parentNode, orderGetChildren);
     					fbFLol.setNodes(nodes);
     				}    				
-    			} 
+    			}
     			
     			mTabHostCDrive.setOnTabChangedListener(new OnTabChangeListener(){
                     @Override
@@ -2193,17 +2222,50 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			textViewIncoming = (TextView) mTabHostShares.getTabWidget().getChildAt(0).findViewById(R.id.textView); 
         			textViewOutgoing = (TextView) mTabHostShares.getTabWidget().getChildAt(1).findViewById(R.id.textView);        			
         			
+        			String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				
+    				if (inSFLol != null){
+	    				inSFLol.setParentHandle(parentHandleIncoming);
+	        			inSFLol.setOrder(orderGetChildren);
+	        			inSFLol.setIsList(isList);
+	        			
+	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(inSFLol);
+	        			fragTransaction.commit();
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(inSFLol);
+	        			fragTransaction.commit();
+    				}
+    				
+    				if (outSFLol != null){
+    					outSFLol.setParentHandle(parentHandleOutgoing);
+    					outSFLol.setOrder(orderGetChildren);
+    					outSFLol.setIsList(isList);
+    					
+    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.detach(outSFLol);
+	        			fragTransaction.commit();
+
+	        			fragTransaction = getSupportFragmentManager().beginTransaction();
+	        			fragTransaction.attach(outSFLol);
+	        			fragTransaction.commit();
+    				}
+        			
+        			
+    				
+        			
         			int index = viewPagerShares.getCurrentItem();
         			if(index==0){	
         				textViewOutgoing.setTypeface(null, Typeface.NORMAL);
         				textViewIncoming.setTypeface(null, Typeface.BOLD);
-        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
-        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+//        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
+//        				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
         				if (inSFLol != null){
-        					inSFLol.setParentHandle(parentHandleIncoming);
-                			inSFLol.setOrder(orderGetChildren);
-                			inSFLol.setIsList(isList);
-                			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
+        					MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
         					if (node != null){
         						inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
         						aB.setTitle(node.getName());
@@ -2216,25 +2278,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
             					firstNavigationLevel = true;
         					}
-        					
-        					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(inSFLol);
-		        			fragTransaction.commit();
-	
-		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(inSFLol);
-		        			fragTransaction.commit();
         				}
         			}
         			else{
         				textViewOutgoing.setTypeface(null, Typeface.BOLD);
         				textViewIncoming.setTypeface(null, Typeface.NORMAL);
-        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
-        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
-        				if (outSFLol != null){
-        					outSFLol.setParentHandle(parentHandleOutgoing);
-        					outSFLol.setOrder(orderGetChildren);
-        					outSFLol.setIsList(isList);
+//        				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 1);		
+//        				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+        				if (outSFLol != null){        					
 //        					outSFLol.refresh(parentHandleIncoming);
         					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
         					if (node != null){
@@ -2249,13 +2300,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
             					firstNavigationLevel = true;
         					}
-        					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.detach(outSFLol);
-		        			fragTransaction.commit();
-	
-		        			fragTransaction = getSupportFragmentManager().beginTransaction();
-		        			fragTransaction.attach(outSFLol);
-		        			fragTransaction.commit();
         				}
         			}  	
     			}
@@ -2495,6 +2539,52 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				mTabsAdapterContacts.addTab(tabSpec2, SentRequestsFragmentLollipop.class, null);
     				mTabsAdapterContacts.addTab(tabSpec3, ReceivedRequestsFragmentLollipop.class, null);
     			}		
+    			else{
+    				String sharesTag = getFragmentTag(R.id.contact_tabs_pager, 0);		
+    				cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				sharesTag = getFragmentTag(R.id.contact_tabs_pager, 1);		
+    				sRFLol = (SentRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				sharesTag = getFragmentTag(R.id.contact_tabs_pager, 2);
+    				rRFLol = (ReceivedRequestsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
+    				
+    				if (cFLol != null){
+    					cFLol.setIsList(isList);
+        				
+            			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.detach(cFLol);
+            			fragTransaction.commit();
+
+            			fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.attach(cFLol);
+            			fragTransaction.commit();
+    				}
+    				
+    				if (sRFLol != null){
+    					//TODO
+//    					sRFLol.setIsList(isList);
+        				
+    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.detach(sRFLol);
+            			fragTransaction.commit();
+
+            			fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.attach(sRFLol);
+            			fragTransaction.commit();
+    				}
+    				
+    				if (rRFLol != null){
+    					//TODO
+//    					rRFLol.setIsList(isList);
+        				
+    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.detach(rRFLol);
+            			fragTransaction.commit();
+
+            			fragTransaction = getSupportFragmentManager().beginTransaction();
+            			fragTransaction.attach(rRFLol);
+            			fragTransaction.commit();
+    				}
+    			}
     			
     			mTabHostContacts.setOnTabChangedListener(new OnTabChangeListener(){
                     @Override
@@ -2618,8 +2708,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			upgradeAccountMenuItem.setVisible(false);
 	    			selectMenuItem.setVisible(true);
 	    			unSelectMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(true);
-        			addMenuItem.setEnabled(true);
+        			addMenuItem.setEnabled(false);
         			rubbishBinMenuItem.setVisible(false); 
         			clearRubbishBinMenuitem.setVisible(false);
         			changePass.setVisible(false); 
@@ -2630,6 +2719,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				helpMenuItem.setVisible(false);
     				gridSmallLargeMenuItem.setVisible(false);
     				cancelAllTransfersMenuItem.setVisible(false);
+    				thumbViewMenuItem.setVisible(true);
+	    			if (isList){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
+					
     			}
     			break;
     		}
@@ -3598,10 +3695,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    else if (drawerItem == DrawerItem.SEARCH){
 	    	if (sFLol != null){			
 				if (createFolderMenuItem != null){
+	    			
 					//Hide
 	    			upgradeAccountMenuItem.setVisible(false);	    			
 					cancelAllTransfersMenuItem.setVisible(false);
-	    			thumbViewMenuItem.setVisible(false);
 					pauseTransfersMenuIcon.setVisible(false);
 					playTransfersMenuIcon.setVisible(false);
 	    			createFolderMenuItem.setVisible(false);
@@ -3626,6 +3723,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					
 					//Show
 	    			selectMenuItem.setVisible(true);
+	    			thumbViewMenuItem.setVisible(true);
+	    			if (isList){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
+					
 				}
 			}
 		}
@@ -4356,6 +4461,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        				
 		        		}
 	    			}
+	    			else if (drawerItem == DrawerItem.SEARCH){
+	    				if (sFLol != null){
+	    					Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("sFLol");
+	    					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        				fragTransaction.detach(currentFragment);
+	        				fragTransaction.commit();
+	        				
+	        				sFLol.setIsList(isList);	
+	        				sFLol.setParentHandle(parentHandleSearch);
+	        				
+	        				fragTransaction = getSupportFragmentManager().beginTransaction();
+	        				fragTransaction.attach(currentFragment);
+	        				fragTransaction.commit();
+	    				}
+	    			}	    				
     				
 //		        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
 //		        		
@@ -4377,7 +4497,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}
            	
 	        	return true;
-	        }	        
+	        }
 //	        case R.id.action_rubbish_bin:{
 //	        	if (drawerItem == DrawerItem.RUBBISH_BIN){
 //	        		drawerItem = DrawerItem.CLOUD_DRIVE;
@@ -5956,7 +6076,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	public void sendToInboxLollipop(MegaNode node){
 		log("sentToInbox MegaNode");
 		
-		if((drawerItem == DrawerItem.SHARED_ITEMS) || (drawerItem == DrawerItem.CLOUD_DRIVE) ){
+		if((drawerItem == DrawerItem.SHARED_ITEMS) || (drawerItem == DrawerItem.CLOUD_DRIVE) || (drawerItem == DrawerItem.SEARCH) ){
 			sendToInbox = true;			
 			Intent intent = new Intent(ContactsExplorerActivityLollipop.ACTION_PICK_CONTACT_SEND_FILE);
 	    	intent.setClass(this, ContactsExplorerActivityLollipop.class);
