@@ -1295,6 +1295,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 //						((ManagerActivityLollipop)context).cameraUploadsClicked();
 //						return;
 //					}
+					//Check if the item is the Camera Uploads folder
 					prefs = dbH.getPreferences();
 					String cameraSyncHandle = prefs.getCamSyncHandle();
 					
@@ -1307,21 +1308,37 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 							}
 						}
 					}
-					
-//					if(n.getName().equals("Media Uploads")){
-//						prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
-//						log("FOUND!!: "+n.getHandle());
-//					}
+					else{
+						if(n.getName().equals("Camera Uploads")){
+							prefs.setCamSyncHandle(String.valueOf(n.getHandle()));
+							dbH.setCamSyncHandle(n.getHandle());
+							log("FOUND Camera Uploads!!: "+n.getHandle());
+							((ManagerActivityLollipop)context).cameraUploadsClicked();
+							return;
+						}
+					}
 
+					//Check if the item is the Media Uploads folder
+					
 					String secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
 					
 					if(secondaryMediaHandle!=null){
 						if(!(secondaryMediaHandle.equals("")))
 						{
 							if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+								log("Click on Media Uploads");
 								((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
 								return;
 							}
+						}
+					}
+					else{
+						if(n.getName().equals("Media Uploads")){
+							prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+							dbH.setSecondaryFolderHandle(n.getHandle());
+							log("FOUND Media Uploads!!: "+n.getHandle());
+							((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
+							return;
 						}
 					}
 					

@@ -4318,8 +4318,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	return true;
 	        }
 	        case R.id.action_grid:{	
-
-	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS||drawerItem == DrawerItem.MEDIA_UPLOADS){
+	        	log("action_grid selected");
+	        	
+	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
 	        		log("action_grid_list in CameraUploads");
 	        		isListCameraUploads = !isListCameraUploads;
 	    			dbH.setPreferredViewListCamera(isListCameraUploads);
@@ -4354,6 +4355,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				fragTransaction.commit();
 
         			}
+	        	}
+	        	else if (drawerItem == DrawerItem.MEDIA_UPLOADS){
+	        		log("action_grid_list in MediaUploads");
+	        		isListCameraUploads = !isListCameraUploads;
+	    			dbH.setPreferredViewListCamera(isListCameraUploads);
+	    			log("dbH.setPreferredViewListCamera: "+isListCameraUploads);
+	    			if (isListCameraUploads){	
+	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+					}
+					else{
+						thumbViewMenuItem.setTitle(getString(R.string.action_list));
+	    			}
 	        		if (muFLol != null){        			
         				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("muFLol");
         				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
