@@ -190,7 +190,7 @@
 	                        android:id="@+id/file_properties_permission_label"
 	                        android:layout_width="wrap_content"
 	                        android:layout_height="wrap_content"
-	                        android:paddingLeft="30dp"
+	                        android:paddingLeft="18dp"
 	                        android:paddingTop="7dp"
 	                        android:text="@string/file_properties_shared_folder_permissions"
 	                        android:textColor="@color/file_properties_info_menu"

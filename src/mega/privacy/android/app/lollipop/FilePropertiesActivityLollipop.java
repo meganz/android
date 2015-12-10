@@ -106,7 +106,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	LinearLayout optionsLayout;
 	TextView nameView;
 	LinearLayout availableOfflineLayout;
-	LinearLayout permissionsLayout;
+
 	LinearLayout sizeLayout;
 	LinearLayout contentLayout;
 	LinearLayout addedLayout;
@@ -129,6 +129,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	TextView addedTextView;
 	TextView modifiedTextView;
 	
+	LinearLayout permissionsLayout;
 	TextView permissionLabel;
 	TextView permissionInfo;
 	
@@ -345,8 +346,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);				
 			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
-			permissionLabel.setVisibility(View.GONE);
-			permissionInfo.setVisibility(View.GONE);
+//			permissionLabel.setVisibility(View.GONE);
+//			permissionInfo.setVisibility(View.GONE);
 
 		}
 		
@@ -744,8 +745,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //					If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 						
-						permissionLabel.setVisibility(View.GONE);
-						permissionInfo.setVisibility(View.GONE);
+//						permissionLabel.setVisibility(View.GONE);
+//						permissionInfo.setVisibility(View.GONE);
+						permissionsLayout.setVisibility(View.GONE);
 						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
 						
 					}
@@ -753,8 +755,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 						owner = false;
 						//If I am not the owner
-						permissionLabel.setVisibility(View.VISIBLE);
-						permissionInfo.setVisibility(View.VISIBLE);
+						permissionsLayout.setVisibility(View.VISIBLE);
+//						permissionLabel.setVisibility(View.VISIBLE);
+//						permissionInfo.setVisibility(View.VISIBLE);
 						
 						int accessLevel= megaApi.getAccess(node);
 						log("Node: "+node.getName());
@@ -2077,8 +2080,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //					If I am the owner
 					if (megaApi.checkAccess(node, MegaShare.ACCESS_OWNER).getErrorCode() == MegaError.API_OK){
 						
-						permissionLabel.setVisibility(View.GONE);
-						permissionInfo.setVisibility(View.GONE);
+//						permissionLabel.setVisibility(View.GONE);
+//						permissionInfo.setVisibility(View.GONE);
+						permissionsLayout.setVisibility(View.GONE);
 						//permissionInfo.setText(getResources().getString(R.string.file_properties_owner));
 						
 					}
@@ -2086,8 +2090,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 						//If I am not the owner
 						owner = false;
-						permissionLabel.setVisibility(View.VISIBLE);
-						permissionInfo.setVisibility(View.VISIBLE);
+						permissionsLayout.setVisibility(View.VISIBLE);
+//						permissionLabel.setVisibility(View.VISIBLE);
+//						permissionInfo.setVisibility(View.VISIBLE);
 						
 						int accessLevel= megaApi.getAccess(node);
 						log("Node: "+node.getName());
