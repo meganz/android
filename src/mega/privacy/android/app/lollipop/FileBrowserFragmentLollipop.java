@@ -1306,6 +1306,23 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 						}
 					}
 					
+//					if(n.getName().equals("Media Uploads")){
+//						prefs.setMegaHandleSecondaryFolder(String.valueOf(n.getHandle()));
+//						log("FOUND!!: "+n.getHandle());
+//					}
+
+					String secondaryMediaHandle = prefs.getMegaHandleSecondaryFolder();
+					
+					if(secondaryMediaHandle!=null){
+						if(!(secondaryMediaHandle.equals("")))
+						{
+							if ((n.getHandle()==Long.parseLong(secondaryMediaHandle))){
+								((ManagerActivityLollipop)context).secondaryMediaUploadsClicked();
+								return;
+							}
+						}
+					}
+					
 					aB.setTitle(n.getName());
 					aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 					((ManagerActivityLollipop)context).setFirstNavigationLevel(false);

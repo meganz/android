@@ -175,6 +175,7 @@
         <string name="cancel_all_transfer_confirmation">Se cancelarán todas las transferencias, ¿está seguro?</string>
 
     <string name="section_cloud_drive" context="The name of every users root drive in the cloud of MEGA.">Disco</string>
+    <string name="section_secondary_media_uploads" context="title of the screen where the secondary media images are uploaded">Media Uploads</string>
     <string name="section_inbox" context="title of the screen that show the inbox">Buzón de entrada</string>
 	<string name="section_saved_for_offline" context="title of the screen that shows the files saved for offline in the device">Disponible sin conexión</string>
 	<string name="section_shared_with_me" context="title of the screen that shows all the folders that the user shares with other users and viceversa">Compartida</string>

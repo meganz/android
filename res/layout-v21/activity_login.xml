@@ -33,7 +33,6 @@
 
             <EditText
                 android:id="@+id/login_email_text"
-                style="@style/Widget.AppCompat.EditText"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="left"

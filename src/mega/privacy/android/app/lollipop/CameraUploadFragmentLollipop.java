@@ -94,6 +94,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	public static int GRID_LARGE = 3;
 	public static int GRID_SMALL = 7;
 	
+	public static int TYPE_CAMERA= 0;
+	public static int TYPE_MEDIA = 1;
+	
 	Context context;
 	ActionBar aB;
 	RecyclerView listView;
@@ -122,6 +125,7 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	boolean firstTimeCam = false;
 	int orderGetChildren = MegaApiJava.ORDER_MODIFICATION_DESC;
 	
+	int type = 0;
 	
 	ArrayList<MegaNode> nodes;
 	ArrayList<PhotoSyncHolder> nodesArray = new ArrayList<CameraUploadFragmentLollipop.PhotoSyncHolder>();
@@ -319,9 +323,22 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		
 	}
 	
+	//int TYPE_CAMERA= 0;
+	//int TYPE_MEDIA = 1;	
+	public static CameraUploadFragmentLollipop newInstance(int type) {
+		log("newInstance type: "+type);
+		CameraUploadFragmentLollipop myFragment = new CameraUploadFragmentLollipop();
+
+	    Bundle args = new Bundle();
+	    args.putInt("type", type);
+	    myFragment.setArguments(args);
+
+	    return myFragment;
+	}	
+	
 	@Override
 	public void onCreate (Bundle savedInstanceState){
-		
+		log("onCreate");
 		if (megaApi == null){
 			megaApi = ((MegaApplication) ((Activity)context).getApplication()).getMegaApi();
 		}
@@ -329,7 +346,14 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		dbH = DatabaseHandler.getDbHandler(context);
 		
 		super.onCreate(savedInstanceState);
-		log("onCreate");
+		Bundle args = getArguments();
+		if (args != null) {
+			type= getArguments().getInt("type", TYPE_MEDIA);
+		}
+		else{
+			type=TYPE_CAMERA;
+		}
+		log("After recovering bundle type: "+type);
 	}
 	
 	@Override
@@ -367,47 +391,55 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 	    	scaleText = scaleW;
 	    }
 		
-		aB.setTitle(getString(R.string.section_photo_sync));	
+	    if(type==TYPE_MEDIA){
+	    	aB.setTitle(getString(R.string.section_secondary_media_uploads));
+	    }
+	    else{
+	    	aB.setTitle(getString(R.string.section_photo_sync));
+	    }
+			
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 		((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
 
-		if (firstTimeCam){
-			setInitialPreferences();
-			View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
-			
-			initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
-			initialImageView.getLayoutParams().height = outMetrics.widthPixels;
-			bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
-			bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
-			camSyncRadioGroup = (RadioGroup) v.findViewById(R.id.cam_sync_radio_group);
-			camSyncData = (RadioButton) v.findViewById(R.id.cam_sync_data);
-			camSyncWifi = (RadioButton) v.findViewById(R.id.cam_sync_wifi);
-			layoutRadioGroup = (RelativeLayout) v.findViewById(R.id.cam_sync_relative_radio);
-			
-			bSkip.setText(getString(R.string.cam_sync_skip).toUpperCase(Locale.getDefault()));
-			android.view.ViewGroup.LayoutParams paramsb2 = bSkip.getLayoutParams();		
-			paramsb2.height = Util.scaleHeightPx(48, outMetrics);
-			paramsb2.width = Util.scaleWidthPx(63, outMetrics);
-			bSkip.setLayoutParams(paramsb2);
-			//Left and Right margin
-			LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bSkip.getLayoutParams();
-			textParamsLogin.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
-			bSkip.setLayoutParams(textParamsLogin);
-			
-			bOK.setText(getString(R.string.cam_sync_ok).toUpperCase(Locale.getDefault()));
-			android.view.ViewGroup.LayoutParams paramsb1 = bOK.getLayoutParams();		
-			paramsb1.height = Util.scaleHeightPx(48, outMetrics);
-			paramsb1.width = Util.scaleWidthPx(144, outMetrics);
-			bOK.setLayoutParams(paramsb1);
-			
-			bSkip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-			bOK.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
-			
-			bOK.setOnClickListener(this);
-			bSkip.setOnClickListener(this);
-			
-			return v;
+		if(type==TYPE_CAMERA){
+			if (firstTimeCam){
+				setInitialPreferences();
+				View v = inflater.inflate(R.layout.activity_cam_sync_initial, container, false);
+				
+				initialImageView = (ImageView) v.findViewById(R.id.cam_sync_image_view);
+				initialImageView.getLayoutParams().height = outMetrics.widthPixels;
+				bOK = (TextView) v.findViewById(R.id.cam_sync_button_ok);
+				bSkip = (TextView) v.findViewById(R.id.cam_sync_button_skip);
+				camSyncRadioGroup = (RadioGroup) v.findViewById(R.id.cam_sync_radio_group);
+				camSyncData = (RadioButton) v.findViewById(R.id.cam_sync_data);
+				camSyncWifi = (RadioButton) v.findViewById(R.id.cam_sync_wifi);
+				layoutRadioGroup = (RelativeLayout) v.findViewById(R.id.cam_sync_relative_radio);
+				
+				bSkip.setText(getString(R.string.cam_sync_skip).toUpperCase(Locale.getDefault()));
+				android.view.ViewGroup.LayoutParams paramsb2 = bSkip.getLayoutParams();		
+				paramsb2.height = Util.scaleHeightPx(48, outMetrics);
+				paramsb2.width = Util.scaleWidthPx(63, outMetrics);
+				bSkip.setLayoutParams(paramsb2);
+				//Left and Right margin
+				LinearLayout.LayoutParams textParamsLogin = (LinearLayout.LayoutParams)bSkip.getLayoutParams();
+				textParamsLogin.setMargins(Util.scaleWidthPx(6, outMetrics), 0, Util.scaleWidthPx(8, outMetrics), 0); 
+				bSkip.setLayoutParams(textParamsLogin);
+				
+				bOK.setText(getString(R.string.cam_sync_ok).toUpperCase(Locale.getDefault()));
+				android.view.ViewGroup.LayoutParams paramsb1 = bOK.getLayoutParams();		
+				paramsb1.height = Util.scaleHeightPx(48, outMetrics);
+				paramsb1.width = Util.scaleWidthPx(144, outMetrics);
+				bOK.setLayoutParams(paramsb1);
+				
+				bSkip.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+				bOK.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleText));
+				
+				bOK.setOnClickListener(this);
+				bSkip.setOnClickListener(this);
+				
+				return v;
+			}
 		}
 				
 		if (isList){
@@ -480,35 +512,44 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				return v;
 			}
 			
-			if (prefs == null){
-				photosyncHandle = -1;
-			}
-			else{
-				//The "PhotoSync" folder exists?
-				if (prefs.getCamSyncHandle() == null){
+			if(type==TYPE_CAMERA){
+				if (prefs == null){
 					photosyncHandle = -1;
 				}
 				else{
-					photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-					if (megaApi.getNodeByHandle(photosyncHandle) == null){
+					//The "PhotoSync" folder exists?
+					if (prefs.getCamSyncHandle() == null){
 						photosyncHandle = -1;
 					}
+					else{
+						photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+						if (megaApi.getNodeByHandle(photosyncHandle) == null){
+							photosyncHandle = -1;
+						}
+					}
 				}
-			}
-			
-			if (photosyncHandle == -1){
-				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-				for (int i=0;i<nl.size();i++){
-					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-						photosyncHandle = nl.get(i).getHandle();
-						dbH.setCamSyncHandle(photosyncHandle);
-						listView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-						break;
+				
+				if (photosyncHandle == -1){
+					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+					for (int i=0;i<nl.size();i++){
+						if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+							photosyncHandle = nl.get(i).getHandle();
+							dbH.setCamSyncHandle(photosyncHandle);
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+							break;
+						}
 					}
 				}
 			}
+			else{
+				photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+				if (megaApi.getNodeByHandle(photosyncHandle) == null){
+					photosyncHandle = -1;
+				}
+			}
+
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
@@ -656,35 +697,43 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 				return v;
 			}
 			
-			if (prefs == null){
-				photosyncHandle = -1;
-			}
-			else{
-				//The "PhotoSync" folder exists?
-				if (prefs.getCamSyncHandle() == null){
+			if(type==TYPE_CAMERA){
+				if (prefs == null){
 					photosyncHandle = -1;
 				}
 				else{
-					photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
-					if (megaApi.getNodeByHandle(photosyncHandle) == null){
+					//The "PhotoSync" folder exists?
+					if (prefs.getCamSyncHandle() == null){
 						photosyncHandle = -1;
 					}
+					else{
+						photosyncHandle = Long.parseLong(prefs.getCamSyncHandle());
+						if (megaApi.getNodeByHandle(photosyncHandle) == null){
+							photosyncHandle = -1;
+						}
+					}
 				}
-			}
-			
-			if (photosyncHandle == -1){
-				ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
-				for (int i=0;i<nl.size();i++){
-					if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
-						photosyncHandle = nl.get(i).getHandle();
-						dbH.setCamSyncHandle(photosyncHandle);
-						listView.setVisibility(View.VISIBLE);
-						emptyImageView.setVisibility(View.GONE);
-						emptyTextView.setVisibility(View.GONE);
-						break;
+				
+				if (photosyncHandle == -1){
+					ArrayList<MegaNode> nl = megaApi.getChildren(megaApi.getRootNode());
+					for (int i=0;i<nl.size();i++){
+						if ((CameraSyncService.CAMERA_UPLOADS.compareTo(nl.get(i).getName()) == 0) && (nl.get(i).isFolder())){
+							photosyncHandle = nl.get(i).getHandle();
+							dbH.setCamSyncHandle(photosyncHandle);
+							listView.setVisibility(View.VISIBLE);
+							emptyImageView.setVisibility(View.GONE);
+							emptyTextView.setVisibility(View.GONE);
+							break;
+						}
 					}
 				}
 			}
+			else{
+				photosyncHandle = Long.parseLong(prefs.getMegaHandleSecondaryFolder());
+				if (megaApi.getNodeByHandle(photosyncHandle) == null){
+					photosyncHandle = -1;
+				}
+			}			
 			
 			listView.setVisibility(View.VISIBLE);
 			emptyImageView.setVisibility(View.GONE);
