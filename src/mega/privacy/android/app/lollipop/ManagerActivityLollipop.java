@@ -2200,8 +2200,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				String sharesTag = getFragmentTag(R.id.shares_tabs_pager, 0);		
         				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(sharesTag);
         				if (inSFLol != null){
-                			inSFLol.setParentHandle(parentHandleIncoming);
+        					inSFLol.setParentHandle(parentHandleIncoming);
                 			inSFLol.setOrder(orderGetChildren);
+                			inSFLol.setIsList(isList);
                 			MegaNode node = megaApi.getNodeByHandle(parentHandleIncoming);
         					if (node != null){
         						inSFLol.setNodes(megaApi.getChildren(node, orderGetChildren));
@@ -2215,6 +2216,14 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
             					firstNavigationLevel = true;
         					}
+        					
+        					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(inSFLol);
+		        			fragTransaction.commit();
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(inSFLol);
+		        			fragTransaction.commit();
         				}
         			}
         			else{
@@ -2225,6 +2234,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         				if (outSFLol != null){
         					outSFLol.setParentHandle(parentHandleOutgoing);
         					outSFLol.setOrder(orderGetChildren);
+        					outSFLol.setIsList(isList);
 //        					outSFLol.refresh(parentHandleIncoming);
         					MegaNode node = megaApi.getNodeByHandle(parentHandleOutgoing);
         					if (node != null){
@@ -2239,8 +2249,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             					aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
             					firstNavigationLevel = true;
         					}
+        					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(outSFLol);
+		        			fragTransaction.commit();
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(outSFLol);
+		        			fragTransaction.commit();
         				}
-        			}  		
+        			}  	
     			}
     			
     			mTabHostShares.setVisibility(View.VISIBLE);
@@ -4225,111 +4242,120 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
 	    			//Rubbish Bin
-    				String cFTagRB = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
-    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRB);
-    				if (rbFLol != null){
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(rbFLol);
-	        			fragTransaction.commit();
-	        			
-	        			rbFLol.setIsList(isList);		        			
-	        			rbFLol.setParentHandle(parentHandleRubbish);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(rbFLol);
-	        			fragTransaction.commit();
-    				}
-    				//Cloud Drive
-    				String cFTagCD = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
-    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagCD);
-    				if (fbFLol != null){
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(fbFLol);
-	        			fragTransaction.commit();
-	        			
-	        			fbFLol.setIsList(isList);
-	        			fbFLol.setParentHandle(parentHandleBrowser);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(fbFLol);
-	        			fragTransaction.commit();
-    				}	        		
-    				if (iFLol != null){        			
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("iFLol");
-        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.detach(currentFragment);
-        				fragTransaction.commit();
-        				
-        				iFLol.setIsList(isList);						
-
-        				fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.attach(currentFragment);
-        				fragTransaction.commit();
-        				
-	        		}
-    				String cFTagC = getFragmentTag(R.id.contact_tabs_pager, 0);		
-		    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagC);
-		        	if (cFLol != null){
-
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(cFLol);
-	        			fragTransaction.commit();
-	        			
-	        			cFLol.setIsList(isList);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(cFLol);
-	        			fragTransaction.commit();	
-
-	        		}
-		        	//Incoming
-    				String cFTagIN = getFragmentTag(R.id.shares_tabs_pager, 0);		
-    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagIN);
-    				if (inSFLol != null){
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(inSFLol);
-	        			fragTransaction.commit();
-	        			
-	        			inSFLol.setIsList(isList);
-	        			inSFLol.setParentHandle(parentHandleOutgoing);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(inSFLol);
-	        			fragTransaction.commit();
-    				}
-
-    				//Outgoing
-    				String cFTagOUT = getFragmentTag(R.id.shares_tabs_pager, 1);		
-    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagOUT);
-    				if (outSFLol != null){
-	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.detach(outSFLol);
-	        			fragTransaction.commit();
-	        			
-	        			outSFLol.setIsList(isList);
-	        			outSFLol.setParentHandle(parentHandleOutgoing);
-
-	        			fragTransaction = getSupportFragmentManager().beginTransaction();
-	        			fragTransaction.attach(outSFLol);
-	        			fragTransaction.commit();
-    				}
-    				if (oFLol != null){        			
-        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
-        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.detach(currentFragment);
-        				fragTransaction.commit();
-
-        				oFLol.setIsList(isList);						
-        				oFLol.setPathNavigation(pathNavigation);
-        				//oFLol.setGridNavigation(false);
-        				//oFLol.setParentHandle(parentHandleSharedWithMe);
-
-        				fragTransaction = getSupportFragmentManager().beginTransaction();
-        				fragTransaction.attach(currentFragment);
-        				fragTransaction.commit();
-        				
-	        		}
-    				
+	    			if (drawerItem == DrawerItem.CLOUD_DRIVE){
+	    				String cFTagRB = getFragmentTag(R.id.cloud_drive_tabs_pager, 1);		
+	    				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagRB);
+	    				if (rbFLol != null){
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(rbFLol);
+		        			fragTransaction.commit();
+		        			
+		        			rbFLol.setIsList(isList);		        			
+		        			rbFLol.setParentHandle(parentHandleRubbish);
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(rbFLol);
+		        			fragTransaction.commit();
+	    				}
+	    				//Cloud Drive
+	    				String cFTagCD = getFragmentTag(R.id.cloud_drive_tabs_pager, 0);		
+	    				fbFLol = (FileBrowserFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagCD);
+	    				if (fbFLol != null){
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(fbFLol);
+		        			fragTransaction.commit();
+		        			
+		        			fbFLol.setIsList(isList);
+		        			fbFLol.setParentHandle(parentHandleBrowser);
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(fbFLol);
+		        			fragTransaction.commit();
+	    				}	        		
+	    			}
+	    			else if(drawerItem == DrawerItem.INBOX){
+	    				if (iFLol != null){        			
+	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("iFLol");
+	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        				fragTransaction.detach(currentFragment);
+	        				fragTransaction.commit();
+	        				
+	        				iFLol.setIsList(isList);						
+	
+	        				fragTransaction = getSupportFragmentManager().beginTransaction();
+	        				fragTransaction.attach(currentFragment);
+	        				fragTransaction.commit();
+	        				
+		        		}
+	    			}
+	    			else if (drawerItem == DrawerItem.CONTACTS){
+	    				String cFTagC = getFragmentTag(R.id.contact_tabs_pager, 0);		
+			    		cFLol = (ContactsFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagC);
+			        	if (cFLol != null){
+	
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(cFLol);
+		        			fragTransaction.commit();
+		        			
+		        			cFLol.setIsList(isList);
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(cFLol);
+		        			fragTransaction.commit();	
+	
+		        		}
+	    			}
+	    			else if (drawerItem == DrawerItem.SHARED_ITEMS){
+			        	//Incoming	    			
+	    				String cFTagIN = getFragmentTag(R.id.shares_tabs_pager, 0);		
+	    				inSFLol = (IncomingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagIN);
+	    				if (inSFLol != null){
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(inSFLol);
+		        			fragTransaction.commit();
+		        			
+		        			inSFLol.setIsList(isList);
+		        			inSFLol.setParentHandle(parentHandleIncoming);
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(inSFLol);
+		        			fragTransaction.commit();
+	    				}
+	
+	    				//Outgoing
+	    				String cFTagOUT = getFragmentTag(R.id.shares_tabs_pager, 1);		
+	    				outSFLol = (OutgoingSharesFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTagOUT);
+	    				if (outSFLol != null){
+		        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.detach(outSFLol);
+		        			fragTransaction.commit();
+		        			
+		        			outSFLol.setIsList(isList);
+		        			outSFLol.setParentHandle(parentHandleOutgoing);
+	
+		        			fragTransaction = getSupportFragmentManager().beginTransaction();
+		        			fragTransaction.attach(outSFLol);
+		        			fragTransaction.commit();
+	    				}
+	    			}
+	    			else if (drawerItem == DrawerItem.SAVED_FOR_OFFLINE){
+	    				if (oFLol != null){        			
+	        				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+	        				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+	        				fragTransaction.detach(currentFragment);
+	        				fragTransaction.commit();
+	
+	        				oFLol.setIsList(isList);						
+	        				oFLol.setPathNavigation(pathNavigation);
+	        				//oFLol.setGridNavigation(false);
+	        				//oFLol.setParentHandle(parentHandleSharedWithMe);
+	
+	        				fragTransaction = getSupportFragmentManager().beginTransaction();
+	        				fragTransaction.attach(currentFragment);
+	        				fragTransaction.commit();
+	        				
+		        		}
+	    			}
     				
 //		        	if (drawerItem == DrawerItem.CLOUD_DRIVE){
 //		        		
