@@ -736,7 +736,8 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 
 			optionClearShares = (LinearLayout) v.findViewById(R.id.file_grid_option_clear_share_layout);	
 			optionMoveTo = (LinearLayout) v.findViewById(R.id.file_grid_option_move_layout);		
-			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);			
+			optionCopyTo = (LinearLayout) v.findViewById(R.id.file_grid_option_copy_layout);
+			optionSendToInbox = (LinearLayout) v.findViewById(R.id.file_grid_option_send_inbox_layout);	
 			
 			optionDownload.setOnClickListener(this);
 			optionShare.setOnClickListener(this);
@@ -747,6 +748,7 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 			optionPublicLink.setOnClickListener(this);
 			optionMoveTo.setOnClickListener(this);
 			optionCopyTo.setOnClickListener(this);
+			optionSendToInbox.setOnClickListener(this);
 			
 			optionsOutLayout.setOnClickListener(this);
 			
@@ -1834,9 +1836,9 @@ public class FileBrowserFragmentLollipop extends Fragment implements OnClickList
 		this.isList = isList;
 	}
 	
-	public boolean getIsList(){
-		return isList;
-	}
+//	public boolean getIsList(){
+//		return isList;
+//	}
 	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
