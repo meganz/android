@@ -904,6 +904,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			else{
 				builder = new AlertDialog.Builder(context);
 			}
+			builder.setTitle(getString(R.string.confirmation_alert));
 			builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
@@ -931,6 +932,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			};
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppCompatAlertDialogStyle);
+			builder.setTitle(getString(R.string.confirmation_alert));
 			builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
 			    .setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}

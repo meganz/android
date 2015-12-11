@@ -32,10 +32,12 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
@@ -519,7 +521,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 					String path = dlFiles.get(document);
 
 					if(availableFreeSpace < document.getSize()){
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 						continue;
 					}
 
@@ -535,7 +537,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			else if(url != null) {
 				if(availableFreeSpace < size) {
-					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 					continue;
 				}
 				Intent service = new Intent(this, DownloadService.class);
@@ -577,6 +579,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		log("onActivityResult");
 		if (intent == null){
 			return;
 		}
@@ -591,6 +594,28 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 			downloadTo (parentPath, url, size, hashes);
 			Snackbar.make(fragmentContainer, getResources().getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
+		}
+		else if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
+			log("REQUEST_CODE_SELECT_IMPORT_FOLDER");
+			if(!Util.isOnline(this)){
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
+				return;
+			}
+			
+			final long toHandle = intent.getLongExtra("IMPORT_TO", 0);
+			
+			MegaNode target = megaApi.getNodeByHandle(toHandle);
+			if(target == null){
+				target = megaApi.getRootNode();
+			}
+			log("Target node: "+target.getName());
+			if(selectedNode!=null){
+				megaApi.copyNode(selectedNode, target, this);
+			}
+			else{
+				log("selected Node is NULL");
+			}
+			
 		}
 	}
 
@@ -617,7 +642,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			else{
 				try{
 					log("no link - show alert dialog");
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);					
 		            builder.setMessage(getString(R.string.general_error_folder_not_found));
 					builder.setTitle(getString(R.string.general_error_word));					
 					
@@ -647,6 +672,41 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				}
 			}
 		}
+		else if (request.getType() == MegaRequest.TYPE_COPY){
+			log("TYPE_COPY");
+
+			if (e.getErrorCode() != MegaError.API_OK) {
+				
+				log("ERROR: "+e.getErrorString());
+				
+				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
+					log("OVERQUOTA ERROR: "+e.getErrorCode());
+					
+					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
+					startActivity(intent);
+					finish();
+				}
+				else
+				{
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
+//					Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//			        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+//			        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//					startActivity(intent);
+//					finish();
+				}							
+				
+			}else{
+				log("OK");
+				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
+//				Intent intent = new Intent(this, ManagerActivityLollipop.class);
+//		        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+//		        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//				startActivity(intent);
+//				finish();
+			}			
+		}
 		else if (request.getType() == MegaRequest.TYPE_FETCH_NODES)
 		{		
 			MegaNode rootNode = megaApiFolder.getRootNode();
@@ -671,7 +731,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			else{
 				try{ 
-					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
+					AlertDialog.Builder builder = new AlertDialog.Builder(this);					
 		            builder.setMessage(getString(R.string.general_error_folder_not_found));
 					builder.setTitle(getString(R.string.general_error_word));
 					
@@ -994,6 +1054,19 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		// TODO Auto-generated method stub
 		
 	}
+	
+	void importNode(){
+		log("importNode");
+		if (megaApi.getRootNode() == null){
+			log("megaApi bad fetch nodes");
+			Snackbar.make(fragmentContainer, getString(R.string.session_problem), Snackbar.LENGTH_LONG).show();
+		}
+		else{
+			Intent intent = new Intent(this, FileExplorerActivityLollipop.class);
+			intent.setAction(FileExplorerActivityLollipop.ACTION_PICK_IMPORT_FOLDER);
+			startActivityForResult(intent, ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER);	
+		}		
+	}
 
 	@Override
 	public void onClick(View v) {
@@ -1031,23 +1104,24 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				slidingOptionsPanel.setVisibility(View.GONE);
 				adapterList.setPositionClicked(-1);
 				adapterList.notifyDataSetChanged();
-				Intent i = new Intent(this, FilePropertiesActivityLollipop.class);
-				i.putExtra("handle", selectedNode.getHandle());
-				
-				if (selectedNode.isFolder()) {
-					if (megaApi.isShared(selectedNode)){
-						i.putExtra("imageId", R.drawable.folder_shared_mime);	
-					}
-					else{
-						i.putExtra("imageId", R.drawable.folder_mime);
-					}
-				} 
-				else {
-					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
-				}
-				i.putExtra("name", selectedNode.getName());
-				this.startActivity(i);
+//				Intent i = new Intent(this, FilePropertiesActivityLollipop.class);
+//				i.putExtra("handle", selectedNode.getHandle());
+//				log("Handle of the selected node: "+selectedNode.getHandle());
+//				if (selectedNode.isFolder()) {
+//					if (megaApi.isShared(selectedNode)){
+//						i.putExtra("imageId", R.drawable.folder_shared_mime);	
+//					}
+//					else{
+//						i.putExtra("imageId", R.drawable.folder_mime);
+//					}
+//				} 
+//				else {
+//					i.putExtra("imageId", MimeTypeMime.typeForName(selectedNode.getName()).getIconResourceId());
+//				}
+//				i.putExtra("name", selectedNode.getName());
+//				this.startActivity(i);
 
+				importNode();
 				break;
 			}
 		}			

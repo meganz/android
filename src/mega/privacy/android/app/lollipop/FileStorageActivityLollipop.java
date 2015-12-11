@@ -924,7 +924,7 @@ public class FileStorageActivityLollipop extends PinActivityLollipop implements 
 			}
 		});
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.menu_new_folder));
 		builder.setPositiveButton(getString(R.string.general_create),
 				new DialogInterface.OnClickListener() {

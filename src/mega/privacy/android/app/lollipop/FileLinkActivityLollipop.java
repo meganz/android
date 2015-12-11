@@ -33,6 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutCompat.LayoutParams;
 import android.support.v7.widget.Toolbar;
@@ -50,8 +51,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 public class FileLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener {
 	
@@ -65,6 +64,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 	
 	ProgressDialog statusDialog;
 	
+    RelativeLayout fragmentContainer;
 	ImageView iconView;
 	TextView nameView;
 	RelativeLayout nameLayout;
@@ -119,6 +119,8 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		aB.setDisplayShowHomeEnabled(true);
 		aB.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 		aB.setDisplayShowTitleEnabled(false);
+		
+		fragmentContainer = (RelativeLayout) findViewById(R.id.file_link_fragment_container);
 		
 		infoLayout = (RelativeLayout) findViewById(R.id.file_link_layout);
 		
@@ -245,14 +247,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		String[] parts = parseDownloadUrl(url);
 		
 		if (parts == null) {
-			Util.showErrorAlertDialog(getString(R.string.manager_download_from_link_incorrect), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.manager_download_from_link_incorrect), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
 		if(!Util.isOnline(this))
 		{
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),
-					false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 
@@ -315,7 +316,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				document = request.getPublicMegaNode();
 				
 				if (document == null){
-					Util.showErrorAlertDialog(MegaError.API_ETEMPUNAVAIL, this);
+					Snackbar.make(fragmentContainer, MegaError.API_ETEMPUNAVAIL, Snackbar.LENGTH_LONG).show();
 					Intent backIntent = new Intent(this, ManagerActivityLollipop.class);
 	    			startActivity(backIntent);
 	    			finish();
@@ -330,7 +331,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			else{
 				
 				try{ 
-					AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_file_not_found), null);
+					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+					dialogBuilder.setTitle(getString(R.string.general_error_word));
+					dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));
 					dialogBuilder.setPositiveButton(
 						getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
@@ -345,10 +348,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 									
 					AlertDialog dialog = dialogBuilder.create();
 					dialog.show(); 
-					Util.brandAlertDialog(dialog);
 				}
 				catch(Exception ex){
-					Util.showToast(this, getString(R.string.general_error_file_not_found)); 
+					Snackbar.make(fragmentContainer, getString(R.string.general_error_file_not_found), Snackbar.LENGTH_LONG).show();
 				}
 				
     			return;
@@ -365,9 +367,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				log("e.getErrorCode() != MegaError.API_OK");
 				
 				if(e.getErrorCode()==MegaError.API_EOVERQUOTA){
-					log("OVERQUOTA ERROR: "+e.getErrorCode());
-					Toast.makeText(this, e.getErrorCode()+"", Toast.LENGTH_LONG).show();
-					
+					log("OVERQUOTA ERROR: "+e.getErrorCode());					
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 					intent.setAction(ManagerActivityLollipop.ACTION_OVERQUOTA_ALERT);
 					startActivity(intent);
@@ -376,8 +376,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else
 				{
-					Util.showErrorAlertDialog(e, this);
-					Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 					Intent intent = new Intent(this, ManagerActivityLollipop.class);
 			        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
 			        	intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -437,7 +436,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		
 		if (document == null){
 			try{ 
-				AlertDialog.Builder dialogBuilder = Util.getCustomAlertBuilder(this, getString(R.string.general_error_word), getString(R.string.general_error_file_not_found), null);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+				dialogBuilder.setTitle(getString(R.string.general_error_word));
+				dialogBuilder.setMessage(getString(R.string.general_error_file_not_found));				
 				dialogBuilder.setPositiveButton(
 					getString(android.R.string.ok),
 					new DialogInterface.OnClickListener() {
@@ -452,10 +453,9 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 								
 				AlertDialog dialog = dialogBuilder.create();
 				dialog.show(); 
-				Util.brandAlertDialog(dialog);
 			}
 			catch(Exception ex){
-				Util.showToast(this, getString(R.string.general_error_file_not_found)); 
+				Snackbar.make(fragmentContainer, getString(R.string.general_error_file_not_found), Snackbar.LENGTH_LONG).show();
 			}
 			
 			return;
@@ -527,14 +527,13 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 			long size = intent.getLongExtra(FileStorageActivity.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivity.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
-
 			
 			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
+			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == ManagerActivityLollipop.REQUEST_CODE_SELECT_IMPORT_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -549,7 +548,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 					statusDialog.dismiss(); 
 				} catch(Exception ex) {};
 				
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -573,7 +572,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 		if (hashes == null){
 			if(url != null) {
 				if(availableFreeSpace < size) {
-					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 					return;
 				}
 				
@@ -606,7 +605,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
 							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+							Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
 						}
 						finish();
 						return;
@@ -625,7 +624,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 						String path = dlFiles.get(document);
 						
 						if(availableFreeSpace < document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 							continue;
 						}
 						
@@ -639,7 +638,7 @@ public class FileLinkActivityLollipop extends PinActivityLollipop implements Meg
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 						continue;
 					}
 					
