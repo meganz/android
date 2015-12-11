@@ -46,7 +46,7 @@
     <string name="no_external_SD_card_detected" context="when no external card exists">No external SD card detected</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">This folder is read only. You have no permissions to upload.</string>
     
-    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file</string>  
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">You are going to remove the exported master key file. . Do you want to continue?</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">Security warning! This is a high risk operation. Do you want to continue?</string> 
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">More options&#8230;</string> 
@@ -58,6 +58,8 @@
     <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">Are you sure you want to delete these elements permanently?</string>
     <string name="title_delete_from_mega" context="confirmation message before removing a file">Delete from MEGA</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">If you leave the folder, you will not be able to see it again</string>
+    
+    <string name="confirmation_alert" context="confirmation message before removing a file">Confirmation alert</string>
     
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Incoming Shares</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Outgoing Shares</string>
@@ -149,6 +151,7 @@
     <string name="login_confirming_account" context="Attempting to activate a MEGA account for a user.">Activating account</string>
     <string name="login_preparing_filelist" context="After login, updating the file list, the file list should be processed before showing it to the user">Preparing file list</string>
     <string name="login_before_share" context="when the user tries to share something to MEGA without being logged">Please, loggin in before sharing with MEGA.</string>
+    <string name="session_problem">A user session problem exists</string>
     
     <string name="tour_space_title">Mega Space</string>
     <string name="tour_speed_title">Mega Speed</string>
@@ -261,6 +264,7 @@
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Get link</string>
     <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Manage link</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Leave</string>
+    <string name="alert_leave_share" context="Title alert before leaving a share.">Leave share</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">Not share</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Remove link</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">This link will not be publicly available anymore</string>

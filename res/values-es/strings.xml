@@ -42,7 +42,7 @@
     <string name="no_external_SD_card_detected" context="when no external card exists">Ninguna tarjeta externa SD detectada</string>
     <string name="no_permissions_upload" context="On clicking menu item upload in a incoming shared folder read only">La carpeta es sólo de lectura. No tiene permisos para subir contenido.</string>
     
-    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra</string>  
+    <string name="remove_key_confirmation" context="confirmation message before removing the previously downloaded MasterKey file">Vas a eliminar el archivo exportado con la clave maestra. ¿Deseas continuar?</string>  
     <string name="export_key_confirmation" context="confirmation message before downloading to the device the MasterKey file">¡Aviso de seguridad! Esta es una operación de alto riesgo. ¿Desea continuar?</string> 
      
     <string name="more_options_overflow" context="title of the menu for more options for each file (rename, share, copy, move, etc)">Más opciones&#8230;</string> 
@@ -55,6 +55,8 @@
     <string name="confirmation_delete_from_mega_plural" context="confirmation message before removing a file">¿Está seguro de que desear eliminar completamente estos elementos de MEGA?</string>
     <string name="confirmation_leave_share_folder" context="confirmation message before leaving an incoming shared folder">Si abandonas la carpeta, no podrás acceder a ella de nuevo</string>
     
+    <string name="confirmation_alert" context="confirmation message before removing a file">Confirmación necesaria</string>
+        
     <string name="action_change_mode_in" context="Folders that have been shared with the user from other MEGA users">Entrantes</string>
     <string name="action_change_mode_out" context="Folders that have been shared by the user to other MEGA users">Salientes</string>
     <string name="action_logout" context="Button where the user can sign off or logout">Desconectar</string>
@@ -238,7 +240,8 @@
 	<string name="contact_shared_files" context="title of the screen where the folders are shown with the contact owner of those folders">Compartir carpetas con:</string>	
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Añadir nuevos contactos usando el botón inferior.</string>		
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
-	
+	<string name="session_problem">Existe un problema con la sesión de usuario</string>
+	    
 	<string name="download_failed" context="Error message">Descarga fallida</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">descargado</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Descargando</string>
@@ -256,6 +259,7 @@
     <string name="context_get_link_menu" context="Item menu option upon right click on one or multiple files.">Obtener enlace</string>
     <string name="context_manage_link_menu" context="Item menu option upon right click on one or multiple files.">Gestionar enlace</string>
     <string name="context_leave_menu" context="Item menu option upon right click on one or multiple files.">Abandonar</string>
+    <string name="alert_leave_share" context="Title alert before leaving a share.">Abandonar compartición</string>
     <string name="context_clean_shares_menu" context="Item menu option upon right click on one or multiple files.">No compartir</string>
     <string name="context_remove_link_menu" context="Item menu option upon right click on one or multiple files.">Eliminar enlace</string>
     <string name="context_remove_link_warning_text" context="Warning that appears prior to remove a link of a file.">El enlace público a este fichero se eliminará.</string>

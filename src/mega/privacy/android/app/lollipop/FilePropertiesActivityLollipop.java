@@ -207,7 +207,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	protected void onCreate(Bundle savedInstanceState) {			
 	
 		super.onCreate(savedInstanceState);
-		
+		log("onCreate");
 		if (megaApi == null){
 			MegaApplication app = (MegaApplication)getApplication();
 			megaApi = app.getMegaApi();
@@ -235,8 +235,10 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			from = extras.getInt("from");
 			String name = extras.getString("name");
 			handle = extras.getLong("handle", -1);
+			log("Handle of the selected node: "+handle);
 			node = megaApi.getNodeByHandle(handle);
 			if (node == null){  
+				log("Node is NULL");
 				finish();
 				return;
 			}
@@ -350,7 +352,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 //			permissionInfo.setVisibility(View.GONE);
 
 		}
-		
+		else{
+			log("Extras is NULL");
+		}
 		refreshProperties();
 		
 /*	        container = (CoordinatorLayout) findViewById(R.id.fragment_container_file_properties);
@@ -1259,7 +1263,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		    }
 		};
 		
-		AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);		
+		builder.setTitle(getResources().getString(R.string.alert_leave_share));
 		String message= getResources().getString(R.string.confirmation_leave_share_folder);
 		builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 	    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
@@ -1411,13 +1416,15 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		};
 		
 		if (moveToRubbish){
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getResources().getString(R.string.confirmation_alert));
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
-			AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getResources().getString(R.string.confirmation_alert));
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();

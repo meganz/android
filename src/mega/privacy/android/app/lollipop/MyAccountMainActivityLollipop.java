@@ -133,23 +133,6 @@ public class MyAccountMainActivityLollipop extends PinActivityLollipop implement
 		currentFragment = UPGRADE_ACCOUNT_FRAGMENT;
 		selectMyAccountFragment(currentFragment);
 	}
-	
-	@SuppressLint("NewApi") 
-	void showAlert(String message, String title) {
-		AlertDialog.Builder bld;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {	
-			bld = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-		}
-		else{
-			bld = new AlertDialog.Builder(this);
-		}
-        bld.setMessage(message);
-        bld.setTitle(title);
-//        bld.setNeutralButton("OK", null);
-        bld.setPositiveButton("OK",null);
-        log("Showing alert dialog: " + message);
-        bld.create().show();
-    }
 
 	/*@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {

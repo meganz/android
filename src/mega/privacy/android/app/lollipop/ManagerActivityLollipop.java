@@ -403,8 +403,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private MenuItem rubbishBinMenuItem;
 	private MenuItem clearRubbishBinMenuitem;
 	private MenuItem changePass;
-	private MenuItem exportMK;
-	private MenuItem removeMK;
+//	private MenuItem exportMK;
+//	private MenuItem removeMK;
 	private MenuItem takePicture;
 	private MenuItem cancelSubscription;
 	private MenuItem killAllSessions;
@@ -893,6 +893,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		log("onCreate");
 		
 		File thumbDir;
 		if (getExternalCacheDir() != null){
@@ -1835,8 +1837,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	    			unSelectMenuItem.setVisible(false);
 	    	    			addMenuItem.setEnabled(false);
 	    	    			changePass.setVisible(false); 
-	    	    			exportMK.setVisible(false); 
-	    	    			removeMK.setVisible(false); 
 	    	    			importLinkMenuItem.setVisible(false);
 	    	    			takePicture.setVisible(false);
 	    	    			refreshMenuItem.setVisible(false);
@@ -1893,8 +1893,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    	    			unSelectMenuItem.setVisible(false); 
 	    	    			clearRubbishBinMenuitem.setVisible(false); 
 	    	    			changePass.setVisible(false); 
-	    	    			exportMK.setVisible(false); 
-	    	    			removeMK.setVisible(false); 
 	    	    			refreshMenuItem.setVisible(false);
 	    					helpMenuItem.setVisible(false);
 	    					settingsMenuItem.setVisible(false);
@@ -1956,8 +1954,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
+ 
 	    			if (isList){	
 	    				thumbViewMenuItem.setTitle(getString(R.string.action_grid));
 					}
@@ -2016,8 +2013,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
         			settingsMenuItem.setVisible(false);
     				refreshMenuItem.setVisible(false);
     				cancelAllTransfersMenuItem.setVisible(false);
@@ -2078,8 +2073,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
+
         			settingsMenuItem.setVisible(false);
     				refreshMenuItem.setVisible(false);
     				cancelAllTransfersMenuItem.setVisible(false);
@@ -2159,8 +2153,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			unSelectMenuItem.setVisible(false);
         			addMenuItem.setEnabled(false);
         			changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
         			importLinkMenuItem.setVisible(false);
         			takePicture.setVisible(false);
         			refreshMenuItem.setVisible(false);
@@ -2418,8 +2410,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					rubbishBinMenuItem.setVisible(false);
     					clearRubbishBinMenuitem.setVisible(false);
     					changePass.setVisible(false); 
-    					exportMK.setVisible(false); 
-    					removeMK.setVisible(false); 
     					importLinkMenuItem.setVisible(false);
     					takePicture.setVisible(false);					
     	    			refreshMenuItem.setVisible(false);
@@ -2473,8 +2463,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     					rubbishBinMenuItem.setVisible(false);
     					clearRubbishBinMenuitem.setVisible(false);
     					changePass.setVisible(false); 
-    					exportMK.setVisible(false); 
-    					removeMK.setVisible(false); 
     					importLinkMenuItem.setVisible(false);
     					takePicture.setVisible(false);					
     	    			refreshMenuItem.setVisible(false);
@@ -2649,8 +2637,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			if (createFolderMenuItem != null){
     				changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
     				createFolderMenuItem.setVisible(false);
     				addContactMenuItem.setVisible(true);
 	    			addMenuItem.setVisible(false);
@@ -2753,8 +2739,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         			rubbishBinMenuItem.setVisible(false); 
         			clearRubbishBinMenuitem.setVisible(false);
         			changePass.setVisible(false); 
-        			exportMK.setVisible(false); 
-        			removeMK.setVisible(false); 
         			settingsMenuItem.setVisible(false);
     				refreshMenuItem.setVisible(false);
     				helpMenuItem.setVisible(false);
@@ -2808,18 +2792,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    				cancelSubscription.setVisible(true);
 	    			}
 	    			killAllSessions.setVisible(true);
-	    			
-	    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-	    			log("Export in: "+path);
-	    			File file= new File(path);
-	    			if(file.exists()){
-	    				exportMK.setVisible(false); 
-		    			removeMK.setVisible(true); 
-	    			}
-	    			else{
-	    				exportMK.setVisible(true); 
-		    			removeMK.setVisible(false); 		
-	    			}
 	    			
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
@@ -3181,8 +3153,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		cancelAllTransfersMenuItem.setVisible(false);
 		
 		changePass = menu.findItem(R.id.action_menu_change_pass);
-		exportMK = menu.findItem(R.id.action_menu_export_MK);
-		removeMK = menu.findItem(R.id.action_menu_remove_MK);
 		
 		takePicture = menu.findItem(R.id.action_take_picture);
 		
@@ -3256,8 +3226,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			unSelectMenuItem.setVisible(false);
 	    			addMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
 	    			importLinkMenuItem.setVisible(false);
 	    			takePicture.setVisible(false);
 	    			refreshMenuItem.setVisible(false);
@@ -3313,8 +3281,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			unSelectMenuItem.setVisible(false); 
 	    			clearRubbishBinMenuitem.setVisible(false); 
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
 	    			refreshMenuItem.setVisible(false);
 					helpMenuItem.setVisible(false);
 					settingsMenuItem.setVisible(false);
@@ -3365,8 +3331,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
@@ -3406,8 +3370,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);					
@@ -3454,8 +3416,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			addMenuItem.setEnabled(false);
     			createFolderMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);					
@@ -3515,8 +3475,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			unSelectMenuItem.setVisible(false);
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
     			importLinkMenuItem.setVisible(false);
     			takePicture.setVisible(false);
     			refreshMenuItem.setVisible(false);
@@ -3588,8 +3546,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
 					changePass.setVisible(false); 
-					exportMK.setVisible(false); 
-					removeMK.setVisible(false); 
 					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);					
 	    			refreshMenuItem.setVisible(false);
@@ -3642,8 +3598,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					rubbishBinMenuItem.setVisible(false);
 					clearRubbishBinMenuitem.setVisible(false);
 					changePass.setVisible(false); 
-					exportMK.setVisible(false); 
-					removeMK.setVisible(false); 
 					importLinkMenuItem.setVisible(false);
 					takePicture.setVisible(false);					
 	    			refreshMenuItem.setVisible(false);
@@ -3683,8 +3637,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			unSelectMenuItem.setVisible(false);    			
 	    			addMenuItem.setEnabled(false);
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
 	    			rubbishBinMenuItem.setVisible(false);
 	    			clearRubbishBinMenuitem.setVisible(false);
 	    			importLinkMenuItem.setVisible(false);
@@ -3720,8 +3672,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			unSelectMenuItem.setVisible(false);    			
     			addMenuItem.setEnabled(false);
     			changePass.setVisible(false); 
-    			exportMK.setVisible(false); 
-    			removeMK.setVisible(false); 
     			rubbishBinMenuItem.setVisible(false);
     			clearRubbishBinMenuitem.setVisible(false);
     			importLinkMenuItem.setVisible(false);
@@ -3749,8 +3699,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			sortByMenuItem.setVisible(false);
 	    			unSelectMenuItem.setVisible(false);
 	    			changePass.setVisible(false); 
-	    			exportMK.setVisible(false); 
-	    			removeMK.setVisible(false); 
 	    			addMenuItem.setEnabled(false);
 	    			createFolderMenuItem.setEnabled(false);
 	    			rubbishBinMenuItem.setVisible(false);
@@ -3808,22 +3756,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					cancelSubscription.setVisible(true);
 				}
 				
-				killAllSessions.setVisible(true);
-    			
-    			String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-    			log("Export in: "+path);
-    			File file= new File(path);
-    			if(file.exists()){
-    				exportMK.setVisible(false); 
-	    			removeMK.setVisible(true); 
-    			}
-    			else{
-    				exportMK.setVisible(true); 
-	    			removeMK.setVisible(false); 		
-    			}
-    			
-    			gridSmallLargeMenuItem.setVisible(false);
- 
+				killAllSessions.setVisible(true);    			
+    			gridSmallLargeMenuItem.setVisible(false); 
 			}
 		}
 	    
@@ -5062,78 +4996,83 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				startActivity(intent);
 				return true;
 	        }
-	        case R.id.action_menu_remove_MK:{
-	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				        switch (which){
-				        case DialogInterface.BUTTON_POSITIVE:
-
-							final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-							final File f = new File(path);
-				        	f.delete();	
-				        	removeMK.setVisible(false);
-				        	exportMK.setVisible(true);
-				            break;
-
-				        case DialogInterface.BUTTON_NEGATIVE:
-				            //No button clicked
-				            break;
-				        }
-				    }
-				};
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-				builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
-				    .setNegativeButton(R.string.general_no, dialogClickListener).show();
-				return true;
-	        }
-	        case R.id.action_menu_export_MK:{
-	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-				    @Override
-				    public void onClick(DialogInterface dialog, int which) {
-				        switch (which){
-				        case DialogInterface.BUTTON_POSITIVE:
-				        	String key = megaApi.exportMasterKey();
-							
-							BufferedWriter out;         
-							try {						
-
-								final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-								final File f = new File(path);
-								log("Export in: "+path);
-								FileWriter fileWriter= new FileWriter(path);	
-								out = new BufferedWriter(fileWriter);	
-								out.write(key);	
-								out.close(); 								
-								String message = getString(R.string.toast_master_key) + " " + path;
-//				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
-
-				    			showAlert(message, "MasterKey exported!");
-								removeMK.setVisible(true);
-					        	exportMK.setVisible(false);
-
-							}catch (FileNotFoundException e) {
-							 e.printStackTrace();
-							}catch (IOException e) {
-							 e.printStackTrace();
-							}
-				        	
-				            break;
-
-				        case DialogInterface.BUTTON_NEGATIVE:
-				            //No button clicked
-				            break;
-				        }
-				    }
-				};
-
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-				builder.setMessage(R.string.export_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
-				    .setNegativeButton(R.string.general_no, dialogClickListener).show();		
-	        	
-	        	return true;
-	        }
+//	        case R.id.action_menu_remove_MK:{
+//	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//				    @Override
+//				    public void onClick(DialogInterface dialog, int which) {
+//				        switch (which){
+//				        case DialogInterface.BUTTON_POSITIVE:
+//
+//							final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+//							final File f = new File(path);
+//				        	f.delete();	
+//				        	removeMK.setVisible(false);
+//				        	exportMK.setVisible(true);
+//				            break;
+//
+//				        case DialogInterface.BUTTON_NEGATIVE:
+//				            //No button clicked
+//				            break;
+//				        }
+//				    }
+//				};
+//
+//				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//				builder.setTitle(getString(R.string.confirmation_alert));
+//				builder.setMessage(R.string.remove_key_confirmation).setPositiveButton(R.string.general_yes, dialogClickListener)
+//				    .setNegativeButton(R.string.general_no, dialogClickListener).show();
+//				return true;
+//	        }
+//	        case R.id.action_menu_export_MK:{
+//	        	log("export MK option selected");
+//	        	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+//				    @Override
+//				    public void onClick(DialogInterface dialog, int which) {
+//				        switch (which){
+//				        case DialogInterface.BUTTON_POSITIVE:
+//				        	String key = megaApi.exportMasterKey();
+//							
+//							BufferedWriter out;         
+//							try {						
+//
+//								final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+//								final File f = new File(path);
+//								log("Export in: "+path);
+//								FileWriter fileWriter= new FileWriter(path);	
+//								out = new BufferedWriter(fileWriter);	
+//								out.write(key);	
+//								out.close(); 								
+//								String message = getString(R.string.toast_master_key) + " " + path;
+////				    			Snackbar.make(fragmentContainer, toastMessage, Snackbar.LENGTH_LONG).show();
+//
+//				    			showAlert(message, "MasterKey exported!");
+//								removeMK.setVisible(true);
+//					        	exportMK.setVisible(false);
+//
+//							}catch (FileNotFoundException e) {
+//							 e.printStackTrace();
+//							}catch (IOException e) {
+//							 e.printStackTrace();
+//							}
+//				        	
+//				            break;
+//
+//				        case DialogInterface.BUTTON_NEGATIVE:
+//				            //No button clicked
+//				            break;
+//				        }
+//				    }
+//				};
+//
+//				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+//				builder.setTitle(getString(R.string.confirmation_alert));
+//				builder.setMessage(R.string.export_key_confirmation);
+//				builder.setPositiveButton(R.string.general_yes, dialogClickListener);
+//				builder.setNegativeButton(R.string.general_no, dialogClickListener);		
+//				AlertDialog dialog = builder.create();
+//				dialog.show();
+//	        	return true;
+//	        }
 //	        case R.id.action_menu_logout:{
 //	        	logout(managerActivity, (MegaApplication)getApplication(), megaApi, false);
 //	        	return true;
@@ -7102,9 +7041,30 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}		
 	}
 	
-	public void leaveIncomingShare (MegaNode n){
+	public void leaveIncomingShare (final MegaNode n){
 		log("leaveIncomingShare");
-		megaApi.remove(n);
+		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	//TODO remove the incoming shares		        	
+		        	megaApi.remove(n);	        	
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);		
+		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+	    	.setNegativeButton(R.string.general_no, dialogClickListener).show();		
 	}
 	
 	public void removeAllSharingContacts (ArrayList<MegaShare> listContacts, MegaNode node){
