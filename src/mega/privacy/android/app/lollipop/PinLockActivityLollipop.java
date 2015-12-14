@@ -243,10 +243,12 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
 		//Add TextWatcher to first letter		
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            	log("onTextChanged first letter");
-            	
-                if(passFirstLetter.length()!=0){
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            public void afterTextChanged(Editable s) {
+            	if(passFirstLetter.length()!=0){
                 	passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
                     
@@ -255,49 +257,42 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
                     passFourthLetter.setText("");                    
                 }
             }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            public void afterTextChanged(Editable s) {}
         });	
 		
 		
 		passSecondLetter.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if(passSecondLetter.length()!=0){
-                    passThirdLetter.requestFocus();
-                    passThirdLetter.setCursorVisible(true);
-                    
-                    passThirdLetter.setText("");
-                    passFourthLetter.setText("");                    
-                }
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            	 if(passSecondLetter.length()!=0){
+                     passThirdLetter.requestFocus();
+                     passThirdLetter.setCursorVisible(true);
+                     
+                     passThirdLetter.setText("");
+                     passFourthLetter.setText("");                    
+                 }
+            }
         });	
 		
 		passThirdLetter.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            	
-                if(passThirdLetter.length()!=0){
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            public void afterTextChanged(Editable s) {
+            	if(passThirdLetter.length()!=0){
                 	passFourthLetter.requestFocus();
                 	passFourthLetter.setCursorVisible(true);
                     
                     passFourthLetter.setText("");                    
                 }
             }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            public void afterTextChanged(Editable s) {}
         });	
 		
 		passFourthLetter.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+			public void afterTextChanged(Editable s) {
             	if(passFourthLetter.length()!=0){
                     if(!secondRound)
                     {  
@@ -396,7 +391,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-            public void afterTextChanged(Editable s) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count){}
         });	
 	}
 
