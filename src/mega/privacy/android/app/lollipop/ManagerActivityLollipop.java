@@ -9487,7 +9487,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					
 					getLinkDialog = builder.create();
 					getLinkDialog.show();
-//					Util.brandAlertDialog(getLinkDialog);
 				}
 			}
 			else{

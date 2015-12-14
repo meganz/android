@@ -39,6 +39,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StatFs;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.support.v7.app.ActionBar;
@@ -62,8 +63,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
-
 
 public class FullScreenImageViewerLollipop extends PinActivityLollipop implements OnPageChangeListener, OnClickListener, MegaRequestListenerInterface, OnItemClickListener{
 	
@@ -82,7 +81,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	private int positionG;
 	private ArrayList<Long> imageHandles;
 	private boolean fromShared = false;
-	
+	private RelativeLayout fragmentContainer;
 	private TextView fileNameTextView;
 	private ImageView actionBarIcon;
 	private ImageView overflowIcon;
@@ -179,6 +178,8 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		
 		viewPager = (ExtendedViewPager) findViewById(R.id.image_viewer_pager);
 		viewPager.setPageMargin(40);
+		
+		fragmentContainer = (RelativeLayout) findViewById(R.id.full_image_viewer_parent_layout);
 		
 		Intent intent = getIntent();
 		positionG = intent.getIntExtra("position", 0);
@@ -660,7 +661,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
 					}
 					else{
-						Toast.makeText(this, getString(R.string.full_image_viewer_not_preview), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
 					}
 					
 					break;
@@ -718,7 +719,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 						startActivity(Intent.createChooser(share, getString(R.string.context_share_image)));
 					}
 					else{
-						Toast.makeText(this, getString(R.string.full_image_viewer_not_preview), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.full_image_viewer_not_preview), Snackbar.LENGTH_LONG).show();
 					}
 					
 					break;
@@ -837,7 +838,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 	public void getPublicLinkAndShareIt(){
 		
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -953,7 +954,7 @@ public class FullScreenImageViewerLollipop extends PinActivityLollipop implement
 		}
 		
 		if(!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -1013,7 +1014,7 @@ log("moveToTrash");
 		final long handle = node.getHandle();
 		moveToRubbish = false;
 		if (!Util.isOnline(this)){
-			Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+			Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 		
@@ -1081,12 +1082,14 @@ log("moveToTrash");
 		
 		if (moveToRubbish){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getResources().getString(R.string.section_rubbish_bin));
 			String message= getResources().getString(R.string.confirmation_move_to_rubbish);
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
 		}
 		else{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle(getResources().getString(R.string.title_delete_from_mega));
 			String message= getResources().getString(R.string.confirmation_delete_from_mega);
 			builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
 		    	.setNegativeButton(R.string.general_no, dialogClickListener).show();
@@ -1116,46 +1119,45 @@ log("moveToTrash");
 				
 				final String link = request.getLink();
 				
+//				AlertDialog getLinkDialog;
+//				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//				builder.setTitle(getString(R.string.context_get_link_menu));
+//				
+//				LayoutInflater inflater = getLayoutInflater();
+//				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
+//				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
+//				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
+//				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
+//				
+//				String urlString = "";
+//				String keyString = "";
+//				String [] s = link.split("!");
+//				if (s.length == 3){
+//					urlString = s[0] + "!" + s[1];
+//					keyString = s[2];
+//				}
+//				
+//				Display display = getWindowManager().getDefaultDisplay();
+//				DisplayMetrics outMetrics = new DisplayMetrics();
+//				display.getMetrics(outMetrics);
+//				float density = getResources().getDisplayMetrics().density;
+//
+//				float scaleW = Util.getScaleW(outMetrics, density);
+//				float scaleH = Util.getScaleH(outMetrics, density);
+//				
+//				url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+//				key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
+//				
+//				url.setText(urlString);
+//				key.setText(keyString);
+//				
+//				
+//				builder.setView(dialoglayout);
+				
 				AlertDialog getLinkDialog;
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
+	            builder.setMessage(link);
 				builder.setTitle(getString(R.string.context_get_link_menu));
-				
-				LayoutInflater inflater = getLayoutInflater();
-				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
-				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-				
-				String urlString = "";
-				String keyString = "";
-				String [] s = link.split("!");
-				if (s.length == 3){
-					urlString = s[0] + "!" + s[1];
-					keyString = s[2];
-				}
-				if (node.isFolder()){
-					thumb.setImageResource(R.drawable.folder_thumbnail);
-				}
-				else{
-					thumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
-				}
-				
-				Display display = getWindowManager().getDefaultDisplay();
-				DisplayMetrics outMetrics = new DisplayMetrics();
-				display.getMetrics(outMetrics);
-				float density = getResources().getDisplayMetrics().density;
-
-				float scaleW = Util.getScaleW(outMetrics, density);
-				float scaleH = Util.getScaleH(outMetrics, density);
-				
-				url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-				key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-				
-				url.setText(urlString);
-				key.setText(keyString);
-				
-				
-				builder.setView(dialoglayout);
 				
 				builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
 					
@@ -1180,17 +1182,15 @@ log("moveToTrash");
 						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
 				            clipboard.setPrimaryClip(clip);
 						}
-						
-						Toast.makeText(fullScreenImageViewer, getString(R.string.file_properties_get_link), Toast.LENGTH_LONG).show();
+						Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
 					}
 				});
 				
 				getLinkDialog = builder.create();
 				getLinkDialog.show();
-				Util.brandAlertDialog(getLinkDialog);
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_link), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_link), Snackbar.LENGTH_LONG).show();
 			}
 			log("export request finished");
 		}
@@ -1202,11 +1202,10 @@ log("moveToTrash");
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_renamed), Toast.LENGTH_SHORT).show();
-//				nameView.setText(megaApi.getNodeByHandle(request.getNodeHandle()).getName());
+				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_renamed), Snackbar.LENGTH_LONG).show();
 			}			
 			else{
-				Toast.makeText(this, getString(R.string.context_no_renamed), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_renamed), Snackbar.LENGTH_LONG).show();
 			}
 		}
 		else if (request.getType() == MegaRequest.TYPE_MOVE){
@@ -1217,22 +1216,22 @@ log("moveToTrash");
 			
 			if (moveToRubbish){
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
 					finish();
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
 				}
 				moveToRubbish = false;
 				log("move to rubbish request finished");
 			}
 			else{
 				if (e.getErrorCode() == MegaError.API_OK){
-					Toast.makeText(this, getString(R.string.context_correctly_moved), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_moved), Snackbar.LENGTH_LONG).show();
 					finish();
 				}
 				else{
-					Toast.makeText(this, getString(R.string.context_no_moved), Toast.LENGTH_LONG).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_no_moved), Snackbar.LENGTH_LONG).show();
 				}
 				log("move nodes request finished");
 			}
@@ -1246,12 +1245,12 @@ log("moveToTrash");
 						statusDialog.dismiss();	
 					} 
 					catch (Exception ex) {}
-					Toast.makeText(this, getString(R.string.context_correctly_removed), Toast.LENGTH_SHORT).show();
+					Snackbar.make(fragmentContainer, getString(R.string.context_correctly_removed), Snackbar.LENGTH_LONG).show();
 				}
 				finish();
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_removed), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_removed), Snackbar.LENGTH_LONG).show();
 			}
 			log("remove request finished");
 		}
@@ -1262,10 +1261,10 @@ log("moveToTrash");
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				Toast.makeText(this, getString(R.string.context_correctly_copied), Toast.LENGTH_SHORT).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_correctly_copied), Snackbar.LENGTH_LONG).show();
 			}
 			else{
-				Toast.makeText(this, getString(R.string.context_no_copied), Toast.LENGTH_LONG).show();
+				Snackbar.make(fragmentContainer, getString(R.string.context_no_copied), Snackbar.LENGTH_LONG).show();
 			}
 			log("copy nodes request finished");
 		}
@@ -1327,15 +1326,14 @@ log("moveToTrash");
 			long size = intent.getLongExtra(FileStorageActivityLollipop.EXTRA_SIZE, 0);
 			long[] hashes = intent.getLongArrayExtra(FileStorageActivityLollipop.EXTRA_DOCUMENT_HASHES);
 			log("URL: " + url + "___SIZE: " + size);
-
 			
 			downloadTo (parentPath, url, size, hashes);
-			Util.showToast(this, R.string.download_began);
+			Snackbar.make(fragmentContainer, getString(R.string.download_began), Snackbar.LENGTH_LONG).show();
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_MOVE_FOLDER && resultCode == RESULT_OK) {
 			
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -1363,7 +1361,7 @@ log("moveToTrash");
 		}
 		else if (requestCode == REQUEST_CODE_SELECT_COPY_FOLDER && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(fragmentContainer, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			
@@ -1429,7 +1427,7 @@ log("moveToTrash");
 		if (hashes == null){
 			if(url != null) {
 				if(availableFreeSpace < size) {
-					Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+					Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 					return;
 				}
 				
@@ -1462,8 +1460,8 @@ log("moveToTrash");
 							intentShare.setDataAndType(Uri.fromFile(new File(localPath)), MimeTypeList.typeForName(tempNode.getName()).getType());
 							if (ManagerActivityLollipop.isIntentAvailable(this, intentShare))
 								startActivity(intentShare);
-							String toastMessage = getString(R.string.general_already_downloaded) + ": " + localPath;
-							Toast.makeText(this, toastMessage, Toast.LENGTH_LONG).show();
+							String message = getString(R.string.general_already_downloaded) + ": " + localPath;
+							Snackbar.make(fragmentContainer, message, Snackbar.LENGTH_LONG).show();
 						}								
 						return;
 					}
@@ -1485,7 +1483,7 @@ log("moveToTrash");
 						String path = dlFiles.get(document);
 						
 						if(availableFreeSpace < document.getSize()){
-							Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space) + " (" + new String(document.getName()) + ")", false, this);
+							Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 							continue;
 						}
 						
@@ -1500,7 +1498,7 @@ log("moveToTrash");
 				}
 				else if(url != null) {
 					if(availableFreeSpace < size) {
-						Util.showErrorAlertDialog(getString(R.string.error_not_enough_free_space), false, this);
+						Snackbar.make(fragmentContainer, getString(R.string.error_not_enough_free_space), Snackbar.LENGTH_LONG).show();
 						continue;
 					}
 					
