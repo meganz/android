@@ -160,14 +160,14 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/folder_link_list_option_properties_layout"
+                android:id="@+id/folder_link_list_option_import_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:id="@+id/folder_link_list_option_properties"
+                    android:id="@+id/folder_link_list_option_import"
                     style="@style/dialogActionButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -176,9 +176,10 @@
                     android:src="@drawable/info_ic" />
 
                 <TextView
-                    android:id="@+id/folder_link_list_option_properties_text"
+                    android:id="@+id/folder_link_list_option_import_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/general_import"
                     android:paddingBottom="2dp"
                     android:paddingTop="2dp"
                     android:textColor="@color/black"

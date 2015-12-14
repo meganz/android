@@ -340,6 +340,8 @@
     <string name="context_no_removed" context="error message">Error. No se pudo borrar de MEGA</string>
     <string name="number_correctly_removed" context="success message when deleting a node">%d ficheros borrados de MEGA</string>
     <string name="number_no_removed" context="success message when deleting a node">, %d so se han podido borrar</string>
+    <string name="number_correctly_leaved" context="success message when moving a node">%d carpetas se han abandonado correctamente</string>
+    <string name="number_no_leaved" context="error message when moving a node">, %d carpetas no se han podido abandonar</string>
     <string name="number_correctly_sent" context="success message when sending multiple files">Fichero correctamente enviado a %d contactos</string>
     <string name="number_no_sent" context="error message when sending multiple files">, a %d contactos no se ha podido enviar</string>
     <string name="number_correctly_sent_multifile" context="success message when sending multiple files">%d ficheros correctamente enviados</string>

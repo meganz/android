@@ -23,8 +23,10 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -65,7 +67,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	EditText passFourthLetter;
 	final StringBuilder sbFirst=new StringBuilder();
 	final StringBuilder sbSecond=new StringBuilder();
-	
+	boolean secondRound = false;
 	InputMethodManager imm;
 	
 	int mode = UNLOCK;
@@ -75,7 +77,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 	MegaAttributes att = null;
 	
 	int attemps = 0;
-	
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -237,27 +239,20 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passFirstLetter.requestFocus();	
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 		imm.showSoftInput(passFirstLetter, InputMethodManager.SHOW_FORCED);
-//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+//		imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);	
 
 		//Add TextWatcher to first letter		
 		passFirstLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if(sbFirst.length()==0 & passFirstLetter.length()==1)
-                {
-                	sbFirst.append(s);
-//                    passFirstLetter.clearFocus();
-                    passSecondLetter.requestFocus();
+            	log("onTextChanged first letter");
+            	
+                if(passFirstLetter.length()!=0){
+                	passSecondLetter.requestFocus();
                     passSecondLetter.setCursorVisible(true);
-
-                }
-                else if(sbSecond.length()==0 & passFirstLetter.length()==1)
-                {
-                	sbSecond.append(s);
-//                    passFirstLetter.clearFocus();
-                    passSecondLetter.requestFocus();
-                    passSecondLetter.setCursorVisible(true);
-
+                    
+                    passSecondLetter.setText("");
+                    passThirdLetter.setText("");
+                    passFourthLetter.setText("");                    
                 }
             }
 
@@ -270,21 +265,12 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passSecondLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if(sbFirst.length()==1 & passSecondLetter.length()==1)
-                {
-                	sbFirst.append(s);
-                    passSecondLetter.clearFocus();
+                if(passSecondLetter.length()!=0){
                     passThirdLetter.requestFocus();
                     passThirdLetter.setCursorVisible(true);
-
-                }    
-                else if(sbSecond.length()==1 & passSecondLetter.length()==1)
-                {
-                	sbSecond.append(s);
-                    passSecondLetter.clearFocus();
-                    passThirdLetter.requestFocus();
-                    passThirdLetter.setCursorVisible(true);
-
+                    
+                    passThirdLetter.setText("");
+                    passFourthLetter.setText("");                    
                 }
             }
 
@@ -295,24 +281,12 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		
 		passThirdLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                if(sbFirst.length()==2 & passThirdLetter.length()==1)
-                {
-                	sbFirst.append(s);
-                    passThirdLetter.clearFocus();
+            	
+                if(passThirdLetter.length()!=0){
+                	passFourthLetter.requestFocus();
+                	passFourthLetter.setCursorVisible(true);
                     
-                    passFourthLetter.requestFocus();
-                    passFourthLetter.setCursorVisible(true);
-
-                }
-                else if(sbSecond.length()==2 & passThirdLetter.length()==1)
-                {
-                	sbSecond.append(s);
-                    passThirdLetter.clearFocus();
-                    
-                    passFourthLetter.requestFocus();
-                    passFourthLetter.setCursorVisible(true);
-
+                    passFourthLetter.setText("");                    
                 }
             }
 
@@ -324,83 +298,100 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passFourthLetter.addTextChangedListener(new TextWatcher() {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if(sbFirst.length()==3 & passFourthLetter.length()==1)
-                {
-                	sbFirst.append(s);                
-                    
-                    switch(mode){
-	                    case RESET_SET:
-	                    {
-	                    	//Re-enter pass
-	                        passFirstLetter.setText("");
-	                        passSecondLetter.setText("");
-	                        passThirdLetter.setText("");
-	                        passFourthLetter.setText("");
-	                        
-	                        passFirstLetter.requestFocus();
-	                        passFirstLetter.setCursorVisible(true);
-	                    	unlockText.setText(R.string.reset_pin_title_2);
-	                    	break;
-	                    }
-	                    case UNLOCK:
-	                    case RESET_UNLOCK:
-	                    {
-	                    	submitForm(sbFirst.toString());
-	                    	break;
-	                    }
-	                    default:
-	                    {
-	                    	//Re-enter pass
-	                        passFirstLetter.setText("");
-	                        passSecondLetter.setText("");
-	                        passThirdLetter.setText("");
-	                        passFourthLetter.setText("");
-	                        
-	                        passFirstLetter.requestFocus();
-	                        passFirstLetter.setCursorVisible(true);
-	                    	unlockText.setText(R.string.unlock_pin_title_2);
-	                    	break;
-	                    }
-                    }      
+            	if(passFourthLetter.length()!=0){
+                    if(!secondRound)
+                    {  
+                    	if(passFirstLetter.length()==1 & passSecondLetter.length()==1 & passThirdLetter.length()==1 & passFourthLetter.length()==1){
+                    		sbFirst.append(passFirstLetter.getText());
+                    		sbFirst.append(passSecondLetter.getText());
+                    		sbFirst.append(passThirdLetter.getText());
+                    		sbFirst.append(passFourthLetter.getText());	                    		
+                    	}
+                        log("sbFirst: "+sbFirst);
+                        switch(mode){
+    	                    case RESET_SET:
+    	                    {
+    	                    	//Re-enter pass
+    	                        passFirstLetter.setText("");
+    	                        passSecondLetter.setText("");
+    	                        passThirdLetter.setText("");
+    	                        passFourthLetter.setText("");
+    	                        
+    	                        passFirstLetter.requestFocus();
+    	                        passFirstLetter.setCursorVisible(true);
+    	                    	unlockText.setText(R.string.reset_pin_title_2);
+    	                    	secondRound=true;
+    	                    	break;
+    	                    }
+    	                    case UNLOCK:
+    	                    case RESET_UNLOCK:
+    	                    {    	                    	
+    	                    	submitForm(sbFirst.toString());
+    	                    	break;
+    	                    }
+    	                    default:
+    	                    {
+    	                    	//Re-enter pass
+    	                    	log("Default CASE");
+    	                        passFirstLetter.setText("");
+    	                        passSecondLetter.setText("");
+    	                        passThirdLetter.setText("");
+    	                        passFourthLetter.setText("");
+    	                        
+    	                        passFirstLetter.requestFocus();
+    	                        passFirstLetter.setCursorVisible(true);
+    	                    	unlockText.setText(R.string.unlock_pin_title_2);
+    	                    	secondRound=true;
+    	                    	break;
+    	                    }
+                        }      
 
-                }
-                else if(sbSecond.length()==3 & passFourthLetter.length()==1)
-                {
-                	log("SECOND TIME 4thletter");
-                	sbSecond.append(s);                             
-                    
-                    if(sbFirst.toString().equals(sbSecond.toString())){
-                    	log("PIN match - submit form");
-                    	submitForm(sbSecond.toString());
                     }
-                    else{
-                    	log("PIN NOT match - show snackBar");
-//                    	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
-                    	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
-                    	View view = snack.getView();
-			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
-                    	params.gravity = Gravity.TOP;
-                    	view.setLayoutParams(params);
-                    	snack.show();
-                    	
-                        //Re-enter pass
-                        passFirstLetter.setText("");
-                        passSecondLetter.setText("");
-                        passThirdLetter.setText("");
-                        passFourthLetter.setText("");
-                        
-                        passFirstLetter.requestFocus();
-                        passFirstLetter.setCursorVisible(true);
-                        sbFirst.setLength(0);
-                        sbSecond.setLength(0);
-                        if(getMode()==RESET_SET){
-                        	unlockText.setText(R.string.reset_pin_title);
+                    else if(secondRound)
+                    {
+                    	log("SECOND TIME 4thletter");
+                    	if(passFirstLetter.length()==1 & passSecondLetter.length()==1 & passThirdLetter.length()==1 & passFourthLetter.length()==1){
+                    		sbSecond.append(passFirstLetter.getText());
+                    		sbSecond.append(passSecondLetter.getText());
+                    		sbSecond.append(passThirdLetter.getText());
+                    		sbSecond.append(passFourthLetter.getText());	                    		
+                    	}
+                        log("sbFirst "+sbFirst);
+                        log("sbSecond "+sbSecond);
+//                    	submitForm(sbSecond.toString());
+                        if(sbFirst.toString().equals(sbSecond.toString())){
+                        	log("PIN match - submit form");
+                        	submitForm(sbSecond.toString());
                         }
                         else{
-                        	unlockText.setText(R.string.unlock_pin_title);
-                        }       	
+                        	log("PIN NOT match - show snackBar");
+//                        	Snackbar.make(, , Snackbar.LENGTH_LONG).show();
+                        	Snackbar snack = Snackbar.make(coordinatorLayout, getString(R.string.pin_lock_not_match), Snackbar.LENGTH_LONG);
+                        	View view = snack.getView();
+    			        	CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams)view.getLayoutParams();
+                        	params.gravity = Gravity.TOP;
+                        	view.setLayoutParams(params);
+                        	snack.show();
+                        	
+                            //Re-enter pass
+                            passFirstLetter.setText("");
+                            passSecondLetter.setText("");
+                            passThirdLetter.setText("");
+                            passFourthLetter.setText("");
+                            
+                            passFirstLetter.requestFocus();
+                            passFirstLetter.setCursorVisible(true);
+                            sbFirst.setLength(0);
+                            sbSecond.setLength(0);
+                            if(getMode()==RESET_SET){
+                            	unlockText.setText(R.string.reset_pin_title);
+                            }
+                            else{
+                            	unlockText.setText(R.string.unlock_pin_title);
+                            }       	
+                        }
                     }
-                }
+            	}
             }
 
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -562,7 +553,7 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 						    	 log("Logout!!!");
 									ManagerActivity.logout(getApplication(), megaApi, false);
 									finish();
-						     }
+						     }							
 						  }.start();
 					}
 					else{					
