@@ -106,8 +106,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	public FrameLayout optionsOutLayout;
 	public LinearLayout optionsLayout;
 	public LinearLayout optionDownload;
-	public LinearLayout optionProperties;
-	public TextView propertiesText;
+	public LinearLayout optionImport;
 	////
 	
 	
@@ -308,11 +307,10 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		optionsLayout = (LinearLayout) findViewById(R.id.folder_link_list_options);
 		optionsOutLayout = (FrameLayout) findViewById(R.id.folder_link_list_out_options);
 		optionDownload = (LinearLayout) findViewById(R.id.folder_link_list_option_download_layout);
-		optionProperties = (LinearLayout) findViewById(R.id.folder_link_list_option_properties_layout);
-		propertiesText = (TextView) findViewById(R.id.folder_link_list_option_properties_text);	
+		optionImport = (LinearLayout) findViewById(R.id.folder_link_list_option_import_layout);
 		
 		optionDownload.setOnClickListener(this);
-		optionProperties.setOnClickListener(this);
+		optionImport.setOnClickListener(this);
 		optionsOutLayout.setOnClickListener(this);
 		
 		slidingOptionsPanel.setVisibility(View.INVISIBLE);
@@ -356,14 +354,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		this.selectedNode = sNode;
 		
-		if (selectedNode.isFolder()) {
-			propertiesText.setText(R.string.general_folder_info);
-		}else{
-			propertiesText.setText(R.string.general_file_info);
-		}
-		
 		optionDownload.setVisibility(View.VISIBLE);
-		optionProperties.setVisibility(View.VISIBLE);				
+		optionImport.setVisibility(View.VISIBLE);				
 					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
@@ -1098,8 +1090,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 				onFileClick(handleList);
 				break;
 			}
-			case R.id.folder_link_list_option_properties_layout: {
-				log("Properties option");
+			case R.id.folder_link_list_option_import_layout: {
+				log("Import option");
 				slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 				slidingOptionsPanel.setVisibility(View.GONE);
 				adapterList.setPositionClicked(-1);

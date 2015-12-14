@@ -205,6 +205,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final public static int MULTIPLE_CONTACTS_SHARE = MULTIPLE_REMOVE_SHARING_CONTACTS+1;
 	//one contact, many files
 	final public static int MULTIPLE_FILE_SHARE = MULTIPLE_CONTACTS_SHARE+1;
+	final public static int MULTIPLE_LEAVE_SHARE = MULTIPLE_FILE_SHARE+1;
 	
 	long totalSizeToDownload=0;
 	long totalSizeDownloaded=0;
@@ -520,12 +521,25 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					}
 					case MegaRequest.TYPE_REMOVE:{
 						log("remove multi request finish");
-						if(error>0){
-							message = getString(R.string.number_correctly_removed, max_items-error) + getString(R.string.number_no_removed, error);
+						if (actionListener==ManagerActivityLollipop.MULTIPLE_LEAVE_SHARE){	
+							log("leave multi share");
+							if(error>0){
+								message = getString(R.string.number_correctly_leaved, max_items-error) + getString(R.string.number_no_leaved, error);
+							}
+							else{
+								message = getString(R.string.number_correctly_leaved, max_items);
+							}
 						}
 						else{
-							message = getString(R.string.number_correctly_removed, max_items);
-						}						
+							log("multi remove");
+							if(error>0){
+								message = getString(R.string.number_correctly_removed, max_items-error) + getString(R.string.number_no_removed, error);
+							}
+							else{
+								message = getString(R.string.number_correctly_removed, max_items);
+							}	
+						}				
+											
 						break;
 					}
 					case MegaRequest.TYPE_REMOVE_CONTACT:{
@@ -7024,21 +7038,42 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}	
 	}
 
-	public void leaveMultipleShares (ArrayList<Long> handleList){
+	public void leaveMultipleShares (final ArrayList<Long> handleList){
 		log("leaveMultipleShares");
-		MultipleRequestListener moveMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_SEND_RUBBISH);
-		if(handleList.size()>1){
-			log("handleList.size()>1");
-			for (int i=0; i<handleList.size(); i++){
-				MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
-				megaApi.remove(node, moveMultipleListener);			
-			}
-		}
-		else{
-			log("handleList.size()<=1");
-			MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
-			megaApi.remove(node, this);
-		}		
+		
+		DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+		    @Override
+		    public void onClick(DialogInterface dialog, int which) {
+		        switch (which){
+		        case DialogInterface.BUTTON_POSITIVE:
+		        	//TODO remove the incoming shares		        	
+		        	MultipleRequestListener moveMultipleListener = new MultipleRequestListener(ManagerActivityLollipop.MULTIPLE_LEAVE_SHARE);
+		    		if(handleList.size()>1){
+		    			log("handleList.size()>1");
+		    			for (int i=0; i<handleList.size(); i++){
+		    				MegaNode node = megaApi.getNodeByHandle(handleList.get(i));
+		    				megaApi.remove(node, moveMultipleListener);			
+		    			}
+		    		}
+		    		else{
+		    			log("handleList.size()<=1");
+		    			MegaNode node = megaApi.getNodeByHandle(handleList.get(0));
+		    			megaApi.remove(node, managerActivity);
+		    		}		
+		            break;
+
+		        case DialogInterface.BUTTON_NEGATIVE:
+		            //No button clicked
+		            break;
+		        }
+		    }
+		};
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);		
+		builder.setTitle(getResources().getString(R.string.alert_leave_share));
+		String message= getResources().getString(R.string.confirmation_leave_share_folder);
+		builder.setMessage(message).setPositiveButton(R.string.general_yes, dialogClickListener)
+	    	.setNegativeButton(R.string.general_no, dialogClickListener).show();		
 	}
 	
 	public void leaveIncomingShare (final MegaNode n){
