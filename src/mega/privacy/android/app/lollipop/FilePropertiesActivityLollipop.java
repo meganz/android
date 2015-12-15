@@ -107,17 +107,24 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	TextView nameView;
 	LinearLayout availableOfflineLayout;
 
-	LinearLayout sizeLayout;
-	LinearLayout contentLayout;
-	LinearLayout addedLayout;
-	LinearLayout modifiedLayout;
-	LinearLayout sharedLayout;
+	RelativeLayout sizeLayout;
+	RelativeLayout contentLayout;
+	RelativeLayout addedLayout;
+	RelativeLayout modifiedLayout;
+	ImageView shareIcon;
+	ImageView infoIcon;
+	ImageView contentIcon;
+	ImageView addedIcon;
+	ImageView modifiedIcon;
+	RelativeLayout sharedLayout;
 	TextView usersSharedWithText;
 	View dividerSharedLayout;
 	
 	TextView availableOfflineView;
 	
-	ImageView publicLinkImage;
+	ImageView publicLinkIcon;
+	
+//	ImageView publicLinkImage;
 	Switch offlineSwitch;
 	
 	TextView sizeTextView;
@@ -129,26 +136,23 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	TextView addedTextView;
 	TextView modifiedTextView;
 	
-	LinearLayout permissionsLayout;
+	RelativeLayout permissionsLayout;
 	TextView permissionLabel;
 	TextView permissionInfo;
+	ImageView permissionsIcon;
 	
 	boolean owner= true;
 	Toolbar tB;
 	ActionBar aB;
 	int typeExport = -1;
 	
-//	RelativeLayout sharedWith;
-//	TableLayout contactTable;	
-//	TableLayout sharedLayout;
-//	TextView contentDetailedTextView;
-//	TextView sharedWithTextView;
-//	TextView publicLinkTextView;
-	
 	ArrayList<MegaShare> sl;
 	MegaOffline mOffDelete;
 	
+	RelativeLayout ownerLayout;
+	TextView ownerLabel;
 	TextView ownerInfo;	
+	ImageView ownerIcon;
 
 	ArrayList<MegaNode> dTreeList = null;
 	
@@ -296,24 +300,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			imageView = (ImageView) findViewById(R.id.file_properties_toolbar_image);
 			imageView.setImageResource(imageId);
-			
-			nameView = (TextView) findViewById(R.id.file_properties_name);
-			publicLinkImage = (ImageView) findViewById(R.id.file_properties_image_link);
-			((RelativeLayout.LayoutParams) publicLinkImage.getLayoutParams()).setMargins(Util.px2dp((-10*scaleH), outMetrics), Util.px2dp((-20*scaleH), outMetrics), 0, 0);
-			publicLinkImage.setVisibility(View.GONE);			
-			
-			optionsLayout = (LinearLayout) findViewById(R.id.file_properties_options);
-			
-			permissionsLayout = (LinearLayout) findViewById(R.id.file_properties_permissions_layout);
-			permissionsLayout.setVisibility(View.GONE);
-			sizeLayout = (LinearLayout) findViewById(R.id.file_properties_size_layout);
-			contentLayout = (LinearLayout) findViewById(R.id.file_properties_content_layout);
-			addedLayout = (LinearLayout) findViewById(R.id.file_properties_added_layout);
-			modifiedLayout = (LinearLayout) findViewById(R.id.file_properties_modified_layout);			
-			
-			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
-			availableOfflineLayout.setVisibility(View.VISIBLE);	
-			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
+		
 			float scaleText;
 			if (scaleH < scaleW){
 				scaleText = scaleH;
@@ -321,36 +308,125 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			else{
 				scaleText = scaleW;
 			}
-			availableOfflineView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleText));
 			
-			offlineSwitch = (Switch) findViewById(R.id.file_properties_switch);
-			offlineSwitch.setOnCheckedChangeListener(this);	
+			//NAME Title
 			
-			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
-			sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
-			contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
-			contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);			
-			addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
-			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
-						
-			imageView.setImageResource(imageId);
+			nameView = (TextView) findViewById(R.id.file_properties_name);
 			nameView.setText(name);
 			nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
 			nameView.setSingleLine();
-			nameView.setTypeface(null, Typeface.BOLD);
-
-			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
-			ownerInfo.setVisibility(View.GONE);			
-			sharedLayout = (LinearLayout) findViewById(R.id.file_properties_shared_layout);
-			usersSharedWithText = (TextView) findViewById(R.id.file_properties_shared_info);	
+			nameView.setTypeface(null, Typeface.BOLD);	
+			
+			nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+			publicLinkIcon = (ImageView) findViewById(R.id.file_properties_public_link_image);
+			RelativeLayout.LayoutParams lpPL = new RelativeLayout.LayoutParams(publicLinkIcon.getLayoutParams());
+			lpPL.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			publicLinkIcon.setLayoutParams(lpPL);			
+			
+			//Available Offline Layout
+			
+			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
+			availableOfflineLayout.setVisibility(View.VISIBLE);	
+			
+			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
+			LinearLayout.LayoutParams params4 = (LinearLayout.LayoutParams) availableOfflineView.getLayoutParams();
+			params4.leftMargin = Util.scaleWidthPx(55, outMetrics);
+			params4.topMargin = Util.scaleHeightPx(15, outMetrics);
+			params4.bottomMargin = Util.scaleHeightPx(15, outMetrics);
+			availableOfflineView.setLayoutParams(params4);			
+			
+			offlineSwitch = (Switch) findViewById(R.id.file_properties_switch);
+			offlineSwitch.setOnCheckedChangeListener(this);
+			
+			//Share with Layout
+			
+			sharedLayout = (RelativeLayout) findViewById(R.id.file_properties_shared_layout);
+			sharedLayout.setOnClickListener(this);
+			
+			shareIcon = (ImageView) findViewById(R.id.file_properties_shared_image);
+			RelativeLayout.LayoutParams lp1 = new RelativeLayout.LayoutParams(shareIcon.getLayoutParams());
+			lp1.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			shareIcon.setLayoutParams(lp1);
+			
+			usersSharedWithText = (TextView) findViewById(R.id.file_properties_shared_info);
+			RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) usersSharedWithText.getLayoutParams();
+			params1.rightMargin = Util.scaleWidthPx(10, outMetrics);
+			usersSharedWithText.setLayoutParams(params1);
+			
 			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
-			usersSharedWithText.setOnClickListener(this);
+			
+			//OPTIONS LAYOUT			
+			optionsLayout = (LinearLayout) findViewById(R.id.file_properties_options);
+			
+			//Permissions Layout
+			permissionsLayout = (RelativeLayout) findViewById(R.id.file_properties_permissions_layout);
+			permissionsLayout.setVisibility(View.GONE);
+			
+		    permissionsIcon = (ImageView) findViewById(R.id.file_properties_permissions_image);
+		    RelativeLayout.LayoutParams lp3 = new RelativeLayout.LayoutParams(permissionsIcon.getLayoutParams());
+			lp3.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			permissionsIcon.setLayoutParams(lp3); 
 			
 			permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);				
 			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
-//			permissionLabel.setVisibility(View.GONE);
-//			permissionInfo.setVisibility(View.GONE);
+			
+			//Owner Layout
+			ownerLayout = (RelativeLayout) findViewById(R.id.file_properties_owner_layout);
+			
+		    ownerIcon = (ImageView) findViewById(R.id.file_properties_owner_image);
+		    RelativeLayout.LayoutParams lp4 = new RelativeLayout.LayoutParams(ownerIcon.getLayoutParams());
+			lp4.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			ownerIcon.setLayoutParams(lp4); 
+			
+			ownerLabel =  (TextView) findViewById(R.id.file_properties_owner_label);
+			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
+			ownerLayout.setVisibility(View.GONE);	
+			
+			//Info Layout
+			
+		    infoIcon = (ImageView) findViewById(R.id.file_properties_size_image);
+		    RelativeLayout.LayoutParams lp2 = new RelativeLayout.LayoutParams(infoIcon.getLayoutParams());
+			lp2.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			infoIcon.setLayoutParams(lp2); 			
+			
+			sizeLayout = (RelativeLayout) findViewById(R.id.file_properties_size_layout);
+			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
+			sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
+			RelativeLayout.LayoutParams params5 = (RelativeLayout.LayoutParams) sizeTextView.getLayoutParams();
+			params5.rightMargin = Util.scaleWidthPx(10, outMetrics);
+			sizeTextView.setLayoutParams(params5);
+			
+			//Content Layout
+			contentLayout = (RelativeLayout) findViewById(R.id.file_properties_content_layout);
+			
+			contentIcon = (ImageView) findViewById(R.id.file_properties_content_image);
+		    RelativeLayout.LayoutParams lpContent = new RelativeLayout.LayoutParams(contentIcon.getLayoutParams());
+		    lpContent.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			contentIcon.setLayoutParams(lpContent);			
+			
+			contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
+			contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);
+			
+			//Added Layout
+			
+			addedLayout = (RelativeLayout) findViewById(R.id.file_properties_added_layout);
+			
+			addedIcon = (ImageView) findViewById(R.id.file_properties_added_image);
+		    RelativeLayout.LayoutParams lpAdded = new RelativeLayout.LayoutParams(addedIcon.getLayoutParams());
+		    lpAdded.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+		    addedIcon.setLayoutParams(lpAdded); 		    
+		    addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
 
+		    
+		    //Modified Layout		    
+		    modifiedLayout = (RelativeLayout) findViewById(R.id.file_properties_modified_layout);
+		    
+		    modifiedIcon = (ImageView) findViewById(R.id.file_properties_modified_image);
+		    RelativeLayout.LayoutParams lpModified = new RelativeLayout.LayoutParams(modifiedIcon.getLayoutParams());
+		    lpModified.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+		    modifiedIcon.setLayoutParams(lpModified); 
+			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
+			
 		}
 		else{
 			log("Extras is NULL");
@@ -561,11 +637,11 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		
 		if(node.isExported()){
 			publicLink=true;
-			publicLinkImage.setVisibility(View.VISIBLE);
+			publicLinkIcon.setVisibility(View.VISIBLE);
 		}	
 		else{
 			publicLink=false;
-			publicLinkImage.setVisibility(View.GONE);
+			publicLinkIcon.setVisibility(View.INVISIBLE);
 		}
 		
 		if (node.isFile()){				
@@ -594,7 +670,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 						if(nI.getName().equals(node.getName())){
 							ownerInfo.setText(user.getEmail());
-							ownerInfo.setVisibility(View.VISIBLE);	
+							ownerLayout.setVisibility(View.VISIBLE);	
 							found=true;
 							break;
 						}
@@ -602,8 +678,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 					i++;
 				}
 			}
-			
-			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);	
 			
 			//Choose the button offlineSwitch
 			
@@ -711,8 +785,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				availableOfflineBoolean = false;
 				offlineSwitch.setChecked(false);
 			}
-
-			availableOfflineView.setPadding(Util.px2dp(15*scaleW, outMetrics), 0, Util.px2dp(20*scaleW, outMetrics), 0);
 			
 			imageView.setImageResource(imageId);
 
@@ -730,7 +802,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 						
 						if(nI.getName().equals(node.getName())){
 							ownerInfo.setText(user.getEmail());
-							ownerInfo.setVisibility(View.VISIBLE);	
+							ownerLayout.setVisibility(View.VISIBLE);	
 							found=true;
 							break;
 						}
@@ -889,7 +961,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				}
 				break;
 			}
-			case R.id.file_properties_shared_info:{
+			case R.id.file_properties_shared_layout:{
 				Intent i = new Intent(this, FileContactListActivityLollipop.class);
 				i.putExtra("name", node.getHandle());
 				startActivity(i);				
@@ -2065,12 +2137,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 		if(!node.isExported()){
 			log("Node HAS public link");
 			publicLink=true;
-			publicLinkImage.setVisibility(View.VISIBLE);
+			publicLinkIcon.setVisibility(View.VISIBLE);
 		}	
 		else{
 			log("Node NOT public link");
 			publicLink=false;
-			publicLinkImage.setVisibility(View.GONE);
+			publicLinkIcon.setVisibility(View.INVISIBLE);
 		}
 		
 		if (node.isFolder()){

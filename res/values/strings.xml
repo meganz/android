@@ -235,7 +235,7 @@
 	<string name="file_properties_shared_folder_select_contact" context="button name">Shared with</string>
 	<string name="file_properties_shared_folder_list_shares" context="when listing all the contacts that shares a folder">Shared with</string>
 	<string name="file_properties_send_file_select_contact" context="send a file to a MEGA user">Send to</string>
-	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner</string>
+	<string name="file_properties_owner" context="shows the owner of an incoming shared folder">Owner:</string>
 	<string name="contact_reinvite" context="option to reinvite a contact">Reinvite</string>	
 	<string name="contact_ignore" context="option to ignore a contact invitation">Ignore</string>
 	<string name="contact_decline" context="option to decline a contact invitation">Decline</string>

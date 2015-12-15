@@ -294,6 +294,8 @@ public class PinLockActivityLollipop extends AppCompatActivity implements OnClic
 		passFourthLetter.addTextChangedListener(new TextWatcher() {
 			public void afterTextChanged(Editable s) {
             	if(passFourthLetter.length()!=0){
+            		passFirstLetter.setCursorVisible(false);
+            		passFirstLetter.requestFocus();
                     if(!secondRound)
                     {  
                     	if(passFirstLetter.length()==1 & passSecondLetter.length()==1 & passThirdLetter.length()==1 & passFourthLetter.length()==1){
