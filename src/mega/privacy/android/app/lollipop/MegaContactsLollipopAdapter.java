@@ -27,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
@@ -549,15 +550,10 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 			Canvas c = new Canvas(defaultAvatar);
 			Paint p = new Paint();
 			p.setAntiAlias(true);
+			p.setStyle(Paint.Style.FILL);
 			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
-			
-			int radius; 
-	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-	        	radius = defaultAvatar.getWidth()/2;
-	        else
-	        	radius = defaultAvatar.getHeight()/2;	        
-
-			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+	        
+	        c.drawRect(0, 0, ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, p);
 			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(defaultAvatar);
 						
 			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
