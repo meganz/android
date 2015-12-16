@@ -266,12 +266,13 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			optionsBackLayout = (RelativeLayout) findViewById(R.id.file_properties_toolbar_back_options_layout);
 			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
+			params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
 			optionsBackLayout.setLayoutParams(params);
 			
 			toolbarBack = (ImageView) findViewById(R.id.file_properties_toolbar_back);
 			params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+//			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+			int leftMarginBack = Util.scaleWidthPx(3, outMetrics);
 			params.setMargins(leftMarginBack, 0, 0, 0);
 			toolbarBack.setLayoutParams(params);
 			toolbarBack.setOnClickListener(this);
@@ -290,7 +291,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			
 			overflowMenuLayout = (RelativeLayout) findViewById(R.id.file_properties_overflow_menu_layout);
 			params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
+			params.setMargins(0, getStatusBarHeight() + Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(5, outMetrics), 0);
 			overflowMenuLayout.setLayoutParams(params);
 			overflowMenuList = (ListView) findViewById(R.id.file_properties_overflow_menu_list);
 			overflowMenuLayout.setVisibility(View.GONE);
@@ -354,6 +355,9 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			usersSharedWithText.setLayoutParams(params1);
 			
 			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
+			LinearLayout.LayoutParams paramsDivider = (LinearLayout.LayoutParams) dividerSharedLayout.getLayoutParams();
+			paramsDivider.leftMargin = Util.scaleWidthPx(55, outMetrics);
+			dividerSharedLayout.setLayoutParams(paramsDivider);
 			
 			//OPTIONS LAYOUT			
 			optionsLayout = (LinearLayout) findViewById(R.id.file_properties_options);
@@ -432,126 +436,6 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			log("Extras is NULL");
 		}
 		refreshProperties();
-		
-/*	        container = (CoordinatorLayout) findViewById(R.id.fragment_container_file_properties);
-			tB = (Toolbar) findViewById(R.id.file_properties_toolbar);
-			setSupportActionBar(tB);
-			aB = getSupportActionBar();
-//			aB.setHomeButtonEnabled(true);
-//			aB.setDisplayShowTitleEnabled(true);
-			aB.setDisplayHomeAsUpEnabled(true);
-			aB.setDisplayShowHomeEnabled(true);
-//			aB.setLogo(R.drawable.ic_arrow_back_black);
-			aB.setElevation(0);
-			
-			CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.file_properties_collapsing_toolbar);
-//			collapsingToolbarLayout.setTitle(getString(R.string.file_properties_activity));
-			collapsingToolbarLayout.setTitle(name);
-//			collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-//			collapsingToolbarLayout.setContentScrimColor(getResources().getColor(R.color.filePropertiesToolBar));
-//			collapsingToolbarLayout.setStatusBarScrimColor(getResources().getColor(R.color.filePropertiesToolBar));
-			collapsingToolbarLayout.setExpandedTitleColor(Color.BLACK);
-			collapsingToolbarLayout.setCollapsedTitleTextColor(Color.BLACK);			
-			collapsingToolbarLayout.setContentScrimColor(Color.WHITE);
-//			collapsingToolbarLayout.setStatusBarScrimColor(getResources().getColor(R.color.accentColor));
-			collapsingToolbarLayout.setBackgroundColor(Color.WHITE);
-			
-			aBLayout = (ControllableAppBarLayout) findViewById(R.id.file_properties_app_bar_layout);
-			aBLayout.initToolbar(outMetrics.heightPixels);
-			
-			nestedSV = (NestedScrollViewAppBarLayout) findViewById(R.id.file_properties_scroll);
-			nestedSV.setAppBarLayout(aBLayout);
-			
-//			aBLayout.setExpanded(false, true);
-			
-			imageView = (ImageView) findViewById(R.id.file_properties_toolbar_image);
-			imageView.setImageResource(imageId);
-			nameView = (TextView) findViewById(R.id.file_properties_name);
-//			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
-//			((RelativeLayout.LayoutParams) imageView.getLayoutParams()).setMargins(0, 0, 0, Util.px2dp((-30*scaleH), outMetrics));
-			publicLinkImage = (ImageView) findViewById(R.id.file_properties_image_link);
-//			((RelativeLayout.LayoutParams) publicLinkImage.getLayoutParams()).setMargins(Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics), Util.px2dp((9*scaleW), outMetrics), Util.px2dp((2*scaleH), outMetrics));
-			((RelativeLayout.LayoutParams) publicLinkImage.getLayoutParams()).setMargins(Util.px2dp((-10*scaleH), outMetrics), Util.px2dp((-20*scaleH), outMetrics), 0, 0);
-			publicLinkImage.setVisibility(View.GONE);			
-			
-			optionsLayout = (LinearLayout) findViewById(R.id.file_properties_options);
-			
-			permissionsLayout = (LinearLayout) findViewById(R.id.file_properties_permissions_layout);
-			permissionsLayout.setVisibility(View.GONE);
-			sizeLayout = (LinearLayout) findViewById(R.id.file_properties_size_layout);
-			contentLayout = (LinearLayout) findViewById(R.id.file_properties_content_layout);
-			addedLayout = (LinearLayout) findViewById(R.id.file_properties_added_layout);
-			modifiedLayout = (LinearLayout) findViewById(R.id.file_properties_modified_layout);			
-			
-			availableOfflineLayout = (LinearLayout) findViewById(R.id.available_offline_layout);
-			availableOfflineLayout.setVisibility(View.VISIBLE);	
-			availableOfflineView = (TextView) findViewById(R.id.file_properties_available_offline_text);
-			float scaleText;
-			if (scaleH < scaleW){
-				scaleText = scaleH;
-			}
-			else{
-				scaleText = scaleW;
-			}
-			availableOfflineView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (15*scaleText));
-			
-			offlineSwitch = (Switch) findViewById(R.id.file_properties_switch);
-			offlineSwitch.setOnCheckedChangeListener(this);			
-			
-//			availableSwitchOnline = (MySwitch) findViewById(R.id.file_properties_switch_online);
-//			availableSwitchOnline.setChecked(true);
-//			availableSwitchOffline = (MySwitch) findViewById(R.id.file_properties_switch_offline);
-//			availableSwitchOffline.setChecked(false);
-//			availableSwitchOnline.setOnCheckedChangeListener(this);			
-//			availableSwitchOffline.setOnCheckedChangeListener(this);	
-//			availableSwitchOnline.getLayoutParams().height = Util.px2dp((20 * scaleH), outMetrics);
-//			availableSwitchOffline.getLayoutParams().height = Util.px2dp((20 * scaleH), outMetrics);
-//			((LinearLayout.LayoutParams) availableSwitchOnline.getLayoutParams()).setMargins(Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics));
-//			((LinearLayout.LayoutParams) availableSwitchOffline.getLayoutParams()).setMargins(Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics), Util.px2dp((5 * scaleW), outMetrics),Util.px2dp((5 * scaleH), outMetrics));
-	
-			sizeTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_size);
-			sizeTextView = (TextView) findViewById(R.id.file_properties_info_data_size);
-			contentTitleTextView  = (TextView) findViewById(R.id.file_properties_info_menu_content);
-			contentTextView = (TextView) findViewById(R.id.file_properties_info_data_content);			
-			addedTextView = (TextView) findViewById(R.id.file_properties_info_data_added);
-			modifiedTextView = (TextView) findViewById(R.id.file_properties_info_data_modified);
-						
-			imageView.setImageResource(imageId);
-			nameView.setText(name);
-			nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-			nameView.setSingleLine();
-			nameView.setTypeface(null, Typeface.BOLD);
-
-			ownerInfo = (TextView) findViewById(R.id.file_properties_owner_info);
-			ownerInfo.setVisibility(View.GONE);			
-			
-//			sharedWith = (RelativeLayout) findViewById(R.id.contacts_shared_with_eye);
-//			sharedLayout= (TableLayout) findViewById(R.id.file_properties_content_table);
-//			sharedLayout.setOnClickListener(this);			
-			
-//			((RelativeLayout.LayoutParams)sharedWith.getLayoutParams()).setMargins(0, Util.px2dp((-40*scaleH), outMetrics), 0, 0);
-			//sharedWithText = (TextView) findViewById(R.id.public_link);
-			//((RelativeLayout.LayoutParams)sharedWithText.getLayoutParams()).setMargins(Util.px2dp((30*scaleW), outMetrics), Util.px2dp((15*scaleH), outMetrics), 0, Util.px2dp((15*scaleH), outMetrics));
-			//sharedWithList = (NestedListView) findViewById(R.id.file_properties_shared_folder_shared_with_list);
-			
-			//TODO que hago con public link
-//			publicLinkTextView = (TextView) findViewById(R.id.file_properties_public_link);		
-			
-			//sharedWithTextView = (TextView) findViewById(R.id.shared_with_detailed);
-			
-			sharedLayout = (LinearLayout) findViewById(R.id.file_properties_shared_layout);
-			usersSharedWithText = (TextView) findViewById(R.id.file_properties_shared_info);	
-			dividerSharedLayout = (View) findViewById(R.id.divider_shared_layout);
-			usersSharedWithText.setOnClickListener(this);
-			
-			permissionLabel = (TextView) findViewById(R.id.file_properties_permission_label);				
-			permissionInfo = (TextView) findViewById(R.id.file_properties_permission_info);
-			permissionLabel.setVisibility(View.GONE);
-			permissionInfo.setVisibility(View.GONE);
-
-		}
-		
-		refreshProperties();*/
 	}
 	
 	private void createOverflowMenu(ListView list){
@@ -698,10 +582,8 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			}
 			else{
 				log(" NOOOOT Checked!");
-			}
-			
-//			availableOfflineView.setPadding(Util.px2dp(30*scaleW, outMetrics), 0, Util.px2dp(40*scaleW, outMetrics), 0);
-			
+			}			
+		
 			if (node.getCreationTime() != 0){
 				try {addedTextView.setText(DateUtils.getRelativeTimeSpanString(node.getCreationTime() * 1000));}catch(Exception ex)	{addedTextView.setText("");}
 
