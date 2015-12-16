@@ -44,6 +44,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
@@ -63,15 +64,17 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	RelativeLayout overflowMenuLayout;
 	ListView overflowMenuList;
 	
+	RelativeLayout mailLayout;
 	TextView initialLetter;
 	ImageView contactPropertiesImage;
 	
 	DisplayMetrics outMetrics;
+	ImageView sharedIcon;
+	ImageView mailIcon;
 	
-	
-	
-	RelativeLayout contentLayout;
 	TextView infoEmail;
+	View separator;
+	RelativeLayout sharedLayout;
 	TextView sharedFoldersButton;	
 	TextView sharedFoldersLabel;
 	String userEmail;	
@@ -153,12 +156,13 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			optionsBackLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_toolbar_back_options_layout);
 			params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
+			params.setMargins(0, getStatusBarHeight(), 0, Util.scaleHeightPx(100, outMetrics));
 			optionsBackLayout.setLayoutParams(params);
 			
 			toolbarBack = (ImageView) v.findViewById(R.id.contact_properties_toolbar_back);
 			params = (RelativeLayout.LayoutParams) toolbarBack.getLayoutParams();
-			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+//			int leftMarginBack = getResources().getDimensionPixelSize(R.dimen.left_margin_back_arrow);
+			int leftMarginBack = Util.scaleWidthPx(3, outMetrics);
 			params.setMargins(leftMarginBack, 0, 0, 0);
 			toolbarBack.setLayoutParams(params);
 			toolbarBack.setOnClickListener(this);
@@ -171,7 +175,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			overflowMenuLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_overflow_menu_layout);
 			params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
-			params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
+			params.setMargins(0, getStatusBarHeight() + Util.scaleHeightPx(5, outMetrics), Util.scaleWidthPx(5, outMetrics), 0);
 			overflowMenuLayout.setLayoutParams(params);
 			overflowMenuList = (ListView) v.findViewById(R.id.contact_properties_overflow_menu_list);
 			overflowMenuLayout.setVisibility(View.GONE);
@@ -181,19 +185,47 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			contactPropertiesImage = (ImageView) v.findViewById(R.id.contact_properties_toolbar_image);
 			initialLetter = (TextView) v.findViewById(R.id.contact_properties_toolbar_initial_letter);
+						
+			//Mail Layout
+			mailLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_email_layout);
+//			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
+//			lpML.setMargins(0, Util.scaleHeightPx(10, outMetrics), 0, 0);
+//			mailLayout.setLayoutParams(lpML);				
+			
+			mailIcon = (ImageView) v.findViewById(R.id.contact_properties_email_icon);
+			RelativeLayout.LayoutParams lp1 = new RelativeLayout.LayoutParams(mailIcon.getLayoutParams());
+			lp1.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			mailIcon.setLayoutParams(lp1);	
 			
 			infoEmail = (TextView) v.findViewById(R.id.contact_properties_email);
 			
-			sharedFoldersLabel = (TextView) v.findViewById(R.id.contact_properties_shared_folders_label);
-			sharedFoldersButton = (TextView) v.findViewById(R.id.contact_properties_shared_folders_button);
-			sharedFoldersButton.setOnClickListener(this);
+			separator = (View) v.findViewById(R.id.divider_shared_layout);
+			RelativeLayout.LayoutParams paramsDivider = (RelativeLayout.LayoutParams) separator.getLayoutParams();
+			paramsDivider.leftMargin = Util.scaleWidthPx(55, outMetrics);
+			separator.setLayoutParams(paramsDivider);			
 			
 			infoEmail.setText(userEmail);		
 			name=false;
 			firstName=false;
 			megaApi.getUserAttribute(contact, 1, this);
 			megaApi.getUserAttribute(contact, 2, this);
-
+			
+			//Shared Layout
+			sharedLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_shared_folders_layout);
+			sharedLayout.setOnClickListener(this);
+			sharedIcon = (ImageView) v.findViewById(R.id.contact_properties_shared_folder_icon);
+			RelativeLayout.LayoutParams lp2 = new RelativeLayout.LayoutParams(sharedIcon.getLayoutParams());
+			lp2.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			sharedIcon.setLayoutParams(lp2);
+			
+			sharedFoldersLabel = (TextView) v.findViewById(R.id.contact_properties_shared_folders_label);
+			sharedFoldersButton = (TextView) v.findViewById(R.id.contact_properties_shared_folders_button);
+			
+			RelativeLayout.LayoutParams params1 = (RelativeLayout.LayoutParams) sharedFoldersButton.getLayoutParams();
+			params1.rightMargin = Util.scaleWidthPx(10, outMetrics);
+			sharedFoldersButton.setLayoutParams(params1);
+			
+//			sharedFoldersButton.setOnClickListener(this);
 			sharedFoldersButton.setText(getDescription(megaApi.getInShares(contact)));
 
 			Bitmap defaultAvatar = Bitmap.createBitmap(outMetrics.widthPixels,outMetrics.widthPixels, Bitmap.Config.ARGB_8888);
@@ -335,7 +367,7 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 				overflowMenuLayout.setVisibility(View.VISIBLE);
 				break;
 			}
-			case R.id.contact_properties_shared_folders_button:{
+			case R.id.contact_properties_shared_folders_layout:{
 				((ContactPropertiesActivityLollipop)context).onContentClick(userEmail);
 				break;
 			}
