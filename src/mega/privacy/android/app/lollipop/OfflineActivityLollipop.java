@@ -26,6 +26,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		super.onCreate(savedInstanceState);
 
 		if (Util.isOnline(this)){
+			log("Network then intent to ManagerActivityLollipop");
 			Intent onlineIntent = new Intent(this, ManagerActivityLollipop.class);
 			startActivity(onlineIntent);
 			finish();

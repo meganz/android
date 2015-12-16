@@ -108,7 +108,13 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 							}
 							else{
 								avatarExists = true;
-								holder.imageView.setImageBitmap(bitmap);
+//								holder.imageView.setImageBitmap(bitmap);
+								if (holder instanceof ViewHolderContactsGrid){
+									((ViewHolderContactsGrid)holder).imageView.setImageBitmap(bitmap);
+								}
+								else if (holder instanceof ViewHolderContactsList){
+									((ViewHolderContactsList)holder).imageView.setImageBitmap(bitmap);
+								}
 								holder.contactInitialLetter.setVisibility(View.GONE);
 							}
 						}
@@ -179,9 +185,8 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
     public class ViewHolderContacts extends RecyclerView.ViewHolder{
     	public ViewHolderContacts(View v) {
 			super(v);
-		}
-    	
-		RoundedImageView imageView;
+		}   	
+		
     	TextView contactInitialLetter;
 //        ImageView imageView;
         TextView textViewContactName;
@@ -200,13 +205,14 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
     	public ViewHolderContactsList(View v) {
 			super(v);
 		}
+    	RoundedImageView imageView;
     }
     
     public class ViewHolderContactsGrid extends ViewHolderContacts{
     	public ViewHolderContactsGrid(View v) {
 			super(v);
 		}
-    	
+    	ImageView imageView;
     	public View separator;
     }
     
@@ -255,7 +261,7 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	    	
 	    	holderGrid = new ViewHolderContactsGrid(v);
 	    	holderGrid.itemLayout = (RelativeLayout) v.findViewById(R.id.contact_grid_item_layout);
-		    holderGrid.imageView = (RoundedImageView) v.findViewById(R.id.contact_grid_thumbnail);	
+		    holderGrid.imageView = (ImageView) v.findViewById(R.id.contact_grid_thumbnail);	
 		    holderGrid.contactInitialLetter = (TextView) v.findViewById(R.id.contact_grid_initial_letter);
 		    holderGrid.textViewContactName = (TextView) v.findViewById(R.id.contact_grid_name);
 		    holderGrid.textViewContent = (TextView) v.findViewById(R.id.contact_grid_content);
@@ -503,39 +509,75 @@ public class MegaContactsLollipopAdapter extends RecyclerView.Adapter<MegaContac
 	public void createDefaultAvatar(ViewHolderContacts holder){
 		log("createDefaultAvatar()");
 		
-		Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(defaultAvatar);
-		Paint p = new Paint();
-		p.setAntiAlias(true);
-		p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+		if (holder instanceof ViewHolderContactsList){
 		
-		int radius; 
-        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
-        	radius = defaultAvatar.getWidth()/2;
-        else
-        	radius = defaultAvatar.getHeight()/2;
-        
-		c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
-		holder.imageView.setImageBitmap(defaultAvatar);
-		
-		
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
-	    display.getMetrics(outMetrics);
-	    float density  = context.getResources().getDisplayMetrics().density;
-	    
-	    int avatarTextSize = getAvatarTextSize(density);
-	    log("DENSITY: " + density + ":::: " + avatarTextSize);
-	    if (holder.contactMail != null){
-		    if (holder.contactMail.length() > 0){
-		    	String firstLetter = holder.contactMail.charAt(0) + "";
-		    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
-		    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
-		    	holder.contactInitialLetter.setText(firstLetter);
-		    	holder.contactInitialLetter.setTextSize(32);
-		    	holder.contactInitialLetter.setTextColor(Color.WHITE);
+			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			
+			int radius; 
+	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+	        	radius = defaultAvatar.getWidth()/2;
+	        else
+	        	radius = defaultAvatar.getHeight()/2;
+	        
+			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+			((ViewHolderContactsList)holder).imageView.setImageBitmap(defaultAvatar);
+						
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = context.getResources().getDisplayMetrics().density;
+		    
+		    int avatarTextSize = getAvatarTextSize(density);
+		    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		    if (holder.contactMail != null){
+			    if (holder.contactMail.length() > 0){
+			    	String firstLetter = holder.contactMail.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
+			    	holder.contactInitialLetter.setText(firstLetter);
+			    	holder.contactInitialLetter.setTextSize(32);
+			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
+			    }
 		    }
-	    }
+		}
+		else if (holder instanceof ViewHolderContactsGrid){
+			Bitmap defaultAvatar = Bitmap.createBitmap(ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT,ManagerActivityLollipop.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
+			Canvas c = new Canvas(defaultAvatar);
+			Paint p = new Paint();
+			p.setAntiAlias(true);
+			p.setColor(context.getResources().getColor(R.color.color_default_avatar_mega));
+			
+			int radius; 
+	        if (defaultAvatar.getWidth() < defaultAvatar.getHeight())
+	        	radius = defaultAvatar.getWidth()/2;
+	        else
+	        	radius = defaultAvatar.getHeight()/2;	        
+
+			c.drawCircle(defaultAvatar.getWidth()/2, defaultAvatar.getHeight()/2, radius, p);
+			((ViewHolderContactsGrid)holder).imageView.setImageBitmap(defaultAvatar);
+						
+			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
+			DisplayMetrics outMetrics = new DisplayMetrics ();
+		    display.getMetrics(outMetrics);
+		    float density  = context.getResources().getDisplayMetrics().density;
+		    
+		    int avatarTextSize = getAvatarTextSize(density);
+		    log("DENSITY: " + density + ":::: " + avatarTextSize);
+		    if (holder.contactMail != null){
+			    if (holder.contactMail.length() > 0){
+			    	String firstLetter = holder.contactMail.charAt(0) + "";
+			    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+			    	holder.contactInitialLetter.setVisibility(View.VISIBLE);
+			    	holder.contactInitialLetter.setText(firstLetter);
+			    	holder.contactInitialLetter.setTextSize(32);
+			    	holder.contactInitialLetter.setTextColor(Color.WHITE);
+			    }
+		    }
+		}
 	}
 		
 	private int getAvatarTextSize (float density){

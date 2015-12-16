@@ -12,18 +12,16 @@ import java.util.Map;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.DownloadService;
 import mega.privacy.android.app.FileStorageActivity;
-import mega.privacy.android.app.FullScreenImageViewer;
+import mega.privacy.android.app.FileStorageActivity.Mode;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MegaStreamingService;
 import mega.privacy.android.app.MimeTypeList;
-import mega.privacy.android.app.MimeTypeMime;
-import mega.privacy.android.app.FileStorageActivity.Mode;
+import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;
@@ -32,12 +30,10 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
@@ -52,7 +48,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -85,6 +80,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	TextView contentText;
     RelativeLayout fragmentContainer;
 	TextView downloadButton;
+	View separator;
 	private TextView cancelButton;
 	LinearLayout optionsBar;
 	
@@ -210,7 +206,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		switch (item.getItemId()) {
 	    	// Respond to the action bar's Up/Home button
 		    case android.R.id.home:{
-		    	finish();
+		    	onBackPressed();
 		    	return true;
 		    }
 		}
@@ -262,6 +258,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		listView.setItemAnimator(new DefaultItemAnimator()); 
 		
 		optionsBar = (LinearLayout) findViewById(R.id.options_folder_link_layout);
+		separator = (View) findViewById(R.id.separator_3);
 		downloadButton = (TextView) findViewById(R.id.folder_link_button_download);
 		downloadButton.setOnClickListener(this);
 		downloadButton.setText(getString(R.string.general_download).toUpperCase(Locale.getDefault()));
@@ -351,11 +348,20 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");
+		optionsBar.setVisibility(View.GONE);
+		separator.setVisibility(View.GONE);
 		
 		this.selectedNode = sNode;
 		
 		optionDownload.setVisibility(View.VISIBLE);
-		optionImport.setVisibility(View.VISIBLE);				
+		if(sNode.isFolder()){
+			optionImport.setVisibility(View.GONE);
+			slidingOptionsPanel.setPanelHeight(optionDownload.getHeight());
+		}
+		else{
+			optionImport.setVisibility(View.VISIBLE);			
+			slidingOptionsPanel.setPanelHeight(optionImport.getHeight()*2);
+		}				
 					
 		slidingOptionsPanel.setVisibility(View.VISIBLE);
 		slidingOptionsPanel.setPanelState(PanelState.COLLAPSED);
@@ -364,7 +370,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	
 	public void hideOptionsPanel(){
 		log("hideOptionsPanel");
-				
+		optionsBar.setVisibility(View.VISIBLE);
+		separator.setVisibility(View.VISIBLE);
 		adapterList.setPositionClicked(-1);
 		slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
 		slidingOptionsPanel.setVisibility(View.GONE);
@@ -863,7 +870,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 			}
 			else{
 				if (MimeTypeList.typeForName(nodes.get(position).getName()).isImage()){
-					Intent intent = new Intent(this, FullScreenImageViewer.class);
+					Intent intent = new Intent(this, FullScreenImageViewerLollipop.class);
 					intent.putExtra("position", position);
 					intent.putExtra("adapterType", ManagerActivityLollipop.FOLDER_LINK_ADAPTER);
 					if (megaApiFolder.getParentNode(nodes.get(position)).getType() == MegaNode.TYPE_ROOT){
@@ -939,8 +946,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		
 		if(slidingOptionsPanel.getPanelState()!=PanelState.HIDDEN){
 			log("getPanelState()!=PanelState.HIDDEN");
-			slidingOptionsPanel.setPanelState(PanelState.HIDDEN);
-			slidingOptionsPanel.setVisibility(View.GONE);
+			hideOptionsPanel();
 			adapterList.setPositionClicked(-1);
 			adapterList.notifyDataSetChanged();
 			return;
