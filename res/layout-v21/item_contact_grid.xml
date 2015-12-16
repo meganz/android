@@ -28,14 +28,11 @@
 		    android:layout_marginTop="5dp"
 		    android:layout_marginRight="5dp">
 		
-		    <mega.privacy.android.app.components.RoundedImageView 
+		    <ImageView 
 			    android:id="@+id/contact_grid_thumbnail"
 			    android:layout_width="157dp"
 			    android:layout_height="157dp"
-			    android:scaleType="fitCenter"
-		        rounded:corner_radius="78dp" 
-		        rounded:border_width="0dp"
-		        rounded:border_color="@color/border_file_properties"/>
+			    android:scaleType="fitCenter"/>
 		    
 		    <TextView
 		        android:id="@+id/contact_grid_initial_letter"
@@ -59,25 +56,24 @@
 	        android:id="@+id/contact_grid_three_dots"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:src="@drawable/action_selector_ic"
+	        android:src="@drawable/ic_dots_vertical_grey"
+	        android:layout_below="@id/contact_grid_separator"
 			android:background="@null" 
-			android:paddingTop="6dp"
-	        android:paddingLeft="2dp"
-	        android:paddingRight="10dp"
-	        android:paddingBottom="12dp"
-	        android:layout_gravity="right"
-	        android:layout_alignParentRight="true" 
-	        android:layout_alignParentBottom="true"/> 
+	        android:layout_marginLeft="2dp"
+	        android:layout_marginRight="8dp"
+	        android:layout_marginTop="22dp"
+	        android:layout_alignParentRight="true"/>
         
         <TextView
 	        android:id="@+id/contact_grid_name"
 	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"	
-	        android:paddingLeft="6dp"
-	        android:paddingTop="3dp"
-	        android:layout_toLeftOf="@id/contact_grid_three_dots"
+	        android:layout_height="wrap_content"
 	        android:layout_alignParentLeft="true"
 	        android:layout_below="@id/contact_grid_separator"
+	        android:layout_marginLeft="12dp"
+	        android:layout_marginTop="15dp"
+	        android:layout_toLeftOf="@id/contact_grid_three_dots"
+			android:textColor="@color/black"
 	        android:ellipsize="end"
         	android:maxLines="1" />
         
@@ -85,8 +81,9 @@
 	        android:id="@+id/contact_grid_content"
 	        android:layout_width="wrap_content"
 	        android:layout_height="30dp"
-	        android:paddingLeft="6dp"
-	        android:paddingBottom="7dp"
+			android:layout_alignParentLeft="true"
+	        android:layout_marginBottom="7dp"
+	        android:layout_marginLeft="12dp"
 	        android:textColor="@color/contact_list_second_row"
 	        android:layout_below="@id/contact_grid_name"
 	        android:textSize="12sp" />  

@@ -8,6 +8,7 @@ import java.util.List;
 import mega.privacy.android.app.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaOffline;
+import mega.privacy.android.app.MegaPreferences;
 import mega.privacy.android.app.MimeTypeList;
 import mega.privacy.android.app.MimeTypeMime;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -61,6 +62,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 	static int FROM_INCOMING_SHARES= 14;
 	static int FROM_OFFLINE= 15;
 
+	MegaPreferences prefs;
+	
 	Context context;
 	ActionBar aB;
 	RecyclerView recyclerView;
@@ -478,14 +481,23 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 			((ManagerActivityLollipop)context).setFirstNavigationLevel(true);
 			((ManagerActivityLollipop)context).supportInvalidateOptionsMenu();
+		    isList = ((ManagerActivityLollipop)context).isList();
+		}
+		else{
+			prefs = dbH.getPreferences();		
+			if (prefs != null){
+				isList = Boolean.parseBoolean(prefs.getPreferredViewListCameraUploads());
+			}
+			else{
+				isList = true;
+			}
 		}
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
-	    density  = getResources().getDisplayMetrics().density;
-	    
-	    isList = ((ManagerActivityLollipop)context).isList();
+	    density  = getResources().getDisplayMetrics().density;	    
+
 		//Check pathNAvigation
 		if (isList){
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
@@ -866,7 +878,12 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			
 			handleList.add(node.getHandle());
 			log("download "+node.getName());
-			((ManagerActivityLollipop) context).onFileClick(handleList);
+			if (context instanceof ManagerActivityLollipop){
+				((ManagerActivityLollipop) context).onFileClick(handleList);
+			}
+			else{
+				//TODO toast no connection
+			}			
 		}
 		else{
 			//TODO toast no connection
@@ -1349,10 +1366,14 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			File currentFile=null;
 			
 			if(currentNode.getHandle().equals("0")){
-				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
+				log("click on Master Key");
+				String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
+				openFile(new File(path));
+//				viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
+//				((ManagerActivityLollipop)context).clickOnMasterKeyFile();
 				return;
 			}
-			
+						
 			if(currentNode.isIncoming()){
 				String handleString = currentNode.getHandleIncoming();
 				currentFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Util.offlineDIR + "/" + handleString + "/"+currentNode.getPath() + "/" + currentNode.getName());
@@ -1429,7 +1450,8 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 
 			}
 			else{
-				if(currentFile.exists() && currentFile.isFile()){
+				if(currentFile.exists() && currentFile.isFile()){			
+					
 					//Open it!
 					if (MimeTypeList.typeForName(currentFile.getName()).isImage()){
 						Intent intent = new Intent(context, FullScreenImageViewerLollipop.class);
@@ -1440,24 +1462,27 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 						startActivity(intent);
 					}
 					else{
-						Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-						viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-						if (ManagerActivityLollipop.isIntentAvailable(context, viewIntent)){
-							context.startActivity(viewIntent);
-						}
-						else{
-							Intent intentShare = new Intent(Intent.ACTION_SEND);
-							intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
-							if (ManagerActivityLollipop.isIntentAvailable(context, intentShare)){
-								context.startActivity(intentShare);
-							}
-						}
-					}
-					
+						openFile(currentFile);
+					}					
 				}					
 			}
 		}
-    }	
+    }
+    
+    public void openFile (File currentFile){
+    	Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+		viewIntent.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+		if (ManagerActivityLollipop.isIntentAvailable(context, viewIntent)){
+			context.startActivity(viewIntent);
+		}
+		else{
+			Intent intentShare = new Intent(Intent.ACTION_SEND);
+			intentShare.setDataAndType(Uri.fromFile(currentFile), MimeTypeList.typeForName(currentFile.getName()).getType());
+			if (ManagerActivityLollipop.isIntentAvailable(context, intentShare)){
+				context.startActivity(intentShare);
+			}
+		}
+    }
 	
 	/*
 	 * Clear all selected items

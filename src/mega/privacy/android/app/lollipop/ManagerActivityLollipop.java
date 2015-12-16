@@ -1082,7 +1082,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         viewPagerCDrive = (ViewPager) findViewById(R.id.cloud_drive_tabs_pager); 
         
         if (!Util.isOnline(this)){
-        	
+        	log("No network: intent to OfflineActivityLollipop");
         	Intent offlineIntent = new Intent(this, OfflineActivityLollipop.class);
 			startActivity(offlineIntent);
 			finish();
@@ -5809,26 +5809,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				}
 			}
 		}
-	}
-	
-	public void clickOnMasterKeyFile(){
-		Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/MEGA/MEGAMasterKey.txt";
-		viewIntent.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
-		if (isIntentAvailable(this, viewIntent)){
-			log("if isIntentAvailable");
-			startActivity(viewIntent);
-		}								
-		else{
-			log("ELSE isIntentAvailable");
-			Intent intentShare = new Intent(Intent.ACTION_SEND);
-			intentShare.setDataAndType(Uri.fromFile(new File(path)), MimeTypeList.typeForName("MEGAMasterKey.txt").getType());
-			if (isIntentAvailable(this, intentShare)){
-				log("call to startActivity(intentShare)");
-				startActivity(intentShare);
-			}									
-			Snackbar.make(fragmentContainer, getString(R.string.general_already_downloaded), Snackbar.LENGTH_LONG).show();
-		}		
 	}
 	
 	/*
