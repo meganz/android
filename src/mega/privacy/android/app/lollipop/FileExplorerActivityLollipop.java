@@ -10,6 +10,7 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.TabsAdapter;
 import mega.privacy.android.app.UploadService;
 import mega.privacy.android.app.UserCredentials;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import nz.mega.sdk.MegaApiAndroid;
@@ -20,6 +21,7 @@ import nz.mega.sdk.MegaGlobalListenerInterface;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
+import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -34,8 +36,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -84,7 +90,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	
 	Toolbar tB;
     ActionBar aB;
-    
+	DisplayMetrics outMetrics;
     RelativeLayout fragmentContainer;
 	LinearLayout loginLoggingIn;
 	ProgressBar loginProgressBar;
@@ -95,6 +101,8 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 	TextView loggingInText;
 	TextView fetchingNodesText;
 	TextView prepareNodesText;
+	
+	MenuItem createFolderMenuItem;
 
 	private String gSession;
     UserCredentials credentials;
@@ -181,6 +189,11 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //		DatabaseHandler dbH = new DatabaseHandler(getApplicationContext());
 		DatabaseHandler dbH = DatabaseHandler.getDbHandler(getApplicationContext());
 		credentials = dbH.getCredentials();
+		
+		Display display = getWindowManager().getDefaultDisplay();
+		outMetrics = new DisplayMetrics ();
+	    display.getMetrics(outMetrics);
+	    float density  = getResources().getDisplayMetrics().density;
 		
 		if (credentials == null){
 			log("User credentials NULL");
@@ -374,6 +387,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		mTabHostExplorer.setOnTabChangedListener(new OnTabChangeListener(){
             @Override
             public void onTabChanged(String tabId) {
+            	invalidateOptionsMenu();
             	log("TabId :"+ tabId);
                 if(tabId.equals("cloudExplorerFragment")){                     	
 
@@ -421,6 +435,89 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 				}
 			});
 		}
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+		
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.file_explorer_action, menu);
+	    
+	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+	    
+	    if (cDriveExplorer != null){	
+	    	createFolderMenuItem.setVisible(true);
+	    }
+//	    if(iSharesExplorer != null){
+//	    	if (iSharesExplorer.deepBrowserTree==0){
+//	    		createFolderMenuItem.setVisible(false);
+//	    	}
+//	    	else{
+//	    		//Check the permissions of the folder
+//	    		createFolderMenuItem.setVisible(true);
+//	    	}
+//	    }
+	    
+	    return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+		log("onPrepareOptionsMenuLollipop");
+		
+		// Inflate the menu items for use in the action bar
+//	    MenuInflater inflater = getMenuInflater();
+//	    inflater.inflate(R.menu.file_explorer_action, menu);
+//	    
+//	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
+	    
+	    //Check the tab shown
+	    int index = viewPagerExplorer.getCurrentItem();
+		if(index==0){				
+			//CLOUD TAB				
+			String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+			log("Tag: "+ cFTag2);
+			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+			if (cDriveExplorer != null){
+				createFolderMenuItem.setVisible(true);
+			}
+		}
+		else{
+			String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);		
+			log("Tag: "+ cFTag1);
+			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+			if(iSharesExplorer != null){	
+				log("Level deepBrowserTree: "+iSharesExplorer.deepBrowserTree);
+		    	if (iSharesExplorer.deepBrowserTree==0){
+		    		createFolderMenuItem.setVisible(false);
+		    	}
+		    	else{		    		
+		    		//Check the folder's permissions
+		    		long parentH = iSharesExplorer.getParentHandle();
+		    		MegaNode n = megaApi.getNodeByHandle(parentH);
+					int accessLevel= megaApi.getAccess(n);
+					log("Node: "+n.getName());
+																			
+					switch(accessLevel){
+						case MegaShare.ACCESS_OWNER:
+						case MegaShare.ACCESS_READWRITE:
+						case MegaShare.ACCESS_FULL:{
+							log("The node is: "+n.getName()+" permissions: "+accessLevel);
+							createFolderMenuItem.setVisible(true);				
+							break;
+						}
+						case MegaShare.ACCESS_READ:{
+							log("The node is: "+n.getName()+" permissions: ACCESS_READ "+accessLevel);
+							createFolderMenuItem.setVisible(false);
+							break;
+						}						
+					}
+		    	}
+		    }
+		}
+	    return super.onPrepareOptionsMenu(menu);
 	}
 	
 	private View getTabIndicator(Context context, String title) {
@@ -1002,28 +1099,30 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			
 			if (error.getErrorCode() == MegaError.API_OK){
 				Snackbar.make(fragmentContainer,getString(R.string.context_folder_created),Snackbar.LENGTH_LONG).show();
+				long parentHandle;
 				if(tabShown==CLOUD_TAB){
-					long parentHandle;
+					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
+					cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
 					if (cDriveExplorer != null){
 						parentHandle = cDriveExplorer.getParentHandle();
 						if (megaApi.getNodeByHandle(parentHandle) != null){
 							nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
 							cDriveExplorer.setNodes(nodes);
 							cDriveExplorer.getListView().invalidate();
-						}					
-					}
-					else{
-						gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 0);
-						cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
-						if (cDriveExplorer != null){
-							parentHandle = cDriveExplorer.getParentHandle();
-							if (megaApi.getNodeByHandle(parentHandle) != null){
-								nodes = megaApi.getChildren(megaApi.getNodeByHandle(cDriveExplorer.getParentHandle()));
-								cDriveExplorer.setNodes(nodes);
-								cDriveExplorer.getListView().invalidate();
-							}
-						}	
-					}
+						}
+					}						
+				}
+				else{
+					gcFTag = getFragmentTag(R.id.explorer_tabs_pager, 1);
+					iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(gcFTag);
+					if (iSharesExplorer != null){
+						parentHandle = iSharesExplorer.getParentHandle();
+						if (megaApi.getNodeByHandle(parentHandle) != null){
+							nodes = megaApi.getChildren(megaApi.getNodeByHandle(iSharesExplorer.getParentHandle()));
+							iSharesExplorer.setNodes(nodes);
+							iSharesExplorer.getListView().invalidate();
+						}
+					}	
 				}
 			}
 		}
@@ -1171,8 +1270,73 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		switch(id){
 			case android.R.id.home:{
 				onBackPressed();
+				break;
+			}
+			case R.id.cab_menu_create_folder:{
+	        	showNewFolderDialog(); 
+        		break;
 			}
 		}
 		return true;
+	}
+	
+	public void showNewFolderDialog(){
+		log("showNewFolderDialog");
+		
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+	    final EditText input = new EditText(this);
+	    layout.addView(input, params);		
+		
+		input.setId(EDIT_TEXT_ID);
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.context_new_folder_name));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					createFolder(value);
+					newFolderDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.general_create),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.menu_new_folder));
+		builder.setPositiveButton(getString(R.string.general_create),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						createFolder(value);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), null);
+		builder.setView(layout);
+		newFolderDialog = builder.create();
+		newFolderDialog.show();
 	}
 }

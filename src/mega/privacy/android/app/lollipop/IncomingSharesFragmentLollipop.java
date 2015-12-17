@@ -1276,7 +1276,8 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 	}
 	
     public void itemClick(int position) {
-	
+    	log("itemClick");
+    	
 		if (adapter.isMultipleSelect()){
 			adapter.toggleSelection(position);
 			updateActionModeTitle();
@@ -1284,7 +1285,7 @@ public class IncomingSharesFragmentLollipop extends Fragment implements OnClickL
 		}
 		else{
 			if (nodes.get(position).isFolder()){
-				
+												
 				deepBrowserTree = deepBrowserTree+1;
 				
 				MegaNode n = nodes.get(position);

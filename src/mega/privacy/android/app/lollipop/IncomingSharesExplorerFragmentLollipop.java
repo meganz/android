@@ -253,6 +253,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 	
 	public void changeActionBarTitle(String folder){
 		((FileExplorerActivityLollipop) context).changeTitle(folder);
+		((FileExplorerActivityLollipop)context).supportInvalidateOptionsMenu();
 	}
 	
 	@Override
@@ -287,7 +288,7 @@ public class IncomingSharesExplorerFragmentLollipop extends Fragment implements 
 			temp = path.split("/");
 			name = temp[temp.length-1];
 
-			changeActionBarTitle(name);
+			changeActionBarTitle(name);			
 			
 			parentHandle = nodes.get(position).getHandle();
 			adapter.setParentHandle(parentHandle);
