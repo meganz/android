@@ -21,6 +21,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.components.SlidingUpPanelLayout;
 import mega.privacy.android.app.components.SlidingUpPanelLayout.PanelState;
+import mega.privacy.android.app.lollipop.ManagerActivityLollipop.DrawerItem;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
@@ -30,11 +31,13 @@ import nz.mega.sdk.MegaRequest;
 import nz.mega.sdk.MegaRequestListenerInterface;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
@@ -48,18 +51,23 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class FolderLinkActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, OnClickListener, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener {
 	
@@ -67,9 +75,11 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	MegaApiAndroid megaApi;
 	MegaApiAndroid megaApiFolder;
 	
+	private AlertDialog decryptionKeyDialog;
+	
 	ActionBar aB;
 	Toolbar tB;
-	
+	Handler handler;
 	String url;
 	RecyclerView listView;
 	GestureDetectorCompat detector;
@@ -83,7 +93,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 	View separator;
 	private TextView cancelButton;
 	LinearLayout optionsBar;
-	
+	DisplayMetrics outMetrics;
 	long parentHandle = -1;
 	ArrayList<MegaNode> nodes;
 	MegaBrowserLollipopAdapter adapterList;
@@ -222,7 +232,7 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		super.onCreate(savedInstanceState);
 		
 		Display display = getWindowManager().getDefaultDisplay();
-		DisplayMetrics outMetrics = new DisplayMetrics ();
+		outMetrics = new DisplayMetrics ();
 	    display.getMetrics(outMetrics);
 	    float density  = getResources().getDisplayMetrics().density;
 		
@@ -232,6 +242,8 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
 		MegaApplication app = (MegaApplication)getApplication();
 		megaApiFolder = app.getMegaApiFolder();
 		megaApi = app.getMegaApi();
+		
+		folderLinkActivity = this;
 		
 		setContentView(R.layout.activity_folder_link);	
 		
@@ -293,7 +305,17 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
     		if (intent.getAction().equals(ManagerActivityLollipop.ACTION_OPEN_MEGA_FOLDER_LINK)){
     			if (parentHandle == -1){
     				url = intent.getDataString();
-    				megaApiFolder.loginToFolder(url, this);
+    				int counter = url.split("!").length - 1;
+    				log("Counter !: "+counter);
+    				if(counter<2){
+    					//Ask for decryption key
+    					log("Ask for decryption key");
+    					askForDecryptionKeyDialog();
+    				}
+    				else{
+    					//Decryption key included!
+    					megaApiFolder.loginToFolder(url, this);
+    				}    				
     			}
     		}
     	}
@@ -345,6 +367,86 @@ public class FolderLinkActivityLollipop extends PinActivityLollipop implements M
             }
         });			
     }
+	
+	public void askForDecryptionKeyDialog(){
+		log("askForDecryptionKeyDialog");
+		
+		LinearLayout layout = new LinearLayout(this);
+	    layout.setOrientation(LinearLayout.VERTICAL);
+	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
+
+	    final EditText input = new EditText(this);
+	    layout.addView(input, params);		
+		
+		input.setId(1);
+		input.setSingleLine();
+		input.setTextColor(getResources().getColor(R.color.text_secondary));
+		input.setHint(getString(R.string.alert_decryption_key));
+//		input.setSelectAllOnFocus(true);
+		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
+		input.setOnEditorActionListener(new OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String value = v.getText().toString().trim();
+					if (value.length() == 0) {
+						return true;
+					}
+					url=url+value;
+					megaApiFolder.loginToFolder(url, folderLinkActivity);
+					decryptionKeyDialog.dismiss();
+					return true;
+				}
+				return false;
+			}
+		});
+		input.setImeActionLabel(getString(R.string.cam_sync_ok),EditorInfo.IME_ACTION_DONE);
+		input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					showKeyboardDelayed(v);
+				}
+			}
+		});
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle(getString(R.string.alert_decryption_key));
+		builder.setMessage(getString(R.string.message_decryption_key));
+		builder.setPositiveButton(getString(R.string.cam_sync_ok),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int whichButton) {
+						String value = input.getText().toString().trim();
+						if (value.length() == 0) {
+							return;
+						}
+						url=url+value;
+						megaApiFolder.loginToFolder(url, folderLinkActivity);
+					}
+				});
+		builder.setNegativeButton(getString(android.R.string.cancel), 
+				new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				finish();
+			}
+		});
+		builder.setView(layout);
+		decryptionKeyDialog = builder.create();
+		decryptionKeyDialog.show();
+	}
+	
+	private void showKeyboardDelayed(final View view) {
+		log("showKeyboardDelayed");
+		handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {				
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+			}
+		}, 50);
+	}
 	
 	public void showOptionsPanel(MegaNode sNode){
 		log("showOptionsPanel");
