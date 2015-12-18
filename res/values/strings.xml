@@ -380,6 +380,9 @@
     <string name="menu_add_contact" context="Menu option to add a contact to your contact list.">Add contact</string>
     <string name="menu_download_from_link" context="Text that is displayed in the dialog to download a MEGA link inside the app">Download from MEGA link</string>
     
+    <string name="alert_decryption_key" context="Title of the alert to introduce the decryption key">Decryption Key</string>
+    <string name="message_decryption_key" context="Message of the alert to introduce the decryption key">Please, introduce the decryption key of the link</string>
+        
     <string name="upload_to_image" context="upload to. Then choose an Image file">Image</string>
 	<string name="upload_to_audio" context="upload to. Then choose an Audio file">Audio</string>
 	<string name="upload_to_video" context="upload to. Then choose a Video file">Video</string>
