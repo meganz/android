@@ -247,6 +247,10 @@
 	
 	<string name="error_not_enough_free_space" context="Error message">Not enough free space</string>
 	
+	<string name="option_full_link" context="Alert Dialog to get link">Full link</string>
+	<string name="option_link_without_key" context="Alert Dialog to get link">Link without decryption key</string>
+	<string name="option_decryption_key" context="Alert Dialog to get link">Decryption key</string>
+	
 	<string name="download_failed" context="Error message">Download failed</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">downloaded</string>
 	<string name="download_downloading" context="Title header on the download page while the file is downloading.">Downloading</string>
@@ -293,6 +297,7 @@
     <string name="context_download_to" context="Menu item">Save to</string>
     <string name="context_clear_rubbish" context="Menu option">Clear Rubbish Bin</string>
     <string name="context_send_link" context="get the link and send it">Send link</string>
+    <string name="context_send" context="get the link and send it">Send</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Send to Inbox</string>
     <string name="context_copy_link" context="get the link and copy it">Copy link</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Remove</string>
