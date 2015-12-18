@@ -342,6 +342,10 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		
 	}
 	
+	public void setIsListDB(boolean isList){
+		dbH.setPreferredViewList(isList);
+	}
+	
 	public int deleteOffline(Context context,MegaOffline node){
 		
 		log("deleteOffline");
@@ -486,12 +490,13 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 		else{
 			prefs = dbH.getPreferences();		
 			if (prefs != null){
-				isList = Boolean.parseBoolean(prefs.getPreferredViewListCameraUploads());
+				isList = Boolean.parseBoolean(prefs.getPreferredViewList());
 			}
 			else{
 				isList = true;
 			}
-		}
+			((OfflineActivityLollipop)context).setListOffline(isList);
+		}	
 		
 		display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		outMetrics = new DisplayMetrics ();
@@ -500,6 +505,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 
 		//Check pathNAvigation
 		if (isList){
+			log("onCreateList");
 			View v = inflater.inflate(R.layout.fragment_offlinelist, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());
@@ -679,6 +685,7 @@ public class OfflineFragmentLollipop extends Fragment implements OnClickListener
 			return v;
 		}
 		else{
+			log("onCreateGRID");
 			View v = inflater.inflate(R.layout.fragment_offlinegrid, container, false);
 			
 			detector = new GestureDetectorCompat(getActivity(), new RecyclerViewOnGestureListener());

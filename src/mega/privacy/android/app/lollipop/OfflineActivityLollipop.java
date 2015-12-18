@@ -1,12 +1,17 @@
 package mega.privacy.android.app.lollipop;
 
+import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.PinActivity;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.R;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 
 
@@ -17,7 +22,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
     ActionBar aB;
 	
 	boolean isListOffline = true;
-
+	private MenuItem thumbViewMenuItem;
 	String pathNavigation = "/";
 	
 	@Override
@@ -48,15 +53,34 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		}
 		
 		if (oFLol == null){
-			oFLol = new OfflineFragmentLollipop();
-			oFLol.setIsList(isListOffline);
+			oFLol = new OfflineFragmentLollipop();			
 			oFLol.setPathNavigation(pathNavigation);
 		}
-		else{
-			oFLol.setIsList(isListOffline);
-		}
-		
+
+//		isListOffline = oFLol.getIsList();
+//		log("IsListOffline: "+isListOffline);
 		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_offline, oFLol, "oFLol").commit();
+	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+		log("onCreateOptionsMenuLollipop");
+		
+		// Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.offline_activity_action, menu);
+	    getSupportActionBar().setDisplayShowCustomEnabled(true);
+	    
+	    thumbViewMenuItem= menu.findItem(R.id.action_grid);
+	    thumbViewMenuItem.setVisible(true);
+	    
+		if (isListOffline){	
+			thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+		}
+		else{
+			thumbViewMenuItem.setTitle(getString(R.string.action_list));
+		}
+		return super.onCreateOptionsMenu(menu);
 	}
 	
 	@Override
@@ -76,6 +100,33 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		switch(id){
 			case android.R.id.home:{
 				onBackPressed();
+			}
+			case R.id.action_grid:{	
+		    	log("action_grid selected");
+		    	isListOffline = !isListOffline;
+		    	oFLol.setIsListDB(isListOffline);
+				if (isListOffline){	
+					thumbViewMenuItem.setTitle(getString(R.string.action_grid));
+				}
+				else{
+					thumbViewMenuItem.setTitle(getString(R.string.action_list));
+				}
+				if (oFLol != null){        			
+					Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("oFLol");
+					FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.detach(currentFragment);
+					fragTransaction.commit();
+
+					oFLol.setIsList(isListOffline);						
+					oFLol.setPathNavigation(pathNavigation);
+					//oFLol.setGridNavigation(false);
+					//oFLol.setParentHandle(parentHandleSharedWithMe);
+
+					fragTransaction = getSupportFragmentManager().beginTransaction();
+					fragTransaction.attach(currentFragment);
+					fragTransaction.commit();
+					
+				}
 			}
 		}
 		return true;
@@ -111,5 +162,13 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 	
 	public static void log(String message) {
 		Util.log("OfflineActivityLollipop", message);	
+	}
+
+	public boolean isListOffline() {
+		return isListOffline;
+	}
+
+	public void setListOffline(boolean isListOffline) {
+		this.isListOffline = isListOffline;
 	}
 }
