@@ -241,6 +241,10 @@
 	<string name="contacts_list_empty_text" context="Adding new relationships (contacts) using the actions.">Añadir nuevos contactos usando el botón inferior.</string>		
 	<string name="error_not_enough_free_space" context="Error message">No hay suficiente espacio</string>
 	<string name="session_problem">Existe un problema con la sesión de usuario</string>
+	
+	<string name="option_full_link" context="Alert Dialog to get link">Link completo</string>
+	<string name="option_link_without_key" context="Alert Dialog to get link">Link sin clave de cifrado</string>
+	<string name="option_decryption_key" context="Alert Dialog to get link">Clave de cifrado</string>
 	    
 	<string name="download_failed" context="Error message">Descarga fallida</string>
 	<string name="download_downloaded" context="notification message. Example: 1 file downloaded">descargado</string>
@@ -288,6 +292,7 @@
     <string name="context_download_to" context="Menu item">Guardar en</string>
     <string name="context_clear_rubbish" context="Menu option">Vaciar la Papelera</string>    
     <string name="context_send_link" context="get the link and send it">Enviar enlace</string>
+        <string name="context_send" context="get the link and send it">Enviar</string>
     <string name="context_send_file_inbox" context="send the file to inbox">Enviar al buzón</string>
     <string name="context_copy_link" context="get the link and copy it">Copiar enlace</string>
     <string name="context_remove" context="Menu option to delete one or multiple selected items.">Eliminar</string>

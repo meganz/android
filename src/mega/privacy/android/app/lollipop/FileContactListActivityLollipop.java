@@ -31,6 +31,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +56,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class FileContactListActivityLollipop extends PinActivityLollipop implements MegaRequestListenerInterface, RecyclerView.OnItemTouchListener, GestureDetector.OnGestureListener, OnClickListener, MegaGlobalListenerInterface {
 
@@ -70,6 +70,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 	ImageView statusDot;
 	TextView createdView;
 	
+	RelativeLayout container;
 	RelativeLayout contactLayout;
 	RelativeLayout fileContactLayout;
 	RecyclerView listView;
@@ -389,6 +390,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			aB.setDisplayShowHomeEnabled(true);
 			aB.setTitle(getString(R.string.file_properties_shared_folder_list_shares));
 			
+			container = (RelativeLayout) findViewById(R.id.file_contact_list);
 			imageView = (ImageView) findViewById(R.id.file_properties_icon);
 			nameView = (TextView) findViewById(R.id.node_name);
 			createdView = (TextView) findViewById(R.id.node_last_update);
@@ -655,7 +657,8 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			if (e.getErrorCode() == MegaError.API_OK){
 				if(removeShare){
 					log("OK onRequestFinish remove");
-					Toast.makeText(this, getString(R.string.context_contact_removed), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_contact_removed), Snackbar.LENGTH_LONG).show();
+
 					removeShare=false;
 					adapter.setShareList(listContacts);
 					listView.invalidate();
@@ -664,7 +667,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				if(changeShare){
 					log("OK onRequestFinish change");
 					permissionsDialog.dismiss();
-					Toast.makeText(this, getString(R.string.context_permissions_changed), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_permissions_changed), Snackbar.LENGTH_LONG).show();
 					changeShare=false;
 					adapter.setShareList(listContacts);
 					listView.invalidate();
@@ -674,12 +677,12 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 			else{
 				if(removeShare){
 					log("ERROR onRequestFinish remove");
-					Toast.makeText(this, getString(R.string.context_contact_not_removed), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_contact_not_removed), Snackbar.LENGTH_LONG).show();
 					removeShare=false;	
 				}
 				if(changeShare){
 					log("ERROR onRequestFinish change");
-					Toast.makeText(this, getString(R.string.context_permissions_not_changed), Toast.LENGTH_SHORT).show();
+					Snackbar.make(container, getString(R.string.context_permissions_not_changed), Snackbar.LENGTH_LONG).show();
 				}
 			}
 			log("Finish onRequestFinish");
@@ -695,10 +698,10 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 				catch (Exception ex) {
 					log("Error dismiss status dialog");
 				}
-				Toast.makeText(this, getString(R.string.context_node_private), Toast.LENGTH_LONG).show();
+				Snackbar.make(container, getString(R.string.context_node_private), Snackbar.LENGTH_LONG).show();
 			}
 			else{
-				Util.showErrorAlertDialog(e, this);
+				Snackbar.make(container, e.getErrorString(), Snackbar.LENGTH_LONG).show();
 			}
 		}
 	}
@@ -900,17 +903,15 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		MegaNode parentNode = megaApi.getNodeByHandle(parentHandle); 
 		if(parentNode == null){
-			Util.showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
+			Snackbar.make(container, getString(R.string.error_temporary_unavaible), Snackbar.LENGTH_LONG).show();
 			return;
 		}
 			
 		if (infos == null) {
-			Util.showErrorAlertDialog(getString(R.string.upload_can_not_open),
-					false, this);
+			Snackbar.make(container, getString(R.string.upload_can_not_open), Snackbar.LENGTH_LONG).show();
 		} 
 		else {
-			Toast.makeText(getApplicationContext(), getString(R.string.upload_began),
-					Toast.LENGTH_SHORT).show();
+			Snackbar.make(container, getString(R.string.upload_began), Snackbar.LENGTH_LONG).show();
 			for (ShareInfo info : infos) {
 				Intent intent = new Intent(this, UploadService.class);
 				intent.putExtra(UploadService.EXTRA_FILEPATH, info.getFileAbsolutePath());
@@ -931,7 +932,7 @@ public class FileContactListActivityLollipop extends PinActivityLollipop impleme
 		
 		if (requestCode == REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK){
 			if(!Util.isOnline(this)){
-				Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+				Snackbar.make(container, getString(R.string.error_server_connection_problem), Snackbar.LENGTH_LONG).show();
 				return;
 			}
 			

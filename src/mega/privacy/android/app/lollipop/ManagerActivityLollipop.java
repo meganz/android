@@ -6291,7 +6291,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	}
 	
 	public void showImportLinkDialog(){
-		log("showRenameDialog");
+		log("showImportLinkDialog");
 		LinearLayout layout = new LinearLayout(this);
 	    layout.setOrientation(LinearLayout.VERTICAL);
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -9426,25 +9426,63 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			if (e.getErrorCode() == MegaError.API_OK){
 				
 				if (isGetLink){
-					final String link = request.getLink();
+					final String link = request.getLink();					
 					
 					AlertDialog getLinkDialog;
 					AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
-		            builder.setMessage(link);
+//		            builder.setMessage(link);
 					builder.setTitle(getString(R.string.context_get_link_menu));
+					
+					// Create TextView
+					final TextView input = new TextView (this);
+					input.setGravity(Gravity.CENTER);
+					
+					final CharSequence[] items = {getString(R.string.option_full_link), getString(R.string.option_link_without_key), getString(R.string.option_decryption_key)};
+
+					android.content.DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int item) {
+							
+							switch(item) {
+			                    case 0:{
+			                    	input.setText(link);
+			                    	break;
+			                    }
+			                    case 1:{
+			                    	String urlString="";			    					
+			    					String [] s = link.split("!");
+			    					if (s.length == 3){
+			    						urlString = s[0] + "!" + s[1];			    						
+			    					}
+			                    	input.setText(urlString);
+			                        break;
+			                    }
+			                    case 2:{
+			                    	String keyString="";
+			    					String [] s = link.split("!");
+			    					if (s.length == 3){
+			    						keyString = "!"+s[2];
+			    					}
+			                    	input.setText(keyString);
+			                        break;
+			                    }
+			                }
+						}
+					};
+					
+					builder.setSingleChoiceItems(items, 0, dialogListener);
 //					
-					builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+					builder.setPositiveButton(getString(R.string.context_send), new android.content.DialogInterface.OnClickListener() {
 						
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							Intent intent = new Intent(Intent.ACTION_SEND);
 							intent.setType("text/plain");
-							intent.putExtra(Intent.EXTRA_TEXT, link);
+							intent.putExtra(Intent.EXTRA_TEXT, input.getText());
 							startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 						}
 					});
 					
-					builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+					builder.setNegativeButton(getString(R.string.context_copy), new android.content.DialogInterface.OnClickListener() {
 						
 						@SuppressLint("NewApi") 
 						@Override
@@ -9454,14 +9492,21 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							    clipboard.setText(link);
 							} else {
 							    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+							    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", input.getText());
 					            clipboard.setPrimaryClip(clip);
 							}
 							Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
 						}
-					});
+					});	
+					
+					input.setText(link);
+					builder.setView(input);
 					
 					getLinkDialog = builder.create();
+					getLinkDialog.create();
+					FrameLayout.LayoutParams lpPL = new FrameLayout.LayoutParams(input.getLayoutParams());
+					lpPL.setMargins(Util.scaleWidthPx(15, outMetrics), 0, Util.scaleWidthPx(15, outMetrics), 0);
+					input.setLayoutParams(lpPL);
 					getLinkDialog.show();
 				}
 			}

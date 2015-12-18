@@ -46,10 +46,12 @@ import android.support.v7.app.ActionBar;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
@@ -58,7 +60,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -1116,62 +1120,66 @@ log("moveToTrash");
 			catch (Exception ex) {}
 			
 			if (e.getErrorCode() == MegaError.API_OK){
-				
-				final String link = request.getLink();
-				
-//				AlertDialog getLinkDialog;
-//				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//				builder.setTitle(getString(R.string.context_get_link_menu));
-//				
-//				LayoutInflater inflater = getLayoutInflater();
-//				View dialoglayout = inflater.inflate(R.layout.dialog_link, null);
-//				ImageView thumb = (ImageView) dialoglayout.findViewById(R.id.dialog_link_thumbnail);
-//				TextView url = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_url);
-//				TextView key = (TextView) dialoglayout.findViewById(R.id.dialog_link_link_key);
-//				
-//				String urlString = "";
-//				String keyString = "";
-//				String [] s = link.split("!");
-//				if (s.length == 3){
-//					urlString = s[0] + "!" + s[1];
-//					keyString = s[2];
-//				}
-//				
-//				Display display = getWindowManager().getDefaultDisplay();
-//				DisplayMetrics outMetrics = new DisplayMetrics();
-//				display.getMetrics(outMetrics);
-//				float density = getResources().getDisplayMetrics().density;
-//
-//				float scaleW = Util.getScaleW(outMetrics, density);
-//				float scaleH = Util.getScaleH(outMetrics, density);
-//				
-//				url.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-//				key.setTextSize(TypedValue.COMPLEX_UNIT_SP, (14*scaleW));
-//				
-//				url.setText(urlString);
-//				key.setText(keyString);
-//				
-//				
-//				builder.setView(dialoglayout);
+
+				final String link = request.getLink();					
 				
 				AlertDialog getLinkDialog;
-				AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);					
-	            builder.setMessage(link);
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);					
+//	            builder.setMessage(link);
 				builder.setTitle(getString(R.string.context_get_link_menu));
 				
-				builder.setPositiveButton(getString(R.string.context_send_link), new android.content.DialogInterface.OnClickListener() {
+				// Create TextView
+				final TextView input = new TextView (this);
+				input.setGravity(Gravity.CENTER);
+				
+				final CharSequence[] items = {getString(R.string.option_full_link), getString(R.string.option_link_without_key), getString(R.string.option_decryption_key)};
+
+				android.content.DialogInterface.OnClickListener dialogListener = new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int item) {
+						
+						switch(item) {
+		                    case 0:{
+		                    	input.setText(link);
+		                    	break;
+		                    }
+		                    case 1:{
+		                    	String urlString="";			    					
+		    					String [] s = link.split("!");
+		    					if (s.length == 3){
+		    						urlString = s[0] + "!" + s[1];			    						
+		    					}
+		                    	input.setText(urlString);
+		                        break;
+		                    }
+		                    case 2:{
+		                    	String keyString="";
+		    					String [] s = link.split("!");
+		    					if (s.length == 3){
+		    						keyString = "!"+s[2];
+		    					}
+		                    	input.setText(keyString);
+		                        break;
+		                    }
+		                }
+					}
+				};
+				
+				builder.setSingleChoiceItems(items, 0, dialogListener);
+//				
+				builder.setPositiveButton(getString(R.string.context_send), new android.content.DialogInterface.OnClickListener() {
 					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent(Intent.ACTION_SEND);
 						intent.setType("text/plain");
-						intent.putExtra(Intent.EXTRA_TEXT, link);
+						intent.putExtra(Intent.EXTRA_TEXT, input.getText());
 						startActivity(Intent.createChooser(intent, getString(R.string.context_get_link)));
 					}
 				});
 				
-				builder.setNegativeButton(getString(R.string.context_copy_link), new android.content.DialogInterface.OnClickListener() {
+				builder.setNegativeButton(getString(R.string.context_copy), new android.content.DialogInterface.OnClickListener() {
 					
+					@SuppressLint("NewApi") 
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
@@ -1179,14 +1187,21 @@ log("moveToTrash");
 						    clipboard.setText(link);
 						} else {
 						    android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", link);
+						    android.content.ClipData clip = android.content.ClipData.newPlainText("Copied Text", input.getText());
 				            clipboard.setPrimaryClip(clip);
 						}
 						Snackbar.make(fragmentContainer, getString(R.string.file_properties_get_link), Snackbar.LENGTH_LONG).show();
 					}
-				});
+				});	
+				
+				input.setText(link);
+				builder.setView(input);
 				
 				getLinkDialog = builder.create();
+				getLinkDialog.create();
+				FrameLayout.LayoutParams lpPL = new FrameLayout.LayoutParams(input.getLayoutParams());
+				lpPL.setMargins(Util.scaleWidthPx(15, outMetrics), 0, Util.scaleWidthPx(15, outMetrics), 0);
+				input.setLayoutParams(lpPL);
 				getLinkDialog.show();
 			}
 			else{
