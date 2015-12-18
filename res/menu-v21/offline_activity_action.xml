@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:MEGA="http://schemas.android.com/apk/res-auto" >
+    
+	<item
+	    android:id="@+id/action_grid"
+	    android:orderInCategory="100"
+	    android:title="@string/action_grid"
+	    android:icon="@drawable/ic_action_bar_null"
+	    MEGA:showAsAction="never" />
+    
+</menu>
