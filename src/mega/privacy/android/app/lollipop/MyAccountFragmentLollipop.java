@@ -192,12 +192,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		mainLayout.setOnClickListener(this);
 		imageLayout = (RelativeLayout) v.findViewById(R.id.my_account_image_layout);
 		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) imageLayout.getLayoutParams();
-		params.setMargins(0, -getStatusBarHeight(), 0, 0);
+//		params.setMargins(0, -getStatusBarHeight(), 0, 0);
+		params.setMargins(0, 0, 0, 0);
 		imageLayout.setLayoutParams(params);
 		
 		optionsBackLayout = (RelativeLayout) v.findViewById(R.id.my_account_toolbar_back_options_layout);
 		params = (RelativeLayout.LayoutParams) optionsBackLayout.getLayoutParams();
-		params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
+//		params.setMargins(0, getStatusBarHeight(), 0, Util.px2dp(100, outMetrics));
+		params.setMargins(0, 0, 0, Util.px2dp(100, outMetrics));
 		optionsBackLayout.setLayoutParams(params);
 		
 		toolbarBack = (ImageView) v.findViewById(R.id.my_account_toolbar_back);
@@ -215,7 +217,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		
 		overflowMenuLayout = (RelativeLayout) v.findViewById(R.id.my_account_overflow_menu_layout);
 		params = (RelativeLayout.LayoutParams) overflowMenuLayout.getLayoutParams();
-		params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
+//		params.setMargins(0, getStatusBarHeight() + Util.px2dp(5, outMetrics), Util.px2dp(5, outMetrics), 0);
+		params.setMargins(0, 0, 0, 0);
 		overflowMenuLayout.setLayoutParams(params);
 		overflowMenuList = (ListView) v.findViewById(R.id.my_account_overflow_menu_list);
 		overflowMenuLayout.setVisibility(View.GONE);
@@ -245,6 +248,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		lastSessionLayout.setVisibility(View.GONE);
 		
 		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
+		upgradeButton.setOnClickListener(this);
 		
 		infoEmail.setText(myEmail);
 		
@@ -550,7 +554,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 			case R.id.my_account_toolbar_back:{
-				((MyAccountMainActivityLollipop)context).finish();
+				((ManagerActivityLollipop)context).onBackPressed();
 				break;
 			}
 			case R.id.my_account_toolbar_overflow:{
@@ -561,13 +565,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				ManagerActivityLollipop.logout(context, megaApi, false);
 				break;
 			}
-			case R.id.btn_upgrade:{
+			case R.id.my_account_account_type_button:{
 				
 //				if (myEmail.compareTo("android102@yopmail.com") == 0){
 //					((ManagerActivityLollipop)context).paySubs();
 //				}				
 				
-				((MyAccountMainActivityLollipop)context).showUpAF(paymentBitSet);
+				((ManagerActivityLollipop)context).showUpAF(null);
+				
+//				((ManagerActivityLollipop)context).launchPayment(ManagerActivityLollipop.SKU_PRO_LITE_MONTH);
+				
+//				Toast.makeText(context, "EOEOEOE", Toast.LENGTH_LONG).show();
 				break;
 			}
 		}
@@ -944,11 +952,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
             startActivity(intent);
 		}
 		else if (itemText.compareTo(getString(R.string.action_upgrade_account)) == 0){
-			((MyAccountMainActivityLollipop)context).showUpAF(null);
+			((ManagerActivityLollipop)context).showUpAF(null);
 		}
 		else if (itemText.compareTo(getString(R.string.action_logout)) == 0){
 			ManagerActivityLollipop.logout(context, megaApi, false);
-			((MyAccountMainActivityLollipop)context).finish();
 		}
 	}
 }

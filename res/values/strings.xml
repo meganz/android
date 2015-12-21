@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name" context="Not translate">MEGAv3</string>
-    <string name="app_version" context="Not translate">3.0.beta_1</string>
-    <string name="sdk_version" context="Not translate">2bc7f24</string>
+    <string name="app_version" context="Not translate">3.0.beta_2</string>
+    <string name="sdk_version" context="Not translate">244b256</string>
     
     <string name="full_description_text" context="Full description text of the app in the Google Play page of the app">MEGA is a secure cloud storage service that gives you 50GB for free.Unlike other cloud storage providers, your data is encrypted and decrypted by the client devices only and never by us.\nYour data is accessible any time, from any device, anywhere. Share folders with your contacts and see their updates in real time.\nThe cloud in your pocket. Access and stream your files from your smartphone or tablet. Upload and sync your media to the cloud.\nSearch, store, download, stream, view, share, rename or delete your files. It\'s all there - in the palm of your hands.\nFor more info, please check our website: https://mega.co.nz/</string>
     <string name="short_description_text" context="Short description text of the app in the Google Play page of the app">MEGA is Cloud Storage with Powerful Always-On Privacy. 50GB for free</string>
@@ -31,6 +31,7 @@
     <string name="general_updating" context="state while upgrading the account">Updating&#8230;</string>  
     <string name="general_storage" context="Text listed before the amount of storage a user gets with a certain package. For example: &quot;1TB Storage&quot;.">Storage</string>
     <string name="general_bandwidth" context="Text listed before the amount of bandwidth a user gets with a certain package. For example: &quot;8TB Bandwidth&quot;. Can also be translated as data transfer.">Bandwidth</string>
+    <string name="general_subscribe" context="Text placed inside the button the user clicks when upgrading to PRO. Meaning: subscribe to this plan">Subscribe</string>  
     <string name="general_error_word" context="It will be followed by the error message">Error</string> 
     <string name="general_error_file_not_found" context="Message shown when a file doesn't exist">File link not found</string>
     <string name="general_error_folder_not_found" context="Message shown when a folder doesn't exist">Folder link not found</string>
@@ -446,7 +447,8 @@
     <string name="no_available_payment_method" context="choose the payment method option when no method is available">At this moment, no method of payment is available for this plan</string>
     <string name="payment_method_credit_card" context="one of the payment methods">Credit Card (subscription)</string>
     <string name="payment_method_fortumo" context="one of the payment methods">Mobile Carrier (one-off)</string>
-    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet</string>
+    <string name="payment_method_centili" context="one of the payment methods">Mobile Carrier (one-off)</string>
+    <string name="payment_method_google_wallet" context="one of the payment methods">Google Wallet (subscription)</string>
     
     <string name="upgrade_per_month" context="button to decide monthly payment. The asterisk is needed">Monthly*</string>
     <string name="upgrade_per_year" context="button to decide annually payment. The asterisk is needed">Annually*</string>

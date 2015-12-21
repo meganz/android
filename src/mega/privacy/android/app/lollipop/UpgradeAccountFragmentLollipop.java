@@ -3,8 +3,8 @@ package mega.privacy.android.app.lollipop;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Locale;
 
-import mega.privacy.android.app.ManagerActivity;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.Product;
 import mega.privacy.android.app.utils.Util;
@@ -20,14 +20,11 @@ import nz.mega.sdk.MegaUser;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.Formatter;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
@@ -36,12 +33,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequestListenerInterface, OnClickListener{		
 	
@@ -53,44 +47,45 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	
 	private ActionBar aB;
 	private MegaApiAndroid megaApi;
-//	private Button liteMonth;
-//	private Button liteYear;
-//	private Button iMonth;
-//	private Button iYear;
-//	private Button iiMonth;
-//	private Button iiiMonth;
-	private TextView proLiteTitle;
-	private TextView pro1Title;
-	private TextView pro2Title;
-	private TextView pro3Title;
-	private TextView proStorageLite;
-	private TextView proStorage1;
-	private TextView proStorage2;
-	private TextView proStorage3;
-	private TextView proBandwithLite;
-	private TextView proBandwith1;
-	private TextView proBandwith2;
-	private TextView proBandwith3;
-	private TextView storageLite;
-	private TextView bandwidthLite;
-	private TextView pricingPerMonthLite;
-	private TextView storage1;
-	private TextView bandwidth1;
-	private TextView pricingPerMonth1;
-	private TextView storage2;
-	private TextView bandwidth2;
-	private TextView pricingPerMonth2;
-	private TextView storage3;
-	private TextView bandwidth3;
-	private TextView pricingPerMonth3;
-	private ImageView proLite;
-	private ImageView pro1;
-	private ImageView pro2;
-	private ImageView pro3;
+	
 	private RelativeLayout proLiteLayout;
 	private RelativeLayout pro1Layout;
 	private RelativeLayout pro3Layout;
 	private RelativeLayout pro2Layout;
+	
+	private RelativeLayout proLiteTransparentLayout;
+	private RelativeLayout pro1TransparentLayout;
+	private RelativeLayout pro3TransparentLayout;
+	private RelativeLayout pro2TransparentLayout;
+	
+	private TextView proLitePriceInteger;
+	private TextView proLitePriceDecimal;
+	private TextView proLiteStorageInteger;
+	private TextView proLiteStorageGb;
+	private TextView proLiteBandwidthInteger;
+	private TextView proLiteBandwidthTb;
+	
+	private TextView pro1PriceInteger;
+	private TextView pro1PriceDecimal;
+	private TextView pro1StorageInteger;
+	private TextView pro1StorageGb;
+	private TextView pro1BandwidthInteger;
+	private TextView pro1BandwidthTb;
+	
+	private TextView pro2PriceInteger;
+	private TextView pro2PriceDecimal;
+	private TextView pro2StorageInteger;
+	private TextView pro2StorageGb;
+	private TextView pro2BandwidthInteger;
+	private TextView pro2BandwidthTb;
+	
+	private TextView pro3PriceInteger;
+	private TextView pro3PriceDecimal;
+	private TextView pro3StorageInteger;
+	private TextView pro3StorageGb;
+	private TextView pro3BandwidthInteger;
+	private TextView pro3BandwidthTb;
+	
 	private Fragment selectMembership;
 	Context context;
 	MegaUser myUser;
@@ -156,139 +151,68 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 
 		View v = null;
 		v = inflater.inflate(R.layout.activity_upgrade, container, false);
-//		liteMonth = (Button) v.findViewById(R.id.lite_month_button);
-//		liteMonth.setOnClickListener(this);
-//		liteYear = (Button) v.findViewById(R.id.lite_year_button);
-//		liteYear.setOnClickListener(this);
-//		iMonth = (Button) v.findViewById(R.id.pro_i_month_button);
-//		iMonth.setOnClickListener(this);
-//		iYear = (Button) v.findViewById(R.id.pro_i_year_button);
-//		iYear.setOnClickListener(this);
-//		iiMonth = (Button) v.findViewById(R.id.pro_ii_month_button);
-//		iiMonth.setOnClickListener(this);
-//		iiiMonth = (Button) v.findViewById(R.id.pro_iii_month_button);
-//		iiiMonth.setOnClickListener(this);
 		
-		proLite = (ImageView) v.findViewById(R.id.prolite_image);
-		pro1 = (ImageView) v.findViewById(R.id.pro1_image);
-		pro2 = (ImageView) v.findViewById(R.id.pro2_image);
-		pro3 = (ImageView) v.findViewById(R.id.pro3_image);
+		proLiteLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout);
+		proLiteLayout.setOnClickListener(this);
+		pro1Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_i_layout);
+		pro1Layout.setOnClickListener(this);
+		pro2Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_ii_layout);
+		pro2Layout.setOnClickListener(this);
+		pro3Layout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_iii_layout);
+		pro3Layout.setOnClickListener(this);
 		
-		proLiteLayout = (RelativeLayout) v.findViewById(R.id.prolite_layout);
-		pro1Layout = (RelativeLayout) v.findViewById(R.id.pro1_layout);
-		pro2Layout = (RelativeLayout) v.findViewById(R.id.pro2_layout);
-		pro3Layout = (RelativeLayout) v.findViewById(R.id.pro3_layout);	
-
-		proLite.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		proLite.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
-		pro1.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		pro1.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
-		pro2.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		pro2.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
-		pro3.getLayoutParams().width = Util.px2dp((100*scaleW), outMetrics);
-		pro3.getLayoutParams().height = Util.px2dp((100*scaleH), outMetrics);
+		proLiteTransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_prolite_layout_transparent);
+		proLiteTransparentLayout.setVisibility(View.INVISIBLE);
+		pro1TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_i_layout_transparent);
+		pro1TransparentLayout.setVisibility(View.INVISIBLE);
+		pro2TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_ii_layout_transparent);
+		pro2TransparentLayout.setVisibility(View.INVISIBLE);
+		pro3TransparentLayout = (RelativeLayout) v.findViewById(R.id.upgrade_pro_iii_layout_transparent);
+		pro3TransparentLayout.setVisibility(View.INVISIBLE);
 		
-		proLiteTitle = (TextView) v.findViewById(R.id.prolite_title);
-		pro1Title = (TextView) v.findViewById(R.id.pro1_title);
-		pro2Title = (TextView) v.findViewById(R.id.pro2_title);
-		pro3Title = (TextView) v.findViewById(R.id.pro3_title);
+		TextView perMonth = (TextView) v.findViewById(R.id.upgrade_prolite_per_month_text);
+		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_i_per_month_text);
+		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_ii_per_month_text);
+		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
+		perMonth = (TextView) v.findViewById(R.id.upgrade_pro_iii_per_month_text);
+		perMonth.setText("/ " + getString(R.string.month_cc).toLowerCase(Locale.getDefault()));
 		
-		proStorageLite = (TextView) v.findViewById(R.id.prolite_storage_title);
-		proStorage1 = (TextView) v.findViewById(R.id.pro1_storage_title);
-		proStorage2 = (TextView) v.findViewById(R.id.pro2_storage_title);
-		proStorage3 = (TextView) v.findViewById(R.id.pro3_storage_title);
+		proLitePriceInteger = (TextView) v.findViewById(R.id.upgrade_prolite_integer_text);
+		proLitePriceDecimal = (TextView) v.findViewById(R.id.upgrade_prolite_decimal_text);
+		proLiteStorageInteger = (TextView) v.findViewById(R.id.upgrade_prolite_storage_value_integer);
+		proLiteStorageGb = (TextView) v.findViewById(R.id.upgrade_prolite_storage_value_gb);
+		proLiteBandwidthInteger = (TextView) v.findViewById(R.id.upgrade_prolite_bandwidth_value_integer);
+		proLiteBandwidthTb = (TextView) v.findViewById(R.id.upgrade_prolite_bandwith_value_tb);
 		
-		storageLite = (TextView) v.findViewById(R.id.prolite_storage);
-		storage1 = (TextView) v.findViewById(R.id.pro1_storage);
-		storage2 = (TextView) v.findViewById(R.id.pro2_storage);
-		storage3 = (TextView) v.findViewById(R.id.pro3_storage);
+		pro1PriceInteger = (TextView) v.findViewById(R.id.upgrade_pro_i_integer_text);
+		pro1PriceDecimal = (TextView) v.findViewById(R.id.upgrade_pro_i_decimal_text);
+		pro1StorageInteger = (TextView) v.findViewById(R.id.upgrade_pro_i_storage_value_integer);
+		pro1StorageGb = (TextView) v.findViewById(R.id.upgrade_pro_i_storage_value_gb);
+		pro1BandwidthInteger = (TextView) v.findViewById(R.id.upgrade_pro_i_bandwidth_value_integer);
+		pro1BandwidthTb = (TextView) v.findViewById(R.id.upgrade_pro_i_bandwith_value_tb);
 		
-		proBandwithLite = (TextView) v.findViewById(R.id.prolite_bandwidth_title);
-		proBandwith1 = (TextView) v.findViewById(R.id.pro1_bandwidth_title);
-		proBandwith2 = (TextView) v.findViewById(R.id.pro2_bandwidth_title);
-		proBandwith3 = (TextView) v.findViewById(R.id.pro3_bandwidth_title);
+		pro2PriceInteger = (TextView) v.findViewById(R.id.upgrade_pro_ii_integer_text);
+		pro2PriceDecimal = (TextView) v.findViewById(R.id.upgrade_pro_ii_decimal_text);
+		pro2StorageInteger = (TextView) v.findViewById(R.id.upgrade_pro_ii_storage_value_integer);
+		pro2StorageGb = (TextView) v.findViewById(R.id.upgrade_pro_ii_storage_value_gb);
+		pro2BandwidthInteger = (TextView) v.findViewById(R.id.upgrade_pro_ii_bandwidth_value_integer);
+		pro2BandwidthTb = (TextView) v.findViewById(R.id.upgrade_pro_ii_bandwith_value_tb);
 		
-		bandwidthLite = (TextView) v.findViewById(R.id.prolite_bandwidth);
-		bandwidth1 = (TextView) v.findViewById(R.id.pro1_bandwidth);
-		bandwidth2 = (TextView) v.findViewById(R.id.pro2_bandwidth);
-		bandwidth3 = (TextView) v.findViewById(R.id.pro3_bandwidth);
+		pro3PriceInteger = (TextView) v.findViewById(R.id.upgrade_pro_iii_integer_text);
+		pro3PriceDecimal = (TextView) v.findViewById(R.id.upgrade_pro_iii_decimal_text);
+		pro3StorageInteger = (TextView) v.findViewById(R.id.upgrade_pro_iii_storage_value_integer);
+		pro3StorageGb = (TextView) v.findViewById(R.id.upgrade_pro_iii_storage_value_gb);
+		pro3BandwidthInteger = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwidth_value_integer);
+		pro3BandwidthTb = (TextView) v.findViewById(R.id.upgrade_pro_iii_bandwith_value_tb);
 		
-		pricingPerMonthLite = (TextView) v.findViewById(R.id.princinglite_from);
-		pricingPerMonth1 = (TextView) v.findViewById(R.id.pricing1_from);
-		pricingPerMonth2 = (TextView) v.findViewById(R.id.pricing2_from);
-		pricingPerMonth3 = (TextView) v.findViewById(R.id.pricing3_from);
-		
-		proLiteTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
-		pro1Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
-		pro2Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
-		pro3Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
-		
-		proStorageLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		proStorage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		proStorage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		proStorage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		
-		storageLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		storage1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		storage2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		storage3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		
-		proBandwithLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		proBandwith1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		proBandwith2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		proBandwith3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		
-		bandwidthLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		bandwidth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		bandwidth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		bandwidth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		
-		pricingPerMonthLite.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		pricingPerMonth1.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		pricingPerMonth2.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		pricingPerMonth3.setTextSize(TypedValue.COMPLEX_UNIT_SP, (18*scaleText));
-		
-//		DecimalFormat df = new DecimalFormat("#.##");
-//		storageLite.setText("200 GB");
-//		bandwidthLite.setText("12 TB");
-//		double savingLite = 4999/12.00/100.00;	    	            
-//		String savingLiteString =df.format(savingLite);
-//		pricingPerMonthLite.setText("from " + savingLiteString +" € per month");
-//		
-//		storage1.setText("500 GB");
-//		bandwidth1.setText("12 TB");
-//		double saving1 = 9999/12.00/100.00;	    	            
-//		String saving1String =df.format(saving1);
-//		pricingPerMonth1.setText("from " + saving1String +" € per month");
-//		
-//		storage2.setText("2 TB");
-//		bandwidth2.setText("48 TB");
-//		double saving2 = 1999/100.00;	    	            
-//		String saving2String =df.format(saving2);
-//		pricingPerMonth2.setText("from " + saving2String +" € per month");
-//		
-//		storage3.setText("4 TB");
-//		bandwidth3.setText("96 TB");
-//		double saving3 = 2999/100.00;	    	            
-//		String saving3String =df.format(saving3);
-//		pricingPerMonth3.setText("from " + saving3String +" € per month");
 		if (paymentBitSet == null){
 			megaApi.getPaymentMethods(this);
 		}
 		
-//		if(accountType!=-1){
-//			checkAccountType();
-//		}
-//		else{
-//			megaApi.getAccountDetails(this);
-//		}
-		
-		/*accountType = ((ManagerActivity)context).getAccountType();
-		usedStorage = ((ManagerActivity)context).getUsedGbStorage();
-		*/
-		checkAvailableAccount();
-
 		megaApi.getPricing(this);
+		checkAvailableAccount();
 		
 		return v;
 	}	
@@ -323,27 +247,27 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 		}
 	}
 
-	public void onUpgrade1Click(View view) {
+	public void onUpgrade1Click() {
 		if (paymentBitSet != null){
-			((ManagerActivity)context).showpF(1, accounts, paymentBitSet);
+			((ManagerActivityLollipop)context).showpF(1, accounts, paymentBitSet);
 		}
 	}
 
-	public void onUpgrade2Click(View view) {
+	public void onUpgrade2Click() {
 		if (paymentBitSet != null){
-			((ManagerActivity)context).showpF(2, accounts, paymentBitSet);
+			((ManagerActivityLollipop)context).showpF(2, accounts, paymentBitSet);
 		}
 	}
 
-	public void onUpgrade3Click(View view) {
+	public void onUpgrade3Click() {
 		if (paymentBitSet != null){
-			((ManagerActivity)context).showpF(3, accounts, paymentBitSet);
+			((ManagerActivityLollipop)context).showpF(3, accounts, paymentBitSet);
 		}
 	}
 	
-	public void onUpgradeLiteClick(View view){
+	public void onUpgradeLiteClick(){
 		if (paymentBitSet != null){
-			((ManagerActivity)context).showpF(4, accounts, paymentBitSet);
+			((ManagerActivityLollipop)context).showpF(4, accounts, paymentBitSet);
 		}
 	}
 
@@ -378,48 +302,99 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 				Product account = new Product (p.getHandle(i), p.getProLevel(i), p.getMonths(i), p.getGBStorage(i), p.getAmount(i), p.getGBTransfer(i));
 
 				if(account.getLevel()==1&&account.getMonths()==1){
-					storage1.setText(account.getStorage()+"GB");
 					log("PRO1: "+account.getStorage());
 					if(usedStorage>account.getStorage()){
 						hideProI();
 					}
-					bandwidth1.setText(account.getTransfer()/1024 + " TB");
-					double saving1 = account.getAmount()/100.00;	    	            
-					String saving1String =df.format(saving1);
-					pricingPerMonth1.setText(saving1String +" € " + getString(R.string.per_month));
+
+					double price = account.getAmount()/100.00;
+					String priceString = df.format(price);
+					String [] s = priceString.split("\\.");
+					if (s.length == 1){
+						pro1PriceInteger.setText(s[0]);
+						pro1PriceDecimal.setText("");
+					}
+					else if (s.length == 2){
+						pro1PriceInteger.setText(s[0]);
+						pro1PriceDecimal.setText("." + s[1] + " €");
+					}
+					
+					pro1StorageInteger.setText(""+account.getStorage());
+					pro1StorageGb.setText(" GB");
+					
+					pro1BandwidthInteger.setText(""+account.getTransfer()/1024);
+					pro1BandwidthTb.setText(" TB");
 				}
 				else if(account.getLevel()==2&&account.getMonths()==1){
-					storage2.setText(sizeTranslation(account.getStorage(),0));
 					log("PRO2: "+account.getStorage());
 					if(usedStorage>account.getStorage()){
 						hideProII();
 					}
-					double saving2 = account.getAmount()/100.00;
-					String saving2String =df.format(saving2);
-					pricingPerMonth2.setText(saving2String +" € " + getString(R.string.per_month));
-					bandwidth2.setText(sizeTranslation(account.getTransfer(),0));
+					
+					double price = account.getAmount()/100.00;
+					String priceString = df.format(price);
+					String [] s = priceString.split("\\.");
+					if (s.length == 1){
+						pro2PriceInteger.setText(s[0]);
+						pro2PriceDecimal.setText("");
+					}
+					else if (s.length == 2){
+						pro2PriceInteger.setText(s[0]);
+						pro2PriceDecimal.setText("." + s[1] + " €");
+					}
+					
+					pro2StorageInteger.setText(sizeTranslation(account.getStorage(),0));
+					pro2StorageGb.setText(" TB");
+					
+					pro2BandwidthInteger.setText(""+account.getTransfer()/1024);
+					pro2BandwidthTb.setText(" TB");
 				}
 				else if(account.getLevel()==3&&account.getMonths()==1){	                	 
-					storage3.setText(sizeTranslation(account.getStorage(),0));  
 					log("PRO3: "+account.getStorage());
 					if(usedStorage>account.getStorage()){
 						hideProIII();
 					}
-					double saving3 = account.getAmount()/100.00;
-					String saving3String =df.format(saving3);
-					pricingPerMonth3.setText(saving3String +" € " + getString(R.string.per_month));
-					bandwidth3.setText(sizeTranslation(account.getTransfer(),0));
+					
+					double price = account.getAmount()/100.00;
+					String priceString = df.format(price);
+					String [] s = priceString.split("\\.");
+					if (s.length == 1){
+						pro3PriceInteger.setText(s[0]);
+						pro3PriceDecimal.setText("");
+					}
+					else if (s.length == 2){
+						pro3PriceInteger.setText(s[0]);
+						pro3PriceDecimal.setText("." + s[1] + " €");
+					}
+					
+					pro3StorageInteger.setText(sizeTranslation(account.getStorage(),0));
+					pro3StorageGb.setText(" TB");
+					
+					pro3BandwidthInteger.setText(""+account.getTransfer()/1024);
+					pro3BandwidthTb.setText(" TB");
 				}
 				else if (account.getLevel()==4&&account.getMonths()==1){
-					storageLite.setText(account.getStorage()+"GB");
 					log("Lite: "+account.getStorage());
 					if(usedStorage>account.getStorage()){
 						hideProLite();
 					}
-					bandwidthLite.setText(account.getTransfer()/1024 + " TB");
-					double savingLite = account.getAmount()/100.00;	    	            
-					String savingLiteString =df.format(savingLite);
-					pricingPerMonthLite.setText(savingLiteString +" € " + getString(R.string.per_month));
+					double price = account.getAmount()/100.00;
+					String priceString = df.format(price);
+					String [] s = priceString.split("\\.");
+					if (s.length == 1){
+						proLitePriceInteger.setText(s[0]);
+						proLitePriceDecimal.setText("");
+					}
+					else if (s.length == 2){
+						proLitePriceInteger.setText(s[0]);
+						proLitePriceDecimal.setText("." + s[1] + " €");
+					}
+					
+					proLiteStorageInteger.setText(""+account.getStorage());
+					proLiteStorageGb.setText(" GB");
+					
+					proLiteBandwidthInteger.setText(""+account.getTransfer()/1024);
+					proLiteBandwidthTb.setText(" TB");
 				}
 				accounts.add(account);
 			}    
@@ -469,72 +444,27 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 	}
 	
 	private void hideProLite(){
-		proLiteLayout.setBackgroundColor(Color.parseColor("#80ffffff"));
-		proLiteLayout.setClickable(false);
-		
-		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-		alpha.setDuration(0); 
-		alpha.setFillAfter(true); 
-		proLite.startAnimation(alpha);
-		
-		proLiteTitle.setTextColor(getResources().getColor(R.color.transparent_black));		
-		proStorageLite.setTextColor(getResources().getColor(R.color.transparent_black));	
-		storageLite.setTextColor(getResources().getColor(R.color.transparent_black));
-		proBandwithLite.setTextColor(getResources().getColor(R.color.transparent_black));						
-		bandwidthLite.setTextColor(getResources().getColor(R.color.transparent_black));						
-		pricingPerMonthLite.setTextColor(getResources().getColor(R.color.transparent_mega));
+		proLiteTransparentLayout.setVisibility(View.VISIBLE);
 	}
 	
 	private void hideProI(){
-		pro1Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
-		pro1Layout.setClickable(false);
+		pro1TransparentLayout.setVisibility(View.VISIBLE);
 		
-		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-		alpha.setDuration(0); 
-		alpha.setFillAfter(true); 
-		pro1.startAnimation(alpha);
+//		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
+//		alpha.setDuration(0); 
+//		alpha.setFillAfter(true); 
+//		pro1.startAnimation(alpha);
 		
-		pro1Title.setTextColor(getResources().getColor(R.color.transparent_black));		
-		proStorage1.setTextColor(getResources().getColor(R.color.transparent_black));	
-		storage1.setTextColor(getResources().getColor(R.color.transparent_black));
-		proBandwith1.setTextColor(getResources().getColor(R.color.transparent_black));						
-		bandwidth1.setTextColor(getResources().getColor(R.color.transparent_black));						
-		pricingPerMonth1.setTextColor(getResources().getColor(R.color.transparent_mega));
 	}
 	
 	private void hideProII(){
-		pro2Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
-		pro2Layout.setClickable(false);
-		
-		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-		alpha.setDuration(0); 
-		alpha.setFillAfter(true); 
-		pro2.startAnimation(alpha);
-		
-		pro2Title.setTextColor(getResources().getColor(R.color.transparent_black));		
-		proStorage2.setTextColor(getResources().getColor(R.color.transparent_black));	
-		storage2.setTextColor(getResources().getColor(R.color.transparent_black));
-		proBandwith2.setTextColor(getResources().getColor(R.color.transparent_black));						
-		bandwidth2.setTextColor(getResources().getColor(R.color.transparent_black));						
-		pricingPerMonth2.setTextColor(getResources().getColor(R.color.transparent_mega));
+		pro2TransparentLayout.setVisibility(View.VISIBLE);
 	}
 	
 	private void hideProIII(){
-		pro3Layout.setBackgroundColor(Color.parseColor("#80ffffff"));
-		pro3Layout.setClickable(false);
-		
-		AlphaAnimation alpha = new AlphaAnimation(0.5F, 0.5F);
-		alpha.setDuration(0); 
-		alpha.setFillAfter(true); 
-		pro3.startAnimation(alpha);
-		
-		pro3Title.setTextColor(getResources().getColor(R.color.transparent_black));		
-		proStorage3.setTextColor(getResources().getColor(R.color.transparent_black));	
-		storage3.setTextColor(getResources().getColor(R.color.transparent_black));
-		proBandwith3.setTextColor(getResources().getColor(R.color.transparent_black));						
-		bandwidth3.setTextColor(getResources().getColor(R.color.transparent_black));						
-		pricingPerMonth3.setTextColor(getResources().getColor(R.color.transparent_mega));
+		pro3TransparentLayout.setVisibility(View.VISIBLE);
 	}
+	
 	public String sizeTranslation(long size, int type) {
 		switch(type){
 			case 0:{
@@ -543,7 +473,7 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 					size=size/1024;
 				}
 								
-				String value = new DecimalFormat("#").format(size) + "TB";			
+				String value = new DecimalFormat("#").format(size);			
 				return value;
 			}
 		}
@@ -580,6 +510,24 @@ public class UpgradeAccountFragmentLollipop extends Fragment implements MegaRequ
 
 	@Override
 	public void onClick(View v) {
+		switch (v.getId()){
+			case R.id.upgrade_prolite_layout:{
+				onUpgradeLiteClick();
+				break;
+			}
+			case R.id.upgrade_pro_i_layout:{
+				onUpgrade1Click();
+				break;
+			}
+			case R.id.upgrade_pro_ii_layout:{
+				onUpgrade2Click();
+				break;
+			}
+			case R.id.upgrade_pro_iii_layout:{
+				onUpgrade3Click();
+				break;
+			}
+		}
 //		switch (v.getId()){
 //			case R.id.lite_month_button:{
 //				((ManagerActivity)context).launchPayment(ManagerActivity.SKU_PRO_LITE_MONTH);
