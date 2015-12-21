@@ -1,0 +1,398 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    android:id="@+id/scroll_view_monthly_annualy" > 
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/background_secondary">
+        
+        <RelativeLayout 
+            android:id="@+id/monthly_annualy_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/monthly_annualy_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#444444"
+                android:gravity="center_vertical">
+                
+                <TextView 
+                    android:id="@+id/monthly_annualy_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+                <RelativeLayout 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/monthly_annualy_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom">
+                    
+                    <TextView 
+	                    android:id="@+id/monthly_annualy_integer_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"
+	                    android:textSize="35sp"/>
+	                
+	                <TextView 
+	                    android:id="@+id/monthly_annualy_decimal_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"                    
+	                    android:layout_toRightOf="@id/monthly_annualy_integer_text"
+	                    android:layout_alignBottom="@id/monthly_annualy_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp" />
+	                
+	                <TextView 
+	                    android:id="@+id/monthly_annualy_per_month_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/upgrade_orange"
+	                    android:layout_toRightOf="@id/monthly_annualy_decimal_text"
+	                    android:layout_alignBottom="@id/monthly_annualy_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp"
+	                    android:layout_marginLeft="5dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/monthly_annualy_layout_values_select"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/monthly_annualy_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/monthly_annualy_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/monthly_annualy_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/monthly_annualy_storage_value_integer"
+                            android:layout_alignBottom="@id/monthly_annualy_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/monthly_annualy_storage_value_gb"
+                            android:layout_alignBottom="@id/monthly_annualy_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/monthly_annualy_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/monthly_annualy_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/monthly_annualy_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/monthly_annualy_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/monthly_annualy_bandwith_value_tb"
+                            android:layout_alignBottom="@id/monthly_annualy_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+			</RelativeLayout>
+        </RelativeLayout>
+        
+        <RelativeLayout 
+            android:id="@+id/monthly_annualy_layout_select"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+        		<RelativeLayout 
+	                android:id="@+id/monthly_annualy_layout_select_inside"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center">
+	                
+                    <TextView
+	                   android:id="@+id/monthly_annualy_select"
+	                   android:layout_width="wrap_content"
+	                   android:layout_height="wrap_content"
+	                   android:text="@string/upgrade_select_pricing"
+	                   android:textAllCaps="true"
+	                   android:textSize="16sp" 
+	                   android:textColor="@color/upgrade_red"
+	                   android:layout_centerHorizontal="true" />
+	                
+                    <TextView
+	                   android:id="@+id/monthly_annualy_select_comment"
+	                   android:layout_width="wrap_content"
+	                   android:layout_height="wrap_content"
+	                   android:text="@string/select_membership_1"
+	                   android:textSize="16sp" 
+	                   android:layout_marginTop="15dp"
+	                   android:layout_centerHorizontal="true"
+	                   android:layout_below="@id/monthly_annualy_select" />
+                    
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/monthly_annualy_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/monthly_annualy_layout_select_inside"
+	                android:orientation="vertical"/>
+                
+                <LinearLayout 
+                    android:id="@+id/monthly_annualy_buttons_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:orientation="horizontal"
+                    android:background="#e0e0e0"
+                    android:layout_below="@id/monthly_annualy_separator">
+                    
+                    <RelativeLayout 
+                        android:id="@+id/monthly_annualy_monthly_layout"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical">
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_monthly_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAllCaps="true"
+                            android:text="MONTHLY"
+                            android:textSize="20sp"
+                            android:layout_centerHorizontal="true"
+                            android:textColor="@color/upgrade_red"/>
+                        
+						<RelativeLayout 
+		                    android:layout_width="wrap_content"
+		                    android:layout_height="wrap_content"
+		                    android:gravity="bottom"
+		                    android:layout_centerHorizontal="true"
+		                    android:layout_below="@id/monthly_annualy_monthly_text">
+		                    
+		                    <TextView 
+			                    android:id="@+id/monthly_annualy_price_monthly_integer_text"
+			                    android:layout_width="wrap_content"
+			                    android:layout_height="wrap_content"
+			                    android:textSize="35sp"/>
+			                
+			                <TextView 
+			                    android:id="@+id/monthly_annualy_price_monthly_decimal_text"
+			                    android:layout_width="wrap_content"
+			                    android:layout_height="wrap_content"
+			                    android:layout_toRightOf="@id/monthly_annualy_price_monthly_integer_text"
+			                    android:layout_alignBottom="@id/monthly_annualy_price_monthly_integer_text"
+			                    android:layout_marginBottom="5dp"
+			                    android:textSize="16sp" />                    
+	                    </RelativeLayout>
+                    </RelativeLayout>
+                    
+                    <LinearLayout 
+	                    android:id="@+id/monthly_annualy_price_separator"
+	                    android:layout_width="1dp"
+	                    android:layout_height="match_parent"
+	                    android:background="@color/separator_grey"
+	                    android:orientation="vertical"/>
+		                    
+		            <RelativeLayout 
+                        android:id="@+id/monthly_annualy_annualy_layout"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical">
+                        
+                        <TextView 
+                            android:id="@+id/monthly_annualy_annualy_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAllCaps="true"
+                            android:text="ANNUALY"
+                            android:textSize="20sp"
+                            android:layout_centerHorizontal="true"
+                            android:textColor="@color/upgrade_red"/>
+                        
+                        <RelativeLayout 
+		                    android:layout_width="wrap_content"
+		                    android:layout_height="wrap_content"
+		                    android:gravity="bottom"
+		                    android:layout_centerHorizontal="true"
+		                    android:layout_below="@id/monthly_annualy_annualy_text">
+		                    
+		                    <TextView 
+			                    android:id="@+id/monthly_annualy_price_annualy_integer_text"
+			                    android:layout_width="wrap_content"
+			                    android:layout_height="wrap_content"
+			                    android:textSize="35sp"/>
+			                
+			                <TextView 
+			                    android:id="@+id/monthly_annualy_price_annualy_decimal_text"
+			                    android:layout_width="wrap_content"
+			                    android:layout_height="wrap_content"
+			                    android:layout_toRightOf="@id/monthly_annualy_price_annualy_integer_text"
+			                    android:layout_alignBottom="@id/monthly_annualy_price_annualy_integer_text"
+			                    android:layout_marginBottom="5dp"
+			                    android:textSize="16sp"/>                    
+	                    </RelativeLayout>
+                    </RelativeLayout>
+                    
+                </LinearLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/monthly_annualy_subscribe_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:orientation="horizontal"
+                    android:background="#ffffff"
+                    android:layout_below="@id/monthly_annualy_buttons_layout">
+		            
+                    <RelativeLayout 
+                        android:id="@+id/monthly_annualy_subscribe_monthly"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical">
+                        
+                        <TextView 
+		                    android:id="@+id/monthly_annualy_subscribe_monthly_text"
+		                    android:layout_width="wrap_content"
+		                    android:layout_height="wrap_content"
+		                    android:textSize="14sp"
+		                    android:textAllCaps="true"
+		                    android:layout_centerHorizontal="true"
+		                    android:text="@string/general_subscribe"/>
+                        
+                    </RelativeLayout>
+                    
+                    <LinearLayout 
+	                    android:id="@+id/monthly_annualy_subscribe_separator"
+	                    android:layout_width="1dp"
+	                    android:layout_height="match_parent"
+	                    android:background="@color/separator_grey"
+	                    android:orientation="vertical"/>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/monthly_annualy_subscribe_annualy"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical">
+                        
+                        <TextView 
+		                    android:id="@+id/monthly_annualy_subscribe_annualy_text"
+		                    android:layout_width="wrap_content"
+		                    android:layout_height="wrap_content"
+		                    android:textSize="14sp"
+		                    android:textAllCaps="true"
+		                    android:layout_centerHorizontal="true"
+		                    android:text="@string/general_subscribe"/>
+                        
+                    </RelativeLayout>
+                    
+                </LinearLayout>
+                
+                
+                
+        </RelativeLayout>
+        
+        <RelativeLayout 
+            android:id="@+id/monthly_annualy_layout_subscribe_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp"
+            android:gravity="center_vertical">
+                
+            <TextView 
+	            android:id="@+id/monthly_annualy_layout_subscribe_comment_text"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:textSize="14sp"
+	            android:layout_centerHorizontal="true"
+	            android:text="@string/upgrade_comment"
+	            android:layout_marginLeft="5dp"
+	            android:layout_marginRight="5dp"/>
+                
+        </RelativeLayout>
+        
+    </LinearLayout>
+
+</ScrollView>
+   

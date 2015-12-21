@@ -218,7 +218,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 		if(parts.length>0){
 
 			currentFolder= parts[parts.length-1];
-			parts = currentFolder.split(".");
+			parts = currentFolder.split("\\.");
 			
 			currentFolder= currentFolder.replace(".zip", "");
 			
@@ -606,7 +606,7 @@ public class ZipBrowserActivity extends PinActivity implements OnClickListener, 
 			if(parts.length>0){
 
 				currentFolder= parts[parts.length-1];
-				parts = currentFolder.split(".");
+				parts = currentFolder.split("\\.");
 				
 				currentFolder= currentFolder.replace(".zip", "");
 				

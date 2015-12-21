@@ -187,6 +187,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	final public static int OVERQUOTA_ALERT = 5003;
 	final public static int CC_FRAGMENT = 5004;
 	final public static int FORTUMO_FRAGMENT = 5005;
+	final public static int MONTHLY_YEARLY_FRAGMENT = 5006;
+	final public static int CENTILI_FRAGMENT = 5007;
 	
 	//MultipleRequestListener options
 	final public static int MULTIPLE_MOVE = 0;
@@ -348,12 +350,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	long parentHandleSearch;
 	long parentHandleInbox;
 	
-	//NON LOLLIPOP FRAGMENTS
-	private UpgradeAccountFragment upAF;
-	private PaymentFragment pF;
-	private CreditCardFragment ccF;
-	private CameraUploadFragmentLollipop cuF;
-	
 	//LOLLIPOP FRAGMENTS
     private FileBrowserFragmentLollipop fbFLol; 
     private RubbishBinFragmentLollipop rbFLol;
@@ -369,6 +365,13 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	private SearchFragmentLollipop sFLol;
 	private SettingsFragmentLollipop sttFLol;
 	private CameraUploadFragmentLollipop muFLol;
+	private UpgradeAccountFragmentLollipop upAFL;
+	private PaymentFragmentLollipop pFL;
+	private MonthlyAnnualyFragmentLollipop myFL;
+	private FortumoFragmentLollipop fFL;
+	private CentiliFragmentLollipop ctFL;
+	private CreditCardFragmentLollipop ccFL;
+	private CameraUploadFragmentLollipop cuFL;
 	
 	ProgressDialog statusDialog;
 	
@@ -683,9 +686,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             }
             
             if (managerActivity != null){
+            	log("ORIGINAL JSON3:" + purchase.getOriginalJson() + ":::");
             	megaApi.submitPurchaseReceipt(purchase.getOriginalJson(), managerActivity);
             }
             else{
+            	log("ORIGINAL JSON4:" + purchase.getOriginalJson() + ":::");
             	megaApi.submitPurchaseReceipt(purchase.getOriginalJson());
             }
         }
@@ -802,21 +807,22 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
             if (accountDetailsFinished){
             	if (levelInventory > levelAccountDetails){
             		if (maxP != null){
+            			log("ORIGINAL JSON1:" + maxP.getOriginalJson() + ":::");
             			megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), managerActivity);
             		}
             	}
             }
             
             
-            boolean isProIMonthly = false;
-            if (proIMonthly != null){
-            	isProIMonthly = true;
+            boolean isProLiteMonthly = false;
+            if (proLiteMonthly != null){
+            	isProLiteMonthly = true;
             }
-            if (isProIMonthly){
-            	log("PRO I IS SUBSCRIPTED: ORDERID: ***____" + proIMonthly.getOrderId() + "____*****");
+            if (isProLiteMonthly){
+            	log("PRO LITE IS SUBSCRIPTED: ORDERID: ***____" + proLiteMonthly.getOrderId() + "____*****");
             }
             else{
-            	log("PRO I IS NOT SUBSCRIPTED");
+            	log("PRO LITE IS NOT SUBSCRIPTED");
             }
             
             if (!mHelper.subscriptionsSupported()) {
@@ -861,6 +867,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
     	}
     	else if (productId.compareTo(SKU_PRO_LITE_MONTH) == 0){
+    		log("LAUNCH PURCHASE FLOW!");
     		mHelper.launchPurchaseFlow(this,
     				SKU_PRO_LITE_MONTH, IabHelper.ITEM_TYPE_SUBS,
                     RC_REQUEST, mPurchaseFinishedListener, payload);	
@@ -1026,6 +1033,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 //		dbH.setSecondaryFolderHandle(num);
 		//Set toolbar
 		tB = (Toolbar) findViewById(R.id.toolbar);
+		tB.setVisibility(View.VISIBLE);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
         aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
@@ -1580,6 +1588,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     	
     	switch (item){
     		case CLOUD_DRIVE:{
+    			tB.setVisibility(View.VISIBLE);
     			mTabHostContacts.setVisibility(View.GONE);    			
     			viewPagerContacts.setVisibility(View.GONE); 
     			mTabHostShares.setVisibility(View.GONE);
@@ -1932,6 +1941,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case SAVED_FOR_OFFLINE:{
     			
+    			tB.setVisibility(View.VISIBLE);
+    			
     			if (oFLol == null){
     				oFLol = new OfflineFragmentLollipop();
     				oFLol.setIsList(isList);
@@ -1985,16 +1996,19 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case CAMERA_UPLOADS:{
-    			if (cuF == null){
-    				cuF = new CameraUploadFragmentLollipop();
-    				cuF.setIsList(isListCameraUploads);
-    				cuF.setIsLargeGrid(isLargeGridCameraUploads);
-    				cuF.setFirstTimeCam(firstTimeCam);
+    			
+    			tB.setVisibility(View.VISIBLE);
+    			
+    			if (cuFL == null){
+    				cuFL = new CameraUploadFragmentLollipop();
+    				cuFL.setIsList(isListCameraUploads);
+    				cuFL.setIsLargeGrid(isLargeGridCameraUploads);
+    				cuFL.setFirstTimeCam(firstTimeCam);
 				}
 				else{
-					cuF.setIsList(isListCameraUploads);
-					cuF.setIsLargeGrid(isLargeGridCameraUploads);
-					cuF.setFirstTimeCam(firstTimeCam);
+					cuFL.setIsList(isListCameraUploads);
+					cuFL.setIsLargeGrid(isLargeGridCameraUploads);
+					cuFL.setFirstTimeCam(firstTimeCam);
 				}				
 				
     			mTabHostCDrive.setVisibility(View.GONE);
@@ -2004,7 +2018,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			mTabHostShares.setVisibility(View.GONE);    			
     			mTabHostShares.setVisibility(View.GONE);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.fragment_container, cuF, "cuFLol");
+				ft.replace(R.id.fragment_container, cuFL, "cuFLol");
     			ft.commit();
     			
     			
@@ -2049,6 +2063,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
       			break;
     		}
     		case MEDIA_UPLOADS:{
+    			
+    			tB.setVisibility(View.VISIBLE);
+    			
     			if (muFLol == null){
 //    				cuF = new CameraUploadFragmentLollipop(CameraUploadFragmentLollipop.TYPE_MEDIA);
     				muFLol = CameraUploadFragmentLollipop.newInstance(CameraUploadFragmentLollipop.TYPE_MEDIA);
@@ -2110,6 +2127,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
       			break;
     		}
     		case INBOX:{
+    			
+    			tB.setVisibility(View.VISIBLE);
+    			
     			if (iFLol == null){
     				iFLol = new InboxFragmentLollipop();
     				iFLol.setParentHandle(megaApi.getInboxNode().getHandle());
@@ -2184,7 +2204,10 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 
     			break;
     		}
-    		case SHARED_ITEMS:{    			    			
+    		case SHARED_ITEMS:{    
+    			
+    			tB.setVisibility(View.VISIBLE);
+    			
     			if (aB == null){
     				aB = getSupportActionBar();
     			}
@@ -2506,6 +2529,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case CONTACTS:{
+    			
+    			tB.setVisibility(View.VISIBLE);
       			
     			if (aB == null){
     				aB = getSupportActionBar();
@@ -2675,6 +2700,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case SETTINGS:{
+    		
+    			tB.setVisibility(View.VISIBLE);
     			
     			drawerLayout.closeDrawer(Gravity.LEFT);
     			aB.setTitle(getString(R.string.action_settings));
@@ -2705,7 +2732,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case SEARCH:{
-    					
+    			
+    			tB.setVisibility(View.VISIBLE);
+    			
     			if (sFLol == null){
     				sFLol = new SearchFragmentLollipop();
         		}
@@ -2767,6 +2796,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     		case ACCOUNT:{
     			
+    			tB.setVisibility(View.GONE);
+    			
     			accountFragment=MY_ACCOUNT_FRAGMENT;
     			
     			if (maFLol == null){
@@ -2815,6 +2846,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     			break;
     		}
     		case TRANSFERS:{
+    			
+    			tB.setVisibility(View.VISIBLE);
+    			
 				log("select TRANSFERS");
 								
 				drawerItem = DrawerItem.TRANSFERS;
@@ -3029,6 +3063,133 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	}
 	
+	public void showMyAccount(){
+		drawerItem = DrawerItem.ACCOUNT;
+		selectDrawerItemLollipop(drawerItem);
+	}
+	
+	public void showCC(int type, ArrayList<Product> accounts, int payMonth, BitSet paymentBitSet){
+		showCC(type, accounts, payMonth, false, paymentBitSet);
+	}
+	
+	public void showCC(int type, ArrayList<Product> accounts, int payMonth, boolean refresh, BitSet paymentBitSet){
+		
+		if (paymentBitSet == null){
+			if (this.paymentBitSet != null){
+				paymentBitSet = this.paymentBitSet;
+			}
+		}
+		
+		accountFragment = CC_FRAGMENT;
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (!refresh){
+			if (ccFL == null){
+				ccFL = new CreditCardFragmentLollipop();
+				ccFL.setInfo(type, accounts, payMonth, paymentBitSet);
+				ft.replace(R.id.fragment_container, ccFL, "ccF");
+				ft.commit();
+			}
+			else{			
+				ccFL.setInfo(type, accounts, payMonth, paymentBitSet);			
+				ft.replace(R.id.fragment_container, ccFL, "ccF");
+				ft.commit();
+			}
+		}
+		else{
+			Fragment tempF = getSupportFragmentManager().findFragmentByTag("ccF");
+			if (tempF != null){
+				ft.detach(tempF);
+				ft.attach(tempF);
+				ft.commit();
+			}
+			else{
+				if (ccFL == null){
+					ccFL = new CreditCardFragmentLollipop();
+					ccFL.setInfo(type, accounts, payMonth, paymentBitSet);
+					ft.replace(R.id.fragment_container, ccFL, "ccF");
+					ft.commit();
+				}
+				else{			
+					ccFL.setInfo(type, accounts, payMonth, paymentBitSet);			
+					ft.replace(R.id.fragment_container, ccFL, "ccF");
+					ft.commit();
+				}
+			}
+		}
+	}
+	
+	public void showFortumo(){
+		accountFragment = FORTUMO_FRAGMENT;
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (fFL == null){
+			fFL = new FortumoFragmentLollipop();
+			ft.replace(R.id.fragment_container,  fFL, "fF");
+			ft.commit();
+		}
+		else{
+			ft.replace(R.id.fragment_container, fFL, "fF");
+			ft.commit();
+		}
+	}
+	
+	public void showCentili(){
+		accountFragment = CENTILI_FRAGMENT;
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		mTabHostShares.setVisibility(View.GONE);
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (ctFL == null){
+			ctFL = new CentiliFragmentLollipop();
+			ft.replace(R.id.fragment_container,  ctFL, "ctF");
+			ft.commit();
+		}
+		else{
+			ft.replace(R.id.fragment_container, ctFL, "ctF");
+			ft.commit();
+		}
+	}
+	
+	public void showmyF(int paymentMethod, int type, ArrayList<Product> accounts, BitSet paymentBitSet){
+		log("showmyF");
+		
+		if (paymentBitSet == null){
+			if (this.paymentBitSet != null){
+				paymentBitSet = this.paymentBitSet;
+			}
+		}
+		
+		accountFragment = MONTHLY_YEARLY_FRAGMENT;
+		
+		mTabHostCDrive.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
+		mTabHostContacts.setVisibility(View.GONE);    			
+		viewPagerContacts.setVisibility(View.GONE); 
+		mTabHostShares.setVisibility(View.GONE);    			
+		viewPagerShares.setVisibility(View.GONE);
+		
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		if (myFL == null){
+			myFL = new MonthlyAnnualyFragmentLollipop();
+			myFL.setInfo(paymentMethod, type, accounts, paymentBitSet);
+			ft.replace(R.id.fragment_container, myFL, "myF");
+			ft.commit();
+		}
+		else{
+			myFL.setInfo(paymentMethod, type, accounts, paymentBitSet);
+			ft.replace(R.id.fragment_container, myFL, "myF");
+			ft.commit();
+		}
+	}
+	
 	public void showpF(int type, ArrayList<Product> accounts, BitSet paymentBitSet){
 		showpF(type, accounts, false, paymentBitSet);
 	}
@@ -3044,21 +3205,23 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		
 		accountFragment=PAYMENT_FRAGMENT;
 		
+		mTabHostCDrive.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
-		mTabHostShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		if (!refresh){
-			if(pF==null){			
-				pF = new PaymentFragment();
-				pF.setInfo(type, accounts, paymentBitSet);
-				ft.replace(R.id.fragment_container, pF, "pF");
+			if(pFL==null){			
+				pFL = new PaymentFragmentLollipop();
+				pFL.setInfo(type, accounts, paymentBitSet);
+				ft.replace(R.id.fragment_container, pFL, "pF");
 				ft.commit();
 			}
 			else{			
-				pF.setInfo(type, accounts, paymentBitSet);			
-				ft.replace(R.id.fragment_container, pF, "pF");
+				pFL.setInfo(type, accounts, paymentBitSet);			
+				ft.replace(R.id.fragment_container, pFL, "pF");
 				ft.commit();
 			}
 		}
@@ -3070,15 +3233,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				ft.commit();
 			}
 			else{
-				if(pF==null){			
-					pF = new PaymentFragment();
-					pF.setInfo(type, accounts, paymentBitSet);
-					ft.replace(R.id.fragment_container, pF, "pF");
+				if(pFL==null){			
+					pFL = new PaymentFragmentLollipop();
+					pFL.setInfo(type, accounts, paymentBitSet);
+					ft.replace(R.id.fragment_container, pFL, "pF");
 					ft.commit();
 				}
 				else{			
-					pF.setInfo(type, accounts, paymentBitSet);			
-					ft.replace(R.id.fragment_container, pF, "pF");
+					pFL.setInfo(type, accounts, paymentBitSet);			
+					ft.replace(R.id.fragment_container, pFL, "pF");
 					ft.commit();
 				}
 			}
@@ -3107,18 +3270,20 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		mTabHostContacts.setVisibility(View.GONE);    			
 		viewPagerContacts.setVisibility(View.GONE); 
 		mTabHostShares.setVisibility(View.GONE);    			
-		mTabHostShares.setVisibility(View.GONE);
+		viewPagerShares.setVisibility(View.GONE);
+		mTabHostCDrive.setVisibility(View.GONE);
+		viewPagerCDrive.setVisibility(View.GONE);
 		
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		if(upAF==null){
-			upAF = new UpgradeAccountFragment();
-			upAF.setInfo(paymentBitSet);
-			ft.replace(R.id.fragment_container, upAF, "upAF");
+		if(upAFL==null){
+			upAFL = new UpgradeAccountFragmentLollipop();
+			upAFL.setInfo(paymentBitSet);
+			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commit();
 		}
 		else{
-			upAF.setInfo(paymentBitSet);
-			ft.replace(R.id.fragment_container, upAF, "upAF");
+			upAFL.setInfo(paymentBitSet);
+			ft.replace(R.id.fragment_container, upAFL, "upAFL");
 			ft.commit();
 		}
 	}	
@@ -3360,7 +3525,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 	    
 	    else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-	    	if (cuF != null){			
+	    	if (cuFL != null){			
 				
 				//Show
     			upgradeAccountMenuItem.setVisible(false);
@@ -4202,9 +4367,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        		}
 	        	}  
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-	        		if (cuF != null){	        		
-	        			cuF.selectAll();
-	        			if (cuF.showSelectMenuItem()){
+	        		if (cuFL != null){	        		
+	        			cuFL.selectAll();
+	        			if (cuFL.showSelectMenuItem()){
 	        				selectMenuItem.setVisible(true);
 	        				unSelectMenuItem.setVisible(false);
 	        			}
@@ -4218,7 +4383,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        }
 	        case R.id.action_grid_view_large_small:{
 	        	if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-	        		if (cuF != null){
+	        		if (cuFL != null){
 	        			Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
 	        			FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.detach(currentFragment);
@@ -4231,7 +4396,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        			else{
 	        				gridSmallLargeMenuItem.setIcon(getResources().getDrawable(R.drawable.ic_menu_gridview));
 	        			}
-	        			cuF.setIsLargeGrid(isLargeGridCameraUploads);
+	        			cuFL.setIsLargeGrid(isLargeGridCameraUploads);
 
 	        			fragTransaction = getSupportFragmentManager().beginTransaction();
 	        			fragTransaction.attach(currentFragment);
@@ -4275,7 +4440,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 					else{
 						thumbViewMenuItem.setTitle(getString(R.string.action_list));
 	    			}
-	        		if (cuF != null){        			
+	        		if (cuFL != null){        			
         				Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("cuFLol");
         				FragmentTransaction fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.detach(currentFragment);
@@ -4292,7 +4457,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     						searchMenuItem.setVisible(false);
     						
     	    			}
-        				cuF.setIsList(isListCameraUploads);
+        				cuFL.setIsList(isListCameraUploads);
 
         				fragTransaction = getSupportFragmentManager().beginTransaction();
         				fragTransaction.attach(currentFragment);
@@ -5367,7 +5532,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			return;
 	    		}
 	    		case UPGRADE_ACCOUNT_FRAGMENT:{
-	    			if (upAF != null){						
+	    			if (upAFL != null){						
 	    				drawerItem = DrawerItem.ACCOUNT;
 	    				selectDrawerItemLollipop(drawerItem);
 	    				if (nV != null){
@@ -5380,16 +5545,16 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			return;
 	    		}
 	    		case PAYMENT_FRAGMENT:{
-	    			if (pF != null){
-	    				pF.onBackPressed();
+	    			if (pFL != null){
+	    				pFL.onBackPressed();
 	    			}
 	    			return;					
 	    		}
 	    		case CC_FRAGMENT:{
-	    			if (ccF != null){
-	    				int parameterType = ccF.getParameterType();
-	    				ArrayList<Product> accounts = ccF.getAccounts();
-	    				BitSet paymentBitSet = ccF.getPaymentBitSet();
+	    			if (ccFL != null){
+	    				int parameterType = ccFL.getParameterType();
+	    				ArrayList<Product> accounts = ccFL.getAccounts();
+	    				BitSet paymentBitSet = ccFL.getPaymentBitSet();
 	    				showpF(parameterType, accounts, paymentBitSet);
 	    			}
 	    			else{
@@ -5398,7 +5563,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    			return;
 	    		}
 	    		case OVERQUOTA_ALERT:{
-	    			if (upAF != null){						
+	    			if (upAFL != null){						
 	    				drawerItem = DrawerItem.CLOUD_DRIVE;
 	    				if (nV != null){
 							Menu nVMenu = nV.getMenu();
@@ -5408,6 +5573,12 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
 						}
 						selectDrawerItemLollipop(drawerItem);					
+	    			}
+	    			return;
+	    		}
+	    		case MONTHLY_YEARLY_FRAGMENT:{
+	    			if (myFL != null){
+	    				myFL.onBackPressed();
 	    			}
 	    			return;
 	    		}
@@ -5427,8 +5598,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		}
     	}
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			if (cuF != null){    		
-    			if (cuF.onBackPressed() == 0){
+			if (cuFL != null){    		
+    			if (cuFL.onBackPressed() == 0){
     				drawerItem = DrawerItem.CLOUD_DRIVE;
     				if (nV != null){
 						Menu nVMenu = nV.getMenu();
@@ -7365,15 +7536,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				public void onClick(DialogInterface dialog, int which) {
 					//Show UpgradeAccountActivity
 					FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-					if(upAF==null){
-						upAF = new UpgradeAccountFragment();
-						ft.replace(R.id.fragment_container, upAF, "upAF");
+					if(upAFL==null){
+						upAFL = new UpgradeAccountFragmentLollipop();
+						ft.replace(R.id.fragment_container, upAFL, "upAFL");
 						drawerItem = DrawerItem.ACCOUNT;
 						accountFragment=OVERQUOTA_ALERT;
 						ft.commit();
 					}
 					else{			
-						ft.replace(R.id.fragment_container, upAF, "upAF");
+						ft.replace(R.id.fragment_container, upAFL, "upAFL");
 						drawerItem = DrawerItem.ACCOUNT;
 						accountFragment=OVERQUOTA_ALERT;
 						ft.commit();
@@ -7495,6 +7666,28 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		return numberOfSubscriptions;
 	}
 	
+	public void showStatusDialog(String text){
+		ProgressDialog temp = null;
+		try{
+			temp = new ProgressDialog(managerActivity);
+			temp.setMessage(text);
+			temp.show();
+		}
+		catch(Exception e){
+			return;
+		}
+		statusDialog = temp;
+	}
+	
+	public void dismissStatusDialog(){
+		if (statusDialog != null){
+			try{
+				statusDialog.dismiss();
+			}
+			catch(Exception ex){}
+		}
+	}
+	
 	public boolean IsFirstNavigationLevel(){
 		return firstNavigationLevel;
 	}
@@ -7610,17 +7803,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			
 			case R.id.navigation_drawer_account_view:{
 //				Snackbar.make(fragmentContainer, "MyAccount", Snackbar.LENGTH_LONG).show();
-				/*drawerItem = DrawerItem.ACCOUNT;
+				drawerItem = DrawerItem.ACCOUNT;
 				if (nV != null){
 					Menu nVMenu = nV.getMenu();
 					MenuItem hidden = nVMenu.findItem(R.id.navigation_item_hidden);
 					resetNavigationViewMenu(nVMenu);
 					hidden.setChecked(true);
 				}
-				selectDrawerItemLollipop(drawerItem);*/
-				Intent myAccountIntent = new Intent(this, MyAccountMainActivityLollipop.class);
-    			startActivity(myAccountIntent);
-    			drawerLayout.closeDrawer(Gravity.LEFT);
+				selectDrawerItemLollipop(drawerItem);
+//				Intent myAccountIntent = new Intent(this, MyAccountMainActivityLollipop.class);
+//    			startActivity(myAccountIntent);
+//    			drawerLayout.closeDrawer(Gravity.LEFT);
 				break;
 			}
 //			case R.id.top_control_bar:{
@@ -8882,6 +9075,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (inventoryFinished){
 					if (levelAccountDetails < levelInventory){
 						if (maxP != null){
+							log("ORIGINAL JSON2:" + maxP.getOriginalJson() + ":::");
 							megaApi.submitPurchaseReceipt(maxP.getOriginalJson(), this);
 						}
 					}
@@ -9692,7 +9886,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		}
 		else if (request.getType() == MegaRequest.TYPE_SUBMIT_PURCHASE_RECEIPT){
 			if (e.getErrorCode() == MegaError.API_OK){
-//				Toast.makeText(this, "PURCHASE CORRECT!", Toast.LENGTH_LONG).show();
+				log("PURCHASE CORRECT!");
 				drawerItem = DrawerItem.CLOUD_DRIVE;
 				selectDrawerItemLollipop(drawerItem);
 			}
@@ -9834,15 +10028,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			}	
 		}
 		else if (drawerItem == DrawerItem.CAMERA_UPLOADS){
-			if (cuF != null){			
-				if(cuF.isAdded()){
-					long cameraUploadHandle = cuF.getPhotoSyncHandle();
+			if (cuFL != null){			
+				if(cuFL.isAdded()){
+					long cameraUploadHandle = cuFL.getPhotoSyncHandle();
 					MegaNode nps = megaApi.getNodeByHandle(cameraUploadHandle);
 					log("cameraUploadHandle: " + cameraUploadHandle);
 					if (nps != null){
 						log("nps != null");
 						ArrayList<MegaNode> nodes = megaApi.getChildren(nps, MegaApiJava.ORDER_MODIFICATION_DESC);
-						cuF.setNodes(nodes);
+						cuFL.setNodes(nodes);
 					}
 				}				
 			}

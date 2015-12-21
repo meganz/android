@@ -1,0 +1,330 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    android:id="@+id/scroll_view_payment" > 
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/background_secondary">
+        
+        <RelativeLayout 
+            android:id="@+id/payment_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/payment_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#444444"
+                android:gravity="center_vertical">
+                
+                <TextView 
+                    android:id="@+id/payment_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+                <RelativeLayout 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/payment_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom">
+                    
+                    <TextView 
+	                    android:id="@+id/payment_integer_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"
+	                    android:textSize="35sp"/>
+	                
+	                <TextView 
+	                    android:id="@+id/payment_decimal_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"                    
+	                    android:layout_toRightOf="@id/payment_integer_text"
+	                    android:layout_alignBottom="@id/payment_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp" />
+	                
+	                <TextView 
+	                    android:id="@+id/payment_per_month_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/upgrade_orange"
+	                    android:layout_toRightOf="@id/payment_decimal_text"
+	                    android:layout_alignBottom="@id/payment_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp"
+	                    android:layout_marginLeft="5dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/payment_layout_values_select"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/payment_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/payment_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/payment_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/payment_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/payment_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/payment_storage_value_integer"
+                            android:layout_alignBottom="@id/payment_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/payment_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/payment_storage_value_gb"
+                            android:layout_alignBottom="@id/payment_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/payment_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/payment_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/payment_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/payment_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/payment_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/payment_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/payment_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/payment_bandwith_value_tb"
+                            android:layout_alignBottom="@id/payment_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+			</RelativeLayout>
+        </RelativeLayout>
+        
+        <RelativeLayout 
+            android:id="@+id/payment_layout_select"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+        		<RelativeLayout 
+	                android:id="@+id/payment_layout_select_inside"
+	                android:layout_width="match_parent"
+	                android:layout_height="50dp"
+	                android:background="@color/white"
+	                android:gravity="center">
+	                
+                    <TextView
+	                   android:id="@+id/payment_text_payment_method"
+	                   android:layout_width="wrap_content"
+	                   android:layout_height="wrap_content"
+	                   android:text="@string/select_payment_method"
+	                   android:textAllCaps="true"
+	                   android:textSize="16sp" 
+	                   android:textColor="@color/upgrade_red"
+	                   android:layout_centerHorizontal="true" />
+	                
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/payment_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/payment_layout_select_inside"
+	                android:orientation="vertical"/>
+                
+                <RelativeLayout
+		            android:id="@+id/payment_method_google_wallet"
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content"
+		            android:background="@color/white"
+		            android:layout_below="@id/payment_separator">
+		            
+		            <ImageView 
+		                android:id="@+id/payment_method_google_wallet_icon"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:src="@drawable/google_wallet_ic"
+		                android:layout_centerVertical="true"
+		                android:layout_marginLeft="20dp"
+		                android:layout_marginTop="10dp"
+		                android:layout_marginBottom="10dp"/>
+		            
+		            <TextView
+		                android:id="@+id/payment_method_google_wallet_text"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:textSize="16sp"
+		                android:textAllCaps="true"
+		                android:text="@string/payment_method_google_wallet"
+		                android:layout_centerVertical="true"
+		                android:layout_toRightOf="@id/payment_method_google_wallet_icon"
+		                android:layout_marginLeft="20dp"/>
+		        </RelativeLayout>
+	        
+	            <RelativeLayout
+		            android:id="@+id/payment_method_credit_card"
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content"
+		            android:background="@color/white"
+		            android:layout_below="@id/payment_method_google_wallet">
+		            
+		            <ImageView 
+		                android:id="@+id/payment_method_credit_card_icon"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:src="@drawable/cc_ic"
+		                android:layout_centerVertical="true"
+		                android:layout_marginLeft="20dp"
+		                android:layout_marginTop="10dp"
+		                android:layout_marginBottom="10dp"/>
+		            
+		            <TextView
+		                android:id="@+id/payment_method_credit_card_text"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:textSize="16sp"
+		                android:textAllCaps="true"
+		                android:text="@string/payment_method_credit_card"
+		                android:layout_centerVertical="true"
+		                android:layout_toRightOf="@id/payment_method_credit_card_icon"
+		                android:layout_marginLeft="20dp"/>
+		        </RelativeLayout>
+                
+                <RelativeLayout
+		            android:id="@+id/payment_method_fortumo"
+		            android:layout_width="match_parent"
+		            android:layout_height="wrap_content"
+		            android:background="@color/white"
+		            android:layout_below="@id/payment_method_credit_card">
+		            
+		            <ImageView 
+		                android:id="@+id/payment_method_fortumo_icon"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:src="@drawable/fortumo_ic"
+		                android:layout_centerVertical="true"
+		                android:layout_marginLeft="20dp"
+		                android:layout_marginTop="10dp"
+		                android:layout_marginBottom="10dp"/>
+		            
+		            <TextView
+		                android:id="@+id/payment_method_fortumo_text"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:textSize="16sp"
+		                android:textAllCaps="true"
+		                android:text="@string/payment_method_fortumo"
+		                android:layout_centerVertical="true"
+		                android:layout_toRightOf="@id/payment_method_fortumo_icon"
+		                android:layout_marginLeft="20dp"/>
+        	</RelativeLayout>
+        	
+            <RelativeLayout
+	            android:id="@+id/payment_method_centili"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:background="@color/white"
+	            android:layout_below="@id/payment_method_fortumo">
+	            
+	            <ImageView 
+	                android:id="@+id/payment_method_centili_icon"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:src="@drawable/centili_ic"
+	                android:layout_centerVertical="true"
+	                android:layout_marginLeft="20dp"
+	                android:layout_marginTop="10dp"
+	                android:layout_marginBottom="10dp"/>
+	            
+	            <TextView
+	                android:id="@+id/payment_method_centili_text"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:textSize="16sp"
+	                android:textAllCaps="true"
+	                android:text="@string/payment_method_centili"
+	                android:layout_centerVertical="true"
+	                android:layout_toRightOf="@id/payment_method_centili_icon"
+	                android:layout_marginLeft="20dp"/>
+	        </RelativeLayout>
+                
+        </RelativeLayout>
+        
+    </LinearLayout>
+
+</ScrollView>
+   

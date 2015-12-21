@@ -1405,34 +1405,27 @@ public class Util {
 	
 	public static boolean isPaymentMethod(BitSet paymentBitSet, int plan){
 		
-		if (paymentBitSet != null){			
+		boolean r = false;
+		if (paymentBitSet != null){
 			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CREDIT_CARD)){
-				if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
-					return false;
-				}
-				else
-				{
-					log("PAYMENT_METHOD_FORTUMO TRUE");
-					if(plan!=4){
-						log("PLAN NO LITE");
-						return false;
-					}
-					else{
-						log("PLAN LITE");
-						return true;
-					}					
+				r = true;
+			}
+			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)){
+				r = true;
+			}
+			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_FORTUMO)){
+				if (plan == 4){
+					r = true;
 				}
 			}
-			else
-			{
-				log("PAYMENT_METHOD_CREDIT_CARD TRUE");
-				return true;
+			if (!Util.checkBitSet(paymentBitSet, MegaApiAndroid.PAYMENT_METHOD_CENTILI)){
+				if (plan == 4){
+					r = true;
+				}
 			}
 		}
-		else{
-			log("isPaymentMethod FALSE");
-			return false;
-		}
+		
+		return r;
 	}
 	
 	public static int scaleHeightPx(int px, DisplayMetrics metrics){
