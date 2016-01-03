@@ -272,6 +272,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 			fetchingNodesText.setVisibility(View.GONE);
 			prepareNodesText.setVisibility(View.GONE);
 			gSession = credentials.getSession();
+			log("SESSION: " + gSession);
 			megaApi.fastLogin(gSession, this);
 		}
 		else{
@@ -474,48 +475,50 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 //	    createFolderMenuItem = menu.findItem(R.id.cab_menu_create_folder);
 	    
 	    //Check the tab shown
-	    int index = viewPagerExplorer.getCurrentItem();
-		if(index==0){				
-			//CLOUD TAB				
-			String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
-			log("Tag: "+ cFTag2);
-			cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
-			if (cDriveExplorer != null){
-				createFolderMenuItem.setVisible(true);
+		if (viewPagerExplorer != null){
+		    int index = viewPagerExplorer.getCurrentItem();
+			if(index==0){				
+				//CLOUD TAB				
+				String cFTag2 = getFragmentTag(R.id.explorer_tabs_pager, 0);		
+				log("Tag: "+ cFTag2);
+				cDriveExplorer = (CloudDriveExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag2);
+				if (cDriveExplorer != null){
+					createFolderMenuItem.setVisible(true);
+				}
 			}
-		}
-		else{
-			String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);		
-			log("Tag: "+ cFTag1);
-			iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
-			if(iSharesExplorer != null){	
-				log("Level deepBrowserTree: "+iSharesExplorer.deepBrowserTree);
-		    	if (iSharesExplorer.deepBrowserTree==0){
-		    		createFolderMenuItem.setVisible(false);
-		    	}
-		    	else{		    		
-		    		//Check the folder's permissions
-		    		long parentH = iSharesExplorer.getParentHandle();
-		    		MegaNode n = megaApi.getNodeByHandle(parentH);
-					int accessLevel= megaApi.getAccess(n);
-					log("Node: "+n.getName());
-																			
-					switch(accessLevel){
-						case MegaShare.ACCESS_OWNER:
-						case MegaShare.ACCESS_READWRITE:
-						case MegaShare.ACCESS_FULL:{
-							log("The node is: "+n.getName()+" permissions: "+accessLevel);
-							createFolderMenuItem.setVisible(true);				
-							break;
+			else{
+				String cFTag1 = getFragmentTag(R.id.explorer_tabs_pager, 1);		
+				log("Tag: "+ cFTag1);
+				iSharesExplorer = (IncomingSharesExplorerFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag1);
+				if(iSharesExplorer != null){	
+					log("Level deepBrowserTree: "+iSharesExplorer.deepBrowserTree);
+			    	if (iSharesExplorer.deepBrowserTree==0){
+			    		createFolderMenuItem.setVisible(false);
+			    	}
+			    	else{		    		
+			    		//Check the folder's permissions
+			    		long parentH = iSharesExplorer.getParentHandle();
+			    		MegaNode n = megaApi.getNodeByHandle(parentH);
+						int accessLevel= megaApi.getAccess(n);
+						log("Node: "+n.getName());
+																				
+						switch(accessLevel){
+							case MegaShare.ACCESS_OWNER:
+							case MegaShare.ACCESS_READWRITE:
+							case MegaShare.ACCESS_FULL:{
+								log("The node is: "+n.getName()+" permissions: "+accessLevel);
+								createFolderMenuItem.setVisible(true);				
+								break;
+							}
+							case MegaShare.ACCESS_READ:{
+								log("The node is: "+n.getName()+" permissions: ACCESS_READ "+accessLevel);
+								createFolderMenuItem.setVisible(false);
+								break;
+							}						
 						}
-						case MegaShare.ACCESS_READ:{
-							log("The node is: "+n.getName()+" permissions: ACCESS_READ "+accessLevel);
-							createFolderMenuItem.setVisible(false);
-							break;
-						}						
-					}
-		    	}
-		    }
+			    	}
+			    }
+			}
 		}
 	    return super.onPrepareOptionsMenu(menu);
 	}
