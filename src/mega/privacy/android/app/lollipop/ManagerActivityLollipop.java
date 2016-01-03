@@ -7798,6 +7798,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			case R.id.btnRight_upgrade:
 			case R.id.overquota_alert_btnRight_upgrade:{
 				//Add navigation to Upgrade Account
+				getProLayout.setVisibility(View.GONE);
+				showUpAF(null);
 				break;
 			}
 			
