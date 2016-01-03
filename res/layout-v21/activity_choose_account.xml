@@ -1,0 +1,965 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:mySwitch="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_secondary"
+    android:id="@+id/scroll_view_upgrade" > 
+    
+    <LinearLayout
+        android:id="@+id/choose_account_main_linear_layout"
+        android:layout_width="match_parent"  
+    	android:layout_height="wrap_content" 
+    	android:orientation="vertical"
+    	android:background="@color/background_secondary"
+    	android:paddingTop="@dimen/status_bar_height">
+    	
+        <!-- Free -->
+        <RelativeLayout 
+            android:id="@+id/choose_account_free_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_free_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#12a22f"
+                android:gravity="center_vertical">
+            
+                <TextView 
+                    android:id="@+id/choose_account_free_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/free_account"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_free_layout_values_subscribe"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/choose_account_free_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_free_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_free_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_free_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:text="50"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_free_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:text="GB"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_free_storage_value_integer"
+                            android:layout_alignBottom="@id/choose_account_free_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_free_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_free_storage_value_gb"
+                            android:layout_alignBottom="@id/choose_account_free_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_free_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/choose_account_free_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_free_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_free_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:text="@string/free_bandwidth"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_free_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/choose_account_free_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_free_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_free_bandwith_value_tb"
+                            android:layout_alignBottom="@id/choose_account_free_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/choose_account_free_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/choose_account_free_layout_values"
+	                android:orientation="vertical"/>
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_free_layout_continue"
+	                android:layout_width="match_parent"
+	                android:layout_height="50dp"
+	                android:background="@color/white"
+	                android:layout_below="@id/choose_account_free_separator"
+	                android:gravity="center">
+	                
+                    <TextView 
+                        android:id="@+id/choose_account_free_continue_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/general_continue"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+	                
+                </RelativeLayout>
+			</RelativeLayout>
+            
+        </RelativeLayout>
+        
+        <!-- Pro Lite -->
+        <RelativeLayout 
+            android:id="@+id/choose_account_prolite_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_prolite_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#444444"
+                android:gravity="center_vertical">
+                
+                <TextView 
+                    android:id="@+id/choose_account_prolite_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/prolite_account"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+                <RelativeLayout 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/choose_account_prolite_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom">
+                    
+                    <TextView 
+	                    android:id="@+id/choose_account_prolite_integer_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"
+	                    android:textSize="35sp"/>
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_prolite_decimal_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"                    
+	                    android:layout_toRightOf="@id/choose_account_prolite_integer_text"
+	                    android:layout_alignBottom="@id/choose_account_prolite_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp" />
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_prolite_per_month_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/upgrade_orange"
+	                    android:layout_toRightOf="@id/choose_account_prolite_decimal_text"
+	                    android:layout_alignBottom="@id/choose_account_prolite_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp"
+	                    android:layout_marginLeft="5dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_prolite_layout_values_subscribe"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/choose_account_prolite_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_prolite_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_prolite_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_prolite_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_prolite_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_prolite_storage_value_integer"
+                            android:layout_alignBottom="@id/choose_account_prolite_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_prolite_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_prolite_storage_value_gb"
+                            android:layout_alignBottom="@id/choose_account_prolite_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_prolite_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/choose_account_prolite_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_prolite_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_prolite_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_orange"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_prolite_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/choose_account_prolite_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_prolite_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_prolite_bandwith_value_tb"
+                            android:layout_alignBottom="@id/choose_account_prolite_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/choose_account_prolite_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/choose_account_prolite_layout_values"
+	                android:orientation="vertical"/>
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_prolite_layout_subscribe"
+	                android:layout_width="match_parent"
+	                android:layout_height="50dp"
+	                android:background="@color/white"
+	                android:layout_below="@id/choose_account_prolite_separator"
+	                android:gravity="center">
+	                
+                    <TextView 
+                        android:id="@+id/choose_account_prolite_subscribe_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/general_subscribe"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+	                
+                </RelativeLayout>
+			</RelativeLayout>
+			<RelativeLayout 
+                android:id="@+id/choose_account_prolite_layout_transparent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible"
+                android:background="#80ffffff">
+                
+            </RelativeLayout>
+        </RelativeLayout>
+        
+        <!-- Pro I -->
+        <RelativeLayout 
+            android:id="@+id/choose_account_pro_i_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_pro_i_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#444444"
+                android:gravity="center_vertical">
+                
+                <TextView 
+                    android:id="@+id/choose_account_pro_i_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/pro1_account"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+                <RelativeLayout 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/choose_account_pro_i_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom">
+                    
+                    <TextView 
+	                    android:id="@+id/choose_account_pro_i_integer_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"
+	                    android:textSize="35sp"/>
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_pro_i_decimal_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"                    
+	                    android:layout_toRightOf="@id/choose_account_pro_i_integer_text"
+	                    android:layout_alignBottom="@id/choose_account_pro_i_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp" />
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_pro_i_per_month_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/upgrade_red"
+	                    android:layout_toRightOf="@id/choose_account_pro_i_decimal_text"
+	                    android:layout_alignBottom="@id/choose_account_pro_i_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp"
+	                    android:layout_marginLeft="5dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_pro_i_layout_values_subscribe"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/choose_account_pro_i_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_pro_i_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_pro_i_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_i_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_i_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_pro_i_storage_value_integer"
+                            android:layout_alignBottom="@id/choose_account_pro_i_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_i_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_pro_i_storage_value_gb"
+                            android:layout_alignBottom="@id/choose_account_pro_i_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_pro_i_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/choose_account_pro_i_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_i_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_i_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_pro_i_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/choose_account_pro_i_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_i_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_pro_i_bandwith_value_tb"
+                            android:layout_alignBottom="@id/choose_account_pro_i_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/choose_account_pro_i_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/choose_account_pro_i_layout_values"
+	                android:orientation="vertical"/>
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_pro_i_layout_subscribe"
+	                android:layout_width="match_parent"
+	                android:layout_height="50dp"
+	                android:background="@color/white"
+	                android:layout_below="@id/choose_account_pro_i_separator"
+	                android:gravity="center">
+	                
+                    <TextView 
+                        android:id="@+id/choose_account_pro_i_subscribe_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/general_subscribe"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+	                
+                </RelativeLayout>
+			</RelativeLayout>
+			<RelativeLayout 
+                android:id="@+id/choose_account_pro_i_layout_transparent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible">
+                
+            </RelativeLayout>
+        </RelativeLayout>
+        
+        <!-- Pro II -->
+        <RelativeLayout 
+            android:id="@+id/choose_account_pro_ii_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_pro_ii_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#444444"
+                android:gravity="center_vertical">
+                
+                <TextView 
+                    android:id="@+id/choose_account_pro_ii_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                   android:text="@string/pro2_account"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+                <RelativeLayout 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/choose_account_pro_ii_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom">
+                    
+                    <TextView 
+	                    android:id="@+id/choose_account_pro_ii_integer_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"
+	                    android:textSize="35sp"/>
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_pro_ii_decimal_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"                    
+	                    android:layout_toRightOf="@id/choose_account_pro_ii_integer_text"
+	                    android:layout_alignBottom="@id/choose_account_pro_ii_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp" />
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_pro_ii_per_month_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/upgrade_red"
+	                    android:layout_toRightOf="@id/choose_account_pro_ii_decimal_text"
+	                    android:layout_alignBottom="@id/choose_account_pro_ii_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp"
+	                    android:layout_marginLeft="5dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_pro_ii_layout_values_subscribe"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/choose_account_pro_ii_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_pro_ii_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_pro_ii_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_ii_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_ii_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_pro_ii_storage_value_integer"
+                            android:layout_alignBottom="@id/choose_account_pro_ii_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_ii_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_pro_ii_storage_value_gb"
+                            android:layout_alignBottom="@id/choose_account_pro_ii_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_pro_ii_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/choose_account_pro_ii_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_ii_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_ii_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_pro_ii_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/choose_account_pro_ii_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_ii_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_pro_ii_bandwith_value_tb"
+                            android:layout_alignBottom="@id/choose_account_pro_ii_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/choose_account_pro_ii_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/choose_account_pro_ii_layout_values"
+	                android:orientation="vertical"/>
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_pro_ii_layout_subscribe"
+	                android:layout_width="match_parent"
+	                android:layout_height="50dp"
+	                android:background="@color/white"
+	                android:layout_below="@id/choose_account_pro_ii_separator"
+	                android:gravity="center">
+	                
+                    <TextView 
+                        android:id="@+id/choose_account_pro_ii_subscribe_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/general_subscribe"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+	                
+                </RelativeLayout>
+			</RelativeLayout>
+			<RelativeLayout 
+                android:id="@+id/choose_account_pro_ii_layout_transparent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible">
+                
+            </RelativeLayout>
+        </RelativeLayout>
+        
+        <!-- Pro III -->
+        <RelativeLayout 
+            android:id="@+id/choose_account_pro_iii_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:layout_margin="5dp">
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_pro_iii_layout_title"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="#444444"
+                android:gravity="center_vertical">
+                
+                <TextView 
+                    android:id="@+id/choose_account_pro_iii_title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/pro3_account"
+                    android:textAllCaps="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="20dp"
+                    android:textSize="35sp"/>
+                
+                <RelativeLayout 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/choose_account_pro_iii_title_text"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="bottom">
+                    
+                    <TextView 
+	                    android:id="@+id/choose_account_pro_iii_integer_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"
+	                    android:textSize="35sp"/>
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_pro_iii_decimal_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/white"                    
+	                    android:layout_toRightOf="@id/choose_account_pro_iii_integer_text"
+	                    android:layout_alignBottom="@id/choose_account_pro_iii_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp" />
+	                
+	                <TextView 
+	                    android:id="@+id/choose_account_pro_iii_per_month_text"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:textColor="@color/upgrade_red"
+	                    android:layout_toRightOf="@id/choose_account_pro_iii_decimal_text"
+	                    android:layout_alignBottom="@id/choose_account_pro_iii_integer_text"
+	                    android:layout_marginBottom="5dp"
+	                    android:textSize="16sp"
+	                    android:layout_marginLeft="5dp" />
+                </RelativeLayout>
+            </RelativeLayout>
+            
+            <RelativeLayout 
+                android:id="@+id/choose_account_pro_iii_layout_values_subscribe"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:layout_below="@id/choose_account_pro_iii_layout_title">
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_pro_iii_layout_values"
+	                android:layout_width="match_parent"
+	                android:layout_height="100dp"
+	                android:background="@color/white"
+	                android:gravity="center_vertical" >
+	                
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_pro_iii_storage_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_iii_storage_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_iii_storage_value_gb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_pro_iii_storage_value_integer"
+                            android:layout_alignBottom="@id/choose_account_pro_iii_storage_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_iii_storage_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_storage"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_pro_iii_storage_value_gb"
+                            android:layout_alignBottom="@id/choose_account_pro_iii_storage_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                    
+                    <RelativeLayout 
+                        android:id="@+id/choose_account_pro_iii_bandwidth_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/choose_account_pro_iii_storage_layout"
+                        android:gravity="bottom">
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_iii_bandwidth_value_integer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="20sp"
+                            android:layout_marginRight="5dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_iii_bandwith_value_tb"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_red"
+                            android:textSize="16sp"
+                            android:layout_toRightOf="@id/choose_account_pro_iii_bandwidth_value_integer"
+                            android:layout_alignBottom="@id/choose_account_pro_iii_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"/>
+                        
+                        <TextView 
+                            android:id="@+id/choose_account_pro_iii_bandwith_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/upgrade_grey"
+                            android:text="@string/general_bandwidth"
+                            android:textAllCaps="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/choose_account_pro_iii_bandwith_value_tb"
+                            android:layout_alignBottom="@id/choose_account_pro_iii_bandwidth_value_integer"
+                            android:layout_marginBottom="1dp"
+                            android:textSize="16sp"/>
+                        
+                    </RelativeLayout>
+                
+                </RelativeLayout>
+                
+                <LinearLayout 
+                    android:id="@+id/choose_account_pro_iii_separator"
+	                android:layout_width="match_parent"
+	                android:layout_height="1dp"
+	                android:background="@color/separator_grey"
+	                android:layout_below="@id/choose_account_pro_iii_layout_values"
+	                android:orientation="vertical"/>
+                
+                <RelativeLayout 
+	                android:id="@+id/choose_account_pro_iii_layout_subscribe"
+	                android:layout_width="match_parent"
+	                android:layout_height="50dp"
+	                android:background="@color/white"
+	                android:layout_below="@id/choose_account_pro_iii_separator"
+	                android:gravity="center">
+	                
+                    <TextView 
+                        android:id="@+id/choose_account_pro_iii_subscribe_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/general_subscribe"
+                        android:textAllCaps="true"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"/>
+	                
+                </RelativeLayout>
+			</RelativeLayout>
+			<RelativeLayout 
+                android:id="@+id/choose_account_pro_iii_layout_transparent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="invisible">
+                
+            </RelativeLayout>
+        </RelativeLayout>        
+    </LinearLayout>
+</ScrollView>
