@@ -87,6 +87,14 @@
             android:screenOrientation="portrait" >            
         </activity>    
 
+         <activity
+            android:name="mega.privacy.android.app.lollipop.ChooseAccountActivityLollipop"
+            android:label="@string/choose_account_activity" 
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait" >            
+        </activity>
+         
         <activity
             android:name="CreateAccountActivity"
             android:label="@string/create_account_text"

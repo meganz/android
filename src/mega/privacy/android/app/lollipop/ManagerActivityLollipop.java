@@ -1268,6 +1268,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        megaApi.creditCardQuerySubscriptions(this);
 	        
 	        if (drawerItem == null) {
+	        	log("DRAWERITEM NULL");
 	        	drawerItem = DrawerItem.CLOUD_DRIVE;
 	        	Intent intent = getIntent();
 	        	if (intent != null){
@@ -1326,6 +1327,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	        	}
 	        }
 	        else{
+	        	log("DRAWERITEM NOT NULL");
 				drawerLayout.closeDrawer(Gravity.LEFT);
 			}	        
 	        
@@ -5306,6 +5308,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 		} 
 		catch (Exception ex) {}
 		
+		log("DRAWERITEM: " + drawerItem);
+		
 		if (drawerItem == DrawerItem.CLOUD_DRIVE){
 
 			int index = viewPagerCDrive.getCurrentItem();
@@ -5330,7 +5334,9 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						return;
 					}
 				}
-			}			
+			}
+			
+			super.onBackPressed();
 		}
 		else if (drawerItem == DrawerItem.TRANSFERS){
 			if (tFLol != null){    		
@@ -5546,7 +5552,17 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    		}
 	    		case PAYMENT_FRAGMENT:{
 	    			if (pFL != null){
-	    				pFL.onBackPressed();
+	    				if (pFL.onBackPressed() == 0){
+	    					drawerItem = DrawerItem.CLOUD_DRIVE;
+		    				if (nV != null){
+								Menu nVMenu = nV.getMenu();
+								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								resetNavigationViewMenu(nVMenu);
+								cloudDrive.setChecked(true);
+								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+							}
+							selectDrawerItemLollipop(drawerItem);
+	    				}
 	    			}
 	    			return;					
 	    		}
@@ -5644,7 +5660,11 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     				return;
     			}
     		}
-    	}		
+    	}	
+		else{
+			super.onBackPressed();
+			return;
+		}
 	}
 	
 	@Override

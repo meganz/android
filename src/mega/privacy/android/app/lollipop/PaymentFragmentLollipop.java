@@ -92,9 +92,9 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 			aB = ((AppCompatActivity)context).getSupportActionBar();
 		}
 		
-		if (paymentBitSet == null){
+//		if (paymentBitSet == null){
 			megaApi.getPaymentMethods(this);
-		}
+//		}
 
 		Display display = ((Activity) context).getWindowManager().getDefaultDisplay();
 		DisplayMetrics outMetrics = new DisplayMetrics();
@@ -868,9 +868,14 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 	}
 	
 	public int onBackPressed(){
-		((ManagerActivityLollipop)context).showUpAF(paymentBitSet);
-
-		return 3;
+		log("onBackPressed");
+		if (context == null){
+			return 0;
+		}
+		else{		
+			((ManagerActivityLollipop)context).showUpAF(paymentBitSet);
+			return 3;
+		}		
 	}
 	
 	@Override

@@ -993,7 +993,7 @@ public class LoginActivityLollipop extends Activity implements OnClickListener, 
 			}
 			else{
 				Intent intent = new Intent();
-				intent = new Intent(this,ChooseAccountActivity.class);
+				intent = new Intent(this,ChooseAccountActivityLollipop.class);
 				startActivity(intent);
 				finish();				
 			}
