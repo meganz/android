@@ -575,6 +575,10 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		return multipleSelect;
 	}
 	
+	public void setMultipleSelect(boolean multipleSelect){
+		this.multipleSelect = multipleSelect;
+	}
+	
 	public void setOrder(int orderGetChildren){
 		this.orderGetChildren = orderGetChildren;
 	}
@@ -614,6 +618,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 				checkedItems.append(checkedPosition, false);
 			}
 		}
+		this.multipleSelect = false;
 		updateActionModeTitle();
 		notifyDataSetChanged();
 	}
@@ -634,7 +639,7 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 	}
 	
 	private static void log(String log) {
-		Util.log("MegaPhotoSyncGridAdapter", log);
+		Util.log("MegaPhotoSyncGridAdapterLollipop", log);
 	}
 
 	@Override
@@ -890,6 +895,8 @@ public class MegaPhotoSyncGridAdapterLollipop extends RecyclerView.Adapter<MegaP
 		else{
 			holder.textRelativeLayout.setVisibility(View.GONE);
 			for (int i=0;i<numberOfCells;i++){
+				holder.longClickLayoutsSelected.get(i).setVisibility(View.GONE);
+				holder.longClickLayoutsUnselected.get(i).setVisibility(View.GONE);
 				
 				if (monthPic.nodeHandles.size() > i){
 					MegaNode n = megaApi.getNodeByHandle(monthPic.nodeHandles.get(i));
