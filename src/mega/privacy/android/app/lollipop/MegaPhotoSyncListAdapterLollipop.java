@@ -47,7 +47,7 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 		public long timestamp;
 	}
 	
-	private SparseBooleanArray selectedItems;
+	private SparseBooleanArray selectedItems = new SparseBooleanArray();;
 	
 	ViewHolderPhotoSyncList holder = null;
 	
@@ -448,9 +448,9 @@ public class MegaPhotoSyncListAdapterLollipop extends RecyclerView.Adapter<MegaP
 			notifyDataSetChanged();
 		}
 		
-		if(this.multipleSelect){
-			selectedItems = new SparseBooleanArray();
-		}
+//		if(this.multipleSelect){
+//			selectedItems = new SparseBooleanArray();
+//		}
 	}
 	
 	public void setOrder(int orderGetChildren){

@@ -874,9 +874,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			updateActionModeTitle();
 		}
 		else{
-			/*if (adapterGrid != null){
+			if (adapterGrid != null){
 				adapterGrid.selectAll();
-			}*/
+			}
 		}
 	}
 	
@@ -1157,113 +1157,18 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 		}
 	}
 	
-	/*@Override
-    public void onItemClick(AdapterView<?> parent, View view, int position,
-            long id) {
-		
-		if (isList){
-			if (adapterList.isMultipleSelect()){
-				SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
-				if (checkedItems.get(position, false) == true){
-					listView.setItemChecked(position, true);
-				}
-				else{
-					listView.setItemChecked(position, false);
-				}				
-				updateActionModeTitle();
-				adapterList.notifyDataSetChanged();
-			}
-			else{
-				PhotoSyncHolder psH = nodesArray.get(position);
-				if (psH.isNode){
-					MegaNode n = megaApi.getNodeByHandle(psH.handle);
-					if (n.isFolder()){
-						
-					}
-					else{
-						if (MimeTypeList.typeForName(n.getName()).isImage()){
-							int positionInNodes = 0;
-							for (int i=0;i<nodes.size();i++){
-								if(nodes.get(i).getHandle() == n.getHandle()){
-									positionInNodes = i;
-								}
-							}
-							Intent intent = new Intent(context, FullScreenImageViewer.class);
-							intent.putExtra("position", positionInNodes);
-							intent.putExtra("adapterType", ManagerActivity.PHOTO_SYNC_ADAPTER);
-							intent.putExtra("parentNodeHandle", photosyncHandle);
-							intent.putExtra("orderGetChildren", orderGetChildren);
-							startActivity(intent);
-						}
-						else if (MimeTypeList.typeForName(n.getName()).isVideo() || MimeTypeList.typeForName(n.getName()).isAudio() ){
-							Intent service = new Intent(context, MegaStreamingService.class);
-					  		context.startService(service);
-					  		String fileName = n.getName();
-							try {
-								fileName = URLEncoder.encode(fileName, "UTF-8").replaceAll("\\+", "%20");
-							} 
-							catch (UnsupportedEncodingException e) {
-								e.printStackTrace();
-							}
-							
-					  		String url = "http://127.0.0.1:4443/" + n.getBase64Handle() + "/" + fileName;
-					  		String mimeType = MimeTypeList.typeForName(n.getName()).getType();
-					  		System.out.println("FILENAME: " + fileName);
-					  		
-					  		Intent mediaIntent = new Intent(Intent.ACTION_VIEW);
-					  		mediaIntent.setDataAndType(Uri.parse(url), mimeType);
-					  		if (ManagerActivity.isIntentAvailable(context, mediaIntent)){
-					  			startActivity(mediaIntent);
-					  		}
-					  		else{
-					  			Toast.makeText(context, context.getResources().getString(R.string.intent_not_available), Toast.LENGTH_LONG).show();
-					  			adapterList.setPositionClicked(-1);
-								adapterList.notifyDataSetChanged();
-								ArrayList<Long> handleList = new ArrayList<Long>();
-								handleList.add(n.getHandle());
-								((ManagerActivity) context).onFileClick(handleList);
-					  		}
-						}
-						else{
-							adapterList.setPositionClicked(-1);
-							adapterList.notifyDataSetChanged();
-							ArrayList<Long> handleList = new ArrayList<Long>();
-							handleList.add(n.getHandle());
-							((ManagerActivity) context).onFileClick(handleList);
-						}
-					}
-				}
-			}
-		}
-    }*/
-	
-	/*@Override
-	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-		return false;
-		log("onItemLongClick");
-		PhotoSyncHolder psH = nodesArray.get(position);
-		if (psH.isNode){
-			if (adapterList.getPositionClicked() == -1){
-				clearSelections();
-				actionMode = ((ActionBarActivity)context).startSupportActionMode(new ActionBarCallBack());
-				listView.setItemChecked(position, true);
-				adapterList.setMultipleSelect(true);
-				updateActionModeTitle();
-				listView.setOnItemLongClickListener(null);
-			}
-			return true;
-		}
-		return false;
-	}*/
-	
 	/*
 	 * Clear all selected items
 	 */
 	private void clearSelections() {
-		if(adapterList.isMultipleSelect()){
-			adapterList.clearSelections();
+		if (isList){
+			if (adapterList != null){
+				if(adapterList.isMultipleSelect()){
+					adapterList.clearSelections();
+				}
+				updateActionModeTitle();
+			}
 		}
-		updateActionModeTitle();
 	}
 	
 	private void updateActionModeTitle() {
@@ -1330,99 +1235,15 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 		else{
-			/*if (adapterGrid != null){
-				if (adapterGrid.getPositionClicked() != -1){
-					adapterGrid.setPositionClicked(-1);
-					adapterGrid.notifyDataSetChanged();
-					return 1;
-				}
-				else if (adapterGrid.isMultipleSelect()){
+			if (adapterGrid != null){
+				if (adapterGrid.isMultipleSelect()){
 					adapterGrid.hideMultipleSelect();
 					return 2;
 				}
-			}*/
+			}
 		}
 		
 		return 0;
-
-//		if (isList){
-//			parentHandle = adapterList.getParentHandle();
-//			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//			
-//			if (adapterList.getPositionClicked() != -1){
-//				adapterList.setPositionClicked(-1);
-//				adapterList.notifyDataSetChanged();
-//				return 1;
-//			}
-//			else{
-//				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-//				if (parentNode != null){
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//						aB.setTitle(getString(R.string.section_cloud_drive));	
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//					}
-//					else{
-//						aB.setTitle(parentNode.getName());					
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					}
-//					
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = parentNode.getHandle();
-//					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//					adapterList.setNodes(nodes);
-//					listView.setSelection(0);
-//					adapterList.setParentHandle(parentHandle);
-//					return 2;
-//				}
-//				else{
-//					return 0;
-//				}
-//			}
-//		}
-//		else{
-//			parentHandle = adapterGrid.getParentHandle();
-//			((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//			
-//			if (adapterGrid.getPositionClicked() != -1){
-//				adapterGrid.setPositionClicked(-1);
-//				adapterGrid.notifyDataSetChanged();
-//				return 1;
-//			}
-//			else{
-//				MegaNode parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(parentHandle));
-//				if (parentNode != null){
-//					listView.setVisibility(View.VISIBLE);
-//					emptyImageView.setVisibility(View.GONE);
-//					emptyTextView.setVisibility(View.GONE);
-//					if (parentNode.getHandle() == megaApi.getRootNode().getHandle()){
-//						aB.setTitle(getString(R.string.section_cloud_drive));	
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(true);
-//					}
-//					else{
-//						aB.setTitle(parentNode.getName());					
-//						((ManagerActivity)context).getmDrawerToggle().setDrawerIndicatorEnabled(false);
-//					}
-//					
-//					((ManagerActivity)context).supportInvalidateOptionsMenu();
-//					
-//					parentHandle = parentNode.getHandle();
-//					((ManagerActivity)context).setParentHandleBrowser(parentHandle);
-//					nodes = megaApi.getChildren(parentNode, orderGetChildren);
-//					adapterGrid.setNodes(nodes);
-//					listView.setSelection(0);
-//					adapterGrid.setParentHandle(parentHandle);
-//					return 2;
-//				}
-//				else{
-//					return 0;
-//				}
-//			}
-//		}
 	}
 	
 	public long getPhotoSyncHandle(){
@@ -1467,9 +1288,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 		else{
-			/*if (adapterGrid != null){
+			if (adapterGrid != null){
 				adapterGrid.setPhotoSyncHandle(photosyncHandle);
-			}*/
+			}
 		}
 		
 		return photosyncHandle;
@@ -1529,123 +1350,96 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}	
 		}
 		else{
-			/*this.monthPics.clear();
 			
-			Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-			DisplayMetrics outMetrics = new DisplayMetrics ();
-		    display.getMetrics(outMetrics);
-		    float density  = ((Activity)context).getResources().getDisplayMetrics().density;
+			if (outMetrics == null){
+				outMetrics = new DisplayMetrics ();
+			}
 			
-		    float scaleW = Util.getScaleW(outMetrics, density);
-		    float scaleH = Util.getScaleH(outMetrics, density);
-		    
+			listView.setVisibility(View.VISIBLE);
+			emptyImageView.setVisibility(View.GONE);
+			emptyTextView.setVisibility(View.GONE);			
+ 
 		    int totalWidth = outMetrics.widthPixels;
-		    int totalHeight = outMetrics.heightPixels;
-		    float dpWidth  = outMetrics.widthPixels / density;
 		    		    
-		    int numberOfCells = totalWidth / GRID_WIDTH;
-		    if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-		    	if (numberOfCells < 4){
-					numberOfCells = 4;
-				}	
+		    int gridWidth = 0;
+		    int numberOfCells = 0;
+		    if (isLargeGridCameraUploads){
+		    	gridWidth = totalWidth / GRID_LARGE;
+		    	numberOfCells = GRID_LARGE;
 		    }
-		    else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-		    	if (numberOfCells < 3){
-					numberOfCells = 3;
-				}	
+		    else{
+		    	gridWidth = totalWidth / GRID_SMALL;
+		    	numberOfCells = GRID_SMALL;
 		    }
 		    
-			
 			if (monthPics != null){
 				monthPics.clear();
 			}
 			
-			if (megaApi.getNodeByHandle(photosyncHandle) != null){
-				nodes = megaApi.getChildren(megaApi.getNodeByHandle(photosyncHandle), MegaApiJava.ORDER_MODIFICATION_DESC);
-				int month = 0;
-				int year = 0;
-				MegaMonthPic monthPic = new MegaMonthPic();
-				boolean thereAreImages = false;
-				for (int i=0;i<nodes.size();i++){
-					if (nodes.get(i).isFolder()){
-						continue;
-					}
-					
-					if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage()){
-						continue;
-					}
-					
-					Date d = new Date(nodes.get(i).getModificationTime()*1000);
-					if ((month == 0) && (year == 0)){
-						month = d.getMonth();
-						year = d.getYear();
-						monthPic.monthYearString = getImageDateString(month, year);
-						monthPics.add(monthPic);
-						monthPic = new MegaMonthPic();
-						i--;
-					}
-					else if ((month == d.getMonth()) && (year == d.getYear())){
-						thereAreImages = true;
-						if (monthPic.nodeHandles.size() == numberOfCells){
-							monthPics.add(monthPic);
-							monthPic = new MegaMonthPic();
-							monthPic.nodeHandles.add(nodes.get(i).getHandle());
-						}
-						else{
-							monthPic.nodeHandles.add(nodes.get(i).getHandle());
-						}
-					}
-					else{
-						month = d.getMonth();
-						year = d.getYear();
-						monthPics.add(monthPic);
-						monthPic = new MegaMonthPic();
-						monthPic.monthYearString = getImageDateString(month, year);
-						monthPics.add(monthPic);
-						monthPic = new MegaMonthPic();
-						i--;						
-					}
-				}
-				if (nodes.size() > 0){
-					monthPics.add(monthPic);
+			
+			int month = 0;
+			int year = 0;
+			MegaMonthPicLollipop monthPic = new MegaMonthPicLollipop();
+			boolean thereAreImages = false;
+			for (int i=0;i<nodes.size();i++){
+				if (nodes.get(i).isFolder()){
+					continue;
 				}
 				
-				if (!thereAreImages){
-					monthPics.clear();
-					if (emptyImageView != null){
-						emptyImageView.setVisibility(View.VISIBLE);
-						listView.setVisibility(View.GONE);
+				if (!MimeTypeList.typeForName(nodes.get(i).getName()).isImage() && (!MimeTypeList.typeForName(nodes.get(i).getName()).isVideo())){
+					continue;
+				}
+				
+				Date d = new Date(nodes.get(i).getModificationTime()*1000);
+				if ((month == 0) && (year == 0)){
+					month = d.getMonth();
+					year = d.getYear();
+					monthPic.monthYearString = getImageDateString(month, year);
+					monthPics.add(monthPic);
+					monthPic = new MegaMonthPicLollipop();
+					i--;
+				}
+				else if ((month == d.getMonth()) && (year == d.getYear())){
+					thereAreImages = true;
+					if (monthPic.nodeHandles.size() == numberOfCells){
+						monthPics.add(monthPic);
+						monthPic = new MegaMonthPicLollipop();
+						monthPic.nodeHandles.add(nodes.get(i).getHandle());
+					}
+					else{
+						monthPic.nodeHandles.add(nodes.get(i).getHandle());
 					}
 				}
 				else{
-					if (emptyImageView != null){
-						emptyImageView.setVisibility(View.GONE);
-						listView.setVisibility(View.VISIBLE);
-					}
+					month = d.getMonth();
+					year = d.getYear();
+					monthPics.add(monthPic);
+					monthPic = new MegaMonthPicLollipop();
+					monthPic.monthYearString = getImageDateString(month, year);
+					monthPics.add(monthPic);
+					monthPic = new MegaMonthPicLollipop();
+					i--;						
 				}
 			}
+			if (nodes.size() > 0){
+				monthPics.add(monthPic);
+			}
+			
+			if (!thereAreImages){
+				monthPics.clear();
+				emptyImageView.setVisibility(View.VISIBLE);
+				listView.setVisibility(View.GONE);
+			}
 			else{
-				if (emptyImageView != null){
-					emptyImageView.setVisibility(View.VISIBLE);
-					listView.setVisibility(View.GONE);
-				}
+				emptyImageView.setVisibility(View.GONE);
+				listView.setVisibility(View.VISIBLE);
 			}
 			
 			if (adapterGrid != null){
+				log("ADAPTERGRID.MONTHPICS = " + monthPics.size());
+				adapterGrid.setNumberOfCells(numberOfCells, gridWidth);
 				adapterGrid.setNodes(monthPics, nodes);
-				if (adapterGrid.getCount() == 0){
-					listView.setVisibility(View.GONE);
-					emptyImageView.setVisibility(View.VISIBLE);
-					emptyTextView.setVisibility(View.GONE);
-					emptyImageView.setImageResource(R.drawable.ic_empty_folder);
-					emptyTextView.setText(R.string.file_browser_empty_folder);
-				}
-				else{
-					listView.setVisibility(View.VISIBLE);
-					emptyImageView.setVisibility(View.GONE);
-					emptyTextView.setVisibility(View.GONE);
-				}			
-			}*/
+			}
 		}
 	}
 	
@@ -1656,9 +1450,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 		else{
-			/*if (adapterGrid != null){
+			if (adapterGrid != null){
 				adapterGrid.notifyDataSetChanged();
-			}*/
+			}
 		}
 	}
 	
@@ -1690,9 +1484,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 		else{
-			/*if (adapterGrid != null){
+			if (adapterGrid != null){
 				adapterGrid.setOrder(orderGetChildren);
-			}*/
+			}
 		}
 	}
 	
@@ -1703,9 +1497,9 @@ public class CameraUploadFragmentLollipop extends Fragment implements OnClickLis
 			}
 		}
 		else{
-			/*if (adapterGrid != null){
+			if (adapterGrid != null){
 				return adapterGrid.isMultipleSelect();
-			}*/
+			}
 		}
 		
 		return false;
