@@ -56,6 +56,31 @@
 			    android:background="@color/white"
 			    android:layout_below="@id/my_account_image_layout"
 			    android:orientation="vertical">
+                
+                <RelativeLayout
+	                android:id="@+id/my_account_name_layout"
+	                android:layout_width="match_parent"
+	                android:layout_height="wrap_content" 
+	                android:layout_below="@id/contact_properties_image_layout">
+	
+	                <ImageView
+		                android:id="@+id/my_account_name_icon"
+		                style="@style/dialogActionButton"
+		                android:layout_width="wrap_content"
+		                android:layout_height="wrap_content"
+		                android:gravity="left"
+		                android:src="@drawable/ic_link_grey"
+		                android:visibility="invisible" />
+	                
+	                <TextView
+	                    android:id="@+id/my_account_name"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_centerVertical="true"
+	                    android:layout_gravity="left|center_vertical"
+	                    android:textStyle="bold"
+	                    android:layout_toRightOf="@id/my_account_name_icon"/>
+	            </RelativeLayout>
 	            
                 <LinearLayout
 			        android:id="@+id/my_account_email_layout"
@@ -134,14 +159,17 @@
 			            
 			        </LinearLayout>
 			
-			        <Button
-			            android:id="@+id/my_account_account_type_button"
-			            android:layout_width="wrap_content"
-			            android:layout_height="wrap_content"
-			            android:text="@string/my_account_upgrade_pro"
-			            android:background="@color/accentColor"
-			            android:textColor="@android:color/white"
-			            android:layout_alignParentRight="true" />
+			        <TextView
+	                    android:id="@+id/my_account_account_type_button"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content"
+	                    android:layout_alignParentRight="true"
+	                    android:paddingRight="15dp"
+	                    android:layout_centerVertical="true"
+	                    android:textColor="@color/accentColor"
+	                    android:textStyle="bold" 
+	                    android:text="@string/my_account_upgrade_pro"/>
+			        
 			    </RelativeLayout>
 			    
                 <LinearLayout
