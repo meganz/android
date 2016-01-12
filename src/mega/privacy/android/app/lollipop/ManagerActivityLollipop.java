@@ -5319,7 +5319,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				rbFLol = (RubbishBinFragmentLollipop) getSupportFragmentManager().findFragmentByTag(cFTag);
 				if (rbFLol != null){
 					if (rbFLol.onBackPressed() == 0){
-						super.onBackPressed();
+						viewPagerCDrive.setCurrentItem(0);	
 					}
 					return;
 				}
@@ -8350,8 +8350,6 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 			final long[] moveHandles = intent.getLongArrayExtra("MOVE_HANDLES");
 			final long toHandle = intent.getLongExtra("MOVE_TO", 0);
 //			final int totalMoves = moveHandles.length;
-			
-			Toast.makeText(this, "TOHANDLE:" + toHandle, Toast.LENGTH_LONG).show();
 			
 			MegaNode parent = megaApi.getNodeByHandle(toHandle);
 			moveToRubbish = false;
