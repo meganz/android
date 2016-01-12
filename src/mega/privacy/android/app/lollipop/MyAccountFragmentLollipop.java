@@ -34,6 +34,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -45,10 +46,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.format.Time;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -90,6 +93,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView initialLetter;
 	ImageView myAccountImage;
 	
+	TextView nameView;
+	ImageView nameIcon;
+	
 	String myEmail;
 	MegaUser myUser;
 	
@@ -100,7 +106,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 	TextView lastSession;
 	TextView connections;
 	
-	Button upgradeButton;
+	TextView upgradeButton;
 	
 	RelativeLayout typeLayout;
 	LinearLayout expirationLayout;
@@ -172,6 +178,14 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
+		
+		float scaleText;
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
 
 		View v = null;
 		v = inflater.inflate(R.layout.fragment_my_account, container, false);
@@ -229,6 +243,19 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		myAccountImage = (ImageView) v.findViewById(R.id.my_account_toolbar_image);
 		initialLetter = (TextView) v.findViewById(R.id.my_account_toolbar_initial_letter);
 		
+		nameView = (TextView) v.findViewById(R.id.my_account_name);
+		nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+		nameView.setSingleLine();
+		nameView.setTypeface(null, Typeface.BOLD);	
+		
+		nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+		
+		nameIcon = (ImageView) v.findViewById(R.id.my_account_name_icon);
+		RelativeLayout.LayoutParams lpPL = new RelativeLayout.LayoutParams(nameIcon .getLayoutParams());
+		lpPL.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+		nameIcon.setLayoutParams(lpPL);
+		nameIcon.setVisibility(View.INVISIBLE);
+		
 		infoEmail = (TextView) v.findViewById(R.id.my_account_email);
 		typeAccount = (TextView) v.findViewById(R.id.my_account_account_type_text);
 		expirationAccount = (TextView) v.findViewById(R.id.my_account_expiration);
@@ -237,6 +264,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		connections = (TextView) v.findViewById(R.id.my_account_connections);
 		
 		typeLayout = (RelativeLayout) v.findViewById(R.id.my_account_account_type_layout);
+		LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) typeLayout.getLayoutParams();
+		lp.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+		typeLayout.setLayoutParams(lp);
+		
 		expirationLayout = (LinearLayout) v.findViewById(R.id.my_account_expiration_layout);
 		usedSpaceLayout = (LinearLayout) v.findViewById(R.id.my_account_used_space_layout);
 		lastSessionLayout = (LinearLayout) v.findViewById(R.id.my_account_last_session_layout);
@@ -247,7 +278,8 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 		usedSpaceLayout.setVisibility(View.GONE);
 		lastSessionLayout.setVisibility(View.GONE);
 		
-		upgradeButton = (Button) v.findViewById(R.id.my_account_account_type_button);
+		upgradeButton = (TextView) v.findViewById(R.id.my_account_account_type_button);
+		upgradeButton.setText(getString(R.string.my_account_upgrade_pro).toUpperCase(Locale.getDefault()));
 		upgradeButton.setOnClickListener(this);
 		
 		infoEmail.setText(myEmail);
@@ -660,6 +692,18 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 					firstName = true;
 				}
 				if(name&&firstName){
+					if (nameView != null){
+						nameView.setText(nameText+" "+firstNameText);
+						if (nameText != null){
+							if (nameText.length() > 0){
+								String firstLetter = nameText.charAt(0) + "";
+								firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+								initialLetter.setText(firstLetter);
+								initialLetter.setTextSize(100);
+								initialLetter.setTextColor(Color.WHITE);
+							}
+						}
+					}
 					name= false;
 					firstName = false;
 				}
