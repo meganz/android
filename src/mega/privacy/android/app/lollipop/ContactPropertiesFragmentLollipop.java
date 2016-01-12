@@ -26,13 +26,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +75,8 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 	ImageView sharedIcon;
 	ImageView mailIcon;
 	
+	TextView nameView;
+	ImageView nameIcon;
 	TextView infoEmail;
 	View separator;
 	RelativeLayout sharedLayout;
@@ -128,6 +133,14 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 
 		float scaleW = Util.getScaleW(outMetrics, density);
 		float scaleH = Util.getScaleH(outMetrics, density);
+		
+		float scaleText;
+		if (scaleH < scaleW){
+			scaleText = scaleH;
+		}
+		else{
+			scaleText = scaleW;
+		}
 
 		View v = null;
 
@@ -185,7 +198,21 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 			
 			contactPropertiesImage = (ImageView) v.findViewById(R.id.contact_properties_toolbar_image);
 			initialLetter = (TextView) v.findViewById(R.id.contact_properties_toolbar_initial_letter);
-						
+			
+			nameView = (TextView) v.findViewById(R.id.contact_properties_name);
+			nameView.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+			nameView.setSingleLine();
+			nameView.setTypeface(null, Typeface.BOLD);	
+			
+			nameView.setTextSize(TypedValue.COMPLEX_UNIT_SP, (20*scaleText));
+			
+			nameIcon = (ImageView) v.findViewById(R.id.contact_properties_name_icon);
+			RelativeLayout.LayoutParams lpPL = new RelativeLayout.LayoutParams(nameIcon .getLayoutParams());
+			lpPL.setMargins(Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics), Util.scaleWidthPx(3, outMetrics), Util.scaleHeightPx(3, outMetrics));
+			nameIcon.setLayoutParams(lpPL);
+			nameIcon.setVisibility(View.INVISIBLE);
+			
+			
 			//Mail Layout
 			mailLayout = (RelativeLayout) v.findViewById(R.id.contact_properties_email_layout);
 //			RelativeLayout.LayoutParams lpML = new RelativeLayout.LayoutParams(mailLayout.getLayoutParams());
@@ -454,9 +481,18 @@ public class ContactPropertiesFragmentLollipop extends Fragment implements OnCli
 					firstName = true;
 				}
 				if(name&&firstName){
-					/*if (collapsingToolbarLayout != null){
-						collapsingToolbarLayout.setTitle(nameText+" "+firstNameText);
-					}*/
+					if (nameView != null){
+						nameView.setText(nameText+" "+firstNameText);
+						if (nameText != null){
+							if (nameText.length() > 0){
+								String firstLetter = nameText.charAt(0) + "";
+								firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+								initialLetter.setText(firstLetter);
+								initialLetter.setTextSize(100);
+								initialLetter.setTextColor(Color.WHITE);
+							}
+						}
+					}
 					name= false;
 					firstName = false;
 				}
