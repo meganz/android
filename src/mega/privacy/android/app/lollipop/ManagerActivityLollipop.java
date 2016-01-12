@@ -5320,8 +5320,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (rbFLol != null){
 					if (rbFLol.onBackPressed() == 0){
 						super.onBackPressed();
-						return;
 					}
+					return;
 				}
 			}
 			else if(index==0){
@@ -5331,8 +5331,8 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 				if (fbFLol != null){
 					if (fbFLol.onBackPressed() == 0){
 						super.onBackPressed();
-						return;
 					}
+					return;
 				}
 			}
 			
