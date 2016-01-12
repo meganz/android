@@ -9075,7 +9075,15 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 						nVDisplayName.setText(nameText+" "+firstNameText);
 						name= false;
 						firstName = false;
+						
+						String firstLetter = fullName.charAt(0) + "";
+				    	firstLetter = firstLetter.toUpperCase(Locale.getDefault());
+				    	nVPictureProfileTextView.setText(firstLetter);
+				    	nVPictureProfileTextView.setTextSize(32);
+				    	nVPictureProfileTextView.setTextColor(Color.WHITE);
 					}
+					name= false;
+					firstName = false;
 				}
 			}
 			else{
