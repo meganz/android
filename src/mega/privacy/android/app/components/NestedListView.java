@@ -1,3 +1,11 @@
+/*
+ * This code was taken from:
+ * 
+ * http://stackoverflow.com/questions/6210895/listview-inside-scrollview-is-not-scrolling-on-android
+ * Username: Muhammad Aamir Ali
+ * 
+ */
+
 package mega.privacy.android.app.components;
 
 import android.content.Context;

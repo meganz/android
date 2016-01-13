@@ -1,4 +1,6 @@
 /*
+ * https://github.com/MikeOrtiz/TouchImageView
+ * 
  * Copyright (c) 2012 Michael Ortiz
  * TouchImageView.java
  * By: Michael Ortiz
