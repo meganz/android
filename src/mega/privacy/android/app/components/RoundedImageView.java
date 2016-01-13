@@ -1,4 +1,6 @@
 /*
+ * https://github.com/vinc3m1/RoundedImageView/
+ * 
  * Copyright (c) 2014, Vincent Mi
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");

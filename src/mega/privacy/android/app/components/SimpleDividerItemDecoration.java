@@ -1,3 +1,11 @@
+/*
+ * This code was taken from:
+ * 
+ * http://stackoverflow.com/questions/31242812/how-to-add-divider-line-in-recyclerview-in-android
+ * Username: Nilesh
+ * 
+ */
+
 package mega.privacy.android.app.components;
 
 import mega.privacy.android.app.R;
