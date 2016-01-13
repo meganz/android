@@ -17,14 +17,18 @@
             android:id="@+id/upgrade_prolite_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_margin="5dp">
+            android:background="@drawable/card_corner"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="8dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="#444444"
+                android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
                 <TextView 
@@ -79,7 +83,7 @@
                 android:id="@+id/upgrade_prolite_layout_values_subscribe"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="@color/white"
+                android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_prolite_layout_title">
                 
@@ -185,7 +189,7 @@
 	                android:id="@+id/upgrade_prolite_layout_subscribe"
 	                android:layout_width="match_parent"
 	                android:layout_height="50dp"
-	                android:background="@color/white"
+	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_prolite_separator"
 	                android:gravity="center">
 	                
@@ -195,8 +199,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                    	android:textColor="@color/accentColor"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
 			</RelativeLayout>
@@ -215,14 +220,18 @@
             android:id="@+id/upgrade_pro_i_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_margin="5dp">
+            android:background="@drawable/card_corner"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="8dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_i_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="#444444"
+                android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
                 <TextView 
@@ -277,7 +286,7 @@
                 android:id="@+id/upgrade_pro_i_layout_values_subscribe"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="@color/white"
+                android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_pro_i_layout_title">
                 
@@ -383,7 +392,7 @@
 	                android:id="@+id/upgrade_pro_i_layout_subscribe"
 	                android:layout_width="match_parent"
 	                android:layout_height="50dp"
-	                android:background="@color/white"
+	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_pro_i_separator"
 	                android:gravity="center">
 	                
@@ -393,8 +402,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/accentColor"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
 			</RelativeLayout>
@@ -412,14 +422,18 @@
             android:id="@+id/upgrade_pro_ii_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_margin="5dp">
+            android:background="@drawable/card_corner"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="8dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_ii_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="#444444"
+                android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
                 <TextView 
@@ -474,7 +488,7 @@
                 android:id="@+id/upgrade_pro_ii_layout_values_subscribe"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="@color/white"
+                android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_pro_ii_layout_title">
                 
@@ -580,7 +594,7 @@
 	                android:id="@+id/upgrade_pro_ii_layout_subscribe"
 	                android:layout_width="match_parent"
 	                android:layout_height="50dp"
-	                android:background="@color/white"
+	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_pro_ii_separator"
 	                android:gravity="center">
 	                
@@ -590,8 +604,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/accentColor"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
 			</RelativeLayout>
@@ -609,14 +624,18 @@
             android:id="@+id/upgrade_pro_iii_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_margin="5dp">
+            android:background="@drawable/card_corner"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="8dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_iii_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="#444444"
+                android:background="@drawable/card_corner_grey"
                 android:gravity="center_vertical">
                 
                 <TextView 
@@ -671,7 +690,7 @@
                 android:id="@+id/upgrade_pro_iii_layout_values_subscribe"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:background="@color/white"
+                android:background="@drawable/card_corner"
                 android:gravity="center_vertical"
                 android:layout_below="@id/upgrade_pro_iii_layout_title">
                 
@@ -777,7 +796,7 @@
 	                android:id="@+id/upgrade_pro_iii_layout_subscribe"
 	                android:layout_width="match_parent"
 	                android:layout_height="50dp"
-	                android:background="@color/white"
+	                android:background="@drawable/card_corner"
 	                android:layout_below="@id/upgrade_pro_iii_separator"
 	                android:gravity="center">
 	                
@@ -787,8 +806,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/general_subscribe"
                         android:textAllCaps="true"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"/>
+                        android:textColor="@color/accentColor"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"/>
 	                
                 </RelativeLayout>
 			</RelativeLayout>
