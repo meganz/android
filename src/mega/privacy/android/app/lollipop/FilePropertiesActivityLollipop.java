@@ -3,6 +3,7 @@ package mega.privacy.android.app.lollipop;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.nirhart.parallaxscroll.views.ParallaxScrollView;
@@ -441,6 +442,7 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	}
 	
 	private void createOverflowMenu(ListView list){
+		log("createOverflowMenu");
 		ArrayList<String> menuOptions = new ArrayList<String>();
 		
 		MegaNode parent = megaApi.getNodeByHandle(handle);
@@ -491,10 +493,12 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 				}
 				
 				if (node.isExported()){
+					log("node Exported");
 					menuOptions.add(getString(R.string.context_manage_link_menu));
 					menuOptions.add(getString(R.string.context_remove_link_menu));
 				}
 				else{
+					log("node NOT Exported");
 					menuOptions.add(getString(R.string.context_get_link_menu));
 				}
 				menuOptions.add(getString(R.string.context_rename));
@@ -2032,9 +2036,29 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 	public void onNodesUpdate(MegaApiJava api, ArrayList<MegaNode> nodes) {
 		log("onNodesUpdate");
 		
+		boolean thisNode = false;
+		Iterator<MegaNode> it = nodes.iterator();
+		while (it.hasNext()){
+			MegaNode n = it.next();
+			if (n != null){
+				if (n.getHandle() == handle){
+					thisNode = true;
+				}
+			}
+		}
+		
+		if (!thisNode){
+			log("exit onNodesUpdate - Not related to this node");
+			return;
+		}
+		
+		if (handle != -1){
+			log("node updated");
+			node = megaApi.getNodeByHandle(handle);
+		}
 		supportInvalidateOptionsMenu();
 		
-		if(!node.isExported()){
+		if(node.isExported()){
 			log("Node HAS public link");
 			publicLink=true;
 			publicLinkIcon.setVisibility(View.VISIBLE);
@@ -2043,6 +2067,14 @@ public class FilePropertiesActivityLollipop extends PinActivityLollipop implemen
 			log("Node NOT public link");
 			publicLink=false;
 			publicLinkIcon.setVisibility(View.INVISIBLE);
+		}
+		
+		if (overflowMenuList != null){
+			log("overflowMenuList != null");
+			createOverflowMenu(overflowMenuList);
+		}
+		else{
+			log("overflowMenuList == null");
 		}
 		
 		if (node.isFolder()){
