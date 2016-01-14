@@ -64,7 +64,8 @@
     <color name="upgrade_orange">#ffa500</color>
     <color name="upgrade_grey">#8d8d8d</color>
     <color name="upgrade_red">#d90007</color>
-    
+    <color name="upgrade_white">#b9ffffff</color>
+        
     <color name="tab_pressed">#ee0008</color>
     
     <color name="transparent_black">#80000000</color>
