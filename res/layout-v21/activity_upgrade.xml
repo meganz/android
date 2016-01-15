@@ -22,7 +22,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:elevation="8dp">
+            android:elevation="2dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_prolite_layout_title"
@@ -225,7 +225,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:elevation="8dp">
+            android:elevation="2dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_i_layout_title"
@@ -427,7 +427,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:elevation="8dp">
+            android:elevation="2dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_ii_layout_title"
@@ -629,7 +629,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:elevation="8dp">
+            android:elevation="2dp">
             
             <RelativeLayout 
                 android:id="@+id/upgrade_pro_iii_layout_title"
