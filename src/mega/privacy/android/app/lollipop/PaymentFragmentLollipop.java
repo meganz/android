@@ -173,7 +173,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 		
@@ -228,7 +228,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 					
@@ -283,7 +283,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 					
@@ -337,7 +337,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 					
@@ -640,7 +640,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 		
@@ -695,7 +695,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 					
@@ -750,7 +750,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 					
@@ -804,7 +804,7 @@ public class PaymentFragmentLollipop extends Fragment implements MegaRequestList
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 					}
 					
