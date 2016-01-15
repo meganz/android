@@ -194,7 +194,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==1 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -263,7 +263,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==2 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -332,7 +332,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==3 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -400,7 +400,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==4 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -529,7 +529,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==1 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -598,7 +598,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==2 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -667,7 +667,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_red));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_red));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_red));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==3 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
@@ -735,7 +735,7 @@ public class MonthlyAnnualyFragmentLollipop extends Fragment implements MegaRequ
 							storageGb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthInteger.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
 							bandwidthTb.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
-							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_orange));
+							perMonth.setTextColor(context.getResources().getColor(R.color.upgrade_white));
 						}
 						if (account.getLevel()==4 && account.getMonths()==12){
 							double price = account.getAmount()/100.00;
