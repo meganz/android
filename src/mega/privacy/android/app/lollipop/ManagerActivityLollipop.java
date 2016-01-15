@@ -5285,6 +5285,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
         log("Showing alert dialog: " + message);
         bld.create().show();
     }
+    
+    public void showCloudDrive(){
+    	drawerItem = DrawerItem.CLOUD_DRIVE;
+		if (nV != null){
+			Menu nVMenu = nV.getMenu();
+			MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+			resetNavigationViewMenu(nVMenu);
+			cloudDrive.setChecked(true);
+			cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+		}
+		selectDrawerItemLollipop(drawerItem);
+    }
 	
 	@Override
 	public void onBackPressed() {
@@ -5524,16 +5536,18 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
     		switch(accountFragment){
 
 	    		case MY_ACCOUNT_FRAGMENT:{
-	    			if (maFLol != null){						
-	    				drawerItem = DrawerItem.CLOUD_DRIVE;
-	    				if (nV != null){
-							Menu nVMenu = nV.getMenu();
-							MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
-							resetNavigationViewMenu(nVMenu);
-							cloudDrive.setChecked(true);
-							cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
-						}
-						selectDrawerItemLollipop(drawerItem);					
+	    			if (maFLol != null){					
+	    				if (maFLol.onBackPressed() == 0){
+		    				drawerItem = DrawerItem.CLOUD_DRIVE;
+		    				if (nV != null){
+								Menu nVMenu = nV.getMenu();
+								MenuItem cloudDrive = nVMenu.findItem(R.id.navigation_item_cloud_drive);
+								resetNavigationViewMenu(nVMenu);
+								cloudDrive.setChecked(true);
+								cloudDrive.setIcon(getResources().getDrawable(R.drawable.cloud_drive_red));
+							}
+							selectDrawerItemLollipop(drawerItem);					
+	    				}
 	    			}
 	    			return;
 	    		}
