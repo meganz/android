@@ -586,7 +586,7 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 			case R.id.my_account_toolbar_back:{
-				((ManagerActivityLollipop)context).onBackPressed();
+				((ManagerActivityLollipop)context).showCloudDrive();
 				break;
 			}
 			case R.id.my_account_toolbar_overflow:{
@@ -611,6 +611,17 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 				break;
 			}
 		}
+	}
+	
+	public int onBackPressed(){
+		if (overflowMenuLayout != null){
+			if (overflowMenuLayout.getVisibility() == View.VISIBLE){
+				overflowMenuLayout.setVisibility(View.GONE);
+				return 1;
+			}
+		}
+		
+		return 0;
 	}
 
 	public String getDescription(ArrayList<MegaNode> nodes){
@@ -939,6 +950,10 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 						}catch (IOException e) {
 						 e.printStackTrace();
 						}
+						
+						if (overflowMenuList != null){
+							createOverflowMenu(overflowMenuList);
+						}
 			        	
 			            break;
 
@@ -974,6 +989,9 @@ public class MyAccountFragmentLollipop extends Fragment implements OnClickListen
 			        	exportMasterKeyMenuItem.setVisible(true);*/
 			        	String message = getString(R.string.toast_master_key_removed);
 			        	showAlert(message, "MasterKey removed!");
+			        	
+			        	createOverflowMenu(overflowMenuList);
+			        	
 			            break;
 
 			        case DialogInterface.BUTTON_NEGATIVE:
