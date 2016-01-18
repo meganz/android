@@ -862,9 +862,9 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 				int alertTitleId = resources.getIdentifier("alertTitle", "id", "android");
 				TextView alertTitle = (TextView) permissionsDialog.getWindow().getDecorView().findViewById(alertTitleId);
 				alertTitle.setTextColor(resources.getColor(R.color.mega));
-				int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
+				/*int titleDividerId = resources.getIdentifier("titleDivider", "id", "android");
 				View titleDivider = permissionsDialog.getWindow().getDecorView().findViewById(titleDividerId);
-				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));
+				titleDivider.setBackgroundColor(resources.getColor(R.color.mega));*/
 			}
 		}		
 
