@@ -243,6 +243,7 @@ public class FileExplorerActivityLollipop extends PinActivityLollipop implements
 		tB = (Toolbar) findViewById(R.id.toolbar_explorer);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
+		log("aB.setHomeAsUpIndicator_65");
 		aB.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
 		aB.setDisplayHomeAsUpEnabled(true);

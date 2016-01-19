@@ -44,6 +44,7 @@ public class OfflineActivityLollipop extends PinActivityLollipop{
 		tB = (Toolbar) findViewById(R.id.toolbar_activity_offline);
 		setSupportActionBar(tB);
 		aB = getSupportActionBar();
+		log("aB.setHomeAsUpIndicator_29");
 		aB.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white);
         aB.setHomeButtonEnabled(true);
         aB.setDisplayHomeAsUpEnabled(true);
