@@ -6124,7 +6124,7 @@ public class ManagerActivityLollipop extends PinActivityLollipop implements Mega
 	    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 	    params.setMargins(Util.scaleWidthPx(20, outMetrics), Util.scaleHeightPx(20, outMetrics), Util.scaleWidthPx(17, outMetrics), 0);
 	
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
+		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setTextColor(getResources().getColor(R.color.text_secondary));

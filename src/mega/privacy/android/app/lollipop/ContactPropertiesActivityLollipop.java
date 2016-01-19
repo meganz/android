@@ -583,7 +583,7 @@ public class ContactPropertiesActivityLollipop extends PinActivityLollipop imple
 
 	public void showRenameDialog(final MegaNode document, String text) {
 
-		final EditTextCursorWatcher input = new EditTextCursorWatcher(this);
+		final EditTextCursorWatcher input = new EditTextCursorWatcher(this, document.isFolder());
 		input.setId(EDIT_TEXT_ID);
 		input.setSingleLine();
 		input.setImeOptions(EditorInfo.IME_ACTION_DONE);
